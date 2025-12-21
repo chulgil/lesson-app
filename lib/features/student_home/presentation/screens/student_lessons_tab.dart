@@ -236,7 +236,6 @@ class _LessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('M월 d일 (E)', 'ko');
     final timeFormat = DateFormat('HH:mm');
     final daysUntil = lesson.dateTime.difference(DateTime.now()).inDays;
 
