@@ -7,6 +7,7 @@ class TimeSlot {
   final TimeOfDay startTime;
   final TimeOfDay endTime;
   final bool isActive;
+  final DateTime? specificDate; // For custom date-specific slots
 
   const TimeSlot({
     required this.id,
@@ -14,6 +15,7 @@ class TimeSlot {
     required this.startTime,
     required this.endTime,
     this.isActive = true,
+    this.specificDate,
   });
 
   /// Get day name in Korean
@@ -26,6 +28,14 @@ class TimeSlot {
   String get fullDayName {
     const days = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
     return days[dayOfWeek - 1];
+  }
+
+  /// Get formatted display string (with specific date if available)
+  String get displayLabel {
+    if (specificDate != null) {
+      return '${specificDate!.month}/${specificDate!.day}($dayName) $timeRange';
+    }
+    return '$dayName $timeRange';
   }
 
   /// Format time range as string
@@ -58,6 +68,7 @@ class TimeSlot {
     TimeOfDay? startTime,
     TimeOfDay? endTime,
     bool? isActive,
+    DateTime? specificDate,
   }) {
     return TimeSlot(
       id: id ?? this.id,
@@ -65,6 +76,7 @@ class TimeSlot {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       isActive: isActive ?? this.isActive,
+      specificDate: specificDate ?? this.specificDate,
     );
   }
 

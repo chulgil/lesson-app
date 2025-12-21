@@ -19,3 +19,6 @@ export 'piece/piece_providers.dart';
 // Payment providers
 export 'payment/payment_repository_provider.dart';
 export 'payment/payment_providers.dart';
+
+// Booking providers
+export 'booking/booking_providers.dart';

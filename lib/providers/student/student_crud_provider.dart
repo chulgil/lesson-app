@@ -78,7 +78,34 @@ class StudentsNotifier extends AsyncNotifier<List<Student>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repository.getStudents());
   }
+
+  /// Update student status (trial → active, active → paused, etc.)
+  Future<Student> updateStudentStatus(
+      String studentId, StudentStatus status) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateStudentStatus(studentId, status);
+      state = await AsyncValue.guard(() => _repository.getStudents());
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
 }
+
+/// Provider to get students by enrollment status (trial/active/paused/inactive)
+final studentsByEnrollmentStatusProvider =
+    FutureProvider.family<List<Student>, StudentStatus>((ref, status) async {
+  final repository = ref.watch(studentRepositoryProvider);
+  return repository.getStudentsByStatus(status);
+});
+
+/// Trial students provider
+final trialStudentsProvider = FutureProvider<List<Student>>((ref) async {
+  final repository = ref.watch(studentRepositoryProvider);
+  return repository.getStudentsByStatus(StudentStatus.trial);
+});
 
 final studentsNotifierProvider =
     AsyncNotifierProvider<StudentsNotifier, List<Student>>(

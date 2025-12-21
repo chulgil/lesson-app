@@ -11,6 +11,12 @@ abstract class StudentRepository {
   Future<Student> updateStudent(Student student);
   Future<void> deleteStudent(String id);
   Future<List<Student>> searchStudents(String query);
+
+  /// Update student status (trial → active, active → paused, etc.)
+  Future<Student> updateStudentStatus(String studentId, StudentStatus status);
+
+  /// Get students by status
+  Future<List<Student>> getStudentsByStatus(StudentStatus status);
 }
 
 /// Mock implementation for development
@@ -29,6 +35,7 @@ class MockStudentRepository implements StudentRepository {
         id: 'student_1',
         name: '홍길동',
         instrument: '바이올린',
+        status: StudentStatus.active, // Long-term student
         phone: '010-1234-5678',
         parentPhone: '010-9876-5432',
         email: 'hong@example.com',
@@ -47,6 +54,7 @@ class MockStudentRepository implements StudentRepository {
         id: 'student_2',
         name: '김영희',
         instrument: '피아노',
+        status: StudentStatus.active, // Regular student
         phone: '010-2345-6789',
         profileColor: Colors.purple,
         lessonDay: '수요일',
@@ -63,6 +71,7 @@ class MockStudentRepository implements StudentRepository {
         id: 'student_3',
         name: '이철수',
         instrument: '첼로',
+        status: StudentStatus.active, // Recently started regular lessons
         phone: '010-3456-7890',
         parentPhone: '010-8765-4321',
         profileColor: Colors.teal,
@@ -81,6 +90,7 @@ class MockStudentRepository implements StudentRepository {
         id: 'student_4',
         name: '박민수',
         instrument: '바이올린',
+        status: StudentStatus.active, // Veteran student
         phone: '010-4567-8901',
         profileColor: Colors.orange,
         lessonDay: '토요일',
@@ -97,6 +107,7 @@ class MockStudentRepository implements StudentRepository {
         id: 'student_5',
         name: '정수진',
         instrument: '플루트',
+        status: StudentStatus.paused, // On break
         phone: '010-5678-9012',
         profileColor: Colors.pink,
         lessonDay: '목요일',
@@ -109,6 +120,45 @@ class MockStudentRepository implements StudentRepository {
         notes: '시험 기간 휴강',
         createdAt: now.subtract(const Duration(days: 30)),
         isActive: false,
+      ),
+      // Trial student - new
+      Student(
+        id: 'student_6',
+        name: '신유진',
+        instrument: '바이올린',
+        status: StudentStatus.trial, // Trial lesson scheduled
+        phone: '010-6789-0123',
+        profileColor: Colors.amber,
+        lessonDay: '토요일',
+        lessonTime: '14:00',
+        lessonDuration: 30,
+        totalLessons: 0,
+        monthlyLessons: 0,
+        practiceStatus: PracticeStatus.normal,
+        practiceRate: 0,
+        notes: '체험 레슨 예정',
+        createdAt: now.subtract(const Duration(days: 3)),
+        isActive: true,
+      ),
+      // Trial student - pending decision
+      Student(
+        id: 'student_7',
+        name: '한지민',
+        instrument: '피아노',
+        status: StudentStatus.trial, // Trial completed, waiting for decision
+        phone: '010-7890-1234',
+        parentPhone: '010-0987-6543',
+        profileColor: Colors.indigo,
+        lessonDay: '일요일',
+        lessonTime: '11:00',
+        lessonDuration: 30,
+        totalLessons: 1,
+        monthlyLessons: 1,
+        practiceStatus: PracticeStatus.normal,
+        practiceRate: 0,
+        notes: '체험 완료, 정규 등록 대기 중',
+        createdAt: now.subtract(const Duration(days: 7)),
+        isActive: true,
       ),
     ]);
   }
@@ -168,5 +218,31 @@ class MockStudentRepository implements StudentRepository {
             s.name.toLowerCase().contains(lowerQuery) ||
             s.instrument.toLowerCase().contains(lowerQuery))
         .toList();
+  }
+
+  @override
+  Future<Student> updateStudentStatus(String studentId, StudentStatus status) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _students.indexWhere((s) => s.id == studentId);
+    if (index == -1) {
+      throw Exception('Student not found');
+    }
+
+    // Update isActive based on status
+    final isActive = status == StudentStatus.trial || status == StudentStatus.active;
+
+    final updated = _students[index].copyWith(
+      status: status,
+      isActive: isActive,
+      updatedAt: DateTime.now(),
+    );
+    _students[index] = updated;
+    return updated;
+  }
+
+  @override
+  Future<List<Student>> getStudentsByStatus(StudentStatus status) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return _students.where((s) => s.status == status).toList();
   }
 }

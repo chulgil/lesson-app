@@ -1,5 +1,42 @@
 import 'package:flutter/material.dart';
 
+/// Student status enum (enrollment status)
+enum StudentStatus {
+  trial,    // 체험 중
+  active,   // 정규 등록
+  paused,   // 휴강
+  inactive; // 수강 종료
+
+  String get label {
+    switch (this) {
+      case StudentStatus.trial:
+        return '체험';
+      case StudentStatus.active:
+        return '정규';
+      case StudentStatus.paused:
+        return '휴강';
+      case StudentStatus.inactive:
+        return '종료';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case StudentStatus.trial:
+        return const Color(0xFFFF9800); // Orange
+      case StudentStatus.active:
+        return const Color(0xFF4CAF50); // Green
+      case StudentStatus.paused:
+        return const Color(0xFF9E9E9E); // Grey
+      case StudentStatus.inactive:
+        return const Color(0xFFE57373); // Red
+    }
+  }
+
+  /// Check if student is currently enrolled (trial or active)
+  bool get isEnrolled => this == StudentStatus.trial || this == StudentStatus.active;
+}
+
 /// Student level enum
 enum StudentLevel {
   beginner,    // 입문
@@ -78,6 +115,7 @@ class Student {
   final String name;
   final String instrument;
   final StudentLevel level;
+  final StudentStatus status; // Enrollment status (trial, active, paused, inactive)
   final int monthlyFee; // Custom monthly fee (can differ from level default)
   final int lessonsPerWeek; // 1 = 주 1회 (월 4회), 2 = 주 2회 (월 8회)
   final String? phone;
@@ -102,6 +140,7 @@ class Student {
     required this.name,
     required this.instrument,
     this.level = StudentLevel.intermediate,
+    this.status = StudentStatus.trial, // Default to trial for new students
     this.monthlyFee = 200000,
     this.lessonsPerWeek = 1,
     this.phone,
@@ -168,6 +207,7 @@ class Student {
     String? name,
     String? instrument,
     StudentLevel? level,
+    StudentStatus? status,
     int? monthlyFee,
     int? lessonsPerWeek,
     String? phone,
@@ -192,6 +232,7 @@ class Student {
       name: name ?? this.name,
       instrument: instrument ?? this.instrument,
       level: level ?? this.level,
+      status: status ?? this.status,
       monthlyFee: monthlyFee ?? this.monthlyFee,
       lessonsPerWeek: lessonsPerWeek ?? this.lessonsPerWeek,
       phone: phone ?? this.phone,

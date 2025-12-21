@@ -47,6 +47,16 @@ class ProfileTab extends StatelessWidget {
                 onTap: () => context.push(AppRoutes.lessonTimeSettings),
               ),
               _MenuItem(
+                icon: Icons.event_note,
+                label: '예약 관리',
+                onTap: () => context.push(AppRoutes.bookingList),
+              ),
+              _MenuItem(
+                icon: Icons.pending_actions,
+                label: '승인 대기 목록',
+                onTap: () => context.push(AppRoutes.pendingBookings),
+              ),
+              _MenuItem(
                 icon: Icons.payments_outlined,
                 label: '수강료 관리',
                 onTap: () => context.push(AppRoutes.paymentManagement),

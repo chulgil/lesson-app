@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -128,9 +129,15 @@ class _DashboardTab extends ConsumerWidget {
                     ),
                   ],
                 ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.notifications_outlined),
+                Row(
+                  children: [
+                    // Pending bookings button with badge
+                    _buildPendingBookingsButton(context, ref),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.notifications_outlined),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -349,6 +356,51 @@ class _DashboardTab extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPendingBookingsButton(BuildContext context, WidgetRef ref) {
+    // TODO: Replace with actual teacher ID from auth provider
+    const teacherId = 'teacher_1';
+    final pendingCountAsync = ref.watch(pendingBookingsCountProvider(teacherId));
+
+    return pendingCountAsync.when(
+      data: (count) {
+        if (count == 0) return const SizedBox.shrink();
+
+        return Stack(
+          children: [
+            IconButton(
+              onPressed: () => context.push(AppRoutes.pendingBookings),
+              icon: const Icon(Icons.event_note),
+              tooltip: '승인 대기',
+            ),
+            Positioned(
+              right: 4,
+              top: 4,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.error,
+                  shape: BoxShape.circle,
+                ),
+                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                child: Text(
+                  count > 9 ? '9+' : '$count',
+                  style: AppTypography.caption.copyWith(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

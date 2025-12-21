@@ -217,10 +217,34 @@ class _StudentDetailContent extends ConsumerWidget {
                   ),
                 ),
 
-                // Instrument and status
+                // Status, Instrument and Practice badges
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // Enrollment status badge (체험/정규/휴강/종료)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: student.status.color.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        student.status.label,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    // Instrument badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -238,6 +262,7 @@ class _StudentDetailContent extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space2),
+                    // Practice status badge
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -322,13 +347,76 @@ class _StudentDetailContent extends ConsumerWidget {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.pause_circle_outline),
-              title: const Text('휴강 설정'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
+            // Show status change options based on current status
+            if (student.status == StudentStatus.trial) ...[
+              ListTile(
+                leading: Icon(Icons.upgrade, color: AppColors.practiceGood),
+                title: Text(
+                  '정규 전환',
+                  style: TextStyle(color: AppColors.practiceGood),
+                ),
+                subtitle: const Text('체험 학생을 정규 학생으로 전환'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirmed = await _showStatusChangeConfirmation(
+                    context,
+                    '정규 전환',
+                    '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
+                  );
+                  if (confirmed == true) {
+                    await ref
+                        .read(studentsNotifierProvider.notifier)
+                        .updateStudentStatus(student.id, StudentStatus.active);
+                    ref.invalidate(studentProvider(student.id));
+                  }
+                },
+              ),
+            ],
+            if (student.status == StudentStatus.active) ...[
+              ListTile(
+                leading: const Icon(Icons.pause_circle_outline),
+                title: const Text('휴강 설정'),
+                subtitle: const Text('일시적으로 레슨을 중단'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirmed = await _showStatusChangeConfirmation(
+                    context,
+                    '휴강 설정',
+                    '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
+                  );
+                  if (confirmed == true) {
+                    await ref
+                        .read(studentsNotifierProvider.notifier)
+                        .updateStudentStatus(student.id, StudentStatus.paused);
+                    ref.invalidate(studentProvider(student.id));
+                  }
+                },
+              ),
+            ],
+            if (student.status == StudentStatus.paused) ...[
+              ListTile(
+                leading: Icon(Icons.play_circle_outline, color: AppColors.practiceGood),
+                title: Text(
+                  '레슨 재개',
+                  style: TextStyle(color: AppColors.practiceGood),
+                ),
+                subtitle: const Text('휴강 상태를 해제하고 레슨 재개'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final confirmed = await _showStatusChangeConfirmation(
+                    context,
+                    '레슨 재개',
+                    '${student.name} 학생의 레슨을 재개하시겠습니까?',
+                  );
+                  if (confirmed == true) {
+                    await ref
+                        .read(studentsNotifierProvider.notifier)
+                        .updateStudentStatus(student.id, StudentStatus.active);
+                    ref.invalidate(studentProvider(student.id));
+                  }
+                },
+              ),
+            ],
             ListTile(
               leading: Icon(Icons.delete_outline, color: AppColors.error),
               title: Text(
@@ -370,6 +458,30 @@ class _StudentDetailContent extends ConsumerWidget {
               backgroundColor: AppColors.error,
             ),
             child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool?> _showStatusChangeConfirmation(
+    BuildContext context,
+    String title,
+    String message,
+  ) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('확인'),
           ),
         ],
       ),

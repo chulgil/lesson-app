@@ -402,7 +402,7 @@ class _PaymentManagementScreenState
                       ],
                     ),
                     if (payment.status == PaymentStatus.pending)
-                      _buildPaymentActionButton(payment),
+                      Flexible(child: _buildPaymentActionButton(payment)),
                   ],
                 ),
 
@@ -448,71 +448,57 @@ class _PaymentManagementScreenState
   /// Step 1: Student clicks "입금완료" to notify teacher
   /// Step 2: Teacher clicks "입금확인" to confirm payment
   Widget _buildPaymentActionButton(Payment payment) {
-    if (payment.isAwaitingTeacherConfirmation) {
-      // Step 2: Teacher confirmation needed
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FilledButton.icon(
-            onPressed: () => _confirmPayment(payment),
-            icon: const Icon(Icons.check, size: 18),
-            label: const Text('입금확인'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.practiceGood,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space4,
-                vertical: AppSpacing.space2,
-              ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Show notification indicator if student confirmed
+        if (payment.isAwaitingTeacherConfirmation) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: AppSpacing.space1,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '학생 입금완료 알림',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.info,
-              fontSize: 10,
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
-          ),
-        ],
-      );
-    } else {
-      // Step 1: Student confirmation or direct teacher confirm
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Student notification button
-          OutlinedButton.icon(
-            onPressed: () => _markStudentConfirmed(payment),
-            icon: Icon(Icons.notifications, size: 16, color: AppColors.info),
-            label: Text(
-              '입금완료',
-              style: TextStyle(color: AppColors.info),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.info),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.notifications_active,
+                  size: 14,
+                  color: AppColors.info,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '입금알림',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.info,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 8),
-          // Direct confirm button
-          FilledButton.icon(
-            onPressed: () => _confirmPayment(payment),
-            icon: const Icon(Icons.check, size: 16),
-            label: const Text('확인'),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.practiceGood,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
+        ],
+        // Confirm button
+        FilledButton.icon(
+          onPressed: () => _confirmPayment(payment),
+          icon: const Icon(Icons.check, size: 16),
+          label: const Text('입금확인'),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.practiceGood,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space2,
             ),
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
   }
 
   Widget _buildTypeBadge(PaymentType type) {

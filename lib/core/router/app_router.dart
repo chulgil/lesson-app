@@ -10,6 +10,11 @@ import '../../features/profile/presentation/screens/instrument_management_screen
 import '../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
 import '../../features/profile/presentation/screens/payment_management_screen.dart';
 import '../../features/profile/presentation/screens/repertoire_management_screen.dart';
+import '../../features/schedule/presentation/screens/booking_detail_screen.dart';
+import '../../features/schedule/presentation/screens/booking_list_screen.dart';
+import '../../features/schedule/presentation/screens/pending_bookings_screen.dart';
+import '../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
+import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
@@ -38,6 +43,13 @@ class AppRoutes {
   static const repertoireManagement = '/profile/repertoire';
   static const lessonTimeSettings = '/profile/lesson-time';
   static const paymentManagement = '/profile/payments';
+
+  // Schedule routes
+  static const pendingBookings = '/schedule/pending';
+  static const trialLessonRequest = '/schedule/trial/request';
+  static const registerRegularLesson = '/schedule/regular/register';
+  static const bookingList = '/schedule/bookings';
+  static const bookingDetail = '/schedule/booking/:id';
 }
 
 /// App router configuration
@@ -150,6 +162,68 @@ class AppRouter {
         path: AppRoutes.paymentManagement,
         name: 'paymentManagement',
         builder: (context, state) => const PaymentManagementScreen(),
+      ),
+
+      // Schedule - Pending Bookings
+      GoRoute(
+        path: AppRoutes.pendingBookings,
+        name: 'pendingBookings',
+        builder: (context, state) {
+          final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+          return PendingBookingsScreen(teacherId: teacherId);
+        },
+      ),
+
+      // Schedule - Trial Lesson Request
+      GoRoute(
+        path: AppRoutes.trialLessonRequest,
+        name: 'trialLessonRequest',
+        builder: (context, state) {
+          final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+          final teacherName = state.uri.queryParameters['teacherName'] ?? '선생님';
+          final studentId = state.uri.queryParameters['studentId']; // Optional
+          return TrialLessonRequestScreen(
+            teacherId: teacherId,
+            teacherName: teacherName,
+            studentId: studentId,
+          );
+        },
+      ),
+
+      // Schedule - Register Regular Lesson
+      GoRoute(
+        path: AppRoutes.registerRegularLesson,
+        name: 'registerRegularLesson',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return RegisterRegularLessonScreen(
+            teacherId: extra?['teacherId'] ?? 'teacher_1',
+            teacherName: extra?['teacherName'] ?? '선생님',
+            studentId: extra?['studentId'],
+            studentName: extra?['studentName'],
+          );
+        },
+      ),
+
+      // Schedule - Booking List
+      GoRoute(
+        path: AppRoutes.bookingList,
+        name: 'bookingList',
+        builder: (context, state) {
+          return BookingListScreen(
+            teacherId: state.uri.queryParameters['teacherId'],
+            studentId: state.uri.queryParameters['studentId'],
+          );
+        },
+      ),
+
+      // Schedule - Booking Detail
+      GoRoute(
+        path: AppRoutes.bookingDetail,
+        name: 'bookingDetail',
+        builder: (context, state) => BookingDetailScreen(
+          bookingId: state.pathParameters['id'] ?? '',
+        ),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -5,3 +5,4 @@ export 'practice_repository.dart';
 export 'settings_repository.dart';
 export 'piece_repository.dart';
 export 'payment_repository.dart';
+export 'booking_repository.dart';

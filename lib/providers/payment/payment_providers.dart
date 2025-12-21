@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/payment.dart';
+import '../../models/student.dart';
 import '../../repositories/payment_repository.dart';
+import '../student/student_crud_provider.dart';
 import 'payment_repository_provider.dart';
 
 /// All payments provider
@@ -100,6 +102,7 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
   }
 
   /// Mark payment as completed (teacher confirmation - step 2)
+  /// Also updates student status: regular payment → active status
   Future<void> markAsCompleted(String paymentId) async {
     final current = state.value;
     if (current == null) return;
@@ -110,6 +113,19 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
       paymentDate: DateTime.now(),
       updatedAt: DateTime.now(),
     ));
+
+    // Auto-update student status when regular payment is confirmed
+    // Trial → remains trial (need explicit upgrade)
+    // Regular payment confirmed → student becomes active
+    if (payment.type == PaymentType.regular) {
+      try {
+        await ref
+            .read(studentsNotifierProvider.notifier)
+            .updateStudentStatus(payment.studentId, StudentStatus.active);
+      } catch (_) {
+        // If student update fails, don't fail the payment update
+      }
+    }
   }
 
   /// Mark payment as student confirmed (step 1)

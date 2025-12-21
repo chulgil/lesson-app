@@ -392,7 +392,7 @@ class _StudentCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name and instrument
+                    // Name, status, and instrument
                     Row(
                       children: [
                         Text(
@@ -402,6 +402,27 @@ class _StudentCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),
+                        // Status badge (체험/정규/휴강/종료)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: student.status.color.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            student.status.label,
+                            style: AppTypography.caption.copyWith(
+                              color: student.status.color,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.space1),
+                        // Instrument badge
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
