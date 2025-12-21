@@ -46,7 +46,7 @@ class PendingBookingsScreen extends ConsumerWidget {
                   booking: booking,
                   showActions: true,
                   onTap: () {
-                    context.push('/schedule/trial/${booking.id}/review');
+                    context.push('/schedule/booking/${booking.id}');
                   },
                   onApprove: () async {
                     final confirmed = await _showApproveConfirmation(context);

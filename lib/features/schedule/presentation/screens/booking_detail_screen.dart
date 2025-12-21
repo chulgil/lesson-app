@@ -410,11 +410,10 @@ class BookingDetailScreen extends ConsumerWidget {
       height: AppSpacing.buttonHeight,
       child: FilledButton.icon(
         onPressed: () {
-          // Navigate to time selection with teacher pre-selected
-          context.push('/schedule/trial/select-time', extra: {
-            'teacherId': booking.teacherId,
-            'teacherName': booking.teacherName,
-          });
+          // Navigate to trial lesson request with teacher pre-selected
+          context.push(
+            '/schedule/trial/request?teacherId=${booking.teacherId}&teacherName=${Uri.encodeComponent(booking.teacherName)}',
+          );
         },
         icon: const Icon(Icons.refresh),
         label: const Text('다른 시간으로 다시 신청'),

@@ -1113,9 +1113,9 @@ class _TrialBookingCard extends ConsumerWidget {
   }
 
   void _onRetry(BuildContext context) {
-    // Navigate to time selection with teacher pre-selected
+    // Navigate to trial lesson request with teacher pre-selected
     context.push(
-      '/schedule/trial/select-time?teacherId=${booking.teacherId}&teacherName=${booking.teacherName}',
+      '/schedule/trial/request?teacherId=${booking.teacherId}&teacherName=${Uri.encodeComponent(booking.teacherName)}',
     );
   }
 }
