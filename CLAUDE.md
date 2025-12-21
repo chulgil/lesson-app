@@ -25,25 +25,40 @@ lib/
 │   │   ├── app_colors.dart
 │   │   ├── app_typography.dart
 │   │   ├── app_spacing.dart
-│   └── └── app_theme.dart
+│   │   └── app_theme.dart
 │   ├── router/               # 라우팅
 │   │   └── app_router.dart
 │   ├── constants/            # 상수
 │   └── utils/                # 유틸리티
 ├── features/                 # 기능별 모듈
 │   ├── auth/                 # 인증
-│   │   └── presentation/
-│   │       ├── screens/
-│   │       └── widgets/
 │   ├── home/                 # 홈/대시보드
 │   ├── students/             # 학생 관리
 │   ├── lessons/              # 레슨 관리
 │   ├── practice/             # 연습 관리
-│   └── profile/              # 프로필
+│   ├── profile/              # 프로필 및 설정
+│   │   └── presentation/screens/
+│   │       ├── profile_tab.dart
+│   │       ├── payment_management_screen.dart
+│   │       ├── lesson_time_settings_screen.dart
+│   │       └── repertoire_management_screen.dart
+│   └── student_home/         # 학생용 화면
 ├── shared/                   # 공유 위젯
 │   └── widgets/
-├── services/                 # 서비스 (API, Storage)
-└── models/                   # 데이터 모델
+├── models/                   # 데이터 모델
+│   ├── student.dart          # 학생 모델 (레벨, 수강료)
+│   ├── payment.dart          # 결제 모델 (체험/정규, 주차)
+│   ├── lesson.dart           # 레슨 모델
+│   └── piece.dart            # 곡 모델
+├── repositories/             # 데이터 저장소
+│   ├── student_repository.dart
+│   ├── payment_repository.dart
+│   └── lesson_repository.dart
+├── providers/                # Riverpod 상태관리
+│   ├── student/
+│   ├── payment/
+│   └── lesson/
+└── services/                 # 서비스 (API, Storage)
 ```
 
 ---
@@ -112,20 +127,97 @@ flutter build apk
 
 | # | 기능 | 상태 |
 |---|------|------|
-| 1 | 로그인 (Google/Kakao) | 🔄 UI 완료 |
-| 2 | 선생님 대시보드 | 🔄 UI 완료 |
-| 3 | 학생 대시보드 | ⏳ 대기 |
-| 4 | 학생 관리 목록 | ⏳ 대기 |
-| 5 | 레슨 캘린더 | ⏳ 대기 |
-| 6 | 레슨 상세 (녹음) | ⏳ 대기 |
-| 7 | 연습 체크리스트 | ⏳ 대기 |
+| 1 | 로그인 (Google/Kakao) | ✅ UI 완료 |
+| 2 | 선생님 대시보드 | ✅ UI 완료 |
+| 3 | 학생 대시보드 | ✅ UI 완료 |
+| 4 | 학생 관리 목록 | ✅ 구현 완료 |
+| 5 | 레슨 캘린더 | ✅ 구현 완료 |
+| 6 | 레슨 노트/녹음 | ✅ 구현 완료 |
+| 7 | 연습 체크리스트 | 🔄 진행 중 |
+| 8 | 수강료 관리 | ✅ 구현 완료 |
 
 ### 추가 기능 (Phase 1+)
 
-- 푸시 알림
-- AI 레슨 요약 (Whisper + Claude)
-- 연습 통계/리포트
-- 결제 시스템
+| 기능 | 상태 |
+|------|------|
+| 2단계 입금확인 (학생→선생님) | ✅ 완료 |
+| 월 4/8회 레슨 횟수 설정 | ✅ 완료 |
+| 푸시 알림 / 알림 시스템 | 예정 |
+| AI 레슨 요약 (Whisper + Claude) | 예정 |
+| 연습 통계/리포트 | 예정 |
+
+---
+
+## 수강료 관리 시스템
+
+### 개요
+
+선생님이 학생별 수강료를 관리하고, 입금 상태를 추적하는 기능
+
+### 데이터 모델
+
+#### StudentLevel (학생 레벨)
+| 레벨 | 한글명 | 기본 월 수강료 |
+|------|--------|----------------|
+| beginner | 입문 | 160,000원 |
+| elementary | 초급 | 180,000원 |
+| intermediate | 중급 | 200,000원 |
+| advanced | 고급 | 240,000원 |
+
+#### PaymentType (결제 유형)
+| 유형 | 설명 |
+|------|------|
+| trial | 체험 레슨 (1회, 기본 30,000원) |
+| regular | 정규 레슨 (월/주 단위) |
+
+#### PaymentStatus (결제 상태)
+| 상태 | 설명 |
+|------|------|
+| pending | 입금 대기 |
+| completed | 입금 완료 |
+| cancelled | 취소 |
+| refunded | 환불 |
+
+### 주요 기능
+
+1. **결제 유형 분리**: 체험 레슨과 정규 레슨 구분
+2. **주차 범위 설정**: 월 전체(1~4주) 또는 부분 기간(예: 3~4주) 선택
+3. **레벨별 자동 금액**: 학생 레벨에 따라 기본 수강료 자동 설정
+4. **입금 확인**: 선생님이 실제 입금 확인 후 상태 변경
+
+### 완료된 기능
+
+#### 2단계 입금확인 시스템
+학생이 먼저 "입금완료"를 알리고, 선생님이 계좌 확인 후 "입금확인" 처리하는 2단계 워크플로우
+
+| 단계 | 액션 | 상태 표시 |
+|------|------|-----------|
+| 1단계 | 학생이 "입금완료" 버튼 클릭 | "확인 대기" (🔔 아이콘) |
+| 2단계 | 선생님이 계좌 확인 후 "입금확인" | "완료" |
+
+**관련 필드**:
+- `Payment.studentConfirmed`: 학생 입금완료 표시 여부
+- `Payment.studentConfirmedAt`: 학생 입금완료 표시 시간
+- `Payment.isAwaitingTeacherConfirmation`: 선생님 확인 대기 여부
+- `Payment.displayStatus`: 2단계 상태 고려한 표시 상태
+
+#### 월 4/8회 레슨 횟수 설정
+주 1회(월 4회) 또는 주 2회(월 8회) 레슨 횟수 설정 기능
+
+| 설정 | 월 레슨 횟수 | 회당 수강료 계산 |
+|------|-------------|-----------------|
+| 주 1회 | 4회 | 월 수강료 ÷ 4 |
+| 주 2회 | 8회 | 월 수강료 ÷ 8 |
+
+**관련 필드**:
+- `Student.lessonsPerWeek`: 주당 레슨 횟수 (1 또는 2)
+- `Student.monthlyLessonCount`: 월 레슨 횟수 (lessonsPerWeek × 4)
+- `Student.lessonFee`: 회당 수강료 (monthlyFee ÷ monthlyLessonCount)
+- `Student.lessonFrequency`: 표시용 문자열 ("주 1회 (월 4회)")
+
+### 향후 계획
+
+- [ ] SMS 자동 감지 (Android)
 
 ---
 

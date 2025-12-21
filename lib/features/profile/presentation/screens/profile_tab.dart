@@ -34,17 +34,22 @@ class ProfileTab extends StatelessWidget {
               _MenuItem(
                 icon: Icons.music_note,
                 label: '악기 관리',
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.instrumentManagement),
               ),
               _MenuItem(
                 icon: Icons.library_music,
                 label: '레퍼토리 관리',
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.repertoireManagement),
               ),
               _MenuItem(
                 icon: Icons.schedule,
                 label: '레슨 시간 설정',
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.lessonTimeSettings),
+              ),
+              _MenuItem(
+                icon: Icons.payments_outlined,
+                label: '수강료 관리',
+                onTap: () => context.push(AppRoutes.paymentManagement),
               ),
             ],
           ),

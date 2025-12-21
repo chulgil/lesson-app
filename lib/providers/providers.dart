@@ -9,3 +9,13 @@ export 'student/student_providers.dart';
 
 // Practice providers
 export 'practice/practice_providers.dart';
+
+// Settings providers
+export 'settings/settings_providers.dart';
+
+// Piece providers
+export 'piece/piece_providers.dart';
+
+// Payment providers
+export 'payment/payment_repository_provider.dart';
+export 'payment/payment_providers.dart';

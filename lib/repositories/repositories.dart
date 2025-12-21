@@ -2,3 +2,6 @@
 export 'student_repository.dart';
 export 'lesson_repository.dart';
 export 'practice_repository.dart';
+export 'settings_repository.dart';
+export 'piece_repository.dart';
+export 'payment_repository.dart';

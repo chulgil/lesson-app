@@ -3,3 +3,6 @@ export 'student.dart';
 export 'lesson.dart';
 export 'practice.dart';
 export 'piece.dart';
+export 'time_slot.dart';
+export 'teacher_settings.dart';
+export 'payment.dart';

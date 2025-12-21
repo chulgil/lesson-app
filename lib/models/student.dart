@@ -1,5 +1,43 @@
 import 'package:flutter/material.dart';
 
+/// Student level enum
+enum StudentLevel {
+  beginner,    // 입문
+  elementary,  // 초급
+  intermediate, // 중급
+  advanced;    // 고급
+
+  String get label {
+    switch (this) {
+      case StudentLevel.beginner:
+        return '입문';
+      case StudentLevel.elementary:
+        return '초급';
+      case StudentLevel.intermediate:
+        return '중급';
+      case StudentLevel.advanced:
+        return '고급';
+    }
+  }
+
+  /// Default monthly fee for each level
+  int get defaultMonthlyFee {
+    switch (this) {
+      case StudentLevel.beginner:
+        return 160000;
+      case StudentLevel.elementary:
+        return 180000;
+      case StudentLevel.intermediate:
+        return 200000;
+      case StudentLevel.advanced:
+        return 240000;
+    }
+  }
+
+  /// Default trial lesson fee
+  static int get defaultTrialFee => 30000;
+}
+
 /// Practice status enum
 enum PracticeStatus {
   good,
@@ -39,6 +77,9 @@ class Student {
   final String id;
   final String name;
   final String instrument;
+  final StudentLevel level;
+  final int monthlyFee; // Custom monthly fee (can differ from level default)
+  final int lessonsPerWeek; // 1 = 주 1회 (월 4회), 2 = 주 2회 (월 8회)
   final String? phone;
   final String? parentPhone;
   final String? email;
@@ -60,6 +101,9 @@ class Student {
     required this.id,
     required this.name,
     required this.instrument,
+    this.level = StudentLevel.intermediate,
+    this.monthlyFee = 200000,
+    this.lessonsPerWeek = 1,
     this.phone,
     this.parentPhone,
     this.email,
@@ -78,6 +122,37 @@ class Student {
     this.isActive = true,
   });
 
+  /// Monthly lesson count based on lessons per week
+  int get monthlyLessonCount => lessonsPerWeek * 4;
+
+  /// Calculate per-lesson fee (monthly / lesson count)
+  int get lessonFee => (monthlyFee / monthlyLessonCount).round();
+
+  /// Get formatted lesson frequency
+  String get lessonFrequency =>
+      lessonsPerWeek == 1 ? '주 1회 (월 4회)' : '주 2회 (월 8회)';
+
+  /// Get short lesson frequency label
+  String get lessonFrequencyShort => lessonsPerWeek == 1 ? '주1회' : '주2회';
+
+  /// Format monthly fee as Korean won
+  String get formattedMonthlyFee {
+    final formatter = monthlyFee.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
+    return '$formatter원';
+  }
+
+  /// Format lesson fee as Korean won
+  String get formattedLessonFee {
+    final formatter = lessonFee.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+        );
+    return '$formatter원';
+  }
+
   /// Get first character of name for avatar
   String get initial => name.isNotEmpty ? name[0] : '?';
 
@@ -92,6 +167,9 @@ class Student {
     String? id,
     String? name,
     String? instrument,
+    StudentLevel? level,
+    int? monthlyFee,
+    int? lessonsPerWeek,
     String? phone,
     String? parentPhone,
     String? email,
@@ -113,6 +191,9 @@ class Student {
       id: id ?? this.id,
       name: name ?? this.name,
       instrument: instrument ?? this.instrument,
+      level: level ?? this.level,
+      monthlyFee: monthlyFee ?? this.monthlyFee,
+      lessonsPerWeek: lessonsPerWeek ?? this.lessonsPerWeek,
       phone: phone ?? this.phone,
       parentPhone: parentPhone ?? this.parentPhone,
       email: email ?? this.email,

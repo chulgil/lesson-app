@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../models/student.dart';
 
 /// Screen for adding a new student
 class AddStudentScreen extends StatefulWidget {
@@ -23,6 +25,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final _notesController = TextEditingController();
 
   String? _selectedInstrument;
+  StudentLevel _selectedLevel = StudentLevel.intermediate;
+  late TextEditingController _monthlyFeeController;
+  int _lessonsPerWeek = 1; // 1 = 주 1회 (월 4회), 2 = 주 2회 (월 8회)
   int _lessonDuration = 60;
   final Set<int> _selectedDays = {};
   TimeOfDay _lessonTime = const TimeOfDay(hour: 14, minute: 0);
@@ -43,12 +48,21 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final List<String> _dayNames = ['월', '화', '수', '목', '금', '토', '일'];
 
   @override
+  void initState() {
+    super.initState();
+    _monthlyFeeController = TextEditingController(
+      text: _selectedLevel.defaultMonthlyFee.toString(),
+    );
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _parentNameController.dispose();
     _parentPhoneController.dispose();
+    _monthlyFeeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -100,6 +114,14 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               _buildSectionTitle('악기'),
               const SizedBox(height: AppSpacing.space3),
               _buildInstrumentSelector(),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Level and tuition section
+              _buildSectionTitle('레벨 및 수강료'),
+              _buildSectionSubtitle('레벨에 따라 기본 수강료가 설정됩니다'),
+              const SizedBox(height: AppSpacing.space3),
+              _buildLevelAndTuitionSection(),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -321,6 +343,269 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           ),
       ],
     );
+  }
+
+  Widget _buildLevelAndTuitionSection() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Level selector
+          Text(
+            '레벨',
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Wrap(
+            spacing: AppSpacing.space2,
+            runSpacing: AppSpacing.space2,
+            children: StudentLevel.values.map((level) {
+              final isSelected = _selectedLevel == level;
+              return ChoiceChip(
+                label: Text(level.label),
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    setState(() {
+                      _selectedLevel = level;
+                      _monthlyFeeController.text =
+                          level.defaultMonthlyFee.toString();
+                    });
+                  }
+                },
+                backgroundColor: AppColors.surfaceLight,
+                selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.primary,
+                side: BorderSide(
+                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                ),
+                labelStyle: AppTypography.bodySmall.copyWith(
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.textPrimaryLight,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              );
+            }).toList(),
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+          const Divider(),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Monthly fee
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '월 수강료',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      '기본: ${_formatCurrencyInMan(_selectedLevel.defaultMonthlyFee)}',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 140,
+                    child: TextFormField(
+                      controller: _monthlyFeeController,
+                      decoration: InputDecoration(
+                        suffixText: '원',
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.space3,
+                          vertical: AppSpacing.space2,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusMedium),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderSide:
+                              const BorderSide(color: AppColors.borderLight),
+                        ),
+                      ),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
+                      textAlign: TextAlign.end,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      onChanged: (_) => setState(() {}),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  Text(
+                    _formatCurrencyInMan(
+                      int.tryParse(_monthlyFeeController.text) ?? 0,
+                    ),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+          const Divider(),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Lesson frequency selector
+          Text(
+            '레슨 횟수',
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFrequencyOption(
+                  value: 1,
+                  title: '주 1회',
+                  subtitle: '월 4회',
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: _buildFrequencyOption(
+                  value: 2,
+                  title: '주 2회',
+                  subtitle: '월 8회',
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space3),
+
+          // Info about custom fee
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    '수강료를 직접 수정하면 레벨 기본값과 다르게 설정됩니다',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFrequencyOption({
+    required int value,
+    required String title,
+    required String subtitle,
+  }) {
+    final isSelected = _lessonsPerWeek == value;
+    return GestureDetector(
+      onTap: () => setState(() => _lessonsPerWeek = value),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : AppColors.surfaceSecondaryLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isSelected)
+                  Icon(
+                    Icons.check_circle,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
+                if (isSelected) const SizedBox(width: 4),
+                Text(
+                  title,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textPrimaryLight,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: AppTypography.caption.copyWith(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.8)
+                    : AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Format amount in 만원 units (e.g., 200000 -> "20만원", 65000 -> "6.5만원")
+  String _formatCurrencyInMan(int amount) {
+    final manWon = amount / 10000;
+    if (manWon == manWon.toInt()) {
+      return '${manWon.toInt()}만원';
+    } else {
+      // Show one decimal place for partial amounts
+      return '${manWon.toStringAsFixed(1)}만원';
+    }
   }
 
   Widget _buildScheduleSection() {
@@ -677,6 +962,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     }
 
     // TODO: Save student to database
+    final monthlyFee = int.tryParse(_monthlyFeeController.text) ??
+        _selectedLevel.defaultMonthlyFee;
+
     final studentData = {
       'name': _nameController.text,
       'phone': _phoneController.text,
@@ -684,6 +972,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       'parentName': _parentNameController.text,
       'parentPhone': _parentPhoneController.text,
       'instrument': _selectedInstrument,
+      'level': _selectedLevel.name,
+      'monthlyFee': monthlyFee,
+      'lessonsPerWeek': _lessonsPerWeek,
       'lessonDays': _selectedDays.map((i) => _dayNames[i]).toList(),
       'lessonTime': _formatTime(_lessonTime),
       'lessonDuration': _lessonDuration,

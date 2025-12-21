@@ -6,6 +6,10 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lessons/presentation/screens/add_lesson_screen.dart';
 import '../../features/lessons/presentation/screens/edit_lesson_screen.dart';
 import '../../features/lessons/presentation/screens/lesson_detail_screen.dart';
+import '../../features/profile/presentation/screens/instrument_management_screen.dart';
+import '../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
+import '../../features/profile/presentation/screens/payment_management_screen.dart';
+import '../../features/profile/presentation/screens/repertoire_management_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
@@ -30,6 +34,10 @@ class AppRoutes {
   static const editLesson = '/lessons/:id/edit';
   static const practice = '/practice';
   static const profile = '/profile';
+  static const instrumentManagement = '/profile/instruments';
+  static const repertoireManagement = '/profile/repertoire';
+  static const lessonTimeSettings = '/profile/lesson-time';
+  static const paymentManagement = '/profile/payments';
 }
 
 /// App router configuration
@@ -116,7 +124,33 @@ class AppRouter {
         ),
       ),
 
-      // TODO: Add more routes as screens are implemented
+      // Instrument Management
+      GoRoute(
+        path: AppRoutes.instrumentManagement,
+        name: 'instrumentManagement',
+        builder: (context, state) => const InstrumentManagementScreen(),
+      ),
+
+      // Repertoire Management
+      GoRoute(
+        path: AppRoutes.repertoireManagement,
+        name: 'repertoireManagement',
+        builder: (context, state) => const RepertoireManagementScreen(),
+      ),
+
+      // Lesson Time Settings
+      GoRoute(
+        path: AppRoutes.lessonTimeSettings,
+        name: 'lessonTimeSettings',
+        builder: (context, state) => const LessonTimeSettingsScreen(),
+      ),
+
+      // Payment Management
+      GoRoute(
+        path: AppRoutes.paymentManagement,
+        name: 'paymentManagement',
+        builder: (context, state) => const PaymentManagementScreen(),
+      ),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
