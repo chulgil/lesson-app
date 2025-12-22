@@ -10,6 +10,9 @@ export 'student/student_providers.dart';
 // Practice providers
 export 'practice/practice_providers.dart';
 
+// Practice repertoire providers
+export 'practice_repertoire/practice_repertoire_providers.dart';
+
 // Settings providers
 export 'settings/settings_providers.dart';
 

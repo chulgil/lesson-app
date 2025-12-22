@@ -16,6 +16,11 @@ import '../../features/schedule/presentation/screens/pending_bookings_screen.dar
 import '../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
 import '../../features/schedule/presentation/screens/select_teacher_screen.dart';
 import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
+import '../../features/practice/presentation/screens/practice_repertoire_screen.dart';
+import '../../features/practice/presentation/screens/add_repertoire_screen.dart';
+import '../../features/practice/presentation/screens/repertoire_detail_screen.dart';
+import '../../features/practice/presentation/screens/add_section_screen.dart';
+import '../../features/practice/presentation/screens/section_detail_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
@@ -52,6 +57,13 @@ class AppRoutes {
   static const registerRegularLesson = '/schedule/regular/register';
   static const bookingList = '/schedule/bookings';
   static const bookingDetail = '/schedule/booking/:id';
+
+  // Practice routes
+  static const practiceRepertoire = '/practice/repertoire';
+  static const addRepertoire = '/practice/repertoire/add';
+  static const repertoireDetail = '/practice/repertoire/:id';
+  static const addSection = '/practice/section/add';
+  static const sectionDetail = '/practice/section/:id';
 }
 
 /// App router configuration
@@ -233,6 +245,70 @@ class AppRouter {
         builder: (context, state) => BookingDetailScreen(
           bookingId: state.pathParameters['id'] ?? '',
         ),
+      ),
+
+      // Practice - Repertoire List
+      GoRoute(
+        path: AppRoutes.practiceRepertoire,
+        name: 'practiceRepertoire',
+        builder: (context, state) {
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          return PracticeRepertoireScreen(studentId: studentId);
+        },
+      ),
+
+      // Practice - Add Repertoire
+      GoRoute(
+        path: AppRoutes.addRepertoire,
+        name: 'addRepertoire',
+        builder: (context, state) {
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          return AddRepertoireScreen(studentId: studentId);
+        },
+      ),
+
+      // Practice - Repertoire Detail
+      GoRoute(
+        path: AppRoutes.repertoireDetail,
+        name: 'repertoireDetail',
+        builder: (context, state) {
+          final repertoireId = state.pathParameters['id'] ?? '';
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          return RepertoireDetailScreen(
+            repertoireId: repertoireId,
+            studentId: studentId,
+          );
+        },
+      ),
+
+      // Practice - Add Section
+      GoRoute(
+        path: AppRoutes.addSection,
+        name: 'addSection',
+        builder: (context, state) {
+          final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          return AddSectionScreen(
+            repertoireId: repertoireId,
+            studentId: studentId,
+          );
+        },
+      ),
+
+      // Practice - Section Detail
+      GoRoute(
+        path: AppRoutes.sectionDetail,
+        name: 'sectionDetail',
+        builder: (context, state) {
+          final sectionId = state.pathParameters['id'] ?? '';
+          final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          return SectionDetailScreen(
+            sectionId: sectionId,
+            repertoireId: repertoireId,
+            studentId: studentId,
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

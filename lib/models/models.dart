@@ -8,3 +8,4 @@ export 'teacher.dart';
 export 'teacher_settings.dart';
 export 'payment.dart';
 export 'lesson_booking.dart';
+export 'practice_repertoire.dart';

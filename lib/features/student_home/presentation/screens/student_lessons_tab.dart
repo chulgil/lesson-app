@@ -1,224 +1,291 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../models/lesson_booking.dart';
+import '../../../../providers/booking/booking_providers.dart';
 
 /// Student lessons tab showing upcoming and past lessons
-class StudentLessonsTab extends StatefulWidget {
+class StudentLessonsTab extends ConsumerWidget {
   const StudentLessonsTab({super.key});
 
-  @override
-  State<StudentLessonsTab> createState() => _StudentLessonsTabState();
-}
-
-class _StudentLessonsTabState extends State<StudentLessonsTab>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  // TODO: Replace with actual student ID from auth
+  static const _currentStudentId = 'student_1';
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final studentBookings = ref.watch(studentBookingsProvider(_currentStudentId));
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+    final trialBookings = studentBookings.whenOrNull(
+          data: (bookings) => bookings
+              .where((b) => b.lessonType == LessonType.trial)
+              .where((b) => b.status.isActive || b.status.canRetry)
+              .toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+        ) ??
+        [];
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
+    final upcomingLessons = _mockUpcomingLessons();
+    final pastLessons = _mockPastLessons();
+
+    // Group past lessons by month
+    final groupedPastLessons = <String, List<_StudentLessonData>>{};
+    for (final lesson in pastLessons) {
+      final monthKey = DateFormat('yyyy년 M월', 'ko').format(lesson.dateTime);
+      groupedPastLessons.putIfAbsent(monthKey, () => []).add(lesson);
+    }
+
+    return CustomScrollView(
+      slivers: [
         // Header
-        Container(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space4,
-            AppSpacing.screenPadding,
-            0,
+        SliverToBoxAdapter(
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space4,
+              AppSpacing.screenPadding,
+              0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('내 레슨', style: AppTypography.headingLarge),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.calendar_month_outlined),
+                  tooltip: '캘린더 보기',
+                ),
+              ],
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('내 레슨', style: AppTypography.headingLarge),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.calendar_month_outlined),
-                tooltip: '캘린더 보기',
+        ),
+
+        // Trial Lesson Button
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space3,
+              AppSpacing.screenPadding,
+              0,
+            ),
+            child: _buildTrialLessonButton(context),
+          ),
+        ),
+
+        // Trial Lesson Bookings Section
+        if (trialBookings.isNotEmpty) ...[
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenPadding,
+                AppSpacing.space4,
+                AppSpacing.screenPadding,
+                AppSpacing.space3,
               ),
-            ],
+              child: Text('내 체험레슨', style: AppTypography.headingSmall),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                  child: TrialBookingCard(booking: trialBookings[index]),
+                ),
+                childCount: trialBookings.length,
+              ),
+            ),
+          ),
+        ],
+
+        // Loading state for bookings
+        if (studentBookings.isLoading)
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space4),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+
+        // Upcoming Lessons Section
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space4,
+              AppSpacing.screenPadding,
+              AppSpacing.space3,
+            ),
+            child: Text('예정된 레슨', style: AppTypography.headingSmall),
           ),
         ),
 
-        // Tabs
-        Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.screenPadding,
-            vertical: AppSpacing.space3,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-          child: TabBar(
-            controller: _tabController,
-            indicator: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        if (upcomingLessons.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space4,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.event_available,
+                      size: 32,
+                      color: AppColors.textTertiaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space3),
+                    Expanded(
+                      child: Text(
+                        '예정된 레슨이 없습니다',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            indicatorSize: TabBarIndicatorSize.tab,
-            dividerColor: Colors.transparent,
-            labelColor: Colors.white,
-            unselectedLabelColor: AppColors.textSecondaryLight,
-            labelStyle: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
             ),
-            tabs: const [
-              Tab(text: '예정된 레슨'),
-              Tab(text: '지난 레슨'),
-            ],
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _LessonCard(
+                  lesson: upcomingLessons[index],
+                  isUpcoming: true,
+                ),
+                childCount: upcomingLessons.length,
+              ),
+            ),
+          ),
+
+        // Past Lessons Section
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space4,
+              AppSpacing.screenPadding,
+              AppSpacing.space3,
+            ),
+            child: Text('지난 레슨', style: AppTypography.headingSmall),
           ),
         ),
 
-        // Tab content
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: const [
-              _UpcomingLessonsView(),
-              _PastLessonsView(),
-            ],
-          ),
+        if (pastLessons.isEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space4,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.history,
+                      size: 32,
+                      color: AppColors.textTertiaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space3),
+                    Expanded(
+                      child: Text(
+                        '지난 레슨이 없습니다',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          ...groupedPastLessons.entries.expand((entry) => [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.screenPadding,
+                      AppSpacing.space2,
+                      AppSpacing.screenPadding,
+                      AppSpacing.space2,
+                    ),
+                    child: Text(
+                      entry.key,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.screenPadding,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => _LessonCard(
+                        lesson: entry.value[index],
+                        isUpcoming: false,
+                      ),
+                      childCount: entry.value.length,
+                    ),
+                  ),
+                ),
+              ]),
+
+        // Bottom padding
+        const SliverToBoxAdapter(
+          child: SizedBox(height: AppSpacing.space6),
         ),
       ],
     );
   }
-}
 
-/// Upcoming lessons view
-class _UpcomingLessonsView extends StatelessWidget {
-  const _UpcomingLessonsView();
-
-  @override
-  Widget build(BuildContext context) {
-    final upcomingLessons = _mockUpcomingLessons();
-
-    if (upcomingLessons.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      itemCount: upcomingLessons.length,
-      itemBuilder: (context, index) {
-        return _LessonCard(
-          lesson: upcomingLessons[index],
-          isUpcoming: true,
-        );
-      },
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.event_available,
-            size: 64,
-            color: AppColors.textTertiaryLight,
+  /// Build trial lesson button
+  Widget _buildTrialLessonButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: FilledButton.icon(
+        onPressed: () {
+          context.push(AppRoutes.selectTeacher);
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('새로운 선생님과 레슨하기'),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '예정된 레슨이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            '선생님이 레슨을 예약하면 여기에 표시됩니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Past lessons view
-class _PastLessonsView extends StatelessWidget {
-  const _PastLessonsView();
-
-  @override
-  Widget build(BuildContext context) {
-    final pastLessons = _mockPastLessons();
-
-    if (pastLessons.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    // Group lessons by month
-    final groupedLessons = <String, List<_StudentLessonData>>{};
-    for (final lesson in pastLessons) {
-      final monthKey = DateFormat('yyyy년 M월', 'ko').format(lesson.dateTime);
-      groupedLessons.putIfAbsent(monthKey, () => []).add(lesson);
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      itemCount: groupedLessons.length,
-      itemBuilder: (context, index) {
-        final monthKey = groupedLessons.keys.elementAt(index);
-        final lessons = groupedLessons[monthKey]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (index > 0) const SizedBox(height: AppSpacing.space4),
-            Text(
-              monthKey,
-              style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            ...lessons.map((lesson) => _LessonCard(
-                  lesson: lesson,
-                  isUpcoming: false,
-                )),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.history,
-            size: 64,
-            color: AppColors.textTertiaryLight,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '지난 레슨이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -555,4 +622,335 @@ List<_StudentLessonData> _mockPastLessons() {
       feedback: '스케일 연습 방법 지도. 3옥타브까지 연습해오기.',
     ),
   ];
+}
+
+/// Trial Booking Card - displays a single trial lesson booking with status and actions
+class TrialBookingCard extends ConsumerWidget {
+  final LessonBooking booking;
+
+  const TrialBookingCard({super.key, required this.booking});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Teacher info & status
+          Row(
+            children: [
+              // Teacher avatar
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.primary,
+                child: Text(
+                  booking.teacherName.isNotEmpty ? booking.teacherName[0] : 'T',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+
+              // Teacher name & instrument
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.teacherName,
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (booking.instrument != null)
+                      Text(
+                        booking.instrument!,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              // Status badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: booking.status.color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      booking.status.icon,
+                      size: 14,
+                      color: booking.status.color,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      booking.status.label,
+                      style: AppTypography.caption.copyWith(
+                        color: booking.status.color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space3),
+
+          // Lesson date/time
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSecondaryLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: AppColors.textSecondaryLight,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  booking.formattedDate,
+                  style: AppTypography.bodyMedium,
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Icon(
+                  Icons.access_time,
+                  size: 16,
+                  color: AppColors.textSecondaryLight,
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  booking.timeRange,
+                  style: AppTypography.bodyMedium,
+                ),
+              ],
+            ),
+          ),
+
+          // Change request info (if any)
+          if (booking.hasChangeRequest) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.swap_horiz,
+                    size: 16,
+                    color: AppColors.warning,
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(
+                    '변경 요청: ${booking.formattedRequestedDate} ${booking.requestedTimeRange}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.warning,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Unavailable message (for unavailable/expired - softer display)
+          if (booking.unavailableMessage != null) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: booking.status.color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: booking.status.color,
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      booking.unavailableMessage!,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: booking.status.color,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // Action buttons
+          if (booking.status.canStudentModify || booking.status.canCancel || booking.status.canRequestChange) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: AppSpacing.space2,
+              runSpacing: AppSpacing.space2,
+              children: [
+                // Modify button (pending only)
+                if (booking.status.canStudentModify)
+                  OutlinedButton.icon(
+                    onPressed: () => _onModify(context),
+                    icon: const Icon(Icons.edit, size: 16),
+                    label: const Text('수정'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+
+                // Request schedule change (confirmed only)
+                if (booking.status.canRequestChange)
+                  OutlinedButton.icon(
+                    onPressed: () => _onRequestChange(context),
+                    icon: const Icon(Icons.swap_horiz, size: 16),
+                    label: const Text('일정 변경'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.info,
+                      side: const BorderSide(color: AppColors.info),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+
+                // Cancel button
+                if (booking.status.canCancel)
+                  OutlinedButton.icon(
+                    onPressed: () => _onCancel(context, ref),
+                    icon: const Icon(Icons.close, size: 16),
+                    label: const Text('취소'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: const BorderSide(color: AppColors.error),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+
+          // Retry button for unavailable/expired statuses
+          if (booking.status.canRetry) ...[
+            const SizedBox(height: AppSpacing.space3),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _onRetry(context),
+                icon: const Icon(Icons.refresh, size: 16),
+                label: const Text('다른 시간으로 다시 신청'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _onModify(BuildContext context) {
+    // Navigate to trial lesson request screen with existing data
+    context.push(
+      '${AppRoutes.trialLessonRequest}?teacherId=${booking.teacherId}&teacherName=${booking.teacherName}&bookingId=${booking.id}',
+    );
+  }
+
+  void _onRequestChange(BuildContext context) {
+    // TODO: Implement schedule change request screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('일정 변경 요청 기능 준비 중입니다'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _onCancel(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('체험레슨 취소'),
+        content: const Text('체험레슨 신청을 취소하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('아니오'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('취소하기'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await ref.read(bookingsNotifierProvider.notifier).cancelBooking(
+              booking.id,
+              null,
+            );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('체험레슨 신청이 취소되었습니다'),
+              backgroundColor: AppColors.practiceGood,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('취소 처리 중 오류가 발생했습니다: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  void _onRetry(BuildContext context) {
+    // Navigate to trial lesson request with teacher pre-selected
+    context.push(
+      '/schedule/trial/request?teacherId=${booking.teacherId}&teacherName=${Uri.encodeComponent(booking.teacherName)}',
+    );
+  }
 }

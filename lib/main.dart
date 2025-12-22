@@ -54,7 +54,7 @@ class LessonApp extends StatelessWidget {
       // Theme
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
 
       // Router
       routerConfig: AppRouter.router,
