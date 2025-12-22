@@ -15,12 +15,18 @@ abstract class PracticeRepository {
   Future<PracticeLog> updatePracticeLog(PracticeLog log);
   Future<void> deletePracticeLog(String id);
   Future<PracticeTask> toggleTask(String logId, String taskId);
+
+  // Streak methods
+  Future<PracticeStreak> getStreak(String studentId);
+  Future<PracticeStreak> updateStreak(String studentId);
+  Future<PracticeStreak> recordPractice(String studentId);
 }
 
 /// Mock implementation for development
 class MockPracticeRepository implements PracticeRepository {
   final _uuid = const Uuid();
   final Map<String, List<PracticeLog>> _logs = {};
+  final Map<String, PracticeStreak> _streaks = {};
 
   MockPracticeRepository() {
     _initMockData();
@@ -96,6 +102,138 @@ class MockPracticeRepository implements PracticeRepository {
         createdAt: date,
       );
     }).whereType<PracticeLog>().toList();
+
+    // Initialize streaks from practice logs
+    _initStreaks();
+  }
+
+  void _initStreaks() {
+    for (final studentId in _logs.keys) {
+      final streak = _calculateStreak(studentId);
+      _streaks[studentId] = streak;
+    }
+  }
+
+  /// Check if a date is a weekend (Saturday or Sunday)
+  bool _isWeekend(DateTime date) {
+    return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+  }
+
+  /// Check if all days between two dates are weekends
+  /// Returns true if streak should continue (gap is only weekends)
+  bool _isGapOnlyWeekends(DateTime newerDate, DateTime olderDate) {
+    final daysDiff = newerDate.difference(olderDate).inDays;
+    if (daysDiff <= 1) return true; // Consecutive days
+
+    // Check each day in the gap
+    for (int i = 1; i < daysDiff; i++) {
+      final gapDate = olderDate.add(Duration(days: i));
+      if (!_isWeekend(gapDate)) {
+        return false; // Found a weekday in the gap
+      }
+    }
+    return true; // Gap only contains weekends
+  }
+
+  /// Check if streak is still active considering weekend exclusion
+  bool _isStreakActive(DateTime lastPracticeDate, DateTime today) {
+    final daysSince = today.difference(lastPracticeDate).inDays;
+    if (daysSince <= 1) return true; // Same day or yesterday
+
+    // Check if gap is only weekends
+    return _isGapOnlyWeekends(today, lastPracticeDate);
+  }
+
+  PracticeStreak _calculateStreak(String studentId) {
+    final logs = _logs[studentId] ?? [];
+    if (logs.isEmpty) {
+      return PracticeStreak(
+        id: 'streak_$studentId',
+        studentId: studentId,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastPracticeDate: null,
+        updatedAt: DateTime.now(),
+      );
+    }
+
+    // Sort logs by date descending
+    final sortedLogs = List<PracticeLog>.from(logs)
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    // Find consecutive practice days
+    int currentStreak = 0;
+    int longestStreak = 0;
+    DateTime? lastPracticeDate;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Get all practice dates with actual practice
+    final practiceDates = sortedLogs
+        .where((log) => log.totalMinutes > 0 || log.tasks.any((t) => t.isCompleted))
+        .map((log) => DateTime(log.date.year, log.date.month, log.date.day))
+        .toSet()
+        .toList()
+      ..sort((a, b) => b.compareTo(a));
+
+    if (practiceDates.isEmpty) {
+      return PracticeStreak(
+        id: 'streak_$studentId',
+        studentId: studentId,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastPracticeDate: null,
+        updatedAt: DateTime.now(),
+      );
+    }
+
+    lastPracticeDate = practiceDates.first;
+
+    // Calculate current streak with weekend exclusion
+    // Streak is active if practiced today, yesterday, or gap is only weekends
+    if (_isStreakActive(lastPracticeDate, today)) {
+      currentStreak = 1;
+
+      for (int i = 1; i < practiceDates.length; i++) {
+        final currentDate = practiceDates[i - 1];
+        final previousDate = practiceDates[i];
+
+        // Check if streak continues (consecutive or gap is only weekends)
+        if (_isGapOnlyWeekends(currentDate, previousDate)) {
+          currentStreak++;
+        } else {
+          break; // Streak broken by weekday gap
+        }
+      }
+    }
+
+    // Calculate longest streak with weekend exclusion
+    int tempStreak = 1;
+    for (int i = 0; i < practiceDates.length - 1; i++) {
+      final currentDate = practiceDates[i];
+      final previousDate = practiceDates[i + 1];
+
+      if (_isGapOnlyWeekends(currentDate, previousDate)) {
+        tempStreak++;
+      } else {
+        if (tempStreak > longestStreak) {
+          longestStreak = tempStreak;
+        }
+        tempStreak = 1;
+      }
+    }
+    if (tempStreak > longestStreak) {
+      longestStreak = tempStreak;
+    }
+
+    return PracticeStreak(
+      id: 'streak_$studentId',
+      studentId: studentId,
+      currentStreak: currentStreak,
+      longestStreak: longestStreak > currentStreak ? longestStreak : currentStreak,
+      lastPracticeDate: lastPracticeDate,
+      updatedAt: DateTime.now(),
+    );
   }
 
   @override
@@ -266,5 +404,61 @@ class MockPracticeRepository implements PracticeRepository {
     _logs[studentId]![logIndex] = updatedLog;
 
     return updatedTask;
+  }
+
+  @override
+  Future<PracticeStreak> getStreak(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    if (_streaks.containsKey(studentId)) {
+      return _streaks[studentId]!;
+    }
+
+    // Create new streak for student
+    final streak = PracticeStreak(
+      id: 'streak_$studentId',
+      studentId: studentId,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: null,
+      updatedAt: DateTime.now(),
+    );
+    _streaks[studentId] = streak;
+    return streak;
+  }
+
+  @override
+  Future<PracticeStreak> updateStreak(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final streak = _calculateStreak(studentId);
+    _streaks[studentId] = streak;
+    return streak;
+  }
+
+  @override
+  Future<PracticeStreak> recordPractice(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Check if already has practice log for today
+    final existingLog = await getPracticeLogByDate(studentId, today);
+    if (existingLog == null) {
+      // Create a minimal practice log for streak
+      final newLog = PracticeLog(
+        id: _uuid.v4(),
+        studentId: studentId,
+        date: today,
+        totalMinutes: 1, // Minimal practice recorded
+        tasks: [],
+        createdAt: now,
+      );
+      _logs.putIfAbsent(studentId, () => []);
+      _logs[studentId]!.add(newLog);
+    }
+
+    // Recalculate streak
+    return updateStreak(studentId);
   }
 }

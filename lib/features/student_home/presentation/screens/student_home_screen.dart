@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../practice/presentation/widgets/practice_streak_card.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
 import 'student_profile_tab.dart';
@@ -130,7 +131,12 @@ class _StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Trial Lesson Section (NEW - moved to top)
+          // Practice Streak Card (NEW)
+          const PracticeStreakCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // Trial Lesson Section
           _buildTrialLessonButton(context),
 
           const SizedBox(height: AppSpacing.space4),
