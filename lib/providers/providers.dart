@@ -22,3 +22,6 @@ export 'payment/payment_providers.dart';
 
 // Booking providers
 export 'booking/booking_providers.dart';
+
+// Teacher providers
+export 'teacher/teacher_providers.dart';

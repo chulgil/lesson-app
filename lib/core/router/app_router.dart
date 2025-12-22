@@ -14,6 +14,7 @@ import '../../features/schedule/presentation/screens/booking_detail_screen.dart'
 import '../../features/schedule/presentation/screens/booking_list_screen.dart';
 import '../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
+import '../../features/schedule/presentation/screens/select_teacher_screen.dart';
 import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
@@ -45,6 +46,7 @@ class AppRoutes {
   static const paymentManagement = '/profile/payments';
 
   // Schedule routes
+  static const selectTeacher = '/schedule/teachers';
   static const pendingBookings = '/schedule/pending';
   static const trialLessonRequest = '/schedule/trial/request';
   static const registerRegularLesson = '/schedule/regular/register';
@@ -162,6 +164,13 @@ class AppRouter {
         path: AppRoutes.paymentManagement,
         name: 'paymentManagement',
         builder: (context, state) => const PaymentManagementScreen(),
+      ),
+
+      // Schedule - Select Teacher
+      GoRoute(
+        path: AppRoutes.selectTeacher,
+        name: 'selectTeacher',
+        builder: (context, state) => const SelectTeacherScreen(),
       ),
 
       // Schedule - Pending Bookings

@@ -226,10 +226,7 @@ class _StudentDashboardTab extends ConsumerWidget {
       height: 56,
       child: FilledButton.icon(
         onPressed: () {
-          // TODO: Replace with teacher selection screen
-          context.push(
-            '${AppRoutes.trialLessonRequest}?teacherId=teacher_1&teacherName=김선생님',
-          );
+          context.push(AppRoutes.selectTeacher);
         },
         icon: const Icon(Icons.add),
         label: const Text('새로운 선생님과 레슨하기'),
