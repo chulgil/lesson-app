@@ -133,7 +133,7 @@ flutter build apk
 | 4 | 학생 관리 목록 | ✅ 구현 완료 |
 | 5 | 레슨 캘린더 | ✅ 구현 완료 |
 | 6 | 레슨 노트/녹음 | ✅ 구현 완료 |
-| 7 | 연습 시스템 | 🔄 진행 중 |
+| 7 | 연습 시스템 | ✅ Phase 1 완료 |
 | 8 | 수강료 관리 | ✅ 구현 완료 |
 
 ### 추가 기능 (Phase 1+)
@@ -337,11 +337,65 @@ class PracticeItem {
 
 | 단계 | 내용 | 상태 |
 |------|------|------|
-| Phase 1 | 기본 연습 할당/완료 | 예정 |
+| Phase 1 | 기본 연습 할당/완료 | ✅ 완료 |
 | Phase 2 | 뱃지 시스템 | 예정 |
 | Phase 3 | 연령별 UI 분화 | 예정 |
 | Phase 4 | 통계/리포트 | 예정 |
 | Phase 5 | 고급 기능 (녹음/영상) | 예정 |
+
+### Phase 1 구현 완료 (2024-12-24)
+
+#### 생성된 파일
+
+| 파일 | 설명 |
+|------|------|
+| `lib/models/practice_item.dart` | PracticeItem 모델 + enums |
+| `lib/repositories/practice_item_repository.dart` | Repository 인터페이스 + Mock |
+| `lib/providers/practice_item/practice_item_providers.dart` | Riverpod providers |
+| `lib/features/lessons/.../practice_items_section.dart` | 선생님용 연습 관리 위젯 |
+| `lib/features/student_home/.../weekly_practice_widget.dart` | 학생용 대시보드 위젯 |
+
+#### 선생님 화면
+
+- **레슨 상세 > 과제 탭**: PracticeItemsSection 위젯
+  - 우선순위별 그룹핑 (🔴필수/🟡추천/🟢도전)
+  - 연습 추가/수정/삭제 (Bottom Sheet)
+  - 완료 토글 및 좋아요 피드백
+
+#### 학생 화면
+
+- **대시보드 > 이번 주 연습**: WeeklyPracticeWidget
+  - 진행률 표시 (Progress bar)
+  - 체크박스 완료 토글
+  - 연습 횟수 +/- 버튼
+  - 선생님 좋아요 표시 ❤️
+
+---
+
+## 레슨 팁 템플릿 시스템
+
+### 개요
+
+레슨 노트 작성 시 자주 사용하는 피드백/팁을 템플릿으로 저장하여 재사용
+
+### 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 카테고리 분류 | 테크닉, 연습방법, 악보해석, 음악성, 공연 |
+| 악기별 필터 | 바이올린, 피아노 등 악기별 템플릿 |
+| 사용 빈도 추적 | 자주 쓰는 템플릿 상위 표시 |
+| 즐겨찾기 | 즐겨찾기한 템플릿 우선 표시 |
+
+### 관련 파일
+
+| 파일 | 설명 |
+|------|------|
+| `lib/models/tip_template.dart` | TipTemplate 모델 + TipCategory enum |
+| `lib/repositories/tip_template_repository.dart` | Repository + Mock 구현 |
+| `lib/providers/tip_template/tip_template_providers.dart` | Riverpod providers |
+| `lib/features/lessons/.../tip_template_bottom_sheet.dart` | 템플릿 선택 Bottom Sheet |
+| `lib/features/profile/.../tip_template_management_screen.dart` | 템플릿 관리 화면 |
 
 ---
 
