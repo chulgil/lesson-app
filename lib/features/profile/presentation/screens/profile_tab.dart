@@ -61,6 +61,11 @@ class ProfileTab extends StatelessWidget {
                 label: '수강료 관리',
                 onTap: () => context.push(AppRoutes.paymentManagement),
               ),
+              _MenuItem(
+                icon: Icons.library_books_outlined,
+                label: '템플릿 관리',
+                onTap: () => context.push(AppRoutes.tipTemplateManagement),
+              ),
             ],
           ),
 

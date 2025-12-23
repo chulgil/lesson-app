@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../models/lesson.dart';
+import '../../../../providers/providers.dart';
 
 /// Screen for adding a new lesson
-class AddLessonScreen extends StatefulWidget {
+class AddLessonScreen extends ConsumerStatefulWidget {
   final String? preselectedStudentId;
+  final String? preselectedDate; // Format: YYYY-MM-DD
+  final int? preselectedHour; // 0-23
 
   const AddLessonScreen({
     super.key,
     this.preselectedStudentId,
+    this.preselectedDate,
+    this.preselectedHour,
   });
 
   @override
-  State<AddLessonScreen> createState() => _AddLessonScreenState();
+  ConsumerState<AddLessonScreen> createState() => _AddLessonScreenState();
 }
 
-class _AddLessonScreenState extends State<AddLessonScreen> {
+class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pieceController = TextEditingController();
   final _notesController = TextEditingController();
@@ -36,12 +43,36 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Handle preselected student
     if (widget.preselectedStudentId != null) {
-      // Find and select the student
       _selectedStudent = _mockStudents.firstWhere(
         (s) => s.id == widget.preselectedStudentId,
         orElse: () => _mockStudents.first,
       );
+    }
+
+    // Handle preselected date (format: YYYY-MM-DD)
+    if (widget.preselectedDate != null) {
+      try {
+        final parts = widget.preselectedDate!.split('-');
+        if (parts.length == 3) {
+          _selectedDate = DateTime(
+            int.parse(parts[0]),
+            int.parse(parts[1]),
+            int.parse(parts[2]),
+          );
+        }
+      } catch (e) {
+        // Keep default date if parsing fails
+        debugPrint('Failed to parse preselected date: $e');
+      }
+    }
+
+    // Handle preselected hour (0-23)
+    if (widget.preselectedHour != null) {
+      final hour = widget.preselectedHour!.clamp(0, 23);
+      _selectedTime = TimeOfDay(hour: hour, minute: 0);
     }
   }
 
@@ -826,7 +857,7 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
     );
   }
 
-  void _saveLesson() {
+  Future<void> _saveLesson() async {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -847,37 +878,65 @@ class _AddLessonScreenState extends State<AddLessonScreen> {
       return;
     }
 
-    // TODO: Save lesson to database
-    final lessonData = {
-      'studentId': _selectedStudent!.id,
-      'date': _selectedDate.toIso8601String(),
-      'time': _formatTime(_selectedTime),
-      'duration': _lessonDuration,
-      'piece': _pieceController.text,
-      'notes': _notesController.text,
-      'isRecurring': _isRecurring,
-      'recurringDays': _recurringDays.toList(),
-      'enableReminder': _enableReminder,
-      'reminderMinutes': _reminderMinutes,
-    };
+    // Create lesson pieces from input
+    final pieces = <LessonPiece>[];
+    if (_pieceController.text.isNotEmpty) {
+      pieces.add(LessonPiece(
+        id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
+        name: _pieceController.text,
+        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
+      ));
+    }
 
-    debugPrint('Saving lesson: $lessonData');
-
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isRecurring
-              ? '${_selectedStudent!.name} 학생의 정기 레슨이 예약되었습니다'
-              : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다',
-        ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.practiceGood,
-      ),
+    // Create the lesson object
+    final lesson = Lesson(
+      id: '', // Will be set by repository
+      studentId: _selectedStudent!.id,
+      studentName: _selectedStudent!.name,
+      teacherName: '김선생님', // TODO: Get from auth
+      instrument: _selectedStudent!.instrument,
+      date: _selectedDate,
+      startTime: _formatTime(_selectedTime),
+      duration: _lessonDuration,
+      status: LessonStatus.scheduled,
+      pieces: pieces,
+      createdAt: DateTime.now(),
     );
 
-    // Go back
-    context.pop();
+    try {
+      // Add lesson using the notifier
+      await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
+
+      // Invalidate the lessonsProvider to refresh calendar
+      ref.invalidate(lessonsProvider);
+
+      if (!mounted) return;
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _isRecurring
+                ? '${_selectedStudent!.name} 학생의 정기 레슨이 예약되었습니다'
+                : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다',
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.practiceGood,
+        ),
+      );
+
+      // Go back
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('레슨 추가 실패: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   // Mock data

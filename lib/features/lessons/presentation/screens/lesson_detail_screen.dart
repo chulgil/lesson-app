@@ -6,7 +6,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
+import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
+import '../widgets/practice_items_section.dart';
+import '../widgets/tip_template_bottom_sheet.dart';
 
 /// Lesson detail screen with recording and notes
 class LessonDetailScreen extends ConsumerStatefulWidget {
@@ -383,29 +386,53 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           const SizedBox(height: AppSpacing.space6),
 
           // Key points
-          _buildSectionHeader('주요 포인트', Icons.lightbulb_outline),
+          _buildSectionHeader(
+            '주요 포인트',
+            Icons.lightbulb_outline,
+            showAddButton: widget.isTeacher,
+            onAdd: () => _showAddKeyPointDialog(lesson),
+          ),
           const SizedBox(height: AppSpacing.space3),
           _buildKeyPointsList(lesson),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Practice tips
-          if (lesson.practiceTips != null) ...[
-            _buildSectionHeader('연습 팁', Icons.tips_and_updates_outlined),
-            const SizedBox(height: AppSpacing.space3),
-            _buildPracticeTips(lesson),
-          ],
+          _buildSectionHeader(
+            '연습 팁',
+            Icons.tips_and_updates_outlined,
+            showAddButton: widget.isTeacher,
+            onAdd: () => _showAddPracticeTipDialog(lesson),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          _buildPracticeTips(lesson),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader(
+    String title,
+    IconData icon, {
+    bool showAddButton = false,
+    VoidCallback? onAdd,
+  }) {
     return Row(
       children: [
         Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(width: AppSpacing.space2),
         Text(title, style: AppTypography.headingSmall),
+        const Spacer(),
+        if (showAddButton && onAdd != null)
+          IconButton(
+            onPressed: onAdd,
+            icon: const Icon(Icons.add_circle_outline),
+            iconSize: 22,
+            color: AppColors.primary,
+            tooltip: '추가',
+            constraints: const BoxConstraints(),
+            padding: EdgeInsets.zero,
+          ),
       ],
     );
   }
@@ -497,10 +524,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           children: [
             Icon(Icons.lightbulb_outline, color: AppColors.textTertiaryLight),
             const SizedBox(width: AppSpacing.space3),
-            Text(
-              '주요 포인트가 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+            Expanded(
+              child: Text(
+                widget.isTeacher
+                    ? '+ 버튼을 눌러 주요 포인트를 추가하세요'
+                    : '주요 포인트가 없습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
             ),
           ],
@@ -509,7 +540,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     }
 
     return Column(
-      children: lesson.keyPoints!.map((point) {
+      children: lesson.keyPoints!.asMap().entries.map((entry) {
+        final index = entry.key;
+        final point = entry.value;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space2),
           child: Row(
@@ -528,6 +561,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               Expanded(
                 child: Text(point, style: AppTypography.bodyMedium),
               ),
+              if (widget.isTeacher)
+                IconButton(
+                  onPressed: () => _removeKeyPoint(lesson, index),
+                  icon: const Icon(Icons.close),
+                  iconSize: 18,
+                  color: AppColors.textTertiaryLight,
+                  constraints: const BoxConstraints(),
+                  padding: EdgeInsets.zero,
+                  tooltip: '삭제',
+                ),
             ],
           ),
         );
@@ -536,6 +579,34 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   Widget _buildPracticeTips(Lesson lesson) {
+    final hasTips = lesson.practiceTips != null && lesson.practiceTips!.isNotEmpty;
+
+    if (!hasTips) {
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceSecondaryLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.tips_and_updates_outlined, color: AppColors.textTertiaryLight),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Text(
+                widget.isTeacher
+                    ? '+ 버튼을 눌러 연습 팁을 추가하세요'
+                    : '연습 팁이 없습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -555,6 +626,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               ),
             ),
           ),
+          if (widget.isTeacher)
+            IconButton(
+              onPressed: () => _showEditPracticeTipDialog(lesson),
+              icon: const Icon(Icons.edit_outlined),
+              iconSize: 18,
+              color: AppColors.info,
+              constraints: const BoxConstraints(),
+              padding: EdgeInsets.zero,
+              tooltip: '수정',
+            ),
         ],
       ),
     );
@@ -827,56 +908,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   Widget _buildAssignmentsTab(Lesson lesson) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionHeader('과제', Icons.assignment),
-          const SizedBox(height: AppSpacing.space3),
-
-          if (lesson.assignments == null || lesson.assignments!.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.assignment_outlined, color: AppColors.textTertiaryLight),
-                  const SizedBox(width: AppSpacing.space3),
-                  Text(
-                    '등록된 과제가 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
-            ...lesson.assignments!.map((assignment) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                  child: _buildAssignmentCard(
-                    title: assignment,
-                    description: '',
-                    isCompleted: false,
-                  ),
-                )),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          if (widget.isTeacher)
-            OutlinedButton.icon(
-              onPressed: () {
-                // Add new assignment
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('과제 추가'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-              ),
-            ),
-        ],
+      child: PracticeItemsSection(
+        lessonId: lesson.id,
+        studentId: lesson.studentId,
+        isTeacher: widget.isTeacher,
       ),
     );
   }
@@ -1023,5 +1058,239 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       }
       return false;
     });
+  }
+
+  // Key points and practice tips editing methods
+  void _showAddKeyPointDialog(Lesson lesson) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _AddTipBottomSheet(
+        title: '주요 포인트 추가',
+        instrument: lesson.instrument,
+        initialCategory: TipCategory.technique,
+        onSubmit: (content) => _addKeyPoint(lesson, content),
+      ),
+    );
+  }
+
+  void _showAddPracticeTipDialog(Lesson lesson) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _AddTipBottomSheet(
+        title: '연습 팁 추가',
+        instrument: lesson.instrument,
+        initialCategory: TipCategory.practice,
+        onSubmit: (content) => _setPracticeTip(lesson, content),
+      ),
+    );
+  }
+
+  void _showEditPracticeTipDialog(Lesson lesson) {
+    final controller = TextEditingController(text: lesson.practiceTips ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('연습 팁 수정'),
+        content: TextField(
+          controller: controller,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            hintText: '연습 팁을 입력하세요',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          if (lesson.practiceTips != null && lesson.practiceTips!.isNotEmpty)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _setPracticeTip(lesson, null);
+              },
+              child: Text(
+                '삭제',
+                style: TextStyle(color: AppColors.error),
+              ),
+            ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _setPracticeTip(lesson, controller.text.trim());
+            },
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _addKeyPoint(Lesson lesson, String content) async {
+    if (content.isEmpty) return;
+
+    final currentPoints = List<String>.from(lesson.keyPoints ?? []);
+    currentPoints.add(content);
+
+    final updatedLesson = lesson.copyWith(keyPoints: currentPoints);
+    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('주요 포인트가 추가되었습니다')),
+      );
+    }
+  }
+
+  Future<void> _removeKeyPoint(Lesson lesson, int index) async {
+    final currentPoints = List<String>.from(lesson.keyPoints ?? []);
+    if (index < 0 || index >= currentPoints.length) return;
+
+    currentPoints.removeAt(index);
+
+    final updatedLesson = lesson.copyWith(
+      keyPoints: currentPoints.isEmpty ? null : currentPoints,
+    );
+    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+  }
+
+  Future<void> _setPracticeTip(Lesson lesson, String? content) async {
+    final updatedLesson = lesson.copyWith(
+      practiceTips: content?.isEmpty == true ? null : content,
+    );
+    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+
+    if (mounted && content != null && content.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('연습 팁이 저장되었습니다')),
+      );
+    }
+  }
+}
+
+/// Bottom sheet for adding tips with template support
+class _AddTipBottomSheet extends ConsumerStatefulWidget {
+  final String title;
+  final String? instrument;
+  final TipCategory? initialCategory;
+  final Function(String content) onSubmit;
+
+  const _AddTipBottomSheet({
+    required this.title,
+    this.instrument,
+    this.initialCategory,
+    required this.onSubmit,
+  });
+
+  @override
+  ConsumerState<_AddTipBottomSheet> createState() => _AddTipBottomSheetState();
+}
+
+class _AddTipBottomSheetState extends ConsumerState<_AddTipBottomSheet> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXLarge),
+        ),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderLight,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              // Header
+              Row(
+                children: [
+                  Text(widget.title, style: AppTypography.headingMedium),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showTipTemplateBottomSheet(
+                        context: context,
+                        instrument: widget.instrument,
+                        initialCategory: widget.initialCategory,
+                        onSelect: widget.onSubmit,
+                      );
+                    },
+                    icon: const Icon(Icons.library_books_outlined, size: 18),
+                    label: const Text('템플릿에서'),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Text input
+              TextField(
+                controller: _controller,
+                maxLines: 4,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: '직접 입력하세요...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    final content = _controller.text.trim();
+                    if (content.isNotEmpty) {
+                      Navigator.pop(context);
+                      widget.onSubmit(content);
+                    }
+                  },
+                  child: const Text('추가'),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

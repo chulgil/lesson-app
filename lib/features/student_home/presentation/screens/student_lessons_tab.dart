@@ -9,18 +9,70 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../../shared/widgets/collapsible_calendar.dart';
 
-/// Student lessons tab showing upcoming and past lessons
-class StudentLessonsTab extends ConsumerWidget {
+/// State provider for student calendar expansion
+final studentCalendarExpandedProvider = StateProvider<bool>((ref) => true);
+
+/// State provider for student selected date
+final studentSelectedDateProvider = StateProvider<DateTime>((ref) {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+});
+
+/// Student lessons tab showing collapsible calendar and lesson list
+class StudentLessonsTab extends ConsumerStatefulWidget {
   const StudentLessonsTab({super.key});
 
+  @override
+  ConsumerState<StudentLessonsTab> createState() => _StudentLessonsTabState();
+}
+
+class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
   // TODO: Replace with actual student ID from auth
   static const _currentStudentId = 'student_1';
 
+  final ScrollController _scrollController = ScrollController();
+  double _lastScrollOffset = 0;
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_handleScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _handleScroll() {
+    final offset = _scrollController.offset;
+    final delta = offset - _lastScrollOffset;
+    final isExpanded = ref.read(studentCalendarExpandedProvider);
+
+    // Only react to significant scroll movements
+    if (delta.abs() > 15) {
+      if (delta > 0 && isExpanded) {
+        // Scrolling down - collapse calendar
+        ref.read(studentCalendarExpandedProvider.notifier).state = false;
+      } else if (delta < 0 && !isExpanded && offset < 100) {
+        // Scrolling up near top - expand calendar
+        ref.read(studentCalendarExpandedProvider.notifier).state = true;
+      }
+      _lastScrollOffset = offset;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isExpanded = ref.watch(studentCalendarExpandedProvider);
+    final selectedDate = ref.watch(studentSelectedDateProvider);
     final studentBookings = ref.watch(studentBookingsProvider(_currentStudentId));
 
+    // Get trial bookings for display
     final trialBookings = studentBookings.whenOrNull(
           data: (bookings) => bookings
               .where((b) => b.lessonType == LessonType.trial)
@@ -30,263 +82,193 @@ class StudentLessonsTab extends ConsumerWidget {
         ) ??
         [];
 
-    final upcomingLessons = _mockUpcomingLessons();
-    final pastLessons = _mockPastLessons();
+    // Get mock lessons and filter by selected date
+    final allLessons = [..._mockUpcomingLessons(), ..._mockPastLessons()];
+    final markedDates = allLessons
+        .map((l) => DateTime(l.dateTime.year, l.dateTime.month, l.dateTime.day))
+        .toSet();
 
-    // Group past lessons by month
-    final groupedPastLessons = <String, List<_StudentLessonData>>{};
-    for (final lesson in pastLessons) {
-      final monthKey = DateFormat('yyyy년 M월', 'ko').format(lesson.dateTime);
-      groupedPastLessons.putIfAbsent(monthKey, () => []).add(lesson);
-    }
+    // Add booking dates to marked dates
+    final bookingDates = studentBookings.whenOrNull(
+          data: (bookings) => bookings
+              .where((b) => b.status.isActive)
+              .map((b) => DateTime(b.lessonDate.year, b.lessonDate.month, b.lessonDate.day))
+              .toSet(),
+        ) ??
+        <DateTime>{};
+    markedDates.addAll(bookingDates);
 
-    return CustomScrollView(
-      slivers: [
+    return Column(
+      children: [
         // Header
-        SliverToBoxAdapter(
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space4,
-              AppSpacing.screenPadding,
-              0,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('내 레슨', style: AppTypography.headingLarge),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.calendar_month_outlined),
-                  tooltip: '캘린더 보기',
-                ),
-              ],
-            ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('내 레슨', style: AppTypography.headingLarge),
+              TextButton.icon(
+                onPressed: () {
+                  context.push(AppRoutes.selectTeacher);
+                },
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('체험레슨'),
+              ),
+            ],
           ),
         ),
 
-        // Trial Lesson Button
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space3,
-              AppSpacing.screenPadding,
-              0,
-            ),
-            child: _buildTrialLessonButton(context),
+        // Collapsible Calendar
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space3,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: CollapsibleCalendar(
+            selectedDate: selectedDate,
+            onDateSelected: (date) {
+              ref.read(studentSelectedDateProvider.notifier).state = date;
+            },
+            isExpanded: isExpanded,
+            markedDates: markedDates,
           ),
         ),
 
-        // Trial Lesson Bookings Section
-        if (trialBookings.isNotEmpty) ...[
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenPadding,
-                AppSpacing.space4,
-                AppSpacing.screenPadding,
-                AppSpacing.space3,
-              ),
-              child: Text('내 체험레슨', style: AppTypography.headingSmall),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPadding,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                  child: TrialBookingCard(booking: trialBookings[index]),
-                ),
-                childCount: trialBookings.length,
-              ),
-            ),
-          ),
-        ],
+        const SizedBox(height: AppSpacing.space3),
 
-        // Loading state for bookings
-        if (studentBookings.isLoading)
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space4),
-              child: Center(child: CircularProgressIndicator()),
-            ),
+        // Content list
+        Expanded(
+          child: _StudentLessonList(
+            selectedDate: selectedDate,
+            trialBookings: trialBookings,
+            scrollController: _scrollController,
+            isLoading: studentBookings.isLoading,
           ),
-
-        // Upcoming Lessons Section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space4,
-              AppSpacing.screenPadding,
-              AppSpacing.space3,
-            ),
-            child: Text('예정된 레슨', style: AppTypography.headingSmall),
-          ),
-        ),
-
-        if (upcomingLessons.isEmpty)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space4,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.event_available,
-                      size: 32,
-                      color: AppColors.textTertiaryLight,
-                    ),
-                    const SizedBox(width: AppSpacing.space3),
-                    Expanded(
-                      child: Text(
-                        '예정된 레슨이 없습니다',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPadding,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _LessonCard(
-                  lesson: upcomingLessons[index],
-                  isUpcoming: true,
-                ),
-                childCount: upcomingLessons.length,
-              ),
-            ),
-          ),
-
-        // Past Lessons Section
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space4,
-              AppSpacing.screenPadding,
-              AppSpacing.space3,
-            ),
-            child: Text('지난 레슨', style: AppTypography.headingSmall),
-          ),
-        ),
-
-        if (pastLessons.isEmpty)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space4,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.history,
-                      size: 32,
-                      color: AppColors.textTertiaryLight,
-                    ),
-                    const SizedBox(width: AppSpacing.space3),
-                    Expanded(
-                      child: Text(
-                        '지난 레슨이 없습니다',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else
-          ...groupedPastLessons.entries.expand((entry) => [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.screenPadding,
-                      AppSpacing.space2,
-                      AppSpacing.screenPadding,
-                      AppSpacing.space2,
-                    ),
-                    child: Text(
-                      entry.key,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.screenPadding,
-                  ),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => _LessonCard(
-                        lesson: entry.value[index],
-                        isUpcoming: false,
-                      ),
-                      childCount: entry.value.length,
-                    ),
-                  ),
-                ),
-              ]),
-
-        // Bottom padding
-        const SliverToBoxAdapter(
-          child: SizedBox(height: AppSpacing.space6),
         ),
       ],
     );
   }
+}
 
-  /// Build trial lesson button
-  Widget _buildTrialLessonButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: FilledButton.icon(
-        onPressed: () {
-          context.push(AppRoutes.selectTeacher);
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('새로운 선생님과 레슨하기'),
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
+class _StudentLessonList extends StatelessWidget {
+  final DateTime selectedDate;
+  final List<LessonBooking> trialBookings;
+  final ScrollController scrollController;
+  final bool isLoading;
+
+  const _StudentLessonList({
+    required this.selectedDate,
+    required this.trialBookings,
+    required this.scrollController,
+    required this.isLoading,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
+
+    // Get all lessons
+    final upcomingLessons = _mockUpcomingLessons();
+    final pastLessons = _mockPastLessons();
+
+    // Filter lessons for selected date
+    final dayLessons = [...upcomingLessons, ...pastLessons].where((l) =>
+        l.dateTime.year == selectedDate.year &&
+        l.dateTime.month == selectedDate.month &&
+        l.dateTime.day == selectedDate.day).toList();
+
+    // Filter trial bookings for selected date
+    final dayTrialBookings = trialBookings.where((b) =>
+        b.lessonDate.year == selectedDate.year &&
+        b.lessonDate.month == selectedDate.month &&
+        b.lessonDate.day == selectedDate.day).toList();
+
+    final hasContent = dayLessons.isNotEmpty || dayTrialBookings.isNotEmpty;
+
+    return ListView(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      children: [
+        // Date title
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              dateFormat.format(selectedDate),
+              style: AppTypography.headingSmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            Text(
+              '${dayLessons.length + dayTrialBookings.length}개',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ],
         ),
-      ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // Loading indicator
+        if (isLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space4),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+
+        // Trial bookings for selected date
+        if (dayTrialBookings.isNotEmpty) ...[
+          ...dayTrialBookings.map((booking) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                child: TrialBookingCard(booking: booking),
+              )),
+        ],
+
+        // Regular lessons for selected date
+        if (dayLessons.isNotEmpty) ...[
+          ...dayLessons.map((lesson) => _LessonCard(
+                lesson: lesson,
+                isUpcoming: lesson.dateTime.isAfter(DateTime.now()),
+              )),
+        ],
+
+        // Empty state
+        if (!hasContent && !isLoading)
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space6),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.event_available,
+                    size: 64,
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  Text(
+                    '이 날짜에 예정된 레슨이 없습니다',
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+        const SizedBox(height: AppSpacing.space6),
+      ],
     );
   }
 }
@@ -331,7 +313,7 @@ class _LessonCard extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.space4),
               child: Row(
                 children: [
-                  // Date column
+                  // Time column
                   Container(
                     width: 56,
                     height: 56,
@@ -346,14 +328,16 @@ class _LessonCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${lesson.dateTime.day}',
-                          style: AppTypography.headingMedium.copyWith(
-                            color:
-                                isUpcoming ? AppColors.primary : AppColors.textSecondaryLight,
+                          timeFormat.format(lesson.dateTime),
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: isUpcoming
+                                ? AppColors.primary
+                                : AppColors.textSecondaryLight,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
-                          DateFormat('E', 'ko').format(lesson.dateTime),
+                          '${lesson.duration}분',
                           style: AppTypography.caption.copyWith(
                             color: isUpcoming
                                 ? AppColors.primary
@@ -400,29 +384,23 @@ class _LessonCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: AppSpacing.space1),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.access_time,
-                              size: 14,
-                              color: AppColors.textTertiaryLight,
+                        if (lesson.piece != null) ...[
+                          const SizedBox(height: AppSpacing.space1),
+                          Text(
+                            lesson.piece!,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondaryLight,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${timeFormat.format(lesson.dateTime)} (${lesson.duration}분)',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ],
                     ),
                   ),
 
                   // D-day or status
-                  if (isUpcoming)
+                  if (isUpcoming && daysUntil >= 0)
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -456,37 +434,6 @@ class _LessonCard extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Lesson content preview (for upcoming)
-            if (isUpcoming && lesson.piece != null) ...[
-              Divider(
-                height: 1,
-                color: AppColors.borderLight,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.space3),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.music_note,
-                      size: 16,
-                      color: AppColors.textTertiaryLight,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Text(
-                        lesson.piece!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
 
             // Feedback preview (for past lessons)
             if (!isUpcoming && lesson.feedback != null) ...[
@@ -671,19 +618,34 @@ class TrialBookingCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.info.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '체험레슨',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.info,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
                       booking.teacherName,
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (booking.instrument != null)
-                      Text(
-                        booking.instrument!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -722,7 +684,7 @@ class TrialBookingCard extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space3),
 
-          // Lesson date/time
+          // Lesson time
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
@@ -731,17 +693,6 @@ class TrialBookingCard extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: AppColors.textSecondaryLight,
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  booking.formattedDate,
-                  style: AppTypography.bodyMedium,
-                ),
-                const SizedBox(width: AppSpacing.space3),
                 Icon(
                   Icons.access_time,
                   size: 16,
@@ -752,6 +703,26 @@ class TrialBookingCard extends ConsumerWidget {
                   booking.timeRange,
                   style: AppTypography.bodyMedium,
                 ),
+                if (booking.instrument != null) ...[
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.secondaryLight.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      booking.instrument!,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -785,7 +756,7 @@ class TrialBookingCard extends ConsumerWidget {
             ),
           ],
 
-          // Unavailable message (for unavailable/expired - softer display)
+          // Unavailable message (for unavailable/expired)
           if (booking.unavailableMessage != null) ...[
             const SizedBox(height: AppSpacing.space3),
             Container(
@@ -817,14 +788,15 @@ class TrialBookingCard extends ConsumerWidget {
           ],
 
           // Action buttons
-          if (booking.status.canStudentModify || booking.status.canCancel || booking.status.canRequestChange) ...[
+          if (booking.status.canStudentModify ||
+              booking.status.canCancel ||
+              booking.status.canRequestChange) ...[
             const SizedBox(height: AppSpacing.space3),
             Wrap(
               alignment: WrapAlignment.end,
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space2,
               children: [
-                // Modify button (pending only)
                 if (booking.status.canStudentModify)
                   OutlinedButton.icon(
                     onPressed: () => _onModify(context),
@@ -836,8 +808,6 @@ class TrialBookingCard extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
                   ),
-
-                // Request schedule change (confirmed only)
                 if (booking.status.canRequestChange)
                   OutlinedButton.icon(
                     onPressed: () => _onRequestChange(context),
@@ -849,8 +819,6 @@ class TrialBookingCard extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
                   ),
-
-                // Cancel button
                 if (booking.status.canCancel)
                   OutlinedButton.icon(
                     onPressed: () => _onCancel(context, ref),
@@ -884,14 +852,12 @@ class TrialBookingCard extends ConsumerWidget {
   }
 
   void _onModify(BuildContext context) {
-    // Navigate to trial lesson request screen with existing data
     context.push(
       '${AppRoutes.trialLessonRequest}?teacherId=${booking.teacherId}&teacherName=${booking.teacherName}&bookingId=${booking.id}',
     );
   }
 
   void _onRequestChange(BuildContext context) {
-    // TODO: Implement schedule change request screen
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('일정 변경 요청 기능 준비 중입니다'),
@@ -948,7 +914,6 @@ class TrialBookingCard extends ConsumerWidget {
   }
 
   void _onRetry(BuildContext context) {
-    // Navigate to trial lesson request with teacher pre-selected
     context.push(
       '/schedule/trial/request?teacherId=${booking.teacherId}&teacherName=${Uri.encodeComponent(booking.teacherName)}',
     );

@@ -78,7 +78,7 @@ class MockLessonRepository implements LessonRepository {
         createdAt: now.subtract(const Duration(days: 3)),
       ),
 
-      // Today's lesson
+      // Today's lessons
       Lesson(
         id: 'lesson_today',
         studentId: 'student_3',
@@ -93,6 +93,51 @@ class MockLessonRepository implements LessonRepository {
           LessonPiece(id: 'p5', name: '바흐 무반주 첼로 모음곡', movement: '1번'),
         ],
         createdAt: now.subtract(const Duration(days: 7)),
+      ),
+      Lesson(
+        id: 'lesson_today_2',
+        studentId: 'student_1',
+        studentName: '홍길동',
+        teacherName: '김선생님',
+        instrument: '바이올린',
+        date: now,
+        startTime: '10:00',
+        duration: 60,
+        status: LessonStatus.scheduled,
+        pieces: const [
+          LessonPiece(id: 'p6', name: '파가니니 카프리스', movement: '24번'),
+        ],
+        createdAt: now.subtract(const Duration(days: 5)),
+      ),
+      Lesson(
+        id: 'lesson_today_3',
+        studentId: 'student_2',
+        studentName: '김영희',
+        teacherName: '김선생님',
+        instrument: '피아노',
+        date: now,
+        startTime: '13:00',
+        duration: 45,
+        status: LessonStatus.scheduled,
+        pieces: const [
+          LessonPiece(id: 'p7', name: '베토벤 소나타', opus: 'Op.13', movement: '비창 1악장'),
+        ],
+        createdAt: now.subtract(const Duration(days: 3)),
+      ),
+      Lesson(
+        id: 'lesson_today_4',
+        studentId: 'student_5',
+        studentName: '최지원',
+        teacherName: '김선생님',
+        instrument: '바이올린',
+        date: now,
+        startTime: '17:00',
+        duration: 60,
+        status: LessonStatus.scheduled,
+        pieces: const [
+          LessonPiece(id: 'p8', name: '비발디 사계', movement: '봄'),
+        ],
+        createdAt: now.subtract(const Duration(days: 2)),
       ),
 
       // Past lessons

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
+import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
 import 'student_profile_tab.dart';
@@ -136,20 +137,14 @@ class _StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Today's Practice
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('오늘의 연습', style: AppTypography.headingMedium),
-              TextButton(
-                onPressed: () {},
-                child: const Text('전체보기'),
-              ),
-            ],
+          // This Week's Practice (from teacher assignments)
+          WeeklyPracticeWidget(
+            studentId: currentStudentId,
+            showHeader: true,
+            onViewAll: () {
+              // TODO: Navigate to full practice list
+            },
           ),
-          const SizedBox(height: AppSpacing.space3),
-
-          _buildPracticeChecklist(),
 
           const SizedBox(height: AppSpacing.space6),
 

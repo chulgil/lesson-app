@@ -10,6 +10,7 @@ import '../../features/profile/presentation/screens/instrument_management_screen
 import '../../features/profile/presentation/screens/lesson_time_settings_screen.dart';
 import '../../features/profile/presentation/screens/payment_management_screen.dart';
 import '../../features/profile/presentation/screens/repertoire_management_screen.dart';
+import '../../features/profile/presentation/screens/tip_template_management_screen.dart';
 import '../../features/schedule/presentation/screens/booking_detail_screen.dart';
 import '../../features/schedule/presentation/screens/booking_list_screen.dart';
 import '../../features/schedule/presentation/screens/pending_bookings_screen.dart';
@@ -49,6 +50,7 @@ class AppRoutes {
   static const repertoireManagement = '/profile/repertoire';
   static const lessonTimeSettings = '/profile/lesson-time';
   static const paymentManagement = '/profile/payments';
+  static const tipTemplateManagement = '/profile/templates';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
@@ -102,9 +104,20 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.addLesson,
         name: 'addLesson',
-        builder: (context, state) => AddLessonScreen(
-          preselectedStudentId: state.uri.queryParameters['studentId'],
-        ),
+        builder: (context, state) {
+          // Parse hour from query parameter
+          int? hour;
+          final hourStr = state.uri.queryParameters['hour'];
+          if (hourStr != null) {
+            hour = int.tryParse(hourStr);
+          }
+
+          return AddLessonScreen(
+            preselectedStudentId: state.uri.queryParameters['studentId'],
+            preselectedDate: state.uri.queryParameters['date'],
+            preselectedHour: hour,
+          );
+        },
       ),
 
       // Lesson Detail
@@ -176,6 +189,13 @@ class AppRouter {
         path: AppRoutes.paymentManagement,
         name: 'paymentManagement',
         builder: (context, state) => const PaymentManagementScreen(),
+      ),
+
+      // Tip Template Management
+      GoRoute(
+        path: AppRoutes.tipTemplateManagement,
+        name: 'tipTemplateManagement',
+        builder: (context, state) => const TipTemplateManagementScreen(),
       ),
 
       // Schedule - Select Teacher

@@ -10,6 +10,9 @@ export 'student/student_providers.dart';
 // Practice providers
 export 'practice/practice_providers.dart';
 
+// Practice item providers (이번 주 연습)
+export 'practice_item/practice_item_providers.dart';
+
 // Practice repertoire providers
 export 'practice_repertoire/practice_repertoire_providers.dart';
 
@@ -28,3 +31,6 @@ export 'booking/booking_providers.dart';
 
 // Teacher providers
 export 'teacher/teacher_providers.dart';
+
+// Tip template providers
+export 'tip_template/tip_template_providers.dart';

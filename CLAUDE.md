@@ -133,7 +133,7 @@ flutter build apk
 | 4 | 학생 관리 목록 | ✅ 구현 완료 |
 | 5 | 레슨 캘린더 | ✅ 구현 완료 |
 | 6 | 레슨 노트/녹음 | ✅ 구현 완료 |
-| 7 | 연습 체크리스트 | 🔄 진행 중 |
+| 7 | 연습 시스템 | 🔄 진행 중 |
 | 8 | 수강료 관리 | ✅ 구현 완료 |
 
 ### 추가 기능 (Phase 1+)
@@ -238,6 +238,43 @@ flutter build apk
 
 ## 개발 규칙
 
+### 디자인 규칙 ⭐ 중요
+
+**모든 UI 작업 전 반드시 앱 브랜드 색상을 확인하세요!**
+
+1. **색상 파일 위치**: `lib/core/theme/app_colors.dart`
+2. **브랜드 컬러 사용 원칙**:
+   - 새로운 UI 컴포넌트 작성 시 반드시 `AppColors` 클래스 사용
+   - 하드코딩된 색상값(#FFFFFF 등) 사용 금지
+   - 새로운 색상이 필요하면 `AppColors`에 먼저 추가 후 사용
+
+3. **앱 브랜드 컬러**:
+   | 용도 | 색상 | 사용처 |
+   |------|------|--------|
+   | Primary | `AppColors.primary` (#6B5B95) | 주요 액션, 브랜드, 선택 상태 |
+   | Primary Light | `AppColors.primaryLight` | 배경 하이라이트 |
+   | Secondary | `AppColors.secondary` (#F4A460) | 보조 액센트, 악기 느낌 |
+   | Success | `AppColors.practiceGood` (#2E8B57) | 완료, 좋음 표시 |
+   | Warning | `AppColors.practiceNormal` | 보통, 주의 |
+   | Error | `AppColors.error` (#DC143C) | 에러, 부족, 일요일 |
+   | Background | `AppColors.backgroundLight` (#FFFAF5) | 화면 배경 |
+   | Surface | `AppColors.surfaceLight` | 카드 배경 |
+
+4. **색상 추가 절차**:
+   ```dart
+   // lib/core/theme/app_colors.dart 에 추가
+   static const newColor = Color(0xFF...);
+   ```
+   - 추가 시 용도 주석 필수
+   - 라이트/다크 모드 둘 다 고려
+
+5. **캘린더/위젯 디자인**:
+   - 선택된 날짜: `AppColors.primary`
+   - 오늘 날짜: `AppColors.secondary` 또는 골드 테두리
+   - 일요일: `AppColors.error` (붉은 계열)
+   - 토요일: `AppColors.primary` (연한)
+   - 레슨 마커: `AppColors.secondary` 또는 음표(♪) 사용
+
 ### 코드 스타일
 
 - Dart 공식 스타일 가이드 준수
@@ -259,9 +296,59 @@ flutter build apk
 
 ---
 
+## 연습 시스템 (이번 주 연습)
+
+### 개요
+
+레슨 후 학생에게 할당되는 연습 과제 관리 시스템. "과제" 대신 "이번 주 연습"으로 명명하여 심리적 부담 완화
+
+### 상세 스펙
+
+📖 **[연습 시스템 상세 스펙](../../../Personal/development/idea/lesson-app/Practice_System_Spec.md)**
+
+### 핵심 기능
+
+| 기능 | 설명 |
+|------|------|
+| 3단계 우선순위 | 🔴필수, 🟡추천, 🟢도전 |
+| 연령별 UI | 어린이(≤12), 학생(13-18), 성인(19+) |
+| 뱃지/칭호 시스템 | 12개 뱃지, 4개 카테고리 |
+| 선생님 피드백 | 좋아요 버튼 + 실시간 알림 |
+| 레퍼토리 연동 | 선택 또는 직접입력 + 자동등록 |
+
+### 주요 모델
+
+```dart
+enum PracticePriority { must, should, could }
+enum PracticeType { repertoire, technique, theory, custom }
+enum AgeGroup { child, student, adult }
+
+class PracticeItem {
+  String id, lessonId, title;
+  PracticePriority priority;
+  PracticeType type;
+  bool isCompleted;
+  int practiceCount;
+  bool hasLike;
+}
+```
+
+### 구현 상태
+
+| 단계 | 내용 | 상태 |
+|------|------|------|
+| Phase 1 | 기본 연습 할당/완료 | 예정 |
+| Phase 2 | 뱃지 시스템 | 예정 |
+| Phase 3 | 연령별 UI 분화 | 예정 |
+| Phase 4 | 통계/리포트 | 예정 |
+| Phase 5 | 고급 기능 (녹음/영상) | 예정 |
+
+---
+
 ## 관련 문서
 
-- [요구사항](../../idea/lesson-app/requirement.md)
+- [요구사항](../../../Personal/development/idea/lesson-app/requirement.md)
+- [연습 시스템 스펙](../../../Personal/development/idea/lesson-app/Practice_System_Spec.md)
 - [기술 의사결정](../../idea/lesson-app/tech_decision.md)
 - [화면 명세서](../../idea/lesson-app/figma/screen_specs.md)
 - [디자인 시스템](../../idea/lesson-app/figma/design_system.md)

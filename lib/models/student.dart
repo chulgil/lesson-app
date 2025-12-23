@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'practice_item.dart';
+
 /// Student status enum (enrollment status)
 enum StudentStatus {
   trial,    // 체험 중
@@ -135,6 +137,10 @@ class Student {
   final DateTime? updatedAt;
   final bool isActive;
 
+  // Age group related fields
+  final DateTime? birthDate; // 생년월일 (비공개, 연령 그룹 자동 계산용)
+  final AgeGroup? manualAgeGroup; // 수동 설정 연령 그룹 (학생 앱 미사용 시)
+
   const Student({
     required this.id,
     required this.name,
@@ -159,7 +165,19 @@ class Student {
     required this.createdAt,
     this.updatedAt,
     this.isActive = true,
+    this.birthDate,
+    this.manualAgeGroup,
   });
+
+  /// Calculate age group from birth date (private)
+  AgeGroup? get calculatedAgeGroup {
+    if (birthDate == null) return null;
+    return AgeGroup.fromBirthDate(birthDate!);
+  }
+
+  /// Effective age group (calculated from birthDate, or manual, or default student)
+  AgeGroup get effectiveAgeGroup =>
+      calculatedAgeGroup ?? manualAgeGroup ?? AgeGroup.student;
 
   /// Monthly lesson count based on lessons per week
   int get monthlyLessonCount => lessonsPerWeek * 4;
@@ -226,6 +244,8 @@ class Student {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isActive,
+    DateTime? birthDate,
+    AgeGroup? manualAgeGroup,
   }) {
     return Student(
       id: id ?? this.id,
@@ -251,6 +271,8 @@ class Student {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
+      birthDate: birthDate ?? this.birthDate,
+      manualAgeGroup: manualAgeGroup ?? this.manualAgeGroup,
     );
   }
 
