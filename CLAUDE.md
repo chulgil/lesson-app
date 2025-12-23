@@ -133,8 +133,10 @@ flutter build apk
 | 4 | 학생 관리 목록 | ✅ 구현 완료 |
 | 5 | 레슨 캘린더 | ✅ 구현 완료 |
 | 6 | 레슨 노트/녹음 | ✅ 구현 완료 |
-| 7 | 연습 시스템 | ✅ Phase 1 완료 |
+| 7 | 연습 시스템 | ✅ Phase 1-2 완료 |
 | 8 | 수강료 관리 | ✅ 구현 완료 |
+| 9 | 레퍼토리 관리 | ✅ 구현 완료 |
+| 10 | 팁 템플릿 시스템 | ✅ 구현 완료 |
 
 ### 추가 기능 (Phase 1+)
 
@@ -142,9 +144,14 @@ flutter build apk
 |------|------|
 | 2단계 입금확인 (학생→선생님) | ✅ 완료 |
 | 월 4/8회 레슨 횟수 설정 | ✅ 완료 |
+| 레슨 스케줄 시스템 (체험/정규) | 🔶 화면 구현, 연결 필요 |
+| Debug 역할 전환 (개발용) | ✅ 완료 |
+| 레퍼토리-연습 연동 | ✅ 완료 |
+| 다중 구간 지원 (마디/줄) | ✅ 완료 |
 | 푸시 알림 / 알림 시스템 | 예정 |
-| AI 레슨 요약 (Whisper + Claude) | 예정 |
+| 뱃지 시스템 | 예정 |
 | 연습 통계/리포트 | 예정 |
+| AI 레슨 요약 (Whisper + Claude) | 예정 |
 
 ---
 
@@ -338,12 +345,12 @@ class PracticeItem {
 | 단계 | 내용 | 상태 |
 |------|------|------|
 | Phase 1 | 기본 연습 할당/완료 | ✅ 완료 |
-| Phase 2 | 뱃지 시스템 | 예정 |
-| Phase 3 | 연령별 UI 분화 | 예정 |
-| Phase 4 | 통계/리포트 | 예정 |
-| Phase 5 | 고급 기능 (녹음/영상) | 예정 |
+| Phase 2 | 레퍼토리 연동 | ✅ 완료 |
+| Phase 3 | 좋아요 & 알림 | 🔶 좋아요 완료, 알림 예정 |
+| Phase 4 | 뱃지 시스템 | 예정 |
+| Phase 5 | 통계/리포트 | 예정 |
 
-### Phase 1 구현 완료 (2024-12-24)
+### Phase 1-2 구현 완료 (2024-12-24)
 
 #### 생성된 파일
 
@@ -360,6 +367,8 @@ class PracticeItem {
 - **레슨 상세 > 과제 탭**: PracticeItemsSection 위젯
   - 우선순위별 그룹핑 (🔴필수/🟡추천/🟢도전)
   - 연습 추가/수정/삭제 (Bottom Sheet)
+  - 레퍼토리 선택 또는 새로 생성
+  - 다중 구간 지원 (마디/줄 선택)
   - 완료 토글 및 좋아요 피드백
 
 #### 학생 화면
@@ -369,6 +378,77 @@ class PracticeItem {
   - 체크박스 완료 토글
   - 연습 횟수 +/- 버튼
   - 선생님 좋아요 표시 ❤️
+
+#### Phase 2 추가 기능 (레퍼토리 연동)
+
+- **레퍼토리 자동 연동**: 연습 추가 시 PracticeSection 자동 생성
+- **다중 구간 지원**:
+  - RangeType enum (마디/줄 선택)
+  - 여러 구간 추가 가능 (+ 구간 추가)
+  - 저장 형식: "곡명 1~5마디, 10~15줄"
+
+---
+
+## Debug Role Switcher (개발용)
+
+### 개요
+
+개발/테스트 중 선생님 ↔ 학생 역할 전환을 위한 Debug FAB
+
+### 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 탭 | 빠른 역할 전환 + 홈 화면 이동 |
+| 길게 누르기 | 상세 옵션 (테스트 학생 선택) |
+| 역할 표시 | 현재 역할 배지 (선생님/학생) |
+
+### 관련 파일
+
+| 파일 | 설명 |
+|------|------|
+| `lib/providers/auth/user_role_provider.dart` | UserRole enum + providers |
+| `lib/core/widgets/debug_role_switcher.dart` | DebugRoleSwitcher, DebugWrapper 위젯 |
+
+### 사용법
+
+- **kDebugMode에서만 표시됨** (Release 빌드에서는 자동 숨김)
+- HomeScreen, StudentHomeScreen에 DebugWrapper 적용됨
+
+---
+
+## 레슨 스케줄 시스템 (구현 중)
+
+### 개요
+
+체험레슨 신청/승인 및 정규레슨 등록 시스템
+
+### 구현 상태
+
+| 기능 | 상태 | 파일 |
+|------|------|------|
+| 모델 정의 | ✅ 완료 | `lib/models/lesson_booking.dart` |
+| Repository | ✅ 완료 | `lib/repositories/booking_repository.dart` |
+| Providers | ✅ 완료 | `lib/providers/booking/` |
+| 시간 선택 위젯 | ✅ 완료 | `lib/features/schedule/.../time_slot_picker.dart` |
+| 예약 카드 위젯 | ✅ 완료 | `lib/features/schedule/.../booking_card.dart` |
+| 스케줄 유형 선택 | ✅ 완료 | `lib/features/schedule/.../schedule_type_selector.dart` |
+| 체험레슨 신청 화면 | ✅ 완료 | `trial_lesson_request_screen.dart` |
+| 승인 대기 목록 | ✅ 완료 | `pending_bookings_screen.dart` |
+| 정규레슨 등록 | ✅ 완료 | `register_regular_lesson_screen.dart` |
+| 예약 목록/상세 | ✅ 완료 | `booking_list_screen.dart`, `booking_detail_screen.dart` |
+| 라우터 연결 | ⚠️ 일부 | 메인 화면에서 진입점 연결 필요 |
+
+### 플로우
+
+```
+체험레슨: 학생 → 선생님 선택 → 날짜/시간 선택 → 신청 → 선생님 승인/거절
+정규레슨: 체험 완료 후 → 스케줄 유형(고정/유동) → 시간 선택 → 등록
+```
+
+### 상세 설계
+
+📖 **[레슨 스케줄 설계](../../../Personal/development/idea/lesson-app/Lesson_Schedule_Design.md)**
 
 ---
 

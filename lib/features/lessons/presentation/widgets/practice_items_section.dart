@@ -507,13 +507,60 @@ class AddPracticeItemSheet extends ConsumerStatefulWidget {
   ConsumerState<AddPracticeItemSheet> createState() => _AddPracticeItemSheetState();
 }
 
+/// Range type for practice sections
+enum RangeType {
+  measure,
+  line;
+
+  String get label {
+    switch (this) {
+      case RangeType.measure:
+        return '마디';
+      case RangeType.line:
+        return '줄';
+    }
+  }
+}
+
+/// A single practice range entry
+class PracticeRangeEntry {
+  RangeType type;
+  final TextEditingController startController;
+  final TextEditingController endController;
+
+  PracticeRangeEntry({
+    this.type = RangeType.measure,
+    String? start,
+    String? end,
+  })  : startController = TextEditingController(text: start),
+        endController = TextEditingController(text: end);
+
+  void dispose() {
+    startController.dispose();
+    endController.dispose();
+  }
+
+  bool get isValid {
+    final start = int.tryParse(startController.text.trim());
+    final end = int.tryParse(endController.text.trim());
+    return start != null && end != null && start <= end;
+  }
+
+  String toDisplayString() {
+    final start = startController.text.trim();
+    final end = endController.text.trim();
+    return '$start~$end${type.label}';
+  }
+}
+
 class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _pieceNameController = TextEditingController();
-  final _startMeasureController = TextEditingController();
-  final _endMeasureController = TextEditingController();
   final _newRepertoireNameController = TextEditingController();
+
+  // Multiple practice ranges
+  final List<PracticeRangeEntry> _practiceRanges = [];
 
   PracticeType _selectedType = PracticeType.repertoire;
   PracticePriority _selectedPriority = PracticePriority.should;
@@ -524,13 +571,21 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   bool _isCreatingNewRepertoire = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Start with one empty range
+    _practiceRanges.add(PracticeRangeEntry());
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _pieceNameController.dispose();
-    _startMeasureController.dispose();
-    _endMeasureController.dispose();
     _newRepertoireNameController.dispose();
+    for (final range in _practiceRanges) {
+      range.dispose();
+    }
     super.dispose();
   }
 
@@ -738,51 +793,24 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
           const SizedBox(height: AppSpacing.space4),
         ],
 
-        // Piece name and measure range
-        Text('곡 정보', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        // Piece name
+        Text('곡명', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: AppSpacing.space2),
         TextField(
           controller: _pieceNameController,
           decoration: InputDecoration(
-            hintText: '곡명 (예: 라폴리아)',
+            hintText: '예: 라폴리아',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.space3),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _startMeasureController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: '시작 마디',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
-              child: Text('~', style: AppTypography.bodyLarge),
-            ),
-            Expanded(
-              child: TextField(
-                controller: _endMeasureController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: '끝 마디',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        const SizedBox(height: AppSpacing.space4),
+
+        // Practice ranges (multiple)
+        Text('연습 구간', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacing.space2),
+        _buildPracticeRanges(),
         const SizedBox(height: AppSpacing.space4),
       ],
     );
@@ -907,6 +935,177 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     );
   }
 
+  Widget _buildPracticeRanges() {
+    return Column(
+      children: [
+        // Range entries
+        ...List.generate(_practiceRanges.length, (index) {
+          return _buildRangeEntry(index);
+        }),
+
+        // Add range button (styled differently from main submit button)
+        const SizedBox(height: AppSpacing.space2),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () {
+              setState(() {
+                _practiceRanges.add(PracticeRangeEntry());
+              });
+            },
+            icon: Icon(
+              Icons.add,
+              size: 18,
+              color: AppColors.textSecondaryLight,
+            ),
+            label: Text(
+              '구간 추가',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space1,
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRangeEntry(int index) {
+    final range = _practiceRanges[index];
+    final canDelete = _practiceRanges.length > 1;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: index < _practiceRanges.length - 1 ? AppSpacing.space2 : 0),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          // Type dropdown (마디/줄)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<RangeType>(
+                value: range.type,
+                isDense: true,
+                items: RangeType.values.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(
+                      type.label,
+                      style: AppTypography.bodySmall,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      range.type = value;
+                    });
+                  }
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+
+          // Start input
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: range.startController,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: '시작',
+                  hintStyle: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                ),
+                style: AppTypography.bodySmall,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+            child: Text('~', style: AppTypography.bodyMedium),
+          ),
+
+          // End input
+          Expanded(
+            child: SizedBox(
+              height: 40,
+              child: TextField(
+                controller: range.endController,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: '끝',
+                  hintStyle: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.surfaceLight,
+                ),
+                style: AppTypography.bodySmall,
+              ),
+            ),
+          ),
+
+          // Delete button
+          const SizedBox(width: AppSpacing.space2),
+          if (canDelete)
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _practiceRanges[index].dispose();
+                  _practiceRanges.removeAt(index);
+                });
+              },
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.close,
+                  size: 20,
+                  color: AppColors.textTertiaryLight,
+                ),
+              ),
+            )
+          else
+            const SizedBox(width: 28), // Placeholder for alignment
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     // Validate based on type
     if (_selectedType == PracticeType.repertoire) {
@@ -928,19 +1127,23 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         );
         return;
       }
-      final startMeasure = int.tryParse(_startMeasureController.text.trim());
-      final endMeasure = int.tryParse(_endMeasureController.text.trim());
-      if (startMeasure == null || endMeasure == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('마디 번호를 입력해주세요')),
-        );
-        return;
-      }
-      if (startMeasure > endMeasure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('시작 마디가 끝 마디보다 클 수 없습니다')),
-        );
-        return;
+      // Validate all practice ranges
+      for (int i = 0; i < _practiceRanges.length; i++) {
+        final range = _practiceRanges[i];
+        final start = int.tryParse(range.startController.text.trim());
+        final end = int.tryParse(range.endController.text.trim());
+        if (start == null || end == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')),
+          );
+          return;
+        }
+        if (start > end) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('구간 ${i + 1}의 시작 번호가 끝 번호보다 클 수 없습니다')),
+          );
+          return;
+        }
       }
     } else {
       final title = _titleController.text.trim();
@@ -964,8 +1167,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       if (_selectedType == PracticeType.repertoire) {
         // Handle repertoire type
         final pieceName = _pieceNameController.text.trim();
-        final startMeasure = int.parse(_startMeasureController.text.trim());
-        final endMeasure = int.parse(_endMeasureController.text.trim());
 
         // Create or get repertoire
         PracticeRepertoire repertoire;
@@ -979,7 +1180,11 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         }
         repertoireId = repertoire.id;
 
-        // Create section in repertoire
+        // Create section for first range (primary section)
+        final firstRange = _practiceRanges.first;
+        final startMeasure = int.parse(firstRange.startController.text.trim());
+        final endMeasure = int.parse(firstRange.endController.text.trim());
+
         final section = await ref.read(sectionCrudProvider.notifier).createSection(
           repertoireId: repertoireId,
           pieceName: pieceName,
@@ -988,8 +1193,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         );
         sectionId = section.id;
 
-        // Build title: "곡명 - 시작~끝 마디"
-        title = '$pieceName $startMeasure~$endMeasure마디';
+        // Build title: "곡명 시작~끝마디, 시작~끝줄, ..."
+        final rangeStrings = _practiceRanges.map((r) => r.toDisplayString()).join(', ');
+        title = '$pieceName $rangeStrings';
       } else {
         title = _titleController.text.trim();
       }
