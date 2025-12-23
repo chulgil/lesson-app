@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
 import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
@@ -24,19 +25,21 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(
-          index: _currentIndex,
-          children: const [
-            _StudentDashboardTab(),
-            StudentLessonsTab(),
-            StudentPracticeTab(),
-            StudentProfileTab(),
-          ],
+    return DebugWrapper(
+      child: Scaffold(
+        body: SafeArea(
+          child: IndexedStack(
+            index: _currentIndex,
+            children: const [
+              _StudentDashboardTab(),
+              StudentLessonsTab(),
+              StudentPracticeTab(),
+              StudentProfileTab(),
+            ],
+          ),
         ),
+        bottomNavigationBar: _buildBottomNavigation(),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 

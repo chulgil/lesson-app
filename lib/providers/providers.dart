@@ -1,6 +1,9 @@
 // Providers barrel file
 // All providers are organized by category
 
+// Auth providers (role switching for debug)
+export 'auth/user_role_provider.dart';
+
 // Lesson providers
 export 'lesson/lesson_providers.dart';
 

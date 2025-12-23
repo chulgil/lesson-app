@@ -7,6 +7,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
@@ -27,19 +28,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(
-          index: _currentIndex,
-          children: const [
-            _DashboardTab(),
-            CalendarTab(),
-            StudentsTab(),
-            ProfileTab(),
-          ],
+    return DebugWrapper(
+      child: Scaffold(
+        body: SafeArea(
+          child: IndexedStack(
+            index: _currentIndex,
+            children: const [
+              _DashboardTab(),
+              CalendarTab(),
+              StudentsTab(),
+              ProfileTab(),
+            ],
+          ),
         ),
+        bottomNavigationBar: _buildBottomNavigation(),
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 
