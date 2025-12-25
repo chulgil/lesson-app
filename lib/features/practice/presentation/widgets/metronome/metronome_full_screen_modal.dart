@@ -1,0 +1,528 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
+import '../../../../../models/metronome_settings.dart';
+import '../../../../../providers/metronome/metronome_provider.dart';
+import 'cat_beat_indicator.dart';
+
+/// Full screen metronome modal with all controls.
+///
+/// Features:
+/// - Large cat beat indicator
+/// - BPM slider and ±5 buttons
+/// - Time signature selector
+/// - Sound selector
+/// - Visual/vibration toggles
+class MetronomeFullScreenModal extends ConsumerWidget {
+  const MetronomeFullScreenModal({super.key});
+
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const MetronomeFullScreenModal(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(metronomeProvider);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.85,
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          const _HandleBar(),
+
+          // Header
+          _Header(onClose: () => Navigator.pop(context)),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(AppSpacing.space6),
+              child: Column(
+                children: [
+                  // Cat beat indicator - large for visibility
+                  CatBeatIndicator(
+                    currentBeat: state.currentBeat,
+                    timeSignature: state.settings.timeSignature,
+                    isPlaying: state.isPlaying,
+                    size: 180,
+                  ),
+                  SizedBox(height: AppSpacing.space8),
+
+                  // BPM display
+                  _BpmDisplay(bpm: state.settings.bpm),
+                  SizedBox(height: AppSpacing.space4),
+
+                  // BPM controls
+                  _BpmSlider(
+                    bpm: state.settings.bpm,
+                    onChanged: (value) =>
+                        ref.read(metronomeProvider.notifier).setBpm(value),
+                    onDecrement: () =>
+                        ref.read(metronomeProvider.notifier).incrementBpm(-5),
+                    onIncrement: () =>
+                        ref.read(metronomeProvider.notifier).incrementBpm(5),
+                  ),
+                  SizedBox(height: AppSpacing.space8),
+
+                  // Play/Pause button
+                  _LargePlayButton(
+                    isPlaying: state.isPlaying,
+                    onPressed: () =>
+                        ref.read(metronomeProvider.notifier).toggle(),
+                  ),
+                  SizedBox(height: AppSpacing.space8),
+
+                  // Time signature selector
+                  _TimeSignatureSelector(
+                    selected: state.settings.timeSignature,
+                    onChanged: (ts) =>
+                        ref.read(metronomeProvider.notifier).setTimeSignature(ts),
+                  ),
+                  SizedBox(height: AppSpacing.space6),
+
+                  // Sound selector
+                  _SoundSelector(
+                    selected: state.settings.sound,
+                    onChanged: (sound) =>
+                        ref.read(metronomeProvider.notifier).setSound(sound),
+                  ),
+                  SizedBox(height: AppSpacing.space6),
+
+                  // Accent pattern selector
+                  _AccentPatternSelector(
+                    selected: state.settings.accentPattern,
+                    onChanged: (pattern) =>
+                        ref.read(metronomeProvider.notifier).setAccentPattern(pattern),
+                  ),
+                  SizedBox(height: AppSpacing.space6),
+
+                  // Toggle options
+                  _ToggleOptions(
+                    visualFlash: state.settings.visualFlash,
+                    vibration: state.settings.vibration,
+                    onVisualFlashChanged: () =>
+                        ref.read(metronomeProvider.notifier).toggleVisualFlash(),
+                    onVibrationChanged: () =>
+                        ref.read(metronomeProvider.notifier).toggleVibration(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HandleBar extends StatelessWidget {
+  const _HandleBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: AppSpacing.space2),
+      width: 40,
+      height: 4,
+      decoration: BoxDecoration(
+        color: AppColors.borderLight,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.onClose});
+
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(AppSpacing.space4),
+      child: Row(
+        children: [
+          const SizedBox(width: 48), // Balance for close button
+          Expanded(
+            child: Text(
+              '메트로놈',
+              style: AppTypography.headingSmall,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: onClose,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BpmDisplay extends StatelessWidget {
+  const _BpmDisplay({required this.bpm});
+
+  final int bpm;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          '$bpm',
+          style: AppTypography.displayLarge.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        Text(
+          'BPM',
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BpmSlider extends StatelessWidget {
+  const _BpmSlider({
+    required this.bpm,
+    required this.onChanged,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  final int bpm;
+  final ValueChanged<int> onChanged;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // -5 button
+        _CircleButton(
+          label: '-5',
+          onPressed: onDecrement,
+        ),
+        SizedBox(width: AppSpacing.space2),
+
+        // Slider
+        Expanded(
+          child: SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: AppColors.primary,
+              inactiveTrackColor: AppColors.primaryLight,
+              thumbColor: AppColors.primary,
+              overlayColor: AppColors.primary.withValues(alpha: 0.2),
+            ),
+            child: Slider(
+              value: bpm.toDouble(),
+              min: MetronomeSettings.minBpm.toDouble(),
+              max: MetronomeSettings.maxBpm.toDouble(),
+              onChanged: (value) => onChanged(value.round()),
+            ),
+          ),
+        ),
+        SizedBox(width: AppSpacing.space2),
+
+        // +5 button
+        _CircleButton(
+          label: '+5',
+          onPressed: onIncrement,
+        ),
+      ],
+    );
+  }
+}
+
+class _CircleButton extends StatelessWidget {
+  const _CircleButton({
+    required this.label,
+    required this.onPressed,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.primary,
+          shape: const CircleBorder(),
+          padding: EdgeInsets.zero,
+        ),
+        child: Text(
+          label,
+          style: AppTypography.buttonSmall.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LargePlayButton extends StatelessWidget {
+  const _LargePlayButton({
+    required this.isPlaying,
+    required this.onPressed,
+  });
+
+  final bool isPlaying;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: BorderSide(color: AppColors.primary, width: 3),
+          shape: const CircleBorder(),
+          padding: EdgeInsets.zero,
+        ),
+        child: Icon(
+          isPlaying ? Icons.pause : Icons.play_arrow,
+          size: 48,
+          color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeSignatureSelector extends StatelessWidget {
+  const _TimeSignatureSelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final TimeSignature selected;
+  final ValueChanged<TimeSignature> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '박자표',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        Row(
+          children: TimeSignature.values.map((ts) {
+            final isSelected = ts == selected;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                  label: Text(ts.label),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(ts),
+                  selectedColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _SoundSelector extends StatelessWidget {
+  const _SoundSelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final MetronomeSound selected;
+  final ValueChanged<MetronomeSound> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '소리',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: MetronomeSound.values.map((sound) {
+            final isSelected = sound == selected;
+            return ChoiceChip(
+              label: Text(sound.label),
+              selected: isSelected,
+              onSelected: (_) => onChanged(sound),
+              selectedColor: AppColors.primary,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _AccentPatternSelector extends StatelessWidget {
+  const _AccentPatternSelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final AccentPattern selected;
+  final ValueChanged<AccentPattern> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '박자 패턴',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: AccentPattern.values.map((pattern) {
+            final isSelected = pattern == selected;
+            return ChoiceChip(
+              label: Text(pattern.label),
+              selected: isSelected,
+              onSelected: (_) => onChanged(pattern),
+              selectedColor: AppColors.primary,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: AppSpacing.space1),
+        Text(
+          selected.description,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ToggleOptions extends StatelessWidget {
+  const _ToggleOptions({
+    required this.visualFlash,
+    required this.vibration,
+    required this.onVisualFlashChanged,
+    required this.onVibrationChanged,
+  });
+
+  final bool visualFlash;
+  final bool vibration;
+  final VoidCallback onVisualFlashChanged;
+  final VoidCallback onVibrationChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '옵션',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        _ToggleRow(
+          label: '시각 플래시',
+          value: visualFlash,
+          onChanged: onVisualFlashChanged,
+        ),
+        _ToggleRow(
+          label: '진동',
+          value: vibration,
+          onChanged: onVibrationChanged,
+        ),
+      ],
+    );
+  }
+}
+
+class _ToggleRow extends StatelessWidget {
+  const _ToggleRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final VoidCallback onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.space1),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: AppTypography.bodyMedium),
+          Switch(
+            value: value,
+            onChanged: (_) => onChanged(),
+            activeColor: AppColors.primary,
+          ),
+        ],
+      ),
+    );
+  }
+}

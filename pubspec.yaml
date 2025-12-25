@@ -37,7 +37,8 @@ dependencies:
   # google_sign_in: ^6.2.1           # TODO: Add when implementing auth
   # kakao_flutter_sdk_user: ^1.9.5  # TODO: Add when ready
 
-  # Audio (Phase 1 - Lesson Recording)
+  # Audio
+  audioplayers: ^6.1.0       # Metronome playback
   # record: ^5.1.2           # TODO: Add when implementing recording
   # just_audio: ^0.9.39      # TODO: Add when implementing playback
   # audio_waveforms: ^1.0.5  # TODO: Add when implementing waveforms
@@ -60,6 +61,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/sounds/
+    - assets/sounds/metronome/pen/
+    - assets/sounds/metronome/drum/
+    - assets/sounds/metronome/happy_kitten/
+    - assets/sounds/metronome/stick/
+    - assets/sounds/metronome/woodblock/
 
   # TODO: Add Pretendard fonts to assets/fonts/
   # Download from: https://github.com/orioncactus/pretendard

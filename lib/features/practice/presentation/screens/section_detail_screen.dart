@@ -5,7 +5,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
+import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../widgets/metronome/metronome.dart';
+import '../widgets/recording_waveform.dart';
 
 /// Section detail screen showing section info and recordings
 class SectionDetailScreen extends ConsumerStatefulWidget {
@@ -69,6 +72,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
             ],
           ),
         ],
+      ),
+      bottomNavigationBar: MetronomeControllerBar(
+        onExpand: () => MetronomeFullScreenModal.show(context),
       ),
       body: sectionAsync.when(
         data: (section) {
@@ -301,11 +307,15 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     // TODO: Save actual recording file
     final mockFilePath = '/recordings/mock_${DateTime.now().millisecondsSinceEpoch}.m4a';
 
+    // Capture current metronome BPM
+    final metronomeBpm = ref.read(metronomeProvider).settings.bpm;
+
     try {
       await ref.read(recordingCrudProvider.notifier).createRecording(
             sectionId: widget.sectionId,
             filePath: mockFilePath,
             durationSeconds: _recordingSeconds,
+            bpm: metronomeBpm, // Save metronome BPM
             isRepresentative: section.recordings.isEmpty, // First recording is representative
           );
 
@@ -674,91 +684,138 @@ class _RecordingControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: isRecording
-            ? AppColors.error.withValues(alpha: 0.1)
-            : AppColors.surfaceSecondaryLight,
+    return SizedBox(
+      width: double.infinity,
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: isRecording
-            ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
-            : null,
-      ),
-      child: Column(
-        children: [
-          if (isRecording) ...[
-            // Recording indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: isPaused ? AppColors.warning : AppColors.error,
-                    shape: BoxShape.circle,
-                  ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isRecording
+                ? AppColors.error.withValues(alpha: 0.15)
+                : AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: isRecording
+                ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
+                : null,
+          ),
+          child: Stack(
+          children: [
+            // Background waveform overlay (only when recording)
+            if (isRecording)
+              Positioned.fill(
+                child: RecordingWaveform(
+                  isActive: !isPaused,
+                  height: 200,
+                  waveColor: Colors.white,
+                  waveCount: 3,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  isPaused ? '일시정지' : '녹음 중',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: isPaused ? AppColors.warning : AppColors.error,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            // Timer
-            Text(
-              _formattedTime,
-              style: AppTypography.headingLarge.copyWith(
-                fontSize: 36,
-                fontFamily: 'monospace',
               ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            // Controls
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Pause/Resume button
-                IconButton.filled(
-                  onPressed: isPaused ? onResumeRecording : onPauseRecording,
-                  icon: Icon(isPaused ? Icons.play_arrow : Icons.pause),
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppColors.warning,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space4),
-                // Stop button
-                IconButton.filled(
-                  onPressed: onStopRecording,
-                  icon: const Icon(Icons.stop),
-                  style: IconButton.styleFrom(
-                    backgroundColor: AppColors.error,
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            // Start recording button
-            FilledButton.icon(
-              onPressed: onStartRecording,
-              icon: const Icon(Icons.mic),
-              label: const Text('녹음 시작'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.error,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space6,
-                  vertical: AppSpacing.space3,
-                ),
+            // Foreground content
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              child: Column(
+                children: [
+                  if (isRecording) ...[
+                    // Recording indicator
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: isPaused ? AppColors.warning : AppColors.error,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          isPaused ? '일시정지' : '녹음 중',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: isPaused ? AppColors.warning : AppColors.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    // Timer
+                    Text(
+                      _formattedTime,
+                      style: AppTypography.headingLarge.copyWith(
+                        fontSize: 36,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    // Controls
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Pause/Resume button (2x size)
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: IconButton.filled(
+                            onPressed: isPaused ? onResumeRecording : onPauseRecording,
+                            icon: Icon(
+                              isPaused ? Icons.play_arrow : Icons.pause,
+                              size: 40,
+                            ),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.warning,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.space4),
+                        // Stop button (2x size)
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: IconButton.filled(
+                            onPressed: onStopRecording,
+                            icon: const Icon(Icons.stop, size: 40),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    // Start recording button (2x size, 60% width, centered)
+                    const SizedBox(height: AppSpacing.space4),
+                    Center(
+                      child: FractionallySizedBox(
+                        widthFactor: 0.6,
+                        child: FilledButton.icon(
+                          onPressed: onStartRecording,
+                          icon: const Icon(Icons.mic, size: 28),
+                          label: Text(
+                            '녹음 시작',
+                            style: AppTypography.bodyLarge.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.space8,
+                              vertical: AppSpacing.space5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
+                ],
               ),
             ),
           ],
-        ],
+        ),
+        ),
       ),
     );
   }
@@ -819,6 +876,27 @@ class _RecordingListItem extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
+                        if (recording.bpm != null) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius:
+                                  BorderRadius.circular(AppSpacing.radiusSmall),
+                            ),
+                            child: Text(
+                              '${recording.bpm} BPM',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                         if (recording.isRepresentative) ...[
                           const SizedBox(width: 8),
                           Container(

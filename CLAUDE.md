@@ -8,7 +8,7 @@
 |------|-----|
 | 기술 스택 | Flutter, Riverpod (@riverpod 코드생성), Go Router, Hive |
 | 플랫폼 | iOS, Android |
-| 상태 | Phase 1 진행중 (90% 완료) |
+| 상태 | Phase 1 진행중 (95% 완료) |
 
 ## 명령어
 
@@ -61,6 +61,9 @@ lib/
 - 팁 템플릿 시스템
 - 연습 스트릭 (주말 제외 정책)
 - Debug 역할 전환
+- 메트로놈 시스템 (엔진, 하단 바, 풀스크린 모달, 고양이 UI)
+- 녹음 파형 애니메이션 (곡선 사인파 흐름)
+- 녹음 시 BPM 표시
 
 ### 진행중
 - 레슨 스케줄 시스템 (화면 완료, 라우터 연결 필요)
@@ -82,6 +85,7 @@ lib/
 | Lesson | 레슨 기록, 노트, 녹음 |
 | PracticeItem | 연습 과제 (priority: must/should/could) |
 | LessonBooking | 체험/정규레슨 예약 (pending/confirmed/completed) |
+| MetronomeSettings | BPM, 박자표, 사운드 템플릿 |
 
 ## 문서 참조
 
@@ -92,6 +96,7 @@ lib/
 | 연습 시스템 스펙 | `idea/lesson-app/specs/practice_system.md` |
 | 수강료 스펙 | `idea/lesson-app/specs/payment_system.md` |
 | 레슨 스케줄 스펙 | `idea/lesson-app/specs/lesson_schedule.md` |
+| 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
 
