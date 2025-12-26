@@ -99,6 +99,7 @@ lib/
 | 레슨 스케줄 스펙 | `idea/lesson-app/specs/lesson_schedule.md` |
 | 체험 레슨 스펙 | `idea/lesson-app/specs/trial_lesson_system.md` |
 | 가용시간 관리 스펙 | `idea/lesson-app/specs/trial_lesson_system.md#가용시간-관리-시스템-상세` |
+| 노쇼/취소 정책 스펙 | `idea/lesson-app/specs/trial_lesson_system.md#노쇼취소-정책-시스템-상세` |
 | 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
