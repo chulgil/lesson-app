@@ -97,6 +97,7 @@ lib/
 | 연습 시스템 스펙 | `idea/lesson-app/specs/practice_system.md` |
 | 수강료 스펙 | `idea/lesson-app/specs/payment_system.md` |
 | 레슨 스케줄 스펙 | `idea/lesson-app/specs/lesson_schedule.md` |
+| 체험 레슨 스펙 | `idea/lesson-app/specs/trial_lesson_system.md` |
 | 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
