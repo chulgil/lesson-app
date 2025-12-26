@@ -134,6 +134,12 @@ class _DashboardTab extends ConsumerWidget {
                 ),
                 Row(
                   children: [
+                    // Booking list button
+                    IconButton(
+                      onPressed: () => context.push(AppRoutes.bookingList),
+                      icon: const Icon(Icons.event_note_outlined),
+                      tooltip: '예약 관리',
+                    ),
                     // Pending bookings button with badge
                     _buildPendingBookingsButton(context, ref),
                     IconButton(

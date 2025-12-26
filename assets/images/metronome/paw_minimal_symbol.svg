@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  File: paw_minimal_symbol.svg
+  Style: Fill-only, no stroke, no shadow, no gradients
+  Color: Uses currentColor
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" viewBox="0 0 0 0" aria-hidden="true" focusable="false">
+  <symbol id="paw-24" viewBox="0 0 24 24">
+    <circle cx="7.6" cy="8.3" r="1.65" fill="currentColor"/>
+    <circle cx="12.0" cy="7.3" r="1.75" fill="currentColor"/>
+    <circle cx="16.4" cy="8.3" r="1.65" fill="currentColor"/>
+    <path d="M12 10.4c-3.25 0-6 1.95-6 4.75C6 17.55 8.05 19.1 12 19.1s6-1.55 6-3.95c0-2.8-2.75-4.75-6-4.75z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="paw-32" viewBox="0 0 32 32">
+    <circle cx="10.1" cy="10.6" r="2.2" fill="currentColor"/>
+    <circle cx="16.0" cy="9.4" r="2.35" fill="currentColor"/>
+    <circle cx="21.9" cy="10.6" r="2.2" fill="currentColor"/>
+    <path d="M16 13.2c-4.35 0-8 2.65-8 6.45 0 3.35 2.7 5.45 8 5.45s8-2.1 8-5.45c0-3.8-3.65-6.45-8-6.45z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="paw-48" viewBox="0 0 48 48">
+    <circle cx="15.2" cy="16.0" r="3.25" fill="currentColor"/>
+    <circle cx="24.0" cy="14.2" r="3.45" fill="currentColor"/>
+    <circle cx="32.8" cy="16.0" r="3.25" fill="currentColor"/>
+    <path d="M24 19.8c-6.6 0-12 4.05-12 9.75 0 5.05 4.05 8.25 12 8.25s12-3.2 12-8.25c0-5.7-5.4-9.75-12-9.75z" fill="currentColor"/>
+  </symbol>
+</svg>

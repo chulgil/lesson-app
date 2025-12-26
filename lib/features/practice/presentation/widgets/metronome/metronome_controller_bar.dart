@@ -25,7 +25,7 @@ class MetronomeControllerBar extends ConsumerWidget {
       onTap: onExpand,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 88,
+        height: 106,
         decoration: BoxDecoration(
           color: AppColors.surfaceLight,
           boxShadow: [
@@ -41,13 +41,15 @@ class MetronomeControllerBar extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Cat indicator - large for visibility
+              // Cat indicator - compact size
               CatBeatIndicator(
                 currentBeat: state.currentBeat,
                 timeSignature: state.settings.timeSignature,
                 isPlaying: state.isPlaying,
-                size: 64,
+                bpm: state.settings.bpm,
+                size: 48,
                 compact: true,
               ),
               const SizedBox(width: AppSpacing.space4),

@@ -52,6 +52,7 @@ class PracticeRecording {
   final String sectionId;
   final String filePath;
   final int durationSeconds;
+  final int? bpm; // Metronome BPM used during recording
   final bool isRepresentative;
   final DateTime createdAt;
 
@@ -60,6 +61,7 @@ class PracticeRecording {
     required this.sectionId,
     required this.filePath,
     required this.durationSeconds,
+    this.bpm,
     this.isRepresentative = false,
     required this.createdAt,
   });
@@ -71,11 +73,15 @@ class PracticeRecording {
     return '$minutes:${seconds.toString().padLeft(2, '0')}';
   }
 
+  /// Get BPM display string
+  String? get bpmText => bpm != null ? '$bpm BPM' : null;
+
   PracticeRecording copyWith({
     String? id,
     String? sectionId,
     String? filePath,
     int? durationSeconds,
+    int? bpm,
     bool? isRepresentative,
     DateTime? createdAt,
   }) {
@@ -84,6 +90,7 @@ class PracticeRecording {
       sectionId: sectionId ?? this.sectionId,
       filePath: filePath ?? this.filePath,
       durationSeconds: durationSeconds ?? this.durationSeconds,
+      bpm: bpm ?? this.bpm,
       isRepresentative: isRepresentative ?? this.isRepresentative,
       createdAt: createdAt ?? this.createdAt,
     );

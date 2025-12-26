@@ -55,7 +55,9 @@ class MetronomeFullScreenModal extends ConsumerWidget {
                     currentBeat: state.currentBeat,
                     timeSignature: state.settings.timeSignature,
                     isPlaying: state.isPlaying,
-                    size: 180,
+                    accentPattern: state.settings.accentPattern,
+                    bpm: state.settings.bpm,
+                    size: 140,
                   ),
                   SizedBox(height: AppSpacing.space8),
 
@@ -75,9 +77,10 @@ class MetronomeFullScreenModal extends ConsumerWidget {
                   ),
                   SizedBox(height: AppSpacing.space8),
 
-                  // Play/Pause button
+                  // Play/Pause button with beat number
                   _LargePlayButton(
                     isPlaying: state.isPlaying,
+                    currentBeat: state.currentBeat,
                     onPressed: () =>
                         ref.read(metronomeProvider.notifier).toggle(),
                   ),
@@ -290,10 +293,12 @@ class _LargePlayButton extends StatelessWidget {
   const _LargePlayButton({
     required this.isPlaying,
     required this.onPressed,
+    required this.currentBeat,
   });
 
   final bool isPlaying;
   final VoidCallback onPressed;
+  final int currentBeat;
 
   @override
   Widget build(BuildContext context) {
@@ -308,11 +313,20 @@ class _LargePlayButton extends StatelessWidget {
           shape: const CircleBorder(),
           padding: EdgeInsets.zero,
         ),
-        child: Icon(
-          isPlaying ? Icons.pause : Icons.play_arrow,
-          size: 48,
-          color: AppColors.primary,
-        ),
+        child: isPlaying && currentBeat > 0
+            ? Text(
+                '$currentBeat',
+                style: AppTypography.displayLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  fontSize: 36,
+                ),
+              )
+            : Icon(
+                isPlaying ? Icons.pause : Icons.play_arrow,
+                size: 48,
+                color: AppColors.primary,
+              ),
       ),
     );
   }

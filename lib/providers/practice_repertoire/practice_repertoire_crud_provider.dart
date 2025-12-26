@@ -327,6 +327,7 @@ class RecordingCrudNotifier extends AsyncNotifier<void> {
     required String sectionId,
     required String filePath,
     required int durationSeconds,
+    int? bpm,
     bool isRepresentative = false,
   }) async {
     state = const AsyncLoading();
@@ -337,6 +338,7 @@ class RecordingCrudNotifier extends AsyncNotifier<void> {
         sectionId: sectionId,
         filePath: filePath,
         durationSeconds: durationSeconds,
+        bpm: bpm,
         isRepresentative: isRepresentative,
         createdAt: DateTime.now(),
       );

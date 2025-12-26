@@ -553,6 +553,7 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
       sectionId: recording.sectionId,
       filePath: recording.filePath,
       durationSeconds: recording.durationSeconds,
+      bpm: recording.bpm,
       isRepresentative: recording.isRepresentative,
       createdAt: DateTime.now(),
     );
