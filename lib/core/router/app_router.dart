@@ -23,6 +23,7 @@ import '../../features/practice/presentation/screens/repertoire_detail_screen.da
 import '../../features/practice/presentation/screens/add_section_screen.dart';
 import '../../features/practice/presentation/screens/section_detail_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
+import '../../features/parent_home/presentation/screens/parent_home_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../features/students/presentation/screens/student_detail_screen.dart';
@@ -36,6 +37,7 @@ class AppRoutes {
   static const roleSelect = '/role-select';
   static const home = '/home'; // Teacher home
   static const studentHome = '/student-home'; // Student home
+  static const parentHome = '/parent-home'; // Parent home
   static const students = '/students';
   static const addStudent = '/students/add';
   static const studentDetail = '/students/:id';
@@ -98,6 +100,13 @@ class AppRouter {
         path: AppRoutes.studentHome,
         name: 'studentHome',
         builder: (context, state) => const StudentHomeScreen(),
+      ),
+
+      // Parent Home (with bottom navigation)
+      GoRoute(
+        path: AppRoutes.parentHome,
+        name: 'parentHome',
+        builder: (context, state) => const ParentHomeScreen(),
       ),
 
       // Add Lesson

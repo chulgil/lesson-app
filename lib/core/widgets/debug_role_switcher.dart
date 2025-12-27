@@ -8,6 +8,18 @@ import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
+/// Get color for user role
+Color _getRoleColor(UserRole role) {
+  switch (role) {
+    case UserRole.teacher:
+      return AppColors.primary;
+    case UserRole.student:
+      return AppColors.secondary;
+    case UserRole.parent:
+      return AppColors.info;
+  }
+}
+
 /// Debug FAB for switching between teacher and student roles
 /// Only visible in debug mode (kDebugMode)
 class DebugRoleSwitcher extends ConsumerWidget {
@@ -34,9 +46,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: currentRole == UserRole.teacher
-                  ? AppColors.primary
-                  : AppColors.secondary,
+              color: _getRoleColor(currentRole),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               boxShadow: [
                 BoxShadow(
@@ -65,19 +75,17 @@ class DebugRoleSwitcher extends ConsumerWidget {
               height: 56,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: currentRole == UserRole.teacher
-                      ? [AppColors.primary, AppColors.primary.withValues(alpha: 0.8)]
-                      : [AppColors.secondary, AppColors.secondary.withValues(alpha: 0.8)],
+                  colors: [
+                    _getRoleColor(currentRole),
+                    _getRoleColor(currentRole).withValues(alpha: 0.8),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (currentRole == UserRole.teacher
-                            ? AppColors.primary
-                            : AppColors.secondary)
-                        .withValues(alpha: 0.4),
+                    color: _getRoleColor(currentRole).withValues(alpha: 0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -97,8 +105,16 @@ class DebugRoleSwitcher extends ConsumerWidget {
 
   void _switchRole(BuildContext context, WidgetRef ref) {
     final currentRole = ref.read(currentUserRoleProvider);
-    final newRole =
-        currentRole == UserRole.teacher ? UserRole.student : UserRole.teacher;
+    // Cycle through: teacher -> student -> parent -> teacher
+    final UserRole newRole;
+    switch (currentRole) {
+      case UserRole.teacher:
+        newRole = UserRole.student;
+      case UserRole.student:
+        newRole = UserRole.parent;
+      case UserRole.parent:
+        newRole = UserRole.teacher;
+    }
 
     ref.read(currentUserRoleProvider.notifier).state = newRole;
 
@@ -108,8 +124,7 @@ class DebugRoleSwitcher extends ConsumerWidget {
         content: Text('${newRole.emoji} ${newRole.label} 모드로 전환'),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor:
-            newRole == UserRole.teacher ? AppColors.primary : AppColors.secondary,
+        backgroundColor: _getRoleColor(newRole),
       ),
     );
 
@@ -165,13 +180,16 @@ class _DebugOptionsSheet extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Row(
-            children: UserRole.values.map((role) {
+            children: UserRole.values.asMap().entries.map((entry) {
+              final index = entry.key;
+              final role = entry.value;
               final isSelected = role == currentRole;
+              final roleColor = _getRoleColor(role);
               return Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
-                    right: role == UserRole.teacher ? AppSpacing.space2 : 0,
-                    left: role == UserRole.student ? AppSpacing.space2 : 0,
+                    right: index < UserRole.values.length - 1 ? AppSpacing.space1 : 0,
+                    left: index > 0 ? AppSpacing.space1 : 0,
                   ),
                   child: InkWell(
                     onTap: () {
@@ -181,22 +199,15 @@ class _DebugOptionsSheet extends ConsumerWidget {
                     },
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                     child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.space3),
+                      padding: const EdgeInsets.all(AppSpacing.space2),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? (role == UserRole.teacher
-                                    ? AppColors.primary
-                                    : AppColors.secondary)
-                                .withValues(alpha: 0.1)
+                            ? roleColor.withValues(alpha: 0.1)
                             : AppColors.surfaceSecondaryLight,
                         borderRadius:
                             BorderRadius.circular(AppSpacing.radiusMedium),
                         border: Border.all(
-                          color: isSelected
-                              ? (role == UserRole.teacher
-                                  ? AppColors.primary
-                                  : AppColors.secondary)
-                              : Colors.transparent,
+                          color: isSelected ? roleColor : Colors.transparent,
                           width: 2,
                         ),
                       ),
@@ -204,19 +215,15 @@ class _DebugOptionsSheet extends ConsumerWidget {
                         children: [
                           Text(
                             role.emoji,
-                            style: const TextStyle(fontSize: 32),
+                            style: const TextStyle(fontSize: 24),
                           ),
                           const SizedBox(height: AppSpacing.space1),
                           Text(
                             role.label,
-                            style: AppTypography.bodyMedium.copyWith(
+                            style: AppTypography.bodySmall.copyWith(
                               fontWeight:
                                   isSelected ? FontWeight.w600 : FontWeight.normal,
-                              color: isSelected
-                                  ? (role == UserRole.teacher
-                                      ? AppColors.primary
-                                      : AppColors.secondary)
-                                  : AppColors.textSecondaryLight,
+                              color: isSelected ? roleColor : AppColors.textSecondaryLight,
                             ),
                           ),
                         ],

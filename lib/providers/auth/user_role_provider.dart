@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// User role enum for distinguishing teacher/student views
+/// User role enum for distinguishing teacher/student/parent views
 enum UserRole {
   teacher,
-  student;
+  student,
+  parent;
 
   String get label {
     switch (this) {
@@ -11,6 +12,8 @@ enum UserRole {
         return '선생님';
       case UserRole.student:
         return '학생';
+      case UserRole.parent:
+        return '학부모';
     }
   }
 
@@ -20,6 +23,8 @@ enum UserRole {
         return '👩‍🏫';
       case UserRole.student:
         return '🎻';
+      case UserRole.parent:
+        return '👨‍👩‍👧';
     }
   }
 
@@ -29,6 +34,8 @@ enum UserRole {
         return '/home';
       case UserRole.student:
         return '/student-home';
+      case UserRole.parent:
+        return '/parent-home';
     }
   }
 }
@@ -47,6 +54,8 @@ final currentUserIdProvider = Provider<String>((ref) {
       return 'teacher_1';
     case UserRole.student:
       return 'student_1';
+    case UserRole.parent:
+      return 'parent_1';
   }
 });
 
