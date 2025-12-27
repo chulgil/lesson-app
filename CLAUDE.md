@@ -104,6 +104,7 @@ lib/
 | 알림 시스템 스펙 | `idea/lesson-app/specs/notification_system.md` |
 | 결제 플로우 스펙 | `idea/lesson-app/specs/payment_flow.md` |
 | 선생님 등록 스펙 | `idea/lesson-app/specs/teacher_registration.md` |
+| 리뷰 시스템 스펙 | `idea/lesson-app/specs/review_system.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
 
