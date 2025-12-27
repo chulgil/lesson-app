@@ -37,3 +37,6 @@ export 'teacher/teacher_providers.dart';
 
 // Tip template providers
 export 'tip_template/tip_template_providers.dart';
+
+// Parent providers
+export 'parent/parent_providers.dart';

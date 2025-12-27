@@ -11,3 +11,12 @@ export 'payment.dart';
 export 'lesson_booking.dart';
 export 'practice_repertoire.dart';
 export 'tip_template.dart';
+
+// Parent system models
+export 'parent.dart';
+export 'parent_child_relation.dart';
+export 'parent_visibility_settings.dart';
+export 'parent_notification_settings.dart';
+
+// Review system
+export 'review.dart';

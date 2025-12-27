@@ -55,6 +55,21 @@ enum PaymentMethod {
   }
 }
 
+/// Billing target type enum
+enum BillingTargetType {
+  student, // Default: student pays themselves
+  parent;  // Parent is the billing target
+
+  String get label {
+    switch (this) {
+      case BillingTargetType.student:
+        return '학생';
+      case BillingTargetType.parent:
+        return '학부모';
+    }
+  }
+}
+
 /// Payment record model
 class Payment {
   final String id;
@@ -78,6 +93,13 @@ class Payment {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  // Parent billing support
+  final BillingTargetType billingTargetType; // Who is the billing target
+  final String? billingTargetId; // Parent ID if parent is billing target
+  final String? billingTargetName; // Parent name for display
+  final bool parentNotified; // Has parent been notified of this payment request
+  final DateTime? parentNotifiedAt; // When parent was notified
+
   const Payment({
     required this.id,
     required this.studentId,
@@ -99,6 +121,11 @@ class Payment {
     this.studentConfirmedAt,
     required this.createdAt,
     this.updatedAt,
+    this.billingTargetType = BillingTargetType.student,
+    this.billingTargetId,
+    this.billingTargetName,
+    this.parentNotified = false,
+    this.parentNotifiedAt,
   });
 
   /// Check if payment is overdue
@@ -152,6 +179,17 @@ class Payment {
     return '$lessonCount회 · $formattedAmount';
   }
 
+  /// Check if parent is the billing target
+  bool get isBilledToParent => billingTargetType == BillingTargetType.parent;
+
+  /// Get billing target display name
+  String get billingTargetDisplayName {
+    if (isBilledToParent && billingTargetName != null) {
+      return '$billingTargetName (학부모)';
+    }
+    return '$studentName (학생)';
+  }
+
   Payment copyWith({
     String? id,
     String? studentId,
@@ -173,6 +211,11 @@ class Payment {
     DateTime? studentConfirmedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    BillingTargetType? billingTargetType,
+    String? billingTargetId,
+    String? billingTargetName,
+    bool? parentNotified,
+    DateTime? parentNotifiedAt,
   }) {
     return Payment(
       id: id ?? this.id,
@@ -195,6 +238,11 @@ class Payment {
       studentConfirmedAt: studentConfirmedAt ?? this.studentConfirmedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      billingTargetType: billingTargetType ?? this.billingTargetType,
+      billingTargetId: billingTargetId ?? this.billingTargetId,
+      billingTargetName: billingTargetName ?? this.billingTargetName,
+      parentNotified: parentNotified ?? this.parentNotified,
+      parentNotifiedAt: parentNotifiedAt ?? this.parentNotifiedAt,
     );
   }
 
@@ -221,6 +269,10 @@ class TuitionSettings {
   final DateTime? lastPaymentDate;
   final DateTime? nextDueDate;
 
+  // Parent billing support
+  final BillingTargetType defaultBillingTarget; // Default billing target
+  final String? defaultBillingParentId; // Default parent to bill
+
   const TuitionSettings({
     required this.studentId,
     this.monthlyFee = 200000,
@@ -233,6 +285,8 @@ class TuitionSettings {
     this.notes,
     this.lastPaymentDate,
     this.nextDueDate,
+    this.defaultBillingTarget = BillingTargetType.parent, // Default to parent
+    this.defaultBillingParentId,
   });
 
   /// Calculate effective per-lesson cost
@@ -272,6 +326,8 @@ class TuitionSettings {
     String? notes,
     DateTime? lastPaymentDate,
     DateTime? nextDueDate,
+    BillingTargetType? defaultBillingTarget,
+    String? defaultBillingParentId,
   }) {
     return TuitionSettings(
       studentId: studentId ?? this.studentId,
@@ -285,6 +341,9 @@ class TuitionSettings {
       notes: notes ?? this.notes,
       lastPaymentDate: lastPaymentDate ?? this.lastPaymentDate,
       nextDueDate: nextDueDate ?? this.nextDueDate,
+      defaultBillingTarget: defaultBillingTarget ?? this.defaultBillingTarget,
+      defaultBillingParentId:
+          defaultBillingParentId ?? this.defaultBillingParentId,
     );
   }
 }

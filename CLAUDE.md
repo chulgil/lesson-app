@@ -105,8 +105,28 @@ lib/
 | 결제 플로우 스펙 | `idea/lesson-app/specs/payment_flow.md` |
 | 선생님 등록 스펙 | `idea/lesson-app/specs/teacher_registration.md` |
 | 리뷰 시스템 스펙 | `idea/lesson-app/specs/review_system.md` |
+| 학부모 시스템 스펙 | `idea/lesson-app/specs/parent_system.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
+
+## 브레인스토밍 Q&A
+
+기획 브레인스토밍 시 사용자와의 Q&A 세션 내용은 `proposal/` 폴더에 저장합니다.
+
+| 문서 | 위치 |
+|------|------|
+| 학부모 시스템 Q&A | `idea/lesson-app/proposal/parent_system.md` |
+
+### Q&A 문서 작성 규칙
+
+1. **파일 위치**: `idea/lesson-app/proposal/{기능명}.md`
+2. **필수 포함 내용**:
+   - 타사 사례 조사 결과
+   - 제시된 질문 목록 (Q1, Q2, ...)
+   - 각 질문별 옵션 (A, B, C, D)
+   - 사용자 결정 사항
+   - 결정 요약 테이블
+3. **연결 스펙**: 해당 Q&A를 기반으로 작성된 스펙 문서 경로 명시
 
 ## 다음 우선순위
 
