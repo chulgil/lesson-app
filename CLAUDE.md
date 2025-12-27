@@ -103,6 +103,7 @@ lib/
 | 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
 | 알림 시스템 스펙 | `idea/lesson-app/specs/notification_system.md` |
 | 결제 플로우 스펙 | `idea/lesson-app/specs/payment_flow.md` |
+| 선생님 등록 스펙 | `idea/lesson-app/specs/teacher_registration.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
 
