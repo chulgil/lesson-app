@@ -102,6 +102,7 @@ lib/
 | 노쇼/취소 정책 스펙 | `idea/lesson-app/specs/trial_lesson_system.md#노쇼취소-정책-시스템-상세` |
 | 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
 | 알림 시스템 스펙 | `idea/lesson-app/specs/notification_system.md` |
+| 결제 플로우 스펙 | `idea/lesson-app/specs/payment_flow.md` |
 
 > 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
 
