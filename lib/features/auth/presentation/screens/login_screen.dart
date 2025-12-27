@@ -112,6 +112,39 @@ class LoginScreen extends StatelessWidget {
           textColor: Colors.white,
           onPressed: () => _handleAppleLogin(context),
         ),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // Parent login link
+        GestureDetector(
+          onTap: () => _handleParentLogin(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space2,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '👨‍👩‍👧',
+                  style: const TextStyle(fontSize: 18),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  '학부모이신가요?',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.info,
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.info,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -159,6 +192,106 @@ class LoginScreen extends StatelessWidget {
   void _handleAppleLogin(BuildContext context) {
     // TODO: Implement Apple login
     _showRoleSelectDialog(context);
+  }
+
+  void _handleParentLogin(BuildContext context) {
+    // Show parent login options
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXLarge),
+        ),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.borderLight,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Parent icon
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                ),
+                child: const Center(
+                  child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 32)),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              Text(
+                '학부모 로그인',
+                style: AppTypography.headingMedium,
+              ),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '자녀의 레슨과 연습을 확인하세요',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Social login buttons for parent
+              _SocialLoginButton(
+                icon: Icons.g_mobiledata_rounded,
+                label: 'Google로 계속하기',
+                backgroundColor: AppColors.googleBackground,
+                textColor: AppColors.textPrimaryLight,
+                borderColor: AppColors.borderLight,
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to invite code screen
+                  context.go(AppRoutes.parentInviteCode);
+                },
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              _SocialLoginButton(
+                icon: Icons.chat_bubble_rounded,
+                label: '카카오로 계속하기',
+                backgroundColor: AppColors.kakaoBackground,
+                textColor: AppColors.textPrimaryLight,
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.parentInviteCode);
+                },
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              _SocialLoginButton(
+                icon: Icons.apple_rounded,
+                label: 'Apple로 계속하기',
+                backgroundColor: AppColors.appleBackground,
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.parentInviteCode);
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showRoleSelectDialog(BuildContext context) {

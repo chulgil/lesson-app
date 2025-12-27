@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lessons/presentation/screens/add_lesson_screen.dart';
 import '../../features/lessons/presentation/screens/edit_lesson_screen.dart';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const splash = '/';
   static const login = '/login';
   static const roleSelect = '/role-select';
+  static const parentInviteCode = '/parent/invite-code'; // Parent invite code
   static const home = '/home'; // Teacher home
   static const studentHome = '/student-home'; // Student home
   static const parentHome = '/parent-home'; // Parent home
@@ -86,6 +88,13 @@ class AppRouter {
         path: AppRoutes.login,
         name: 'login',
         builder: (context, state) => const LoginScreen(),
+      ),
+
+      // Parent Invite Code
+      GoRoute(
+        path: AppRoutes.parentInviteCode,
+        name: 'parentInviteCode',
+        builder: (context, state) => const ParentInviteCodeScreen(),
       ),
 
       // Teacher Home (with bottom navigation)
