@@ -6,24 +6,28 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/lesson_booking.dart';
+import '../../../../models/lesson_booking.dart' hide LessonType;
 import '../../../../models/student.dart';
+import '../../../../models/teacher_student_relation.dart';
 import '../../../../models/time_slot.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../../providers/student/student_providers.dart';
 import '../widgets/time_slot_selector.dart';
 
-/// Screen for student to request a trial lesson
+/// Screen for student to request a trial or one-time lesson
+/// Used for both trial lessons (new students) and one-time lessons (existing students)
 class TrialLessonRequestScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName;
   final String? studentId; // Optional: for existing students
+  final LessonType lessonType; // trial or oneTime
 
   const TrialLessonRequestScreen({
     super.key,
     required this.teacherId,
     required this.teacherName,
     this.studentId,
+    this.lessonType = LessonType.trial, // Default to trial
   });
 
   @override
@@ -38,11 +42,18 @@ class _TrialLessonRequestScreenState
 
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay? _selectedTime; // Changed from TimeSlot
-  static const int _trialLessonDuration = 60; // Trial lesson duration in minutes
+  static const int _lessonDuration = 60; // Lesson duration in minutes
   LessonGoal _selectedGoal = LessonGoal.hobby;
   ExperienceLevel _selectedExperience = ExperienceLevel.beginner;
   bool _isSubmitting = false;
   Student? _currentStudent;
+
+  // Helper getters for lesson type specific labels
+  bool get _isTrialLesson => widget.lessonType == LessonType.trial;
+  String get _screenTitle => _isTrialLesson ? '체험레슨 신청' : '1회 레슨 신청';
+  String get _priceLabel => _isTrialLesson ? '체험레슨 30,000원' : '1회 레슨 50,000원';
+  String get _submitButtonLabel => _isTrialLesson ? '체험레슨 신청하기' : '1회 레슨 신청하기';
+  String get _successMessage => _isTrialLesson ? '체험레슨 신청이 완료되었습니다' : '1회 레슨 신청이 완료되었습니다';
 
   @override
   void initState() {
@@ -86,7 +97,7 @@ class _TrialLessonRequestScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('체험레슨 신청'),
+        title: Text(_screenTitle),
       ),
       body: Form(
         key: _formKey,
@@ -209,9 +220,6 @@ class _TrialLessonRequestScreenState
         ? TimeOfDay(hour: daySlot.endTime.hour + 1, minute: 0)
         : const TimeOfDay(hour: 22, minute: 0);
 
-    final showAm = daySlot.startTime.hour < 12;
-    final showPm = daySlot.endTime.hour >= 12;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -250,10 +258,8 @@ class _TrialLessonRequestScreenState
           },
           availableStart: daySlot.startTime,
           availableEnd: daySlot.endTime,
-          lessonDurationMinutes: _trialLessonDuration,
+          lessonDurationMinutes: _lessonDuration,
           bookedSlots: const [], // TODO: Get from provider when backend is ready
-          showAmSection: showAm,
-          showPmSection: showPm,
           displayStart: displayStart,
           displayEnd: displayEnd,
         ),
@@ -279,7 +285,7 @@ class _TrialLessonRequestScreenState
                 Icon(Icons.check_circle, size: 16, color: AppColors.success),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
-                  '${_formatTimeOfDay(_selectedTime!)} ~ ${_formatTimeOfDay(_addMinutes(_selectedTime!, _trialLessonDuration))} ($_trialLessonDuration분)',
+                  '${_formatTimeOfDay(_selectedTime!)} ~ ${_formatTimeOfDay(_addMinutes(_selectedTime!, _lessonDuration))} ($_lessonDuration분)',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
@@ -334,7 +340,7 @@ class _TrialLessonRequestScreenState
                   style: AppTypography.headingSmall,
                 ),
                 Text(
-                  '체험레슨 30,000원',
+                  _priceLabel,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -436,7 +442,7 @@ class _TrialLessonRequestScreenState
                   color: Colors.white,
                 ),
               )
-            : const Text('체험레슨 신청하기'),
+            : Text(_submitButtonLabel),
       ),
     );
   }
@@ -478,7 +484,7 @@ class _TrialLessonRequestScreenState
             _messageController.text.isEmpty ? null : _messageController.text,
         preferredDate: _selectedDate,
         preferredStartTime: _selectedTime!,
-        preferredEndTime: _addMinutes(_selectedTime!, _trialLessonDuration),
+        preferredEndTime: _addMinutes(_selectedTime!, _lessonDuration),
       );
 
       await ref.read(bookingsNotifierProvider.notifier).requestTrialLesson(
@@ -489,8 +495,8 @@ class _TrialLessonRequestScreenState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('체험레슨 신청이 완료되었습니다'),
+          SnackBar(
+            content: Text(_successMessage),
             backgroundColor: AppColors.practiceGood,
           ),
         );

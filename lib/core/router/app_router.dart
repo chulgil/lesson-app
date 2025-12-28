@@ -23,6 +23,7 @@ import '../../features/schedule/presentation/screens/register_regular_lesson_scr
 import '../../features/schedule/presentation/screens/select_teacher_screen.dart';
 import '../../features/schedule/presentation/screens/lesson_type_select_screen.dart';
 import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
+import '../../models/teacher_student_relation.dart';
 import '../../features/practice/presentation/screens/practice_repertoire_screen.dart';
 import '../../features/practice/presentation/screens/add_repertoire_screen.dart';
 import '../../features/practice/presentation/screens/repertoire_detail_screen.dart';
@@ -383,7 +384,7 @@ class AppRouter {
         },
       ),
 
-      // Schedule - Trial Lesson Request
+      // Schedule - Trial/One-Time Lesson Request
       GoRoute(
         path: AppRoutes.trialLessonRequest,
         name: 'trialLessonRequest',
@@ -391,10 +392,15 @@ class AppRouter {
           final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
           final teacherName = state.uri.queryParameters['teacherName'] ?? '선생님';
           final studentId = state.uri.queryParameters['studentId']; // Optional
+          final lessonTypeStr = state.uri.queryParameters['lessonType'];
+          final lessonType = lessonTypeStr == 'oneTime'
+              ? LessonType.oneTime
+              : LessonType.trial;
           return TrialLessonRequestScreen(
             teacherId: teacherId,
             teacherName: teacherName,
             studentId: studentId,
+            lessonType: lessonType,
           );
         },
       ),

@@ -155,6 +155,13 @@ class _RegisterRegularLessonScreenState
           _buildSectionTitle('레슨 횟수'),
           const SizedBox(height: AppSpacing.space3),
           _buildLessonsPerWeekSelector(),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '* 5주차가 있는 달은 기본 휴강입니다. 추가 레슨이 필요하시면 1회 레슨을 신청해주세요.',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -348,11 +355,6 @@ class _RegisterRegularLessonScreenState
         ? TimeOfDay(hour: daySlot.endTime.hour + 1, minute: 0)
         : const TimeOfDay(hour: 22, minute: 0);
 
-    // Check if we need AM section (any available time before 12:00)
-    final showAm = daySlot.startTime.hour < 12;
-    // Check if we need PM section (any available time at or after 12:00)
-    final showPm = daySlot.endTime.hour >= 12;
-
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -406,8 +408,6 @@ class _RegisterRegularLessonScreenState
             availableEnd: daySlot.endTime,
             lessonDurationMinutes: _selectedLessonDuration,
             bookedSlots: const [], // TODO: Get from provider when backend is ready
-            showAmSection: showAm,
-            showPmSection: showPm,
             displayStart: displayStart,
             displayEnd: displayEnd,
           ),

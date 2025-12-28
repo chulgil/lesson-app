@@ -37,13 +37,12 @@ class SelectableTimeSlot {
   }
 }
 
-/// Time slot selector widget with AM/PM sections and 30-minute intervals
+/// Time slot selector widget with 30-minute intervals
 ///
-/// Displays time slots in a grid layout similar to Naver booking system:
+/// Displays time slots in a grid layout:
 /// - Fixed 30-minute intervals (on the hour and half hour)
-/// - AM/PM section headers
 /// - 4-column grid layout
-/// - 12-hour time format for PM times
+/// - 24-hour time format (14:00, 16:00)
 /// - Disabled slots shown in gray
 class TimeSlotSelector extends StatelessWidget {
   /// Selected time (null if none selected)
@@ -64,16 +63,10 @@ class TimeSlotSelector extends StatelessWidget {
   /// Already booked time slots (by other students)
   final List<TimeOfDay> bookedSlots;
 
-  /// Whether to show AM section (default: true)
-  final bool showAmSection;
-
-  /// Whether to show PM section (default: true)
-  final bool showPmSection;
-
-  /// Display range start (default: 9:00 AM)
+  /// Display range start (default: 9:00)
   final TimeOfDay displayStart;
 
-  /// Display range end (default: 10:00 PM)
+  /// Display range end (default: 22:00)
   final TimeOfDay displayEnd;
 
   const TimeSlotSelector({
@@ -84,8 +77,6 @@ class TimeSlotSelector extends StatelessWidget {
     required this.availableEnd,
     this.lessonDurationMinutes = 60,
     this.bookedSlots = const [],
-    this.showAmSection = true,
-    this.showPmSection = true,
     this.displayStart = const TimeOfDay(hour: 9, minute: 0),
     this.displayEnd = const TimeOfDay(hour: 22, minute: 0),
   });
@@ -93,38 +84,8 @@ class TimeSlotSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final allSlots = _generateAllSlots();
-    final amSlots = allSlots.where((s) => s.time.hour < 12).toList();
-    final pmSlots = allSlots.where((s) => s.time.hour >= 12).toList();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // AM Section
-        if (showAmSection && amSlots.isNotEmpty) ...[
-          _buildSectionHeader('오전'),
-          const SizedBox(height: AppSpacing.space3),
-          _buildTimeGrid(amSlots),
-          const SizedBox(height: AppSpacing.space5),
-        ],
-
-        // PM Section
-        if (showPmSection && pmSlots.isNotEmpty) ...[
-          _buildSectionHeader('오후'),
-          const SizedBox(height: AppSpacing.space3),
-          _buildTimeGrid(pmSlots),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: AppTypography.bodyMedium.copyWith(
-        color: AppColors.textSecondaryLight,
-        fontWeight: FontWeight.w500,
-      ),
-    );
+    return _buildTimeGrid(allSlots);
   }
 
   Widget _buildTimeGrid(List<SelectableTimeSlot> slots) {
@@ -301,21 +262,10 @@ class _TimeSlotButton extends StatelessWidget {
     }
   }
 
-  /// Format time in 12-hour format for display
-  /// AM: 10:00, 10:30, 11:00, 11:30
-  /// PM: 12:00, 12:30, 1:00, 1:30, 2:00...
+  /// Format time in 24-hour format for display (14:00, 16:30)
   String _formatTime(TimeOfDay time) {
-    final hour = time.hour;
+    final hour = time.hour.toString().padLeft(2, '0');
     final minute = time.minute.toString().padLeft(2, '0');
-
-    if (hour == 0) {
-      return '12:$minute'; // Midnight
-    } else if (hour < 12) {
-      return '$hour:$minute'; // AM
-    } else if (hour == 12) {
-      return '12:$minute'; // Noon
-    } else {
-      return '${hour - 12}:$minute'; // PM
-    }
+    return '$hour:$minute';
   }
 }
