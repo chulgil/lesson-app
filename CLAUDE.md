@@ -1,5 +1,7 @@
 # CLAUDE.md - Lesson App
 
+> 마지막 업데이트: 2025-12-28
+
 음악 레슨/연습 관리 앱 (Flutter)
 
 ## 빠른 참조
@@ -22,20 +24,75 @@ flutter analyze                    # 분석
 ## 프로젝트 구조
 
 ```
-lib/
-├── core/theme/          # AppColors, AppTypography, AppSpacing
-├── features/            # auth, home, lessons, students, practice, profile, student_home, schedule
-├── models/              # student, payment, lesson, piece, practice_item, lesson_booking, tip_template
-├── repositories/        # 인터페이스 + Mock 구현
-├── providers/           # Riverpod (@riverpod 코드생성 적용)
-└── services/            # API, Storage
+lesson-app/
+├── lib/
+│   ├── core/theme/          # AppColors, AppTypography, AppSpacing
+│   ├── features/            # auth, home, lessons, students, practice, profile, student_home, schedule
+│   ├── models/              # student, payment, lesson, piece, practice_item, lesson_booking, tip_template
+│   ├── repositories/        # 인터페이스 + Mock 구현
+│   ├── providers/           # Riverpod (@riverpod 코드생성 적용)
+│   └── services/            # API, Storage
+├── docs/                    # 모든 프로젝트 문서
+│   ├── requirement/         # 요구사항
+│   ├── proposal/            # 기획 제안서, Q&A
+│   ├── specs/               # 기능 명세 (도메인별)
+│   └── README.md            # 문서 인덱스
+└── CLAUDE.md
 ```
+
+---
+
+## 문서 구조
+
+> **중요**: 모든 프로젝트 문서는 `docs/` 폴더에 위치합니다.
+
+### 문서 위치
+
+| 폴더 | 내용 | 예시 |
+|------|------|------|
+| `docs/requirement/` | 요구사항, 구현 현황 | requirement.md, implementation_status.md |
+| `docs/proposal/` | 기획 제안서, 브레인스토밍 Q&A | parent_system.md, minor_registration_policy.md |
+| `docs/specs/[domain]/` | 도메인별 기능 명세 | lesson/, practice/, payment/ |
+
+### 도메인별 스펙
+
+| 도메인 | 문서 | 설명 |
+|--------|------|------|
+| **lesson/** | lesson_schedule.md | 레슨 스케줄 시스템 |
+| | Lesson_Types_Analysis.md | 레슨 유형 분석 |
+| | Lesson_Schedule_Design.md | 레슨 스케줄 설계 |
+| | student_centered_architecture.md | 학생 중심 아키텍처 |
+| | Unified_Lesson_Booking_Spec.md | 통합 예약 스펙 |
+| **practice/** | practice_system.md | 연습 시스템 스펙 |
+| | Practice_System_Spec.md | 연습 시스템 상세 |
+| | practice_streak_spec.md | 연습 스트릭 |
+| | recording_requirement.md | 녹음 기능 |
+| **metronome/** | metronome_system.md | 메트로놈 시스템 |
+| | metronome_sound.md | 사운드 이펙트 |
+| | metronome_indicator.md | UI 인디케이터 |
+| **payment/** | payment_system.md | 결제 시스템 |
+| | payment_flow.md | 결제 플로우 |
+| | payment_requirement.md | 결제 요구사항 |
+| **user/** | parent_system.md | 학부모 시스템 |
+| | parent_login_flow.md | 학부모 로그인 |
+| | teacher_registration.md | 선생님 등록 |
+| **notification/** | notification_system.md | 알림 시스템 |
+| **review/** | review_system.md | 리뷰/피드백 시스템 |
+| **trial/** | trial_lesson_system.md | 체험 레슨 |
+| **design/** | ux_guidelines.md | UX 가이드라인 |
+| | figma_templates.md | Figma 템플릿 |
+| | competitive_analysis.md | 경쟁사 분석 |
+
+→ [전체 문서 인덱스](docs/README.md)
+
+---
 
 ## 핵심 규칙
 
 ### 디자인
 - 색상: 반드시 `AppColors` 클래스 사용 (하드코딩 금지)
 - Primary: #6B5B95, Secondary: #F4A460, Background: #FFFAF5
+- UX 가이드라인: [docs/specs/design/ux_guidelines.md](docs/specs/design/ux_guidelines.md)
 
 ### 코드
 - Dart 스타일 가이드 준수
@@ -46,6 +103,8 @@ lib/
 - Repository 패턴: 인터페이스 + Mock 분리
 - Provider: @riverpod 어노테이션 사용
 - 대형 위젯: 별도 파일로 분리 (500줄 이상 지양)
+
+---
 
 ## 구현 현황
 
@@ -77,6 +136,33 @@ lib/
 - 통계/리포트
 - AI 레슨 요약
 
+---
+
+## Claude 작업 워크플로우
+
+```
+1. docs/requirement/ 확인 → 요구사항 파악
+2. docs/specs/[domain]/ 확인 → 관련 스펙 파악
+3. 구현 작업 수행
+4. docs/specs/ 명세 업데이트 → 구현 내용 반영
+5. 필요시 proposal/ 에 Q&A 기록
+```
+
+### 브레인스토밍 Q&A 작성 규칙
+
+기획 브레인스토밍 시 사용자와의 Q&A 세션 내용은 `docs/proposal/` 폴더에 저장합니다.
+
+1. **파일 위치**: `docs/proposal/{기능명}.md`
+2. **필수 포함 내용**:
+   - 타사 사례 조사 결과
+   - 제시된 질문 목록 (Q1, Q2, ...)
+   - 각 질문별 옵션 (A, B, C, D)
+   - 사용자 결정 사항
+   - 결정 요약 테이블
+3. **연결 스펙**: 해당 Q&A를 기반으로 작성된 스펙 문서 경로 명시
+
+---
+
 ## 주요 모델
 
 | 모델 | 용도 |
@@ -88,52 +174,20 @@ lib/
 | LessonBooking | 체험/정규레슨 예약 (pending/confirmed/completed) |
 | MetronomeSettings | BPM, 박자표, 사운드 템플릿 |
 
-## 문서 참조
+---
 
-| 문서 | 위치 |
-|------|------|
-| 요구사항 | `idea/lesson-app/requirement.md` |
-| 구현 현황 | `idea/lesson-app/implementation_status.md` |
-| 연습 시스템 스펙 | `idea/lesson-app/specs/practice_system.md` |
-| 수강료 스펙 | `idea/lesson-app/specs/payment_system.md` |
-| 레슨 스케줄 스펙 | `idea/lesson-app/specs/lesson_schedule.md` |
-| 체험 레슨 스펙 | `idea/lesson-app/specs/trial_lesson_system.md` |
-| 가용시간 관리 스펙 | `idea/lesson-app/specs/trial_lesson_system.md#가용시간-관리-시스템-상세` |
-| 노쇼/취소 정책 스펙 | `idea/lesson-app/specs/trial_lesson_system.md#노쇼취소-정책-시스템-상세` |
-| 메트로놈 스펙 | `idea/lesson-app/specs/metronome_system.md` |
-| 알림 시스템 스펙 | `idea/lesson-app/specs/notification_system.md` |
-| 결제 플로우 스펙 | `idea/lesson-app/specs/payment_flow.md` |
-| 선생님 등록 스펙 | `idea/lesson-app/specs/teacher_registration.md` |
-| 리뷰 시스템 스펙 | `idea/lesson-app/specs/review_system.md` |
-| 학부모 시스템 스펙 | `idea/lesson-app/specs/parent_system.md` |
+## 작업 우선순위
 
-> 경로 기준: `/Volumes/SSD/Dev/Personal/development/`
+| 순위 | 작업 | 상태 | 긴급도 |
+|:----:|------|:----:|:------:|
+| 1 | 레슨 스케줄 라우터 연결 | 진행중 | 높음 |
+| 2 | 연습 알림 시스템 | 대기 | 중간 |
+| 3 | 외부 선생님 등록 | 대기 | 중간 |
+| 4 | 백엔드 API (FastAPI) | 대기 | 낮음 |
 
-## 브레인스토밍 Q&A
+> Claude 작업 시: 위 순위대로 진행, 상태 업데이트 필수
 
-기획 브레인스토밍 시 사용자와의 Q&A 세션 내용은 `proposal/` 폴더에 저장합니다.
-
-| 문서 | 위치 |
-|------|------|
-| 학부모 시스템 Q&A | `idea/lesson-app/proposal/parent_system.md` |
-
-### Q&A 문서 작성 규칙
-
-1. **파일 위치**: `idea/lesson-app/proposal/{기능명}.md`
-2. **필수 포함 내용**:
-   - 타사 사례 조사 결과
-   - 제시된 질문 목록 (Q1, Q2, ...)
-   - 각 질문별 옵션 (A, B, C, D)
-   - 사용자 결정 사항
-   - 결정 요약 테이블
-3. **연결 스펙**: 해당 Q&A를 기반으로 작성된 스펙 문서 경로 명시
-
-## 다음 우선순위
-
-1. 레슨 스케줄 라우터 연결
-2. 연습 알림 시스템
-3. 외부 선생님 등록
-4. 백엔드 API (FastAPI)
+---
 
 ## 문제 해결
 
