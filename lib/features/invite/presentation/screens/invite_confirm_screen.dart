@@ -340,18 +340,89 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        final errorMessage = e.toString();
+        // Already connected is a success case
+        if (errorMessage.contains('이미 연결')) {
+          _showAlreadyConnectedDialog(widget.invite.creatorRole.label);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _showAlreadyConnectedDialog(String targetRoleLabel) {
+    final userRole = ref.read(currentUserRoleProvider);
+    final homeRoute = userRole.homeRoute;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space4),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.info.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.link,
+                size: 48,
+                color: AppColors.info,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              '이미 연결되어 있습니다',
+              style: AppTypography.headingSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '해당 $targetRoleLabel과 이미\n연결되어 있습니다.',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.space4),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                context.go(homeRoute);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('확인'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showSuccessDialog(String targetRoleLabel) {
