@@ -124,6 +124,30 @@ class MockInviteRepository implements InviteRepository {
       expiresAt: now.add(const Duration(days: 7)),
     );
 
+    // Teacher 2's invite (for testing new connections)
+    _invites['invite_3'] = Invite(
+      id: 'invite_3',
+      creatorId: 'teacher_2',
+      creatorRole: InviteUserRole.teacher,
+      inviteCode: 'TEACH2',
+      inviteUrl: '$_appScheme://$_inviteHost/TEACH2',
+      qrCodeData: '$_appScheme://$_inviteHost/TEACH2',
+      createdAt: now.subtract(const Duration(hours: 1)),
+      expiresAt: now.add(const Duration(days: 7)),
+    );
+
+    // Student 2's invite (for testing new connections)
+    _invites['invite_4'] = Invite(
+      id: 'invite_4',
+      creatorId: 'student_2',
+      creatorRole: InviteUserRole.student,
+      inviteCode: 'STUD02',
+      inviteUrl: '$_appScheme://$_inviteHost/STUD02',
+      qrCodeData: '$_appScheme://$_inviteHost/STUD02',
+      createdAt: now.subtract(const Duration(hours: 1)),
+      expiresAt: now.add(const Duration(days: 7)),
+    );
+
     // Pending connection request
     _requests['request_1'] = ConnectionRequest(
       id: 'request_1',
