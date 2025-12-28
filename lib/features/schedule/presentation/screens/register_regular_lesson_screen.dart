@@ -721,8 +721,11 @@ class _RegisterRegularLessonScreenState
       return const SizedBox.shrink();
     }
 
+    // Only show "5주차 휴강" when starting from week 1 in a 5-week month
+    final currentWeek = LessonDateUtils.getWeekOfMonth(_startDate);
     final hasWeek5 = LessonDateUtils.hasWeek5(_startDate.year, _startDate.month);
-    final weekInfo = hasWeek5
+    final showWeek5Notice = hasWeek5 && currentWeek == 1;
+    final weekInfo = showWeek5Notice
         ? '${prorated.remainingWeeks}주분, 5주차 휴강'
         : '${prorated.remainingWeeks}주분';
 
