@@ -419,6 +419,118 @@ enum ParentPermission {
 | 전환 완료 | 자녀 | "본인 계정으로 전환되었습니다" |
 | 전환 완료 | 학부모 | "자녀(김민수)가 본인 계정으로 전환되었습니다. 이제 조회만 가능합니다" |
 
+### 선생님 → 학부모 직접 초대 (권장)
+
+선생님이 학부모를 직접 초대하는 방식입니다. 학부모 주도 연결과 함께 **권장 플로우**입니다.
+
+#### 초대 플로우
+
+```
+[선생님 앱]
+    │
+    ▼
+[학부모 초대] ← 연락처/전화번호 입력
+    │
+    │ 초대 링크 전송 (SMS/카카오톡)
+    ▼
+[학부모 앱 가입]
+    │
+    ▼
+[초대 확인 화면]
+  "김선생님이 레슨 관리에 초대했습니다"
+    │
+    ▼
+[연결할 자녀 선택]
+  ├── 기존 자녀 선택
+  └── 새 자녀 추가
+    │
+    ▼
+[연결 완료]
+    ├── 선생님: 학생 목록에 자녀 등록 (🟣 신규)
+    └── 학부모: 해당 선생님 레슨 관리 가능
+```
+
+#### 선생님 주도 초대 API
+
+```dart
+// 선생님이 학부모 초대
+Future<void> inviteParent({
+  required String teacherId,
+  required String phoneNumber,
+  required InviteMethod method,  // sms, kakao, link
+  String? studentName,  // 힌트용 (선택)
+}) async {
+  // 1. 초대 코드 생성
+  final inviteCode = generateParentInviteCode(teacherId);
+  final inviteLink = 'lessonapp://parent-invite/$inviteCode';
+
+  // 2. 초대 방법에 따라 전송
+  switch (method) {
+    case InviteMethod.sms:
+      await sendSmsInvite(
+        phoneNumber,
+        inviteLink,
+        message: '${teacherName} 선생님이 레슨 관리에 초대했습니다',
+      );
+      break;
+    case InviteMethod.kakao:
+      await shareKakaoInvite(inviteLink, studentName);
+      break;
+    case InviteMethod.link:
+      // 링크 복사만 (UI에서 처리)
+      break;
+  }
+
+  // 3. 초대 기록 저장
+  await logParentInviteSent(
+    teacherId: teacherId,
+    phoneNumber: phoneNumber,
+    method: method,
+    inviteCode: inviteCode,
+  );
+}
+
+// 학부모가 초대 수락 (자녀 선택 후)
+Future<void> acceptParentInvite({
+  required String parentId,
+  required String inviteCode,
+  required String childId,  // 선택한 자녀
+}) async {
+  // 1. 초대 코드 검증
+  final invite = await validateParentInviteCode(inviteCode);
+  if (invite == null || invite.isExpired) {
+    throw InvalidStateException('유효하지 않은 초대입니다');
+  }
+
+  // 2. 자녀 확인
+  final child = await getChild(childId);
+  if (child == null || child.parentId != parentId) {
+    throw InvalidStateException('유효하지 않은 자녀입니다');
+  }
+
+  // 3. 선생님 학생 목록에 자녀 등록
+  final student = await createStudentFromChild(
+    child: child,
+    teacherId: invite.teacherId,
+    managedByParentId: parentId,
+  );
+
+  // 4. 학부모-선생님 연결 생성
+  await createParentTeacherConnection(parentId, invite.teacherId, childId);
+
+  // 5. 알림 발송
+  await notifyTeacherParentConnected(invite.teacherId, parentId, child.name);
+  await notifyParentConnected(parentId, invite.teacherId, child.name);
+}
+```
+
+#### 양방향 초대 비교
+
+| 방식 | 시작 주체 | 장점 | 사용 상황 |
+|------|----------|------|----------|
+| **학부모 주도** | 학부모 | 학부모가 적극적으로 참여 | 학부모가 먼저 앱 설치한 경우 |
+| **선생님 주도** | 선생님 | 선생님이 간편하게 연락처로 초대 | 선생님이 학부모 연락처 보유 시 (권장) |
+
 ### 설정 변경 시 처리
 
 자동 연결 수락 설정이 변경될 때의 처리 로직입니다.
