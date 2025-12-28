@@ -1,5 +1,36 @@
 import 'package:flutter/material.dart';
 
+/// V2: Parent permission level enum
+enum ParentPermission {
+  viewOnly,       // 열람만 가능
+  managePayments, // 결제 관리
+  manageLessons,  // 레슨 관리 (일정 변경 등)
+  fullAccess;     // 전체 권한
+
+  String get label {
+    switch (this) {
+      case ParentPermission.viewOnly:
+        return '열람 전용';
+      case ParentPermission.managePayments:
+        return '결제 관리';
+      case ParentPermission.manageLessons:
+        return '레슨 관리';
+      case ParentPermission.fullAccess:
+        return '전체 권한';
+    }
+  }
+
+  /// Check if permission allows payments
+  bool get canManagePayments =>
+      this == ParentPermission.managePayments ||
+      this == ParentPermission.fullAccess;
+
+  /// Check if permission allows lesson management
+  bool get canManageLessons =>
+      this == ParentPermission.manageLessons ||
+      this == ParentPermission.fullAccess;
+}
+
 /// Parent registration status enum
 enum ParentStatus {
   pending, // Invitation sent, not yet registered
@@ -180,4 +211,62 @@ class ParentInvitation {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+}
+
+/// V2: Parent-Teacher direct connection model
+///
+/// Represents a direct connection between parent and teacher.
+/// Used when parent registers child via teacher invitation.
+class ParentTeacherConnection {
+  final String id;
+  final String parentId;
+  final String teacherId;
+  final String? studentId; // Connected child (null if not yet specified)
+  final ParentPermission permission;
+  final DateTime connectedAt;
+  final DateTime? updatedAt;
+
+  const ParentTeacherConnection({
+    required this.id,
+    required this.parentId,
+    required this.teacherId,
+    this.studentId,
+    this.permission = ParentPermission.viewOnly,
+    required this.connectedAt,
+    this.updatedAt,
+  });
+
+  /// Check if child is connected
+  bool get hasChild => studentId != null;
+
+  /// Copy with new values
+  ParentTeacherConnection copyWith({
+    String? id,
+    String? parentId,
+    String? teacherId,
+    String? studentId,
+    ParentPermission? permission,
+    DateTime? connectedAt,
+    DateTime? updatedAt,
+  }) {
+    return ParentTeacherConnection(
+      id: id ?? this.id,
+      parentId: parentId ?? this.parentId,
+      teacherId: teacherId ?? this.teacherId,
+      studentId: studentId ?? this.studentId,
+      permission: permission ?? this.permission,
+      connectedAt: connectedAt ?? this.connectedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ParentTeacherConnection &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

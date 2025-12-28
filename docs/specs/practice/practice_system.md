@@ -1,7 +1,9 @@
 # 연습 시스템 스펙
 
 > 작성일: 2025-12-25
+> 마지막 업데이트: 2025-12-28
 > 상태: Phase 1-2 완료, Phase 3 진행 중
+> 연관 스펙: [invite_system_v2.md](../invite/invite_system_v2.md)
 
 ---
 
@@ -173,3 +175,64 @@ class PracticeItem {
 | 금요일 연습 → 월요일 연습 | ✅ 유지 (주말은 카운트 안 함) |
 | 금요일 연습 → 화요일 연습 | ❌ 리셋 (월요일에 연습 안 함) |
 | 토요일 연습 | ✅ 스트릭에 포함 (보너스) |
+
+---
+
+## 연습 성과 인디케이터 (V2)
+
+> invite_system_v2.md에서 정의된 통합 인디케이터 시스템
+
+### PracticeLevel enum
+
+```dart
+enum PracticeLevel {
+  newStudent,   // 🟣 신규 연결 (연습 데이터 없음)
+  excellent,    // 🟢 우수 (5/7일 이상)
+  average,      // 🟠 보통 (3-4/7일)
+  poor,         // 🔴 부족 (1-2/7일)
+  onBreak,      // ⚪ 휴강 중
+}
+```
+
+### 성과 기준 (최근 7일 기준)
+
+| 레벨 | 조건 | 색상 | 아이콘 |
+|------|------|:----:|:------:|
+| excellent | 5일 이상 연습 | 🟢 #4CAF50 | 채워진 원 |
+| average | 3-4일 연습 | 🟠 #FF9800 | 채워진 원 |
+| poor | 1-2일 연습 | 🔴 #F44336 | 채워진 원 |
+| onBreak | 휴강 상태 | ⚪ #9E9E9E | 채워진 원 |
+| newStudent | 연결 직후 (7일 미만) | 🟣 #6B5B95 | 채워진 원 |
+
+### 계산 로직
+
+```dart
+PracticeLevel calculatePracticeLevel(Student student) {
+  // 1. 휴강 상태 우선 체크
+  if (student.isOnBreak) return PracticeLevel.onBreak;
+
+  // 2. 신규 연결 체크 (연결 후 7일 미만)
+  if (student.connectedAt != null) {
+    final daysSinceConnection = DateTime.now().difference(student.connectedAt!).inDays;
+    if (daysSinceConnection < 7) return PracticeLevel.newStudent;
+  }
+
+  // 3. 최근 7일 연습일 수 계산
+  final practiceDays = countPracticeDaysInLast7Days(student.id);
+
+  if (practiceDays >= 5) return PracticeLevel.excellent;
+  if (practiceDays >= 3) return PracticeLevel.average;
+  if (practiceDays >= 1) return PracticeLevel.poor;
+
+  // 4. 연습 기록 없음도 poor로 표시
+  return PracticeLevel.poor;
+}
+```
+
+### UI 표시 위치
+
+| 화면 | 위치 | 형태 |
+|------|------|------|
+| 학생 목록 | 학생 이름 왼쪽 | 원형 인디케이터 |
+| 학생 상세 | 프로필 영역 | 원형 + 텍스트 |
+| 대시보드 | 학생 카드 | 원형 인디케이터 |

@@ -1,7 +1,9 @@
 # 수강료 관리 시스템 스펙
 
 > 작성일: 2025-12-25
+> 마지막 업데이트: 2025-12-28
 > 상태: ✅ 구현 완료
+> 연관 스펙: [invite_system_v2.md](../invite/invite_system_v2.md)
 
 ---
 
@@ -33,6 +35,8 @@
 
 ## 결제 상태
 
+### 현재 구현 (V1)
+
 | 상태 | 영문 | 설명 |
 |------|------|------|
 | 입금 대기 | pending | 결제 생성됨 |
@@ -40,6 +44,37 @@
 | 완료 | completed | 선생님 입금확인 완료 |
 | 취소 | cancelled | 취소됨 |
 | 환불 | refunded | 환불됨 |
+
+### V2 결제 상태 (예정)
+
+> invite_system_v2.md 정의 - 상태 전환 기반 흐름
+
+| 상태 | 영문 | 설명 | 색상 |
+|------|------|------|:----:|
+| 청구됨 | pending | 결제 생성, 입금 대기 | 🟡 |
+| 입금됨 | paid | 학생/학부모가 입금 기록 | 🔵 |
+| 확인완료 | confirmed | 선생님이 입금 확인 | 🟢 |
+| 연체 | overdue | 마감일 초과 | 🔴 |
+| 취소 | cancelled | 취소됨 | ⚪ |
+
+```dart
+// V2 PaymentStatus enum
+enum PaymentStatus {
+  pending,    // 청구됨 (입금 대기)
+  paid,       // 입금 기록됨 (학생/학부모가 입력)
+  confirmed,  // 확인 완료 (선생님이 확인)
+  overdue,    // 연체 (마감일 초과)
+  cancelled,  // 취소
+}
+```
+
+### V2 추가 필드
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| paidAt | DateTime? | 입금 기록 시간 |
+| confirmedAt | DateTime? | 선생님 확인 시간 |
+| dueDate | DateTime? | 결제 마감일 |
 
 ---
 

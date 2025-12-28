@@ -1,7 +1,9 @@
 # 학부모 시스템 스펙
 
 > 작성일: 2025-12-27
+> 마지막 업데이트: 2025-12-28
 > 상태: 확정
+> 연관 스펙: [invite_system_v2.md](../invite/invite_system_v2.md)
 
 ## 개요
 
@@ -786,7 +788,54 @@ class Parent {
 }
 ```
 
-### 12.2 ParentChildRelation (학부모-자녀 관계)
+### 12.2 Child (자녀 프로필) - V2
+
+> 만 14세 미만 학생을 위한 자녀 프로필 모델
+> invite_system_v2.md 참조
+
+```dart
+class Child {
+  final String id;
+  final String parentId;         // 부모 ID
+  final String name;             // 이름/닉네임
+  final int? birthYear;          // 생년 (만 14세 판단용)
+  final String? instrument;      // 악기
+  final String? level;           // 레벨
+  final DateTime createdAt;
+  final DateTime updatedAt;
+}
+```
+
+### 12.3 ParentTeacherConnection (학부모-선생님 연결) - V2
+
+> 학부모가 선생님과 직접 연결하는 경우
+> invite_system_v2.md 참조
+
+```dart
+class ParentTeacherConnection {
+  final String id;
+  final String parentId;
+  final String teacherId;
+  final String? studentId;       // 연결된 자녀 (null이면 자녀 미지정)
+  final ParentPermission permission;
+  final DateTime connectedAt;
+}
+```
+
+### 12.4 ParentPermission (권한 수준) - V2
+
+> invite_system_v2.md 참조
+
+```dart
+enum ParentPermission {
+  viewOnly,       // 열람만 가능
+  managePayments, // 결제 관리
+  manageLessons,  // 레슨 관리
+  fullAccess,     // 전체 권한
+}
+```
+
+### 12.6 ParentChildRelation (학부모-자녀 관계)
 
 ```dart
 class ParentChildRelation {
@@ -799,7 +848,7 @@ class ParentChildRelation {
 }
 ```
 
-### 12.3 ParentVisibilitySettings (열람 범위 설정)
+### 12.7 ParentVisibilitySettings (열람 범위 설정)
 
 ```dart
 class ParentVisibilitySettings {
@@ -816,7 +865,7 @@ class ParentVisibilitySettings {
 }
 ```
 
-### 12.4 ParentNotificationSettings (알림 설정)
+### 12.8 ParentNotificationSettings (알림 설정)
 
 ```dart
 class ParentNotificationSettings {
