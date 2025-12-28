@@ -130,12 +130,12 @@ lesson-app/
 - 외부 선생님 등록 시스템 (온보딩 3단계, 프로필 설정)
 - 선생님 검색 시스템 (필터링, 프로필 상세)
 - 양방향 초대 시스템 (QR/URL/코드, 연결 요청 관리)
+- 학부모 시스템 (이중 역할 전환, 프로필 스위처, 미연결 자녀 대시보드)
 
 ### 진행중
 - 없음
 
 ### 예정
-- 학부모 시스템 (이중 역할 전환, 미연결 자녀 연습)
 - OAuth 연동 (Google, Kakao)
 - 푸시 알림
 - 뱃지 시스템
@@ -180,6 +180,8 @@ lesson-app/
 | PracticeItem | 연습 과제 (priority: must/should/could) |
 | LessonBooking | 체험/정규레슨 예약 (pending/confirmed/completed) |
 | MetronomeSettings | BPM, 박자표, 사운드 템플릿 |
+| UserProfile | 이중 역할 지원 (학부모/학생/자녀), 프로필 전환 |
+| ChildProfile | 자녀 프로필 (connected/pending/unconnected) |
 
 ---
 
@@ -189,7 +191,7 @@ lesson-app/
 |:----:|------|:----:|:------:|
 | 1 | 외부 선생님 등록 | ✅ 완료 | - |
 | 2 | 양방향 QR/URL 초대 | ✅ 완료 | - |
-| 3 | 학부모 시스템 | 📋 스펙완료 | 높음 |
+| 3 | 학부모 시스템 | ✅ 완료 | - |
 | 4 | OAuth 연동 | 대기 | 높음 |
 | 5 | 백엔드 API (FastAPI) | 대기 | 중간 |
 
