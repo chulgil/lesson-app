@@ -1549,6 +1549,263 @@ for (final req in pendingRequests) {
 
 ---
 
+## 결제 관리 상세 스펙
+
+### 수기 입력 방식
+
+현재 무통장 입금만 지원하므로 결제는 **수기 입력** 방식으로 관리합니다.
+
+#### 결제 입력 주체
+
+| 역할 | 입력 가능 | 확인 가능 |
+|------|:--------:|:--------:|
+| 선생님 | ✅ 수강료 청구, 입금 확인 | ✅ 전체 |
+| 학생 | ✅ 입금 기록 (본인) | ✅ 본인 + 선생님 확인 상태 |
+| 학부모 | ✅ 입금 기록 (자녀) | ✅ 자녀 + 선생님 확인 상태 |
+
+#### 결제 플로우
+
+```
+[선생님]                      [학생/학부모]
+    │                              │
+    ▼                              │
+1. 수강료 청구                     │
+   (금액, 마감일)                   │
+    │                              │
+    │ ─── 알림 발송 ───►           │
+    │                              ▼
+    │                         2. 입금 기록
+    │                            (입금일, 금액)
+    │                              │
+    │ ◄─── 확인 요청 ────          │
+    ▼                              │
+3. 입금 확인                       │
+   (확인 완료 표시)                 │
+    │                              │
+    │ ─── 확인 완료 알림 ───►       │
+    │                              ▼
+    │                         4. 선생님 확인 상태 표시
+```
+
+#### 결제 상태
+
+```dart
+enum PaymentStatus {
+  pending,    // 청구됨 (입금 대기)
+  paid,       // 입금 기록됨 (학생/학부모가 입력)
+  confirmed,  // 확인 완료 (선생님이 확인)
+  overdue,    // 연체 (마감일 초과)
+}
+```
+
+#### 결제 데이터 모델
+
+```dart
+class Payment {
+  final String id;
+  final String studentId;
+  final String teacherId;
+  final int amount;
+  final DateTime dueDate;         // 마감일
+  final PaymentStatus status;
+
+  // 학생/학부모 입력
+  final DateTime? paidAt;         // 입금일 (학생/학부모 기록)
+  final String? paidBy;           // 입금자 (학생 or 학부모 ID)
+
+  // 선생님 확인
+  final DateTime? confirmedAt;    // 확인일
+  final String? confirmedBy;      // 확인자 (선생님 ID)
+
+  final DateTime createdAt;
+}
+```
+
+#### 연결 상태별 결제 기능
+
+| 기능 | 미연결 | 연결 후 |
+|------|:------:|:------:|
+| 수강료 청구 (선생님) | ✅ 수기 기록 | ✅ + 알림 발송 |
+| 입금 기록 (학생/학부모) | ❌ | ✅ 앱에서 입력 |
+| 입금 확인 (선생님) | ✅ 수기 | ✅ 앱에서 확인 |
+| **선생님 확인 상태 표시** | ❌ | ✅ 학생/학부모가 확인 |
+
+---
+
+## 휴강 상태 전환 로직
+
+### 휴강 정의
+
+휴강은 **일시적으로 레슨을 중단**한 상태입니다.
+연습 성과 인디케이터에서 회색(⚪)으로 표시됩니다.
+
+### 휴강 설정
+
+| 설정 방법 | 설명 |
+|----------|------|
+| 선생님이 설정 | 학생 프로필에서 "휴강" 토글 On |
+| 자동 해제 | 다음 레슨 예약 시 자동으로 휴강 해제 |
+
+### 휴강 처리 로직
+
+```dart
+// 휴강 설정
+Future<void> setOnBreak({
+  required String studentId,
+  required bool onBreak,
+  String? reason,
+  DateTime? expectedReturnDate,
+}) async {
+  // 1. 학생 상태 업데이트
+  await updateStudent(
+    studentId: studentId,
+    onBreak: onBreak,
+    breakReason: reason,
+    expectedReturnDate: expectedReturnDate,
+  );
+
+  // 2. 연습 레벨 업데이트 (연결된 경우)
+  final student = await getStudent(studentId);
+  if (student.connectionStatus == ConnectionStatus.connected) {
+    await updateStudentPracticeLevel(
+      studentId: studentId,
+      level: onBreak ? PracticeLevel.onBreak : null,  // null이면 재계산
+    );
+  }
+
+  // 3. 로그 기록
+  await logBreakChange(
+    studentId: studentId,
+    onBreak: onBreak,
+    reason: reason,
+  );
+}
+
+// 레슨 예약 시 자동 휴강 해제
+Future<void> scheduleLesson({
+  required String studentId,
+  required DateTime lessonTime,
+}) async {
+  final student = await getStudent(studentId);
+
+  // 휴강 중인 학생이면 자동 해제
+  if (student.onBreak == true) {
+    await setOnBreak(studentId: studentId, onBreak: false);
+  }
+
+  // 레슨 예약 생성
+  await createLessonBooking(studentId: studentId, time: lessonTime);
+}
+```
+
+### 휴강과 연습 성과
+
+| 상태 | 연습 성과 계산 | 인디케이터 |
+|------|:-------------:|:---------:|
+| **휴강 중** | 계산 안 함 | ⚪ 회색 |
+| **휴강 해제** | 해제 시점부터 계산 | 성과에 따라 변경 |
+
+---
+
+## 연습 성과 계산 로직
+
+### 계산 기준
+
+**최근 7일** 기준으로 연습한 날 수를 계산합니다.
+
+| 레벨 | 조건 | 색상 |
+|------|------|:----:|
+| 우수 (excellent) | 5일 이상 연습 | 🟢 |
+| 보통 (average) | 3-4일 연습 | 🟠 |
+| 부족 (poor) | 1-2일 연습 | 🔴 |
+| 신규 (newStudent) | 연습 기록 없음 | 🟣 |
+| 휴강 (onBreak) | 휴강 중 | ⚪ |
+
+### 계산 로직
+
+```dart
+// 연습 성과 계산
+Future<PracticeLevel> calculatePracticeLevel(String studentId) async {
+  final student = await getStudent(studentId);
+
+  // 1. 휴강 중이면 onBreak 반환
+  if (student.onBreak == true) {
+    return PracticeLevel.onBreak;
+  }
+
+  // 2. 최근 7일 연습 기록 조회
+  final now = DateTime.now();
+  final weekAgo = now.subtract(Duration(days: 7));
+
+  final practices = await getPracticeRecords(
+    studentId: studentId,
+    from: weekAgo,
+    to: now,
+  );
+
+  // 3. 연습한 날 수 계산 (중복 제거)
+  final practiceDays = practices
+      .map((p) => DateFormat('yyyy-MM-dd').format(p.date))
+      .toSet()
+      .length;
+
+  // 4. 레벨 결정
+  if (practiceDays == 0) {
+    // 연습 기록이 아예 없으면 신규 학생
+    final allPractices = await getAllPracticeRecords(studentId);
+    if (allPractices.isEmpty) {
+      return PracticeLevel.newStudent;
+    }
+    return PracticeLevel.poor;  // 기록은 있지만 최근 연습 없음
+  }
+
+  if (practiceDays >= 5) return PracticeLevel.excellent;
+  if (practiceDays >= 3) return PracticeLevel.average;
+  return PracticeLevel.poor;
+}
+
+// 매일 자정에 배치로 업데이트 (또는 학생 목록 조회 시)
+Future<void> updateAllPracticeLevels(String teacherId) async {
+  final students = await getStudentsByTeacher(teacherId);
+
+  for (final student in students) {
+    if (student.connectionStatus == ConnectionStatus.connected) {
+      final level = await calculatePracticeLevel(student.id);
+      await updateStudentPracticeLevel(
+        studentId: student.id,
+        level: level,
+      );
+    }
+  }
+}
+```
+
+### 업데이트 타이밍
+
+| 트리거 | 설명 |
+|--------|------|
+| **연습 기록 저장** | 해당 학생만 재계산 |
+| **학생 목록 조회** | 캐시 만료 시 재계산 |
+| **매일 자정 배치** | 전체 학생 일괄 업데이트 |
+| **휴강 상태 변경** | 해당 학생만 업데이트 |
+
+### 신규 연결과 연습 성과
+
+```
+[앱 연결]
+    │
+    ▼
+🟣 신규 연결 (newStudent)
+    │
+    │ 첫 연습 기록
+    ▼
+🔴/🟠/🟢 연습 성과에 따라 변경
+```
+
+> **Note**: 신규 연결 학생은 최초 연습 기록이 생기기 전까지 🟣 보라색으로 표시됩니다.
+
+---
+
 ## 관련 문서
 
 - [브레인스토밍 Q&A](../../proposal/invite_ux_improvement.md)
