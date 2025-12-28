@@ -102,6 +102,95 @@
 > **자동 수락 Off 시**: 학생이 선생님을 팔로우하면 🔵 초대 받음 상태가 되고,
 > 선생님이 알림 센터에서 수락하면 연결됩니다.
 
+### 설정 변경 시 처리
+
+자동 연결 수락 설정이 변경될 때의 처리 로직입니다.
+
+#### On → Off 변경 시
+
+```
+[현재 상태: 자동 수락 On]
+        │
+        ▼
+[선생님이 Off로 변경]
+        │
+        ├── 기존 연결: 영향 없음 (유지)
+        ├── 대기 중인 요청 (🔵): 없음 (자동 수락이었으므로)
+        └── 변경 이후: 새 요청은 수동 수락 필요
+```
+
+| 항목 | 처리 |
+|------|------|
+| 기존 연결된 학생 | **유지** - 설정 변경이 기존 연결에 영향 없음 |
+| 변경 후 새 요청 | **수동 수락** - 알림에서 수락/거절 |
+
+#### Off → On 변경 시
+
+```
+[현재 상태: 자동 수락 Off]
+        │
+        ├── 대기 중인 요청들 (🔵 초대 받음)
+        │   ├── 학생 A: 2시간 전 요청
+        │   └── 학생 B: 1일 전 요청
+        │
+        ▼
+[선생님이 On으로 변경]
+        │
+        ├── 옵션 A: 대기 중인 요청 모두 자동 수락
+        ├── 옵션 B: 대기 중인 요청은 그대로 유지 (수동 수락)
+        └── **선택: 옵션 B** (기존 대기 요청은 수동 처리)
+```
+
+| 항목 | 처리 |
+|------|------|
+| 대기 중인 요청 | **유지** - 선생님이 개별적으로 수락/거절 |
+| 변경 후 새 요청 | **자동 수락** - 즉시 연결 |
+
+#### 설정 변경 API
+
+```dart
+Future<void> updateAutoAcceptSetting({
+  required String teacherId,
+  required bool autoAccept,
+}) async {
+  // 1. 설정 업데이트
+  await updateTeacherSettings(
+    teacherId: teacherId,
+    autoAcceptConnection: autoAccept,
+  );
+
+  // 2. 대기 중인 요청은 그대로 유지 (별도 처리 없음)
+  // - On→Off: 대기 중인 요청 없음
+  // - Off→On: 기존 요청은 수동 처리 유지
+
+  // 3. 설정 변경 로그 기록 (향후 분석용)
+  await logSettingChange(
+    teacherId: teacherId,
+    setting: 'autoAcceptConnection',
+    newValue: autoAccept,
+  );
+}
+```
+
+#### 설정 변경 확인 다이얼로그
+
+```
+[Off → On 변경 시]
+  "자동 연결 수락을 켜시겠습니까?"
+  "앞으로 학생의 연결 요청이 자동으로 수락됩니다."
+  "대기 중인 요청은 개별적으로 처리해야 합니다."
+
+  [취소]  [확인]
+```
+
+```
+[On → Off 변경 시]
+  "자동 연결 수락을 끄시겠습니까?"
+  "앞으로 학생의 연결 요청을 직접 수락해야 합니다."
+
+  [취소]  [확인]
+```
+
 ---
 
 ## 사용자 흐름
@@ -384,6 +473,111 @@ String normalizePhoneNumber(String phone, String countryCode) {
 └── 설치 링크 + 선생님 코드 포함
 ```
 
+### 전화번호 불일치 병합
+
+수기 등록 학생의 전화번호와 앱 가입 시 사용하는 전화번호가 다를 수 있습니다.
+
+#### 시나리오
+
+```
+[선생님: 수기 등록]
+  이름: 김민수
+  전화번호: +82 10-1234-5678 (부모님 번호)
+        │
+        ▼
+[학생: 앱 가입]
+  이름: 김민수
+  전화번호: +82 10-9999-8888 (본인 번호)
+        │
+        ▼
+[코드로 선생님에게 연결 시도]
+        │
+        ▼
+[전화번호 불일치 감지!]
+        │
+        ├── 자동 병합 불가
+        └── 선생님에게 확인 요청
+```
+
+#### 병합 처리 방식
+
+| 상황 | 처리 |
+|------|------|
+| 전화번호 일치 | 자동 병합 (수기 → 연결됨) |
+| 전화번호 불일치 + 이름 일치 | 선생님에게 확인 요청 알림 |
+| 전화번호 불일치 + 이름 불일치 | 새 학생으로 등록 |
+
+#### 병합 확인 알림
+
+```dart
+// 병합 후보 감지 시 선생님에게 알림
+await notifyMergeCandidate(
+  teacherId: teacherId,
+  existingStudentId: offlineStudent.id,  // 수기 등록
+  newStudentId: appStudent.id,            // 앱 가입
+  matchType: 'name_only',                 // 이름만 일치
+);
+```
+
+#### 병합 확인 UI
+
+```
+알림: "김민수님이 연결을 요청했습니다"
+      "기존 등록된 '김민수' 학생과 동일인인가요?"
+
+      [예, 병합합니다]  [아니오, 별도 학생입니다]
+```
+
+#### 병합 API
+
+```dart
+// 병합 수락
+Future<void> mergeStudents({
+  required String offlineStudentId,  // 수기 등록
+  required String appStudentId,      // 앱 가입
+  required String teacherId,
+}) async {
+  // 1. 수기 등록 학생의 데이터를 앱 학생에게 이전
+  await transferStudentData(
+    fromId: offlineStudentId,
+    toId: appStudentId,
+  );
+
+  // 2. 수기 등록 학생 삭제 (soft delete)
+  await softDeleteStudent(offlineStudentId);
+
+  // 3. 앱 학생의 connectionStatus 업데이트
+  await updateStudentConnectionStatus(
+    studentId: appStudentId,
+    status: ConnectionStatus.connected,
+  );
+
+  // 4. 연결 완료 처리
+  await createConnection(appStudentId, teacherId);
+}
+
+// 병합 거절 (별도 학생으로 처리)
+Future<void> rejectMerge({
+  required String offlineStudentId,
+  required String appStudentId,
+  required String teacherId,
+}) async {
+  // 앱 학생을 새 학생으로 등록
+  await createConnection(appStudentId, teacherId);
+  // 수기 등록 학생은 그대로 유지 (오프라인)
+}
+```
+
+#### 데이터 이전 항목
+
+| 데이터 | 이전 방식 |
+|--------|----------|
+| 레슨 기록 | 수기 학생 → 앱 학생으로 이전 |
+| 결제 기록 | 수기 학생 → 앱 학생으로 이전 |
+| 연습 과제 | 수기 학생 → 앱 학생으로 이전 |
+| 메모 | 수기 학생 → 앱 학생으로 이전 |
+| 전화번호 | 앱 학생 번호 유지 (부모 번호 별도 저장) |
+
 ---
 
 ## 기능별 사용 가능 여부
@@ -438,6 +632,183 @@ void onRejectTapped(String notificationId, String studentId, String teacherId) {
   );
   dismissNotification(notificationId);
 }
+```
+
+### 푸시 알림 백그라운드 액션
+
+앱이 백그라운드/종료 상태일 때 푸시 알림에서 바로 액션을 처리하는 방식입니다.
+
+#### 알림 페이로드 구조
+
+```dart
+// FCM 메시지 페이로드
+{
+  "notification": {
+    "title": "연결 요청",
+    "body": "김민수님이 연결을 원합니다"
+  },
+  "data": {
+    "type": "connection_request",
+    "notification_id": "notif_123",
+    "student_id": "student_456",
+    "teacher_id": "teacher_789",
+    "student_name": "김민수",
+    "actions": ["accept", "reject"]
+  },
+  "android": {
+    "notification": {
+      "click_action": "FLUTTER_NOTIFICATION_CLICK"
+    }
+  },
+  "apns": {
+    "payload": {
+      "aps": {
+        "category": "CONNECTION_REQUEST"
+      }
+    }
+  }
+}
+```
+
+#### iOS 카테고리 등록
+
+```swift
+// iOS Notification Categories (AppDelegate)
+let acceptAction = UNNotificationAction(
+  identifier: "ACCEPT_ACTION",
+  title: "수락",
+  options: .foreground
+)
+
+let rejectAction = UNNotificationAction(
+  identifier: "REJECT_ACTION",
+  title: "거절",
+  options: .destructive
+)
+
+let connectionCategory = UNNotificationCategory(
+  identifier: "CONNECTION_REQUEST",
+  actions: [acceptAction, rejectAction],
+  intentIdentifiers: [],
+  options: .customDismissAction
+)
+
+UNUserNotificationCenter.current().setNotificationCategories([connectionCategory])
+```
+
+#### Flutter 백그라운드 핸들러
+
+```dart
+// firebase_messaging 백그라운드 핸들러
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  final data = message.data;
+  final type = data['type'];
+
+  // 연결 요청 알림은 액션 버튼으로만 처리
+  // 백그라운드에서 자동 처리하지 않음
+  if (type == 'connection_request') {
+    // 로컬 알림으로 표시 (액션 버튼 포함)
+    await _showLocalNotificationWithActions(
+      title: message.notification?.title ?? '',
+      body: message.notification?.body ?? '',
+      payload: data,
+    );
+  }
+}
+
+// 알림 액션 응답 처리
+void _handleNotificationAction(NotificationResponse response) async {
+  final payload = jsonDecode(response.payload ?? '{}');
+  final action = response.actionId;
+
+  switch (action) {
+    case 'accept':
+      await _handleAcceptInBackground(payload);
+      break;
+    case 'reject':
+      await _handleRejectInBackground(payload);
+      break;
+    default:
+      // 알림 탭 - 앱 열기
+      _navigateToConnectionRequests();
+  }
+}
+
+// 백그라운드에서 수락 처리
+Future<void> _handleAcceptInBackground(Map<String, dynamic> payload) async {
+  try {
+    await api.acceptConnection(
+      studentId: payload['student_id'],
+      teacherId: payload['teacher_id'],
+    );
+
+    // 성공 로컬 알림
+    await _showLocalNotification(
+      title: '연결 완료',
+      body: '${payload['student_name']}님과 연결되었습니다',
+    );
+  } catch (e) {
+    // 실패 시 앱 열기 유도
+    await _showLocalNotification(
+      title: '연결 실패',
+      body: '앱을 열어 다시 시도해주세요',
+    );
+  }
+}
+
+// 백그라운드에서 거절 처리
+Future<void> _handleRejectInBackground(Map<String, dynamic> payload) async {
+  try {
+    await api.rejectConnection(
+      studentId: payload['student_id'],
+      teacherId: payload['teacher_id'],
+    );
+    // 거절은 별도 알림 없음
+  } catch (e) {
+    await _showLocalNotification(
+      title: '처리 실패',
+      body: '앱을 열어 다시 시도해주세요',
+    );
+  }
+}
+```
+
+#### 알림 액션 실패 처리
+
+| 상황 | 처리 |
+|------|------|
+| 네트워크 오류 | 로컬 알림으로 재시도 유도 |
+| 이미 처리됨 | 무시 (idempotent) |
+| 만료된 요청 | "요청이 만료되었습니다" 알림 |
+| 서버 오류 | 로컬 알림으로 앱 열기 유도 |
+
+#### Android 액션 버튼 설정
+
+```dart
+// flutter_local_notifications 설정
+final androidDetails = AndroidNotificationDetails(
+  'connection_channel',
+  '연결 알림',
+  importance: Importance.high,
+  priority: Priority.high,
+  actions: [
+    AndroidNotificationAction(
+      'accept',
+      '수락',
+      icon: DrawableResourceAndroidBitmap('ic_check'),
+      showsUserInterface: false,
+    ),
+    AndroidNotificationAction(
+      'reject',
+      '거절',
+      icon: DrawableResourceAndroidBitmap('ic_close'),
+      showsUserInterface: false,
+    ),
+  ],
+);
 ```
 
 ### 알림 센터 통합
@@ -801,12 +1172,17 @@ for (final req in pendingRequests) {
 - [ ] 미가입자 초대
 - [ ] 재연결 기능 (handleReconnect, acceptReconnect)
 - [ ] 재연결 시 데이터 복구 로직
+- [ ] 전화번호 불일치 병합 로직 (mergeStudents)
+- [ ] 설정 변경 시 처리 (updateAutoAcceptSetting)
+- [ ] 푸시 알림 백그라운드 액션 (FCM + Local Notification)
 
 ### Phase 3
 - [ ] 알림 센터 통합
 - [ ] 연결 해제 기능
 - [ ] 검색 노출 설정
 - [ ] 연속 거절 시 영구 차단 (3회 이상)
+- [ ] iOS 알림 카테고리 등록
+- [ ] Android 알림 액션 버튼
 
 ---
 
