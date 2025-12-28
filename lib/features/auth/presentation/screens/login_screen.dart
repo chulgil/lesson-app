@@ -203,8 +203,9 @@ class LoginScreen extends StatelessWidget {
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
       ),
+      isScrollControlled: true,
       builder: (context) => SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -222,17 +223,17 @@ class LoginScreen extends StatelessWidget {
 
               // Parent icon
               Container(
-                width: 64,
-                height: 64,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: AppColors.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: const Center(
-                  child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 32)),
+                  child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 28)),
                 ),
               ),
-              const SizedBox(height: AppSpacing.space3),
+              const SizedBox(height: AppSpacing.space2),
 
               Text(
                 '학부모 로그인',
@@ -241,12 +242,12 @@ class LoginScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.space1),
               Text(
                 '자녀의 레슨과 연습을 확인하세요',
-                style: AppTypography.bodyMedium.copyWith(
+                style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.space4),
+              const SizedBox(height: AppSpacing.space3),
 
               // Social login buttons for parent
               _SocialLoginButton(
@@ -261,7 +262,7 @@ class LoginScreen extends StatelessWidget {
                   context.go(AppRoutes.parentInviteCode);
                 },
               ),
-              const SizedBox(height: AppSpacing.space3),
+              const SizedBox(height: AppSpacing.space2),
 
               _SocialLoginButton(
                 icon: Icons.chat_bubble_rounded,
@@ -273,7 +274,7 @@ class LoginScreen extends StatelessWidget {
                   context.go(AppRoutes.parentInviteCode);
                 },
               ),
-              const SizedBox(height: AppSpacing.space3),
+              const SizedBox(height: AppSpacing.space2),
 
               _SocialLoginButton(
                 icon: Icons.apple_rounded,
@@ -286,7 +287,7 @@ class LoginScreen extends StatelessWidget {
                 },
               ),
 
-              const SizedBox(height: AppSpacing.space4),
+              const SizedBox(height: AppSpacing.space3),
             ],
           ),
         ),

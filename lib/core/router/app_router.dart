@@ -25,6 +25,8 @@ import '../../features/practice/presentation/screens/add_section_screen.dart';
 import '../../features/practice/presentation/screens/section_detail_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../features/parent_home/presentation/screens/parent_home_screen.dart';
+import '../../features/parent_home/presentation/screens/child_profiles_screen.dart';
+import '../../features/parent_home/presentation/screens/child_profile_form_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../features/students/presentation/screens/student_detail_screen.dart';
@@ -70,6 +72,11 @@ class AppRoutes {
   static const repertoireDetail = '/practice/repertoire/:id';
   static const addSection = '/practice/section/add';
   static const sectionDetail = '/practice/section/:id';
+
+  // Parent routes
+  static const childProfiles = '/parent/children';
+  static const addChildProfile = '/parent/children/add';
+  static const editChildProfile = '/parent/children/:id/edit';
 }
 
 /// App router configuration
@@ -346,6 +353,41 @@ class AppRouter {
             repertoireId: repertoireId,
             studentId: studentId,
           );
+        },
+      ),
+
+      // Parent - Add Child Profile (must be before childProfiles for proper matching)
+      GoRoute(
+        path: AppRoutes.addChildProfile,
+        name: 'addChildProfile',
+        builder: (context, state) {
+          final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+          return ChildProfileFormScreen(parentId: parentId);
+        },
+      ),
+
+      // Parent - Edit Child Profile (must be before childProfiles for proper matching)
+      GoRoute(
+        path: AppRoutes.editChildProfile,
+        name: 'editChildProfile',
+        builder: (context, state) {
+          // childId available via state.pathParameters['id'] if needed
+          final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+          // Note: The screen will fetch the child profile using the ID
+          return ChildProfileFormScreen(
+            parentId: parentId,
+            // existingProfile will be loaded via provider
+          );
+        },
+      ),
+
+      // Parent - Child Profiles List
+      GoRoute(
+        path: AppRoutes.childProfiles,
+        name: 'childProfiles',
+        builder: (context, state) {
+          final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
+          return ChildProfilesScreen(parentId: parentId);
         },
       ),
     ],

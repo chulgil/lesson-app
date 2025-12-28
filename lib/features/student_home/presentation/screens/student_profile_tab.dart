@@ -1,17 +1,24 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../models/parent.dart';
+import '../../../../providers/parent/parent_crud_provider.dart';
 
 /// Student profile tab with settings and account info
-class StudentProfileTab extends StatelessWidget {
+class StudentProfileTab extends ConsumerWidget {
   const StudentProfileTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -33,7 +40,7 @@ class StudentProfileTab extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding),
-            child: _buildMenuSection(context),
+            child: _buildMenuSection(context, ref),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -240,7 +247,7 @@ class StudentProfileTab extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuSection(BuildContext context) {
+  Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -286,6 +293,14 @@ class StudentProfileTab extends StatelessWidget {
             title: '레슨 녹음 파일',
             subtitle: '12개 저장됨',
             onTap: () {},
+          ),
+          _buildMenuDivider(),
+          _buildMenuItem(
+            icon: Icons.family_restroom,
+            iconColor: AppColors.secondary,
+            title: '학부모 초대',
+            subtitle: '학부모님과 연결하기',
+            onTap: () => _showInviteCodeDialog(context, ref),
           ),
         ],
       ),
@@ -364,6 +379,7 @@ class StudentProfileTab extends StatelessWidget {
     required String title,
     String? subtitle,
     Widget? trailing,
+    Color? iconColor,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -375,13 +391,13 @@ class StudentProfileTab extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: iconColor?.withValues(alpha: 0.1) ?? AppColors.surfaceSecondaryLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
                 size: 20,
-                color: AppColors.textSecondaryLight,
+                color: iconColor ?? AppColors.textSecondaryLight,
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -464,6 +480,117 @@ class StudentProfileTab extends StatelessWidget {
               '로그아웃',
               style: TextStyle(color: AppColors.error),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInviteCodeDialog(BuildContext context, WidgetRef ref) {
+    // Generate a random 6-character alphanumeric invite code
+    final random = Random();
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    final inviteCode = List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
+    // Hardcoded student info for now (will be from provider in production)
+    const studentName = '홍길동';
+    const studentId = 'student_1';
+
+    // Create and save the invitation to the repository
+    final invitation = ParentInvitation(
+      id: 'inv_${DateTime.now().millisecondsSinceEpoch}',
+      studentId: studentId,
+      source: InvitationSource.student,
+      parentPhone: '',
+      invitationCode: inviteCode,
+      expiresAt: DateTime.now().add(const Duration(hours: 24)),
+      createdAt: DateTime.now(),
+    );
+
+    ref.read(invitationsNotifierProvider(studentId).notifier).createInvitation(invitation);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('학부모 초대 코드'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '학부모님을 초대합니다',
+              style: AppTypography.bodyMedium,
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space5,
+                vertical: AppSpacing.space4,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(color: AppColors.primary),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: inviteCode.split('').map((digit) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      digit,
+                      style: AppTypography.headingLarge.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              '이 코드를 학부모님께 전달해주세요.\n학부모님이 앱에서 코드를 입력하면\n연결됩니다.',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '* 코드는 24시간 동안 유효합니다',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: inviteCode));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('초대 코드가 복사되었습니다'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            icon: const Icon(Icons.copy, size: 18),
+            label: const Text('복사'),
+          ),
+          FilledButton.icon(
+            onPressed: () {
+              SharePlus.instance.share(
+                ShareParams(
+                  text: '[레슨앱] 학부모 초대\n\n'
+                      '$studentName 학생의 학부모님을 초대합니다.\n\n'
+                      '초대 코드: $inviteCode\n\n'
+                      '앱을 설치하고 위 코드를 입력해주세요.',
+                ),
+              );
+            },
+            icon: const Icon(Icons.share, size: 18),
+            label: const Text('공유'),
           ),
         ],
       ),
