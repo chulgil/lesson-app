@@ -73,13 +73,13 @@ lesson-app/
 | **payment/** | payment_system.md | 결제 시스템 |
 | | payment_flow.md | 결제 플로우 |
 | | payment_requirement.md | 결제 요구사항 |
-| **user/** | parent_system.md | 학부모 시스템 |
+| **user/** | parent_system.md | 학부모 시스템 (이중 역할, 미연결 자녀 포함) |
 | | parent_login_flow.md | 학부모 로그인 |
 | | teacher_registration.md | 선생님 등록 |
 | **notification/** | notification_system.md | 알림 시스템 |
 | **review/** | review_system.md | 리뷰/피드백 시스템 |
 | **trial/** | trial_lesson_system.md | 체험 레슨 |
-| **invite/** | invite_system.md | 양방향 초대 시스템 |
+| **invite/** | invite_system_v2.md | 양방향 초대 시스템 (선생님↔학부모 직접 초대 포함) |
 | **design/** | ux_guidelines.md | UX 가이드라인 |
 | | figma_templates.md | Figma 템플릿 |
 | | competitive_analysis.md | 경쟁사 분석 |
@@ -135,6 +135,7 @@ lesson-app/
 - 없음
 
 ### 예정
+- 학부모 시스템 (이중 역할 전환, 미연결 자녀 연습)
 - OAuth 연동 (Google, Kakao)
 - 푸시 알림
 - 뱃지 시스템
@@ -188,8 +189,9 @@ lesson-app/
 |:----:|------|:----:|:------:|
 | 1 | 외부 선생님 등록 | ✅ 완료 | - |
 | 2 | 양방향 QR/URL 초대 | ✅ 완료 | - |
-| 3 | OAuth 연동 | 대기 | 높음 |
-| 4 | 백엔드 API (FastAPI) | 대기 | 중간 |
+| 3 | 학부모 시스템 | 📋 스펙완료 | 높음 |
+| 4 | OAuth 연동 | 대기 | 높음 |
+| 5 | 백엔드 API (FastAPI) | 대기 | 중간 |
 
 > Claude 작업 시: 위 순위대로 진행, 상태 업데이트 필수
 
