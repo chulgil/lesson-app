@@ -112,12 +112,18 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('내 레슨', style: AppTypography.headingLarge),
-              TextButton.icon(
+              FilledButton.icon(
                 onPressed: () {
                   context.push(AppRoutes.selectTeacher);
                 },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('레슨 신청'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space2,
+                  ),
+                ),
               ),
             ],
           ),
