@@ -101,18 +101,40 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text('학생 관리', style: AppTypography.headingLarge),
-          FilledButton.icon(
-            onPressed: () {
-              context.push('/students/add');
-            },
-            icon: const Icon(Icons.person_add, size: 18),
-            label: const Text('학생 추가'),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space4,
-                vertical: AppSpacing.space2,
+          Row(
+            children: [
+              // Invite button (outlined style)
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.push('/invite');
+                },
+                icon: const Icon(Icons.mail_outline, size: 18),
+                label: const Text('학생 초대'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space3,
+                    vertical: AppSpacing.space2,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: AppSpacing.space2),
+              // Create button (filled style)
+              FilledButton.icon(
+                onPressed: () {
+                  context.push('/students/add');
+                },
+                icon: const Icon(Icons.edit_note, size: 18),
+                label: const Text('학생 작성'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space3,
+                    vertical: AppSpacing.space2,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -272,14 +294,27 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             ),
           ),
           const SizedBox(height: AppSpacing.space6),
-          if (query.isEmpty)
+          if (query.isEmpty) ...[
             FilledButton.icon(
+              onPressed: () {
+                context.push('/invite');
+              },
+              icon: const Icon(Icons.mail_outline),
+              label: const Text('학생 초대하기'),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            OutlinedButton.icon(
               onPressed: () {
                 context.push('/students/add');
               },
-              icon: const Icon(Icons.person_add),
-              label: const Text('첫 학생 추가하기'),
+              icon: const Icon(Icons.edit_note),
+              label: const Text('직접 작성하기'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+              ),
             ),
+          ],
         ],
       ),
     );

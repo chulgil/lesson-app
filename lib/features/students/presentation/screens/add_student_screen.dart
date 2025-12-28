@@ -74,7 +74,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('학생 추가'),
+        title: const Text('학생 작성'),
         leading: IconButton(
           onPressed: () => _showExitConfirmation(context),
           icon: const Icon(Icons.close),
@@ -809,7 +809,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       height: AppSpacing.buttonHeight,
       child: FilledButton(
         onPressed: _saveStudent,
-        child: const Text('학생 추가하기'),
+        child: const Text('저장하기'),
       ),
     );
   }
