@@ -534,8 +534,13 @@ class _PaymentManagementScreenState
       switch (payment.status) {
         case PaymentStatus.pending:
           color = AppColors.warning;
+        case PaymentStatus.paid:
+          color = AppColors.info;
+        case PaymentStatus.confirmed:
         case PaymentStatus.completed:
           color = AppColors.practiceGood;
+        case PaymentStatus.overdue:
+          color = AppColors.error;
         case PaymentStatus.cancelled:
           color = AppColors.textTertiaryLight;
         case PaymentStatus.refunded:
@@ -573,8 +578,13 @@ class _PaymentManagementScreenState
     switch (status) {
       case PaymentStatus.pending:
         return AppColors.warning;
+      case PaymentStatus.paid:
+        return AppColors.info;
+      case PaymentStatus.confirmed:
       case PaymentStatus.completed:
         return AppColors.practiceGood;
+      case PaymentStatus.overdue:
+        return AppColors.error;
       case PaymentStatus.cancelled:
         return AppColors.textTertiaryLight;
       case PaymentStatus.refunded:

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Payment type enum (trial vs regular)
 enum PaymentType {
   trial,   // 체험 레슨
@@ -13,25 +15,63 @@ enum PaymentType {
   }
 }
 
-/// Payment status enum
+/// Payment status enum (V2: state-transition based flow)
 enum PaymentStatus {
-  pending,
-  completed,
-  cancelled,
-  refunded;
+  pending,    // 청구됨 (입금 대기)
+  paid,       // 입금됨 (학생/학부모가 입금 기록)
+  confirmed,  // 확인 완료 (선생님이 입금 확인)
+  overdue,    // 연체 (마감일 초과)
+  cancelled,  // 취소됨
+  refunded,   // 환불됨
+  @Deprecated('Use confirmed instead. Kept for backwards compatibility.')
+  completed;  // V1 완료 → V2 confirmed로 마이그레이션 예정
 
   String get label {
     switch (this) {
       case PaymentStatus.pending:
-        return '대기';
-      case PaymentStatus.completed:
-        return '완료';
+        return '청구됨';
+      case PaymentStatus.paid:
+        return '입금됨';
+      case PaymentStatus.confirmed:
+        return '확인완료';
+      case PaymentStatus.overdue:
+        return '연체';
       case PaymentStatus.cancelled:
         return '취소';
       case PaymentStatus.refunded:
         return '환불';
+      case PaymentStatus.completed:
+        return '완료'; // Legacy
     }
   }
+
+  /// V2: Get color for status indicator
+  Color get color {
+    switch (this) {
+      case PaymentStatus.pending:
+        return const Color(0xFFFF9800); // 🟡 Amber
+      case PaymentStatus.paid:
+        return const Color(0xFF2196F3); // 🔵 Blue
+      case PaymentStatus.confirmed:
+      case PaymentStatus.completed:
+        return const Color(0xFF4CAF50); // 🟢 Green
+      case PaymentStatus.overdue:
+        return const Color(0xFFF44336); // 🔴 Red
+      case PaymentStatus.cancelled:
+      case PaymentStatus.refunded:
+        return const Color(0xFF9E9E9E); // ⚪ Grey
+    }
+  }
+
+  /// V2: Check if payment requires action
+  bool get requiresAction => this == PaymentStatus.pending || this == PaymentStatus.paid;
+
+  /// V2: Check if payment is finalized
+  bool get isFinalized =>
+      this == PaymentStatus.confirmed ||
+      this == PaymentStatus.completed ||
+      this == PaymentStatus.cancelled ||
+      this == PaymentStatus.refunded;
 }
 
 /// Payment method enum
@@ -97,6 +137,12 @@ class Payment {
   final BillingTargetType billingTargetType; // Who is the billing target
   final String? billingTargetId; // Parent ID if parent is billing target
   final String? billingTargetName; // Parent name for display
+
+  // V2: State transition timestamps
+  final DateTime? paidAt; // When student/parent recorded payment (maps to studentConfirmedAt)
+  final String? paidBy; // Who recorded the payment (student or parent ID)
+  final DateTime? confirmedAt; // When teacher confirmed the payment
+  final String? confirmedBy; // Who confirmed the payment (teacher ID)
   final bool parentNotified; // Has parent been notified of this payment request
   final DateTime? parentNotifiedAt; // When parent was notified
 
@@ -124,6 +170,10 @@ class Payment {
     this.billingTargetType = BillingTargetType.student,
     this.billingTargetId,
     this.billingTargetName,
+    this.paidAt,
+    this.paidBy,
+    this.confirmedAt,
+    this.confirmedBy,
     this.parentNotified = false,
     this.parentNotifiedAt,
   });
@@ -138,14 +188,37 @@ class Payment {
   bool get isAwaitingTeacherConfirmation =>
       status == PaymentStatus.pending && studentConfirmed;
 
-  /// Get display status considering 2-step confirmation
+  /// Get display status considering V2 state-transition flow
   String get displayStatus {
+    // V2 status values
+    if (status == PaymentStatus.confirmed) return '확인완료';
+    if (status == PaymentStatus.paid) return '입금됨';
+    if (status == PaymentStatus.overdue) return '연체';
+    // Legacy status values
     if (status == PaymentStatus.completed) return '완료';
     if (status == PaymentStatus.cancelled) return '취소';
     if (status == PaymentStatus.refunded) return '환불';
-    if (studentConfirmed) return '확인 대기';
+    // V1 fallback: use studentConfirmed flag
+    if (studentConfirmed) return '입금됨';
     if (isOverdue) return '연체';
-    return '대기';
+    return '청구됨';
+  }
+
+  /// V2: Get effective status considering both V1 and V2 fields
+  PaymentStatus get effectiveStatus {
+    // If already using V2 status, return as-is
+    if (status == PaymentStatus.paid ||
+        status == PaymentStatus.confirmed ||
+        status == PaymentStatus.overdue) {
+      return status;
+    }
+    // V1 to V2 mapping
+    if (status == PaymentStatus.completed) return PaymentStatus.confirmed;
+    if (status == PaymentStatus.pending && studentConfirmed) {
+      return PaymentStatus.paid;
+    }
+    if (isOverdue) return PaymentStatus.overdue;
+    return status;
   }
 
   /// Format amount as Korean won
@@ -214,6 +287,10 @@ class Payment {
     BillingTargetType? billingTargetType,
     String? billingTargetId,
     String? billingTargetName,
+    DateTime? paidAt,
+    String? paidBy,
+    DateTime? confirmedAt,
+    String? confirmedBy,
     bool? parentNotified,
     DateTime? parentNotifiedAt,
   }) {
@@ -241,6 +318,10 @@ class Payment {
       billingTargetType: billingTargetType ?? this.billingTargetType,
       billingTargetId: billingTargetId ?? this.billingTargetId,
       billingTargetName: billingTargetName ?? this.billingTargetName,
+      paidAt: paidAt ?? this.paidAt,
+      paidBy: paidBy ?? this.paidBy,
+      confirmedAt: confirmedAt ?? this.confirmedAt,
+      confirmedBy: confirmedBy ?? this.confirmedBy,
       parentNotified: parentNotified ?? this.parentNotified,
       parentNotifiedAt: parentNotifiedAt ?? this.parentNotifiedAt,
     );

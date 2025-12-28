@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'invite.dart';
 import 'practice_item.dart';
 
 /// Student status enum (enrollment status)
@@ -141,6 +142,17 @@ class Student {
   final DateTime? birthDate; // 생년월일 (비공개, 연령 그룹 자동 계산용)
   final AgeGroup? manualAgeGroup; // 수동 설정 연령 그룹 (학생 앱 미사용 시)
 
+  // V2: Connection status (mutual follow system)
+  final ConnectionStatus connectionStatus; // App connection status
+  final DateTime? connectedAt; // When mutual follow was established (for newStudent check)
+
+  // V2: Break (휴강) related fields
+  final String? breakReason; // Reason for break
+  final DateTime? expectedReturnDate; // Expected return date from break
+
+  // V2: Practice level (calculated from practice records)
+  final PracticeLevel? practiceLevel; // Calculated practice performance
+
   const Student({
     required this.id,
     required this.name,
@@ -167,6 +179,11 @@ class Student {
     this.isActive = true,
     this.birthDate,
     this.manualAgeGroup,
+    this.connectionStatus = ConnectionStatus.offline,
+    this.connectedAt,
+    this.breakReason,
+    this.expectedReturnDate,
+    this.practiceLevel,
   });
 
   /// Calculate age group from birth date (private)
@@ -178,6 +195,24 @@ class Student {
   /// Effective age group (calculated from birthDate, or manual, or default student)
   AgeGroup get effectiveAgeGroup =>
       calculatedAgeGroup ?? manualAgeGroup ?? AgeGroup.student;
+
+  /// V2: Check if student is on break (휴강 상태)
+  bool get isOnBreak => status == StudentStatus.paused;
+
+  /// V2: Get effective practice level (considers break status)
+  PracticeLevel get effectivePracticeLevel {
+    if (isOnBreak) return PracticeLevel.onBreak;
+    return practiceLevel ?? PracticeLevel.newStudent;
+  }
+
+  /// V2: Check if student is newly connected (less than 7 days)
+  bool get isNewStudent {
+    if (connectedAt == null) return false;
+    return DateTime.now().difference(connectedAt!).inDays < 7;
+  }
+
+  /// V2: Check if student has app connection
+  bool get isAppConnected => connectionStatus == ConnectionStatus.connected;
 
   /// Monthly lesson count based on lessons per week
   int get monthlyLessonCount => lessonsPerWeek * 4;
@@ -246,6 +281,11 @@ class Student {
     bool? isActive,
     DateTime? birthDate,
     AgeGroup? manualAgeGroup,
+    ConnectionStatus? connectionStatus,
+    DateTime? connectedAt,
+    String? breakReason,
+    DateTime? expectedReturnDate,
+    PracticeLevel? practiceLevel,
   }) {
     return Student(
       id: id ?? this.id,
@@ -273,6 +313,11 @@ class Student {
       isActive: isActive ?? this.isActive,
       birthDate: birthDate ?? this.birthDate,
       manualAgeGroup: manualAgeGroup ?? this.manualAgeGroup,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
+      connectedAt: connectedAt ?? this.connectedAt,
+      breakReason: breakReason ?? this.breakReason,
+      expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
+      practiceLevel: practiceLevel ?? this.practiceLevel,
     );
   }
 
