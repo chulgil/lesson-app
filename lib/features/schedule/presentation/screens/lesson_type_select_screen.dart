@@ -209,21 +209,20 @@ class LessonTypeSelectScreen extends ConsumerWidget {
         );
         break;
       case LessonType.regular:
-        // TODO: Navigate to regular lesson schedule screen
-        // For now, show a snackbar
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('정기 레슨 신청 기능은 준비 중입니다'),
-          ),
+        // Navigate to regular lesson registration screen
+        context.push(
+          AppRoutes.registerRegularLesson,
+          extra: {
+            'teacherId': teacherId,
+            'teacherName': teacherName,
+          },
         );
         break;
       case LessonType.oneTime:
-        // TODO: Navigate to one-time lesson request screen
-        // For now, show a snackbar
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('1회 추가 레슨 신청 기능은 준비 중입니다'),
-          ),
+        // 1회 레슨은 체험 레슨과 동일한 프로세스 사용 (스펙: SingleLessonBooking)
+        // lessonType 파라미터로 구분
+        context.push(
+          '${AppRoutes.trialLessonRequest}?teacherId=$teacherId&teacherName=${Uri.encodeComponent(teacherName)}&lessonType=oneTime',
         );
         break;
     }
