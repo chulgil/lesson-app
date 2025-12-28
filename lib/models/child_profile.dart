@@ -15,6 +15,51 @@ enum ChildProfileStatus {
   }
 }
 
+/// Child connection status with teacher
+///
+/// Determines what features are available for the child:
+/// - connected: Full features with teacher
+/// - pending: Waiting for teacher connection
+/// - unconnected: Practice/metronome only (no lessons, no repertoire)
+enum ChildConnectionStatus {
+  connected,
+  pending,
+  unconnected;
+
+  String get label {
+    switch (this) {
+      case ChildConnectionStatus.connected:
+        return '연결됨';
+      case ChildConnectionStatus.pending:
+        return '대기 중';
+      case ChildConnectionStatus.unconnected:
+        return '미연결';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case ChildConnectionStatus.connected:
+        return const Color(0xFF4CAF50); // Green
+      case ChildConnectionStatus.pending:
+        return const Color(0xFFFFA726); // Orange
+      case ChildConnectionStatus.unconnected:
+        return const Color(0xFF9E9E9E); // Grey
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ChildConnectionStatus.connected:
+        return Icons.link;
+      case ChildConnectionStatus.pending:
+        return Icons.hourglass_empty;
+      case ChildConnectionStatus.unconnected:
+        return Icons.link_off;
+    }
+  }
+}
+
 /// Child profile model for under-14 students (no account registration)
 ///
 /// This is NOT a user account - it's a profile under parent's account.
@@ -31,6 +76,7 @@ class ChildProfile {
   final String? teacherName; // For display
   final Color profileColor;
   final ChildProfileStatus status;
+  final ChildConnectionStatus connectionStatus;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -45,6 +91,7 @@ class ChildProfile {
     this.teacherName,
     required this.profileColor,
     this.status = ChildProfileStatus.active,
+    this.connectionStatus = ChildConnectionStatus.unconnected,
     required this.createdAt,
     this.updatedAt,
   });
@@ -54,6 +101,18 @@ class ChildProfile {
 
   /// Check if child is active
   bool get isActive => status == ChildProfileStatus.active;
+
+  /// Check if child is connected to a teacher
+  bool get isConnected => connectionStatus == ChildConnectionStatus.connected;
+
+  /// Check if connection is pending
+  bool get isPending => connectionStatus == ChildConnectionStatus.pending;
+
+  /// Check if child is unconnected (practice/metronome only)
+  bool get isUnconnected => connectionStatus == ChildConnectionStatus.unconnected;
+
+  /// Check if child has a teacher assigned
+  bool get hasTeacher => teacherId != null;
 
   /// Calculate current age from birth year
   int get age => DateTime.now().year - birthYear;
@@ -128,6 +187,7 @@ class ChildProfile {
     String? teacherName,
     Color? profileColor,
     ChildProfileStatus? status,
+    ChildConnectionStatus? connectionStatus,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -142,6 +202,7 @@ class ChildProfile {
       teacherName: teacherName ?? this.teacherName,
       profileColor: profileColor ?? this.profileColor,
       status: status ?? this.status,
+      connectionStatus: connectionStatus ?? this.connectionStatus,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
