@@ -41,6 +41,14 @@ import '../../features/profile/presentation/screens/certificate_edit_screen.dart
 import '../../features/profile/presentation/screens/profile_visibility_screen.dart';
 import '../../features/search/presentation/screens/teacher_search_screen.dart';
 import '../../features/search/presentation/screens/teacher_detail_screen.dart';
+import '../../features/invite/presentation/screens/invite_screen.dart';
+import '../../features/invite/presentation/screens/scan_invite_screen.dart';
+import '../../features/invite/presentation/screens/code_input_screen.dart';
+import '../../features/invite/presentation/screens/invite_confirm_screen.dart';
+import '../../features/invite/presentation/screens/invite_history_screen.dart';
+import '../../features/invite/presentation/screens/pending_requests_screen.dart';
+import '../../features/invite/presentation/screens/my_connections_screen.dart';
+import '../../models/invite.dart';
 
 /// App route paths
 class AppRoutes {
@@ -104,6 +112,15 @@ class AppRoutes {
   // Search routes
   static const teacherSearch = '/search/teachers';
   static const teacherDetail = '/teachers/:id';
+
+  // Invite routes
+  static const invite = '/invite';
+  static const inviteScan = '/invite/scan';
+  static const inviteCode = '/invite/code';
+  static const inviteConfirm = '/invite/confirm';
+  static const inviteHistory = '/invite/history';
+  static const pendingRequests = '/invite/requests';
+  static const myConnections = '/connections';
 }
 
 /// App router configuration
@@ -506,6 +523,58 @@ class AppRouter {
         builder: (context, state) => TeacherDetailScreen(
           teacherId: state.pathParameters['id'] ?? '',
         ),
+      ),
+
+      // Invite - Create/Share Invite
+      GoRoute(
+        path: AppRoutes.invite,
+        name: 'invite',
+        builder: (context, state) => const InviteScreen(),
+      ),
+
+      // Invite - Scan QR Code
+      GoRoute(
+        path: AppRoutes.inviteScan,
+        name: 'inviteScan',
+        builder: (context, state) => const ScanInviteScreen(),
+      ),
+
+      // Invite - Enter Code
+      GoRoute(
+        path: AppRoutes.inviteCode,
+        name: 'inviteCode',
+        builder: (context, state) => const CodeInputScreen(),
+      ),
+
+      // Invite - Confirm Connection
+      GoRoute(
+        path: AppRoutes.inviteConfirm,
+        name: 'inviteConfirm',
+        builder: (context, state) {
+          final invite = state.extra as Invite;
+          return InviteConfirmScreen(invite: invite);
+        },
+      ),
+
+      // Invite - History
+      GoRoute(
+        path: AppRoutes.inviteHistory,
+        name: 'inviteHistory',
+        builder: (context, state) => const InviteHistoryScreen(),
+      ),
+
+      // Invite - Pending Requests
+      GoRoute(
+        path: AppRoutes.pendingRequests,
+        name: 'pendingRequests',
+        builder: (context, state) => const PendingRequestsScreen(),
+      ),
+
+      // My Connections
+      GoRoute(
+        path: AppRoutes.myConnections,
+        name: 'myConnections',
+        builder: (context, state) => const MyConnectionsScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
