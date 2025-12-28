@@ -270,6 +270,53 @@ Future<void> handleFollow(String followerId, String followeeId, FollowUserRole f
       await notifyConnectionRequest(followeeId, followerId);
     }
   }
+
+  // Case 3: 선생님이 학생을 팔로우하는 경우 (앱 초대)
+  if (followerRole == FollowUserRole.teacher) {
+    // 학생에게 초대 알림 발송
+    await notifyInviteReceived(followeeId, followerId);
+  }
+}
+
+// 언팔로우 처리
+Future<void> handleUnfollow(String unfollowerId, String unfolloweeId) async {
+  // 1. Follow 레코드 삭제
+  await deleteFollow(unfollowerId, unfolloweeId);
+
+  // 2. 맞팔 상태였다면 Connection 비활성화
+  if (hasConnection(unfollowerId, unfolloweeId)) {
+    await deactivateConnection(unfollowerId, unfolloweeId);
+
+    // 3. Student.connectionStatus 업데이트
+    await updateStudentConnectionStatus(
+      studentId: getStudentId(unfollowerId, unfolloweeId),
+      status: ConnectionStatus.disconnected,
+    );
+
+    // 4. 상대방에게 연결 해제 알림
+    await notifyDisconnection(unfolloweeId, unfollowerId);
+  }
+}
+
+// 연결 요청 응답 처리 (수동 수락 모드)
+Future<void> handleConnectionResponse({
+  required String teacherId,
+  required String studentId,
+  required bool accept,
+}) async {
+  if (accept) {
+    // 수락: 맞팔 생성
+    await createFollow(teacherId, studentId);
+    await createConnection(studentId, teacherId);
+    await notifyConnection(studentId, teacherId);
+  } else {
+    // 거절: 학생의 팔로우 삭제 + 알림
+    await deleteFollow(studentId, teacherId);
+    await notifyConnectionRejected(studentId, teacherId);
+
+    // 거절 후 24시간 동안 재요청 불가 (스팸 방지)
+    await setConnectionCooldown(studentId, teacherId, Duration(hours: 24));
+  }
 }
 ```
 
@@ -337,11 +384,37 @@ String normalizePhoneNumber(String phone, String countryCode) {
 
 ### 연결 관련 알림
 
-| 이벤트 | 수신자 | 메시지 |
-|--------|--------|--------|
-| 팔로우 받음 | 선생님/학생 | "김민수님이 연결을 원합니다" |
-| 자동 연결 | 양쪽 | "김민수님과 연결되었습니다" |
-| 연결 해제 | 양쪽 | "김민수님과의 연결이 해제되었습니다" |
+| 이벤트 | 수신자 | 메시지 | 액션 |
+|--------|--------|--------|------|
+| 팔로우 받음 (자동수락 OFF) | 선생님 | "김민수님이 연결을 원합니다" | [수락] [거절] |
+| 초대 받음 | 학생 | "김선생님이 연결을 요청했습니다" | [수락] |
+| 자동 연결 | 양쪽 | "김민수님과 연결되었습니다" | - |
+| 연결 거절됨 | 학생 | "연결 요청이 거절되었습니다" | - |
+| 연결 해제 | 양쪽 | "김민수님과의 연결이 해제되었습니다" | - |
+
+### 알림 액션 API
+
+```dart
+// 알림에서 [수락] 버튼 클릭 시
+void onAcceptTapped(String notificationId, String studentId, String teacherId) {
+  handleConnectionResponse(
+    teacherId: teacherId,
+    studentId: studentId,
+    accept: true,
+  );
+  dismissNotification(notificationId);
+}
+
+// 알림에서 [거절] 버튼 클릭 시
+void onRejectTapped(String notificationId, String studentId, String teacherId) {
+  handleConnectionResponse(
+    teacherId: teacherId,
+    studentId: studentId,
+    accept: false,
+  );
+  dismissNotification(notificationId);
+}
+```
 
 ### 알림 센터 통합
 
@@ -349,7 +422,8 @@ String normalizePhoneNumber(String phone, String countryCode) {
 알림 센터
 ├── 연결 알림
 │   ├── 🔵 박학생님이 연결을 원합니다 [수락] [거절]
-│   └── 🟣 김민수님과 연결되었습니다
+│   ├── 🟣 김민수님과 연결되었습니다
+│   └── ⚪ 이학생님과의 연결이 해제되었습니다
 ├── 레슨 알림
 └── 연습 알림
 ```
@@ -386,7 +460,8 @@ class StudentStatusIndicator extends StatelessWidget {
   Color _getColor() {
     // 앱 연결됨 → 연습 성과 표시
     if (student.connectionStatus == ConnectionStatus.connected) {
-      return switch (student.practiceLevel) {
+      // practiceLevel이 null이면 신규 학생으로 처리
+      return switch (student.practiceLevel ?? PracticeLevel.newStudent) {
         PracticeLevel.excellent => Colors.green,           // 🟢 우수
         PracticeLevel.average => Colors.orange,            // 🟠 보통
         PracticeLevel.poor => Colors.red,                  // 🔴 부족
@@ -438,6 +513,10 @@ Widget? _buildTrailing(Student student) {
     ConnectionStatus.offline => TextButton(
       onPressed: _inviteToApp,
       child: Text('앱 초대'),
+    ),
+    ConnectionStatus.inviteReceived => TextButton(
+      onPressed: () => _acceptConnection(student),
+      child: Text('수락'),
     ),
     ConnectionStatus.disconnected => TextButton(
       onPressed: _reconnect,
@@ -495,12 +574,16 @@ for (final req in pendingRequests) {
 ## 구현 우선순위
 
 ### Phase 1 (MVP)
-- [ ] 자동 맞팔 로직
+- [ ] 자동 맞팔 로직 (handleFollow)
+- [ ] 언팔로우 로직 (handleUnfollow)
+- [ ] 연결 요청 응답 (handleConnectionResponse)
 - [ ] **통합 인디케이터** (연습 성과 + 연결 상태)
 - [ ] 수기 등록 학생
 - [ ] 코드/링크 공유
 - [ ] 신규 연결 상태 (🟣 보라색)
+- [ ] 🔵 초대 받음 → [수락] 버튼
 - [ ] 연결 끊김/재연결 버튼
+- [ ] 선생님 설정: 자동 연결 수락 On/Off
 
 ### Phase 2
 - [ ] 전화번호 직접 검색
