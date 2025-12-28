@@ -217,6 +217,83 @@
 > **자동 수락 Off 시**: 학생이 선생님을 팔로우하면 🔵 초대 받음 상태가 되고,
 > 선생님이 알림 센터에서 수락하면 연결됩니다.
 
+### 학부모 연결 시나리오
+
+학부모는 자녀(학생)를 통해 선생님과 연결됩니다.
+
+#### 학부모-학생-선생님 관계
+
+```
+[학부모] ──── 자녀 등록 ────► [학생]
+    │                           │
+    │                           │ 선생님과 연결
+    │                           ▼
+    └───── 자동 연결 ─────► [선생님]
+```
+
+#### 연결 시나리오
+
+| 시나리오 | 처리 |
+|----------|------|
+| 학생이 선생님과 연결됨 | 학부모에게 알림: "자녀가 김선생님과 연결되었습니다" |
+| 학부모가 직접 선생님 팔로우 | 자녀 선택 → 해당 자녀의 선생님으로 연결 |
+| 학부모가 자녀 없이 팔로우 | 거절 (자녀 등록 먼저 필요) |
+
+#### 학부모 전용 필드
+
+```dart
+class Parent {
+  final String id;
+  final String name;
+  final String? phoneNumber;
+  final List<String> childrenIds;  // 자녀(학생) ID 목록
+  final DateTime createdAt;
+}
+
+// 학부모-선생님 연결은 자녀를 통해 자동 생성
+class ParentTeacherConnection {
+  final String parentId;
+  final String teacherId;
+  final String studentId;  // 어떤 자녀를 통한 연결인지
+  final DateTime connectedAt;
+}
+```
+
+#### 학부모 팔로우 처리 로직
+
+```dart
+Future<void> handleParentFollow(String parentId, String teacherId) async {
+  // 1. 학부모의 자녀 목록 확인
+  final parent = await getParent(parentId);
+  if (parent.childrenIds.isEmpty) {
+    throw InvalidStateException('자녀를 먼저 등록해주세요');
+  }
+
+  // 2. 해당 선생님과 연결된 자녀 찾기
+  final connectedChild = await findChildConnectedToTeacher(
+    childrenIds: parent.childrenIds,
+    teacherId: teacherId,
+  );
+
+  if (connectedChild != null) {
+    // 자녀가 이미 연결됨 → 학부모도 자동 연결
+    await createParentTeacherConnection(parentId, teacherId, connectedChild.id);
+    await notifyParentConnected(parentId, teacherId, connectedChild.id);
+  } else {
+    // 자녀가 연결되지 않음 → 자녀 선택 요청
+    throw NeedChildSelectionException('연결할 자녀를 선택해주세요');
+  }
+}
+```
+
+#### 학부모 알림
+
+| 이벤트 | 수신자 | 메시지 |
+|--------|--------|--------|
+| 자녀-선생님 연결됨 | 학부모 | "자녀(김민수)가 김선생님과 연결되었습니다" |
+| 학부모 연결 완료 | 선생님 | "김민수 학부모님이 연결되었습니다" |
+| 자녀-선생님 연결 해제 | 학부모 | "자녀(김민수)와 김선생님의 연결이 해제되었습니다" |
+
 ### 설정 변경 시 처리
 
 자동 연결 수락 설정이 변경될 때의 처리 로직입니다.
@@ -524,6 +601,52 @@ Future<void> handleUnfollow(String unfollowerId, String unfolloweeId) async {
     // 4. 상대방에게 연결 해제 알림
     await notifyDisconnection(unfolloweeId, unfollowerId);
   }
+}
+
+// 오프라인 학생에게 앱 초대 (선생님 전용)
+Future<void> inviteToApp({
+  required String teacherId,
+  required String studentId,
+  required InviteMethod method,  // sms, kakao, link
+}) async {
+  // 1. 학생 상태 확인
+  final student = await getStudent(studentId);
+  if (student.connectionStatus != ConnectionStatus.offline) {
+    throw InvalidStateException('오프라인 학생만 초대 가능합니다');
+  }
+
+  // 2. 초대 링크 생성
+  final inviteCode = generateInviteCode(teacherId);
+  final inviteLink = 'lessonapp://invite/$inviteCode';
+
+  // 3. 초대 방법에 따라 전송
+  switch (method) {
+    case InviteMethod.sms:
+      await sendSmsInvite(student.phoneNumber, inviteLink);
+      break;
+    case InviteMethod.kakao:
+      await shareKakaoInvite(inviteLink, student.name);
+      break;
+    case InviteMethod.link:
+      // 링크 복사만 (UI에서 처리)
+      break;
+  }
+
+  // 4. 초대 기록 저장 (통계용)
+  await logInviteSent(
+    teacherId: teacherId,
+    studentId: studentId,
+    method: method,
+  );
+
+  // Note: 학생 상태는 변경하지 않음
+  // 학생이 앱 설치 후 코드로 연결해야 inviteSent로 변경됨
+}
+
+enum InviteMethod {
+  sms,    // 문자 메시지
+  kakao,  // 카카오톡 공유
+  link,   // 링크 복사
 }
 
 // 연결 요청 응답 처리 (수동 수락 모드)
