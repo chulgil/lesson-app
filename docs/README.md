@@ -21,7 +21,8 @@ docs/
 │   ├── notification/     # 알림 시스템
 │   ├── review/           # 리뷰 시스템
 │   ├── trial/            # 체험 레슨
-│   └── design/           # UX/UI 설계
+│   ├── design/           # UX/UI 설계
+│   └── dev/              # 개발 가이드
 └── task.md               # 개발 태스크
 ```
 
@@ -123,6 +124,12 @@ docs/
 | 문서 | 상태 | 설명 |
 |------|------|------|
 | [tech_decision.md](specs/tech_decision.md) | ✅ 확정 | 기술 스택 결정 |
+
+### 개발 (dev/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [test_scenarios.md](specs/dev/test_scenarios.md) | ✅ 확정 | 로그인 테스트 시나리오 |
 
 ---
 

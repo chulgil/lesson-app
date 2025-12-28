@@ -128,7 +128,7 @@ lesson-app/
 - 연습 알림 시스템 (FCM + Local Notification)
 
 ### 진행중
-- 외부 선생님 등록
+- 외부 선생님 등록 (Phase 1 온보딩 완료 - 휴대폰 인증, 프로필 설정, 튜토리얼)
 
 ### 예정
 - OAuth 연동 (Google, Kakao)
