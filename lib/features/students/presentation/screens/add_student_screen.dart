@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/student.dart';
+import '../../../../providers/student/student_crud_provider.dart';
 
 /// Screen for adding a new student
-class AddStudentScreen extends StatefulWidget {
+class AddStudentScreen extends ConsumerStatefulWidget {
   const AddStudentScreen({super.key});
 
   @override
-  State<AddStudentScreen> createState() => _AddStudentScreenState();
+  ConsumerState<AddStudentScreen> createState() => _AddStudentScreenState();
 }
 
-class _AddStudentScreenState extends State<AddStudentScreen> {
+class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -946,7 +949,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     );
   }
 
-  void _saveStudent() {
+  Future<void> _saveStudent() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -961,38 +964,70 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       return;
     }
 
-    // TODO: Save student to database
     final monthlyFee = int.tryParse(_monthlyFeeController.text) ??
         _selectedLevel.defaultMonthlyFee;
 
-    final studentData = {
-      'name': _nameController.text,
-      'phone': _phoneController.text,
-      'email': _emailController.text,
-      'parentName': _parentNameController.text,
-      'parentPhone': _parentPhoneController.text,
-      'instrument': _selectedInstrument,
-      'level': _selectedLevel.name,
-      'monthlyFee': monthlyFee,
-      'lessonsPerWeek': _lessonsPerWeek,
-      'lessonDays': _selectedDays.map((i) => _dayNames[i]).toList(),
-      'lessonTime': _formatTime(_lessonTime),
-      'lessonDuration': _lessonDuration,
-      'notes': _notesController.text,
-    };
+    // Create lesson day string from selected days
+    final lessonDays = _selectedDays.map((i) => _dayNames[i]).join(', ');
 
-    debugPrint('Saving student: $studentData');
+    // Generate random profile color
+    final profileColors = [
+      AppColors.primary,
+      AppColors.secondary,
+      const Color(0xFF2E8B57),
+      const Color(0xFF6B5B95),
+      const Color(0xFFE57373),
+      const Color(0xFF4FC3F7),
+    ];
+    final profileColor = profileColors[DateTime.now().millisecond % profileColors.length];
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${_nameController.text} 학생이 추가되었습니다'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.practiceGood,
-      ),
+    // Create Student object
+    final student = Student(
+      id: const Uuid().v4(),
+      name: _nameController.text.trim(),
+      instrument: _selectedInstrument!,
+      level: _selectedLevel,
+      status: StudentStatus.trial,
+      monthlyFee: monthlyFee,
+      lessonsPerWeek: _lessonsPerWeek,
+      phone: _phoneController.text.isNotEmpty ? _phoneController.text.trim() : null,
+      parentPhone: _parentPhoneController.text.isNotEmpty ? _parentPhoneController.text.trim() : null,
+      email: _emailController.text.isNotEmpty ? _emailController.text.trim() : null,
+      profileColor: profileColor,
+      lessonDay: lessonDays.isNotEmpty ? lessonDays : null,
+      lessonTime: _formatTime(_lessonTime),
+      lessonDuration: _lessonDuration,
+      notes: _notesController.text.isNotEmpty ? _notesController.text.trim() : null,
+      createdAt: DateTime.now(),
     );
 
-    // Go back
-    context.pop();
+    try {
+      // Save student using provider
+      await ref.read(studentsNotifierProvider.notifier).addStudent(student);
+
+      if (!mounted) return;
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${_nameController.text} 학생이 추가되었습니다'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.practiceGood,
+        ),
+      );
+
+      // Go back
+      context.pop();
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('학생 추가 실패: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 }
