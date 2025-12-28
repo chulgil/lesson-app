@@ -117,7 +117,7 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
                   context.push(AppRoutes.selectTeacher);
                 },
                 icon: const Icon(Icons.add, size: 18),
-                label: const Text('체험레슨'),
+                label: const Text('레슨 신청'),
               ),
             ],
           ),

@@ -21,6 +21,7 @@ import '../../features/schedule/presentation/screens/booking_list_screen.dart';
 import '../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
 import '../../features/schedule/presentation/screens/select_teacher_screen.dart';
+import '../../features/schedule/presentation/screens/lesson_type_select_screen.dart';
 import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
 import '../../features/practice/presentation/screens/practice_repertoire_screen.dart';
 import '../../features/practice/presentation/screens/add_repertoire_screen.dart';
@@ -93,6 +94,7 @@ class AppRoutes {
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
+  static const lessonTypeSelect = '/schedule/lesson/type';
   static const pendingBookings = '/schedule/pending';
   static const trialLessonRequest = '/schedule/trial/request';
   static const registerRegularLesson = '/schedule/regular/register';
@@ -355,6 +357,20 @@ class AppRouter {
         path: AppRoutes.selectTeacher,
         name: 'selectTeacher',
         builder: (context, state) => const SelectTeacherScreen(),
+      ),
+
+      // Schedule - Lesson Type Select
+      GoRoute(
+        path: AppRoutes.lessonTypeSelect,
+        name: 'lessonTypeSelect',
+        builder: (context, state) {
+          final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+          final teacherName = state.uri.queryParameters['teacherName'] ?? '선생님';
+          return LessonTypeSelectScreen(
+            teacherId: teacherId,
+            teacherName: teacherName,
+          );
+        },
       ),
 
       // Schedule - Pending Bookings

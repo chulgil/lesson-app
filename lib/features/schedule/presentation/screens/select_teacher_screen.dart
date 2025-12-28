@@ -234,8 +234,9 @@ class _SelectTeacherScreenState extends ConsumerState<SelectTeacherScreen> {
   }
 
   void _onTeacherSelected(Teacher teacher) {
+    // Navigate to lesson type selection screen
     context.push(
-      '${AppRoutes.trialLessonRequest}?teacherId=${teacher.id}&teacherName=${Uri.encodeComponent(teacher.name)}',
+      '${AppRoutes.lessonTypeSelect}?teacherId=${teacher.id}&teacherName=${Uri.encodeComponent(teacher.name)}',
     );
   }
 }
@@ -500,7 +501,7 @@ class _TeacherCard extends StatelessWidget {
                         vertical: AppSpacing.space2,
                       ),
                     ),
-                    child: const Text('체험신청'),
+                    child: const Text('레슨 신청'),
                   ),
                 ],
               ),
