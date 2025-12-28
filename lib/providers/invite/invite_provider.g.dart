@@ -431,9 +431,9 @@ final pendingRequestCountProvider = AutoDisposeFutureProvider<int>.internal(
 // ignore: unused_element
 typedef PendingRequestCountRef = AutoDisposeFutureProviderRef<int>;
 String _$currentInviteUserRoleHash() =>
-    r'845aceec73d9cc5d55ca9e8e3612b0704039e2db';
+    r'588b216dacf821ea8d22a0a20f104b36a1e0303c';
 
-/// Current user role (for testing - should come from auth)
+/// Current user role - synced with app's role system
 ///
 /// Copied from [CurrentInviteUserRole].
 @ProviderFor(CurrentInviteUserRole)
@@ -450,9 +450,9 @@ final currentInviteUserRoleProvider =
 
 typedef _$CurrentInviteUserRole = Notifier<InviteUserRole>;
 String _$currentInviteUserIdHash() =>
-    r'b2c6bb4f22ae915bb195f25873c89ce87f6d0d40';
+    r'34b17e1b79a3010ede127f97a4767d5fcad2ae55';
 
-/// Current user ID (for testing - should come from auth)
+/// Current user ID - synced with app's user system
 ///
 /// Copied from [CurrentInviteUserId].
 @ProviderFor(CurrentInviteUserId)

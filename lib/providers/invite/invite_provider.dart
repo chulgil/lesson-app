@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/invite.dart';
 import '../../repositories/invite_repository.dart';
+import '../auth/user_role_provider.dart';
 
 part 'invite_provider.g.dart';
 
@@ -11,12 +12,25 @@ InviteRepository inviteRepository(InviteRepositoryRef ref) {
   return MockInviteRepository();
 }
 
-/// Current user role (for testing - should come from auth)
+/// Current user role - synced with app's role system
 @Riverpod(keepAlive: true)
 class CurrentInviteUserRole extends _$CurrentInviteUserRole {
   @override
   InviteUserRole build() {
-    return InviteUserRole.teacher; // Default for testing
+    // Sync with app's role system
+    final appRole = ref.watch(currentUserRoleProvider);
+    return _mapUserRole(appRole);
+  }
+
+  InviteUserRole _mapUserRole(UserRole role) {
+    switch (role) {
+      case UserRole.teacher:
+        return InviteUserRole.teacher;
+      case UserRole.student:
+      case UserRole.parent:
+        // Parent uses student role for invite system
+        return InviteUserRole.student;
+    }
   }
 
   void setRole(InviteUserRole role) {
@@ -24,12 +38,13 @@ class CurrentInviteUserRole extends _$CurrentInviteUserRole {
   }
 }
 
-/// Current user ID (for testing - should come from auth)
+/// Current user ID - synced with app's user system
 @Riverpod(keepAlive: true)
 class CurrentInviteUserId extends _$CurrentInviteUserId {
   @override
   String build() {
-    return 'teacher_1'; // Default for testing
+    // Sync with app's user system
+    return ref.watch(currentUserIdProvider);
   }
 
   void setUserId(String userId) {
