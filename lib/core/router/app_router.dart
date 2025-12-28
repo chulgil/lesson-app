@@ -32,6 +32,7 @@ import '../../features/parent_home/presentation/screens/parent_home_screen.dart'
 import '../../features/parent_home/presentation/screens/child_profiles_screen.dart';
 import '../../features/parent_home/presentation/screens/child_profile_form_screen.dart';
 import '../../features/students/presentation/screens/add_student_screen.dart';
+import '../../features/students/presentation/screens/add_student_method_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../features/students/presentation/screens/student_detail_screen.dart';
 import '../../features/profile/presentation/screens/extended_profile_screen.dart';
@@ -69,6 +70,7 @@ class AppRoutes {
   static const studentHome = '/student-home'; // Student home
   static const parentHome = '/parent-home'; // Parent home
   static const students = '/students';
+  static const addStudentMethod = '/students/add-method';
   static const addStudent = '/students/add';
   static const studentDetail = '/students/:id';
   static const editStudent = '/students/:id/edit';
@@ -226,7 +228,14 @@ class AppRouter {
         ),
       ),
 
-      // Add Student
+      // Add Student Method Selection
+      GoRoute(
+        path: AppRoutes.addStudentMethod,
+        name: 'addStudentMethod',
+        builder: (context, state) => const AddStudentMethodScreen(),
+      ),
+
+      // Add Student (direct registration)
       GoRoute(
         path: AppRoutes.addStudent,
         name: 'addStudent',
