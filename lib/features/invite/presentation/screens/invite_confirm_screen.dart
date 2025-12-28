@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/invite.dart';
+import '../../../../providers/auth/user_role_provider.dart';
 import '../../../../providers/invite/invite_provider.dart';
 
 /// Screen for confirming connection request from an invite
@@ -354,10 +355,14 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
   }
 
   void _showSuccessDialog(String targetRoleLabel) {
+    // Get home route based on current user role
+    final userRole = ref.read(currentUserRoleProvider);
+    final homeRoute = userRole.homeRoute;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
@@ -400,8 +405,8 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                context.go('/'); // Go to home
+                Navigator.of(dialogContext).pop(); // Close dialog
+                context.go(homeRoute); // Go to role-specific home
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
