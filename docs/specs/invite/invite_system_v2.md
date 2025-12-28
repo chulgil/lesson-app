@@ -164,6 +164,30 @@
 | ContactSyncScreen | /add/contacts | 연락처 동기화 |
 | PhoneSearchScreen | /add/phone | 전화번호 검색 |
 | ManualAddScreen | /add/manual | 수기 등록 (선생님 전용) |
+| TeacherSettingsScreen | /settings | 선생님 설정 (연결 수락 방식 등) |
+
+### 선생님 설정 화면
+
+```
+TeacherSettingsScreen (/settings)
+├── 프로필 섹션
+│   ├── 프로필 사진
+│   ├── 이름
+│   └── 전화번호
+│
+├── 연결 설정 섹션
+│   └── 🔘 자동 연결 수락 [Switch: On/Off]
+│       └── 설명: "학생이 연결을 요청하면 자동으로 수락합니다"
+│
+├── 알림 설정 섹션
+│   ├── 레슨 알림
+│   ├── 연습 알림
+│   └── 결제 알림
+│
+└── 계정 섹션
+    ├── 로그아웃
+    └── 계정 삭제
+```
 
 ---
 
@@ -430,6 +454,190 @@ void onRejectTapped(String notificationId, String studentId, String teacherId) {
 
 ---
 
+## 거절 후 처리 플로우
+
+### 연결 거절 시나리오
+
+```
+[학생이 선생님을 팔로우]
+        │
+        ▼
+[선생님 자동 수락 OFF]
+        │
+        ▼
+[선생님 알림 수신: "김민수님이 연결을 원합니다"]
+        │
+        ├──[수락]──► handleConnectionResponse(accept: true)
+        │              └── 맞팔 생성 → 🟣 신규 연결
+        │
+        └──[거절]──► handleConnectionResponse(accept: false)
+                       │
+                       ├── 1. 학생의 팔로우 레코드 삭제
+                       ├── 2. 학생에게 거절 알림 발송
+                       ├── 3. 24시간 쿨다운 설정
+                       └── 4. 선생님 학생 목록에서 해당 학생 제거
+```
+
+### 거절 후 상태 변화
+
+| 시점 | 선생님 측 | 학생 측 |
+|------|----------|---------|
+| 팔로우 직후 | 🔵 초대 받음 (학생 목록에 표시) | 🟡 초대 보냄 |
+| 거절 직후 | **목록에서 제거** | 🟡 초대 보냄 → **제거 + 알림** |
+| 24시간 내 | 재요청 불가 | "잠시 후 다시 시도해주세요" |
+| 24시간 후 | - | 재요청 가능 |
+
+### 거절 관련 API
+
+```dart
+// 쿨다운 확인
+Future<bool> canRequestConnection(String studentId, String teacherId) async {
+  final cooldown = await getConnectionCooldown(studentId, teacherId);
+  return cooldown == null || cooldown.isBefore(DateTime.now());
+}
+
+// 쿨다운 설정
+Future<void> setConnectionCooldown(
+  String studentId,
+  String teacherId,
+  Duration duration,
+) async {
+  await db.connectionCooldowns.insert({
+    'studentId': studentId,
+    'teacherId': teacherId,
+    'expiresAt': DateTime.now().add(duration),
+  });
+}
+
+// 쿨다운 조회
+Future<DateTime?> getConnectionCooldown(String studentId, String teacherId) async {
+  final record = await db.connectionCooldowns.findOne({
+    'studentId': studentId,
+    'teacherId': teacherId,
+  });
+  return record?['expiresAt'];
+}
+```
+
+### 거절 알림 메시지
+
+| 상황 | 메시지 |
+|------|--------|
+| 거절됨 | "연결 요청이 거절되었습니다" |
+| 쿨다운 중 재요청 | "잠시 후 다시 시도해주세요" |
+| 3회 연속 거절 | "이 선생님에게 더 이상 요청할 수 없습니다" (향후) |
+
+---
+
+## 재연결 플로우
+
+### 연결 끊김 시나리오
+
+```
+[학생 또는 선생님이 언팔로우]
+        │
+        ▼
+handleUnfollow()
+        │
+        ├── Follow 레코드 삭제
+        ├── Connection 비활성화
+        ├── Student.connectionStatus = disconnected
+        └── 상대방에게 알림 발송
+                │
+                ▼
+[양측 상태 변화]
+        │
+        ├── 선생님: 학생 목록에 ⚪ 연결 끊김 + [재연결] 버튼
+        └── 학생: 선생님 목록에서 제거 or ⚪ 연결 끊김
+```
+
+### 재연결 흐름
+
+```
+[선생님: 학생 목록]
+        │
+        ▼
+⚪ 김민수 [재연결] 버튼
+        │
+        ▼ 탭
+handleReconnect()
+        │
+        ├── 새로운 Follow 생성 (선생님 → 학생)
+        ├── 학생에게 알림: "김선생님이 재연결을 요청했습니다"
+        └── Student.connectionStatus = inviteSent (🟡)
+                │
+                ▼
+[학생: 알림 수신 or 선생님 목록 확인]
+        │
+        ├──[수락]──► 맞팔 생성 → 🟣 신규 연결
+        │              └── 기존 연습 데이터 복구
+        │
+        └──[무시]──► 상태 유지 (🟡 초대 보냄)
+```
+
+### 재연결 API
+
+```dart
+// 재연결 요청 (선생님 → 학생)
+Future<void> handleReconnect(String teacherId, String studentId) async {
+  // 1. 기존 disconnected 상태 확인
+  final student = await getStudent(studentId);
+  if (student.connectionStatus != ConnectionStatus.disconnected) {
+    throw InvalidStateException('재연결 대상이 아닙니다');
+  }
+
+  // 2. 선생님의 팔로우 생성
+  await createFollow(teacherId, studentId);
+
+  // 3. 학생 상태 업데이트
+  await updateStudentConnectionStatus(
+    studentId: studentId,
+    status: ConnectionStatus.inviteSent,
+  );
+
+  // 4. 학생에게 재연결 알림 발송
+  await notifyReconnectRequest(studentId, teacherId);
+}
+
+// 재연결 수락 (학생)
+Future<void> acceptReconnect(String studentId, String teacherId) async {
+  // 1. 학생의 팔로우 생성 (맞팔 완성)
+  await createFollow(studentId, teacherId);
+
+  // 2. Connection 재활성화
+  await reactivateConnection(studentId, teacherId);
+
+  // 3. 상태 업데이트
+  await updateStudentConnectionStatus(
+    studentId: studentId,
+    status: ConnectionStatus.connected,
+  );
+
+  // 4. 양측에 알림
+  await notifyReconnected(studentId, teacherId);
+}
+```
+
+### 재연결 시 데이터 처리
+
+| 데이터 | 처리 방식 |
+|--------|----------|
+| 연습 기록 | **복구** - 기존 기록 유지, 연결 후 계속 기록 |
+| 레슨 기록 | **유지** - 연결 끊김 중에도 선생님이 관리 |
+| 결제 기록 | **유지** - 연결 끊김 중에도 선생님이 관리 |
+| 연습 과제 | **복구** - 연결 끊김 중 추가된 과제도 표시 |
+| 연습 성과 | **재계산** - 재연결 시점부터 7일 기준 |
+
+### 재연결 알림
+
+| 이벤트 | 수신자 | 메시지 |
+|--------|--------|--------|
+| 재연결 요청 | 학생 | "김선생님이 재연결을 요청했습니다" |
+| 재연결 수락 | 선생님 | "김민수님과 다시 연결되었습니다" |
+| 재연결 완료 | 양쪽 | - |
+
+---
+
 ## UI 컴포넌트
 
 ### StudentStatusIndicator (통합 인디케이터)
@@ -583,18 +791,22 @@ for (final req in pendingRequests) {
 - [ ] 신규 연결 상태 (🟣 보라색)
 - [ ] 🔵 초대 받음 → [수락] 버튼
 - [ ] 연결 끊김/재연결 버튼
-- [ ] 선생님 설정: 자동 연결 수락 On/Off
+- [ ] 선생님 설정 화면 (TeacherSettingsScreen)
+- [ ] 자동 연결 수락 On/Off 설정
+- [ ] 거절 후 24시간 쿨다운
 
 ### Phase 2
 - [ ] 전화번호 직접 검색
 - [ ] 연락처 동기화
 - [ ] 미가입자 초대
-- [ ] 재연결 기능
+- [ ] 재연결 기능 (handleReconnect, acceptReconnect)
+- [ ] 재연결 시 데이터 복구 로직
 
 ### Phase 3
 - [ ] 알림 센터 통합
 - [ ] 연결 해제 기능
 - [ ] 검색 노출 설정
+- [ ] 연속 거절 시 영구 차단 (3회 이상)
 
 ---
 
