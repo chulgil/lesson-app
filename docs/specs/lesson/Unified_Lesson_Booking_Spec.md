@@ -879,6 +879,101 @@ enum LessonInstanceStatus {
 
 ---
 
+## 첫 달 일할 계산 (Prorated Fee)
+
+### 배경
+
+정규레슨 등록 시 월 중간에 시작하는 경우, 첫 달은 남은 주차 수에 비례하여 수강료를 일할 계산합니다.
+
+### 핵심 규칙
+
+| 항목 | 설명 |
+|------|------|
+| 주차 계산 기준 | ISO 주차 (월요일 시작) |
+| 5주차 처리 | 기본 휴강으로 계산에 포함 |
+| 적용 범위 | 첫 달만 일할 계산 |
+| 계산 공식 | `월 수강료 × (남은 주차 / 4)` |
+| 반올림 | 1,000원 단위로 반올림 |
+
+### 주차 계산 알고리즘
+
+```dart
+/// ISO 주차 기준 (월요일 시작)
+/// - 달의 첫 번째 월요일 포함 주 = 1주차
+/// - 첫 번째 월요일 이전 날짜 = 1주차에 포함
+
+static int getWeekOfMonth(DateTime date) {
+  final firstDayOfMonth = DateTime(date.year, date.month, 1);
+  final firstMonday = firstDayOfMonth.weekday == DateTime.monday
+      ? firstDayOfMonth
+      : firstDayOfMonth.add(Duration(days: (8 - firstDayOfMonth.weekday) % 7));
+
+  if (date.isBefore(firstMonday)) {
+    return 1;
+  }
+
+  final daysSinceFirstMonday = date.difference(firstMonday).inDays;
+  return (daysSinceFirstMonday ~/ 7) + 2;
+}
+```
+
+### 일할 계산 예시
+
+**시나리오: 월 수강료 200,000원**
+
+| 시작 시점 | 남은 주차 | 계산 | 첫 달 수강료 |
+|----------|----------|------|-------------|
+| 1주차 시작 | 4주 | 200,000 × 4/4 | 200,000원 |
+| 2주차 시작 | 3주 | 200,000 × 3/4 | 150,000원 |
+| 3주차 시작 | 2주 | 200,000 × 2/4 | 100,000원 |
+| 4주차 시작 | 1주 | 200,000 × 1/4 | 50,000원 |
+
+**5주차가 있는 달의 예시:**
+
+| 시작 시점 | 총 주차 | 남은 주차 | 첫 달 수강료 | 비고 |
+|----------|--------|----------|-------------|------|
+| 1주차 시작 | 5주 | 4주* | 200,000원 | 5주차 휴강 |
+| 2주차 시작 | 5주 | 3주* | 150,000원 | 5주차 휴강 |
+| 3주차 시작 | 5주 | 2주* | 100,000원 | 5주차 휴강 |
+
+\* 5주차는 기본 휴강이므로 실제 레슨 횟수 기준
+
+### UI 표시
+
+```
+┌─────────────────────────────────────────┐
+│  ⚠️ 시작일 기준 첫 달은 일할 계산됩니다   │
+│                                         │
+│  첫 달 수강료              100,000원    │
+│                           (2주분)       │
+└─────────────────────────────────────────┘
+```
+
+5주차가 있는 달인 경우:
+```
+│  첫 달 수강료              100,000원    │
+│                    (2주분, 5주차 휴강)   │
+```
+
+### 구현 위치
+
+- **유틸리티 클래스**: `lib/core/utils/date_utils.dart`
+  - `LessonDateUtils.getWeekOfMonth()`: 주차 계산
+  - `LessonDateUtils.getTotalWeeksInMonth()`: 해당 달의 총 주차 수
+  - `LessonDateUtils.getRemainingWeeksInMonth()`: 시작일 기준 남은 주차 수
+  - `LessonDateUtils.calculateProratedFee()`: 일할 계산
+  - `LessonDateUtils.hasWeek5()`: 5주차 여부 확인
+
+- **화면**: `lib/features/schedule/presentation/screens/register_regular_lesson_screen.dart`
+  - `_buildFirstMonthFeeSection()`: 첫 달 수강료 안내 위젯
+
+### 관련 정책
+
+- **5주차 휴강**: 5주차가 있는 달은 기본 휴강 (추가 레슨 원할 시 1회 레슨 신청)
+- **환불**: 첫 달은 일할 계산으로 받았으므로 환불 시에도 동일하게 적용
+
+---
+
 ## 데이터 모델 추가
 
 ### TeacherInvitation (신규)

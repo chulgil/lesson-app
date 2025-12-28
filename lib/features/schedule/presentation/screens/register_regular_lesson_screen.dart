@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_utils.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../models/teacher_settings.dart';
 import '../../../../models/time_slot.dart';
@@ -700,8 +701,91 @@ class _RegisterRegularLessonScreenState
               ),
             ],
           ),
+          // First month prorated fee
+          _buildFirstMonthFeeSection(),
         ],
       ),
+    );
+  }
+
+  /// Build first month prorated fee section
+  Widget _buildFirstMonthFeeSection() {
+    final prorated = LessonDateUtils.calculateProratedFee(
+      monthlyFee: _monthlyFee,
+      startDate: _startDate,
+      lessonsPerWeek: _lessonsPerWeek,
+    );
+
+    // Only show if prorated fee is different from monthly fee
+    if (prorated.remainingWeeks >= 4) {
+      return const SizedBox.shrink();
+    }
+
+    final hasWeek5 = LessonDateUtils.hasWeek5(_startDate.year, _startDate.month);
+    final weekInfo = hasWeek5
+        ? '${prorated.remainingWeeks}주분, 5주차 휴강'
+        : '${prorated.remainingWeeks}주분';
+
+    return Column(
+      children: [
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.warning.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: AppColors.warning),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      '시작일 기준 첫 달은 일할 계산됩니다',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.warning,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '첫 달 수강료',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        _formatFee(prorated.proratedFee),
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        '($weekInfo)',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
