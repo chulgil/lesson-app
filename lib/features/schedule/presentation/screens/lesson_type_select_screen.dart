@@ -167,12 +167,36 @@ class LessonTypeSelectScreen extends ConsumerWidget {
     // For demo purposes, return different relations based on teacherId
     // In production, this will be fetched from the backend
 
-    // Mock: Return 'none' for all teachers for now
-    // This means only trial lesson is available
+    // Mock: Return different relations for testing
+    RelationStatus status;
+    DateTime? lastLessonDate;
+    int totalLessonCount = 0;
+
+    switch (teacherId) {
+      case 'teacher_1':
+        // First teacher: currently active regular lessons
+        status = RelationStatus.active;
+        lastLessonDate = DateTime.now().subtract(const Duration(days: 3));
+        totalLessonCount = 12;
+        break;
+      case 'teacher_2':
+        // Second teacher: had lessons before, now inactive
+        status = RelationStatus.inactive;
+        lastLessonDate = DateTime.now().subtract(const Duration(days: 60));
+        totalLessonCount = 8;
+        break;
+      default:
+        // Other teachers: first time meeting
+        status = RelationStatus.none;
+        break;
+    }
+
     return TeacherStudentRelation(
       teacherId: teacherId,
       studentId: 'current_student_id',
-      status: RelationStatus.none,
+      status: status,
+      lastLessonDate: lastLessonDate,
+      totalLessonCount: totalLessonCount,
     );
   }
 
