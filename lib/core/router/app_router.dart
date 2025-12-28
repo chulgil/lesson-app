@@ -3,6 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/parent_invite_code_screen.dart';
+import '../../features/auth/presentation/screens/student_invite_code_screen.dart';
+import '../../features/onboarding/presentation/screens/phone_verification_screen.dart';
+import '../../features/onboarding/presentation/screens/profile_setup_screen.dart';
+import '../../features/onboarding/presentation/screens/tutorial_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lessons/presentation/screens/add_lesson_screen.dart';
 import '../../features/lessons/presentation/screens/edit_lesson_screen.dart';
@@ -30,6 +34,13 @@ import '../../features/parent_home/presentation/screens/child_profile_form_scree
 import '../../features/students/presentation/screens/add_student_screen.dart';
 import '../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../features/students/presentation/screens/student_detail_screen.dart';
+import '../../features/profile/presentation/screens/extended_profile_screen.dart';
+import '../../features/profile/presentation/screens/education_edit_screen.dart';
+import '../../features/profile/presentation/screens/career_edit_screen.dart';
+import '../../features/profile/presentation/screens/certificate_edit_screen.dart';
+import '../../features/profile/presentation/screens/profile_visibility_screen.dart';
+import '../../features/search/presentation/screens/teacher_search_screen.dart';
+import '../../features/search/presentation/screens/teacher_detail_screen.dart';
 
 /// App route paths
 class AppRoutes {
@@ -39,6 +50,13 @@ class AppRoutes {
   static const login = '/login';
   static const roleSelect = '/role-select';
   static const parentInviteCode = '/parent/invite-code'; // Parent invite code
+  static const studentInviteCode = '/student/invite-code'; // Student invite code
+
+  // Teacher onboarding routes
+  static const teacherPhoneVerification = '/onboarding/phone-verification';
+  static const teacherProfileSetup = '/onboarding/profile-setup';
+  static const teacherTutorial = '/onboarding/tutorial';
+
   static const home = '/home'; // Teacher home
   static const studentHome = '/student-home'; // Student home
   static const parentHome = '/parent-home'; // Parent home
@@ -57,6 +75,11 @@ class AppRoutes {
   static const lessonTimeSettings = '/profile/lesson-time';
   static const paymentManagement = '/profile/payments';
   static const tipTemplateManagement = '/profile/templates';
+  static const extendedProfile = '/profile/extended';
+  static const educationEdit = '/profile/education/edit';
+  static const careerEdit = '/profile/career/edit';
+  static const certificateEdit = '/profile/certificate/edit';
+  static const profileVisibility = '/profile/visibility';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
@@ -77,6 +100,10 @@ class AppRoutes {
   static const childProfiles = '/parent/children';
   static const addChildProfile = '/parent/children/add';
   static const editChildProfile = '/parent/children/:id/edit';
+
+  // Search routes
+  static const teacherSearch = '/search/teachers';
+  static const teacherDetail = '/teachers/:id';
 }
 
 /// App router configuration
@@ -102,6 +129,34 @@ class AppRouter {
         path: AppRoutes.parentInviteCode,
         name: 'parentInviteCode',
         builder: (context, state) => const ParentInviteCodeScreen(),
+      ),
+
+      // Student Invite Code
+      GoRoute(
+        path: AppRoutes.studentInviteCode,
+        name: 'studentInviteCode',
+        builder: (context, state) => const StudentInviteCodeScreen(),
+      ),
+
+      // Teacher Onboarding - Phone Verification
+      GoRoute(
+        path: AppRoutes.teacherPhoneVerification,
+        name: 'teacherPhoneVerification',
+        builder: (context, state) => const PhoneVerificationScreen(),
+      ),
+
+      // Teacher Onboarding - Profile Setup
+      GoRoute(
+        path: AppRoutes.teacherProfileSetup,
+        name: 'teacherProfileSetup',
+        builder: (context, state) => const ProfileSetupScreen(),
+      ),
+
+      // Teacher Onboarding - Tutorial
+      GoRoute(
+        path: AppRoutes.teacherTutorial,
+        name: 'teacherTutorial',
+        builder: (context, state) => const TutorialScreen(),
       ),
 
       // Teacher Home (with bottom navigation)
@@ -221,6 +276,52 @@ class AppRouter {
         path: AppRoutes.tipTemplateManagement,
         name: 'tipTemplateManagement',
         builder: (context, state) => const TipTemplateManagementScreen(),
+      ),
+
+      // Extended Profile
+      GoRoute(
+        path: AppRoutes.extendedProfile,
+        name: 'extendedProfile',
+        builder: (context, state) => const ExtendedProfileScreen(),
+      ),
+
+      // Education Edit
+      GoRoute(
+        path: AppRoutes.educationEdit,
+        name: 'educationEdit',
+        builder: (context, state) {
+          final indexStr = state.uri.queryParameters['index'];
+          final index = indexStr != null ? int.tryParse(indexStr) : null;
+          return EducationEditScreen(index: index);
+        },
+      ),
+
+      // Career Edit
+      GoRoute(
+        path: AppRoutes.careerEdit,
+        name: 'careerEdit',
+        builder: (context, state) {
+          final indexStr = state.uri.queryParameters['index'];
+          final index = indexStr != null ? int.tryParse(indexStr) : null;
+          return CareerEditScreen(index: index);
+        },
+      ),
+
+      // Certificate Edit
+      GoRoute(
+        path: AppRoutes.certificateEdit,
+        name: 'certificateEdit',
+        builder: (context, state) {
+          final certificateId = state.uri.queryParameters['id'];
+          return CertificateEditScreen(certificateId: certificateId);
+        },
+      ),
+
+      // Profile Visibility
+      GoRoute(
+        path: AppRoutes.profileVisibility,
+        name: 'profileVisibility',
+        builder: (context, state) => const ProfileVisibilityScreen(),
       ),
 
       // Schedule - Select Teacher
@@ -389,6 +490,22 @@ class AppRouter {
           final parentId = state.uri.queryParameters['parentId'] ?? 'parent_1';
           return ChildProfilesScreen(parentId: parentId);
         },
+      ),
+
+      // Search - Teacher Search
+      GoRoute(
+        path: AppRoutes.teacherSearch,
+        name: 'teacherSearch',
+        builder: (context, state) => const TeacherSearchScreen(),
+      ),
+
+      // Search - Teacher Detail
+      GoRoute(
+        path: AppRoutes.teacherDetail,
+        name: 'teacherDetail',
+        builder: (context, state) => TeacherDetailScreen(
+          teacherId: state.pathParameters['id'] ?? '',
+        ),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

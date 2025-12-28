@@ -180,22 +180,22 @@ class LoginScreen extends StatelessWidget {
   }
 
   void _handleGoogleLogin(BuildContext context) {
-    // TODO: Implement Google login
-    _showRoleSelectDialog(context);
+    // Test scenario: Existing teacher with students → go to home
+    _showRoleSelectDialog(context, authProvider: 'google');
   }
 
   void _handleKakaoLogin(BuildContext context) {
-    // TODO: Implement Kakao login
-    _showRoleSelectDialog(context);
+    // Test scenario: Existing teacher without students → go to home
+    _showRoleSelectDialog(context, authProvider: 'kakao');
   }
 
   void _handleAppleLogin(BuildContext context) {
-    // TODO: Implement Apple login
-    _showRoleSelectDialog(context);
+    // Test scenario: New teacher → go to onboarding SMS flow
+    _showRoleSelectDialog(context, authProvider: 'apple');
   }
 
   void _handleParentLogin(BuildContext context) {
-    // Show parent login options
+    // Show parent login options with test scenarios
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -204,7 +204,7 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
       isScrollControlled: true,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           child: Column(
@@ -249,40 +249,45 @@ class LoginScreen extends StatelessWidget {
 
               const SizedBox(height: AppSpacing.space3),
 
-              // Social login buttons for parent
-              _SocialLoginButton(
+              // Social login buttons for parent with test scenarios
+              _ParentLoginOption(
                 icon: Icons.g_mobiledata_rounded,
                 label: 'Google로 계속하기',
+                description: '기존 학부모 (자녀 등록됨)',
                 backgroundColor: AppColors.googleBackground,
                 textColor: AppColors.textPrimaryLight,
                 borderColor: AppColors.borderLight,
                 onPressed: () {
-                  Navigator.pop(context);
-                  // Navigate to invite code screen
-                  context.go(AppRoutes.parentInviteCode);
+                  Navigator.pop(sheetContext);
+                  // Existing parent with children → go to parent home directly
+                  context.go(AppRoutes.parentHome);
                 },
               ),
               const SizedBox(height: AppSpacing.space2),
 
-              _SocialLoginButton(
+              _ParentLoginOption(
                 icon: Icons.chat_bubble_rounded,
                 label: '카카오로 계속하기',
+                description: '기존 학부모 (자녀 없음)',
                 backgroundColor: AppColors.kakaoBackground,
                 textColor: AppColors.textPrimaryLight,
                 onPressed: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.parentInviteCode);
+                  Navigator.pop(sheetContext);
+                  // Existing parent without children → go to parent home directly
+                  context.go(AppRoutes.parentHome);
                 },
               ),
               const SizedBox(height: AppSpacing.space2),
 
-              _SocialLoginButton(
+              _ParentLoginOption(
                 icon: Icons.apple_rounded,
                 label: 'Apple로 계속하기',
+                description: '신규 가입 → 초대코드 입력',
                 backgroundColor: AppColors.appleBackground,
                 textColor: Colors.white,
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext);
+                  // New parent → go to invite code screen
                   context.go(AppRoutes.parentInviteCode);
                 },
               ),
@@ -295,7 +300,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _showRoleSelectDialog(BuildContext context) {
+  void _showRoleSelectDialog(BuildContext context, {String authProvider = 'google'}) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -303,7 +308,7 @@ class LoginScreen extends StatelessWidget {
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
       ),
-      builder: (context) => SafeArea(
+      builder: (dialogContext) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           child: Column(
@@ -338,10 +343,10 @@ class LoginScreen extends StatelessWidget {
               _RoleOptionCard(
                 icon: Icons.school,
                 title: '선생님',
-                description: '학생 관리, 레슨 일정, 피드백 작성',
+                description: _getTeacherDescription(authProvider),
                 onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.home);
+                  Navigator.pop(dialogContext);
+                  _handleTeacherLogin(context, authProvider);
                 },
               ),
 
@@ -351,10 +356,10 @@ class LoginScreen extends StatelessWidget {
               _RoleOptionCard(
                 icon: Icons.person,
                 title: '학생',
-                description: '연습 기록, 레슨 일정, 피드백 확인',
+                description: _getStudentDescription(authProvider),
                 onTap: () {
-                  Navigator.pop(context);
-                  context.go(AppRoutes.studentHome);
+                  Navigator.pop(dialogContext);
+                  _handleStudentLogin(context, authProvider);
                 },
               ),
 
@@ -364,6 +369,70 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getTeacherDescription(String authProvider) {
+    switch (authProvider) {
+      case 'google':
+        return '기존 선생님 (학생 있음)';
+      case 'kakao':
+        return '기존 선생님 (학생 없음)';
+      case 'apple':
+        return '신규 가입 → SMS 인증';
+      default:
+        return '학생 관리, 레슨 일정, 피드백 작성';
+    }
+  }
+
+  String _getStudentDescription(String authProvider) {
+    switch (authProvider) {
+      case 'google':
+        return '기존 학생 (레슨 있음)';
+      case 'kakao':
+        return '기존 학생 (레슨 없음)';
+      case 'apple':
+        return '신규 학생 → 초대코드 입력';
+      default:
+        return '레슨 일정, 연습 기록, 피드백 확인';
+    }
+  }
+
+  void _handleStudentLogin(BuildContext context, String authProvider) {
+    switch (authProvider) {
+      case 'google':
+        // Existing student with lessons → go to student home directly
+        context.go(AppRoutes.studentHome);
+        break;
+      case 'kakao':
+        // Existing student without lessons → go to student home directly
+        context.go(AppRoutes.studentHome);
+        break;
+      case 'apple':
+        // New student → go to invite code screen
+        context.go(AppRoutes.studentInviteCode);
+        break;
+      default:
+        context.go(AppRoutes.studentHome);
+    }
+  }
+
+  void _handleTeacherLogin(BuildContext context, String authProvider) {
+    switch (authProvider) {
+      case 'google':
+        // Existing teacher with students → go to home directly
+        context.go(AppRoutes.home);
+        break;
+      case 'kakao':
+        // Existing teacher without students → go to home directly
+        context.go(AppRoutes.home);
+        break;
+      case 'apple':
+        // New teacher → go to onboarding SMS flow
+        context.go(AppRoutes.teacherPhoneVerification);
+        break;
+      default:
+        context.go(AppRoutes.home);
+    }
   }
 }
 
@@ -476,6 +545,77 @@ class _SocialLoginButton extends StatelessWidget {
             Text(
               label,
               style: AppTypography.button.copyWith(color: textColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Parent login option button with description (for test scenarios)
+class _ParentLoginOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String description;
+  final Color backgroundColor;
+  final Color textColor;
+  final Color? borderColor;
+  final VoidCallback onPressed;
+
+  const _ParentLoginOption({
+    required this.icon,
+    required this.label,
+    required this.description,
+    required this.backgroundColor,
+    required this.textColor,
+    this.borderColor,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          border: Border.all(
+            color: borderColor ?? backgroundColor,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: textColor, size: 24),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTypography.button.copyWith(color: textColor),
+                  ),
+                  Text(
+                    description,
+                    style: AppTypography.caption.copyWith(
+                      color: textColor.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: textColor.withValues(alpha: 0.5),
             ),
           ],
         ),

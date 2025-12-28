@@ -32,6 +32,11 @@ class ProfileTab extends StatelessWidget {
             title: '레슨 관리',
             items: [
               _MenuItem(
+                icon: Icons.person_outline,
+                label: '프로필 상세 수정',
+                onTap: () => context.push(AppRoutes.extendedProfile),
+              ),
+              _MenuItem(
                 icon: Icons.music_note,
                 label: '악기 관리',
                 onTap: () => context.push(AppRoutes.instrumentManagement),
@@ -244,7 +249,7 @@ class ProfileTab extends StatelessWidget {
           // Edit button
           IconButton(
             onPressed: () {
-              // TODO: Navigate to edit profile
+              context.push(AppRoutes.extendedProfile);
             },
             icon: const Icon(Icons.edit_outlined),
             style: IconButton.styleFrom(
