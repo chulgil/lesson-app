@@ -11,6 +11,7 @@ import '../../../../models/time_slot.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../../providers/settings/teacher_settings_provider.dart';
 import '../widgets/schedule_type_selector.dart';
+import '../widgets/time_slot_selector.dart';
 
 /// Screen for registering a regular lesson after trial
 class RegisterRegularLessonScreen extends ConsumerStatefulWidget {
@@ -336,14 +337,21 @@ class _RegisterRegularLessonScreenState
       ),
     );
 
-    // Generate time slots based on lesson duration
-    final timeSlots = _generateTimeSlots(
-      availableStart: daySlot.startTime,
-      availableEnd: daySlot.endTime,
-      lessonDurationMinutes: _selectedLessonDuration,
-    );
-
     final selectedTime = _selectedTimesPerDay[dayOfWeek];
+
+    // Determine display range based on available times
+    // Show from 9 AM to 10 PM by default, adjusted if available times are outside
+    final displayStart = daySlot.startTime.hour < 9
+        ? TimeOfDay(hour: daySlot.startTime.hour, minute: 0)
+        : const TimeOfDay(hour: 9, minute: 0);
+    final displayEnd = daySlot.endTime.hour > 22
+        ? TimeOfDay(hour: daySlot.endTime.hour + 1, minute: 0)
+        : const TimeOfDay(hour: 22, minute: 0);
+
+    // Check if we need AM section (any available time before 12:00)
+    final showAm = daySlot.startTime.hour < 12;
+    // Check if we need PM section (any available time at or after 12:00)
+    final showPm = daySlot.endTime.hour >= 12;
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
@@ -356,6 +364,7 @@ class _RegisterRegularLessonScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Day header with available time info
           Row(
             children: [
               Text(
@@ -365,55 +374,68 @@ class _RegisterRegularLessonScreenState
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '(${_formatTimeOfDay(daySlot.startTime)}-${_formatTimeOfDay(daySlot.endTime)} 가능)',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space2,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                ),
+                child: Text(
+                  '${_formatTimeOfDay(daySlot.startTime)}-${_formatTimeOfDay(daySlot.endTime)} 가능',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.space3),
-          Wrap(
-            spacing: AppSpacing.space2,
-            runSpacing: AppSpacing.space2,
-            children: timeSlots.map((time) {
-              final isSelected = selectedTime != null &&
-                  selectedTime.hour == time.hour &&
-                  selectedTime.minute == time.minute;
+          const SizedBox(height: AppSpacing.space4),
 
-              return _TimeSlotChip(
-                time: time,
-                duration: _selectedLessonDuration,
-                isSelected: isSelected,
-                onTap: () {
-                  setState(() {
-                    _selectedTimesPerDay[dayOfWeek] = time;
-                  });
-                },
-              );
-            }).toList(),
+          // Time slot selector with AM/PM sections
+          TimeSlotSelector(
+            selectedTime: selectedTime,
+            onTimeSelected: (time) {
+              setState(() {
+                _selectedTimesPerDay[dayOfWeek] = time;
+              });
+            },
+            availableStart: daySlot.startTime,
+            availableEnd: daySlot.endTime,
+            lessonDurationMinutes: _selectedLessonDuration,
+            bookedSlots: const [], // TODO: Get from provider when backend is ready
+            showAmSection: showAm,
+            showPmSection: showPm,
+            displayStart: displayStart,
+            displayEnd: displayEnd,
           ),
+
+          // Selection summary
           if (selectedTime != null) ...[
-            const SizedBox(height: AppSpacing.space3),
+            const SizedBox(height: AppSpacing.space4),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space3,
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(
+                  color: AppColors.success.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle, size: 16, color: AppColors.primary),
+                  Icon(Icons.check_circle, size: 16, color: AppColors.success),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
-                    '선택: ${_formatTimeOfDay(selectedTime)}-${_formatTimeOfDay(_addMinutes(selectedTime, _selectedLessonDuration))}',
+                    '${_formatTimeOfDay(selectedTime)} ~ ${_formatTimeOfDay(_addMinutes(selectedTime, _selectedLessonDuration))} (${LessonDurations.format(_selectedLessonDuration)})',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.success,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -424,28 +446,6 @@ class _RegisterRegularLessonScreenState
         ],
       ),
     );
-  }
-
-  List<TimeOfDay> _generateTimeSlots({
-    required TimeOfDay availableStart,
-    required TimeOfDay availableEnd,
-    required int lessonDurationMinutes,
-  }) {
-    final slots = <TimeOfDay>[];
-    var current = availableStart;
-
-    while (_canFitLesson(current, availableEnd, lessonDurationMinutes)) {
-      slots.add(current);
-      current = _addMinutes(current, lessonDurationMinutes);
-    }
-
-    return slots;
-  }
-
-  bool _canFitLesson(TimeOfDay start, TimeOfDay end, int durationMinutes) {
-    final startMinutes = start.hour * 60 + start.minute;
-    final endMinutes = end.hour * 60 + end.minute;
-    return startMinutes + durationMinutes <= endMinutes;
   }
 
   TimeOfDay _addMinutes(TimeOfDay time, int minutes) {
@@ -870,59 +870,3 @@ class _DayButton extends StatelessWidget {
   }
 }
 
-/// Time slot chip for selection
-class _TimeSlotChip extends StatelessWidget {
-  final TimeOfDay time;
-  final int duration;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _TimeSlotChip({
-    required this.time,
-    required this.duration,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final endTime = TimeOfDay(
-      hour: (time.hour * 60 + time.minute + duration) ~/ 60,
-      minute: (time.hour * 60 + time.minute + duration) % 60,
-    );
-
-    return Material(
-      color: isSelected ? AppColors.primary : Colors.transparent,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space3,
-            vertical: AppSpacing.space2,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
-            ),
-          ),
-          child: Text(
-            '${_formatTime(time)}-${_formatTime(endTime)}',
-            style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-}
