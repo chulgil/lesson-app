@@ -18,16 +18,32 @@
 
 ---
 
-## 연결 상태 정의
+## 학생 상태 인디케이터 (통합)
 
-### 상태 종류
+기존 **연습 성과 인디케이터**와 **연결 상태**를 하나로 통합합니다.
+앱 연결 여부에 따라 표시 내용이 달라집니다.
 
-| 상태 | 아이콘 | 색상 코드 | 설명 | 조건 |
-|------|:------:|:--------:|------|------|
-| **앱 연결** | 🟢 | `Colors.green` | 상호 연결 완료 | 양쪽 모두 팔로우 |
-| **초대 보냄** | 🟡 | `Colors.amber` | 내가 팔로우함 | 나만 팔로우 |
-| **초대 받음** | 🔵 | `Colors.blue` | 상대가 팔로우함 | 상대만 팔로우 |
-| **오프라인** | ⚪ | `Colors.grey[400]` | 수기 등록 | 앱 미사용 |
+### 앱 연결됨 → 연습 성과 표시
+
+| 상태 | 아이콘 | 색상 코드 | 설명 |
+|------|:------:|:--------:|------|
+| **우수** | 🟢 | `Colors.green` | 연습 잘함 (예: 5/7일 이상) |
+| **보통** | 🟠 | `Colors.orange` | 적당히 연습 (예: 3-4/7일) |
+| **부족** | 🔴 | `Colors.red` | 연습 부족 (예: 1-2/7일) |
+| **휴강** | ⚪ | `Colors.grey[400]` | 휴강 중인 학생 |
+| **신규 연결** | 🟣 | `Color(0xFF6B5B95)` | 연습 데이터 없음 (첫 연결) |
+
+### 앱 미연결 → 연결 상태 표시
+
+| 상태 | 아이콘 | 색상 코드 | 설명 |
+|------|:------:|:--------:|------|
+| **초대 보냄** | 🟡 | `Colors.amber` | 내가 팔로우함 (대기 중) |
+| **초대 받음** | 🔵 | `Colors.blue` | 상대가 팔로우함 (수락 대기) |
+| **오프라인** | ⚪ | `Colors.grey[400]` | 수기 등록 (앱 미사용) |
+| **연결 끊김** | ⚪ | `Colors.grey[400]` | 학생이 팔로우 해제함 |
+
+> **Note**: 오프라인과 연결 끊김은 동일한 회색 원으로 표시됩니다.
+> 버튼으로 구분: 오프라인 → "앱 초대", 연결 끊김 → "재연결"
 
 ### 상태 전환 다이어그램
 
@@ -43,27 +59,48 @@
 │         │                                                    │
 │         │ "앱 초대" 클릭                                      │
 │         ▼                                                    │
-│     🟡 초대 보냄 ────── 학생 팔로우 ──────► 🟢 앱 연결        │
+│     🟡 초대 보냄 ────── 학생 팔로우 ──────► 🟣 신규 연결      │
 │                                                              │
 │   [학생: 선생님 검색]                                         │
 │         │                                                    │
 │         │ 전화번호/코드로 팔로우                              │
 │         ▼                                                    │
-│     🔵 초대 받음 ────── 선생님 수락 ──────► 🟢 앱 연결        │
-│         │               (자동)                               │
+│     🔵 초대 받음 ────── 선생님 수락 ──────► 🟣 신규 연결      │
+│         │           (자동/수동 설정)                         │
 │         │                                                    │
 │         │ 수기 학생과 매칭 시                                 │
 │         ▼                                                    │
-│     🟢 앱 연결 (자동 연결)                                    │
+│     🟣 신규 연결 (자동 연결)                                  │
+│                                                              │
+│                                                              │
+│   [앱 연결 후] → 연습 성과에 따라 변경                        │
+│                                                              │
+│     🟣 신규 연결 ──── 연습 시작 ────► 🟢🟠🔴 연습 성과        │
+│                                                              │
+│                                                              │
+│   [연결 해제]                                                 │
+│                                                              │
+│     🟢🟠🔴 연습성과 ── 학생이 언팔 ──► ⚪ 연결 끊김           │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### 자동 맞팔 규칙
+### 연결 승인 규칙
 
 1. **선생님 → 학생 초대**: 학생이 팔로우하면 자동 맞팔
-2. **학생 → 선생님 팔로우**: 선생님이 자동 맞팔 (승인 불필요)
+2. **학생 → 선생님 팔로우**: 선생님 설정에 따라 처리
+   - **자동 수락 (기본)**: 즉시 맞팔 처리
+   - **수동 수락**: 선생님이 알림에서 수락/거절
 3. **수기 학생 매칭**: 전화번호 일치 시 자동 연결
+
+### 선생님 설정
+
+| 설정 | 기본값 | 설명 |
+|------|:------:|------|
+| 자동 연결 수락 | ✅ On | 학생 요청 시 자동으로 연결 수락 |
+
+> **자동 수락 Off 시**: 학생이 선생님을 팔로우하면 🔵 초대 받음 상태가 되고,
+> 선생님이 알림 센터에서 수락하면 연결됩니다.
 
 ---
 
@@ -78,13 +115,15 @@
 │       ├── 🔍 연락처에서 찾기 → 연락처 목록 (앱 가입자 표시)
 │       ├── 📱 전화번호로 찾기 → +82 입력 → 검색 결과
 │       ├── 🔗 내 코드 공유 → QR/링크/문자 공유
-│       └── ✏️ 수기 등록 → 이름, 전화번호 입력 → 📝 오프라인 상태
+│       └── ✏️ 수기 등록 → 이름, 전화번호 입력 → ⚪ 오프라인 상태
 │
 └── 학생 목록
-    ├── 👤 김민수 🟢 ← 앱 연결됨 (전체 기능)
+    ├── 👤 김민수 🟢 ← 우수 (연습 잘함)
+    ├── 👤 박철수 🟣 ← 신규 연결 (연습 데이터 없음)
     ├── 👤 이지은 🟡 ← 초대 보냄 (수락 대기)
     ├── 👤 박서준 🔵 ← 초대 받음 → 탭하면 자동 연결
-    └── 👤 최유리 ⚪ ← 오프라인 → "앱 초대" 버튼
+    ├── 👤 최유리 ⚪ ← 오프라인 → "앱 초대" 버튼
+    └── 👤 한지민 ⚪ ← 연결 끊김 → "재연결" 버튼
 ```
 
 ### 학생/학부모 플로우
@@ -95,10 +134,11 @@
 │   └── 선생님 찾기 화면
 │       ├── 🔍 연락처에서 찾기 → 선생님 목록
 │       ├── 📱 전화번호로 찾기 → +82 입력
-│       └── 📝 코드로 연결 → 6자리 코드 입력
+│       └── 🔢 코드로 연결 → 6자리 코드 입력
 │
 └── 내 선생님
-    ├── 👤 김선생님 🟢 ← 앱 연결됨
+    ├── 👤 김선생님 🟣 ← 신규 연결
+    ├── 👤 이선생님 🟢 ← 우수 (연습 잘함)
     └── 👤 박선생님 🟡 ← 초대 보냄 (자동 수락 예정)
 ```
 
@@ -135,19 +175,30 @@
 class Student {
   final String id;
   final String name;
-  final String? phoneNumber;        // +국가번호 형식
-  final ConnectionStatus status;    // 연결 상태
-  final String? connectedUserId;    // 연결된 앱 사용자 ID
+  final String? phoneNumber;           // +국가번호 형식
+  final ConnectionStatus connectionStatus;  // 연결 상태
+  final PracticeLevel? practiceLevel;  // 연습 성과 (연결된 경우만)
+  final String? connectedUserId;       // 연결된 앱 사용자 ID
   final DateTime createdAt;
   final DateTime? connectedAt;
+  final DateTime? disconnectedAt;      // 연결 끊긴 시간
   // ... 기존 필드
 }
 
 enum ConnectionStatus {
-  offline,      // 📝 수기 등록
-  inviteSent,   // 📤 초대 보냄
-  inviteReceived, // 📩 초대 받음
-  connected,    // 🔗 앱 연결
+  offline,        // ⚪ 수기 등록 (앱 미사용)
+  inviteSent,     // 🟡 초대 보냄
+  inviteReceived, // 🔵 초대 받음
+  connected,      // 🟣🟢🟠🔴 앱 연결됨 (연습 성과에 따라 색상 결정)
+  disconnected,   // ⚪ 연결 끊김 (학생이 언팔)
+}
+
+enum PracticeLevel {
+  newStudent,   // 🟣 신규 연결 (연습 데이터 없음)
+  excellent,    // 🟢 우수 (5/7일 이상)
+  average,      // 🟠 보통 (3-4/7일)
+  poor,         // 🔴 부족 (1-2/7일)
+  onBreak,      // ⚪ 휴강
 }
 ```
 
@@ -169,6 +220,19 @@ enum FollowUserRole {
 }
 ```
 
+### TeacherSettings 모델 (확장)
+
+```dart
+class TeacherSettings {
+  final String teacherId;
+  final bool autoAcceptConnection;  // 학생 연결 요청 자동 수락 (기본: true)
+  // ... 기타 설정
+}
+```
+
+> **Note**: `autoAcceptConnection`이 `false`인 경우,
+> 학생이 팔로우하면 알림 센터에서 수락/거절할 수 있습니다.
+
 ### 연결 판정 로직
 
 ```dart
@@ -181,14 +245,30 @@ bool isMutualFollow(String userId1, String userId2) {
   return follow1 && follow2;
 }
 
-// 자동 맞팔 처리
-Future<void> handleFollow(String followerId, String followeeId) async {
+// 팔로우 처리 (설정 반영)
+Future<void> handleFollow(String followerId, String followeeId, FollowUserRole followerRole) async {
   await createFollow(followerId, followeeId);
 
-  // 상대방이 이미 나를 팔로우했다면 자동 맞팔
+  // Case 1: 상대방이 이미 나를 팔로우했다면 자동 맞팔
   if (hasFollowed(followeeId, followerId)) {
     await createConnection(followerId, followeeId);
     await notifyConnection(followerId, followeeId);
+    return;
+  }
+
+  // Case 2: 학생이 선생님을 팔로우하는 경우
+  if (followerRole == FollowUserRole.student) {
+    final teacherSettings = await getTeacherSettings(followeeId);
+
+    if (teacherSettings.autoAcceptConnection) {
+      // 자동 수락: 즉시 맞팔 처리
+      await createFollow(followeeId, followerId);
+      await createConnection(followerId, followeeId);
+      await notifyConnection(followerId, followeeId);
+    } else {
+      // 수동 수락: 선생님에게 알림만 발송
+      await notifyConnectionRequest(followeeId, followerId);
+    }
   }
 }
 ```
@@ -239,7 +319,7 @@ String normalizePhoneNumber(String phone, String countryCode) {
 
 ### 연결 상태별 기능
 
-| 기능 | 📝 오프라인 | 📤/📩 대기중 | 🔗 연결됨 |
+| 기능 | ⚪ 오프라인 | 🟡/🔵 대기중 | 🟣🟢🟠🔴 연결됨 |
 |------|:----------:|:-----------:|:--------:|
 | 학생 프로필 | ✅ (선생님) | ✅ (선생님) | ✅ |
 | 레슨 스케줄 | ✅ (선생님) | ✅ (선생님) | ✅ 양쪽 |
@@ -268,8 +348,8 @@ String normalizePhoneNumber(String phone, String countryCode) {
 ```
 알림 센터
 ├── 연결 알림
-│   ├── 📩 박학생님이 연결을 원합니다 [수락] [거절]
-│   └── 🔗 김민수님과 연결되었습니다
+│   ├── 🔵 박학생님이 연결을 원합니다 [수락] [거절]
+│   └── 🟣 김민수님과 연결되었습니다
 ├── 레슨 알림
 └── 연습 알림
 ```
@@ -278,16 +358,16 @@ String normalizePhoneNumber(String phone, String countryCode) {
 
 ## UI 컴포넌트
 
-### ConnectionStatusIcon
+### StudentStatusIndicator (통합 인디케이터)
 
 ```dart
-class ConnectionStatusIcon extends StatelessWidget {
-  final ConnectionStatus status;
+class StudentStatusIndicator extends StatelessWidget {
+  final Student student;
   final double size;
 
-  const ConnectionStatusIcon({
+  const StudentStatusIndicator({
     super.key,
-    required this.status,
+    required this.student,
     this.size = 12,
   });
 
@@ -304,11 +384,24 @@ class ConnectionStatusIcon extends StatelessWidget {
   }
 
   Color _getColor() {
-    return switch (status) {
-      ConnectionStatus.connected => Colors.green,       // 🟢
-      ConnectionStatus.inviteSent => Colors.amber,      // 🟡
-      ConnectionStatus.inviteReceived => Colors.blue,   // 🔵
-      ConnectionStatus.offline => Colors.grey[400]!,    // ⚪ 연한 회색
+    // 앱 연결됨 → 연습 성과 표시
+    if (student.connectionStatus == ConnectionStatus.connected) {
+      return switch (student.practiceLevel) {
+        PracticeLevel.excellent => Colors.green,           // 🟢 우수
+        PracticeLevel.average => Colors.orange,            // 🟠 보통
+        PracticeLevel.poor => Colors.red,                  // 🔴 부족
+        PracticeLevel.onBreak => Colors.grey[400]!,        // ⚪ 휴강
+        PracticeLevel.newStudent => const Color(0xFF6B5B95), // 🟣 신규
+      };
+    }
+
+    // 앱 미연결 → 연결 상태 표시
+    return switch (student.connectionStatus) {
+      ConnectionStatus.inviteSent => Colors.amber,       // 🟡 초대 보냄
+      ConnectionStatus.inviteReceived => Colors.blue,    // 🔵 초대 받음
+      ConnectionStatus.offline => Colors.grey[400]!,     // ⚪ 오프라인
+      ConnectionStatus.disconnected => Colors.grey[400]!, // ⚪ 연결 끊김
+      _ => Colors.grey[400]!,
     };
   }
 }
@@ -318,19 +411,41 @@ class ConnectionStatusIcon extends StatelessWidget {
 
 ```dart
 ListTile(
-  leading: StudentAvatar(student),
+  leading: Stack(
+    children: [
+      StudentAvatar(student),
+      Positioned(
+        bottom: 0,
+        right: 0,
+        child: StudentStatusIndicator(student: student, size: 14),
+      ),
+    ],
+  ),
   title: Row(
     children: [
       Text(student.name),
       SizedBox(width: 8),
-      ConnectionStatusIcon(status: student.status),  // 🔗 📤 📩 📝
+      _buildBadge(student),  // 정규, 바이올린 등
     ],
   ),
-  subtitle: Text(student.status.label),  // "앱 연결됨", "초대 보냄" 등
-  trailing: student.status == ConnectionStatus.offline
-    ? TextButton(onPressed: _inviteToApp, child: Text('앱 초대'))
-    : null,
+  subtitle: Text(_getSubtitle(student)),
+  trailing: _buildTrailing(student),
 )
+
+// 연결 상태에 따른 후행 버튼
+Widget? _buildTrailing(Student student) {
+  return switch (student.connectionStatus) {
+    ConnectionStatus.offline => TextButton(
+      onPressed: _inviteToApp,
+      child: Text('앱 초대'),
+    ),
+    ConnectionStatus.disconnected => TextButton(
+      onPressed: _reconnect,
+      child: Text('재연결'),
+    ),
+    _ => null,
+  };
+}
 ```
 
 ---
@@ -381,14 +496,17 @@ for (final req in pendingRequests) {
 
 ### Phase 1 (MVP)
 - [ ] 자동 맞팔 로직
-- [ ] 연결 상태 아이콘 표시
+- [ ] **통합 인디케이터** (연습 성과 + 연결 상태)
 - [ ] 수기 등록 학생
 - [ ] 코드/링크 공유
+- [ ] 신규 연결 상태 (🟣 보라색)
+- [ ] 연결 끊김/재연결 버튼
 
 ### Phase 2
 - [ ] 전화번호 직접 검색
 - [ ] 연락처 동기화
 - [ ] 미가입자 초대
+- [ ] 재연결 기능
 
 ### Phase 3
 - [ ] 알림 센터 통합
