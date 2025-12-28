@@ -125,9 +125,19 @@ class _StudentDashboardTab extends ConsumerWidget {
                   ),
                 ],
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_outlined),
+              Row(
+                children: [
+                  // Invite button
+                  IconButton(
+                    onPressed: () => context.push(AppRoutes.invite),
+                    icon: const Icon(Icons.person_add_outlined),
+                    tooltip: '선생님 초대',
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.notifications_outlined),
+                  ),
+                ],
               ),
             ],
           ),

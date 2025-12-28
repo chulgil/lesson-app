@@ -134,6 +134,12 @@ class _DashboardTab extends ConsumerWidget {
                 ),
                 Row(
                   children: [
+                    // Invite button
+                    IconButton(
+                      onPressed: () => context.push(AppRoutes.invite),
+                      icon: const Icon(Icons.person_add_outlined),
+                      tooltip: '학생 초대',
+                    ),
                     // Booking list button
                     IconButton(
                       onPressed: () => context.push(AppRoutes.bookingList),
