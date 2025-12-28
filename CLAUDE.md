@@ -79,6 +79,7 @@ lesson-app/
 | **notification/** | notification_system.md | 알림 시스템 |
 | **review/** | review_system.md | 리뷰/피드백 시스템 |
 | **trial/** | trial_lesson_system.md | 체험 레슨 |
+| **invite/** | invite_system.md | 양방향 초대 시스템 |
 | **design/** | ux_guidelines.md | UX 가이드라인 |
 | | figma_templates.md | Figma 템플릿 |
 | | competitive_analysis.md | 경쟁사 분석 |
