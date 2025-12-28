@@ -32,6 +32,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
 
   final List<Map<String, String>> _degreeOptions = [
     {'value': 'high_school', 'label': '고등학교'},
+    {'value': 'certificate', 'label': '수료'},
     {'value': 'associate', 'label': '전문학사'},
     {'value': 'bachelor', 'label': '학사'},
     {'value': 'master', 'label': '석사'},

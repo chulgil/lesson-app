@@ -44,13 +44,13 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         const Education(
           school: '서울대학교',
           major: '피아노',
-          degree: '학사',
+          degree: 'bachelor',
           graduationYear: 2008,
         ),
         const Education(
           school: '독일 베를린 예술대학교',
           major: '피아노 연주',
-          degree: '석사',
+          degree: 'master',
           graduationYear: 2012,
         ),
       ],
@@ -112,7 +112,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         const Education(
           school: '한국예술종합학교',
           major: '바이올린',
-          degree: '학사',
+          degree: 'bachelor',
           graduationYear: 2016,
         ),
       ],
@@ -162,13 +162,13 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         const Education(
           school: '연세대학교',
           major: '첼로',
-          degree: '학사',
+          degree: 'bachelor',
           graduationYear: 2014,
         ),
         const Education(
           school: '연세대학교 대학원',
           major: '첼로 연주',
-          degree: '석사',
+          degree: 'master',
           graduationYear: 2017,
         ),
       ],
@@ -224,7 +224,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         const Education(
           school: 'MI(Musicians Institute)',
           major: 'Guitar Performance',
-          degree: '수료',
+          degree: 'certificate',
           graduationYear: 2011,
         ),
       ],
@@ -274,7 +274,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         const Education(
           school: '경희대학교',
           major: '플룻',
-          degree: '학사',
+          degree: 'bachelor',
           graduationYear: 2018,
         ),
       ],

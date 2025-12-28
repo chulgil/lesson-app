@@ -311,7 +311,7 @@ List<TeacherProfile> _generateMockProfiles() {
         const Education(
           school: '서울대학교',
           major: '바이올린',
-          degree: '학사',
+          degree: 'bachelor',
           graduationYear: 2008,
         ),
       ],
