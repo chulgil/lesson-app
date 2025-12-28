@@ -5,11 +5,18 @@ import '../../models/time_slot.dart';
 import '../../repositories/settings_repository.dart';
 import 'settings_repository_provider.dart';
 
-/// Teacher settings provider
+/// Teacher settings provider (for current logged-in teacher)
 final teacherSettingsProvider =
     FutureProvider<TeacherSettings>((ref) async {
   final repository = ref.watch(settingsRepositoryProvider);
   return repository.getTeacherSettings();
+});
+
+/// Teacher settings provider by teacherId (for viewing other teacher's settings)
+final teacherSettingsByIdProvider =
+    FutureProvider.family<TeacherSettings, String>((ref, teacherId) async {
+  final repository = ref.watch(settingsRepositoryProvider);
+  return repository.getTeacherSettingsById(teacherId);
 });
 
 /// Teacher instruments provider (derived from settings)

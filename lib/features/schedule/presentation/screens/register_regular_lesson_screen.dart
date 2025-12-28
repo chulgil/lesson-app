@@ -6,8 +6,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
+import '../../../../models/teacher_settings.dart';
 import '../../../../models/time_slot.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../../providers/settings/teacher_settings_provider.dart';
 import '../widgets/schedule_type_selector.dart';
 
 /// Screen for registering a regular lesson after trial
@@ -33,7 +35,9 @@ class RegisterRegularLessonScreen extends ConsumerStatefulWidget {
 class _RegisterRegularLessonScreenState
     extends ConsumerState<RegisterRegularLessonScreen> {
   ScheduleType _scheduleType = ScheduleType.fixed;
-  TimeSlot? _selectedTimeSlot;
+  int _selectedLessonDuration = 60; // Default, will be updated from teacher settings
+  final Set<int> _selectedDays = {}; // Selected days of week (1=Mon, 7=Sun)
+  final Map<int, TimeOfDay> _selectedTimesPerDay = {}; // Day -> selected start time
   int _lessonsPerWeek = 1;
   int _monthlyFee = 200000;
   DateTime _startDate = _getNextMonday();
@@ -49,83 +53,134 @@ class _RegisterRegularLessonScreenState
   Widget build(BuildContext context) {
     final availabilityAsync =
         ref.watch(teacherAvailabilityProvider(widget.teacherId));
+    final settingsAsync =
+        ref.watch(teacherSettingsByIdProvider(widget.teacherId));
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('정규레슨 등록'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Student info
-            if (widget.studentName != null) _buildStudentInfo(),
+      body: settingsAsync.when(
+        data: (settings) => availabilityAsync.when(
+          data: (slots) => _buildContent(settings, slots),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (_, __) => const Center(child: Text('시간 정보를 불러올 수 없습니다')),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const Center(child: Text('설정 정보를 불러올 수 없습니다')),
+      ),
+    );
+  }
 
-            const SizedBox(height: AppSpacing.space6),
+  Widget _buildContent(TeacherSettings settings, List<TimeSlot> slots) {
+    // Initialize lesson duration from teacher's default if not set
+    if (_selectedLessonDuration == 60 && settings.defaultLessonDuration != 60) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _selectedLessonDuration = settings.defaultLessonDuration;
+        });
+      });
+    }
 
-            // Schedule type
-            _buildSectionTitle('레슨 유형'),
-            const SizedBox(height: AppSpacing.space3),
-            ScheduleTypeSelector(
-              selectedType: _scheduleType,
-              onTypeSelected: (type) {
-                setState(() {
-                  _scheduleType = type;
-                  if (type == ScheduleType.flexible) {
-                    _selectedTimeSlot = null;
-                  }
-                });
-              },
-            ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Student info
+          if (widget.studentName != null) _buildStudentInfo(),
 
-            const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space6),
 
-            // Fixed time slot selection
-            if (_scheduleType == ScheduleType.fixed) ...[
-              _buildSectionTitle('고정 레슨 시간'),
-              const SizedBox(height: AppSpacing.space3),
-              availabilityAsync.when(
-                data: (slots) => _buildTimeSlotGrid(slots),
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const Text('시간 정보를 불러올 수 없습니다'),
+          // Schedule type
+          _buildSectionTitle('레슨 유형'),
+          const SizedBox(height: AppSpacing.space3),
+          ScheduleTypeSelector(
+            selectedType: _scheduleType,
+            onTypeSelected: (type) {
+              setState(() {
+                _scheduleType = type;
+                if (type == ScheduleType.flexible) {
+                  _selectedDays.clear();
+                  _selectedTimesPerDay.clear();
+                }
+              });
+            },
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Fixed time slot selection
+          if (_scheduleType == ScheduleType.fixed) ...[
+            // Lesson duration selection
+            _buildSectionTitle('레슨 시간'),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '선생님 기본 설정: ${LessonDurations.format(settings.defaultLessonDuration)}',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
               ),
-              const SizedBox(height: AppSpacing.space6),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            _buildLessonDurationSelector(settings),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Day selection
+            _buildSectionTitle('요일 선택'),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '주 $_lessonsPerWeek회 레슨 - ${_lessonsPerWeek}개 요일을 선택하세요',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            _buildDaySelector(slots),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Time selection for each selected day
+            if (_selectedDays.isNotEmpty) ...[
+              _buildSectionTitle('시간 선택'),
+              const SizedBox(height: AppSpacing.space3),
+              ..._selectedDays.map((day) => _buildTimeSelectionForDay(day, slots)),
             ],
-
-            // Lessons per week
-            _buildSectionTitle('레슨 횟수'),
-            const SizedBox(height: AppSpacing.space3),
-            _buildLessonsPerWeekSelector(),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Monthly fee
-            _buildSectionTitle('월 수강료'),
-            const SizedBox(height: AppSpacing.space3),
-            _buildFeeSelector(),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Start date
-            _buildSectionTitle('시작일'),
-            const SizedBox(height: AppSpacing.space3),
-            _buildStartDateSelector(),
-
-            const SizedBox(height: AppSpacing.space8),
-
-            // Summary
-            _buildSummary(),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Submit button
-            _buildSubmitButton(),
 
             const SizedBox(height: AppSpacing.space6),
           ],
-        ),
+
+          // Lessons per week
+          _buildSectionTitle('레슨 횟수'),
+          const SizedBox(height: AppSpacing.space3),
+          _buildLessonsPerWeekSelector(),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Monthly fee
+          _buildSectionTitle('월 수강료'),
+          const SizedBox(height: AppSpacing.space3),
+          _buildFeeSelector(),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Start date
+          _buildSectionTitle('시작일'),
+          const SizedBox(height: AppSpacing.space3),
+          _buildStartDateSelector(),
+
+          const SizedBox(height: AppSpacing.space8),
+
+          // Summary
+          _buildSummary(),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Submit button
+          _buildSubmitButton(),
+
+          const SizedBox(height: AppSpacing.space6),
+        ],
       ),
     );
   }
@@ -177,16 +232,121 @@ class _RegisterRegularLessonScreenState
     return Text(title, style: AppTypography.headingSmall);
   }
 
-  Widget _buildTimeSlotGrid(List<TimeSlot> slots) {
-    // Group by day
-    final Map<int, List<TimeSlot>> slotsByDay = {};
-    for (final slot in slots) {
-      slotsByDay.putIfAbsent(slot.dayOfWeek, () => []).add(slot);
-    }
+  Widget _buildLessonDurationSelector(TeacherSettings settings) {
+    final durations = settings.allLessonDurations;
 
+    return Wrap(
+      spacing: AppSpacing.space2,
+      runSpacing: AppSpacing.space2,
+      children: durations.map((duration) {
+        final isSelected = _selectedLessonDuration == duration;
+        final isDefault = duration == settings.defaultLessonDuration;
+
+        return ChoiceChip(
+          label: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(LessonDurations.format(duration)),
+              if (isDefault) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.star,
+                  size: 12,
+                  color: isSelected ? Colors.white : AppColors.secondary,
+                ),
+              ],
+            ],
+          ),
+          selected: isSelected,
+          onSelected: (selected) {
+            if (selected) {
+              setState(() {
+                _selectedLessonDuration = duration;
+                // Clear time selections when duration changes
+                _selectedTimesPerDay.clear();
+              });
+            }
+          },
+          backgroundColor: AppColors.surfaceLight,
+          selectedColor: AppColors.primary,
+          side: BorderSide(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+          ),
+          labelStyle: AppTypography.bodySmall.copyWith(
+            color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDaySelector(List<TimeSlot> slots) {
     final dayNames = ['월', '화', '수', '목', '금', '토', '일'];
 
+    // Get available days from teacher's slots
+    final availableDays = slots
+        .where((slot) => slot.isActive)
+        .map((slot) => slot.dayOfWeek)
+        .toSet();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(7, (index) {
+        final dayOfWeek = index + 1;
+        final isAvailable = availableDays.contains(dayOfWeek);
+        final isSelected = _selectedDays.contains(dayOfWeek);
+
+        return _DayButton(
+          label: dayNames[index],
+          isAvailable: isAvailable,
+          isSelected: isSelected,
+          onTap: isAvailable
+              ? () {
+                  setState(() {
+                    if (isSelected) {
+                      _selectedDays.remove(dayOfWeek);
+                      _selectedTimesPerDay.remove(dayOfWeek);
+                    } else if (_selectedDays.length < _lessonsPerWeek) {
+                      _selectedDays.add(dayOfWeek);
+                    } else {
+                      // Replace oldest selection
+                      final oldest = _selectedDays.first;
+                      _selectedDays.remove(oldest);
+                      _selectedTimesPerDay.remove(oldest);
+                      _selectedDays.add(dayOfWeek);
+                    }
+                  });
+                }
+              : null,
+        );
+      }),
+    );
+  }
+
+  Widget _buildTimeSelectionForDay(int dayOfWeek, List<TimeSlot> slots) {
+    final dayNames = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+    final daySlot = slots.firstWhere(
+      (slot) => slot.dayOfWeek == dayOfWeek && slot.isActive,
+      orElse: () => TimeSlot(
+        id: 'default',
+        dayOfWeek: dayOfWeek,
+        startTime: const TimeOfDay(hour: 14, minute: 0),
+        endTime: const TimeOfDay(hour: 18, minute: 0),
+      ),
+    );
+
+    // Generate time slots based on lesson duration
+    final timeSlots = _generateTimeSlots(
+      availableStart: daySlot.startTime,
+      availableEnd: daySlot.endTime,
+      lessonDurationMinutes: _selectedLessonDuration,
+    );
+
+    final selectedTime = _selectedTimesPerDay[dayOfWeek];
+
     return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -194,42 +354,109 @@ class _RegisterRegularLessonScreenState
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
-        children: List.generate(6, (dayIndex) {
-          final dayOfWeek = dayIndex + 1;
-          final daySlots = slotsByDay[dayOfWeek] ?? [];
-
-          if (daySlots.isEmpty) return const SizedBox.shrink();
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
               Text(
-                '${dayNames[dayIndex]}요일',
-                style: AppTypography.bodyMedium.copyWith(
+                dayNames[dayOfWeek - 1],
+                style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space2,
-                children: daySlots.map((slot) {
-                  final isSelected = _selectedTimeSlot?.id == slot.id;
-                  return _TimeSlotButton(
-                    slot: slot,
-                    isSelected: isSelected,
-                    onTap: () {
-                      setState(() => _selectedTimeSlot = slot);
-                    },
-                  );
-                }).toList(),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '(${_formatTimeOfDay(daySlot.startTime)}-${_formatTimeOfDay(daySlot.endTime)} 가능)',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
               ),
-              const SizedBox(height: AppSpacing.space3),
             ],
-          );
-        }),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Wrap(
+            spacing: AppSpacing.space2,
+            runSpacing: AppSpacing.space2,
+            children: timeSlots.map((time) {
+              final isSelected = selectedTime != null &&
+                  selectedTime.hour == time.hour &&
+                  selectedTime.minute == time.minute;
+
+              return _TimeSlotChip(
+                time: time,
+                duration: _selectedLessonDuration,
+                isSelected: isSelected,
+                onTap: () {
+                  setState(() {
+                    _selectedTimesPerDay[dayOfWeek] = time;
+                  });
+                },
+              );
+            }).toList(),
+          ),
+          if (selectedTime != null) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, size: 16, color: AppColors.primary),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(
+                    '선택: ${_formatTimeOfDay(selectedTime)}-${_formatTimeOfDay(_addMinutes(selectedTime, _selectedLessonDuration))}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
+  }
+
+  List<TimeOfDay> _generateTimeSlots({
+    required TimeOfDay availableStart,
+    required TimeOfDay availableEnd,
+    required int lessonDurationMinutes,
+  }) {
+    final slots = <TimeOfDay>[];
+    var current = availableStart;
+
+    while (_canFitLesson(current, availableEnd, lessonDurationMinutes)) {
+      slots.add(current);
+      current = _addMinutes(current, lessonDurationMinutes);
+    }
+
+    return slots;
+  }
+
+  bool _canFitLesson(TimeOfDay start, TimeOfDay end, int durationMinutes) {
+    final startMinutes = start.hour * 60 + start.minute;
+    final endMinutes = end.hour * 60 + end.minute;
+    return startMinutes + durationMinutes <= endMinutes;
+  }
+
+  TimeOfDay _addMinutes(TimeOfDay time, int minutes) {
+    final totalMinutes = time.hour * 60 + time.minute + minutes;
+    return TimeOfDay(hour: totalMinutes ~/ 60, minute: totalMinutes % 60);
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 
   Widget _buildLessonsPerWeekSelector() {
@@ -240,7 +467,16 @@ class _RegisterRegularLessonScreenState
             title: '주 1회',
             subtitle: '월 4회',
             isSelected: _lessonsPerWeek == 1,
-            onTap: () => setState(() => _lessonsPerWeek = 1),
+            onTap: () => setState(() {
+              _lessonsPerWeek = 1;
+              // Keep only first selected day
+              if (_selectedDays.length > 1) {
+                final first = _selectedDays.first;
+                _selectedDays.clear();
+                _selectedDays.add(first);
+                _selectedTimesPerDay.removeWhere((key, _) => key != first);
+              }
+            }),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -374,6 +610,7 @@ class _RegisterRegularLessonScreenState
 
   Widget _buildSummary() {
     final perLessonFee = _monthlyFee ~/ (_lessonsPerWeek * 4);
+    final dayNames = ['월', '화', '수', '목', '금', '토', '일'];
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -394,20 +631,42 @@ class _RegisterRegularLessonScreenState
             ],
           ),
           const SizedBox(height: AppSpacing.space2),
-          if (_scheduleType == ScheduleType.fixed &&
-              _selectedTimeSlot != null) ...[
+          if (_scheduleType == ScheduleType.fixed) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('고정 시간', style: AppTypography.bodyMedium),
+                Text('레슨 시간', style: AppTypography.bodyMedium),
                 Text(
-                  '${_selectedTimeSlot!.fullDayName} ${_selectedTimeSlot!.timeRange}',
+                  LessonDurations.format(_selectedLessonDuration),
                   style: AppTypography.bodyMedium
                       .copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.space2),
+            if (_selectedDays.isNotEmpty)
+              ...(_selectedDays.toList()..sort()).map((day) {
+                final time = _selectedTimesPerDay[day];
+                final timeStr = time != null
+                    ? '${_formatTimeOfDay(time)}-${_formatTimeOfDay(_addMinutes(time, _selectedLessonDuration))}'
+                    : '미선택';
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('${dayNames[day - 1]}요일', style: AppTypography.bodyMedium),
+                      Text(
+                        timeStr,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: time != null ? null : AppColors.textTertiaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
           ],
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -447,8 +706,9 @@ class _RegisterRegularLessonScreenState
   }
 
   Widget _buildSubmitButton() {
-    final isValid =
-        _scheduleType == ScheduleType.flexible || _selectedTimeSlot != null;
+    final isValid = _scheduleType == ScheduleType.flexible ||
+        (_selectedDays.length == _lessonsPerWeek &&
+            _selectedTimesPerDay.length == _lessonsPerWeek);
 
     return SizedBox(
       width: double.infinity,
@@ -478,23 +738,45 @@ class _RegisterRegularLessonScreenState
   }
 
   Future<void> _submitRegistration() async {
-    if (_scheduleType == ScheduleType.fixed && _selectedTimeSlot == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('레슨 시간을 선택해주세요'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      return;
+    if (_scheduleType == ScheduleType.fixed) {
+      if (_selectedDays.length != _lessonsPerWeek) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$_lessonsPerWeek개의 요일을 선택해주세요'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+      if (_selectedTimesPerDay.length != _lessonsPerWeek) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('각 요일의 레슨 시간을 선택해주세요'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
     }
 
     setState(() => _isSubmitting = true);
 
     try {
+      // Create time slots from selected days and times
+      final fixedSlots = _selectedDays.map((day) {
+        final time = _selectedTimesPerDay[day]!;
+        return TimeSlot(
+          id: 'slot_$day',
+          dayOfWeek: day,
+          startTime: time,
+          endTime: _addMinutes(time, _selectedLessonDuration),
+        );
+      }).toList();
+
       final registration = RegularLessonRegistration(
         studentId: widget.studentId ?? 'new_student',
         scheduleType: _scheduleType,
-        fixedTimeSlot: _selectedTimeSlot,
+        fixedTimeSlot: fixedSlots.isNotEmpty ? fixedSlots.first : null,
         lessonsPerWeek: _lessonsPerWeek,
         monthlyFee: _monthlyFee,
         startDate: _startDate,
@@ -534,19 +816,81 @@ class _RegisterRegularLessonScreenState
   }
 }
 
-class _TimeSlotButton extends StatelessWidget {
-  final TimeSlot slot;
+/// Day selection button
+class _DayButton extends StatelessWidget {
+  final String label;
+  final bool isAvailable;
+  final bool isSelected;
+  final VoidCallback? onTap;
+
+  const _DayButton({
+    required this.label,
+    required this.isAvailable,
+    required this.isSelected,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary
+              : isAvailable
+                  ? AppColors.surfaceLight
+                  : AppColors.surfaceSecondaryLight,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primary
+                : isAvailable
+                    ? AppColors.borderLight
+                    : Colors.transparent,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: AppTypography.bodyMedium.copyWith(
+              color: isSelected
+                  ? Colors.white
+                  : isAvailable
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textTertiaryLight,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Time slot chip for selection
+class _TimeSlotChip extends StatelessWidget {
+  final TimeOfDay time;
+  final int duration;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _TimeSlotButton({
-    required this.slot,
+  const _TimeSlotChip({
+    required this.time,
+    required this.duration,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final endTime = TimeOfDay(
+      hour: (time.hour * 60 + time.minute + duration) ~/ 60,
+      minute: (time.hour * 60 + time.minute + duration) % 60,
+    );
+
     return Material(
       color: isSelected ? AppColors.primary : Colors.transparent,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -565,7 +909,7 @@ class _TimeSlotButton extends StatelessWidget {
             ),
           ),
           child: Text(
-            slot.timeRange,
+            '${_formatTime(time)}-${_formatTime(endTime)}',
             style: AppTypography.bodySmall.copyWith(
               color: isSelected ? Colors.white : AppColors.textPrimaryLight,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -574,5 +918,11 @@ class _TimeSlotButton extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 }

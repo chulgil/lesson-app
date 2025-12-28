@@ -6,6 +6,7 @@ import '../models/time_slot.dart';
 /// Repository interface for teacher settings
 abstract class SettingsRepository {
   Future<TeacherSettings> getTeacherSettings();
+  Future<TeacherSettings> getTeacherSettingsById(String teacherId);
   Future<TeacherSettings> updateInstruments(List<String> instruments);
   Future<TeacherSettings> updateDefaultDuration(int duration);
   Future<TeacherSettings> addCustomDuration(int duration);
@@ -80,6 +81,65 @@ class MockSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> getTeacherSettings() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _settings;
+  }
+
+  @override
+  Future<TeacherSettings> getTeacherSettingsById(String teacherId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    // Return mock settings for any teacher
+    // In production, this would fetch from the backend
+    return TeacherSettings(
+      id: teacherId,
+      instruments: ['바이올린', '피아노'],
+      defaultLessonDuration: 60,
+      customLessonDurations: [50], // Example: teacher added 50 min option
+      disabledDurations: [120], // Example: teacher disabled 2 hour option
+      availableSlots: [
+        TimeSlot(
+          id: 'slot_1',
+          dayOfWeek: 1, // Monday
+          startTime: const TimeOfDay(hour: 14, minute: 0),
+          endTime: const TimeOfDay(hour: 21, minute: 0),
+          isActive: true,
+        ),
+        TimeSlot(
+          id: 'slot_2',
+          dayOfWeek: 2, // Tuesday
+          startTime: const TimeOfDay(hour: 14, minute: 0),
+          endTime: const TimeOfDay(hour: 21, minute: 0),
+          isActive: true,
+        ),
+        TimeSlot(
+          id: 'slot_3',
+          dayOfWeek: 3, // Wednesday
+          startTime: const TimeOfDay(hour: 15, minute: 0),
+          endTime: const TimeOfDay(hour: 20, minute: 0),
+          isActive: true,
+        ),
+        TimeSlot(
+          id: 'slot_4',
+          dayOfWeek: 4, // Thursday
+          startTime: const TimeOfDay(hour: 14, minute: 0),
+          endTime: const TimeOfDay(hour: 21, minute: 0),
+          isActive: true,
+        ),
+        TimeSlot(
+          id: 'slot_5',
+          dayOfWeek: 5, // Friday
+          startTime: const TimeOfDay(hour: 14, minute: 0),
+          endTime: const TimeOfDay(hour: 19, minute: 0),
+          isActive: true,
+        ),
+        TimeSlot(
+          id: 'slot_6',
+          dayOfWeek: 6, // Saturday
+          startTime: const TimeOfDay(hour: 10, minute: 0),
+          endTime: const TimeOfDay(hour: 18, minute: 0),
+          isActive: true,
+        ),
+      ],
+      createdAt: DateTime.now().subtract(const Duration(days: 365)),
+    );
   }
 
   @override
