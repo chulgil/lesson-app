@@ -219,70 +219,193 @@
 
 ### 학부모 연결 시나리오
 
-학부모는 자녀(학생)를 통해 선생님과 연결됩니다.
+**미성년자** 학생은 학부모가 대신 등록하고 관리합니다.
+학부모가 선생님과 연결하면 자녀가 자동으로 선생님 학생 목록에 등록됩니다.
 
-#### 학부모-학생-선생님 관계
+#### 핵심 컨셉
+
+| 항목 | 설명 |
+|------|------|
+| 대상 | 미성년자 자녀만 (성인 학생은 직접 연결) |
+| 주체 | 학부모가 선생님을 찾아 연결 |
+| 결과 | 자녀가 선생님 학생 목록에 자동 등록 |
+| 권한 | 학부모가 자녀 연습 기록 대신 입력 가능 |
+
+#### 학부모 주도 연결 플로우
 
 ```
-[학부모] ──── 자녀 등록 ────► [학생]
-    │                           │
-    │                           │ 선생님과 연결
-    │                           ▼
-    └───── 자동 연결 ─────► [선생님]
+[학부모 앱 가입]
+        │
+        ▼
+[자녀 등록] ← 이름, 생년월일 입력
+        │
+        ▼
+[선생님 찾기] ← 코드/전화번호/연락처
+        │
+        ▼
+[연결할 자녀 선택] ← 자녀가 여러 명인 경우
+        │
+        ▼
+[선생님과 연결]
+        │
+        ├── 선생님 학생 목록: 자녀 자동 등록 (🟣 신규)
+        ├── 학부모: 자녀의 레슨/연습 관리 가능
+        └── 자녀: 학부모 계정으로 관리됨 (본인 앱 미사용)
 ```
 
-#### 연결 시나리오
+#### 자녀 본인 앱 사용 시 (계정 전환)
 
-| 시나리오 | 처리 |
-|----------|------|
-| 학생이 선생님과 연결됨 | 학부모에게 알림: "자녀가 김선생님과 연결되었습니다" |
-| 학부모가 직접 선생님 팔로우 | 자녀 선택 → 해당 자녀의 선생님으로 연결 |
-| 학부모가 자녀 없이 팔로우 | 거절 (자녀 등록 먼저 필요) |
+```
+[자녀가 성장하여 본인 앱 사용 원함]
+        │
+        ▼
+[자녀 본인 계정으로 앱 가입]
+        │
+        ▼
+[선생님 코드로 연결 시도]
+        │
+        ▼
+[기존 학부모 등록 자녀와 매칭 감지]
+        │
+        ▼
+[학부모에게 확인 요청]
+  "자녀(김민수)가 본인 계정으로 전환을 요청했습니다"
+        │
+        ├──[승인]──► 기존 데이터 자녀 계정으로 이전
+        │              └── 학부모는 조회 권한만 유지
+        │
+        └──[거절]──► 전환 거절 (기존 유지)
+```
 
-#### 학부모 전용 필드
+#### 학부모 전용 모델
 
 ```dart
 class Parent {
   final String id;
   final String name;
   final String? phoneNumber;
-  final List<String> childrenIds;  // 자녀(학생) ID 목록
+  final List<Child> children;  // 등록된 자녀 목록
   final DateTime createdAt;
 }
 
-// 학부모-선생님 연결은 자녀를 통해 자동 생성
+class Child {
+  final String id;
+  final String name;
+  final DateTime birthDate;      // 미성년자 확인용
+  final String? linkedStudentId; // 선생님과 연결된 경우 Student ID
+  final bool hasOwnAccount;      // 본인 계정 전환 여부
+}
+
+// 학부모-선생님 연결 (자녀 통해)
 class ParentTeacherConnection {
   final String parentId;
   final String teacherId;
-  final String studentId;  // 어떤 자녀를 통한 연결인지
+  final String childId;       // 어떤 자녀를 통한 연결인지
   final DateTime connectedAt;
 }
 ```
 
-#### 학부모 팔로우 처리 로직
+#### 학부모 연결 처리 로직
 
 ```dart
-Future<void> handleParentFollow(String parentId, String teacherId) async {
-  // 1. 학부모의 자녀 목록 확인
-  final parent = await getParent(parentId);
-  if (parent.childrenIds.isEmpty) {
-    throw InvalidStateException('자녀를 먼저 등록해주세요');
+Future<void> handleParentConnect({
+  required String parentId,
+  required String teacherId,
+  required String childId,  // 선택한 자녀
+}) async {
+  // 1. 자녀 확인
+  final child = await getChild(childId);
+  if (child == null || child.parentId != parentId) {
+    throw InvalidStateException('유효하지 않은 자녀입니다');
   }
 
-  // 2. 해당 선생님과 연결된 자녀 찾기
-  final connectedChild = await findChildConnectedToTeacher(
-    childrenIds: parent.childrenIds,
+  // 2. 미성년자 확인
+  if (!child.isMinor) {
+    throw InvalidStateException('미성년자 자녀만 대리 등록 가능합니다');
+  }
+
+  // 3. 선생님 학생 목록에 자녀 등록
+  final student = await createStudentFromChild(
+    child: child,
     teacherId: teacherId,
+    managedByParentId: parentId,
   );
 
-  if (connectedChild != null) {
-    // 자녀가 이미 연결됨 → 학부모도 자동 연결
-    await createParentTeacherConnection(parentId, teacherId, connectedChild.id);
-    await notifyParentConnected(parentId, teacherId, connectedChild.id);
-  } else {
-    // 자녀가 연결되지 않음 → 자녀 선택 요청
-    throw NeedChildSelectionException('연결할 자녀를 선택해주세요');
+  // 4. 자녀-학생 연결
+  await linkChildToStudent(childId, student.id);
+
+  // 5. 학부모-선생님 연결 생성
+  await createParentTeacherConnection(parentId, teacherId, childId);
+
+  // 6. 알림 발송
+  await notifyTeacherNewStudent(teacherId, student, parentId);
+  await notifyParentConnected(parentId, teacherId, child.name);
+}
+
+// 미성년자 확인
+extension on Child {
+  bool get isMinor {
+    final age = DateTime.now().year - birthDate.year;
+    return age < 19;  // 한국 기준 만 19세 미만
   }
+}
+```
+
+#### 학부모 권한
+
+| 권한 | 설명 |
+|------|------|
+| **연습 기록 입력** | ✅ 자녀 대신 연습 시간/곡 기록 |
+| **연습 스트릭 확인** | ✅ 자녀의 연습 지속성 확인 |
+| **메트로놈 사용** | ✅ 자녀와 함께 사용 |
+| **녹음** | ✅ 자녀 연습 녹음 |
+| **레슨 노트 확인** | ✅ 선생님 레슨 노트 확인 |
+| **결제 관리** | ✅ 수강료 입금 기록 |
+| **레슨 알림** | ✅ 레슨 리마인더 수신 |
+
+#### 계정 전환 API
+
+```dart
+// 자녀 본인 계정 전환 요청 (자녀가 요청)
+Future<void> requestAccountTransfer({
+  required String childStudentId,  // 현재 학부모가 관리하는 Student
+  required String newAccountId,    // 자녀 본인이 만든 계정
+}) async {
+  // 1. 학부모에게 전환 요청 알림
+  final student = await getStudent(childStudentId);
+  await notifyParentTransferRequest(
+    parentId: student.managedByParentId,
+    childName: student.name,
+    newAccountId: newAccountId,
+  );
+}
+
+// 학부모가 전환 승인
+Future<void> approveAccountTransfer({
+  required String parentId,
+  required String childStudentId,
+  required String newAccountId,
+}) async {
+  // 1. 기존 데이터를 새 계정으로 이전
+  await transferStudentData(
+    fromId: childStudentId,
+    toAccountId: newAccountId,
+  );
+
+  // 2. 학부모 권한 변경 (관리 → 조회만)
+  await updateParentPermission(
+    parentId: parentId,
+    studentId: childStudentId,
+    permission: ParentPermission.viewOnly,
+  );
+
+  // 3. 자녀에게 전환 완료 알림
+  await notifyTransferComplete(newAccountId);
+}
+
+enum ParentPermission {
+  fullControl,  // 대리 관리 (연습 기록 입력 가능)
+  viewOnly,     // 조회만 (자녀 본인 계정 전환 후)
 }
 ```
 
@@ -290,9 +413,11 @@ Future<void> handleParentFollow(String parentId, String teacherId) async {
 
 | 이벤트 | 수신자 | 메시지 |
 |--------|--------|--------|
-| 자녀-선생님 연결됨 | 학부모 | "자녀(김민수)가 김선생님과 연결되었습니다" |
-| 학부모 연결 완료 | 선생님 | "김민수 학부모님이 연결되었습니다" |
-| 자녀-선생님 연결 해제 | 학부모 | "자녀(김민수)와 김선생님의 연결이 해제되었습니다" |
+| 연결 완료 | 학부모 | "김선생님과 연결되었습니다. 자녀(김민수) 레슨을 관리할 수 있습니다" |
+| 연결 완료 | 선생님 | "김민수 학생이 등록되었습니다 (학부모: 김철수)" |
+| 계정 전환 요청 | 학부모 | "자녀(김민수)가 본인 계정으로 전환을 요청했습니다" |
+| 전환 완료 | 자녀 | "본인 계정으로 전환되었습니다" |
+| 전환 완료 | 학부모 | "자녀(김민수)가 본인 계정으로 전환되었습니다. 이제 조회만 가능합니다" |
 
 ### 설정 변경 시 처리
 
