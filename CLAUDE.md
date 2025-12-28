@@ -136,12 +136,12 @@ lesson-app/
 - 없음
 
 ### 예정
-- OAuth 연동 (Google, Kakao)
+- 백엔드 API (FastAPI)
+- OAuth 연동 (Google, Kakao) - 백엔드 필요
 - 푸시 알림
 - 뱃지 시스템
 - 통계/리포트
 - AI 레슨 요약
-- 백엔드 API 연동 (FastAPI)
 
 ---
 
@@ -192,8 +192,8 @@ lesson-app/
 | 1 | 외부 선생님 등록 | ✅ 완료 | - |
 | 2 | 양방향 QR/URL 초대 | ✅ 완료 | - |
 | 3 | 학부모 시스템 | ✅ 완료 | - |
-| 4 | OAuth 연동 | 대기 | 높음 |
-| 5 | 백엔드 API (FastAPI) | 대기 | 중간 |
+| 4 | 백엔드 API (FastAPI) | 대기 | 높음 |
+| 5 | OAuth 연동 (백엔드 필요) | 대기 | 높음 |
 
 > Claude 작업 시: 위 순위대로 진행, 상태 업데이트 필수
 
