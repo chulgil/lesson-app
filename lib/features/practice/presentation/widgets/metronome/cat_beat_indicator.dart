@@ -244,15 +244,15 @@ class _AnimatedPawState extends State<_AnimatedPaw>
   void initState() {
     super.initState();
 
-    // Drop animation: 140ms per spec
+    // Drop animation: reduced from 140ms to 80ms for snappier response
     _dropController = AnimationController(
-      duration: const Duration(milliseconds: 140),
+      duration: const Duration(milliseconds: 80),
       vsync: this,
     );
 
-    // Scale animation: 120ms per spec (up + down)
+    // Scale animation: reduced from 120ms to 60ms for snappier response
     _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 120),
+      duration: const Duration(milliseconds: 60),
       vsync: this,
     );
 
@@ -673,8 +673,9 @@ class _CompactCatWithPulseState extends State<_CompactCatWithPulse>
   @override
   void initState() {
     super.initState();
+    // Reduced from 100ms to 60ms for snappier response
     _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 60),
       vsync: this,
     );
 

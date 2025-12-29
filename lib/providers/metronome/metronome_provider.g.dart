@@ -6,9 +6,12 @@ part of 'metronome_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$metronomeHash() => r'dd5e105ffb86c80c15159ca5a4e1c5407aee9003';
+String _$metronomeHash() => r'52ac129c18d42d473145e4f40b236b6b0e2b752e';
 
 /// Metronome state management with Riverpod.
+///
+/// Uses flutter_soloud (C++ SoLoud via FFI) for low-latency native audio
+/// on all platforms (iOS, Android, Mac, Windows, Linux, Web).
 ///
 /// Copied from [Metronome].
 @ProviderFor(Metronome)

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../core/audio/metronome_engine.dart';
+import '../../core/audio/metronome_engine_interface.dart';
 import '../../models/metronome_settings.dart';
 import '../../services/metronome_storage_service.dart';
 
@@ -37,16 +38,22 @@ class MetronomeState {
 }
 
 /// Metronome state management with Riverpod.
+///
+/// Uses flutter_soloud (C++ SoLoud via FFI) for low-latency native audio
+/// on all platforms (iOS, Android, Mac, Windows, Linux, Web).
 @Riverpod(keepAlive: true)
 class Metronome extends _$Metronome {
-  MetronomeEngine? _engine;
+  MetronomeEngineInterface? _engine;
   final MetronomeStorageService _storage = MetronomeStorageService();
   bool _initialized = false;
   bool _engineReady = false;
 
   @override
   MetronomeState build() {
+    // Use SoLoud-based engine for low-latency audio on all platforms
+    debugPrint('Metronome: Using SoLoud engine for low-latency audio');
     _engine = MetronomeEngine();
+
     _engine!.onBeat = _onBeat;
 
     // Initialize engine and load saved settings
@@ -82,6 +89,13 @@ class Metronome extends _$Metronome {
     }
   }
 
+  /// Pre-warm the engine to reduce first-play latency.
+  /// Call this when metronome screen opens.
+  Future<void> warmUp() async {
+    debugPrint('Metronome: warmUp called');
+    await _ensureReady();
+  }
+
   Future<void> _saveSettings() async {
     await _storage.saveSettings(state.settings);
   }
@@ -95,58 +109,108 @@ class Metronome extends _$Metronome {
 
   /// Start the metronome.
   Future<void> start() async {
-    await _ensureReady();
-    _engine?.start();
+    debugPrint('Metronome: start called');
+
+    // Update state first for immediate UI response
     state = state.copyWith(isPlaying: true);
+
+    try {
+      await _ensureReady();
+      await _engine?.start();
+    } catch (e) {
+      debugPrint('Metronome: start engine error: $e');
+      // Revert state on error
+      state = state.copyWith(isPlaying: false);
+    }
   }
 
   /// Stop the metronome.
-  void stop() {
-    _engine?.stop();
+  Future<void> stop() async {
+    debugPrint('Metronome: stop called');
+
+    // Update state first for immediate UI response
     state = state.copyWith(
       isPlaying: false,
       currentBeat: 0,
       isAccent: false,
     );
+
+    try {
+      await _engine?.stop();
+    } catch (e) {
+      debugPrint('Metronome: stop engine error: $e');
+    }
   }
 
   /// Toggle play/stop.
   Future<void> toggle() async {
+    debugPrint('Metronome: toggle called, isPlaying: ${state.isPlaying}');
     if (state.isPlaying) {
-      stop();
+      await stop();
     } else {
       await start();
     }
   }
 
   /// Set BPM (40-208 range).
-  void setBpm(int bpm) {
+  Future<void> setBpm(int bpm) async {
     final clampedBpm = MetronomeSettings.clampBpm(bpm);
-    _engine?.setBpm(clampedBpm);
+    debugPrint('Metronome: setBpm called with $bpm -> $clampedBpm');
+
+    // Update state first to ensure UI responds immediately
     state = state.copyWith(
       settings: state.settings.copyWith(bpm: clampedBpm),
     );
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.setBpm(clampedBpm);
+    } catch (e) {
+      debugPrint('Metronome: setBpm engine error: $e');
+    }
+
     _saveSettings();
   }
 
   /// Increment BPM by given amount.
-  void incrementBpm(int delta) {
-    setBpm(state.settings.bpm + delta);
+  Future<void> incrementBpm(int delta) async {
+    debugPrint('Metronome: incrementBpm called with delta $delta');
+    await setBpm(state.settings.bpm + delta);
   }
 
   /// Set time signature.
-  void setTimeSignature(TimeSignature timeSignature) {
+  Future<void> setTimeSignature(TimeSignature timeSignature) async {
+    debugPrint('Metronome: setTimeSignature called: $timeSignature');
     final newSettings = state.settings.copyWith(timeSignature: timeSignature);
-    _engine?.updateSettings(newSettings);
+
+    // Update state first for immediate UI response
     state = state.copyWith(settings: newSettings);
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.updateSettings(newSettings);
+    } catch (e) {
+      debugPrint('Metronome: setTimeSignature engine error: $e');
+    }
+
     _saveSettings();
   }
 
   /// Set metronome sound.
-  void setSound(MetronomeSound sound) {
+  Future<void> setSound(MetronomeSound sound) async {
+    debugPrint('Metronome: setSound called: $sound');
     final newSettings = state.settings.copyWith(sound: sound);
-    _engine?.updateSettings(newSettings);
+
+    // Update state first for immediate UI response
     state = state.copyWith(settings: newSettings);
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.updateSettings(newSettings);
+    } catch (e) {
+      debugPrint('Metronome: setSound engine error: $e');
+    }
+
     _saveSettings();
   }
 
@@ -171,17 +235,41 @@ class Metronome extends _$Metronome {
   }
 
   /// Set accent pattern.
-  void setAccentPattern(AccentPattern pattern) {
+  /// Note: metronome package only supports 2-level (main/accent), not 3-level (strong/medium/weak).
+  /// - firstBeatOnly: first beat = accent, others = main
+  /// - uniform: all beats = main (no accent)
+  /// - strongMediumWeak: same as firstBeatOnly (3-level not supported by package)
+  Future<void> setAccentPattern(AccentPattern pattern) async {
+    debugPrint('Metronome: setAccentPattern called: $pattern');
     final newSettings = state.settings.copyWith(accentPattern: pattern);
-    _engine?.updateSettings(newSettings);
+
+    // Update state first for immediate UI response
     state = state.copyWith(settings: newSettings);
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.updateSettings(newSettings);
+    } catch (e) {
+      debugPrint('Metronome: setAccentPattern engine error: $e');
+    }
+
     _saveSettings();
   }
 
   /// Update all settings at once.
   Future<void> updateSettings(MetronomeSettings settings) async {
-    await _engine?.updateSettings(settings);
+    debugPrint('Metronome: updateSettings called');
+
+    // Update state first for immediate UI response
     state = state.copyWith(settings: settings);
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.updateSettings(settings);
+    } catch (e) {
+      debugPrint('Metronome: updateSettings engine error: $e');
+    }
+
     await _saveSettings();
   }
 }

@@ -15,7 +15,7 @@ import 'cat_beat_indicator.dart';
 /// - Time signature selector
 /// - Sound selector
 /// - Visual/vibration toggles
-class MetronomeFullScreenModal extends ConsumerWidget {
+class MetronomeFullScreenModal extends ConsumerStatefulWidget {
   const MetronomeFullScreenModal({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -28,7 +28,23 @@ class MetronomeFullScreenModal extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MetronomeFullScreenModal> createState() =>
+      _MetronomeFullScreenModalState();
+}
+
+class _MetronomeFullScreenModalState
+    extends ConsumerState<MetronomeFullScreenModal> {
+  @override
+  void initState() {
+    super.initState();
+    // Pre-warm engine to reduce first-play latency
+    Future.microtask(() {
+      ref.read(metronomeProvider.notifier).warmUp();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(metronomeProvider);
 
     return Container(
