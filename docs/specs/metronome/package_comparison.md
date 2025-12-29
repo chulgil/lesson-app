@@ -179,6 +179,60 @@ await metronome.init(
 
 ---
 
+## 8. 구현 최적화 (2025-12-30)
+
+### 8.1 플레이 버튼 지연 문제 해결
+
+metronome 패키지 사용 시 발생한 플레이 버튼 지연(~3초) 문제와 해결책:
+
+| 문제 | 원인 | 해결 |
+|------|------|------|
+| 첫 플레이 지연 | 엔진 초기화 대기 | 앱 시작 시 사전 초기화 |
+| 매번 플레이 지연 | async/await 블로킹 | 동기 함수로 변경 |
+| UI 응답 지연 | 상태 업데이트 후 엔진 호출 | 상태 먼저 업데이트, 엔진은 fire-and-forget |
+
+### 8.2 최적화된 코드 패턴
+
+```dart
+// Before (느림 - async 대기)
+Future<void> start() async {
+  await _ensureReady();
+  await _engine?.start();
+  state = state.copyWith(isPlaying: true);
+}
+
+// After (빠름 - 동기 + fire-and-forget)
+void start() {
+  if (state.isPlaying) return;
+  state = state.copyWith(isPlaying: true);  // UI 즉시 업데이트
+  _engine?.start();  // await 없이 호출
+}
+```
+
+### 8.3 사전 초기화 (Pre-warming)
+
+```dart
+// main.dart - 앱 시작 시 메트로놈 엔진 초기화
+class _LessonAppState extends ConsumerState<LessonApp> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(metronomeProvider.notifier).warmUp();
+    });
+  }
+}
+```
+
+### 8.4 핵심 원칙
+
+1. **UI 응답 최우선**: 상태 업데이트는 항상 동기적으로
+2. **엔진 호출 비동기**: await 없이 fire-and-forget 패턴
+3. **사전 초기화**: 앱 시작 시 엔진 미리 로드
+4. **중복 호출 방지**: 상태 체크로 불필요한 호출 차단
+
+---
+
 ## 참고 자료
 
 - [SoLoud Concepts](https://solhsa.com/soloud/concepts.html)

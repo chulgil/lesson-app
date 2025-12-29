@@ -15,24 +15,32 @@ class MetronomeState {
     this.isPlaying = false,
     this.currentBeat = 0,
     this.isAccent = false,
+    this.isLoading = false,
+    this.isReady = false,
   });
 
   final MetronomeSettings settings;
   final bool isPlaying;
   final int currentBeat;
   final bool isAccent;
+  final bool isLoading; // True while toggling play/stop
+  final bool isReady; // True when engine is initialized
 
   MetronomeState copyWith({
     MetronomeSettings? settings,
     bool? isPlaying,
     int? currentBeat,
     bool? isAccent,
+    bool? isLoading,
+    bool? isReady,
   }) {
     return MetronomeState(
       settings: settings ?? this.settings,
       isPlaying: isPlaying ?? this.isPlaying,
       currentBeat: currentBeat ?? this.currentBeat,
       isAccent: isAccent ?? this.isAccent,
+      isLoading: isLoading ?? this.isLoading,
+      isReady: isReady ?? this.isReady,
     );
   }
 }
@@ -71,12 +79,25 @@ class Metronome extends _$Metronome {
     if (_initialized) return;
     _initialized = true;
 
-    // Load saved settings
-    final savedSettings = await _storage.loadSettings();
+    final stopwatch = Stopwatch()..start();
+    debugPrint('Metronome: _initAsync started');
+
+    // Load saved settings (in parallel with engine init for speed)
+    final settingsFuture = _storage.loadSettings();
+
+    debugPrint('Metronome: Starting engine.init() at ${stopwatch.elapsedMilliseconds}ms');
     await _engine!.init();
+    debugPrint('Metronome: engine.init() done at ${stopwatch.elapsedMilliseconds}ms');
+
+    final savedSettings = await settingsFuture;
+    debugPrint('Metronome: settings loaded at ${stopwatch.elapsedMilliseconds}ms');
+
     await _engine!.updateSettings(savedSettings);
+    debugPrint('Metronome: updateSettings done at ${stopwatch.elapsedMilliseconds}ms');
+
     _engineReady = true;
-    state = state.copyWith(settings: savedSettings);
+    state = state.copyWith(settings: savedSettings, isReady: true);
+    debugPrint('Metronome: _initAsync completed in ${stopwatch.elapsedMilliseconds}ms');
   }
 
   /// Wait for engine to be ready before starting
@@ -107,48 +128,39 @@ class Metronome extends _$Metronome {
     );
   }
 
-  /// Start the metronome.
-  Future<void> start() async {
-    debugPrint('Metronome: start called');
+  /// Start the metronome - immediate response, no waiting.
+  void start() {
+    if (state.isPlaying) return; // Already playing
 
-    // Update state first for immediate UI response
+    debugPrint('Metronome: start called');
     state = state.copyWith(isPlaying: true);
 
-    try {
-      await _ensureReady();
-      await _engine?.start();
-    } catch (e) {
-      debugPrint('Metronome: start engine error: $e');
-      // Revert state on error
-      state = state.copyWith(isPlaying: false);
-    }
+    // Start engine without blocking - it will catch up
+    _engine?.start();
   }
 
-  /// Stop the metronome.
-  Future<void> stop() async {
-    debugPrint('Metronome: stop called');
+  /// Stop the metronome - immediate response, no waiting.
+  void stop() {
+    if (!state.isPlaying) return; // Already stopped
 
-    // Update state first for immediate UI response
+    debugPrint('Metronome: stop called');
     state = state.copyWith(
       isPlaying: false,
       currentBeat: 0,
       isAccent: false,
     );
 
-    try {
-      await _engine?.stop();
-    } catch (e) {
-      debugPrint('Metronome: stop engine error: $e');
-    }
+    // Stop engine without blocking
+    _engine?.stop();
   }
 
-  /// Toggle play/stop.
-  Future<void> toggle() async {
+  /// Toggle play/stop - immediate response.
+  void toggle() {
     debugPrint('Metronome: toggle called, isPlaying: ${state.isPlaying}');
     if (state.isPlaying) {
-      await stop();
+      stop();
     } else {
-      await start();
+      start();
     }
   }
 

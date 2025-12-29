@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'providers/metronome/metronome_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +31,22 @@ void main() async {
   );
 }
 
-class LessonApp extends StatelessWidget {
+class LessonApp extends ConsumerStatefulWidget {
   const LessonApp({super.key});
+
+  @override
+  ConsumerState<LessonApp> createState() => _LessonAppState();
+}
+
+class _LessonAppState extends ConsumerState<LessonApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Pre-initialize metronome engine at app startup to eliminate play delay
+    Future.microtask(() {
+      ref.read(metronomeProvider.notifier).warmUp();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

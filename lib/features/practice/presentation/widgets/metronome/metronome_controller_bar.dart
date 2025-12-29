@@ -9,7 +9,8 @@ import 'cat_beat_indicator.dart';
 /// Compact metronome controller bar for bottom of screen.
 ///
 /// Shows: BPM display, play/pause button, cat indicator, expand button.
-class MetronomeControllerBar extends ConsumerWidget {
+/// Pre-warms the metronome engine on mount to reduce first-play latency.
+class MetronomeControllerBar extends ConsumerStatefulWidget {
   const MetronomeControllerBar({
     super.key,
     this.onExpand,
@@ -18,11 +19,26 @@ class MetronomeControllerBar extends ConsumerWidget {
   final VoidCallback? onExpand;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MetronomeControllerBar> createState() =>
+      _MetronomeControllerBarState();
+}
+
+class _MetronomeControllerBarState extends ConsumerState<MetronomeControllerBar> {
+  @override
+  void initState() {
+    super.initState();
+    // Pre-warm engine as soon as controller bar is shown
+    Future.microtask(() {
+      ref.read(metronomeProvider.notifier).warmUp();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(metronomeProvider);
 
     return GestureDetector(
-      onTap: onExpand,
+      onTap: widget.onExpand,
       behavior: HitTestBehavior.opaque,
       child: Container(
         height: 106,
@@ -81,7 +97,7 @@ class MetronomeControllerBar extends ConsumerWidget {
                 height: 48,
                 child: IconButton.outlined(
                   icon: const Icon(Icons.fullscreen, size: 28),
-                  onPressed: onExpand,
+                  onPressed: widget.onExpand,
                   tooltip: '전체 화면',
                   style: IconButton.styleFrom(
                     foregroundColor: AppColors.primary,

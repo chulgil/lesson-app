@@ -53,12 +53,17 @@ class MetronomeEngine implements MetronomeEngineInterface {
   Future<void> init() async {
     if (_initialized) return;
 
+    final stopwatch = Stopwatch()..start();
+    debugPrint('MetronomeEngine: init started');
+
     try {
       _metronome = pkg.Metronome();
+      debugPrint('MetronomeEngine: Metronome() created at ${stopwatch.elapsedMilliseconds}ms');
 
       // Get audio paths based on accent pattern
       final (mainPath, accentPath) = _getAudioPaths(_settings);
 
+      debugPrint('MetronomeEngine: calling _metronome.init() at ${stopwatch.elapsedMilliseconds}ms');
       await _metronome!.init(
         mainPath,
         accentedPath: accentPath,
@@ -68,12 +73,13 @@ class MetronomeEngine implements MetronomeEngineInterface {
         timeSignature: _mapTimeSignature(_settings.timeSignature),
         sampleRate: 44100,
       );
+      debugPrint('MetronomeEngine: _metronome.init() done at ${stopwatch.elapsedMilliseconds}ms');
 
       // Listen for tick events
       _tickSubscription = _metronome!.tickStream.listen(_onTick);
 
       _initialized = true;
-      debugPrint('MetronomeEngine: Metronome package initialized');
+      debugPrint('MetronomeEngine: Metronome package initialized in ${stopwatch.elapsedMilliseconds}ms');
     } catch (e) {
       debugPrint('MetronomeEngine: Init failed: $e');
     }
@@ -155,14 +161,16 @@ class MetronomeEngine implements MetronomeEngineInterface {
 
     _isPlaying = true;
     _currentBeat = 0;
-    await _metronome?.play();
+    // Don't await - play() can be slow on some devices
+    _metronome?.play();
     debugPrint('MetronomeEngine: Started at ${_settings.bpm} BPM');
   }
 
   @override
   Future<void> stop() async {
     _isPlaying = false;
-    await _metronome?.pause();
+    // Don't await - pause() can be slow on some devices
+    _metronome?.pause();
     _currentBeat = 0;
     debugPrint('MetronomeEngine: Stopped');
   }
