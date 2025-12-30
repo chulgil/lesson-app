@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2025-12-28
+> 마지막 업데이트: 2025-12-31
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -21,6 +21,7 @@ docs/
 │   ├── notification/     # 알림 시스템
 │   ├── review/           # 리뷰 시스템
 │   ├── trial/            # 체험 레슨
+│   ├── invite/           # 초대 시스템
 │   ├── design/           # UX/UI 설계
 │   └── dev/              # 개발 가이드
 └── task.md               # 개발 태스크
@@ -67,6 +68,7 @@ docs/
 | [Practice_System_Spec.md](specs/practice/Practice_System_Spec.md) | ✅ 확정 | 연습 시스템 상세 스펙 |
 | [practice_streak_spec.md](specs/practice/practice_streak_spec.md) | ✅ 확정 | 연습 스트릭 스펙 |
 | [recording_requirement.md](specs/practice/recording_requirement.md) | ✅ 확정 | 녹음 기능 요구사항 |
+| [recording_player_ui.md](specs/practice/recording_player_ui.md) | ✅ 확정 | 녹음 재생 UI 스펙 |
 
 ### 메트로놈 (metronome/)
 
@@ -109,6 +111,12 @@ docs/
 | 문서 | 상태 | 설명 |
 |------|------|------|
 | [trial_lesson_system.md](specs/trial/trial_lesson_system.md) | ✅ 확정 | 체험 레슨 시스템 |
+
+### 초대 시스템 (invite/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | 양방향 초대 시스템 (QR/URL/코드) |
 
 ### UX/UI 설계 (design/)
 

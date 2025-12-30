@@ -1,6 +1,6 @@
 # CLAUDE.md - Lesson App
 
-> 마지막 업데이트: 2025-12-28
+> 마지막 업데이트: 2025-12-31
 
 음악 레슨/연습 관리 앱 (Flutter)
 
@@ -28,7 +28,7 @@ lesson-app/
 ├── lib/
 │   ├── core/theme/          # AppColors, AppTypography, AppSpacing
 │   ├── features/            # auth, home, lessons, students, practice, profile, student_home, schedule
-│   ├── models/              # student, payment, lesson, piece, practice_item, lesson_booking, tip_template
+│   ├── models/              # student, payment, lesson, piece, practice_item, lesson_booking, tip_template, recording
 │   ├── repositories/        # 인터페이스 + Mock 구현
 │   ├── providers/           # Riverpod (@riverpod 코드생성 적용)
 │   └── services/            # API, Storage
@@ -66,7 +66,8 @@ lesson-app/
 | **practice/** | practice_system.md | 연습 시스템 스펙 |
 | | Practice_System_Spec.md | 연습 시스템 상세 |
 | | practice_streak_spec.md | 연습 스트릭 |
-| | recording_requirement.md | 녹음 기능 |
+| | recording_requirement.md | 녹음 기능 요구사항 |
+| | recording_player_ui.md | 녹음 재생 UI 스펙 |
 | **metronome/** | metronome_system.md | 메트로놈 시스템 |
 | | metronome_sound.md | 사운드 이펙트 |
 | | metronome_indicator.md | UI 인디케이터 |
@@ -131,6 +132,7 @@ lesson-app/
 - 선생님 검색 시스템 (필터링, 프로필 상세)
 - 양방향 초대 시스템 (QR/URL/코드, 연결 요청 관리)
 - 학부모 시스템 (이중 역할 전환, 프로필 스위처, 미연결 자녀 대시보드)
+- 녹음 재생 시스템 (웨이브폼, A-B 루프, 속도 조절, 메트로놈 연동)
 
 ### 진행중
 - 없음
@@ -180,6 +182,7 @@ lesson-app/
 | PracticeItem | 연습 과제 (priority: must/should/could) |
 | LessonBooking | 체험/정규레슨 예약 (pending/confirmed/completed) |
 | MetronomeSettings | BPM, 박자표, 사운드 템플릿 |
+| Recording | 녹음 파일 (UUID, 경로, 메타데이터) |
 | UserProfile | 이중 역할 지원 (학부모/학생/자녀), 프로필 전환 |
 | ChildProfile | 자녀 프로필 (connected/pending/unconnected) |
 
