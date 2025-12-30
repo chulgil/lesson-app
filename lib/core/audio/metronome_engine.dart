@@ -14,6 +14,12 @@ class MetronomeEngine implements MetronomeEngineInterface {
   pkg.Metronome? _metronome;
   StreamSubscription<int>? _tickSubscription;
 
+  // Timer-based beat tracking (fallback when tickStream doesn't work)
+  Timer? _beatTimer;
+  Stopwatch? _stopwatch;
+  int _expectedTicks = 0;
+  bool _useNativeTick = true; // Try native tickStream first
+
   MetronomeSettings _settings = const MetronomeSettings();
   int _currentBeat = 0;
   bool _isPlaying = false;
@@ -86,14 +92,77 @@ class MetronomeEngine implements MetronomeEngineInterface {
   }
 
   void _onTick(int tick) {
+    // Native tickStream is working - use it and disable timer fallback
+    if (_useNativeTick) {
+      debugPrint('MetronomeEngine: Native tickStream working, disabling timer fallback');
+      _useNativeTick = false; // Mark that native tick works
+      _stopBeatTimer(); // Stop any running timer
+    }
+
     // metronome package tick is 0-indexed within time signature
     _currentBeat = tick + 1;
 
     final isAccent =
         _currentBeat == 1 && _settings.accentPattern != AccentPattern.uniform;
 
+    debugPrint('MetronomeEngine: _onTick beat=$_currentBeat isAccent=$isAccent');
+
     // Notify listeners
     onBeat?.call(_currentBeat, isAccent);
+  }
+
+  /// Timer-based beat tracking with drift correction.
+  void _onTimerTick() {
+    if (!_isPlaying) return;
+
+    _expectedTicks++;
+    _currentBeat = ((_currentBeat) % _mapTimeSignature(_settings.timeSignature)) + 1;
+
+    final isAccent =
+        _currentBeat == 1 && _settings.accentPattern != AccentPattern.uniform;
+
+    // Notify listeners
+    onBeat?.call(_currentBeat, isAccent);
+
+    // Drift correction for next tick
+    if (_stopwatch != null) {
+      final expectedMs = _expectedTicks * _msPerBeat;
+      final actualMs = _stopwatch!.elapsedMilliseconds;
+      final drift = actualMs - expectedMs;
+
+      // Adjust next interval to compensate for drift
+      final nextInterval = _msPerBeat - drift;
+      if (nextInterval > 0) {
+        _beatTimer?.cancel();
+        _beatTimer = Timer(Duration(milliseconds: nextInterval.round()), _onTimerTick);
+      } else {
+        // We're behind, fire immediately
+        _beatTimer?.cancel();
+        Timer.run(_onTimerTick);
+      }
+    }
+  }
+
+  double get _msPerBeat => 60000.0 / _settings.bpm;
+
+  void _startBeatTimer() {
+    _stopBeatTimer();
+
+    _stopwatch = Stopwatch()..start();
+    _expectedTicks = 0;
+    _currentBeat = 0;
+
+    // First beat fires immediately
+    _beatTimer = Timer(Duration(milliseconds: _msPerBeat.round()), _onTimerTick);
+    debugPrint('MetronomeEngine: Timer-based beat tracking started');
+  }
+
+  void _stopBeatTimer() {
+    _beatTimer?.cancel();
+    _beatTimer = null;
+    _stopwatch?.stop();
+    _stopwatch = null;
+    _expectedTicks = 0;
   }
 
   int _mapTimeSignature(TimeSignature ts) {
@@ -161,6 +230,12 @@ class MetronomeEngine implements MetronomeEngineInterface {
 
     _isPlaying = true;
     _currentBeat = 0;
+
+    // Start timer-based beat tracking as fallback
+    // If native tickStream works, the timer will be stopped in _onTick
+    _useNativeTick = true;
+    _startBeatTimer();
+
     // Don't await - play() can be slow on some devices
     _metronome?.play();
     debugPrint('MetronomeEngine: Started at ${_settings.bpm} BPM');
@@ -169,6 +244,7 @@ class MetronomeEngine implements MetronomeEngineInterface {
   @override
   Future<void> stop() async {
     _isPlaying = false;
+    _stopBeatTimer();
     // Don't await - pause() can be slow on some devices
     _metronome?.pause();
     _currentBeat = 0;
@@ -204,6 +280,7 @@ class MetronomeEngine implements MetronomeEngineInterface {
   @override
   Future<void> dispose() async {
     await stop();
+    _stopBeatTimer();
     await _tickSubscription?.cancel();
     _tickSubscription = null;
 
