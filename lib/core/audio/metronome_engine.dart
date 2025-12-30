@@ -1,29 +1,38 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
-import 'package:metronome/metronome.dart' as pkg;
 import '../../models/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
 
-/// High-precision metronome engine using the metronome package.
+/// Timer-based metronome engine with audio playback.
 ///
-/// Uses platform-native audio scheduling for sample-accurate timing.
+/// Uses [AudioPlayer] for sound and [Timer.periodic] for timing.
 /// Supports different sounds for strong/medium/weak beats.
 class MetronomeEngine implements MetronomeEngineInterface {
   MetronomeEngine();
 
-  pkg.Metronome? _metronome;
-  StreamSubscription<int>? _tickSubscription;
+  // Audio player pool for each beat type (2 players each for overlap)
+  final List<AudioPlayer> _strongPlayers = [];
+  final List<AudioPlayer> _mediumPlayers = [];
+  final List<AudioPlayer> _weakPlayers = [];
+  int _strongIndex = 0;
+  int _mediumIndex = 0;
+  int _weakIndex = 0;
 
-  // Timer-based beat tracking (fallback when tickStream doesn't work)
-  Timer? _beatTimer;
+  Timer? _timer;
   Stopwatch? _stopwatch;
   int _expectedTicks = 0;
-  bool _useNativeTick = true; // Try native tickStream first
 
   MetronomeSettings _settings = const MetronomeSettings();
   int _currentBeat = 0;
   bool _isPlaying = false;
+  bool _soundsLoaded = false;
   bool _initialized = false;
+
+  // Asset paths cached for playback
+  String _strongAsset = '';
+  String _mediumAsset = '';
+  String _weakAsset = '';
 
   @override
   BeatCallback? onBeat;
@@ -37,24 +46,6 @@ class MetronomeEngine implements MetronomeEngineInterface {
   @override
   MetronomeSettings get settings => _settings;
 
-  /// Get audio paths based on accent pattern.
-  /// - uniform: same file for all beats (no accent difference)
-  /// - firstBeatOnly/strongMediumWeak: strong for accent, medium for main
-  (String mainPath, String accentPath) _getAudioPaths(MetronomeSettings settings) {
-    final mainPath = settings.sound.getAssetPath(BeatType.medium);
-
-    // For uniform pattern, use same sound for all beats
-    if (settings.accentPattern == AccentPattern.uniform) {
-      debugPrint('MetronomeEngine: Uniform pattern - using same sound for all beats');
-      return (mainPath, mainPath);
-    }
-
-    // For accent patterns, use strong sound for first beat
-    final accentPath = settings.sound.getAssetPath(BeatType.strong);
-    debugPrint('MetronomeEngine: Accent pattern - main: $mainPath, accent: $accentPath');
-    return (mainPath, accentPath);
-  }
-
   @override
   Future<void> init() async {
     if (_initialized) return;
@@ -62,163 +53,99 @@ class MetronomeEngine implements MetronomeEngineInterface {
     final stopwatch = Stopwatch()..start();
     debugPrint('MetronomeEngine: init started');
 
+    await _initAudioPlayers();
+    debugPrint('MetronomeEngine: audio players created at ${stopwatch.elapsedMilliseconds}ms');
+
+    await _loadSoundPaths();
+    debugPrint('MetronomeEngine: sounds loaded at ${stopwatch.elapsedMilliseconds}ms');
+
+    _initialized = true;
+    debugPrint('MetronomeEngine: initialized in ${stopwatch.elapsedMilliseconds}ms');
+  }
+
+  Future<void> _initAudioPlayers() async {
+    // Create 2 players per beat type for alternating playback
+    for (var i = 0; i < 2; i++) {
+      final strong = AudioPlayer();
+      final medium = AudioPlayer();
+      final weak = AudioPlayer();
+
+      await strong.setPlayerMode(PlayerMode.lowLatency);
+      await medium.setPlayerMode(PlayerMode.lowLatency);
+      await weak.setPlayerMode(PlayerMode.lowLatency);
+
+      _strongPlayers.add(strong);
+      _mediumPlayers.add(medium);
+      _weakPlayers.add(weak);
+    }
+  }
+
+  /// Warm up audio players by pre-loading sounds
+  Future<void> _warmUpAudio() async {
+    if (!_soundsLoaded || _settings.sound == MetronomeSound.silent) return;
+
+    // Pre-load all sound files to reduce first-play latency
     try {
-      _metronome = pkg.Metronome();
-      debugPrint('MetronomeEngine: Metronome() created at ${stopwatch.elapsedMilliseconds}ms');
-
-      // Get audio paths based on accent pattern
-      final (mainPath, accentPath) = _getAudioPaths(_settings);
-
-      debugPrint('MetronomeEngine: calling _metronome.init() at ${stopwatch.elapsedMilliseconds}ms');
-      await _metronome!.init(
-        mainPath,
-        accentedPath: accentPath,
-        bpm: _settings.bpm,
-        volume: 100,
-        enableTickCallback: true,
-        timeSignature: _mapTimeSignature(_settings.timeSignature),
-        sampleRate: 44100,
-      );
-      debugPrint('MetronomeEngine: _metronome.init() done at ${stopwatch.elapsedMilliseconds}ms');
-
-      // Listen for tick events
-      _tickSubscription = _metronome!.tickStream.listen(_onTick);
-
-      _initialized = true;
-      debugPrint('MetronomeEngine: Metronome package initialized in ${stopwatch.elapsedMilliseconds}ms');
-    } catch (e) {
-      debugPrint('MetronomeEngine: Init failed: $e');
-    }
-  }
-
-  void _onTick(int tick) {
-    // Native tickStream is working - use it and disable timer fallback
-    if (_useNativeTick) {
-      debugPrint('MetronomeEngine: Native tickStream working, disabling timer fallback');
-      _useNativeTick = false; // Mark that native tick works
-      _stopBeatTimer(); // Stop any running timer
-    }
-
-    // metronome package tick is 0-indexed within time signature
-    _currentBeat = tick + 1;
-
-    final isAccent =
-        _currentBeat == 1 && _settings.accentPattern != AccentPattern.uniform;
-
-    debugPrint('MetronomeEngine: _onTick beat=$_currentBeat isAccent=$isAccent');
-
-    // Notify listeners
-    onBeat?.call(_currentBeat, isAccent);
-  }
-
-  /// Timer-based beat tracking with drift correction.
-  void _onTimerTick() {
-    if (!_isPlaying) return;
-
-    _expectedTicks++;
-    _currentBeat = ((_currentBeat) % _mapTimeSignature(_settings.timeSignature)) + 1;
-
-    final isAccent =
-        _currentBeat == 1 && _settings.accentPattern != AccentPattern.uniform;
-
-    // Notify listeners
-    onBeat?.call(_currentBeat, isAccent);
-
-    // Drift correction for next tick
-    if (_stopwatch != null) {
-      final expectedMs = _expectedTicks * _msPerBeat;
-      final actualMs = _stopwatch!.elapsedMilliseconds;
-      final drift = actualMs - expectedMs;
-
-      // Adjust next interval to compensate for drift
-      final nextInterval = _msPerBeat - drift;
-      if (nextInterval > 0) {
-        _beatTimer?.cancel();
-        _beatTimer = Timer(Duration(milliseconds: nextInterval.round()), _onTimerTick);
-      } else {
-        // We're behind, fire immediately
-        _beatTimer?.cancel();
-        Timer.run(_onTimerTick);
+      for (final player in _strongPlayers) {
+        await player.setSource(AssetSource(_strongAsset));
       }
+      for (final player in _mediumPlayers) {
+        await player.setSource(AssetSource(_mediumAsset));
+      }
+      for (final player in _weakPlayers) {
+        await player.setSource(AssetSource(_weakAsset));
+      }
+      debugPrint('MetronomeEngine: Audio warmed up');
+    } catch (e) {
+      debugPrint('MetronomeEngine: Warm-up failed: $e');
     }
-  }
-
-  double get _msPerBeat => 60000.0 / _settings.bpm;
-
-  void _startBeatTimer() {
-    _stopBeatTimer();
-
-    _stopwatch = Stopwatch()..start();
-    _expectedTicks = 0;
-    _currentBeat = 0;
-
-    // First beat fires immediately
-    _beatTimer = Timer(Duration(milliseconds: _msPerBeat.round()), _onTimerTick);
-    debugPrint('MetronomeEngine: Timer-based beat tracking started');
-  }
-
-  void _stopBeatTimer() {
-    _beatTimer?.cancel();
-    _beatTimer = null;
-    _stopwatch?.stop();
-    _stopwatch = null;
-    _expectedTicks = 0;
-  }
-
-  int _mapTimeSignature(TimeSignature ts) {
-    return switch (ts) {
-      TimeSignature.twoFour => 2,
-      TimeSignature.threeFour => 3,
-      TimeSignature.fourFour => 4,
-      TimeSignature.sixEight => 6,
-    };
   }
 
   @override
   Future<void> updateSettings(MetronomeSettings newSettings) async {
-    debugPrint('MetronomeEngine: updateSettings called');
+    final wasPlaying = _isPlaying;
+    if (wasPlaying) {
+      await stop();
+    }
 
     final soundChanged = _settings.sound != newSettings.sound;
-    final bpmChanged = _settings.bpm != newSettings.bpm;
-    final timeSignatureChanged =
-        _settings.timeSignature != newSettings.timeSignature;
-    final accentPatternChanged =
-        _settings.accentPattern != newSettings.accentPattern;
-
     _settings = newSettings;
 
-    if (!_initialized || _metronome == null) {
-      debugPrint('MetronomeEngine: Not initialized, skipping engine update');
+    // Reload sounds if sound type changed
+    if (soundChanged) {
+      await _loadSoundPaths();
+    }
+
+    if (wasPlaying) {
+      await start();
+    }
+  }
+
+  Future<void> _loadSoundPaths() async {
+    if (_settings.sound == MetronomeSound.silent) {
+      _soundsLoaded = false;
       return;
     }
 
-    try {
-      // Update metronome settings without stopping
-      // The metronome package handles live updates
-      if (bpmChanged) {
-        debugPrint('MetronomeEngine: Setting BPM to ${newSettings.bpm}');
-        await _metronome!.setBPM(newSettings.bpm);
-      }
+    // Get asset paths for each beat type
+    final strongPath = _settings.sound.getAssetPath(BeatType.strong);
+    final mediumPath = _settings.sound.getAssetPath(BeatType.medium);
+    final weakPath = _settings.sound.getAssetPath(BeatType.weak);
 
-      if (timeSignatureChanged) {
-        debugPrint('MetronomeEngine: Setting time signature');
-        await _metronome!.setTimeSignature(
-          _mapTimeSignature(newSettings.timeSignature),
-        );
-      }
+    // Remove 'assets/' prefix for AssetSource
+    _strongAsset = strongPath.replaceFirst('assets/', '');
+    _mediumAsset = mediumPath.replaceFirst('assets/', '');
+    _weakAsset = weakPath.replaceFirst('assets/', '');
 
-      // Update audio files when sound OR accent pattern changes
-      if (soundChanged || accentPatternChanged) {
-        debugPrint('MetronomeEngine: Setting audio files (sound: $soundChanged, accent: $accentPatternChanged)');
-        final (mainPath, accentPath) = _getAudioPaths(newSettings);
-        await _metronome!.setAudioFile(
-          mainPath: mainPath,
-          accentedPath: accentPath,
-        );
-      }
-    } catch (e) {
-      debugPrint('MetronomeEngine: updateSettings error: $e');
-    }
+    debugPrint('MetronomeEngine: Sound paths set...');
+    debugPrint('  Strong: $_strongAsset');
+    debugPrint('  Medium: $_mediumAsset');
+    debugPrint('  Weak: $_weakAsset');
+
+    _soundsLoaded = true;
+
+    // Pre-load sounds to reduce first-play latency
+    await _warmUpAudio();
   }
 
   @override
@@ -230,24 +157,47 @@ class MetronomeEngine implements MetronomeEngineInterface {
 
     _isPlaying = true;
     _currentBeat = 0;
+    _expectedTicks = 0;
 
-    // Start timer-based beat tracking as fallback
-    // If native tickStream works, the timer will be stopped in _onTick
-    _useNativeTick = true;
-    _startBeatTimer();
+    // Play first beat immediately
+    _tick();
 
-    // Don't await - play() can be slow on some devices
-    _metronome?.play();
+    // Start stopwatch AFTER first beat for accurate intervals
+    _stopwatch = Stopwatch()..start();
+
+    // Use high-frequency timer with drift correction
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 5),
+      (_) => _checkAndTick(),
+    );
+
     debugPrint('MetronomeEngine: Started at ${_settings.bpm} BPM');
+  }
+
+  /// Check if it's time to tick based on elapsed time (drift-corrected).
+  void _checkAndTick() {
+    if (_stopwatch == null) return;
+
+    final elapsed = _stopwatch!.elapsedMilliseconds;
+    final intervalMs = _settings.intervalMs;
+    final expectedTime = (_expectedTicks + 1) * intervalMs;
+
+    // If we've reached or passed the expected time, tick
+    if (elapsed >= expectedTime) {
+      _expectedTicks++;
+      _tick();
+    }
   }
 
   @override
   Future<void> stop() async {
     _isPlaying = false;
-    _stopBeatTimer();
-    // Don't await - pause() can be slow on some devices
-    _metronome?.pause();
+    _timer?.cancel();
+    _timer = null;
+    _stopwatch?.stop();
+    _stopwatch = null;
     _currentBeat = 0;
+    _expectedTicks = 0;
     debugPrint('MetronomeEngine: Stopped');
   }
 
@@ -260,6 +210,77 @@ class MetronomeEngine implements MetronomeEngineInterface {
     }
   }
 
+  void _tick() {
+    _currentBeat++;
+    if (_currentBeat > _settings.timeSignature.beatsPerMeasure) {
+      _currentBeat = 1;
+    }
+
+    final beatType = _getBeatType(_currentBeat);
+    final isAccent = _currentBeat == 1 &&
+        _settings.accentPattern != AccentPattern.uniform;
+
+    // Play sound (fire and forget - don't await)
+    _playBeat(beatType);
+
+    // Notify listeners
+    onBeat?.call(_currentBeat, isAccent);
+  }
+
+  /// Determine beat type based on beat number, time signature, and accent pattern.
+  BeatType _getBeatType(int beat) {
+    switch (_settings.accentPattern) {
+      case AccentPattern.uniform:
+        // All beats same intensity (medium)
+        return BeatType.medium;
+
+      case AccentPattern.firstBeatOnly:
+        // First beat strong, rest weak
+        return beat == 1 ? BeatType.strong : BeatType.weak;
+
+      case AccentPattern.strongMediumWeak:
+        // Original pattern: strong-medium-weak
+        if (beat == 1) return BeatType.strong;
+
+        // For 4/4, beat 3 is medium
+        if (_settings.timeSignature == TimeSignature.fourFour && beat == 3) {
+          return BeatType.medium;
+        }
+
+        // For 6/8, beat 4 is medium (second group starts)
+        if (_settings.timeSignature == TimeSignature.sixEight && beat == 4) {
+          return BeatType.medium;
+        }
+
+        return BeatType.weak;
+    }
+  }
+
+  void _playBeat(BeatType beatType) {
+    if (_settings.sound == MetronomeSound.silent || !_soundsLoaded) return;
+
+    // Get player and asset based on beat type, using round-robin for overlap
+    final (player, asset) = switch (beatType) {
+      BeatType.strong => (
+          _strongPlayers[_strongIndex++ % _strongPlayers.length],
+          _strongAsset
+        ),
+      BeatType.medium => (
+          _mediumPlayers[_mediumIndex++ % _mediumPlayers.length],
+          _mediumAsset
+        ),
+      BeatType.weak => (
+          _weakPlayers[_weakIndex++ % _weakPlayers.length],
+          _weakAsset
+        ),
+    };
+
+    // Play the sound (fire and forget)
+    player.play(AssetSource(asset)).catchError((e) {
+      debugPrint('MetronomeEngine: Failed to play beat: $e');
+    });
+  }
+
   @override
   Future<void> setBpm(int bpm) async {
     final clampedBpm = MetronomeSettings.clampBpm(bpm);
@@ -267,8 +288,11 @@ class MetronomeEngine implements MetronomeEngineInterface {
 
     _settings = _settings.copyWith(bpm: clampedBpm);
 
-    if (_initialized && _metronome != null) {
-      await _metronome!.setBPM(clampedBpm);
+    if (_isPlaying) {
+      // Reset timing for new BPM
+      _expectedTicks = 0;
+      _stopwatch?.reset();
+      _stopwatch?.start();
     }
   }
 
@@ -280,15 +304,18 @@ class MetronomeEngine implements MetronomeEngineInterface {
   @override
   Future<void> dispose() async {
     await stop();
-    _stopBeatTimer();
-    await _tickSubscription?.cancel();
-    _tickSubscription = null;
-
-    if (_initialized && _metronome != null) {
-      await _metronome!.destroy();
-      _metronome = null;
-      _initialized = false;
+    for (final player in _strongPlayers) {
+      await player.dispose();
     }
+    for (final player in _mediumPlayers) {
+      await player.dispose();
+    }
+    for (final player in _weakPlayers) {
+      await player.dispose();
+    }
+    _strongPlayers.clear();
+    _mediumPlayers.clear();
+    _weakPlayers.clear();
     debugPrint('MetronomeEngine: Disposed');
   }
 }
