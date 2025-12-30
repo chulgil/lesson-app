@@ -69,6 +69,7 @@ docs/
 | [practice_streak_spec.md](specs/practice/practice_streak_spec.md) | ✅ 확정 | 연습 스트릭 스펙 |
 | [recording_requirement.md](specs/practice/recording_requirement.md) | ✅ 확정 | 녹음 기능 요구사항 |
 | [recording_player_ui.md](specs/practice/recording_player_ui.md) | ✅ 확정 | 녹음 재생 UI 스펙 |
+| [waveform_improvements.md](specs/practice/waveform_improvements.md) | ✅ 확정 | 파형 UI 개선 (모듈화, 핀치줌) |
 
 ### 메트로놈 (metronome/)
 

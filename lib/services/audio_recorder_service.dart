@@ -36,6 +36,10 @@ class AudioRecorderService {
   Stream<Amplitude> get amplitudeStream =>
       _recorder.onAmplitudeChanged(const Duration(milliseconds: 100));
 
+  /// Normalized amplitude stream (0.0 to 1.0) for waveform widgets.
+  Stream<double> get normalizedAmplitudeStream =>
+      amplitudeStream.map((amp) => ((amp.current + 60) / 60).clamp(0.0, 1.0));
+
   /// Current amplitude value (for UI).
   double _currentAmplitude = 0;
   double get currentAmplitude => _currentAmplitude;

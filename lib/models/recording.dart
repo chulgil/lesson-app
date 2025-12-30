@@ -3,6 +3,13 @@ import 'package:hive/hive.dart';
 
 part 'recording.g.dart';
 
+/// Minimum recording duration in seconds.
+/// Recordings shorter than this cannot be saved.
+const int minRecordingSeconds = 5;
+
+/// Maximum recording duration in seconds (3 minutes).
+const int maxRecordingSeconds = 180;
+
 /// Type of recording.
 @HiveType(typeId: 20)
 enum RecordingType {
