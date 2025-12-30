@@ -8,6 +8,7 @@ import '../../../../models/recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/recording/recording_provider.dart';
 import '../../../../services/audio_player_service.dart';
+import 'recording_waveform.dart' show ABLoop, ZoomableWaveformProgressBar;
 
 /// Playback speed options.
 enum PlaybackSpeed {
@@ -21,25 +22,6 @@ enum PlaybackSpeed {
   const PlaybackSpeed(this.value, this.label);
   final double value;
   final String label;
-}
-
-/// A-B Loop state for section repeat.
-class ABLoop {
-  const ABLoop({this.pointA, this.pointB});
-
-  final Duration? pointA;
-  final Duration? pointB;
-
-  bool get isActive => pointA != null && pointB != null;
-  bool get hasA => pointA != null;
-  bool get hasB => pointB != null;
-
-  ABLoop copyWith({Duration? pointA, Duration? pointB, bool clearA = false, bool clearB = false}) {
-    return ABLoop(
-      pointA: clearA ? null : (pointA ?? this.pointA),
-      pointB: clearB ? null : (pointB ?? this.pointB),
-    );
-  }
 }
 
 /// Bottom sheet player for recording playback.
@@ -213,6 +195,29 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     _player.setSpeed(speed.value);
   }
 
+  /// Handle A-B marker drag
+  void _handleMarkerDrag(bool isA, double newProgress) {
+    final newPosition = Duration(
+      milliseconds: (_duration.inMilliseconds * newProgress).round(),
+    );
+
+    setState(() {
+      if (isA) {
+        // Ensure A is before B if B exists
+        if (_abLoop.hasB && newPosition >= _abLoop.pointB!) {
+          return;
+        }
+        _abLoop = _abLoop.copyWith(pointA: newPosition);
+      } else {
+        // Ensure B is after A
+        if (_abLoop.hasA && newPosition <= _abLoop.pointA!) {
+          return;
+        }
+        _abLoop = _abLoop.copyWith(pointB: newPosition);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Clamp progress to 0.0-1.0 range to prevent overflow
@@ -252,12 +257,13 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
               ),
               SizedBox(height: AppSpacing.space4),
 
-              // Waveform / Progress bar
-              _WaveformProgressBar(
+              // Waveform / Progress bar with pinch zoom
+              ZoomableWaveformProgressBar(
                 progress: progress,
                 abLoop: _abLoop,
                 duration: _duration,
                 onSeek: _seek,
+                onABMarkerDrag: _handleMarkerDrag,
               ),
               SizedBox(height: AppSpacing.space2),
 
@@ -441,218 +447,5 @@ class _ABButton extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// Waveform-style progress bar.
-class _WaveformProgressBar extends StatelessWidget {
-  const _WaveformProgressBar({
-    required this.progress,
-    required this.abLoop,
-    required this.duration,
-    required this.onSeek,
-  });
-
-  final double progress;
-  final ABLoop abLoop;
-  final Duration duration;
-  final ValueChanged<double> onSeek;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (details) {
-        final box = context.findRenderObject() as RenderBox;
-        final localPos = details.localPosition;
-        final newProgress = (localPos.dx / box.size.width).clamp(0.0, 1.0);
-        onSeek(newProgress);
-      },
-      onHorizontalDragUpdate: (details) {
-        final box = context.findRenderObject() as RenderBox;
-        final localPos = details.localPosition;
-        final newProgress = (localPos.dx / box.size.width).clamp(0.0, 1.0);
-        onSeek(newProgress);
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          height: 60,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2E),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: CustomPaint(
-            painter: _WaveformPainter(
-              progress: progress.clamp(0.0, 1.0),
-              abLoop: abLoop,
-              duration: duration,
-            ),
-            size: Size.infinite,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Custom painter for waveform visualization.
-class _WaveformPainter extends CustomPainter {
-  _WaveformPainter({
-    required this.progress,
-    required this.abLoop,
-    required this.duration,
-  });
-
-  final double progress;
-  final ABLoop abLoop;
-  final Duration duration;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final playedPaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
-
-    final unplayedPaint = Paint()
-      ..color = const Color(0xFF636366)
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
-
-    final loopPaint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.3);
-
-    final markerPaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 2;
-
-    // Draw A-B loop highlight when both are set
-    if (abLoop.isActive && duration.inMilliseconds > 0) {
-      final aProgress = abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
-      final bProgress = abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
-      final loopRect = Rect.fromLTRB(
-        size.width * aProgress,
-        0,
-        size.width * bProgress,
-        size.height,
-      );
-      canvas.drawRect(loopRect, loopPaint);
-    }
-
-    // Draw waveform bars
-    const barCount = 50;
-    final barWidth = size.width / barCount;
-    final centerY = size.height / 2;
-
-    for (int i = 0; i < barCount; i++) {
-      final x = i * barWidth + barWidth / 2;
-      final barProgress = i / barCount;
-
-      // Simulated waveform heights (in real implementation, use actual audio data)
-      final height = (20 + (i % 7) * 5 + (i % 3) * 3).toDouble();
-      final halfHeight = height / 2;
-
-      final paint = barProgress <= progress ? playedPaint : unplayedPaint;
-
-      canvas.drawLine(
-        Offset(x, centerY - halfHeight),
-        Offset(x, centerY + halfHeight),
-        paint,
-      );
-    }
-
-    // Draw A marker (vertical line with label)
-    if (abLoop.hasA && duration.inMilliseconds > 0) {
-      final aProgress = abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
-      final aX = (size.width * aProgress).clamp(0.0, size.width);
-
-      // Marker line (thicker)
-      canvas.drawLine(
-        Offset(aX, 0),
-        Offset(aX, size.height),
-        markerPaint..strokeWidth = 3,
-      );
-
-      // A label background (larger)
-      final labelRect = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(aX, 12), width: 22, height: 20),
-        const Radius.circular(4),
-      );
-      canvas.drawRRect(labelRect, Paint()..color = AppColors.primary);
-
-      // A label text (larger font)
-      final textPainter = TextPainter(
-        text: const TextSpan(
-          text: 'A',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      textPainter.paint(canvas, Offset(aX - 5, 5));
-    }
-
-    // Draw B marker (vertical line with label)
-    if (abLoop.hasB && duration.inMilliseconds > 0) {
-      final bProgress = abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
-      final bX = (size.width * bProgress).clamp(0.0, size.width);
-
-      // Marker line (thicker)
-      canvas.drawLine(
-        Offset(bX, 0),
-        Offset(bX, size.height),
-        markerPaint..strokeWidth = 3,
-      );
-
-      // B label background (larger)
-      final labelRect = RRect.fromRectAndRadius(
-        Rect.fromCenter(center: Offset(bX, 12), width: 22, height: 20),
-        const Radius.circular(4),
-      );
-      canvas.drawRRect(labelRect, Paint()..color = AppColors.primary);
-
-      // B label text (larger font)
-      final textPainter = TextPainter(
-        text: const TextSpan(
-          text: 'B',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
-      textPainter.paint(canvas, Offset(bX - 5, 5));
-    }
-
-    // Draw playhead (clamped to prevent overflow)
-    final clampedProgress = progress.clamp(0.0, 1.0);
-    final playheadX = (size.width * clampedProgress).clamp(0.0, size.width);
-    final playheadPaint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 2;
-
-    canvas.drawLine(
-      Offset(playheadX, 4),
-      Offset(playheadX, size.height - 4),
-      playheadPaint,
-    );
-
-    // Draw playhead knob (clamped to stay within bounds)
-    final knobX = playheadX.clamp(6.0, size.width - 6.0);
-    canvas.drawCircle(
-      Offset(knobX, centerY),
-      6,
-      Paint()..color = Colors.white,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _WaveformPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.abLoop != abLoop;
   }
 }

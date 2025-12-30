@@ -8,6 +8,8 @@ import 'waveform/amplitude_waveform.dart';
 export 'waveform/waveform_style.dart';
 export 'waveform/wave_waveform.dart';
 export 'waveform/amplitude_waveform.dart';
+export 'waveform/zoomable_waveform.dart';
+export 'waveform/ab_loop.dart';
 
 /// Animated waveform visualization for recording.
 ///
