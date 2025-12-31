@@ -21,8 +21,9 @@ SO THAT 나중에 수동으로 편집하지 않아도 깔끔한 녹음 파일을
 | 항목 | 결정 |
 |------|------|
 | 처리 방식 | 자동 트리밍 (후처리, 원본 보존) |
-| 적용 범위 | 앞뒤 모두 (중간 무음은 유지) |
+| 적용 범위 | 앞뒤 + 중간 무음 스킵 |
 | 임계값 | 사용자 조절 가능 슬라이더 (기본 40%) |
+| 중간 무음 스킵 | 10초 이상 무음 시 3초만 유지 (5~30초 조절 가능) |
 | 버퍼 | 소리 시작 3초 전, 소리 종료 3초 후 유지 |
 | 기능명 | 스마트 녹음 |
 
@@ -146,6 +147,72 @@ _positionSubscription = _player.onPositionChanged.listen((pos) {
 });
 ```
 
+### 7. 중간 무음 스킵 (Middle Silence Skip)
+
+#### 개요
+녹음 중간에 긴 무음 구간(악보 넘기기, 잠시 쉬기 등)이 있을 때 재생 시 자동으로 건너뛰는 기능.
+
+#### 설정
+```dart
+class SmartRecordingSettings {
+  final bool middleSilenceSkipEnabled;  // 기본 true
+  final int middleSilenceThreshold;     // 5~30초, 기본 10초
+}
+```
+
+#### 동작 방식
+1. **녹음 중**: 소리가 threshold 이상 무음으로 감지되면 `SilencePeriod` 기록
+2. **녹음 완료**: 무음 구간을 제외한 `PlayableSegment` 목록 생성 (3초 버퍼 적용)
+3. **재생 시**: 세그먼트 끝에 도달하면 다음 세그먼트 시작점으로 자동 seek
+
+#### 세그먼트 계산 로직
+```dart
+// silencePeriods → segments 변환
+List<PlayableSegment> segments = [];
+Duration currentStart = contentStart;
+
+for (final silence in silencePeriods) {
+  if (silence.startTime > currentStart) {
+    segments.add(PlayableSegment(
+      start: currentStart,
+      end: silence.startTime,  // 무음 시작 전까지
+    ));
+  }
+  currentStart = silence.endTime;  // 무음 끝난 후부터
+}
+
+// 마지막 세그먼트
+if (currentStart < contentEnd) {
+  segments.add(PlayableSegment(start: currentStart, end: contentEnd));
+}
+```
+
+#### 재생 흐름
+```
+[Segment 1 재생] → position >= segment.end
+    ↓
+[Segment 2로 seek] → 자동으로 다음 세그먼트 시작
+    ↓
+[Segment 2 재생] → ...
+    ↓
+[마지막 Segment 완료] → onComplete 호출
+```
+
+#### 메타데이터 형식 (JSON)
+```json
+{
+  "trimStart": 3600,
+  "trimEnd": 4140,
+  "totalDuration": 60000,
+  "contentStart": 3600,
+  "contentEnd": 55860,
+  "segments": [
+    {"start": 3600, "end": 20000},
+    {"start": 35000, "end": 55860}
+  ]
+}
+```
+
 ---
 
 ## Implementation Status
@@ -173,6 +240,14 @@ _positionSubscription = _player.onPositionChanged.listen((pos) {
 - [x] 녹음 화면 상태 표시
 - [x] 설정 저장 (Hive)
 
+### Phase 5: 중간 무음 스킵 ✅
+- [x] `SilencePeriod` 모델 추가
+- [x] `SmartRecordingState`에 무음 구간 리스트 추가
+- [x] 녹음 중 무음 구간 실시간 감지
+- [x] `TrimMetadata`에 세그먼트 지원 추가
+- [x] `AudioPlayerService` 세그먼트 기반 재생
+- [x] 설정 UI (중간 무음 스킵 토글 + 임계값 슬라이더)
+
 ---
 
 ## File Structure
@@ -199,9 +274,11 @@ lib/
 | 케이스 | 처리 |
 |--------|------|
 | 전체가 무음 | 트리밍 없이 저장 |
-| 무음 < 3초 | 트림 없음 (버퍼보다 짧음) |
-| 녹음 중간에 무음 | 무시 (앞뒤만 트림) |
+| 앞뒤 무음 < 3초 | 트림 없음 (버퍼보다 짧음) |
+| 중간 무음 < threshold | 무시 (설정 임계값보다 짧음) |
+| 중간 무음 스킵 OFF | 중간 무음은 건너뛰지 않음 |
 | 스마트 녹음 OFF | 일반 녹음으로 동작 |
+| 레거시 메타데이터 | key=value 형식 파싱 지원 |
 
 ---
 
@@ -209,7 +286,9 @@ lib/
 
 ```dart
 SmartRecordingSettings.defaults = SmartRecordingSettings(
-  smartRecordingEnabled: true,  // 기본 활성화
-  trimThreshold: 0.40,          // 40% 임계값
+  smartRecordingEnabled: true,         // 기본 활성화
+  trimThreshold: 0.40,                 // 40% 임계값
+  middleSilenceSkipEnabled: true,      // 중간 무음 스킵 활성화
+  middleSilenceThreshold: 10,          // 10초 이상 무음 스킵
 );
 ```

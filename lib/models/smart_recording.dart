@@ -15,6 +15,60 @@ enum RecordingPhase {
   ending,
 }
 
+/// Represents a silence period detected during recording.
+class SilencePeriod {
+  const SilencePeriod({
+    required this.startTime,
+    required this.endTime,
+  });
+
+  /// When silence started (relative to recording start).
+  final Duration startTime;
+
+  /// When silence ended (relative to recording start).
+  final Duration endTime;
+
+  /// Duration of the silence period.
+  Duration get duration => endTime - startTime;
+
+  Map<String, dynamic> toJson() => {
+        'startTime': startTime.inMilliseconds,
+        'endTime': endTime.inMilliseconds,
+      };
+
+  factory SilencePeriod.fromJson(Map<String, dynamic> json) => SilencePeriod(
+        startTime: Duration(milliseconds: json['startTime'] as int),
+        endTime: Duration(milliseconds: json['endTime'] as int),
+      );
+}
+
+/// Represents a playable audio segment (non-silent portion).
+class AudioSegment {
+  const AudioSegment({
+    required this.start,
+    required this.end,
+  });
+
+  /// Start position in the original audio.
+  final Duration start;
+
+  /// End position in the original audio.
+  final Duration end;
+
+  /// Duration of this segment.
+  Duration get duration => end - start;
+
+  Map<String, dynamic> toJson() => {
+        'start': start.inMilliseconds,
+        'end': end.inMilliseconds,
+      };
+
+  factory AudioSegment.fromJson(Map<String, dynamic> json) => AudioSegment(
+        start: Duration(milliseconds: json['start'] as int),
+        end: Duration(milliseconds: json['end'] as int),
+      );
+}
+
 /// State for smart recording functionality.
 class SmartRecordingState {
   const SmartRecordingState({
@@ -26,6 +80,8 @@ class SmartRecordingState {
     this.originalFilePath,
     this.soundStartTime,
     this.soundEndTime,
+    this.silencePeriods = const [],
+    this.middleSilenceStartTime,
   });
 
   /// Whether smart recording is enabled.
@@ -52,6 +108,12 @@ class SmartRecordingState {
   /// Timestamp when sound last stopped.
   final DateTime? soundEndTime;
 
+  /// List of detected silence periods during recording.
+  final List<SilencePeriod> silencePeriods;
+
+  /// When current middle silence started (for tracking).
+  final DateTime? middleSilenceStartTime;
+
   /// Minimum threshold value.
   static const double minThreshold = 0.20;
 
@@ -64,6 +126,18 @@ class SmartRecordingState {
   /// Minimum silence duration to consider for trimming.
   static const Duration minSilenceDuration = Duration(seconds: 3);
 
+  /// Default middle silence threshold for skipping.
+  static const Duration defaultMiddleSilenceThreshold = Duration(seconds: 10);
+
+  /// Minimum middle silence threshold.
+  static const Duration minMiddleSilenceThreshold = Duration(seconds: 5);
+
+  /// Maximum middle silence threshold.
+  static const Duration maxMiddleSilenceThreshold = Duration(seconds: 30);
+
+  /// Buffer to keep before/after skipped silence.
+  static const Duration silenceBuffer = Duration(seconds: 3);
+
   /// Total duration trimmed.
   Duration get totalTrimmed => trimmedStart + trimmedEnd;
 
@@ -72,6 +146,9 @@ class SmartRecordingState {
 
   /// Whether original file can be recovered.
   bool get canRecover => originalFilePath != null;
+
+  /// Whether there are middle silence periods to skip.
+  bool get hasMiddleSilence => silencePeriods.isNotEmpty;
 
   SmartRecordingState copyWith({
     bool? isEnabled,
@@ -82,6 +159,9 @@ class SmartRecordingState {
     String? originalFilePath,
     DateTime? soundStartTime,
     DateTime? soundEndTime,
+    List<SilencePeriod>? silencePeriods,
+    DateTime? middleSilenceStartTime,
+    bool clearMiddleSilenceStartTime = false,
   }) {
     return SmartRecordingState(
       isEnabled: isEnabled ?? this.isEnabled,
@@ -92,6 +172,10 @@ class SmartRecordingState {
       originalFilePath: originalFilePath ?? this.originalFilePath,
       soundStartTime: soundStartTime ?? this.soundStartTime,
       soundEndTime: soundEndTime ?? this.soundEndTime,
+      silencePeriods: silencePeriods ?? this.silencePeriods,
+      middleSilenceStartTime: clearMiddleSilenceStartTime
+          ? null
+          : (middleSilenceStartTime ?? this.middleSilenceStartTime),
     );
   }
 
@@ -106,13 +190,16 @@ class SmartRecordingState {
       originalFilePath: null,
       soundStartTime: null,
       soundEndTime: null,
+      silencePeriods: const [],
+      middleSilenceStartTime: null,
     );
   }
 
   @override
   String toString() {
     return 'SmartRecordingState(isEnabled: $isEnabled, threshold: $threshold, '
-        'phase: $phase, trimmedStart: $trimmedStart, trimmedEnd: $trimmedEnd)';
+        'phase: $phase, trimmedStart: $trimmedStart, trimmedEnd: $trimmedEnd, '
+        'silencePeriods: ${silencePeriods.length})';
   }
 }
 
@@ -121,6 +208,8 @@ class SmartRecordingSettings {
   const SmartRecordingSettings({
     this.smartRecordingEnabled = true,
     this.trimThreshold = SmartRecordingState.defaultThreshold,
+    this.middleSilenceSkipEnabled = true,
+    this.middleSilenceThreshold = 10,
   });
 
   /// Whether smart recording is enabled by default.
@@ -129,12 +218,25 @@ class SmartRecordingSettings {
   /// Default trim threshold.
   final double trimThreshold;
 
+  /// Whether middle silence skip is enabled.
+  final bool middleSilenceSkipEnabled;
+
+  /// Middle silence threshold in seconds (5-30).
+  final int middleSilenceThreshold;
+
+  /// Get middle silence threshold as Duration.
+  Duration get middleSilenceThresholdDuration =>
+      Duration(seconds: middleSilenceThreshold);
+
   /// Create settings from JSON.
   factory SmartRecordingSettings.fromJson(Map<String, dynamic> json) {
     return SmartRecordingSettings(
       smartRecordingEnabled: json['smartRecordingEnabled'] as bool? ?? true,
       trimThreshold: (json['trimThreshold'] as num?)?.toDouble() ??
           SmartRecordingState.defaultThreshold,
+      middleSilenceSkipEnabled:
+          json['middleSilenceSkipEnabled'] as bool? ?? true,
+      middleSilenceThreshold: json['middleSilenceThreshold'] as int? ?? 10,
     );
   }
 
@@ -143,16 +245,25 @@ class SmartRecordingSettings {
     return {
       'smartRecordingEnabled': smartRecordingEnabled,
       'trimThreshold': trimThreshold,
+      'middleSilenceSkipEnabled': middleSilenceSkipEnabled,
+      'middleSilenceThreshold': middleSilenceThreshold,
     };
   }
 
   SmartRecordingSettings copyWith({
     bool? smartRecordingEnabled,
     double? trimThreshold,
+    bool? middleSilenceSkipEnabled,
+    int? middleSilenceThreshold,
   }) {
     return SmartRecordingSettings(
-      smartRecordingEnabled: smartRecordingEnabled ?? this.smartRecordingEnabled,
+      smartRecordingEnabled:
+          smartRecordingEnabled ?? this.smartRecordingEnabled,
       trimThreshold: trimThreshold ?? this.trimThreshold,
+      middleSilenceSkipEnabled:
+          middleSilenceSkipEnabled ?? this.middleSilenceSkipEnabled,
+      middleSilenceThreshold:
+          middleSilenceThreshold ?? this.middleSilenceThreshold,
     );
   }
 }

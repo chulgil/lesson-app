@@ -55,6 +55,21 @@ class SmartRecordingSettingsNotifier extends _$SmartRecordingSettingsNotifier {
     state = state.copyWith(trimThreshold: clampedThreshold);
     await _saveSettings();
   }
+
+  /// Toggle middle silence skip on/off.
+  Future<void> toggleMiddleSilenceSkip() async {
+    state = state.copyWith(
+      middleSilenceSkipEnabled: !state.middleSilenceSkipEnabled,
+    );
+    await _saveSettings();
+  }
+
+  /// Set the middle silence threshold in seconds.
+  Future<void> setMiddleSilenceThreshold(int seconds) async {
+    final clamped = seconds.clamp(5, 30);
+    state = state.copyWith(middleSilenceThreshold: clamped);
+    await _saveSettings();
+  }
 }
 
 /// Provider for smart recording state during active recording.
@@ -63,10 +78,14 @@ class SmartRecordingSettingsNotifier extends _$SmartRecordingSettingsNotifier {
 class SmartRecordingNotifier extends _$SmartRecordingNotifier {
   StreamSubscription<double>? _amplitudeSubscription;
   DateTime? _recordingStartTime;
+  Duration _middleSilenceThreshold = SmartRecordingState.defaultMiddleSilenceThreshold;
+  bool _middleSilenceSkipEnabled = true;
 
   @override
   SmartRecordingState build() {
     final settings = ref.watch(smartRecordingSettingsNotifierProvider);
+    _middleSilenceThreshold = settings.middleSilenceThresholdDuration;
+    _middleSilenceSkipEnabled = settings.middleSilenceSkipEnabled;
 
     ref.onDispose(() {
       _amplitudeSubscription?.cancel();
@@ -89,12 +108,17 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     _amplitudeSubscription?.cancel();
     _recordingStartTime = DateTime.now();
 
+    // Reload settings
+    final settings = ref.read(smartRecordingSettingsNotifierProvider);
+    _middleSilenceThreshold = settings.middleSilenceThresholdDuration;
+    _middleSilenceSkipEnabled = settings.middleSilenceSkipEnabled;
+
     state = state.resetForNewRecording();
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _amplitudeSubscription = recorder.normalizedAmplitudeStream.listen(_onAmplitude);
 
-    debugPrint('SmartRecording: Started monitoring (threshold=${state.threshold})');
+    debugPrint('SmartRecording: Started monitoring (threshold=${state.threshold}, middleSilence=$_middleSilenceThreshold)');
   }
 
   /// Stop monitoring and calculate trim durations.
@@ -116,7 +140,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
     if (state.soundStartTime != null) {
       final silenceAtStart = state.soundStartTime!.difference(_recordingStartTime!);
-      // Keep 3 seconds before sound starts
       trimmedStart = silenceAtStart - buffer;
       if (trimmedStart < Duration.zero) {
         trimmedStart = Duration.zero;
@@ -125,10 +148,23 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
     if (state.soundEndTime != null) {
       final silenceAtEnd = now.difference(state.soundEndTime!);
-      // Keep 3 seconds after sound ends
       trimmedEnd = silenceAtEnd - buffer;
       if (trimmedEnd < Duration.zero) {
         trimmedEnd = Duration.zero;
+      }
+    }
+
+    // Finalize any ongoing middle silence
+    List<SilencePeriod> finalSilencePeriods = List.from(state.silencePeriods);
+    if (state.middleSilenceStartTime != null && _middleSilenceSkipEnabled) {
+      final silenceDuration = now.difference(state.middleSilenceStartTime!);
+      if (silenceDuration >= _middleSilenceThreshold) {
+        final startOffset = state.middleSilenceStartTime!.difference(_recordingStartTime!);
+        final endOffset = now.difference(_recordingStartTime!);
+        finalSilencePeriods.add(SilencePeriod(
+          startTime: startOffset + buffer,
+          endTime: endOffset - buffer,
+        ));
       }
     }
 
@@ -138,28 +174,32 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
       return state.copyWith(
         trimmedStart: Duration.zero,
         trimmedEnd: Duration.zero,
+        silencePeriods: const [],
       );
     }
 
     final result = state.copyWith(
       trimmedStart: trimmedStart,
       trimmedEnd: trimmedEnd,
+      silencePeriods: finalSilencePeriods,
     );
 
     debugPrint('SmartRecording: Stopped monitoring');
     debugPrint('  Recording duration: $recordingDuration');
     debugPrint('  Trimmed start: $trimmedStart');
     debugPrint('  Trimmed end: $trimmedEnd');
+    debugPrint('  Middle silence periods: ${finalSilencePeriods.length}');
+    for (int i = 0; i < finalSilencePeriods.length; i++) {
+      final p = finalSilencePeriods[i];
+      debugPrint('    [$i] ${p.startTime} ~ ${p.endTime} (skip ${p.duration})');
+    }
 
     _recordingStartTime = null;
     return result;
   }
 
   void _onAmplitude(double amplitude) {
-    // Debug: Log every 10th amplitude to avoid spam
-    if (DateTime.now().millisecond % 1000 < 100) {
-      debugPrint('SmartRecording: _onAmplitude called, amp=$amplitude, threshold=${state.threshold}');
-    }
+    if (_recordingStartTime == null) return;
 
     final now = DateTime.now();
 
@@ -173,17 +213,53 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
           soundEndTime: now,
         );
         debugPrint('SmartRecording: Sound started at ${now.difference(_recordingStartTime!)}');
-      } else {
-        // Update last sound time
+      } else if (state.phase == RecordingPhase.ending) {
+        // Sound resumed after silence - check if middle silence should be recorded
+        if (state.middleSilenceStartTime != null && _middleSilenceSkipEnabled) {
+          final silenceDuration = now.difference(state.middleSilenceStartTime!);
+          if (silenceDuration >= _middleSilenceThreshold) {
+            // Add silence period (with buffer on each end)
+            const buffer = Duration(seconds: 3);
+            final startOffset = state.middleSilenceStartTime!.difference(_recordingStartTime!);
+            final endOffset = now.difference(_recordingStartTime!);
+
+            // Only add if the skipped portion is positive
+            if (endOffset - startOffset > buffer * 2) {
+              final newPeriod = SilencePeriod(
+                startTime: startOffset + buffer,
+                endTime: endOffset - buffer,
+              );
+              final updatedPeriods = [...state.silencePeriods, newPeriod];
+              state = state.copyWith(
+                phase: RecordingPhase.recording,
+                soundEndTime: now,
+                silencePeriods: updatedPeriods,
+                clearMiddleSilenceStartTime: true,
+              );
+              debugPrint('SmartRecording: Added middle silence skip: ${newPeriod.startTime} ~ ${newPeriod.endTime}');
+              return;
+            }
+          }
+        }
+        // Resume recording without adding silence period
         state = state.copyWith(
           phase: RecordingPhase.recording,
           soundEndTime: now,
+          clearMiddleSilenceStartTime: true,
         );
+        debugPrint('SmartRecording: Sound resumed at ${now.difference(_recordingStartTime!)}');
+      } else {
+        // Update last sound time
+        state = state.copyWith(soundEndTime: now);
       }
     } else {
       // Silence detected
       if (state.phase == RecordingPhase.recording) {
-        state = state.copyWith(phase: RecordingPhase.ending);
+        // Start tracking potential middle silence
+        state = state.copyWith(
+          phase: RecordingPhase.ending,
+          middleSilenceStartTime: now,
+        );
         debugPrint('SmartRecording: Sound ended at ${now.difference(_recordingStartTime!)}');
       }
     }

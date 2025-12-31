@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -14,11 +15,13 @@ class AudioTrimmerService {
   /// Trim silent sections from audio file based on smart recording state.
   ///
   /// Returns [TrimResult] with trimmed file path and original backup path.
+  /// [silencePeriods] contains middle silence periods to skip.
   Future<TrimResult> trimAudio({
     required String inputPath,
     required Duration trimStart,
     required Duration trimEnd,
     required Duration totalDuration,
+    List<SilencePeriod> silencePeriods = const [],
   }) async {
     try {
       // Validate durations
@@ -56,6 +59,7 @@ class AudioTrimmerService {
         trimStart,
         trimEnd,
         totalDuration,
+        silencePeriods,
       );
 
       if (trimmedPath == null) {
@@ -173,6 +177,7 @@ class AudioTrimmerService {
     Duration trimStart,
     Duration trimEnd,
     Duration totalDuration,
+    List<SilencePeriod> silencePeriods,
   ) async {
     try {
       // For m4a/aac files, we cannot easily trim without FFmpeg
@@ -184,6 +189,33 @@ class AudioTrimmerService {
         return null;
       }
 
+      final contentStart = trimStart;
+      final contentEnd = totalDuration - trimEnd;
+
+      // Calculate playable segments
+      List<Map<String, dynamic>> segments = [];
+      if (silencePeriods.isNotEmpty) {
+        // Build segments by excluding silence periods
+        Duration currentStart = contentStart;
+        for (final silence in silencePeriods) {
+          // Add segment before this silence
+          if (silence.startTime > currentStart) {
+            segments.add({
+              'start': currentStart.inMilliseconds,
+              'end': silence.startTime.inMilliseconds,
+            });
+          }
+          currentStart = silence.endTime;
+        }
+        // Add final segment after last silence
+        if (currentStart < contentEnd) {
+          segments.add({
+            'start': currentStart.inMilliseconds,
+            'end': contentEnd.inMilliseconds,
+          });
+        }
+      }
+
       // Create metadata file
       final metadataPath = '$inputPath.trim';
       final metadataFile = File(metadataPath);
@@ -192,15 +224,17 @@ class AudioTrimmerService {
         'trimStart': trimStart.inMilliseconds,
         'trimEnd': trimEnd.inMilliseconds,
         'totalDuration': totalDuration.inMilliseconds,
-        'contentStart': trimStart.inMilliseconds,
-        'contentEnd': (totalDuration - trimEnd).inMilliseconds,
+        'contentStart': contentStart.inMilliseconds,
+        'contentEnd': contentEnd.inMilliseconds,
+        'segments': segments,
       };
 
-      await metadataFile.writeAsString(
-        metadata.entries.map((e) => '${e.key}=${e.value}').join('\n'),
-      );
+      await metadataFile.writeAsString(jsonEncode(metadata));
 
       debugPrint('AudioTrimmer: Created trim metadata file');
+      if (segments.isNotEmpty) {
+        debugPrint('  Segments: ${segments.length}');
+      }
       return inputPath; // Return same path, player will use metadata
     } catch (e) {
       debugPrint('AudioTrimmer: Error creating trimmed copy: $e');
@@ -217,23 +251,43 @@ class AudioTrimmerService {
       }
 
       final content = await metadataFile.readAsString();
-      final lines = content.split('\n');
-      final map = <String, int>{};
 
-      for (final line in lines) {
-        final parts = line.split('=');
-        if (parts.length == 2) {
-          map[parts[0]] = int.tryParse(parts[1]) ?? 0;
+      // Try JSON format first (new format)
+      try {
+        final json = jsonDecode(content) as Map<String, dynamic>;
+        final segmentsJson = json['segments'] as List<dynamic>? ?? [];
+        final segments = segmentsJson
+            .map((s) => PlayableSegment.fromJson(s as Map<String, dynamic>))
+            .toList();
+
+        return TrimMetadata(
+          trimStart: Duration(milliseconds: json['trimStart'] as int? ?? 0),
+          trimEnd: Duration(milliseconds: json['trimEnd'] as int? ?? 0),
+          totalDuration: Duration(milliseconds: json['totalDuration'] as int? ?? 0),
+          contentStart: Duration(milliseconds: json['contentStart'] as int? ?? 0),
+          contentEnd: Duration(milliseconds: json['contentEnd'] as int? ?? 0),
+          segments: segments,
+        );
+      } catch (_) {
+        // Fall back to legacy key=value format
+        final lines = content.split('\n');
+        final map = <String, int>{};
+
+        for (final line in lines) {
+          final parts = line.split('=');
+          if (parts.length == 2) {
+            map[parts[0]] = int.tryParse(parts[1]) ?? 0;
+          }
         }
-      }
 
-      return TrimMetadata(
-        trimStart: Duration(milliseconds: map['trimStart'] ?? 0),
-        trimEnd: Duration(milliseconds: map['trimEnd'] ?? 0),
-        totalDuration: Duration(milliseconds: map['totalDuration'] ?? 0),
-        contentStart: Duration(milliseconds: map['contentStart'] ?? 0),
-        contentEnd: Duration(milliseconds: map['contentEnd'] ?? 0),
-      );
+        return TrimMetadata(
+          trimStart: Duration(milliseconds: map['trimStart'] ?? 0),
+          trimEnd: Duration(milliseconds: map['trimEnd'] ?? 0),
+          totalDuration: Duration(milliseconds: map['totalDuration'] ?? 0),
+          contentStart: Duration(milliseconds: map['contentStart'] ?? 0),
+          contentEnd: Duration(milliseconds: map['contentEnd'] ?? 0),
+        );
+      }
     } catch (e) {
       debugPrint('AudioTrimmer: Error reading trim metadata: $e');
       return null;
@@ -261,6 +315,7 @@ class TrimMetadata {
     required this.totalDuration,
     required this.contentStart,
     required this.contentEnd,
+    this.segments = const [],
   });
 
   /// Duration trimmed from start.
@@ -278,9 +333,50 @@ class TrimMetadata {
   /// End position of actual content.
   final Duration contentEnd;
 
+  /// Playable segments (for middle silence skip).
+  /// If empty, the entire contentStart~contentEnd range is played.
+  final List<PlayableSegment> segments;
+
   /// Duration of actual content.
   Duration get contentDuration => contentEnd - contentStart;
 
   /// Whether file has been trimmed.
   bool get hasTrimming => trimStart > Duration.zero || trimEnd > Duration.zero;
+
+  /// Whether there are middle silence skips.
+  bool get hasMiddleSilenceSkip => segments.isNotEmpty;
+
+  /// Effective play duration (accounting for middle silence skips).
+  Duration get effectivePlayDuration {
+    if (segments.isEmpty) {
+      return contentDuration;
+    }
+    return segments.fold(
+      Duration.zero,
+      (sum, seg) => sum + seg.duration,
+    );
+  }
+}
+
+/// A playable segment within the audio file.
+class PlayableSegment {
+  const PlayableSegment({
+    required this.start,
+    required this.end,
+  });
+
+  final Duration start;
+  final Duration end;
+
+  Duration get duration => end - start;
+
+  Map<String, dynamic> toJson() => {
+        'start': start.inMilliseconds,
+        'end': end.inMilliseconds,
+      };
+
+  factory PlayableSegment.fromJson(Map<String, dynamic> json) => PlayableSegment(
+        start: Duration(milliseconds: json['start'] as int),
+        end: Duration(milliseconds: json['end'] as int),
+      );
 }

@@ -173,6 +173,122 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   ],
                 ),
               ),
+
+              // Middle silence skip section
+              const SizedBox(height: AppSpacing.space4),
+              const Divider(),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Middle silence toggle
+              Row(
+                children: [
+                  const Icon(
+                    Icons.content_cut,
+                    size: 18,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '중간 무음 스킵',
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          '재생 시 긴 무음 구간 자동 건너뛰기',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: settings.middleSilenceSkipEnabled,
+                    onChanged: (_) {
+                      ref
+                          .read(smartRecordingSettingsNotifierProvider.notifier)
+                          .toggleMiddleSilenceSkip();
+                    },
+                    activeColor: AppColors.primary,
+                  ),
+                ],
+              ),
+
+              // Middle silence threshold slider (only when enabled)
+              if (settings.middleSilenceSkipEnabled) ...[
+                const SizedBox(height: AppSpacing.space3),
+                Row(
+                  children: [
+                    Text(
+                      '무음 감지 기준',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${settings.middleSilenceThreshold}초 이상',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                Row(
+                  children: [
+                    Text(
+                      '5초',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    Expanded(
+                      child: SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: AppColors.primary,
+                          inactiveTrackColor: AppColors.primary.withValues(alpha: 0.2),
+                          thumbColor: AppColors.primary,
+                          overlayColor: AppColors.primary.withValues(alpha: 0.1),
+                        ),
+                        child: Slider(
+                          value: settings.middleSilenceThreshold.toDouble(),
+                          min: 5,
+                          max: 30,
+                          divisions: 5,
+                          onChanged: (value) {
+                            ref
+                                .read(smartRecordingSettingsNotifierProvider.notifier)
+                                .setMiddleSilenceThreshold(value.toInt());
+                          },
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '30초',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ],
         ),
