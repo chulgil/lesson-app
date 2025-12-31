@@ -58,6 +58,8 @@ class _PracticeRecordingScreenState
       recordingNotifierProvider(widget.repertoireId, widget.studentId),
     );
 
+    debugPrint('PracticeRecordingScreen: build - isRecording=${state.isRecording}, isPaused=${state.isPaused}');
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.repertoireName),
@@ -80,7 +82,6 @@ class _PracticeRecordingScreenState
                   isRecording: state.isRecording,
                   isPaused: state.isPaused,
                   duration: _recordingDuration,
-                  amplitudeStream: ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream,
                   onStart: () => _startRecording(),
                   onStop: () => _stopRecording(),
                   onCancel: () => _cancelRecording(),
@@ -215,12 +216,11 @@ class _PracticeRecordingScreenState
   }
 }
 
-class _RecordingSection extends StatelessWidget {
+class _RecordingSection extends ConsumerWidget {
   const _RecordingSection({
     required this.isRecording,
     required this.isPaused,
     required this.duration,
-    required this.amplitudeStream,
     required this.onStart,
     required this.onStop,
     required this.onCancel,
@@ -229,7 +229,6 @@ class _RecordingSection extends StatelessWidget {
   final bool isRecording;
   final bool isPaused;
   final Duration duration;
-  final Stream<double> amplitudeStream;
   final VoidCallback onStart;
   final VoidCallback onStop;
   final VoidCallback onCancel;
@@ -241,10 +240,20 @@ class _RecordingSection extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final waveformStyle = isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
     final waveformIsActive = isRecording && !isPaused;
-    debugPrint('_RecordingSection: isRecording=$isRecording, isPaused=$isPaused, style=$waveformStyle, isActive=$waveformIsActive');
+
+    // Get amplitude stream only when recording - this ensures fresh stream each time
+    final amplitudeStream = isRecording
+        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+        : null;
+
+    // Check microphone permission
+    final micPermissionAsync = ref.watch(microphonePermissionProvider);
+    final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
+
+    debugPrint('_RecordingSection: isRecording=$isRecording, style=$waveformStyle, hasStream=${amplitudeStream != null}');
 
     return Container(
       padding: EdgeInsets.all(AppSpacing.space6),
@@ -325,12 +334,27 @@ class _RecordingSection extends StatelessWidget {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed: onStart,
-                    icon: const Icon(Icons.mic, size: 36),
-                    style: IconButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                    onPressed: hasMicPermission ? onStart : () async {
+                      // Request permission when mic is not available
+                      final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
+                      if (granted) {
+                        ref.invalidate(microphonePermissionProvider);
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
+                          );
+                        }
+                      }
+                    },
+                    icon: Icon(
+                      hasMicPermission ? Icons.mic : Icons.mic_off,
+                      size: 36,
                     ),
-                    tooltip: '녹음 시작',
+                    style: IconButton.styleFrom(
+                      backgroundColor: hasMicPermission ? AppColors.primary : AppColors.textSecondaryLight,
+                    ),
+                    tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                   ),
                 ),
               ],

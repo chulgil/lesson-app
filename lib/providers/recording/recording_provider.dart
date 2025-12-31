@@ -100,6 +100,13 @@ AudioPlayerService audioPlayerService(AudioPlayerServiceRef ref) {
   return service;
 }
 
+/// Provider for checking microphone permission status.
+@riverpod
+Future<bool> microphonePermission(MicrophonePermissionRef ref) async {
+  final recorder = ref.watch(audioRecorderServiceProvider);
+  return await recorder.hasPermission();
+}
+
 /// Main recording provider for a repertoire.
 @riverpod
 class RecordingNotifier extends _$RecordingNotifier {
@@ -165,21 +172,31 @@ class RecordingNotifier extends _$RecordingNotifier {
         await stopPlayback();
       }
 
+      // Set recording state BEFORE starting recording
+      // This ensures UI updates with amplitude waveform style before recording starts
+      state = state.copyWith(
+        isRecording: true,
+        isPaused: false,
+        currentRecordingDuration: Duration.zero,
+      );
+
+      // Allow Riverpod to process state change and UI to rebuild
+      // before starting recording (which resets stream cache)
+      await Future.delayed(Duration.zero);
+
       final path = await _recorder.startRecording(repertoireId: _repertoireId);
       if (path != null) {
-        state = state.copyWith(
-          isRecording: true,
-          isPaused: false,
-          currentRecordingPath: path,
-          currentRecordingDuration: Duration.zero,
-        );
+        state = state.copyWith(currentRecordingPath: path);
         debugPrint('RecordingProvider: Started recording at $path');
         return true;
+      } else {
+        // Revert recording state if failed
+        state = state.copyWith(isRecording: false);
+        return false;
       }
-      return false;
     } catch (e) {
       debugPrint('RecordingProvider: Failed to start recording: $e');
-      state = state.copyWith(error: 'Failed to start recording');
+      state = state.copyWith(isRecording: false, error: 'Failed to start recording');
       return false;
     }
   }

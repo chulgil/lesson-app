@@ -141,6 +141,13 @@ class AudioRecorderService {
       final fileName = '${_uuid.v4()}.m4a';
       final filePath = '$dir/$fileName';
 
+      // Reset stream cache before starting new recording
+      // This ensures the amplitude stream is fresh for each recording session
+      await _amplitudeBroadcastSubscription?.cancel();
+      _amplitudeBroadcastSubscription = null;
+      _normalizedAmplitudeStreamCache = null;
+      debugPrint('AudioRecorder: Reset amplitude stream cache');
+
       // Configure and start recording
       await _recorder.start(
         RecordConfig(

@@ -724,7 +724,7 @@ class _StatItem extends StatelessWidget {
 }
 
 /// Recording control widget
-class _RecordingControl extends StatelessWidget {
+class _RecordingControl extends ConsumerWidget {
   final bool isRecording;
   final bool isPaused;
   final int recordingSeconds;
@@ -750,7 +750,16 @@ class _RecordingControl extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Get amplitude stream only when recording
+    final amplitudeStream = isRecording
+        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+        : null;
+
+    // Check microphone permission
+    final micPermissionAsync = ref.watch(microphonePermissionProvider);
+    final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
+
     return SizedBox(
       width: double.infinity,
       child: ClipRRect(
@@ -771,10 +780,11 @@ class _RecordingControl extends StatelessWidget {
             if (isRecording)
               Positioned.fill(
                 child: RecordingWaveform(
+                  style: WaveformStyle.amplitude,
                   isActive: !isPaused,
                   height: 200,
-                  waveColor: Colors.white,
-                  waveCount: 3,
+                  waveColor: Colors.white.withValues(alpha: 0.6),
+                  amplitudeStream: amplitudeStream,
                 ),
               ),
             // Foreground content
@@ -856,17 +866,32 @@ class _RecordingControl extends StatelessWidget {
                       child: FractionallySizedBox(
                         widthFactor: 0.6,
                         child: FilledButton.icon(
-                          onPressed: onStartRecording,
-                          icon: const Icon(Icons.mic, size: 28),
+                          onPressed: hasMicPermission ? onStartRecording : () async {
+                            // Request permission when mic is not available
+                            final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
+                            if (granted) {
+                              ref.invalidate(microphonePermissionProvider);
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
+                                );
+                              }
+                            }
+                          },
+                          icon: Icon(
+                            hasMicPermission ? Icons.mic : Icons.mic_off,
+                            size: 28,
+                          ),
                           label: Text(
-                            '녹음 시작',
+                            hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                             style: AppTypography.bodyLarge.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.error,
+                            backgroundColor: hasMicPermission ? AppColors.error : AppColors.textSecondaryLight,
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.space8,
                               vertical: AppSpacing.space5,

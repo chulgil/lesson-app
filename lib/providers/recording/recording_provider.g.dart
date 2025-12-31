@@ -66,7 +66,27 @@ final audioPlayerServiceProvider = Provider<AudioPlayerService>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AudioPlayerServiceRef = ProviderRef<AudioPlayerService>;
-String _$recordingNotifierHash() => r'5da0db0d42109e321af6d15d4dffec7d05f1a154';
+String _$microphonePermissionHash() =>
+    r'9db1a642b027e4b154481ebfb49b2887ace56bce';
+
+/// Provider for checking microphone permission status.
+///
+/// Copied from [microphonePermission].
+@ProviderFor(microphonePermission)
+final microphonePermissionProvider = AutoDisposeFutureProvider<bool>.internal(
+  microphonePermission,
+  name: r'microphonePermissionProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$microphonePermissionHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef MicrophonePermissionRef = AutoDisposeFutureProviderRef<bool>;
+String _$recordingNotifierHash() => r'd1b880f9b38e1c00e67468f756afd963b65a8f78';
 
 /// Copied from Dart SDK
 class _SystemHash {
