@@ -216,7 +216,7 @@ class _PracticeRecordingScreenState
   }
 }
 
-class _RecordingSection extends ConsumerWidget {
+class _RecordingSection extends ConsumerStatefulWidget {
   const _RecordingSection({
     required this.isRecording,
     required this.isPaused,
@@ -233,6 +233,100 @@ class _RecordingSection extends ConsumerWidget {
   final VoidCallback onStop;
   final VoidCallback onCancel;
 
+  @override
+  ConsumerState<_RecordingSection> createState() => _RecordingSectionState();
+}
+
+class _RecordingSectionState extends ConsumerState<_RecordingSection> {
+  // Thresholds for amplitude detection
+  static const _noInputThreshold = 0.05;
+  static const _quietThreshold = 0.40; // Updated for smart recording
+  static const _micCheckDuration = Duration(milliseconds: 1500);
+
+  bool _hasMicInput = true;
+  bool _isQuiet = false;
+  StreamSubscription<double>? _micCheckSubscription;
+  DateTime? _recordingStartTime;
+
+  @override
+  void didUpdateWidget(covariant _RecordingSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.isRecording && !oldWidget.isRecording) {
+      _startMicInputCheck();
+    }
+
+    if (!widget.isRecording && oldWidget.isRecording) {
+      _stopMicInputCheck();
+      setState(() {
+        _hasMicInput = true;
+        _isQuiet = false;
+      });
+    }
+  }
+
+  void _startMicInputCheck() {
+    _micCheckSubscription?.cancel();
+    _recordingStartTime = DateTime.now();
+    debugPrint('_RecordingSectionState: Starting mic input check');
+
+    final recorder = ref.read(audioRecorderServiceProvider);
+    _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
+      final now = DateTime.now();
+
+      // Strong input detected (amplitude >= quiet threshold)
+      if (amplitude >= _quietThreshold) {
+        if (!_hasMicInput || _isQuiet) {
+          debugPrint('_RecordingSectionState: Strong input detected (amplitude=$amplitude)');
+          setState(() {
+            _hasMicInput = true;
+            _isQuiet = false;
+          });
+        }
+        return;
+      }
+
+      // Quiet input (between noInput and quiet threshold)
+      if (amplitude >= _noInputThreshold && amplitude < _quietThreshold) {
+        if (_recordingStartTime != null &&
+            now.difference(_recordingStartTime!) >= _micCheckDuration) {
+          if (!_isQuiet && widget.isRecording) {
+            debugPrint('_RecordingSectionState: Quiet input detected (amplitude=$amplitude)');
+            setState(() {
+              _hasMicInput = true;
+              _isQuiet = true;
+            });
+          }
+        }
+        return;
+      }
+
+      // No input detected (amplitude < noInput threshold)
+      if (_recordingStartTime != null &&
+          now.difference(_recordingStartTime!) >= _micCheckDuration) {
+        if (_hasMicInput && widget.isRecording) {
+          debugPrint('_RecordingSectionState: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
+          setState(() {
+            _hasMicInput = false;
+            _isQuiet = false;
+          });
+        }
+      }
+    });
+  }
+
+  void _stopMicInputCheck() {
+    _micCheckSubscription?.cancel();
+    _micCheckSubscription = null;
+    _recordingStartTime = null;
+  }
+
+  @override
+  void dispose() {
+    _stopMicInputCheck();
+    super.dispose();
+  }
+
   String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
@@ -240,12 +334,12 @@ class _RecordingSection extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final waveformStyle = isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
-    final waveformIsActive = isRecording && !isPaused;
+  Widget build(BuildContext context) {
+    final waveformStyle = widget.isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
+    final waveformIsActive = widget.isRecording && !widget.isPaused;
 
     // Get amplitude stream only when recording - this ensures fresh stream each time
-    final amplitudeStream = isRecording
+    final amplitudeStream = widget.isRecording
         ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
         : null;
 
@@ -253,17 +347,50 @@ class _RecordingSection extends ConsumerWidget {
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
     final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
 
-    debugPrint('_RecordingSection: isRecording=$isRecording, style=$waveformStyle, hasStream=${amplitudeStream != null}');
+    debugPrint('_RecordingSection: isRecording=${widget.isRecording}, style=$waveformStyle, hasStream=${amplitudeStream != null}');
 
     return Container(
       padding: EdgeInsets.all(AppSpacing.space6),
       child: Column(
         children: [
+          // Warning banner for no input or quiet
+          if (widget.isRecording && (!_hasMicInput || _isQuiet)) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    !_hasMicInput ? Icons.mic_external_off : Icons.volume_down,
+                    size: 16,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    !_hasMicInput ? '입력 없음' : '소리가 약함',
+                    style: AppTypography.caption.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: AppSpacing.space2),
+          ],
+
           // Waveform visualization
           Container(
             height: 100,
             decoration: BoxDecoration(
-              color: isRecording ? AppColors.primary : AppColors.surfaceLight,
+              color: widget.isRecording ? AppColors.primary : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(16),
             ),
             child: ClipRRect(
@@ -272,7 +399,7 @@ class _RecordingSection extends ConsumerWidget {
                 style: waveformStyle,
                 isActive: waveformIsActive,
                 height: 100,
-                waveColor: isRecording ? Colors.white : AppColors.primary,
+                waveColor: widget.isRecording ? Colors.white : AppColors.primary,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -281,17 +408,17 @@ class _RecordingSection extends ConsumerWidget {
 
           // Duration display
           Text(
-            _formatDuration(duration),
+            _formatDuration(widget.duration),
             style: AppTypography.displayMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: isRecording ? AppColors.primary : AppColors.textSecondaryLight,
+              color: widget.isRecording ? AppColors.primary : AppColors.textSecondaryLight,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
 
           // Max duration hint
           Text(
-            isRecording ? '녹음 중...' : '최대 3분',
+            widget.isRecording ? '녹음 중...' : '최대 3분',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.textSecondaryLight,
             ),
@@ -302,10 +429,10 @@ class _RecordingSection extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (isRecording) ...[
+              if (widget.isRecording) ...[
                 // Cancel button
                 IconButton.outlined(
-                  onPressed: onCancel,
+                  onPressed: widget.onCancel,
                   icon: const Icon(Icons.close),
                   style: IconButton.styleFrom(
                     foregroundColor: Colors.red,
@@ -320,7 +447,7 @@ class _RecordingSection extends ConsumerWidget {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed: onStop,
+                    onPressed: widget.onStop,
                     icon: const Icon(Icons.stop, size: 36),
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -334,7 +461,7 @@ class _RecordingSection extends ConsumerWidget {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed: hasMicPermission ? onStart : () async {
+                    onPressed: hasMicPermission ? widget.onStart : () async {
                       // Request permission when mic is not available
                       final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
                       if (granted) {

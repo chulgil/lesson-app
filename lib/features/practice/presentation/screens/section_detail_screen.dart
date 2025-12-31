@@ -8,12 +8,17 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../models/recording.dart';
+import '../../../../models/smart_recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../../../providers/recording/recording_provider.dart';
+import '../../../../providers/smart_recording/smart_recording_provider.dart';
+import '../../../../services/audio_trimmer_service.dart';
 import '../widgets/metronome/metronome.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
+import '../widgets/smart_recording/smart_recording_indicator.dart';
+import '../widgets/smart_recording/smart_recording_settings.dart';
 
 /// Section detail screen showing section info and recordings
 class SectionDetailScreen extends ConsumerStatefulWidget {
@@ -268,6 +273,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       }
     }
 
+    // Start smart recording monitoring
+    ref.read(smartRecordingNotifierProvider.notifier).startMonitoring();
+
     // Start actual recording
     final path = await recorder.startRecording(repertoireId: widget.repertoireId);
     if (path != null) {
@@ -278,6 +286,8 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       });
       _startTimer();
     } else {
+      // Stop smart recording if recording failed
+      ref.read(smartRecordingNotifierProvider.notifier).reset();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -323,9 +333,13 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   Future<void> _stopRecording(PracticeSection section) async {
     final recorder = ref.read(audioRecorderServiceProvider);
 
+    // Stop smart recording monitoring and get trim info
+    final smartRecordingState = ref.read(smartRecordingNotifierProvider.notifier).stopMonitoring();
+
     if (_recordingSeconds < 3) {
       // Cancel recording if too short
       await recorder.cancelRecording();
+      ref.read(smartRecordingNotifierProvider.notifier).reset();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
@@ -349,6 +363,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     });
 
     if (filePath == null) {
+      ref.read(smartRecordingNotifierProvider.notifier).reset();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -365,12 +380,29 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
     // Capture current metronome BPM
     final metronomeBpm = ref.read(metronomeProvider).settings.bpm;
+    final totalDuration = Duration(seconds: _recordingSeconds);
+
+    // Apply smart recording trimming if enabled
+    TrimResult? trimResult;
+    if (smartRecordingState.isEnabled && smartRecordingState.hasTrimming) {
+      trimResult = await AudioTrimmerService.instance.trimAudio(
+        inputPath: filePath,
+        trimStart: smartRecordingState.trimmedStart,
+        trimEnd: smartRecordingState.trimmedEnd,
+        totalDuration: totalDuration,
+      );
+    }
+
+    // Calculate actual duration after trimming
+    final actualDuration = trimResult?.hasTrimming == true
+        ? _recordingSeconds - trimResult!.trimmedStart.inSeconds - trimResult.trimmedEnd.inSeconds
+        : _recordingSeconds;
 
     try {
       await ref.read(recordingCrudProvider.notifier).createRecording(
             sectionId: widget.sectionId,
             filePath: filePath, // Use actual file path from recorder
-            durationSeconds: _recordingSeconds,
+            durationSeconds: actualDuration,
             bpm: metronomeBpm, // Save metronome BPM
             isRepresentative: section.recordings.isEmpty, // First recording is representative
           );
@@ -379,13 +411,37 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       await ref.read(sectionCrudProvider.notifier).incrementPractice(
             widget.sectionId,
             widget.repertoireId,
-            _recordingSeconds,
+            actualDuration,
           );
 
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
 
-      if (mounted) {
+      // Show smart recording result dialog if trimming was applied
+      if (mounted && trimResult?.hasTrimming == true) {
+        await showSmartRecordingResult(
+          context,
+          trimmedStart: trimResult!.trimmedStart,
+          trimmedEnd: trimResult.trimmedEnd,
+          totalDuration: totalDuration,
+          onRestore: trimResult.originalFilePath != null
+              ? () async {
+                  await AudioTrimmerService.instance.restoreOriginal(
+                    originalPath: trimResult!.originalFilePath!,
+                    trimmedPath: filePath,
+                  );
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('원본 파일이 복구되었습니다'),
+                        backgroundColor: AppColors.success,
+                      ),
+                    );
+                  }
+                }
+              : null,
+        );
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('녹음이 저장되었습니다'),
@@ -404,6 +460,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       }
     }
 
+    ref.read(smartRecordingNotifierProvider.notifier).reset();
     setState(() {
       _recordingSeconds = 0;
     });
@@ -750,14 +807,15 @@ class _RecordingControl extends ConsumerStatefulWidget {
 }
 
 class _RecordingControlState extends ConsumerState<_RecordingControl> {
-  static const _micInputThreshold = 0.05;
+  // Thresholds for amplitude detection
+  static const _noInputThreshold = 0.05; // Below this = silence/no input
+  static const _quietThreshold = 0.40; // Below this = quiet but audible (updated for smart recording)
   static const _micCheckDuration = Duration(milliseconds: 1500);
-  static const _autoStopDuration = Duration(seconds: 5);
 
   bool _hasMicInput = true;
+  bool _isQuiet = false; // Track quiet state separately
   StreamSubscription<double>? _micCheckSubscription;
   DateTime? _recordingStartTime;
-  DateTime? _noInputStartTime; // Track when no input state started
 
   String get _formattedTime {
     final minutes = widget.recordingSeconds ~/ 60;
@@ -779,6 +837,7 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
       _stopMicInputCheck();
       setState(() {
         _hasMicInput = true;
+        _isQuiet = false;
       });
     }
   }
@@ -786,57 +845,51 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
   void _startMicInputCheck() {
     _micCheckSubscription?.cancel();
     _recordingStartTime = DateTime.now();
-    _noInputStartTime = null;
     debugPrint('_RecordingControlState: Starting mic input check');
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
-      // If we detect any amplitude above threshold, mark as having input
-      if (amplitude > _micInputThreshold) {
-        // Reset no-input timer when input is detected
-        _noInputStartTime = null;
-        if (!_hasMicInput) {
-          debugPrint('_RecordingControlState: Mic input detected (amplitude=$amplitude)');
+      final now = DateTime.now();
+
+      // Strong input detected (amplitude >= quiet threshold)
+      if (amplitude >= _quietThreshold) {
+        if (!_hasMicInput || _isQuiet) {
+          debugPrint('_RecordingControlState: Strong input detected (amplitude=$amplitude)');
           setState(() {
             _hasMicInput = true;
+            _isQuiet = false;
           });
         }
         return;
       }
 
-      // No input detected - track the start time
-      final now = DateTime.now();
+      // Quiet input (between noInput and quiet threshold)
+      if (amplitude >= _noInputThreshold && amplitude < _quietThreshold) {
+        // After initial check duration, show quiet warning
+        if (_recordingStartTime != null &&
+            now.difference(_recordingStartTime!) >= _micCheckDuration) {
+          if (!_isQuiet && widget.isRecording) {
+            debugPrint('_RecordingControlState: Quiet input detected (amplitude=$amplitude)');
+            setState(() {
+              _hasMicInput = true;
+              _isQuiet = true;
+            });
+          }
+        }
+        return;
+      }
 
-      // After initial check duration, show warning banner
+      // No input detected (amplitude < noInput threshold)
+      // After initial check duration, show no-input warning
       if (_recordingStartTime != null &&
           now.difference(_recordingStartTime!) >= _micCheckDuration) {
         if (_hasMicInput && widget.isRecording) {
           debugPrint('_RecordingControlState: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
-          _noInputStartTime = now; // Start tracking for auto-stop
           setState(() {
             _hasMicInput = false;
+            _isQuiet = false;
           });
         }
-      }
-
-      // Auto-stop after 5 seconds of no input
-      if (_noInputStartTime != null &&
-          now.difference(_noInputStartTime!) >= _autoStopDuration &&
-          widget.isRecording) {
-        debugPrint('_RecordingControlState: Auto-stopping recording after ${_autoStopDuration.inSeconds}s of no input');
-        _micCheckSubscription?.cancel();
-        _micCheckSubscription = null;
-
-        // Show message and stop recording
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('입력 없음 - 녹음 자동 정지'),
-              backgroundColor: AppColors.warning,
-            ),
-          );
-        }
-        widget.onStopRecording();
       }
     });
   }
@@ -845,7 +898,6 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
     _micCheckSubscription?.cancel();
     _micCheckSubscription = null;
     _recordingStartTime = null;
-    _noInputStartTime = null;
   }
 
   @override
@@ -897,8 +949,13 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
               padding: const EdgeInsets.all(AppSpacing.space4),
               child: Column(
                 children: [
-                  // Mic input warning banner
-                  if (widget.isRecording && !_hasMicInput) ...[
+                  // Smart recording indicator (shows phase: waiting, recording, ending)
+                  if (widget.isRecording) ...[
+                    SmartRecordingIndicator(isRecording: widget.isRecording),
+                    const SizedBox(height: AppSpacing.space2),
+                  ],
+                  // Mic input warning banner (no input or quiet) - shown alongside smart recording
+                  if (widget.isRecording && (!_hasMicInput || _isQuiet)) ...[
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
@@ -911,10 +968,14 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.mic_external_off, size: 16, color: Colors.white),
+                          Icon(
+                            !_hasMicInput ? Icons.mic_external_off : Icons.volume_down,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 4),
                           Text(
-                            '입력 없음',
+                            !_hasMicInput ? '입력 없음' : '소리가 약함',
                             style: AppTypography.caption.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -993,8 +1054,10 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                       ],
                     ),
                   ] else ...[
+                    // Smart recording toggle
+                    const SmartRecordingToggle(),
+                    const SizedBox(height: AppSpacing.space3),
                     // Start recording button (2x size, 60% width, centered)
-                    const SizedBox(height: AppSpacing.space4),
                     Center(
                       child: FractionallySizedBox(
                         widthFactor: 0.6,

@@ -1,0 +1,286 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import '../models/smart_recording.dart';
+
+/// Service for trimming audio files.
+///
+/// Provides functionality to trim silent sections from the start and end
+/// of audio recordings while preserving the original file for recovery.
+class AudioTrimmerService {
+  AudioTrimmerService._();
+  static final instance = AudioTrimmerService._();
+
+  /// Trim silent sections from audio file based on smart recording state.
+  ///
+  /// Returns [TrimResult] with trimmed file path and original backup path.
+  Future<TrimResult> trimAudio({
+    required String inputPath,
+    required Duration trimStart,
+    required Duration trimEnd,
+    required Duration totalDuration,
+  }) async {
+    try {
+      // Validate durations
+      if (trimStart < Duration.zero || trimEnd < Duration.zero) {
+        return TrimResult.noTrim(inputPath);
+      }
+
+      // Check if trimming is needed
+      if (trimStart == Duration.zero && trimEnd == Duration.zero) {
+        debugPrint('AudioTrimmer: No trimming needed');
+        return TrimResult.noTrim(inputPath);
+      }
+
+      // Calculate actual content duration
+      final contentDuration = totalDuration - trimStart - trimEnd;
+      if (contentDuration.inSeconds < 1) {
+        debugPrint('AudioTrimmer: Content too short after trimming, skipping');
+        return TrimResult.failed(
+          inputPath,
+          'Recording too short after trimming (less than 1 second)',
+        );
+      }
+
+      // Create backup of original file
+      final originalBackupPath = await _createBackup(inputPath);
+      if (originalBackupPath == null) {
+        debugPrint('AudioTrimmer: Failed to create backup');
+        return TrimResult.failed(inputPath, 'Failed to create backup');
+      }
+
+      // For now, we store trim metadata and let the player handle the actual trimming
+      // This is more efficient than re-encoding the audio file
+      final trimmedPath = await _createTrimmedCopy(
+        inputPath,
+        trimStart,
+        trimEnd,
+        totalDuration,
+      );
+
+      if (trimmedPath == null) {
+        // Restore original if trimming failed
+        await _restoreBackup(originalBackupPath, inputPath);
+        return TrimResult.failed(inputPath, 'Failed to create trimmed file');
+      }
+
+      debugPrint('AudioTrimmer: Successfully trimmed');
+      debugPrint('  Original: $originalBackupPath');
+      debugPrint('  Trimmed: $trimmedPath');
+      debugPrint('  Start: ${trimStart.inMilliseconds}ms');
+      debugPrint('  End: ${trimEnd.inMilliseconds}ms');
+
+      return TrimResult(
+        success: true,
+        trimmedFilePath: trimmedPath,
+        originalFilePath: originalBackupPath,
+        trimmedStart: trimStart,
+        trimmedEnd: trimEnd,
+      );
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error trimming audio: $e');
+      return TrimResult.failed(inputPath, e.toString());
+    }
+  }
+
+  /// Restore original file from backup.
+  Future<bool> restoreOriginal({
+    required String originalPath,
+    required String trimmedPath,
+  }) async {
+    try {
+      final originalFile = File(originalPath);
+      final trimmedFile = File(trimmedPath);
+
+      if (!await originalFile.exists()) {
+        debugPrint('AudioTrimmer: Original file not found for restore');
+        return false;
+      }
+
+      // Delete trimmed file
+      if (await trimmedFile.exists()) {
+        await trimmedFile.delete();
+      }
+
+      // Copy original back to trimmed location
+      await originalFile.copy(trimmedPath);
+
+      debugPrint('AudioTrimmer: Restored original file');
+      return true;
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error restoring original: $e');
+      return false;
+    }
+  }
+
+  /// Delete backup file after it's no longer needed.
+  Future<void> deleteBackup(String backupPath) async {
+    try {
+      final file = File(backupPath);
+      if (await file.exists()) {
+        await file.delete();
+        debugPrint('AudioTrimmer: Deleted backup file');
+      }
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error deleting backup: $e');
+    }
+  }
+
+  Future<String?> _createBackup(String inputPath) async {
+    try {
+      final inputFile = File(inputPath);
+      if (!await inputFile.exists()) {
+        return null;
+      }
+
+      final directory = await getApplicationDocumentsDirectory();
+      final backupDir = Directory('${directory.path}/recording_backups');
+      if (!await backupDir.exists()) {
+        await backupDir.create(recursive: true);
+      }
+
+      // Extract filename and extension manually
+      final lastSlash = inputPath.lastIndexOf('/');
+      final fullName = lastSlash >= 0 ? inputPath.substring(lastSlash + 1) : inputPath;
+      final lastDot = fullName.lastIndexOf('.');
+      final fileName = lastDot >= 0 ? fullName.substring(0, lastDot) : fullName;
+      final extension = lastDot >= 0 ? fullName.substring(lastDot) : '';
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final backupPath = '${backupDir.path}/${fileName}_original_$timestamp$extension';
+
+      await inputFile.copy(backupPath);
+      return backupPath;
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error creating backup: $e');
+      return null;
+    }
+  }
+
+  Future<void> _restoreBackup(String backupPath, String targetPath) async {
+    try {
+      final backupFile = File(backupPath);
+      if (await backupFile.exists()) {
+        await backupFile.copy(targetPath);
+        await backupFile.delete();
+      }
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error restoring backup: $e');
+    }
+  }
+
+  Future<String?> _createTrimmedCopy(
+    String inputPath,
+    Duration trimStart,
+    Duration trimEnd,
+    Duration totalDuration,
+  ) async {
+    try {
+      // For m4a/aac files, we cannot easily trim without FFmpeg
+      // Instead, we store trim metadata in a companion file
+      // The player will use this metadata to skip the trimmed sections
+
+      final inputFile = File(inputPath);
+      if (!await inputFile.exists()) {
+        return null;
+      }
+
+      // Create metadata file
+      final metadataPath = '$inputPath.trim';
+      final metadataFile = File(metadataPath);
+
+      final metadata = {
+        'trimStart': trimStart.inMilliseconds,
+        'trimEnd': trimEnd.inMilliseconds,
+        'totalDuration': totalDuration.inMilliseconds,
+        'contentStart': trimStart.inMilliseconds,
+        'contentEnd': (totalDuration - trimEnd).inMilliseconds,
+      };
+
+      await metadataFile.writeAsString(
+        metadata.entries.map((e) => '${e.key}=${e.value}').join('\n'),
+      );
+
+      debugPrint('AudioTrimmer: Created trim metadata file');
+      return inputPath; // Return same path, player will use metadata
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error creating trimmed copy: $e');
+      return null;
+    }
+  }
+
+  /// Read trim metadata for a recording.
+  Future<TrimMetadata?> readTrimMetadata(String audioPath) async {
+    try {
+      final metadataFile = File('$audioPath.trim');
+      if (!await metadataFile.exists()) {
+        return null;
+      }
+
+      final content = await metadataFile.readAsString();
+      final lines = content.split('\n');
+      final map = <String, int>{};
+
+      for (final line in lines) {
+        final parts = line.split('=');
+        if (parts.length == 2) {
+          map[parts[0]] = int.tryParse(parts[1]) ?? 0;
+        }
+      }
+
+      return TrimMetadata(
+        trimStart: Duration(milliseconds: map['trimStart'] ?? 0),
+        trimEnd: Duration(milliseconds: map['trimEnd'] ?? 0),
+        totalDuration: Duration(milliseconds: map['totalDuration'] ?? 0),
+        contentStart: Duration(milliseconds: map['contentStart'] ?? 0),
+        contentEnd: Duration(milliseconds: map['contentEnd'] ?? 0),
+      );
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error reading trim metadata: $e');
+      return null;
+    }
+  }
+
+  /// Delete trim metadata file.
+  Future<void> deleteTrimMetadata(String audioPath) async {
+    try {
+      final metadataFile = File('$audioPath.trim');
+      if (await metadataFile.exists()) {
+        await metadataFile.delete();
+      }
+    } catch (e) {
+      debugPrint('AudioTrimmer: Error deleting trim metadata: $e');
+    }
+  }
+}
+
+/// Trim metadata for audio playback.
+class TrimMetadata {
+  const TrimMetadata({
+    required this.trimStart,
+    required this.trimEnd,
+    required this.totalDuration,
+    required this.contentStart,
+    required this.contentEnd,
+  });
+
+  /// Duration trimmed from start.
+  final Duration trimStart;
+
+  /// Duration trimmed from end.
+  final Duration trimEnd;
+
+  /// Original total duration.
+  final Duration totalDuration;
+
+  /// Start position of actual content.
+  final Duration contentStart;
+
+  /// End position of actual content.
+  final Duration contentEnd;
+
+  /// Duration of actual content.
+  Duration get contentDuration => contentEnd - contentStart;
+
+  /// Whether file has been trimmed.
+  bool get hasTrimming => trimStart > Duration.zero || trimEnd > Duration.zero;
+}
