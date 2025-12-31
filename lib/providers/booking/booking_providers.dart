@@ -139,10 +139,41 @@ class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
   }
 
   /// Approve a trial lesson request
-  Future<LessonBooking> approveTrialLesson(String bookingId) async {
+  /// If [selectedOptionId] is provided, use that schedule option for the lesson
+  Future<LessonBooking> approveTrialLesson(
+    String bookingId, {
+    String? selectedOptionId,
+  }) async {
     state = const AsyncValue.loading();
     try {
-      final booking = await _repository.approveTrialLesson(bookingId);
+      final booking = await _repository.approveTrialLesson(
+        bookingId,
+        selectedOptionId: selectedOptionId,
+      );
+      final bookings = await _repository.getAllBookings();
+      state = AsyncValue.data(bookings);
+      return booking;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Request a regular lesson (student-initiated, pending teacher approval)
+  Future<LessonBooking> requestRegularLesson({
+    required String teacherId,
+    required String teacherName,
+    required RegularLessonRequest request,
+    int monthlyFee = 200000,
+  }) async {
+    state = const AsyncValue.loading();
+    try {
+      final booking = await _repository.requestRegularLesson(
+        teacherId: teacherId,
+        teacherName: teacherName,
+        request: request,
+        monthlyFee: monthlyFee,
+      );
       final bookings = await _repository.getAllBookings();
       state = AsyncValue.data(bookings);
       return booking;

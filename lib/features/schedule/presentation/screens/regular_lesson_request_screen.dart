@@ -6,60 +6,58 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/lesson_booking.dart' hide LessonType;
+import '../../../../models/lesson_booking.dart';
 import '../../../../models/student.dart';
-import '../../../../models/teacher_student_relation.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../../providers/student/student_providers.dart';
 import '../widgets/schedule_option_card.dart';
 import '../widgets/schedule_option_picker.dart';
 
-/// Screen for student to request a trial or one-time lesson
-/// Supports multi-option scheduling (1-3 options with priority)
-class TrialLessonRequestScreen extends ConsumerStatefulWidget {
+/// Screen for student to request a regular lesson with multi-option scheduling
+/// Supports 1-3 schedule options with priority for teacher selection
+class RegularLessonRequestScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName;
   final String? studentId;
-  final LessonType lessonType;
 
-  const TrialLessonRequestScreen({
+  const RegularLessonRequestScreen({
     super.key,
     required this.teacherId,
     required this.teacherName,
     this.studentId,
-    this.lessonType = LessonType.trial,
   });
 
   @override
-  ConsumerState<TrialLessonRequestScreen> createState() =>
-      _TrialLessonRequestScreenState();
+  ConsumerState<RegularLessonRequestScreen> createState() =>
+      _RegularLessonRequestScreenState();
 }
 
-class _TrialLessonRequestScreenState
-    extends ConsumerState<TrialLessonRequestScreen> {
+class _RegularLessonRequestScreenState
+    extends ConsumerState<RegularLessonRequestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _messageController = TextEditingController();
   final _uuid = const Uuid();
 
-  // Multi-option schedule
+  // Lesson frequency
+  int _lessonsPerWeek = 1;
+
+  // Multi-option schedule (each option contains 1 or 2 day+time pairs)
   List<ScheduleOption> _scheduleOptions = [];
   static const int _lessonDuration = 60;
   static const int _maxOptions = 3;
   static const int _minOptions = 1;
 
-  LessonGoal _selectedGoal = LessonGoal.hobby;
-  ExperienceLevel _selectedExperience = ExperienceLevel.beginner;
+  // Preferred start date
+  DateTime _preferredStartDate = _getNextMonday();
+
   bool _isSubmitting = false;
   Student? _currentStudent;
 
-  // Helper getters
-  bool get _isTrialLesson => widget.lessonType == LessonType.trial;
-  String get _screenTitle => _isTrialLesson ? '체험레슨 신청' : '1회 레슨 신청';
-  String get _priceLabel => _isTrialLesson ? '체험레슨 30,000원' : '1회 레슨 50,000원';
-  String get _submitButtonLabel =>
-      _isTrialLesson ? '체험레슨 신청하기' : '1회 레슨 신청하기';
-  String get _successMessage =>
-      _isTrialLesson ? '체험레슨 신청이 완료되었습니다' : '1회 레슨 신청이 완료되었습니다';
+  static DateTime _getNextMonday() {
+    final now = DateTime.now();
+    final daysUntilMonday = (DateTime.monday - now.weekday) % 7;
+    return now.add(Duration(days: daysUntilMonday == 0 ? 7 : daysUntilMonday));
+  }
 
   @override
   void initState() {
@@ -69,13 +67,12 @@ class _TrialLessonRequestScreenState
   }
 
   void _initializeDefaultOption() {
-    // Start with one default option
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    // Start with one default option (Tuesday 2pm for weekly 1x)
     _scheduleOptions = [
       ScheduleOption(
         id: _uuid.v4(),
         priority: 1,
-        date: tomorrow,
+        dayOfWeek: DateTime.tuesday,
         startTime: const TimeOfDay(hour: 14, minute: 0),
         endTime: const TimeOfDay(hour: 15, minute: 0),
       ),
@@ -90,9 +87,6 @@ class _TrialLessonRequestScreenState
       if (student != null && mounted) {
         setState(() {
           _currentStudent = student;
-          _selectedGoal = LessonGoal.hobby;
-          _selectedExperience =
-              ExperienceLevel.fromStudentLevel(student.level);
         });
       }
     } catch (e) {
@@ -111,9 +105,14 @@ class _TrialLessonRequestScreenState
     final priority = isNew ? _scheduleOptions.length + 1 : index + 1;
     final existingOption = isNew ? null : _scheduleOptions[index];
 
+    // Determine picker mode based on lessons per week
+    final pickerMode = _lessonsPerWeek == 2
+        ? ScheduleOptionPickerMode.regularLesson2x
+        : ScheduleOptionPickerMode.regularLesson;
+
     final result = await ScheduleOptionPicker.show(
       context: context,
-      mode: ScheduleOptionPickerMode.singleLesson,
+      mode: pickerMode,
       initialOption: existingOption,
       priority: priority,
       lessonDuration: _lessonDuration,
@@ -156,11 +155,35 @@ class _TrialLessonRequestScreenState
     });
   }
 
+  void _onLessonsPerWeekChanged(int value) {
+    if (_lessonsPerWeek == value) return;
+
+    setState(() {
+      _lessonsPerWeek = value;
+      // Reset options when changing frequency
+      _scheduleOptions = [
+        ScheduleOption(
+          id: _uuid.v4(),
+          priority: 1,
+          dayOfWeek: DateTime.tuesday,
+          startTime: const TimeOfDay(hour: 14, minute: 0),
+          endTime: const TimeOfDay(hour: 15, minute: 0),
+          // For 2x, add second slot
+          secondDayOfWeek: value == 2 ? DateTime.thursday : null,
+          secondStartTime:
+              value == 2 ? const TimeOfDay(hour: 14, minute: 0) : null,
+          secondEndTime:
+              value == 2 ? const TimeOfDay(hour: 15, minute: 0) : null,
+        ),
+      ];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_screenTitle),
+        title: const Text('정규레슨 신청'),
       ),
       body: Form(
         key: _formKey,
@@ -177,8 +200,18 @@ class _TrialLessonRequestScreenState
 
                     const SizedBox(height: AppSpacing.space6),
 
+                    // Lessons per week
+                    _buildLessonsPerWeekSection(),
+
+                    const SizedBox(height: AppSpacing.space6),
+
                     // Schedule options
                     _buildScheduleOptionsSection(),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Preferred start date
+                    _buildStartDateSection(),
 
                     const SizedBox(height: AppSpacing.space6),
 
@@ -243,7 +276,7 @@ class _TrialLessonRequestScreenState
                   style: AppTypography.headingSmall,
                 ),
                 Text(
-                  _priceLabel,
+                  '정규레슨 신청',
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -260,7 +293,93 @@ class _TrialLessonRequestScreenState
     return Text(title, style: AppTypography.headingSmall);
   }
 
+  Widget _buildLessonsPerWeekSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('레슨 횟수'),
+        const SizedBox(height: AppSpacing.space3),
+        Row(
+          children: [
+            Expanded(
+              child: _buildFrequencyOption(
+                title: '주 1회',
+                subtitle: '월 4회',
+                isSelected: _lessonsPerWeek == 1,
+                onTap: () => _onLessonsPerWeekChanged(1),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: _buildFrequencyOption(
+                title: '주 2회',
+                subtitle: '월 8회',
+                isSelected: _lessonsPerWeek == 2,
+                onTap: () => _onLessonsPerWeekChanged(2),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          '* 5주차가 있는 달은 기본 휴강입니다',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFrequencyOption({
+    required String title,
+    required String subtitle,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: isSelected
+          ? AppColors.primary.withValues(alpha: 0.1)
+          : AppColors.surfaceLight,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Text(
+                title,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color:
+                      isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildScheduleOptionsSection() {
+    final is2xWeekly = _lessonsPerWeek == 2;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,6 +408,18 @@ class _TrialLessonRequestScreenState
               ),
             ),
           ],
+        ),
+
+        const SizedBox(height: AppSpacing.space2),
+
+        // Description
+        Text(
+          is2xWeekly
+              ? '각 옵션에 2개의 요일을 선택하세요 (예: 화+목)'
+              : '각 옵션에 1개의 요일과 시간을 선택하세요',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
         ),
 
         const SizedBox(height: AppSpacing.space2),
@@ -391,6 +522,69 @@ class _TrialLessonRequestScreenState
     );
   }
 
+  Widget _buildStartDateSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('희망 시작일'),
+        const SizedBox(height: AppSpacing.space3),
+        InkWell(
+          onTap: _selectStartDate,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              border: Border.all(color: AppColors.borderLight),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today, color: AppColors.primary),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Text(
+                    _formatDate(_preferredStartDate),
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Icon(Icons.edit, size: 18, color: AppColors.textTertiaryLight),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          '* 선생님이 다른 시작일을 제안할 수 있습니다',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _selectStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _preferredStartDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 90)),
+      locale: const Locale('ko'),
+    );
+
+    if (picked != null && mounted) {
+      setState(() => _preferredStartDate = picked);
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+    return '${date.year}년 ${date.month}월 ${date.day}일 (${weekdays[date.weekday - 1]})';
+  }
+
   Widget _buildBottomButton() {
     return Container(
       padding: EdgeInsets.only(
@@ -419,7 +613,7 @@ class _TrialLessonRequestScreenState
                     color: Colors.white,
                   ),
                 )
-              : Text(_submitButtonLabel),
+              : const Text('정규레슨 신청하기'),
         ),
       ),
     );
@@ -440,7 +634,7 @@ class _TrialLessonRequestScreenState
 
     // Validate all options have complete data
     for (final option in _scheduleOptions) {
-      if (option.date == null ||
+      if (option.dayOfWeek == null ||
           option.startTime == null ||
           option.endTime == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -450,6 +644,21 @@ class _TrialLessonRequestScreenState
           ),
         );
         return;
+      }
+
+      // For 2x weekly, validate second slot
+      if (_lessonsPerWeek == 2) {
+        if (option.secondDayOfWeek == null ||
+            option.secondStartTime == null ||
+            option.secondEndTime == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${option.priorityLabel}의 두 번째 요일을 선택해주세요'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          return;
+        }
       }
     }
 
@@ -467,18 +676,19 @@ class _TrialLessonRequestScreenState
 
     try {
       // Create request with multiple schedule options
-      final request = TrialLessonRequest(
+      final request = RegularLessonRequest(
+        studentId: _currentStudent!.id,
         studentName: _currentStudent!.name,
         studentPhone: _currentStudent!.phone,
         studentEmail: _currentStudent!.email,
-        goal: _selectedGoal,
-        experience: _selectedExperience,
+        lessonsPerWeek: _lessonsPerWeek,
+        scheduleOptions: _scheduleOptions,
+        preferredStartDate: _preferredStartDate,
         message:
             _messageController.text.isEmpty ? null : _messageController.text,
-        scheduleOptions: _scheduleOptions,
       );
 
-      await ref.read(bookingsNotifierProvider.notifier).requestTrialLesson(
+      await ref.read(bookingsNotifierProvider.notifier).requestRegularLesson(
             teacherId: widget.teacherId,
             teacherName: widget.teacherName,
             request: request,
@@ -486,8 +696,8 @@ class _TrialLessonRequestScreenState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_successMessage),
+          const SnackBar(
+            content: Text('정규레슨 신청이 완료되었습니다'),
             backgroundColor: AppColors.practiceGood,
           ),
         );

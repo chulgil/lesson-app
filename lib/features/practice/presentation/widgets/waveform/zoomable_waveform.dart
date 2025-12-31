@@ -53,10 +53,20 @@ class _ZoomableWaveformProgressBarState
   double _baseScale = 1.0;
   double _offset = 0.0; // Normalized offset (0.0 to 1.0 - 1/_scale)
   Offset? _lastFocalPoint;
+  Offset? _scaleStartPoint;
 
   // For marker dragging
   bool _isDraggingMarkerA = false;
   bool _isDraggingMarkerB = false;
+
+  // For distinguishing tap from pan
+  bool _isPanning = false;
+  bool _isZooming = false;
+
+  // For reliable tap detection on iOS
+  bool _isInScaleGesture = false;
+  double _maxMoveDistance = 0.0;
+  static const double _tapThreshold = 15.0; // Max movement to be considered a tap
 
   /// Convert local x position to progress value considering zoom
   double _localXToProgress(double localX, double width) {
@@ -79,15 +89,60 @@ class _ZoomableWaveformProgressBarState
     return (touchX - markerX).abs() < 20; // 20px touch target
   }
 
-  void _handleScaleStart(ScaleStartDetails details) {
+  void _handleScaleStart(ScaleStartDetails details, double width) {
     _baseScale = _scale;
     _lastFocalPoint = details.localFocalPoint;
+    _scaleStartPoint = details.localFocalPoint;
+    _isPanning = false;
+    _isZooming = false;
+    _isInScaleGesture = true;
+    _maxMoveDistance = 0.0;
+
+    // Check if starting on a marker
+    final localX = details.localFocalPoint.dx;
+    if (widget.abLoop.hasA) {
+      final aProgress =
+          widget.abLoop.pointA!.inMilliseconds / widget.duration.inMilliseconds;
+      if (_isNearMarker(localX, aProgress, width)) {
+        _isDraggingMarkerA = true;
+        return;
+      }
+    }
+    if (widget.abLoop.hasB) {
+      final bProgress =
+          widget.abLoop.pointB!.inMilliseconds / widget.duration.inMilliseconds;
+      if (_isNearMarker(localX, bProgress, width)) {
+        _isDraggingMarkerB = true;
+        return;
+      }
+    }
   }
 
   void _handleScaleUpdate(ScaleUpdateDetails details, double width) {
+    // Track max movement distance from start point for tap detection
+    if (_scaleStartPoint != null) {
+      final distance = (details.localFocalPoint - _scaleStartPoint!).distance;
+      if (distance > _maxMoveDistance) {
+        _maxMoveDistance = distance;
+      }
+    }
+
+    // Handle marker dragging
+    if (_isDraggingMarkerA || _isDraggingMarkerB) {
+      final localX = details.localFocalPoint.dx;
+      final newProgress = _localXToProgress(localX, width);
+      if (_isDraggingMarkerA && widget.onABMarkerDrag != null) {
+        widget.onABMarkerDrag!(true, newProgress);
+      } else if (_isDraggingMarkerB && widget.onABMarkerDrag != null) {
+        widget.onABMarkerDrag!(false, newProgress);
+      }
+      return;
+    }
+
     setState(() {
-      // Handle pinch zoom
+      // Detect if zooming (pinch with scale != 1.0)
       if (details.scale != 1.0) {
+        _isZooming = true;
         final newScale =
             (_baseScale * details.scale).clamp(widget.minScale, widget.maxScale);
 
@@ -104,12 +159,19 @@ class _ZoomableWaveformProgressBarState
         _scale = newScale;
       }
 
-      // Handle pan when zoomed
-      if (_scale > 1.0 && details.scale == 1.0) {
-        final delta = details.focalPoint.dx - (_lastFocalPoint?.dx ?? 0);
-        final visibleWidth = 1.0 / _scale;
-        final progressDelta = -delta / width * visibleWidth;
-        _offset = (_offset + progressDelta).clamp(0.0, 1.0 - visibleWidth);
+      // Handle pan when zoomed (single finger drag)
+      if (_scale > 1.0 && details.scale == 1.0 && details.pointerCount == 1) {
+        // Use localFocalPoint for consistent coordinate comparison
+        final delta = details.localFocalPoint.dx - (_lastFocalPoint?.dx ?? 0);
+        // Mark as panning if moved more than threshold
+        if (delta.abs() > 5) {
+          _isPanning = true;
+        }
+        if (_isPanning) {
+          final visibleWidth = 1.0 / _scale;
+          final progressDelta = -delta / width * visibleWidth;
+          _offset = (_offset + progressDelta).clamp(0.0, 1.0 - visibleWidth);
+        }
       }
 
       _lastFocalPoint = details.localFocalPoint;
@@ -120,50 +182,39 @@ class _ZoomableWaveformProgressBarState
     });
   }
 
-  void _handleTapDown(TapDownDetails details, double width) {
-    final localX = details.localPosition.dx;
+  void _handleScaleEnd(ScaleEndDetails details, double width) {
+    // Use distance-based tap detection for reliability on iOS
+    // If movement was minimal, treat as a tap (not pan, not zoom, not marker drag)
+    final isTap = _maxMoveDistance < _tapThreshold &&
+        !_isZooming &&
+        !_isDraggingMarkerA &&
+        !_isDraggingMarkerB;
 
-    // Check if tapping on A or B marker for dragging
-    if (widget.abLoop.hasA) {
-      final aProgress =
-          widget.abLoop.pointA!.inMilliseconds / widget.duration.inMilliseconds;
-      if (_isNearMarker(localX, aProgress, width)) {
-        _isDraggingMarkerA = true;
-        return;
-      }
-    }
+    debugPrint('ZoomableWaveform: scaleEnd - maxMove: $_maxMoveDistance, isTap: $isTap, zooming: $_isZooming');
 
-    if (widget.abLoop.hasB) {
-      final bProgress =
-          widget.abLoop.pointB!.inMilliseconds / widget.duration.inMilliseconds;
-      if (_isNearMarker(localX, bProgress, width)) {
-        _isDraggingMarkerB = true;
-        return;
-      }
-    }
-
-    // Regular seek
-    final newProgress = _localXToProgress(localX, width);
-    widget.onSeek(newProgress);
-  }
-
-  void _handlePanUpdate(DragUpdateDetails details, double width) {
-    final localX = details.localPosition.dx;
-    final newProgress = _localXToProgress(localX, width);
-
-    if (_isDraggingMarkerA && widget.onABMarkerDrag != null) {
-      widget.onABMarkerDrag!(true, newProgress);
-    } else if (_isDraggingMarkerB && widget.onABMarkerDrag != null) {
-      widget.onABMarkerDrag!(false, newProgress);
-    } else if (!_isDraggingMarkerA && !_isDraggingMarkerB) {
-      // Regular seek while dragging
+    if (isTap && _scaleStartPoint != null) {
+      final newProgress = _localXToProgress(_scaleStartPoint!.dx, width);
+      debugPrint('ZoomableWaveform: TAP SEEK to progress: $newProgress');
       widget.onSeek(newProgress);
     }
-  }
 
-  void _handlePanEnd(DragEndDetails details) {
+    // Reset states
     _isDraggingMarkerA = false;
     _isDraggingMarkerB = false;
+    _isPanning = false;
+    _isZooming = false;
+    _isInScaleGesture = false;
+    _maxMoveDistance = 0.0;
+    _scaleStartPoint = null;
+  }
+
+  /// Handle tap gesture for reliable seek on iOS
+  void _handleTapUp(TapUpDetails details, double width) {
+    // This is called when tap is recognized (no scale gesture interference)
+    if (!_isInScaleGesture) {
+      final newProgress = _localXToProgress(details.localPosition.dx, width);
+      widget.onSeek(newProgress);
+    }
   }
 
   /// Reset zoom to default
@@ -214,12 +265,11 @@ class _ZoomableWaveformProgressBarState
 
             // Waveform
             GestureDetector(
-              onScaleStart: _handleScaleStart,
+              behavior: HitTestBehavior.opaque,
+              onTapUp: (details) => _handleTapUp(details, width),
+              onScaleStart: (details) => _handleScaleStart(details, width),
               onScaleUpdate: (details) => _handleScaleUpdate(details, width),
-              onTapDown: (details) => _handleTapDown(details, width),
-              onHorizontalDragUpdate: (details) =>
-                  _handlePanUpdate(details, width),
-              onHorizontalDragEnd: _handlePanEnd,
+              onScaleEnd: (details) => _handleScaleEnd(details, width),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
@@ -252,7 +302,7 @@ class _ZoomableWaveformProgressBarState
                   offset: _offset,
                   abLoop: widget.abLoop,
                   duration: widget.duration,
-                  onTap: (newOffset) {
+                  onOffsetChanged: (newOffset) {
                     setState(() {
                       final maxOffset = 1.0 - (1.0 / _scale);
                       _offset = newOffset.clamp(0.0, maxOffset.clamp(0.0, 1.0));
@@ -455,14 +505,14 @@ class _ZoomableWaveformPainter extends CustomPainter {
 }
 
 /// Mini map showing the full waveform with viewport indicator.
-class _MiniMap extends StatelessWidget {
+class _MiniMap extends StatefulWidget {
   const _MiniMap({
     required this.progress,
     required this.scale,
     required this.offset,
     required this.abLoop,
     required this.duration,
-    required this.onTap,
+    required this.onOffsetChanged,
   });
 
   final double progress;
@@ -470,37 +520,65 @@ class _MiniMap extends StatelessWidget {
   final double offset;
   final ABLoop abLoop;
   final Duration duration;
-  final ValueChanged<double> onTap;
+  final ValueChanged<double> onOffsetChanged;
+
+  @override
+  State<_MiniMap> createState() => _MiniMapState();
+}
+
+class _MiniMapState extends State<_MiniMap> {
+  double? _dragStartOffset;
+
+  void _handleDragStart(DragStartDetails details) {
+    _dragStartOffset = widget.offset;
+  }
+
+  void _handleDragUpdate(DragUpdateDetails details, double width) {
+    if (_dragStartOffset == null) return;
+    final delta = details.delta.dx / width;
+    final visibleWidth = 1.0 / widget.scale;
+    final maxOffset = (1.0 - visibleWidth).clamp(0.0, 1.0);
+    final newOffset = (widget.offset + delta).clamp(0.0, maxOffset);
+    widget.onOffsetChanged(newOffset);
+  }
+
+  void _handleTap(TapDownDetails details, double width) {
+    final localX = details.localPosition.dx;
+    final tapProgress = localX / width;
+    // Center the viewport on tap position
+    final visibleWidth = 1.0 / widget.scale;
+    final newOffset = tapProgress - visibleWidth / 2;
+    widget.onOffsetChanged(newOffset);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (details) {
-        final box = context.findRenderObject() as RenderBox;
-        final localX = details.localPosition.dx;
-        final progress = localX / box.size.width;
-        // Center the viewport on tap position
-        final visibleWidth = 1.0 / scale;
-        final newOffset = progress - visibleWidth / 2;
-        onTap(newOffset);
-      },
-      child: Container(
-        height: 20,
-        decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: CustomPaint(
-          painter: _MiniMapPainter(
-            progress: progress,
-            scale: scale,
-            offset: offset,
-            abLoop: abLoop,
-            duration: duration,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        return GestureDetector(
+          onTapDown: (details) => _handleTap(details, width),
+          onHorizontalDragStart: _handleDragStart,
+          onHorizontalDragUpdate: (details) => _handleDragUpdate(details, width),
+          child: Container(
+            height: 20,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: CustomPaint(
+              painter: _MiniMapPainter(
+                progress: widget.progress,
+                scale: widget.scale,
+                offset: widget.offset,
+                abLoop: widget.abLoop,
+                duration: widget.duration,
+              ),
+              size: const Size(double.infinity, 20),
+            ),
           ),
-          size: const Size(double.infinity, 20),
-        ),
-      ),
+        );
+      },
     );
   }
 }

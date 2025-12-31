@@ -80,6 +80,7 @@ class _PracticeRecordingScreenState
                   isRecording: state.isRecording,
                   isPaused: state.isPaused,
                   duration: _recordingDuration,
+                  amplitudeStream: ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream,
                   onStart: () => _startRecording(),
                   onStop: () => _stopRecording(),
                   onCancel: () => _cancelRecording(),
@@ -219,6 +220,7 @@ class _RecordingSection extends StatelessWidget {
     required this.isRecording,
     required this.isPaused,
     required this.duration,
+    required this.amplitudeStream,
     required this.onStart,
     required this.onStop,
     required this.onCancel,
@@ -227,6 +229,7 @@ class _RecordingSection extends StatelessWidget {
   final bool isRecording;
   final bool isPaused;
   final Duration duration;
+  final Stream<double> amplitudeStream;
   final VoidCallback onStart;
   final VoidCallback onStop;
   final VoidCallback onCancel;
@@ -239,6 +242,10 @@ class _RecordingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final waveformStyle = isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
+    final waveformIsActive = isRecording && !isPaused;
+    debugPrint('_RecordingSection: isRecording=$isRecording, isPaused=$isPaused, style=$waveformStyle, isActive=$waveformIsActive');
+
     return Container(
       padding: EdgeInsets.all(AppSpacing.space6),
       child: Column(
@@ -253,9 +260,11 @@ class _RecordingSection extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: RecordingWaveform(
-                isActive: isRecording && !isPaused,
+                style: waveformStyle,
+                isActive: waveformIsActive,
                 height: 100,
                 waveColor: isRecording ? Colors.white : AppColors.primary,
+                amplitudeStream: amplitudeStream,
               ),
             ),
           ),

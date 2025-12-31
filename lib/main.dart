@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'models/recording.dart';
 import 'providers/metronome/metronome_provider.dart';
 
 void main() async {
@@ -14,6 +15,11 @@ void main() async {
 
   // Initialize Hive for local storage
   await Hive.initFlutter();
+
+  // Register Hive adapters
+  Hive.registerAdapter(RecordingTypeAdapter());
+  Hive.registerAdapter(StorageStatusAdapter());
+  Hive.registerAdapter(RecordingAdapter());
 
   // Initialize date formatting for Korean locale
   await initializeDateFormatting('ko');

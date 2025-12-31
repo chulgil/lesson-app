@@ -605,66 +605,6 @@ class _PaymentManagementScreenState
     );
   }
 
-  /// Mark payment as student confirmed (step 1)
-  Future<void> _markStudentConfirmed(Payment payment) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('입금 완료 알림'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${payment.studentName}님이 입금을 완료했나요?'),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 18, color: AppColors.info),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '선생님이 계좌 확인 후 최종 입금확인을 진행합니다',
-                      style: AppTypography.caption.copyWith(color: AppColors.info),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.info),
-            child: const Text('입금 완료'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await ref.read(paymentsNotifierProvider.notifier).markStudentConfirmed(payment.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${payment.studentName}님 입금완료 알림이 등록되었습니다'),
-            backgroundColor: AppColors.info,
-          ),
-        );
-      }
-    }
-  }
-
   /// Confirm payment as teacher (step 2 or direct confirmation)
   Future<void> _confirmPayment(Payment payment) async {
     final isStep2 = payment.isAwaitingTeacherConfirmation;

@@ -5,9 +5,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
+import '../../../../models/recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../providers/recording/recording_provider.dart';
 import '../widgets/metronome/metronome.dart';
+import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
 
 /// Section detail screen showing section info and recordings
@@ -244,28 +247,60 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     );
   }
 
-  void _startRecording() {
-    setState(() {
-      _isRecording = true;
-      _isPaused = false;
-      _recordingSeconds = 0;
-    });
-    // TODO: Start actual recording
-    _startTimer();
+  Future<void> _startRecording() async {
+    final recorder = ref.read(audioRecorderServiceProvider);
+
+    // Check permission first
+    if (!await recorder.hasPermission()) {
+      final granted = await recorder.requestPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('마이크 권한이 필요합니다'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // Start actual recording
+    final path = await recorder.startRecording(repertoireId: widget.repertoireId);
+    if (path != null) {
+      setState(() {
+        _isRecording = true;
+        _isPaused = false;
+        _recordingSeconds = 0;
+      });
+      _startTimer();
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('녹음을 시작할 수 없습니다'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  void _pauseRecording() {
+  Future<void> _pauseRecording() async {
+    final recorder = ref.read(audioRecorderServiceProvider);
+    await recorder.pauseRecording();
     setState(() {
       _isPaused = true;
     });
-    // TODO: Pause actual recording
   }
 
-  void _resumeRecording() {
+  Future<void> _resumeRecording() async {
+    final recorder = ref.read(audioRecorderServiceProvider);
+    await recorder.resumeRecording();
     setState(() {
       _isPaused = false;
     });
-    // TODO: Resume actual recording
     _startTimer();
   }
 
@@ -284,7 +319,11 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   Future<void> _stopRecording(PracticeSection section) async {
+    final recorder = ref.read(audioRecorderServiceProvider);
+
     if (_recordingSeconds < 3) {
+      // Cancel recording if too short
+      await recorder.cancelRecording();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
@@ -299,13 +338,28 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       return;
     }
 
+    // Stop actual recording and get file path
+    final filePath = await recorder.stopRecording();
+
     setState(() {
       _isRecording = false;
       _isPaused = false;
     });
 
-    // TODO: Save actual recording file
-    final mockFilePath = '/recordings/mock_${DateTime.now().millisecondsSinceEpoch}.m4a';
+    if (filePath == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('녹음 저장에 실패했습니다'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      setState(() {
+        _recordingSeconds = 0;
+      });
+      return;
+    }
 
     // Capture current metronome BPM
     final metronomeBpm = ref.read(metronomeProvider).settings.bpm;
@@ -313,7 +367,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     try {
       await ref.read(recordingCrudProvider.notifier).createRecording(
             sectionId: widget.sectionId,
-            filePath: mockFilePath,
+            filePath: filePath, // Use actual file path from recorder
             durationSeconds: _recordingSeconds,
             bpm: metronomeBpm, // Save metronome BPM
             isRepresentative: section.recordings.isEmpty, // First recording is representative
@@ -432,12 +486,25 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     }
   }
 
-  void _playRecording(PracticeRecording recording) {
-    // TODO: Implement audio playback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('재생: ${recording.formattedDuration}'),
-      ),
+  void _playRecording(PracticeRecording practiceRecording) {
+    // Convert PracticeRecording to Recording model for the player sheet
+    final recording = Recording(
+      id: practiceRecording.id,
+      repertoireId: widget.repertoireId,
+      studentId: widget.studentId,
+      type: RecordingType.student,
+      localPath: practiceRecording.filePath,
+      durationSeconds: practiceRecording.durationSeconds,
+      recordedAt: practiceRecording.createdAt,
+      isRepresentative: practiceRecording.isRepresentative,
+    );
+
+    // Show the recording player bottom sheet
+    RecordingPlayerSheet.show(
+      context,
+      recording: recording,
+      repertoireId: widget.repertoireId,
+      studentId: widget.studentId,
     );
   }
 

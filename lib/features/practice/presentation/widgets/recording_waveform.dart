@@ -54,8 +54,11 @@ class RecordingWaveform extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('RecordingWaveform: style=$style, isActive=$isActive, hasStream=${amplitudeStream != null}');
+
     switch (style) {
       case WaveformStyle.wave:
+        debugPrint('RecordingWaveform: Rendering WaveWaveform');
         return WaveWaveform(
           isActive: isActive,
           height: height,
@@ -65,6 +68,7 @@ class RecordingWaveform extends StatelessWidget {
 
       case WaveformStyle.amplitude:
         if (amplitudeStream == null) {
+          debugPrint('RecordingWaveform: amplitude style but NO STREAM - falling back to wave');
           // Fallback to wave if no stream provided
           return WaveWaveform(
             isActive: isActive,
@@ -73,6 +77,7 @@ class RecordingWaveform extends StatelessWidget {
             waveCount: waveCount,
           );
         }
+        debugPrint('RecordingWaveform: Creating AmplitudeWaveform with isActive=$isActive');
         return AmplitudeWaveform(
           amplitudeStream: amplitudeStream!,
           isActive: isActive,

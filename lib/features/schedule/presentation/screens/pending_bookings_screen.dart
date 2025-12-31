@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -8,9 +7,11 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../models/time_slot.dart';
 import '../../../../providers/booking/booking_providers.dart';
-import '../widgets/booking_card.dart';
+import '../widgets/schedule_option_card.dart';
+import '../widgets/teacher_approval_card.dart';
 
 /// Screen showing pending booking requests for teacher approval
+/// Supports multi-option schedule selection
 class PendingBookingsScreen extends ConsumerWidget {
   final String teacherId;
 
@@ -42,83 +43,12 @@ class PendingBookingsScreen extends ConsumerWidget {
               itemCount: bookings.length,
               itemBuilder: (context, index) {
                 final booking = bookings[index];
-                return BookingCard(
-                  booking: booking,
-                  showActions: true,
-                  onTap: () {
-                    context.push('/schedule/booking/${booking.id}');
-                  },
-                  onApprove: () async {
-                    final confirmed = await _showApproveConfirmation(context);
-                    if (confirmed && context.mounted) {
-                      try {
-                        await ref
-                            .read(bookingsNotifierProvider.notifier)
-                            .approveTrialLesson(booking.id);
-                        ref.invalidate(pendingBookingsProvider(teacherId));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  '${booking.studentName}님의 체험레슨이 승인되었습니다'),
-                              backgroundColor: AppColors.practiceGood,
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('승인 처리 중 오류가 발생했습니다: $e'),
-                              backgroundColor: AppColors.error,
-                            ),
-                          );
-                        }
-                      }
-                    }
-                  },
-                  onReject: () async {
-                    final result = await showModalBottomSheet<
-                        ({UnavailableReason reason, List<TimeSlot> suggestedSlots})>(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) => _UnavailableBottomSheet(
-                        teacherId: booking.teacherId,
-                      ),
-                    );
-                    if (result != null && context.mounted) {
-                      try {
-                        await ref
-                            .read(bookingsNotifierProvider.notifier)
-                            .markUnavailable(
-                              booking.id,
-                              result.reason,
-                              suggestedTimeSlots: result.suggestedSlots.isNotEmpty
-                                  ? result.suggestedSlots
-                                  : null,
-                            );
-                        ref.invalidate(pendingBookingsProvider(teacherId));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result.suggestedSlots.isNotEmpty
-                                  ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
-                                  : '학생에게 안내가 전달되었습니다'),
-                            ),
-                          );
-                        }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('처리 중 오류가 발생했습니다: $e'),
-                              backgroundColor: AppColors.error,
-                            ),
-                          );
-                        }
-                      }
-                    }
-                  },
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+                  child: TeacherApprovalListItem(
+                    booking: booking,
+                    onTap: () => _showApprovalSheet(context, ref, booking),
+                  ),
                 );
               },
             ),
@@ -164,7 +94,7 @@ class PendingBookingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '새로운 체험레슨 신청이 들어오면\n여기에 표시됩니다',
+            '새로운 레슨 신청이 들어오면\n여기에 표시됩니다',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textTertiaryLight,
             ),
@@ -175,27 +105,502 @@ class PendingBookingsScreen extends ConsumerWidget {
     );
   }
 
-  Future<bool> _showApproveConfirmation(BuildContext context) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('체험레슨 승인'),
-            content: const Text('이 체험레슨 신청을 승인하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+  void _showApprovalSheet(
+    BuildContext context,
+    WidgetRef ref,
+    LessonBooking booking,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => _ApprovalBottomSheet(
+          booking: booking,
+          teacherId: teacherId,
+          scrollController: scrollController,
+          onApproved: () {
+            ref.invalidate(pendingBookingsProvider(teacherId));
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Bottom sheet for booking approval with multi-option support
+class _ApprovalBottomSheet extends ConsumerStatefulWidget {
+  final LessonBooking booking;
+  final String teacherId;
+  final ScrollController scrollController;
+  final VoidCallback onApproved;
+
+  const _ApprovalBottomSheet({
+    required this.booking,
+    required this.teacherId,
+    required this.scrollController,
+    required this.onApproved,
+  });
+
+  @override
+  ConsumerState<_ApprovalBottomSheet> createState() =>
+      _ApprovalBottomSheetState();
+}
+
+class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
+  String? _selectedOptionId;
+  bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-select primary option if available
+    if (widget.booking.hasScheduleOptions) {
+      _selectedOptionId = widget.booking.primaryOption?.id;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final booking = widget.booking;
+    final options = booking.sortedScheduleOptions;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXLarge),
+        ),
+      ),
+      child: Column(
+        children: [
+          // Handle bar
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: AppSpacing.space2),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(2),
               ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('승인'),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Row(
+              children: [
+                _buildLessonTypeBadge(booking),
+                const Spacer(),
+                Text(
+                  _getTimeSinceRequest(booking),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Divider(color: AppColors.borderLight, height: 1),
+
+          // Content
+          Expanded(
+            child: ListView(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              children: [
+                // Student info
+                _buildStudentInfo(booking),
+
+                const SizedBox(height: AppSpacing.space5),
+
+                // Schedule options or single schedule
+                if (options.isNotEmpty) ...[
+                  Text(
+                    '희망 일정 중 하나를 선택해주세요',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  ...options.map((option) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                        child: ScheduleOptionCard(
+                          option: option,
+                          mode: ScheduleOptionCardMode.teacher,
+                          isSelected: option.id == _selectedOptionId,
+                          onTap: () {
+                            setState(() => _selectedOptionId = option.id);
+                          },
+                        ),
+                      )),
+                ] else ...[
+                  // Legacy single option display
+                  _buildLegacyScheduleCard(booking),
+                ],
+
+                const SizedBox(height: AppSpacing.space4),
+
+                // Warning note
+                _buildWarningNote(),
+              ],
+            ),
+          ),
+
+          // Action buttons
+          _buildActionButtons(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLessonTypeBadge(LessonBooking booking) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space1,
+      ),
+      decoration: BoxDecoration(
+        color: booking.lessonType.color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+      ),
+      child: Text(
+        '${booking.lessonType.label}레슨 신청',
+        style: AppTypography.bodySmall.copyWith(
+          color: booking.lessonType.color,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentInfo(LessonBooking booking) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          child: Text(
+            booking.studentName.isNotEmpty ? booking.studentName[0] : '?',
+            style: AppTypography.headingMedium.copyWith(
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                booking.studentName,
+                style: AppTypography.headingSmall,
+              ),
+              if (booking.lessonGoal != null || booking.experienceLevel != null)
+                Text(
+                  [
+                    if (booking.lessonGoal != null) booking.lessonGoal!.label,
+                    if (booking.experienceLevel != null)
+                      booking.experienceLevel!.label,
+                  ].join(' · '),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              if (booking.studentMessage != null &&
+                  booking.studentMessage!.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.space2),
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 16,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          booking.studentMessage!,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLegacyScheduleCard(LessonBooking booking) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(
+          color: AppColors.primary,
+          width: 2,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 18,
+                color: AppColors.textPrimaryLight,
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                booking.fullFormattedDate,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
-        ) ??
-        false;
+          const SizedBox(height: AppSpacing.space2),
+          Row(
+            children: [
+              Icon(
+                Icons.access_time,
+                size: 18,
+                color: AppColors.textSecondaryLight,
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                booking.timeRange,
+                style: AppTypography.bodyMedium,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
+  Widget _buildWarningNote() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 18,
+            color: AppColors.warning,
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              '모든 일정이 불가능하면 거절 후 메시지로 대안을 제안해주세요',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.warning,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    final hasOptions = widget.booking.hasScheduleOptions;
+    final canApprove = !hasOptions || _selectedOptionId != null;
+
+    return Container(
+      padding: EdgeInsets.only(
+        left: AppSpacing.space4,
+        right: AppSpacing.space4,
+        bottom: MediaQuery.of(context).padding.bottom + AppSpacing.space4,
+        top: AppSpacing.space3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundLight,
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _isProcessing ? null : () => _handleReject(context),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                side: BorderSide(color: AppColors.borderLight),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+              ),
+              child: Text(
+                '거절하기',
+                style: AppTypography.button.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: FilledButton(
+              onPressed: canApprove && !_isProcessing
+                  ? () => _handleApprove(context)
+                  : null,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                backgroundColor: AppColors.primary,
+                disabledBackgroundColor:
+                    AppColors.textSecondaryLight.withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+              ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      '승인하기',
+                      style: AppTypography.button.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleApprove(BuildContext context) async {
+    setState(() => _isProcessing = true);
+
+    try {
+      await ref.read(bookingsNotifierProvider.notifier).approveTrialLesson(
+            widget.booking.id,
+            selectedOptionId: _selectedOptionId,
+          );
+
+      if (mounted) {
+        Navigator.pop(context);
+        widget.onApproved();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${widget.booking.studentName}님의 레슨이 승인되었습니다',
+            ),
+            backgroundColor: AppColors.practiceGood,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('승인 처리 중 오류가 발생했습니다: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
+
+  Future<void> _handleReject(BuildContext context) async {
+    final result = await showModalBottomSheet<
+        ({UnavailableReason reason, List<TimeSlot> suggestedSlots})>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => _UnavailableBottomSheet(
+        teacherId: widget.teacherId,
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() => _isProcessing = true);
+
+      try {
+        await ref.read(bookingsNotifierProvider.notifier).markUnavailable(
+              widget.booking.id,
+              result.reason,
+              suggestedTimeSlots:
+                  result.suggestedSlots.isNotEmpty ? result.suggestedSlots : null,
+            );
+
+        if (mounted) {
+          Navigator.pop(context);
+          widget.onApproved();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.suggestedSlots.isNotEmpty
+                  ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
+                  : '학생에게 안내가 전달되었습니다'),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('처리 중 오류가 발생했습니다: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isProcessing = false);
+        }
+      }
+    }
+  }
+
+  String _getTimeSinceRequest(LessonBooking booking) {
+    final now = DateTime.now();
+    final diff = now.difference(booking.createdAt);
+
+    if (diff.inDays > 0) {
+      return '${diff.inDays}일 전 신청';
+    } else if (diff.inHours > 0) {
+      return '${diff.inHours}시간 전 신청';
+    } else if (diff.inMinutes > 0) {
+      return '${diff.inMinutes}분 전 신청';
+    } else {
+      return '방금 신청';
+    }
+  }
 }
 
 /// Bottom sheet for marking booking as unavailable with optional time suggestions

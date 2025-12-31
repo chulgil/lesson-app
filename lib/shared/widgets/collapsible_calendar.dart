@@ -130,14 +130,6 @@ class _CollapsibleCalendarState extends State<CollapsibleCalendar>
     }
   }
 
-  void _goToToday() {
-    final today = DateTime.now();
-    setState(() {
-      _currentMonth = DateTime(today.year, today.month, 1);
-    });
-    widget.onDateSelected(DateTime(today.year, today.month, today.day));
-  }
-
   void _onHeaderTap() {
     // Notify parent to toggle expansion state
     widget.onToggleExpand?.call();

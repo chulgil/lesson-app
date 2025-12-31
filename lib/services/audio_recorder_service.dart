@@ -36,9 +36,33 @@ class AudioRecorderService {
   Stream<Amplitude> get amplitudeStream =>
       _recorder.onAmplitudeChanged(const Duration(milliseconds: 100));
 
+  /// Cached normalized amplitude stream (0.0 to 1.0) for waveform widgets.
+  /// Cached to ensure same stream instance is returned (prevents widget re-subscription).
+  Stream<double>? _normalizedAmplitudeStreamCache;
+  StreamSubscription<double>? _amplitudeBroadcastSubscription;
+
   /// Normalized amplitude stream (0.0 to 1.0) for waveform widgets.
-  Stream<double> get normalizedAmplitudeStream =>
-      amplitudeStream.map((amp) => ((amp.current + 60) / 60).clamp(0.0, 1.0));
+  /// The broadcast stream keeps source subscription alive even when listeners come and go.
+  Stream<double> get normalizedAmplitudeStream {
+    if (_normalizedAmplitudeStreamCache == null) {
+      _normalizedAmplitudeStreamCache = _recorder
+          .onAmplitudeChanged(const Duration(milliseconds: 100))
+          .map((amp) => ((amp.current + 60) / 60).clamp(0.0, 1.0))
+          .asBroadcastStream(
+            onListen: (subscription) {
+              // Keep a reference to prevent cancellation when listener count drops to zero
+              _amplitudeBroadcastSubscription = subscription;
+            },
+            onCancel: (subscription) {
+              // Pause instead of cancel to keep stream alive for future listeners
+              subscription.pause();
+            },
+          );
+    }
+    // Resume if paused (when a new listener attaches)
+    _amplitudeBroadcastSubscription?.resume();
+    return _normalizedAmplitudeStreamCache!;
+  }
 
   /// Current amplitude value (for UI).
   double _currentAmplitude = 0;
@@ -236,6 +260,8 @@ class AudioRecorderService {
   Future<void> dispose() async {
     await _stateSubscription?.cancel();
     await _amplitudeSubscription?.cancel();
+    await _amplitudeBroadcastSubscription?.cancel();
+    _normalizedAmplitudeStreamCache = null;
     await _recorder.dispose();
     debugPrint('AudioRecorder: Disposed');
   }

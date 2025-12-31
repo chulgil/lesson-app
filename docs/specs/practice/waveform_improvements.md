@@ -1,7 +1,7 @@
 # Waveform UI Improvements Specification
 
 > 작성일: 2025-12-31
-> 상태: 승인됨
+> 상태: 구현 완료
 
 ## Overview
 
@@ -204,49 +204,48 @@ class ABMarkerHandle extends StatelessWidget {
 
 ---
 
-## 3. Implementation Plan
+## 3. Implementation Status
 
-### Phase 1: 녹음 파형 모듈화
+### Phase 1: 녹음 파형 모듈화 - COMPLETED
 1. `waveform/` 폴더 생성
 2. `WaveformStyle` enum 및 팩토리 패턴 구현
 3. 기존 `RecordingWaveform` → `WaveWaveform`으로 리팩토링
 4. `AmplitudeWaveform` 위젯 신규 생성
-5. `AudioRecorderService.amplitudeStream` 연결
-6. 최소 녹음 시간(5초) 검증 로직 추가
+5. `AudioRecorderService.normalizedAmplitudeStream` 추가
+6. `minRecordingSeconds=5`, `maxRecordingSeconds=180` 상수 추가
 
-### Phase 2: 재생 파형 개선
-1. `ZoomableWaveform` 위젯 생성
-2. 핀치 줌 제스처 구현
-3. 스크롤 오프셋 관리
-4. 파형 데이터 캐싱
+### Phase 2: 재생 파형 개선 - COMPLETED
+1. `ZoomableWaveformProgressBar` 위젯 생성
+2. 핀치 줌 (1x ~ 10x) 제스처 구현
+3. focal point 기준 줌 및 팬/스크롤 오프셋 관리
+4. 미니맵 오버뷰 (1.5x 이상 줌 시 표시)
 
-### Phase 3: A-B 마커 개선
-1. `ABMarkerHandle` 위젯 생성
-2. 드래그 제스처 구현
-3. 마커 위치 ↔ 시간 변환
-4. 기존 A-B 버튼과 통합
+### Phase 3: A-B 마커 개선 - COMPLETED
+1. A-B 마커 드래그 핸들 (20px 터치 영역)
+2. 드래그 시 마커 위치 실시간 업데이트
+3. `ABLoop` 클래스 별도 모듈 분리
+4. `_handleMarkerDrag` 콜백으로 상태 관리 통합
 
 ---
 
-## 4. File Structure
+## 4. File Structure (Implemented)
 
 ```
 lib/
 ├── features/practice/presentation/
 │   └── widgets/
-│       ├── waveform/                    # 신규 - 파형 모듈 폴더
-│       │   ├── waveform_style.dart      # 신규 - enum 및 팩토리
-│       │   ├── wave_waveform.dart       # 기존 RecordingWaveform 리팩토링
-│       │   └── amplitude_waveform.dart  # 신규 - 막대 그래프
-│       ├── zoomable_waveform.dart       # 신규 - 재생 시 줌 가능 파형
-│       ├── ab_marker_handle.dart        # 신규 - 드래그 가능 마커
-│       ├── recording_waveform.dart      # 기존 유지 (wave_waveform으로 위임)
-│       └── recording_player_sheet.dart  # 수정 (새 위젯 사용)
-├── providers/recording/
-│   ├── amplitude_provider.dart          # 신규 - 진폭 상태 관리
-│   └── waveform_style_provider.dart     # 신규 - 스타일 선택 상태
+│       ├── waveform/                    # 파형 모듈 폴더
+│       │   ├── waveform_style.dart      # enum WaveformStyle (wave/amplitude)
+│       │   ├── wave_waveform.dart       # 곡선 웨이브 애니메이션
+│       │   ├── amplitude_waveform.dart  # 실시간 진폭 막대 그래프
+│       │   ├── zoomable_waveform.dart   # 핀치 줌 재생 파형 + A-B 드래그
+│       │   └── ab_loop.dart             # ABLoop 클래스 (공용)
+│       ├── recording_waveform.dart      # 팩토리 위젯 + exports
+│       └── recording_player_sheet.dart  # ZoomableWaveformProgressBar 사용
+├── services/
+│   └── audio_recorder_service.dart      # normalizedAmplitudeStream 추가
 └── models/
-    └── recording.dart                   # 수정 - minRecordingSeconds 상수
+    └── recording.dart                   # minRecordingSeconds=5, maxRecordingSeconds=180
 ```
 
 ---

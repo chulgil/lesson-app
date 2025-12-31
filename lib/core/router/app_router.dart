@@ -22,11 +22,13 @@ import '../../features/schedule/presentation/screens/pending_bookings_screen.dar
 import '../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
 import '../../features/schedule/presentation/screens/select_teacher_screen.dart';
 import '../../features/schedule/presentation/screens/lesson_type_select_screen.dart';
+import '../../features/schedule/presentation/screens/regular_lesson_request_screen.dart';
 import '../../features/schedule/presentation/screens/trial_lesson_request_screen.dart';
 import '../../models/teacher_student_relation.dart';
 import '../../features/practice/presentation/screens/practice_repertoire_screen.dart';
 import '../../features/practice/presentation/screens/add_repertoire_screen.dart';
 import '../../features/practice/presentation/screens/repertoire_detail_screen.dart';
+import '../../features/practice/presentation/screens/practice_recording_screen.dart';
 import '../../features/practice/presentation/screens/add_section_screen.dart';
 import '../../features/practice/presentation/screens/section_detail_screen.dart';
 import '../../features/student_home/presentation/screens/student_home_screen.dart';
@@ -98,7 +100,8 @@ class AppRoutes {
   static const lessonTypeSelect = '/schedule/lesson/type';
   static const pendingBookings = '/schedule/pending';
   static const trialLessonRequest = '/schedule/trial/request';
-  static const registerRegularLesson = '/schedule/regular/register';
+  static const regularLessonRequest = '/schedule/regular/request'; // Student-initiated
+  static const registerRegularLesson = '/schedule/regular/register'; // Teacher direct registration
   static const bookingList = '/schedule/bookings';
   static const bookingDetail = '/schedule/booking/:id';
 
@@ -106,6 +109,7 @@ class AppRoutes {
   static const practiceRepertoire = '/practice/repertoire';
   static const addRepertoire = '/practice/repertoire/add';
   static const repertoireDetail = '/practice/repertoire/:id';
+  static const practiceRecording = '/practice/recording/:repertoireId';
   static const addSection = '/practice/section/add';
   static const sectionDetail = '/practice/section/:id';
 
@@ -405,7 +409,23 @@ class AppRouter {
         },
       ),
 
-      // Schedule - Register Regular Lesson
+      // Schedule - Regular Lesson Request (Student-initiated)
+      GoRoute(
+        path: AppRoutes.regularLessonRequest,
+        name: 'regularLessonRequest',
+        builder: (context, state) {
+          final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+          final teacherName = state.uri.queryParameters['teacherName'] ?? '선생님';
+          final studentId = state.uri.queryParameters['studentId'];
+          return RegularLessonRequestScreen(
+            teacherId: teacherId,
+            teacherName: teacherName,
+            studentId: studentId,
+          );
+        },
+      ),
+
+      // Schedule - Register Regular Lesson (Teacher direct registration)
       GoRoute(
         path: AppRoutes.registerRegularLesson,
         name: 'registerRegularLesson',
@@ -470,6 +490,22 @@ class AppRouter {
           final studentId = state.uri.queryParameters['studentId'] ?? '';
           return RepertoireDetailScreen(
             repertoireId: repertoireId,
+            studentId: studentId,
+          );
+        },
+      ),
+
+      // Practice - Recording
+      GoRoute(
+        path: AppRoutes.practiceRecording,
+        name: 'practiceRecording',
+        builder: (context, state) {
+          final repertoireId = state.pathParameters['repertoireId'] ?? '';
+          final studentId = state.uri.queryParameters['studentId'] ?? '';
+          final repertoireName = state.uri.queryParameters['name'] ?? '';
+          return PracticeRecordingScreen(
+            repertoireId: repertoireId,
+            repertoireName: repertoireName,
             studentId: studentId,
           );
         },

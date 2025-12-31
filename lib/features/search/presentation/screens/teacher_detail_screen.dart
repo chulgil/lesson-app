@@ -265,7 +265,7 @@ class _TeacherDetailContent extends StatelessWidget {
                           padding:
                               const EdgeInsets.only(bottom: AppSpacing.space2),
                           child: Text(
-                            '${edu.school} ${edu.major}${edu.degree != null ? ' (${edu.degree})' : ''}',
+                            '${edu.school} ${edu.major} (${edu.degree})',
                             style: AppTypography.bodyMedium
                                 .copyWith(color: AppColors.textSecondaryLight),
                           ),
@@ -302,7 +302,7 @@ class _TeacherDetailContent extends StatelessWidget {
                               ),
                               Expanded(
                                 child: Text(
-                                  '${career.organization} - ${career.position}${career.period != null ? ' (${career.period})' : ''}',
+                                  '${career.organization} - ${career.position} (${career.period})',
                                   style: AppTypography.bodyMedium.copyWith(
                                       color: AppColors.textSecondaryLight),
                                 ),
@@ -368,30 +368,54 @@ class _TeacherDetailContent extends StatelessWidget {
                   const SizedBox(height: AppSpacing.space4),
                 ],
 
-                // Contact button
+                // Lesson request buttons
                 const SizedBox(height: AppSpacing.space6),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('체험 레슨 신청 기능은 곧 추가됩니다'),
+                Row(
+                  children: [
+                    // Trial lesson button
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          context.push(
+                            '/schedule/trial/request?teacherId=${profile.id}&teacherName=${Uri.encodeComponent(profile.name ?? '')}',
+                          );
+                        },
+                        icon: const Icon(Icons.school_outlined),
+                        label: const Text('체험레슨'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.secondary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.space3),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.calendar_today),
-                    label: const Text('체험 레슨 신청'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.space3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ),
+                    const SizedBox(width: AppSpacing.space3),
+                    // Regular lesson button
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          context.push(
+                            '/schedule/regular/request?teacherId=${profile.id}&teacherName=${Uri.encodeComponent(profile.name ?? '')}',
+                          );
+                        },
+                        icon: const Icon(Icons.calendar_today),
+                        label: const Text('정규레슨'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.space3),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.space6),
               ],

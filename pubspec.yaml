@@ -38,9 +38,9 @@ dependencies:
   # kakao_flutter_sdk_user: ^1.9.5  # TODO: Add when ready
 
   # Audio
-  # record: ^5.1.2           # TODO: Add when implementing recording
-  # just_audio: ^0.9.39      # TODO: Add when implementing playback
-  # audio_waveforms: ^1.0.5  # TODO: Add when implementing waveforms
+  record: ^6.0.0
+  just_audio: ^0.9.39
+  audioplayers: ^6.1.0      # For simple audio playback
 
   # Push Notifications
   firebase_core: ^3.9.0

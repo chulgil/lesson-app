@@ -40,6 +40,12 @@ class _RepertoireDetailScreenState
       appBar: AppBar(
         title: const Text('레퍼토리 상세'),
         actions: [
+          // Recording button
+          IconButton(
+            onPressed: () => _openRecordingScreen(context),
+            icon: const Icon(Icons.mic),
+            tooltip: '녹음',
+          ),
           if (_hasChanges)
             TextButton(
               onPressed: _saveChanges,
@@ -424,6 +430,16 @@ class _RepertoireDetailScreenState
           ),
         ),
       ),
+    );
+  }
+
+  void _openRecordingScreen(BuildContext context) {
+    final repertoire =
+        ref.read(repertoireProvider(widget.repertoireId)).valueOrNull;
+    final repertoireName = repertoire?.name ?? '';
+    context.push(
+      '${AppRoutes.practiceRecording.replaceFirst(':repertoireId', widget.repertoireId)}'
+      '?studentId=${widget.studentId}&name=${Uri.encodeComponent(repertoireName)}',
     );
   }
 

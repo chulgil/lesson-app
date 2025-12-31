@@ -19,7 +19,16 @@ abstract class BookingRepository {
     required TrialLessonRequest request,
     required int fee,
   });
-  Future<LessonBooking> approveTrialLesson(String id);
+  Future<LessonBooking> approveTrialLesson(String id, {String? selectedOptionId});
+
+  // Regular lesson request (student-initiated, pending approval)
+  Future<LessonBooking> requestRegularLesson({
+    required String teacherId,
+    required String teacherName,
+    required RegularLessonRequest request,
+    int monthlyFee = 200000,
+  });
+
   Future<LessonBooking> markUnavailable(
     String id,
     UnavailableReason reason, {
@@ -263,18 +272,56 @@ class MockBookingRepository implements BookingRepository {
   }
 
   @override
-  Future<LessonBooking> approveTrialLesson(String id) async {
+  Future<LessonBooking> approveTrialLesson(String id, {String? selectedOptionId}) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _bookings.indexWhere((b) => b.id == id);
     if (index == -1) {
       throw Exception('Booking not found');
     }
-    final updated = _bookings[index].copyWith(
+
+    var booking = _bookings[index];
+
+    // If selectedOptionId is provided and the booking has schedule options,
+    // update the lesson date/time from the selected option
+    if (selectedOptionId != null && booking.hasScheduleOptions) {
+      final selectedOption = booking.scheduleOptions?.firstWhere(
+        (o) => o.id == selectedOptionId,
+        orElse: () => booking.scheduleOptions!.first,
+      );
+      if (selectedOption != null && selectedOption.date != null) {
+        booking = booking.copyWith(
+          lessonDate: selectedOption.date,
+          startTime: selectedOption.startTime,
+          endTime: selectedOption.endTime,
+          selectedOptionId: selectedOptionId,
+        );
+      }
+    }
+
+    final updated = booking.copyWith(
       status: BookingStatus.confirmed,
       confirmedAt: DateTime.now(),
     );
     _bookings[index] = updated;
     return updated;
+  }
+
+  @override
+  Future<LessonBooking> requestRegularLesson({
+    required String teacherId,
+    required String teacherName,
+    required RegularLessonRequest request,
+    int monthlyFee = 200000,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final booking = request.toBooking(
+      id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
+      teacherId: teacherId,
+      teacherName: teacherName,
+      monthlyFee: monthlyFee,
+    );
+    _bookings.add(booking);
+    return booking;
   }
 
   @override
