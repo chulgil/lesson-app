@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,6 +19,7 @@ class RecordingState {
     this.isRecording = false,
     this.isPaused = false,
     this.isPlaying = false,
+    this.hasMicInput = true,
     this.currentRecordingPath,
     this.currentRecordingDuration = Duration.zero,
     this.playingRecordingId,
@@ -31,6 +33,7 @@ class RecordingState {
   final bool isRecording;
   final bool isPaused;
   final bool isPlaying;
+  final bool hasMicInput; // true if mic input is detected during recording
   final String? currentRecordingPath;
   final Duration currentRecordingDuration;
   final String? playingRecordingId;
@@ -53,6 +56,7 @@ class RecordingState {
     bool? isRecording,
     bool? isPaused,
     bool? isPlaying,
+    bool? hasMicInput,
     String? currentRecordingPath,
     Duration? currentRecordingDuration,
     String? playingRecordingId,
@@ -66,6 +70,7 @@ class RecordingState {
       isRecording: isRecording ?? this.isRecording,
       isPaused: isPaused ?? this.isPaused,
       isPlaying: isPlaying ?? this.isPlaying,
+      hasMicInput: hasMicInput ?? this.hasMicInput,
       currentRecordingPath: currentRecordingPath ?? this.currentRecordingPath,
       currentRecordingDuration: currentRecordingDuration ?? this.currentRecordingDuration,
       playingRecordingId: playingRecordingId ?? this.playingRecordingId,
@@ -111,6 +116,8 @@ Future<bool> microphonePermission(MicrophonePermissionRef ref) async {
 @riverpod
 class RecordingNotifier extends _$RecordingNotifier {
   static const _uuid = Uuid();
+  static const _micInputThreshold = 0.05; // Minimum amplitude to consider as input
+  static const _micCheckDuration = Duration(milliseconds: 1500); // Time to check for input
 
   RecordingRepository get _repository => ref.read(recordingRepositoryProvider);
   AudioRecorderService get _recorder => ref.read(audioRecorderServiceProvider);
@@ -118,6 +125,7 @@ class RecordingNotifier extends _$RecordingNotifier {
 
   String _repertoireId = '';
   String _studentId = '';
+  StreamSubscription<double>? _micInputCheckSubscription;
 
   @override
   RecordingState build(String repertoireId, String studentId) {
@@ -186,8 +194,12 @@ class RecordingNotifier extends _$RecordingNotifier {
 
       final path = await _recorder.startRecording(repertoireId: _repertoireId);
       if (path != null) {
-        state = state.copyWith(currentRecordingPath: path);
+        state = state.copyWith(currentRecordingPath: path, hasMicInput: true);
         debugPrint('RecordingProvider: Started recording at $path');
+
+        // Start monitoring amplitude for mic input detection
+        _startMicInputCheck();
+
         return true;
       } else {
         // Revert recording state if failed
@@ -199,6 +211,42 @@ class RecordingNotifier extends _$RecordingNotifier {
       state = state.copyWith(isRecording: false, error: 'Failed to start recording');
       return false;
     }
+  }
+
+  /// Start monitoring amplitude to check if mic input is present.
+  void _startMicInputCheck() {
+    _micInputCheckSubscription?.cancel();
+
+    bool hasDetectedInput = false;
+    final startTime = DateTime.now();
+
+    _micInputCheckSubscription = _recorder.normalizedAmplitudeStream.listen((amplitude) {
+      // If we detect any amplitude above threshold, mark as having input
+      if (amplitude > _micInputThreshold) {
+        hasDetectedInput = true;
+        _micInputCheckSubscription?.cancel();
+        _micInputCheckSubscription = null;
+        debugPrint('RecordingProvider: Mic input detected (amplitude=$amplitude)');
+        return;
+      }
+
+      // After check duration, if no input detected, update state
+      if (DateTime.now().difference(startTime) >= _micCheckDuration) {
+        _micInputCheckSubscription?.cancel();
+        _micInputCheckSubscription = null;
+
+        if (!hasDetectedInput && state.isRecording) {
+          state = state.copyWith(hasMicInput: false);
+          debugPrint('RecordingProvider: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
+        }
+      }
+    });
+  }
+
+  /// Stop mic input check subscription.
+  void _stopMicInputCheck() {
+    _micInputCheckSubscription?.cancel();
+    _micInputCheckSubscription = null;
   }
 
   /// Pause recording.
@@ -218,6 +266,8 @@ class RecordingNotifier extends _$RecordingNotifier {
   /// Stop and save recording.
   Future<Recording?> stopRecording() async {
     if (!state.isRecording) return null;
+
+    _stopMicInputCheck();
 
     try {
       final path = await _recorder.stopRecording();
@@ -246,6 +296,7 @@ class RecordingNotifier extends _$RecordingNotifier {
       state = state.copyWith(
         isRecording: false,
         isPaused: false,
+        hasMicInput: true, // Reset for next recording
         currentRecordingPath: null,
         currentRecordingDuration: Duration.zero,
         recordings: [recording, ...state.recordings],
@@ -266,10 +317,14 @@ class RecordingNotifier extends _$RecordingNotifier {
   /// Cancel recording without saving.
   Future<void> cancelRecording() async {
     if (!state.isRecording) return;
+
+    _stopMicInputCheck();
+
     await _recorder.cancelRecording();
     state = state.copyWith(
       isRecording: false,
       isPaused: false,
+      hasMicInput: true, // Reset for next recording
       currentRecordingPath: null,
       currentRecordingDuration: Duration.zero,
     );
