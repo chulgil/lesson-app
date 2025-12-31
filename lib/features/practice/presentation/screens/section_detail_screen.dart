@@ -273,12 +273,13 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       }
     }
 
-    // Start smart recording monitoring
-    ref.read(smartRecordingNotifierProvider.notifier).startMonitoring();
-
-    // Start actual recording
+    // Start actual recording FIRST (this resets amplitude stream cache)
     final path = await recorder.startRecording(repertoireId: widget.repertoireId);
     if (path != null) {
+      // Start smart recording monitoring AFTER recording started
+      // (must be after startRecording to get fresh amplitude stream)
+      ref.read(smartRecordingNotifierProvider.notifier).startMonitoring();
+
       setState(() {
         _isRecording = true;
         _isPaused = false;
@@ -286,8 +287,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       });
       _startTimer();
     } else {
-      // Stop smart recording if recording failed
-      ref.read(smartRecordingNotifierProvider.notifier).reset();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

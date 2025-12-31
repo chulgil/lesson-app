@@ -1,6 +1,7 @@
 # Smart Recording Spec (스마트 녹음)
 
 > 작성일: 2025-12-31
+> 구현 완료: 2025-12-31
 
 ## Overview
 
@@ -19,10 +20,10 @@ SO THAT 나중에 수동으로 편집하지 않아도 깔끔한 녹음 파일을
 
 | 항목 | 결정 |
 |------|------|
-| 처리 방식 | 자동 트리밍 (후처리, 원본 보존 가능) |
+| 처리 방식 | 자동 트리밍 (후처리, 원본 보존) |
 | 적용 범위 | 앞뒤 모두 (중간 무음은 유지) |
 | 임계값 | 사용자 조절 가능 슬라이더 (기본 40%) |
-| UI | 실시간 상태 표시 + 트림 결과 미리보기 |
+| 버퍼 | 소리 시작 3초 전, 소리 종료 3초 후 유지 |
 | 기능명 | 스마트 녹음 |
 
 ---
@@ -37,8 +38,8 @@ static const double minThreshold = 0.20;  // 최소 20%
 static const double maxThreshold = 0.60;  // 최대 60%
 static const double defaultThreshold = 0.40;  // 기본 40%
 
-// 최소 무음 지속 시간 (이보다 짧으면 트림 안 함)
-static const Duration minSilenceDuration = Duration(seconds: 3);
+// 버퍼: 소리 전후로 유지할 시간
+const buffer = Duration(seconds: 3);
 ```
 
 ### 2. Recording State Machine
@@ -47,29 +48,59 @@ static const Duration minSilenceDuration = Duration(seconds: 3);
 [녹음 시작]
     ↓
 [대기 상태] ← amplitude < threshold
-    ↓ amplitude >= threshold (3초 이상 지속)
+    ↓ amplitude >= threshold
 [녹음 중 상태]
-    ↓ amplitude < threshold (3초 이상 지속)
+    ↓ amplitude < threshold
 [종료 대기 상태]
     ↓
 [녹음 종료]
     ↓
-[자동 트리밍] → 앞: soundStartTime - recordingStartTime
-              → 뒤: recordingEndTime - soundEndTime
+[자동 트리밍]
+    → 앞: (soundStartTime - recordingStartTime) - 3초 버퍼
+    → 뒤: (recordingEndTime - soundEndTime) - 3초 버퍼
     ↓
-[저장 완료] + "앞 X초 / 뒤 Y초 트림됨 [복구]"
+[저장 완료]
 ```
 
-### 3. Data Model
+### 3. 트리밍 계산 로직
+
+```dart
+// 시작 트림 계산
+if (soundStartTime != null) {
+  final silenceAtStart = soundStartTime - recordingStartTime;
+  trimmedStart = silenceAtStart - buffer;  // 3초 전까지 유지
+  if (trimmedStart < Duration.zero) {
+    trimmedStart = Duration.zero;  // 음수면 트림 안 함
+  }
+}
+
+// 종료 트림 계산
+if (soundEndTime != null) {
+  final silenceAtEnd = recordingEndTime - soundEndTime;
+  trimmedEnd = silenceAtEnd - buffer;  // 3초 후까지 유지
+  if (trimmedEnd < Duration.zero) {
+    trimmedEnd = Duration.zero;  // 음수면 트림 안 함
+  }
+}
+```
+
+**예시:**
+- 녹음 총 20초, 소리 시작 6.6초, 소리 종료 13.4초
+- 시작 트림: 6.6 - 3 = 3.6초 트림 (3.6초부터 재생)
+- 종료 트림: (20 - 13.4) - 3 = 3.6초 트림 (16.4초에서 종료)
+- 결과: 3.6초 ~ 16.4초 재생 (소리 시작 3초 전 ~ 소리 종료 3초 후)
+
+### 4. Data Model
 
 ```dart
 class SmartRecordingState {
   final bool isEnabled;           // 스마트 녹음 ON/OFF
   final double threshold;         // 임계값 (0.20 ~ 0.60)
   final RecordingPhase phase;     // waiting / recording / ending
+  final DateTime? soundStartTime; // 소리 시작 시점
+  final DateTime? soundEndTime;   // 소리 종료 시점
   final Duration trimmedStart;    // 트림된 앞부분 길이
   final Duration trimmedEnd;      // 트림된 뒷부분 길이
-  final String? originalFilePath; // 원본 파일 경로 (복구용)
 }
 
 enum RecordingPhase {
@@ -79,105 +110,87 @@ enum RecordingPhase {
 }
 ```
 
-### 4. Settings Storage
+### 5. Provider 설정
 
 ```dart
-// Hive 또는 SharedPreferences
-class SmartRecordingSettings {
-  bool smartRecordingEnabled = true;
-  double trimThreshold = 0.40;
+// keepAlive: true - 녹음 세션 동안 dispose 방지
+@Riverpod(keepAlive: true)
+class SmartRecordingNotifier extends _$SmartRecordingNotifier {
+  // ...
 }
 ```
 
----
+### 6. 재생 시 트림 적용
 
-## UI Spec
+```dart
+// AudioPlayerService
+Future<bool> load(String filePath) async {
+  _trimMetadata = await AudioTrimmerService.instance.readTrimMetadata(filePath);
+  // ...
+}
 
-### 1. 녹음 화면 상태 표시
+Future<void> play() async {
+  await _player.play(UrlSource(fileUrl));
+  // 트림 시작 지점으로 seek
+  if (_trimMetadata?.contentStart > Duration.zero) {
+    await _player.seek(_trimMetadata!.contentStart);
+  }
+}
 
-#### 대기 상태 (Waiting)
-```
-┌─────────────────────────────┐
-│  [파형 애니메이션 - 낮은 진폭]  │
-│                             │
-│     ⏳ 대기 중...            │
-│   연주를 시작하세요          │
-│                             │
-│        00:05               │
-│   (준비 시간 카운트)         │
-└─────────────────────────────┘
-```
-
-#### 녹음 중 상태 (Recording)
-```
-┌─────────────────────────────┐
-│  [파형 애니메이션 - 활성]     │
-│                             │
-│     🔴 녹음 중              │
-│                             │
-│        01:23               │
-│   (실제 녹음 시간만 표시)     │
-└─────────────────────────────┘
-```
-
-### 2. 녹음 완료 후 결과
-
-```
-┌─────────────────────────────┐
-│  ✅ 녹음 저장됨              │
-│                             │
-│  총 길이: 1분 45초           │
-│  ─────────────────────────  │
-│  스마트 녹음 적용:           │
-│  • 앞 8초 트림됨            │
-│  • 뒤 3초 트림됨            │
-│                             │
-│  [원본 복구]  [확인]         │
-└─────────────────────────────┘
-```
-
-### 3. 설정 화면 (토글 + 슬라이더)
-
-```
-┌─────────────────────────────┐
-│  스마트 녹음                 │
-│  ────────────────────────── │
-│  [ON ○───────────── OFF]    │
-│                             │
-│  트림 민감도                 │
-│  낮음 ●────────○──── 높음   │
-│        [40%]                │
-│                             │
-│  ℹ️ 녹음 시작/종료 시        │
-│     조용한 구간을 자동 제거   │
-└─────────────────────────────┘
+// 트림 종료 지점에서 자동 정지
+_positionSubscription = _player.onPositionChanged.listen((pos) {
+  if (pos >= _trimMetadata!.contentEnd) {
+    stop();
+    onComplete?.call();
+  }
+});
 ```
 
 ---
 
-## Implementation Plan
+## Implementation Status
 
-### Phase 1: Core Logic
-1. `SmartRecordingState` 모델 추가
-2. `SmartRecordingProvider` 생성 (설정 관리)
-3. Amplitude 모니터링 로직 확장
-4. 녹음 시작/종료 시점 트래킹
+### Phase 1: Core Logic ✅
+- [x] `SmartRecordingState` 모델 추가
+- [x] `SmartRecordingProvider` 생성 (keepAlive: true)
+- [x] Amplitude 모니터링 로직
+- [x] 녹음 시작/종료 시점 트래킹
+- [x] 3초 버퍼 적용
 
-### Phase 2: Audio Trimming
-1. FFmpeg 또는 just_audio를 이용한 트리밍
-2. 원본 파일 보존 로직
-3. 트림된 파일 저장
+### Phase 2: Audio Trimming ✅
+- [x] `AudioTrimmerService` 구현
+- [x] 원본 파일 백업 (`recording_backups/`)
+- [x] `.trim` 메타데이터 파일 생성
+- [x] 트림된 오디오 저장
 
-### Phase 3: UI Integration
-1. 녹음 화면 상태 표시 추가
-2. 설정 화면 토글/슬라이더 추가
-3. 완료 다이얼로그 트림 정보 표시
-4. 원본 복구 기능
+### Phase 3: Playback Integration ✅
+- [x] `AudioPlayerService`에서 트림 메타데이터 로드
+- [x] 재생 시 트림 시작 지점으로 자동 seek
+- [x] 트림 종료 지점에서 자동 정지
 
-### Phase 4: Polish
-1. 애니메이션 전환 효과
-2. 사용자 온보딩 툴팁
-3. 에러 핸들링
+### Phase 4: UI ✅
+- [x] 스마트 녹음 토글 버튼 ("스마트" 라벨)
+- [x] 녹음 화면 상태 표시
+- [x] 설정 저장 (Hive)
+
+---
+
+## File Structure
+
+```
+lib/
+├── models/
+│   └── smart_recording.dart              # SmartRecordingState, Settings
+├── providers/
+│   └── smart_recording/
+│       ├── smart_recording_provider.dart # NotIFier (keepAlive)
+│       └── smart_recording_provider.g.dart
+├── services/
+│   └── audio_trimmer_service.dart        # 트리밍 + 메타데이터
+└── features/practice/presentation/
+    └── screens/
+        └── section_detail_screen.dart    # 녹음 UI 통합
+```
 
 ---
 
@@ -185,38 +198,18 @@ class SmartRecordingSettings {
 
 | 케이스 | 처리 |
 |--------|------|
-| 전체가 무음 | 트리밍 없이 저장 + 경고 표시 |
-| 1초 미만 실제 녹음 | 저장 취소 + 안내 메시지 |
-| 녹음 중간에 5초+ 무음 | 무시 (앞뒤만 트림) |
-| 원본 복구 후 다시 트림 | 새로운 원본으로 트림 |
+| 전체가 무음 | 트리밍 없이 저장 |
+| 무음 < 3초 | 트림 없음 (버퍼보다 짧음) |
+| 녹음 중간에 무음 | 무시 (앞뒤만 트림) |
+| 스마트 녹음 OFF | 일반 녹음으로 동작 |
 
 ---
 
 ## Settings Default
 
 ```dart
-// 첫 사용자: 스마트 녹음 활성화, 40% 임계값
 SmartRecordingSettings.defaults = SmartRecordingSettings(
-  smartRecordingEnabled: true,
-  trimThreshold: 0.40,
+  smartRecordingEnabled: true,  // 기본 활성화
+  trimThreshold: 0.40,          // 40% 임계값
 );
-```
-
-## File Structure
-
-```
-lib/
-├── models/
-│   └── smart_recording.dart          # SmartRecordingState
-├── providers/
-│   └── smart_recording/
-│       ├── smart_recording_provider.dart
-│       └── smart_recording_provider.g.dart
-├── services/
-│   └── audio_trimmer_service.dart    # FFmpeg wrapper
-└── features/practice/presentation/
-    └── widgets/
-        └── smart_recording/
-            ├── smart_recording_indicator.dart
-            └── smart_recording_settings.dart
 ```

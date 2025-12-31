@@ -27,14 +27,15 @@ final smartRecordingSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SmartRecordingSettingsNotifier
     = AutoDisposeNotifier<SmartRecordingSettings>;
 String _$smartRecordingNotifierHash() =>
-    r'af85a1f60cb368cdaa1027860f5f214f3cc54586';
+    r'fb09025fffee2dc42e9fef971f40b335c5958b92';
 
 /// Provider for smart recording state during active recording.
+/// keepAlive: true to prevent disposal during recording session.
 ///
 /// Copied from [SmartRecordingNotifier].
 @ProviderFor(SmartRecordingNotifier)
-final smartRecordingNotifierProvider = AutoDisposeNotifierProvider<
-    SmartRecordingNotifier, SmartRecordingState>.internal(
+final smartRecordingNotifierProvider =
+    NotifierProvider<SmartRecordingNotifier, SmartRecordingState>.internal(
   SmartRecordingNotifier.new,
   name: r'smartRecordingNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -44,6 +45,6 @@ final smartRecordingNotifierProvider = AutoDisposeNotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$SmartRecordingNotifier = AutoDisposeNotifier<SmartRecordingState>;
+typedef _$SmartRecordingNotifier = Notifier<SmartRecordingState>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'audio_trimmer_service.dart';
 
 /// State of audio playback.
 enum PlaybackState {
@@ -56,6 +57,19 @@ class AudioPlayerService {
   String? _currentPath;
   String? get currentPath => _currentPath;
 
+  /// Trim metadata for current file.
+  TrimMetadata? _trimMetadata;
+
+  /// Content start position (after trim).
+  Duration get contentStart => _trimMetadata?.contentStart ?? Duration.zero;
+
+  /// Content end position (after trim).
+  Duration get contentEnd => _trimMetadata?.contentEnd ?? _duration;
+
+  /// Effective duration (after trim).
+  Duration get effectiveDuration =>
+      _trimMetadata?.contentDuration ?? _duration;
+
   /// Callback when playback completes.
   VoidCallback? onComplete;
 
@@ -79,6 +93,15 @@ class AudioPlayerService {
 
     _positionSubscription = _player.onPositionChanged.listen((pos) {
       _position = pos;
+
+      // Check if we've reached the trim end point
+      if (_trimMetadata != null &&
+          _state == PlaybackState.playing &&
+          pos >= _trimMetadata!.contentEnd) {
+        debugPrint('AudioPlayer: Reached trim end, stopping');
+        stop();
+        onComplete?.call();
+      }
     });
 
     _durationSubscription = _player.onDurationChanged.listen((dur) {
@@ -105,6 +128,13 @@ class AudioPlayerService {
   Future<bool> load(String filePath) async {
     try {
       _currentPath = filePath;
+
+      // Load trim metadata if exists
+      _trimMetadata = await AudioTrimmerService.instance.readTrimMetadata(filePath);
+      if (_trimMetadata != null && _trimMetadata!.hasTrimming) {
+        debugPrint('AudioPlayer: Loaded with trim - start: ${_trimMetadata!.contentStart}, end: ${_trimMetadata!.contentEnd}');
+      }
+
       debugPrint('AudioPlayer: Loading $filePath');
       return true;
     } catch (e) {
@@ -124,6 +154,13 @@ class AudioPlayerService {
       // Use UrlSource with file:// protocol for iOS compatibility
       final fileUrl = 'file://$_currentPath';
       await _player.play(UrlSource(fileUrl));
+
+      // Seek to content start if trimmed
+      if (_trimMetadata != null && _trimMetadata!.contentStart > Duration.zero) {
+        await _player.seek(_trimMetadata!.contentStart);
+        debugPrint('AudioPlayer: Seeked to trim start: ${_trimMetadata!.contentStart}');
+      }
+
       debugPrint('AudioPlayer: Playing $fileUrl');
     } catch (e) {
       debugPrint('AudioPlayer: Failed to play: $e');

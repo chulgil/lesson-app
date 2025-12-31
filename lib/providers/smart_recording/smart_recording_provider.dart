@@ -58,7 +58,8 @@ class SmartRecordingSettingsNotifier extends _$SmartRecordingSettingsNotifier {
 }
 
 /// Provider for smart recording state during active recording.
-@riverpod
+/// keepAlive: true to prevent disposal during recording session.
+@Riverpod(keepAlive: true)
 class SmartRecordingNotifier extends _$SmartRecordingNotifier {
   StreamSubscription<double>? _amplitudeSubscription;
   DateTime? _recordingStartTime;
@@ -79,7 +80,11 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
   /// Start monitoring amplitude for smart recording.
   void startMonitoring() {
-    if (!state.isEnabled) return;
+    debugPrint('SmartRecording: startMonitoring called, isEnabled=${state.isEnabled}');
+    if (!state.isEnabled) {
+      debugPrint('SmartRecording: Skipping - smart recording is disabled');
+      return;
+    }
 
     _amplitudeSubscription?.cancel();
     _recordingStartTime = DateTime.now();
@@ -104,20 +109,25 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     final now = DateTime.now();
     final recordingDuration = now.difference(_recordingStartTime!);
 
-    // Calculate trimmed durations
+    // Calculate trimmed durations with 3-second buffer
+    const buffer = Duration(seconds: 3);
     Duration trimmedStart = Duration.zero;
     Duration trimmedEnd = Duration.zero;
 
     if (state.soundStartTime != null) {
-      trimmedStart = state.soundStartTime!.difference(_recordingStartTime!);
-      if (trimmedStart < SmartRecordingState.minSilenceDuration) {
+      final silenceAtStart = state.soundStartTime!.difference(_recordingStartTime!);
+      // Keep 3 seconds before sound starts
+      trimmedStart = silenceAtStart - buffer;
+      if (trimmedStart < Duration.zero) {
         trimmedStart = Duration.zero;
       }
     }
 
     if (state.soundEndTime != null) {
-      trimmedEnd = now.difference(state.soundEndTime!);
-      if (trimmedEnd < SmartRecordingState.minSilenceDuration) {
+      final silenceAtEnd = now.difference(state.soundEndTime!);
+      // Keep 3 seconds after sound ends
+      trimmedEnd = silenceAtEnd - buffer;
+      if (trimmedEnd < Duration.zero) {
         trimmedEnd = Duration.zero;
       }
     }
@@ -146,6 +156,11 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
   }
 
   void _onAmplitude(double amplitude) {
+    // Debug: Log every 10th amplitude to avoid spam
+    if (DateTime.now().millisecond % 1000 < 100) {
+      debugPrint('SmartRecording: _onAmplitude called, amp=$amplitude, threshold=${state.threshold}');
+    }
+
     final now = DateTime.now();
 
     // Sound detected
