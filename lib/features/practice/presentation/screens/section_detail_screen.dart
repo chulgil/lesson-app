@@ -752,10 +752,12 @@ class _RecordingControl extends ConsumerStatefulWidget {
 class _RecordingControlState extends ConsumerState<_RecordingControl> {
   static const _micInputThreshold = 0.05;
   static const _micCheckDuration = Duration(milliseconds: 1500);
+  static const _autoStopDuration = Duration(seconds: 5);
 
   bool _hasMicInput = true;
   StreamSubscription<double>? _micCheckSubscription;
   DateTime? _recordingStartTime;
+  DateTime? _noInputStartTime; // Track when no input state started
 
   String get _formattedTime {
     final minutes = widget.recordingSeconds ~/ 60;
@@ -784,16 +786,17 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
   void _startMicInputCheck() {
     _micCheckSubscription?.cancel();
     _recordingStartTime = DateTime.now();
+    _noInputStartTime = null;
     debugPrint('_RecordingControlState: Starting mic input check');
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
       // If we detect any amplitude above threshold, mark as having input
       if (amplitude > _micInputThreshold) {
-        _micCheckSubscription?.cancel();
-        _micCheckSubscription = null;
-        debugPrint('_RecordingControlState: Mic input detected (amplitude=$amplitude)');
+        // Reset no-input timer when input is detected
+        _noInputStartTime = null;
         if (!_hasMicInput) {
+          debugPrint('_RecordingControlState: Mic input detected (amplitude=$amplitude)');
           setState(() {
             _hasMicInput = true;
           });
@@ -801,18 +804,39 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
         return;
       }
 
-      // After check duration, if no input detected, update state
-      if (_recordingStartTime != null &&
-          DateTime.now().difference(_recordingStartTime!) >= _micCheckDuration) {
-        _micCheckSubscription?.cancel();
-        _micCheckSubscription = null;
+      // No input detected - track the start time
+      final now = DateTime.now();
 
+      // After initial check duration, show warning banner
+      if (_recordingStartTime != null &&
+          now.difference(_recordingStartTime!) >= _micCheckDuration) {
         if (_hasMicInput && widget.isRecording) {
           debugPrint('_RecordingControlState: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
+          _noInputStartTime = now; // Start tracking for auto-stop
           setState(() {
             _hasMicInput = false;
           });
         }
+      }
+
+      // Auto-stop after 5 seconds of no input
+      if (_noInputStartTime != null &&
+          now.difference(_noInputStartTime!) >= _autoStopDuration &&
+          widget.isRecording) {
+        debugPrint('_RecordingControlState: Auto-stopping recording after ${_autoStopDuration.inSeconds}s of no input');
+        _micCheckSubscription?.cancel();
+        _micCheckSubscription = null;
+
+        // Show message and stop recording
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('입력 없음 - 녹음 자동 정지'),
+              backgroundColor: AppColors.warning,
+            ),
+          );
+        }
+        widget.onStopRecording();
       }
     });
   }
@@ -821,6 +845,7 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
     _micCheckSubscription?.cancel();
     _micCheckSubscription = null;
     _recordingStartTime = null;
+    _noInputStartTime = null;
   }
 
   @override
@@ -886,11 +911,11 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.mic_external_off, size: 18, color: Colors.white),
-                          const SizedBox(width: 6),
+                          const Icon(Icons.mic_external_off, size: 16, color: Colors.white),
+                          const SizedBox(width: 4),
                           Text(
-                            '마이크 입력이 감지되지 않습니다',
-                            style: AppTypography.bodySmall.copyWith(
+                            '입력 없음',
+                            style: AppTypography.caption.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
