@@ -6,7 +6,7 @@
 
 ---
 
-## 📁 문서 구조
+## 문서 구조
 
 ```
 docs/
@@ -24,12 +24,12 @@ docs/
 │   ├── invite/           # 초대 시스템
 │   ├── design/           # UX/UI 설계
 │   └── dev/              # 개발 가이드
-└── task.md               # 개발 태스크
+└── session/              # 작업 세션 기록
 ```
 
 ---
 
-## 📋 요구사항 (requirement/)
+## 요구사항 (requirement/)
 
 | 문서 | 설명 |
 |------|------|
@@ -38,17 +38,18 @@ docs/
 
 ---
 
-## 💡 제안서 (proposal/)
+## 제안서 (proposal/)
 
 | 문서 | 설명 |
 |------|------|
 | [existing_relationship_onboarding.md](proposal/existing_relationship_onboarding.md) | 기존 관계 온보딩 |
 | [minor_registration_policy.md](proposal/minor_registration_policy.md) | 미성년자 등록 정책 |
 | [parent_system.md](proposal/parent_system.md) | 학부모 시스템 Q&A |
+| [invite_ux_improvement.md](proposal/invite_ux_improvement.md) | 초대 UX 개선 |
 
 ---
 
-## 📐 기능 명세 (specs/)
+## 기능 명세 (specs/)
 
 ### 레슨 시스템 (lesson/)
 
@@ -59,6 +60,7 @@ docs/
 | [Lesson_Schedule_Design.md](specs/lesson/Lesson_Schedule_Design.md) | ✅ 확정 | 레슨 스케줄 설계 |
 | [student_centered_architecture.md](specs/lesson/student_centered_architecture.md) | ✅ 확정 | 학생 중심 아키텍처 |
 | [Unified_Lesson_Booking_Spec.md](specs/lesson/Unified_Lesson_Booking_Spec.md) | ✅ 확정 | 통합 레슨 예약 스펙 |
+| [Multi_Option_Schedule_Spec.md](specs/lesson/Multi_Option_Schedule_Spec.md) | ✅ 확정 | 다중 옵션 스케줄 제안 |
 
 ### 연습 시스템 (practice/)
 
@@ -78,6 +80,8 @@ docs/
 | [metronome_system.md](specs/metronome/metronome_system.md) | ✅ 확정 | 메트로놈 시스템 |
 | [metronome_sound.md](specs/metronome/metronome_sound.md) | ✅ 확정 | 사운드 이펙트 |
 | [metronome_indicator.md](specs/metronome/metronome_indicator.md) | ✅ 확정 | UI 인디케이터 |
+| [metronome_timing_analysis.md](specs/metronome/metronome_timing_analysis.md) | ✅ 확정 | 타이밍 분석 |
+| [package_comparison.md](specs/metronome/package_comparison.md) | ✅ 확정 | 패키지 비교 |
 
 ### 결제 시스템 (payment/)
 
@@ -117,6 +121,7 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [invite_system.md](specs/invite/invite_system.md) | - | 초대 시스템 v1 (레거시) |
 | [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | 양방향 초대 시스템 (QR/URL/코드) |
 
 ### UX/UI 설계 (design/)
@@ -142,6 +147,6 @@ docs/
 
 ---
 
-## 🔗 관련 문서
+## 관련 문서
 
 - [프로젝트 CLAUDE.md](../CLAUDE.md) - 프로젝트 개발 가이드
