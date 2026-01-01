@@ -73,6 +73,54 @@ docs/                        # 모든 프로젝트 문서
 
 ---
 
+## Issue 기반 작업
+
+작업은 GitHub Issue 단위로 진행하여 이력을 관리합니다.
+
+### Issue 생성 요청
+
+```
+"메트로놈 타이밍 버그 이슈 만들어줘"
+"학부모 대시보드 기능 이슈 만들어줘. domain: parent 라벨로"
+"BookingService 리팩토링 Claude 작업 이슈 생성해줘"
+```
+
+### Issue 해결 요청
+
+```
+"#42 이슈 해결해줘"
+"#42 분석하고 수정 방안 알려줘"
+```
+
+### 라벨 체계
+
+| 카테고리 | 라벨 |
+|----------|------|
+| 타입 | `bug`, `feature`, `enhancement`, `refactor`, `claude` |
+| 우선순위 | `priority: critical/high/medium/low` |
+| 도메인 | `domain: lesson/student/parent/practice/payment/schedule/notification/auth` |
+| 상태 | `status: todo/in-progress/blocked/review/done` |
+
+### 브랜치 네이밍
+
+```bash
+fix/42-metronome-timing      # 버그 수정
+feat/15-parent-dashboard     # 새 기능
+refactor/28-booking-service  # 리팩토링
+```
+
+### 커밋에 이슈 연결
+
+```bash
+git commit -m "fix(메트로놈): BPM 120 이상 타이밍 밀림 수정
+
+Refs #42"
+```
+
+→ 상세 가이드: [Claude Issue 워크플로우](../../guide/git/Claude_Issue_Workflow.md)
+
+---
+
 ## Claude 작업 지침
 
 ### 📋 작업 시작 전 체크리스트
