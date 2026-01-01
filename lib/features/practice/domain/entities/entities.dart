@@ -7,4 +7,5 @@ export 'practice_log.dart';
 export 'practice_repertoire.dart';
 export 'practice_stats.dart';
 export 'practice_streak.dart';
+export 'recording.dart';
 export 'smart_recording.dart';
