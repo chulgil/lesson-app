@@ -124,10 +124,18 @@ features/[domain]/
 - [x] practice 도메인 시범 적용
 - [x] lesson, student 도메인 확장 적용
 
-#### 2.2 Models 분산 배치
+#### 2.2 Models 분산 배치 (진행 중)
 - **현재**: `lib/models/` (중앙집중)
 - **목표**: 각 feature의 `data/models/`로 이동
-- [ ] 공유 모델은 `lib/core/models/`에 유지
+
+**Step 1: 공유 enum 추출** ✅ 완료
+- `lib/core/models/shared_enums.dart` 생성
+  - AgeGroup (from practice_item.dart)
+  - ConnectionStatus, PracticeLevel, ConnectionStatusHelper (from invite.dart)
+- `lib/core/models/models.dart` barrel file 생성
+- 기존 파일에서 re-export 설정 (하위 호환성 유지)
+
+**Step 2: Feature 전용 모델 이동** (대기)
 - [ ] feature 전용 모델은 해당 feature로 이동
 - **난이도**: 중
 
@@ -190,9 +198,11 @@ features/[domain]/
     ↓
 4단계: Phase 2.1 확장 (lesson, student 도메인) ✅ 완료
     ↓
-5단계 (다음): Phase 2.2, 3.2 모델/Provider 분산
+5단계: Phase 2.2 Step 1 공유 enum 추출 ✅ 완료
     ↓
-6단계 (지속): Phase 4 테스트 및 문서화
+6단계 (다음): Phase 2.2 Step 2 feature 전용 모델 이동
+    ↓
+7단계 (지속): Phase 3.2, 4 Provider 분산/테스트/문서화
 ```
 
 ---
@@ -222,6 +232,7 @@ features/[domain]/
 - [x] practice 도메인 Clean Architecture 적용 (domain/data 레이어)
 - [x] lesson 도메인 Clean Architecture 적용
 - [x] student 도메인 Clean Architecture 적용
+- [x] 공유 enum lib/core/models/로 추출 (AgeGroup, ConnectionStatus, PracticeLevel)
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -251,3 +262,4 @@ features/[domain]/
 | 2025-01-01 | Phase 3.1 Ref 타입 현대화 완료 (26건) |
 | 2026-01-01 | Phase 2.1 practice 도메인 Clean Architecture 적용 완료 |
 | 2026-01-01 | Phase 2.1 lesson, student 도메인 Clean Architecture 확장 완료 |
+| 2026-01-01 | Phase 2.2 Step 1 공유 enum lib/core/models/로 추출 완료 |

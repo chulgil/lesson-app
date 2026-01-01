@@ -1,4 +1,3 @@
-import '../models/invite.dart';
 import '../models/practice_repertoire.dart';
 import '../models/student.dart';
 

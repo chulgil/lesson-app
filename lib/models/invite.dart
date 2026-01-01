@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+// Re-export shared enums for backward compatibility
+export '../core/models/shared_enums.dart'
+    show ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
+
 /// Method used to send/receive invitation
 enum InviteMethod {
   qrCode,     // QR code scan (in-person)
@@ -410,108 +414,9 @@ class Connection {
 
 // ============================================================================
 // V2 Models - Mutual Follow System (invite_system_v2.md)
+// Note: ConnectionStatus, PracticeLevel, ConnectionStatusHelper are defined in
+// lib/core/models/shared_enums.dart and re-exported from this file.
 // ============================================================================
-
-/// Connection status for V2 mutual follow system
-/// Represents the relationship between teacher and student
-enum ConnectionStatus {
-  offline,        // Manual registration only (no app)
-  inviteSent,     // I followed, waiting for follow back
-  inviteReceived, // They followed me, I haven't followed back
-  connected,      // Mutual follow established
-  disconnected;   // Was connected, but one side unfollowed
-
-  String get label {
-    switch (this) {
-      case ConnectionStatus.offline:
-        return '오프라인';
-      case ConnectionStatus.inviteSent:
-        return '초대 보냄';
-      case ConnectionStatus.inviteReceived:
-        return '초대 받음';
-      case ConnectionStatus.connected:
-        return '연결됨';
-      case ConnectionStatus.disconnected:
-        return '연결 끊김';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case ConnectionStatus.offline:
-        return const Color(0xFF9E9E9E); // Grey
-      case ConnectionStatus.inviteSent:
-        return const Color(0xFFFFC107); // Amber/Yellow
-      case ConnectionStatus.inviteReceived:
-        return const Color(0xFF2196F3); // Blue
-      case ConnectionStatus.connected:
-        return const Color(0xFF4CAF50); // Green (default, varies by PracticeLevel)
-      case ConnectionStatus.disconnected:
-        return const Color(0xFF9E9E9E); // Grey
-    }
-  }
-
-  /// Whether this status represents an app-connected user
-  bool get isAppConnected => this == ConnectionStatus.connected;
-
-  /// Whether action button should show "Re-connect" instead of "Invite"
-  bool get showReconnectButton => this == ConnectionStatus.disconnected;
-}
-
-/// Practice level for V2 integrated indicator
-/// Used to show student's practice performance in student list
-enum PracticeLevel {
-  newStudent, // Just connected (no practice data yet)
-  excellent,  // 5+ days in last 7 days
-  average,    // 3-4 days in last 7 days
-  poor,       // 1-2 days in last 7 days
-  onBreak;    // On break status
-
-  String get label {
-    switch (this) {
-      case PracticeLevel.newStudent:
-        return '신규';
-      case PracticeLevel.excellent:
-        return '우수';
-      case PracticeLevel.average:
-        return '보통';
-      case PracticeLevel.poor:
-        return '부족';
-      case PracticeLevel.onBreak:
-        return '휴강';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case PracticeLevel.newStudent:
-        return const Color(0xFF6B5B95); // App primary (purple)
-      case PracticeLevel.excellent:
-        return const Color(0xFF4CAF50); // Green
-      case PracticeLevel.average:
-        return const Color(0xFFFF9800); // Orange
-      case PracticeLevel.poor:
-        return const Color(0xFFF44336); // Red
-      case PracticeLevel.onBreak:
-        return const Color(0xFF9E9E9E); // Grey
-    }
-  }
-
-  /// Minimum practice days required for this level
-  int get minDays {
-    switch (this) {
-      case PracticeLevel.excellent:
-        return 5;
-      case PracticeLevel.average:
-        return 3;
-      case PracticeLevel.poor:
-        return 1;
-      case PracticeLevel.newStudent:
-      case PracticeLevel.onBreak:
-        return 0;
-    }
-  }
-}
 
 /// Follow relationship for V2 mutual follow system
 /// Represents one-directional follow (like Instagram)
@@ -557,33 +462,4 @@ class Follow {
 
   @override
   int get hashCode => id.hashCode;
-}
-
-/// Helper class to calculate connection status from follow relationships
-class ConnectionStatusHelper {
-  /// Calculate ConnectionStatus from follow relationships
-  static ConnectionStatus calculateStatus({
-    required bool iFollowThem,
-    required bool theyFollowMe,
-    required bool hasAppAccount,
-  }) {
-    if (!hasAppAccount) return ConnectionStatus.offline;
-    if (iFollowThem && theyFollowMe) return ConnectionStatus.connected;
-    if (iFollowThem && !theyFollowMe) return ConnectionStatus.inviteSent;
-    if (!iFollowThem && theyFollowMe) return ConnectionStatus.inviteReceived;
-    return ConnectionStatus.disconnected;
-  }
-
-  /// Calculate PracticeLevel from practice days in last 7 days
-  static PracticeLevel calculatePracticeLevel({
-    required int practiceDaysInLast7Days,
-    required bool isOnBreak,
-    required bool isNewStudent,
-  }) {
-    if (isOnBreak) return PracticeLevel.onBreak;
-    if (isNewStudent) return PracticeLevel.newStudent;
-    if (practiceDaysInLast7Days >= 5) return PracticeLevel.excellent;
-    if (practiceDaysInLast7Days >= 3) return PracticeLevel.average;
-    return PracticeLevel.poor;
-  }
 }

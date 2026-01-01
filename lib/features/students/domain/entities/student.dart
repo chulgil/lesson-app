@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
-// Import shared enums from models layer
-// These are cross-domain concerns and remain in lib/models/
-import '../../../../models/invite.dart' show ConnectionStatus, PracticeLevel;
-import '../../../../models/practice_item.dart' show AgeGroup;
+// Import shared enums from core layer
+import '../../../../core/models/shared_enums.dart';
 
-// Re-export for convenience
-export '../../../../models/invite.dart' show ConnectionStatus, PracticeLevel;
-export '../../../../models/practice_item.dart' show AgeGroup;
+// Re-export shared enums for convenience
+export '../../../../core/models/shared_enums.dart'
+    show AgeGroup, ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
 
 /// Student status enum (enrollment status)
 enum StudentStatus {

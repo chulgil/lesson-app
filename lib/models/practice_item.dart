@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 
+// Re-export shared enum for backward compatibility
+export '../core/models/shared_enums.dart' show AgeGroup;
+
 /// Practice priority levels for "이번 주 연습"
 enum PracticePriority {
   must, // 🔴 필수 - 꼭 해오기
@@ -123,61 +126,6 @@ enum PracticeType {
         return Icons.menu_book;
       case PracticeType.custom:
         return Icons.edit_note;
-    }
-  }
-}
-
-/// Age groups for UI differentiation
-enum AgeGroup {
-  child, // 어린이 (12세 이하)
-  student, // 학생 (13-18세)
-  adult; // 성인 (19세 이상)
-
-  String get label {
-    switch (this) {
-      case AgeGroup.child:
-        return '어린이';
-      case AgeGroup.student:
-        return '학생';
-      case AgeGroup.adult:
-        return '성인';
-    }
-  }
-
-  String get description {
-    switch (this) {
-      case AgeGroup.child:
-        return '초등학생 이하';
-      case AgeGroup.student:
-        return '중고등학생';
-      case AgeGroup.adult:
-        return '대학생 이상';
-    }
-  }
-
-  /// Calculate age group from birth date
-  static AgeGroup fromBirthDate(DateTime birthDate) {
-    final now = DateTime.now();
-    int age = now.year - birthDate.year;
-    if (now.month < birthDate.month ||
-        (now.month == birthDate.month && now.day < birthDate.day)) {
-      age--;
-    }
-
-    if (age <= 12) return AgeGroup.child;
-    if (age <= 18) return AgeGroup.student;
-    return AgeGroup.adult;
-  }
-
-  /// Age threshold
-  int get maxAge {
-    switch (this) {
-      case AgeGroup.child:
-        return 12;
-      case AgeGroup.student:
-        return 18;
-      case AgeGroup.adult:
-        return 999;
     }
   }
 }
