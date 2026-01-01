@@ -1,6 +1,10 @@
 // Practice repertoire domain entities
 // Moved from lib/models/practice_repertoire.dart for Clean Architecture
 
+import 'package:hive/hive.dart';
+
+part 'practice_repertoire.g.dart';
+
 /// Daily practice status for a section on a specific date
 class DailyPracticeStatus {
   final String id;
@@ -48,16 +52,30 @@ class DailyPracticeStatus {
 }
 
 /// Practice recording model
-class PracticeRecording {
+@HiveType(typeId: 30)
+class PracticeRecording extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final String sectionId;
+
+  @HiveField(2)
   final String filePath;
+
+  @HiveField(3)
   final int durationSeconds;
+
+  @HiveField(4)
   final int? bpm; // Metronome BPM used during recording
+
+  @HiveField(5)
   final bool isRepresentative;
+
+  @HiveField(6)
   final DateTime createdAt;
 
-  const PracticeRecording({
+  PracticeRecording({
     required this.id,
     required this.sectionId,
     required this.filePath,

@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/practice/domain/entities/practice_repertoire.dart';
 import 'models/recording.dart';
 import 'providers/metronome/metronome_provider.dart';
 
@@ -20,9 +21,18 @@ void main() async {
   Hive.registerAdapter(RecordingTypeAdapter());
   Hive.registerAdapter(StorageStatusAdapter());
   Hive.registerAdapter(RecordingAdapter());
+  Hive.registerAdapter(PracticeRecordingAdapter());
 
   // Open Hive boxes at startup to ensure persistence
-  await Hive.openBox<Recording>('recordings');
+  final recordingsBox = await Hive.openBox<Recording>('recordings');
+  final practiceRecordingsBox = await Hive.openBox<PracticeRecording>('practice_recordings');
+  debugPrint('=== Main: Hive boxes opened at startup ===');
+  debugPrint('Main: recordings box length: ${recordingsBox.length}');
+  debugPrint('Main: practice_recordings box length: ${practiceRecordingsBox.length}');
+  for (final r in practiceRecordingsBox.values) {
+    debugPrint('  Main: ${r.id.substring(0, 8)}... -> ${r.filePath}');
+  }
+  debugPrint('=== End of startup box check ===');
 
   // Initialize date formatting for Korean locale
   await initializeDateFormatting('ko');

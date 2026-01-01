@@ -44,7 +44,17 @@ class HiveRecordingRepository implements RecordingRepository {
       return _box!;
     }
     _box = await Hive.openBox<Recording>(_boxName);
-    debugPrint('RecordingRepository: Opened box with ${_box!.length} recordings');
+    debugPrint('=== RecordingRepository: Box opened ===');
+    debugPrint('RecordingRepository: Total recordings in box: ${_box!.length}');
+    debugPrint('RecordingRepository: Box path: ${_box!.path}');
+
+    // Log all recordings for debugging
+    for (final recording in _box!.values) {
+      debugPrint('  - ID: ${recording.id.substring(0, 8)}..., '
+          'repertoireId: ${recording.repertoireId}, '
+          'path: ${recording.localPath}');
+    }
+    debugPrint('=== End of box contents ===');
     return _box!;
   }
 
@@ -97,9 +107,18 @@ class HiveRecordingRepository implements RecordingRepository {
   @override
   Future<void> saveRecording(Recording recording) async {
     final box = await _recordingsBox;
+    debugPrint('=== RecordingRepository: Saving recording ===');
+    debugPrint('  ID: ${recording.id}');
+    debugPrint('  repertoireId: ${recording.repertoireId}');
+    debugPrint('  localPath: ${recording.localPath}');
+    debugPrint('  Box length before: ${box.length}');
+
     await box.put(recording.id, recording);
     await box.flush(); // Ensure data is written to disk immediately
-    debugPrint('RecordingRepository: Saved recording ${recording.id} (flushed)');
+
+    debugPrint('  Box length after: ${box.length}');
+    debugPrint('  Box path: ${box.path}');
+    debugPrint('=== Recording saved and flushed ===');
   }
 
   @override

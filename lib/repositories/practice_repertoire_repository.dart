@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/practice_repertoire.dart';
@@ -36,11 +38,68 @@ abstract class PracticeRepertoireRepository {
 
 /// Mock implementation for development
 class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
+  static const String _recordingsBoxName = 'practice_recordings';
+
   final _uuid = const Uuid();
   final Map<String, List<PracticeRepertoire>> _repertoires = {};
 
+  Box<PracticeRecording>? _recordingsBox;
+
+  Future<Box<PracticeRecording>> get _practiceRecordingsBox async {
+    if (_recordingsBox != null && _recordingsBox!.isOpen) {
+      return _recordingsBox!;
+    }
+    _recordingsBox = await Hive.openBox<PracticeRecording>(_recordingsBoxName);
+    debugPrint('PracticeRepertoireRepository: Opened recordings box with ${_recordingsBox!.length} recordings');
+    return _recordingsBox!;
+  }
+
   MockPracticeRepertoireRepository() {
     _initMockData();
+    _loadPersistedRecordings();
+  }
+
+  /// Load persisted recordings from Hive and merge with mock sections
+  Future<void> _loadPersistedRecordings() async {
+    try {
+      final box = await _practiceRecordingsBox;
+      debugPrint('PracticeRepertoireRepository: Loading ${box.length} persisted recordings');
+
+      for (final recording in box.values) {
+        _addRecordingToSection(recording);
+      }
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to load persisted recordings: $e');
+    }
+  }
+
+  /// Add a recording to the corresponding section in memory
+  void _addRecordingToSection(PracticeRecording recording) {
+    for (final repertoires in _repertoires.values) {
+      for (int i = 0; i < repertoires.length; i++) {
+        final repertoire = repertoires[i];
+        final sectionIndex = repertoire.sections.indexWhere(
+          (s) => s.id == recording.sectionId,
+        );
+        if (sectionIndex != -1) {
+          final section = repertoire.sections[sectionIndex];
+
+          // Check if recording already exists
+          if (section.recordings.any((r) => r.id == recording.id)) {
+            return;
+          }
+
+          final updatedRecordings = List<PracticeRecording>.from(section.recordings)
+            ..add(recording);
+          final updatedSection = section.copyWith(recordings: updatedRecordings);
+          final updatedSections = List<PracticeSection>.from(repertoire.sections);
+          updatedSections[sectionIndex] = updatedSection;
+          repertoires[i] = repertoire.copyWith(sections: updatedSections);
+          debugPrint('PracticeRepertoireRepository: Added persisted recording ${recording.id.substring(0, 8)}... to section ${recording.sectionId}');
+          return;
+        }
+      }
+    }
   }
 
   void _initMockData() {
@@ -558,7 +617,22 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
       createdAt: DateTime.now(),
     );
 
-    // Find and update the section
+    // Save to Hive for persistence
+    try {
+      final box = await _practiceRecordingsBox;
+      await box.put(newRecording.id, newRecording);
+      await box.flush();
+      debugPrint('=== PracticeRepertoireRepository: Recording saved to Hive ===');
+      debugPrint('  ID: ${newRecording.id}');
+      debugPrint('  sectionId: ${newRecording.sectionId}');
+      debugPrint('  filePath: ${newRecording.filePath}');
+      debugPrint('  Box length: ${box.length}');
+      debugPrint('=== Recording persisted successfully ===');
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to persist recording: $e');
+    }
+
+    // Find and update the section in memory
     for (final repertoires in _repertoires.values) {
       for (int i = 0; i < repertoires.length; i++) {
         final repertoire = repertoires[i];
@@ -599,6 +673,17 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   Future<void> deleteRecording(String id) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
+    // Delete from Hive
+    try {
+      final box = await _practiceRecordingsBox;
+      await box.delete(id);
+      await box.flush();
+      debugPrint('PracticeRepertoireRepository: Deleted recording $id from Hive (flushed)');
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to delete recording from Hive: $e');
+    }
+
+    // Delete from memory
     for (final repertoires in _repertoires.values) {
       for (int i = 0; i < repertoires.length; i++) {
         final repertoire = repertoires[i];
