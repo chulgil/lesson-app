@@ -8,7 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/child_profile.dart';
 import '../../../../models/parent_notification_settings.dart';
-import '../../../../providers/child_profile_provider.dart';
+import '../providers/child_profile_provider.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import 'child_profile_form_screen.dart';
 

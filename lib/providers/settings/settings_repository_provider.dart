@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/settings_repository.dart';
-
-/// Settings repository provider
-final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
-  return MockSettingsRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/settings/presentation/providers/settings_repository_provider.dart';

@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/child_profile.dart';
-import '../../../../providers/child_profile_provider.dart';
+import '../providers/child_profile_provider.dart';
 
 /// Screen for adding or editing a child profile
 class ChildProfileFormScreen extends ConsumerStatefulWidget {

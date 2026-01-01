@@ -1,3 +1,2 @@
-// Settings providers barrel file
-export 'settings_repository_provider.dart';
-export 'teacher_settings_provider.dart';
+// Re-export from feature layer for backward compatibility
+export '../../features/settings/presentation/providers/settings_providers.dart';
