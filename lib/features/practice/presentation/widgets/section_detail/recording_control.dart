@@ -270,7 +270,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                               !hasMicPermission
                                   ? '마이크 권한 필요'
                                   : isSmartMode
-                                      ? '스마트 녹음 시작'
+                                      ? '스마트 녹음'
                                       : '녹음 시작',
                               style: AppTypography.bodyLarge.copyWith(
                                 color: Colors.white,
