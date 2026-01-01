@@ -1,0 +1,214 @@
+# 레슨 앱 리팩토링 태스크
+
+> 마지막 분석: 2025-01-01
+> 분석 기준: 최신 Flutter 개발 트렌드 및 Clean Architecture 원칙
+
+---
+
+## 프로젝트 현황 요약
+
+| 항목 | 현재 상태 |
+|------|----------|
+| 파일 수 | 216개 Dart 파일 |
+| 코드량 | ~76,691줄 |
+| 대형 파일 (800줄+) | 15개 이상 |
+| 최대 파일 | 1,510줄 |
+| 아키텍처 | Feature-based (presentation only) |
+| 상태관리 | Riverpod (@riverpod 코드생성) |
+| 라우팅 | go_router (14.2.0) |
+| 로컬 저장소 | Hive (2.2.3) |
+
+---
+
+## 아키텍처 분석 결과
+
+### 현재 구조의 장점 ✅
+
+1. **Feature-based 폴더 구조**: 도메인별 분리 시도
+2. **Riverpod 코드생성**: 타입 안전한 상태관리
+3. **Repository 패턴**: 인터페이스 + Mock 분리
+4. **일관된 네이밍**: 파일/클래스 네이밍 규칙 준수
+
+### 개선이 필요한 영역 ⚠️
+
+1. **대형 파일 다수**: 유지보수 어려움
+2. **레이어 불완전**: presentation만 존재, domain/data 레이어 부재
+3. **중앙집중 모델**: models/ 폴더에 모든 모델 집중
+4. **Provider 구조**: 일부 legacy 패턴 혼재
+5. **테스트 커버리지**: 테스트 코드 부족
+
+---
+
+## 리팩토링 태스크 목록
+
+### Phase 1: 대형 파일 분할 (우선순위: 높음)
+
+> 800줄 이상 파일을 300~500줄 수준으로 분할
+
+#### 1.1 라우터 파일 분할 (653줄)
+- **파일**: `lib/core/router/app_router.dart`
+- **작업**:
+  - [ ] 도메인별 라우트 파일 분리
+    - `auth_routes.dart`
+    - `home_routes.dart`
+    - `practice_routes.dart`
+    - `schedule_routes.dart`
+    - `profile_routes.dart`
+  - [ ] 중앙 라우터는 import만 담당
+- **예상 영향**: 라우트 추가/수정 시 충돌 감소
+- **난이도**: 중
+
+#### 1.2 대형 스크린 파일 분할
+
+| 파일 | 현재 줄 수 | 분할 전략 |
+|------|-----------|----------|
+| `section_detail_screen.dart` | ~800+ | 위젯 분리 (녹음, 재생, 설정) |
+| `lesson_detail_screen.dart` | ~600+ | 탭별 위젯 분리 |
+| `student_detail_screen.dart` | ~500+ | 섹션별 위젯 분리 |
+| `practice_home_screen.dart` | ~500+ | 카드/리스트 위젯 분리 |
+
+- [ ] 각 스크린의 하위 위젯을 `widgets/` 폴더로 분리
+- [ ] 비즈니스 로직은 Provider로 이동
+- **난이도**: 중~높음
+
+---
+
+### Phase 2: Clean Architecture 레이어 정립 (우선순위: 중간)
+
+> 현재: features/[domain]/presentation/
+> 목표: features/[domain]/{data, domain, presentation}/
+
+#### 2.1 Domain 레이어 도입
+```
+features/practice/
+├── domain/
+│   ├── entities/         # 비즈니스 엔티티
+│   ├── repositories/     # Repository 인터페이스
+│   └── usecases/         # Use Case 클래스
+├── data/
+│   ├── models/           # DTO, API 모델
+│   ├── datasources/      # Remote/Local 데이터소스
+│   └── repositories/     # Repository 구현체
+└── presentation/
+    ├── screens/
+    ├── widgets/
+    └── providers/        # UI 상태 Provider
+```
+
+- [ ] practice 도메인부터 시범 적용
+- [ ] 성공 시 다른 도메인으로 확장
+- **난이도**: 높음
+
+#### 2.2 Models 분산 배치
+- **현재**: `lib/models/` (중앙집중)
+- **목표**: 각 feature의 `data/models/`로 이동
+- [ ] 공유 모델은 `lib/core/models/`에 유지
+- [ ] feature 전용 모델은 해당 feature로 이동
+- **난이도**: 중
+
+---
+
+### Phase 3: Provider 구조 개선 (우선순위: 중간)
+
+#### 3.1 Ref 타입 현대화 ✅ 완료
+- [x] deprecated Ref 타입을 `Ref`로 변경 (26건)
+- [x] flutter_riverpod import 추가
+
+#### 3.2 Provider 위치 정리
+- **현재**: `lib/providers/` (중앙집중)
+- **목표**: 각 feature의 `presentation/providers/`로 이동
+- [ ] UI 상태 Provider는 feature 내부로 이동
+- [ ] 공유 Provider는 `lib/core/providers/`에 유지
+- **난이도**: 중
+
+#### 3.3 AsyncValue 패턴 일관화
+- [ ] 모든 비동기 Provider에 AsyncValue 적용
+- [ ] 에러 핸들링 표준화
+- [ ] 로딩 상태 UI 컴포넌트 표준화
+- **난이도**: 낮음
+
+---
+
+### Phase 4: 코드 품질 개선 (우선순위: 낮음)
+
+#### 4.1 테스트 커버리지 확대
+- **현재 상태**: 테스트 코드 부족
+- [ ] Repository 단위 테스트 추가
+- [ ] Provider 테스트 추가
+- [ ] Widget 테스트 (주요 화면)
+- [ ] Integration 테스트 (핵심 플로우)
+- **목표**: 60% 이상 커버리지
+- **난이도**: 중
+
+#### 4.2 문서화 강화
+- [ ] 주요 클래스 dartdoc 추가
+- [ ] 아키텍처 문서 작성 (`docs/architecture.md`)
+- [ ] API 문서 자동 생성 설정
+- **난이도**: 낮음
+
+#### 4.3 의존성 업데이트
+- [ ] 주요 패키지 최신 버전 확인
+- [ ] Breaking changes 대응
+- [ ] deprecated API 제거
+- **난이도**: 중
+
+---
+
+## 실행 우선순위
+
+```
+1단계 (즉시): Phase 1.1 라우터 분할
+    ↓
+2단계 (1주): Phase 1.2 대형 스크린 분할
+    ↓
+3단계 (2주): Phase 2.1 practice 도메인 Clean Architecture 적용
+    ↓
+4단계 (3주): Phase 2.2, 3.2 모델/Provider 분산
+    ↓
+5단계 (지속): Phase 4 테스트 및 문서화
+```
+
+---
+
+## 리팩토링 원칙
+
+### DO ✅
+- 한 번에 하나의 리팩토링만 진행
+- 각 단계 후 `flutter analyze` 확인 (0 issues 유지)
+- 기능 동작 확인 후 커밋
+- 작은 단위로 PR 생성
+
+### DON'T ❌
+- 여러 리팩토링 동시 진행
+- 테스트 없이 대규모 변경
+- 기존 기능 동작 미확인 상태로 커밋
+
+---
+
+## 태스크 체크리스트
+
+### 즉시 실행 가능
+- [ ] `app_router.dart` 도메인별 분할
+- [ ] 미사용 import 정리
+- [ ] deprecated 경고 추가 수정 (있는 경우)
+
+### 기획 필요
+- [ ] Clean Architecture 전환 범위 결정
+- [ ] 테스트 전략 수립
+- [ ] 마이그레이션 일정 계획
+
+---
+
+## 참고 자료
+
+- [Flutter Clean Architecture](https://resocoder.com/flutter-clean-architecture-tdd/)
+- [Riverpod Best Practices](https://riverpod.dev/docs/concepts/best_practices)
+- [Effective Dart](https://dart.dev/effective-dart)
+
+---
+
+## 변경 이력
+
+| 날짜 | 변경 내용 |
+|------|----------|
+| 2025-01-01 | 초기 분석 및 태스크 작성 |

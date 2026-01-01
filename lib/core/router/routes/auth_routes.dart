@@ -1,0 +1,56 @@
+// Auth and onboarding route definitions
+
+import 'package:go_router/go_router.dart';
+
+import '../../../features/auth/presentation/screens/login_screen.dart';
+import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
+import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
+import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
+import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
+import '../../../features/onboarding/presentation/screens/tutorial_screen.dart';
+import '../app_routes.dart';
+
+/// Auth and onboarding routes
+List<GoRoute> authRoutes = [
+  // Login
+  GoRoute(
+    path: AppRoutes.login,
+    name: 'login',
+    builder: (context, state) => const LoginScreen(),
+  ),
+
+  // Parent Invite Code
+  GoRoute(
+    path: AppRoutes.parentInviteCode,
+    name: 'parentInviteCode',
+    builder: (context, state) => const ParentInviteCodeScreen(),
+  ),
+
+  // Student Invite Code
+  GoRoute(
+    path: AppRoutes.studentInviteCode,
+    name: 'studentInviteCode',
+    builder: (context, state) => const StudentInviteCodeScreen(),
+  ),
+
+  // Teacher Onboarding - Phone Verification
+  GoRoute(
+    path: AppRoutes.teacherPhoneVerification,
+    name: 'teacherPhoneVerification',
+    builder: (context, state) => const PhoneVerificationScreen(),
+  ),
+
+  // Teacher Onboarding - Profile Setup
+  GoRoute(
+    path: AppRoutes.teacherProfileSetup,
+    name: 'teacherProfileSetup',
+    builder: (context, state) => const ProfileSetupScreen(),
+  ),
+
+  // Teacher Onboarding - Tutorial
+  GoRoute(
+    path: AppRoutes.teacherTutorial,
+    name: 'teacherTutorial',
+    builder: (context, state) => const TutorialScreen(),
+  ),
+];
