@@ -1,0 +1,125 @@
+// Lesson recording card widget
+
+import 'package:flutter/material.dart';
+
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
+
+/// Recording card for lesson recordings
+class LessonRecordingCard extends StatelessWidget {
+  final String title;
+  final String duration;
+  final String date;
+  final bool hasTranscript;
+  final VoidCallback? onPlay;
+  final VoidCallback? onViewTranscript;
+
+  const LessonRecordingCard({
+    super.key,
+    required this.title,
+    required this.duration,
+    required this.date,
+    this.hasTranscript = false,
+    this.onPlay,
+    this.onViewTranscript,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Icon(Icons.audio_file, color: AppColors.primary),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '$date · $duration',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onPlay,
+                icon: const Icon(Icons.play_circle_filled),
+                iconSize: 40,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
+          if (hasTranscript) ...[
+            const SizedBox(height: AppSpacing.space3),
+            GestureDetector(
+              onTap: onViewTranscript,
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.text_snippet_outlined,
+                      size: 16,
+                      color: AppColors.textSecondaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Text(
+                      '텍스트 변환 완료',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '보기',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,132 @@
+// Add tip bottom sheet widget
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
+import '../../../../../models/tip_template.dart';
+import '../tip_template_bottom_sheet.dart';
+
+/// Bottom sheet for adding tips with template support
+class AddTipBottomSheet extends ConsumerStatefulWidget {
+  final String title;
+  final String? instrument;
+  final TipCategory? initialCategory;
+  final Function(String content) onSubmit;
+
+  const AddTipBottomSheet({
+    super.key,
+    required this.title,
+    this.instrument,
+    this.initialCategory,
+    required this.onSubmit,
+  });
+
+  @override
+  ConsumerState<AddTipBottomSheet> createState() => _AddTipBottomSheetState();
+}
+
+class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXLarge),
+        ),
+      ),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderLight,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
+              // Header
+              Row(
+                children: [
+                  Text(widget.title, style: AppTypography.headingMedium),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showTipTemplateBottomSheet(
+                        context: context,
+                        instrument: widget.instrument,
+                        initialCategory: widget.initialCategory,
+                        onSelect: widget.onSubmit,
+                      );
+                    },
+                    icon: const Icon(Icons.library_books_outlined, size: 18),
+                    label: const Text('템플릿에서'),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Text input
+              TextField(
+                controller: _controller,
+                maxLines: 4,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: '직접 입력하세요...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    final content = _controller.text.trim();
+                    if (content.isNotEmpty) {
+                      Navigator.pop(context);
+                      widget.onSubmit(content);
+                    }
+                  },
+                  child: const Text('추가'),
+                ),
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

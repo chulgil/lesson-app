@@ -8,8 +8,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
+import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
-import '../widgets/tip_template_bottom_sheet.dart';
 
 /// Lesson detail screen with recording and notes
 class LessonDetailScreen extends ConsumerStatefulWidget {
@@ -129,7 +129,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         child: Column(
           children: [
             // Lesson info header
-            _buildLessonHeader(lesson),
+            LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
 
             // Tab bar
             _buildTabBar(),
@@ -207,140 +207,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildLessonHeader(Lesson lesson) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Student/Teacher info
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primaryLight,
-                child: Text(
-                  widget.isTeacher
-                      ? (lesson.studentName.isNotEmpty ? lesson.studentName[0] : '?')
-                      : (lesson.teacherName?.isNotEmpty == true ? lesson.teacherName![0] : '?'),
-                  style: AppTypography.headingSmall.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          widget.isTeacher
-                              ? lesson.studentName
-                              : (lesson.teacherName ?? '선생님'),
-                          style: AppTypography.headingMedium,
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondaryLight.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            lesson.instrument,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                        // Status badge
-                        _buildStatusBadge(lesson.status),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      '${lesson.date.month}월 ${lesson.date.day}일 ${lesson.startTime} · ${lesson.duration}분',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // Pieces
-          if (lesson.pieces.isNotEmpty)
-            Wrap(
-              spacing: AppSpacing.space2,
-              runSpacing: AppSpacing.space2,
-              children: lesson.pieces.map((piece) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryLight,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                  child: Text(
-                    piece.displayName,
-                    style: AppTypography.bodySmall,
-                  ),
-                );
-              }).toList(),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatusBadge(LessonStatus status) {
-    Color color;
-    switch (status) {
-      case LessonStatus.scheduled:
-        color = AppColors.primary;
-      case LessonStatus.completed:
-        color = AppColors.practiceGood;
-      case LessonStatus.cancelled:
-        color = AppColors.textTertiaryLight;
-      case LessonStatus.noShow:
-        color = AppColors.error;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        status.label,
-        style: AppTypography.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 
@@ -680,7 +546,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               final recording = entry.value;
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: _buildRecordingCard(
+                child: LessonRecordingCard(
                   title: '레슨 녹음 ${idx + 1}',
                   duration: _formatRecordingDuration(recording.duration),
                   date:
@@ -696,7 +562,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           if (lesson.recordings?.any((r) => r.aiSummary != null) == true) ...[
             _buildSectionHeader('AI 요약', Icons.auto_awesome),
             const SizedBox(height: AppSpacing.space3),
-            _buildAISummaryCard(lesson),
+            Builder(
+              builder: (context) {
+                final aiSummary = lesson.recordings
+                    ?.firstWhere((r) => r.aiSummary != null, orElse: () => lesson.recordings!.first)
+                    .aiSummary;
+                if (aiSummary == null) return const SizedBox.shrink();
+                return AISummaryCard(summary: aiSummary);
+              },
+            ),
           ],
         ],
       ),
@@ -753,156 +627,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     final minutes = seconds ~/ 60;
     final secs = seconds % 60;
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
-
-  Widget _buildRecordingCard({
-    required String title,
-    required String duration,
-    required String date,
-    required bool hasTranscript,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                child: Icon(Icons.audio_file, color: AppColors.primary),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTypography.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '$date · $duration',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  // Play recording
-                },
-                icon: const Icon(Icons.play_circle_filled),
-                iconSize: 40,
-                color: AppColors.primary,
-              ),
-            ],
-          ),
-          if (hasTranscript) ...[
-            const SizedBox(height: AppSpacing.space3),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.text_snippet_outlined,
-                    size: 16,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    '텍스트 변환 완료',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '보기',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAISummaryCard(Lesson lesson) {
-    final aiSummary = lesson.recordings
-        ?.firstWhere((r) => r.aiSummary != null, orElse: () => lesson.recordings!.first)
-        .aiSummary;
-
-    if (aiSummary == null) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withValues(alpha: 0.05),
-            AppColors.secondary.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                'AI가 생성한 레슨 요약',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          Text(
-            aiSummary,
-            style: AppTypography.bodyMedium.copyWith(
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildAssignmentsTab(Lesson lesson) {
@@ -995,7 +719,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AddTipBottomSheet(
+      builder: (context) => AddTipBottomSheet(
         title: '주요 포인트 추가',
         instrument: lesson.instrument,
         initialCategory: TipCategory.technique,
@@ -1009,7 +733,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AddTipBottomSheet(
+      builder: (context) => AddTipBottomSheet(
         title: '연습 팁 추가',
         instrument: lesson.instrument,
         initialCategory: TipCategory.practice,
@@ -1100,126 +824,5 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         const SnackBar(content: Text('연습 팁이 저장되었습니다')),
       );
     }
-  }
-}
-
-/// Bottom sheet for adding tips with template support
-class _AddTipBottomSheet extends ConsumerStatefulWidget {
-  final String title;
-  final String? instrument;
-  final TipCategory? initialCategory;
-  final Function(String content) onSubmit;
-
-  const _AddTipBottomSheet({
-    required this.title,
-    this.instrument,
-    this.initialCategory,
-    required this.onSubmit,
-  });
-
-  @override
-  ConsumerState<_AddTipBottomSheet> createState() => _AddTipBottomSheetState();
-}
-
-class _AddTipBottomSheetState extends ConsumerState<_AddTipBottomSheet> {
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
-      ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-              // Header
-              Row(
-                children: [
-                  Text(widget.title, style: AppTypography.headingMedium),
-                  const Spacer(),
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      showTipTemplateBottomSheet(
-                        context: context,
-                        instrument: widget.instrument,
-                        initialCategory: widget.initialCategory,
-                        onSelect: widget.onSubmit,
-                      );
-                    },
-                    icon: const Icon(Icons.library_books_outlined, size: 18),
-                    label: const Text('템플릿에서'),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // Text input
-              TextField(
-                controller: _controller,
-                maxLines: 4,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: '직접 입력하세요...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // Submit button
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: () {
-                    final content = _controller.text.trim();
-                    if (content.isNotEmpty) {
-                      Navigator.pop(context);
-                      widget.onSubmit(content);
-                    }
-                  },
-                  child: const Text('추가'),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
