@@ -199,9 +199,12 @@ features/[domain]/
 | `providers/onboarding/` | `features/onboarding/presentation/providers/` | 2개 |
 | `providers/search/` | `features/search/presentation/providers/` | 1개 |
 | `providers/teacher/` | `features/search/presentation/providers/` | 1개 |
+| `providers/settings/` | `features/settings/presentation/providers/` | 3개 |
 
 - [x] UI 상태 Provider는 feature 내부로 이동
 - [x] 기존 위치에 re-export 파일 생성 (하위 호환성)
+- [x] settings providers 마이그레이션 (새 feature 생성)
+- [x] import 경로 정리 (child_profile_provider 등)
 - [x] `flutter analyze` 검증 완료
 - **난이도**: 중
 
@@ -226,7 +229,8 @@ features/[domain]/
 
 #### 4.2 문서화 강화
 - [ ] 주요 클래스 dartdoc 추가
-- [ ] 아키텍처 문서 작성 (`docs/architecture.md`)
+- [x] 아키텍처 문서 작성 (`docs/architecture.md`) ✅ 완료
+- [x] Claude 지침서 개선 (`CLAUDE.md`) ✅ 완료
 - [ ] API 문서 자동 생성 설정
 - **난이도**: 낮음
 
@@ -295,7 +299,11 @@ features/[domain]/
 - [x] payment.dart → features/lessons/domain/entities/ 이동
 - [x] notification 관련 모델 → features/notifications/domain/entities/ 이동 (새 feature)
 - [x] recording.dart → features/practice/domain/entities/ 이동 (Hive codegen)
-- [x] Phase 3.2 Provider 분산 배치 완료 (20개 그룹, 48+ 파일)
+- [x] Phase 3.2 Provider 분산 배치 완료 (21개 그룹, 51+ 파일)
+- [x] settings providers 마이그레이션 (features/settings/ 새 feature 생성)
+- [x] child_profile_provider import 경로 정리
+- [x] docs/architecture.md 아키텍처 문서 작성
+- [x] CLAUDE.md Claude 작업 지침 개선
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -328,3 +336,5 @@ features/[domain]/
 | 2026-01-01 | Phase 2.2 Step 1 공유 enum lib/core/models/로 추출 완료 |
 | 2026-01-01 | Phase 2.2 Step 2 모든 feature 전용 모델 이동 완료 (12개 모델) |
 | 2026-01-01 | Phase 3.2 Provider 분산 배치 완료 (20개 그룹 → feature별 providers/) |
+| 2026-01-01 | settings providers 마이그레이션, import 경로 정리 |
+| 2026-01-01 | Phase 4.2 아키텍처 문서 및 Claude 지침서 작성 완료 |
