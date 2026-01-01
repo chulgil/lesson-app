@@ -135,8 +135,10 @@ features/[domain]/
 - `lib/core/models/models.dart` barrel file 생성
 - 기존 파일에서 re-export 설정 (하위 호환성 유지)
 
-**Step 2: Feature 전용 모델 이동** (대기)
-- [ ] feature 전용 모델은 해당 feature로 이동
+**Step 2: Feature 전용 모델 이동** (진행 중)
+- [x] practice_repertoire.dart → features/practice/domain/entities/
+- [x] tip_template.dart → features/lessons/domain/entities/
+- [ ] 나머지 feature 전용 모델 이동 (piece, payment, recording 등)
 - **난이도**: 중
 
 ---
@@ -233,6 +235,8 @@ features/[domain]/
 - [x] lesson 도메인 Clean Architecture 적용
 - [x] student 도메인 Clean Architecture 적용
 - [x] 공유 enum lib/core/models/로 추출 (AgeGroup, ConnectionStatus, PracticeLevel)
+- [x] practice_repertoire.dart → features/practice/domain/entities/ 이동
+- [x] tip_template.dart → features/lessons/domain/entities/ 이동
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -263,3 +267,4 @@ features/[domain]/
 | 2026-01-01 | Phase 2.1 practice 도메인 Clean Architecture 적용 완료 |
 | 2026-01-01 | Phase 2.1 lesson, student 도메인 Clean Architecture 확장 완료 |
 | 2026-01-01 | Phase 2.2 Step 1 공유 enum lib/core/models/로 추출 완료 |
+| 2026-01-01 | Phase 2.2 Step 2 practice_repertoire, tip_template 모델 이동 |
