@@ -1,6 +1,9 @@
 // Barrel file for practice domain entities
 
+export 'metronome_settings.dart';
+export 'piece.dart';
 export 'practice_log.dart';
 export 'practice_repertoire.dart';
 export 'practice_stats.dart';
 export 'practice_streak.dart';
+export 'smart_recording.dart';

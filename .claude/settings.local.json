@@ -18,9 +18,13 @@
       "Bash(git push)",
       "mcp__serena__list_dir",
       "mcp__serena__find_symbol",
-      "mcp__serena__find_file"
+      "mcp__serena__find_file",
+      "mcp__serena__check_onboarding_performed",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "korea-investment",
     "yahoo-finance",
