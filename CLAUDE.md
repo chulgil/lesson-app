@@ -77,12 +77,53 @@ docs/                        # 모든 프로젝트 문서
 
 작업은 GitHub Issue 단위로 진행하여 이력을 관리합니다.
 
-### Issue 생성 요청
+### Issue 생성 시 Claude 행동 지침
+
+사용자가 간단히 요청해도 Claude는 다음을 수행합니다:
+
+1. **관련 코드 파악**: 이슈와 관련된 파일/코드를 먼저 검색
+2. **상세 본문 작성**: 문제 설명, 관련 파일, 예상 원인 등 포함
+3. **적절한 라벨 자동 선택**: 도메인, 우선순위, 타입 라벨 부착
+4. **이슈 생성 후 확인**: 생성된 이슈 URL 제공
+
+#### 예시: 간단한 요청 → 상세한 이슈
 
 ```
+사용자: "메트로놈 타이밍 버그 이슈 만들어줘"
+
+Claude 행동:
+1. lib/core/audio/metronome_engine.dart 등 관련 파일 검색
+2. 기존 메트로놈 관련 이슈/스펙 확인
+3. 상세 이슈 생성:
+
+gh issue create \
+  --title "[BUG] 메트로놈 타이밍 문제" \
+  --label "bug,domain: practice,priority: medium" \
+  --body "## 문제 설명
+메트로놈 타이밍 관련 문제 발생
+
+## 관련 파일
+- lib/core/audio/metronome_engine.dart
+- lib/features/practice/presentation/providers/metronome_provider.dart
+
+## 관련 스펙
+- docs/specs/metronome/
+
+## 예상 원인
+[코드 분석 후 작성]
+"
+```
+
+### Issue 생성 요청 예시
+
+```
+# 간단한 요청 (Claude가 알아서 상세 작성)
 "메트로놈 타이밍 버그 이슈 만들어줘"
-"학부모 대시보드 기능 이슈 만들어줘. domain: parent 라벨로"
-"BookingService 리팩토링 Claude 작업 이슈 생성해줘"
+"녹음 파형 안 보이는 버그 이슈 생성해줘"
+"학부모 대시보드 기능 이슈 만들어줘"
+
+# 상세 요청 (사용자가 정보 제공)
+"버그 이슈 만들어줘: BPM 120 이상에서 타이밍 밀림. 1분 이상 실행 시 발생"
 ```
 
 ### Issue 해결 요청
