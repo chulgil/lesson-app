@@ -363,6 +363,186 @@ class DownloadedRecording {
 
 ---
 
+## 저장소 영속성 전략 (앱 삭제 후 보존)
+
+> **설계 목표**: 앱을 삭제하더라도 녹음 파일이 사용자 기기에 남아있도록 하는 하이브리드 저장 전략
+
+### 배경 및 타사 분석
+
+iOS 앱은 샌드박스 환경에서 실행되어 기본적으로 앱 삭제 시 모든 데이터가 삭제됩니다.
+타사 앱들의 저장 전략을 분석한 결과:
+
+| 앱 | 저장 전략 | 앱 삭제 후 유지 |
+|---|---|---|
+| Apple Voice Memos | iCloud 동기화 | ✅ iCloud에 남음 |
+| Yousician | 앱 내 저장 + 서버 | ⚠️ 서버에만 남음 |
+| ForScore | iCloud/Dropbox 연동 | ✅ 클라우드에 남음 |
+| 일반 녹음 앱 | Files 앱 내보내기 | ✅ Files 앱에 남음 |
+
+### 하이브리드 저장 전략 (채택)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    하이브리드 저장 전략                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
+│  │   앱 내부    │    │   iCloud     │    │   수동       │      │
+│  │   저장소     │ ←→ │   백업       │    │   내보내기   │      │
+│  │  (기본)     │    │  (선택)      │    │  (선택)      │      │
+│  └──────────────┘    └──────────────┘    └──────────────┘      │
+│        │                    │                    │              │
+│        ▼                    ▼                    ▼              │
+│   앱 삭제 시            앱 삭제 후           사용자 지정        │
+│   함께 삭제            iCloud에 유지        위치에 유지         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 저장소 옵션
+
+#### 1. 앱 내부 저장소 (기본)
+- **위치**: `getApplicationDocumentsDirectory()`
+- **특징**: 현재 구현 방식, 앱 삭제 시 함께 삭제
+- **용도**: 일상적인 녹음 저장
+
+#### 2. iCloud Drive 백업 (선택)
+- **위치**: `iCloud Drive/LessonApp/Recordings/`
+- **특징**: 앱 삭제 후에도 유지, 기기 간 동기화
+- **구현**: `NSUbiquitousContainers` 설정 필요
+- **용도**: 중요한 녹음 백업
+
+#### 3. 수동 내보내기
+- **방식**: UIDocumentPickerViewController 사용
+- **대상**: Files 앱, Dropbox, Google Drive 등
+- **특징**: 사용자가 원하는 위치에 저장
+- **용도**: 일괄 백업, 공유
+
+### 일괄 내보내기 기능
+
+학생별/곡별 녹음을 ZIP으로 압축하여 내보내기:
+
+```
+[내보내기 옵션]
+├── 전체 내보내기 (모든 녹음)
+├── 학생별 내보내기
+│   └── 김서연_녹음_2026-01.zip
+│       ├── 바흐_미뉴엣/
+│       │   ├── 2026-01-01_14-30.m4a
+│       │   └── 2026-01-02_15-00.m4a
+│       └── 스케일_A장조/
+│           └── 2026-01-03_10-00.m4a
+└── 곡별 내보내기
+    └── 바흐_미뉴엣_녹음.zip
+```
+
+### UI 설계
+
+#### 설정 화면
+```
+┌─────────────────────────────────────────┐
+│ 녹음 저장 설정                          │
+├─────────────────────────────────────────┤
+│                                         │
+│ 📁 기본 저장                            │
+│    앱 내부 저장소 (자동)           ✓    │
+│                                         │
+│ ☁️ iCloud 백업                          │
+│    새 녹음을 iCloud에 자동 백업    [○]  │
+│    ℹ️ 앱 삭제 후에도 iCloud에 유지      │
+│                                         │
+│ 📤 녹음 내보내기                        │
+│    [전체 내보내기]                      │
+│    [학생별 내보내기]                    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### 내보내기 진행 화면
+```
+┌─────────────────────────────────────────┐
+│ 녹음 내보내기                           │
+├─────────────────────────────────────────┤
+│                                         │
+│ 📦 ZIP 파일 생성 중...                  │
+│ ━━━━━━━━━━━━━━━━━━━━━━━━━ 75%          │
+│                                         │
+│ 포함된 녹음: 15개                       │
+│ 예상 크기: 45.2 MB                      │
+│                                         │
+│ [취소]                                  │
+└─────────────────────────────────────────┘
+```
+
+### 기술 구현
+
+#### Info.plist 설정 (Files 앱 노출)
+```xml
+<!-- 앱 Documents를 Files 앱에서 볼 수 있도록 -->
+<key>UIFileSharingEnabled</key>
+<true/>
+<key>LSSupportsOpeningDocumentsInPlace</key>
+<true/>
+
+<!-- iCloud Container 설정 -->
+<key>NSUbiquitousContainers</key>
+<dict>
+    <key>iCloud.com.lessonapp.lessonApp</key>
+    <dict>
+        <key>NSUbiquitousContainerIsDocumentScopePublic</key>
+        <true/>
+        <key>NSUbiquitousContainerSupportedFolderLevels</key>
+        <string>Any</string>
+        <key>NSUbiquitousContainerName</key>
+        <string>LessonApp</string>
+    </dict>
+</dict>
+```
+
+#### 내보내기 서비스
+```dart
+class RecordingExportService {
+  /// 학생별 녹음을 ZIP으로 내보내기
+  Future<void> exportByStudent({
+    required String studentId,
+    required String studentName,
+  }) async {
+    // 1. 학생의 모든 녹음 수집
+    // 2. 폴더 구조 생성 (곡별)
+    // 3. ZIP 압축
+    // 4. UIDocumentPickerViewController로 저장 위치 선택
+  }
+
+  /// iCloud에 녹음 백업
+  Future<void> backupToICloud(Recording recording) async {
+    // iCloud Container에 파일 복사
+  }
+
+  /// iCloud 백업 복원
+  Future<List<Recording>> restoreFromICloud() async {
+    // iCloud에서 녹음 파일 목록 조회 및 복원
+  }
+}
+```
+
+### 구현 우선순위
+
+| 순위 | 기능 | 복잡도 | 우선순위 |
+|:---:|------|:---:|:---:|
+| 1 | Files 앱 노출 (Info.plist) | 낮음 | 🔴 높음 |
+| 2 | 일괄 내보내기 (ZIP) | 중간 | 🔴 높음 |
+| 3 | iCloud 백업 옵션 | 높음 | 🟡 중간 |
+| 4 | iCloud 복원 | 높음 | 🟡 중간 |
+
+### 참고 자료
+
+- [UIDocumentPickerViewController - Apple](https://developer.apple.com/documentation/uikit/uidocumentpickerviewcontroller)
+- [iOS File Provider Extension - Kodeco](https://www.kodeco.com/697468-ios-file-provider-extension-tutorial)
+- [path_provider - Flutter](https://pub.dev/packages/path_provider)
+- [Voice Memos iCloud Sync - Apple](https://support.apple.com/en-us/118285)
+
+---
+
 ## 기술 요구사항
 
 ### 음성 녹음
