@@ -2,6 +2,7 @@
 
 export 'metronome_settings.dart';
 export 'piece.dart';
+export 'practice_item.dart';
 export 'practice_log.dart';
 export 'practice_repertoire.dart';
 export 'practice_stats.dart';
