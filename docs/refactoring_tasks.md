@@ -1,6 +1,6 @@
 # 레슨 앱 리팩토링 태스크
 
-> 마지막 분석: 2025-01-01
+> 마지막 업데이트: 2025-01-01
 > 분석 기준: 최신 Flutter 개발 트렌드 및 Clean Architecture 원칙
 
 ---
@@ -41,35 +41,46 @@
 
 ## 리팩토링 태스크 목록
 
-### Phase 1: 대형 파일 분할 (우선순위: 높음)
+### Phase 1: 대형 파일 분할 (우선순위: 높음) ✅ 완료
 
 > 800줄 이상 파일을 300~500줄 수준으로 분할
 
-#### 1.1 라우터 파일 분할 (653줄)
-- **파일**: `lib/core/router/app_router.dart`
+#### 1.1 라우터 파일 분할 ✅ 완료
+- **파일**: `lib/core/router/app_router.dart` (653줄 → 53줄)
 - **작업**:
-  - [ ] 도메인별 라우트 파일 분리
-    - `auth_routes.dart`
-    - `home_routes.dart`
-    - `practice_routes.dart`
-    - `schedule_routes.dart`
-    - `profile_routes.dart`
-  - [ ] 중앙 라우터는 import만 담당
-- **예상 영향**: 라우트 추가/수정 시 충돌 감소
-- **난이도**: 중
+  - [x] 도메인별 라우트 파일 분리 (12개 파일 생성)
+    - `app_routes.dart` - 라우트 경로 상수
+    - `routes/auth_routes.dart`
+    - `routes/home_routes.dart`
+    - `routes/student_routes.dart`
+    - `routes/lesson_routes.dart`
+    - `routes/practice_routes.dart`
+    - `routes/schedule_routes.dart`
+    - `routes/profile_routes.dart`
+    - `routes/invite_routes.dart`
+    - `routes/search_routes.dart`
+    - `routes/onboarding_routes.dart`
+  - [x] 중앙 라우터는 import만 담당
+- **결과**: 라우트 추가/수정 시 충돌 감소
+- **커밋**: `dd83198`
 
-#### 1.2 대형 스크린 파일 분할
+#### 1.2 대형 스크린 파일 분할 ✅ 완료
 
-| 파일 | 현재 줄 수 | 분할 전략 |
-|------|-----------|----------|
-| `section_detail_screen.dart` | ~800+ | 위젯 분리 (녹음, 재생, 설정) |
-| `lesson_detail_screen.dart` | ~600+ | 탭별 위젯 분리 |
-| `student_detail_screen.dart` | ~500+ | 섹션별 위젯 분리 |
-| `practice_home_screen.dart` | ~500+ | 카드/리스트 위젯 분리 |
+| 파일 | 이전 | 이후 | 분할 내용 |
+|------|------|------|----------|
+| `section_detail_screen.dart` | 1,319줄 | 634줄 | 5개 위젯 분리 |
+| `lesson_detail_screen.dart` | 1,225줄 | 828줄 | 4개 위젯 분리 |
+| `student_detail_screen.dart` | 1,148줄 | 614줄 | 5개 위젯 분리 |
+| **합계** | **3,692줄** | **2,076줄** | **-1,616줄 (-44%)** |
 
-- [ ] 각 스크린의 하위 위젯을 `widgets/` 폴더로 분리
-- [ ] 비즈니스 로직은 Provider로 이동
-- **난이도**: 중~높음
+**생성된 위젯 파일:**
+- `widgets/section_detail/` (5개): SectionInfoCard, PracticeStatsCard, RecordingControl, SectionRecordingListItem, CompletionToggle
+- `widgets/lesson_detail/` (4개): AddTipBottomSheet, LessonHeaderCard, LessonRecordingCard, AISummaryCard
+- `widgets/student_detail/` (5개): StudentStatsCards, StudentPracticeSection, StudentUpcomingLessonsSection, StudentRecentLessonsSection, StudentLessonCard
+
+- [x] 각 스크린의 하위 위젯을 `widgets/[screen_name]/` 폴더로 분리
+- [x] Barrel 파일 생성 (`*_widgets.dart`)
+- **커밋**: `c401632`, `30ce970`, `edeafed`
 
 ---
 
@@ -157,13 +168,13 @@ features/practice/
 ## 실행 우선순위
 
 ```
-1단계 (즉시): Phase 1.1 라우터 분할
+1단계: Phase 1.1 라우터 분할 ✅ 완료
     ↓
-2단계 (1주): Phase 1.2 대형 스크린 분할
+2단계: Phase 1.2 대형 스크린 분할 ✅ 완료
     ↓
-3단계 (2주): Phase 2.1 practice 도메인 Clean Architecture 적용
+3단계 (다음): Phase 2.1 practice 도메인 Clean Architecture 적용
     ↓
-4단계 (3주): Phase 2.2, 3.2 모델/Provider 분산
+4단계: Phase 2.2, 3.2 모델/Provider 분산
     ↓
 5단계 (지속): Phase 4 테스트 및 문서화
 ```
@@ -187,10 +198,14 @@ features/practice/
 
 ## 태스크 체크리스트
 
+### 완료됨 ✅
+- [x] `app_router.dart` 도메인별 분할
+- [x] 대형 스크린 파일 분할 (section_detail, lesson_detail, student_detail)
+- [x] deprecated Ref 타입 수정 (26건)
+- [x] deprecated 경고 수정 (PaymentStatus 등)
+
 ### 즉시 실행 가능
-- [ ] `app_router.dart` 도메인별 분할
-- [ ] 미사용 import 정리
-- [ ] deprecated 경고 추가 수정 (있는 경우)
+- [ ] 미사용 import 정리 (선택사항)
 
 ### 기획 필요
 - [ ] Clean Architecture 전환 범위 결정
@@ -212,3 +227,6 @@ features/practice/
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2025-01-01 | 초기 분석 및 태스크 작성 |
+| 2025-01-01 | Phase 1.1 라우터 분할 완료 (653줄 → 53줄) |
+| 2025-01-01 | Phase 1.2 대형 스크린 분할 완료 (3,692줄 → 2,076줄, -44%) |
+| 2025-01-01 | Phase 3.1 Ref 타입 현대화 완료 (26건) |
