@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 문서 확인
+    url: https://github.com/user/lesson-app/tree/main/docs
+    about: 기존 문서와 스펙을 먼저 확인해주세요
+  - name: 프로젝트 가이드
+    url: https://github.com/user/lesson-app/blob/main/CLAUDE.md
+    about: 프로젝트 구조와 개발 가이드를 확인해주세요
