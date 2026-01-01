@@ -1,6 +1,6 @@
 # 레슨 앱 리팩토링 태스크
 
-> 마지막 업데이트: 2025-01-01
+> 마지막 업데이트: 2026-01-01
 > 분석 기준: 최신 Flutter 개발 트렌드 및 Clean Architecture 원칙
 
 ---
@@ -89,26 +89,40 @@
 > 현재: features/[domain]/presentation/
 > 목표: features/[domain]/{data, domain, presentation}/
 
-#### 2.1 Domain 레이어 도입 ✅ 완료 (practice 도메인)
+#### 2.1 Domain 레이어 도입 ✅ 완료 (practice, lesson, student 도메인)
+
+**적용된 도메인 구조:**
 ```
-features/practice/
+features/[domain]/
 ├── domain/
-│   ├── entities/         # PracticeTask, PracticeLog, PracticeStreak, PracticeStats
-│   └── repositories/     # PracticeRepository 인터페이스
+│   ├── entities/         # 도메인 엔티티
+│   └── repositories/     # Repository 인터페이스
 ├── data/
-│   └── repositories/     # MockPracticeRepository 구현체
+│   └── repositories/     # Mock 구현체
 └── presentation/
     ├── screens/
     ├── widgets/
-    └── providers/        # (기존 lib/providers/practice/ 유지)
+    └── providers/        # (기존 lib/providers/ 유지)
 ```
 
-- [x] practice 도메인 시범 적용
-  - Domain 레이어: entities (4개), repository 인터페이스
-  - Data 레이어: MockPracticeRepository 구현체
-  - 하위 호환성: lib/models/practice.dart, lib/repositories/practice_repository.dart re-export
-- [ ] 성공 시 다른 도메인으로 확장 (lesson, student)
+**practice 도메인** ✅
+- Domain: PracticeTask, PracticeLog, PracticeStreak, PracticeStats
+- Data: MockPracticeRepository
 - **커밋**: `c32e2e9`
+
+**lesson 도메인** ✅
+- Domain: Lesson, LessonPiece, LessonRecording, LessonStatus
+- Data: MockLessonRepository
+- 하위 호환성: lib/models/lesson.dart, lib/repositories/lesson_repository.dart re-export
+
+**student 도메인** ✅
+- Domain: Student, StudentStatus, StudentLevel, PracticeStatus
+- Data: MockStudentRepository
+- 하위 호환성: lib/models/student.dart, lib/repositories/student_repository.dart re-export
+- 공유 타입: ConnectionStatus, PracticeLevel (invite.dart), AgeGroup (practice_item.dart) 참조
+
+- [x] practice 도메인 시범 적용
+- [x] lesson, student 도메인 확장 적용
 
 #### 2.2 Models 분산 배치
 - **현재**: `lib/models/` (중앙집중)
@@ -174,9 +188,9 @@ features/practice/
     ↓
 3단계: Phase 2.1 practice 도메인 Clean Architecture ✅ 완료
     ↓
-4단계 (다음): Phase 2.1 확장 (lesson, student 도메인)
+4단계: Phase 2.1 확장 (lesson, student 도메인) ✅ 완료
     ↓
-5단계: Phase 2.2, 3.2 모델/Provider 분산
+5단계 (다음): Phase 2.2, 3.2 모델/Provider 분산
     ↓
 6단계 (지속): Phase 4 테스트 및 문서화
 ```
@@ -206,6 +220,8 @@ features/practice/
 - [x] deprecated Ref 타입 수정 (26건)
 - [x] deprecated 경고 수정 (PaymentStatus 등)
 - [x] practice 도메인 Clean Architecture 적용 (domain/data 레이어)
+- [x] lesson 도메인 Clean Architecture 적용
+- [x] student 도메인 Clean Architecture 적용
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -234,3 +250,4 @@ features/practice/
 | 2025-01-01 | Phase 1.2 대형 스크린 분할 완료 (3,692줄 → 2,076줄, -44%) |
 | 2025-01-01 | Phase 3.1 Ref 타입 현대화 완료 (26건) |
 | 2026-01-01 | Phase 2.1 practice 도메인 Clean Architecture 적용 완료 |
+| 2026-01-01 | Phase 2.1 lesson, student 도메인 Clean Architecture 확장 완료 |
