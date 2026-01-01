@@ -124,9 +124,10 @@ features/[domain]/
 - [x] practice 도메인 시범 적용
 - [x] lesson, student 도메인 확장 적용
 
-#### 2.2 Models 분산 배치 (진행 중)
+#### 2.2 Models 분산 배치 ✅ 완료
 - **현재**: `lib/models/` (중앙집중)
-- **목표**: 각 feature의 `data/models/`로 이동
+- **목표**: 각 feature의 `domain/entities/`로 이동
+- **방식**: Re-export 패턴으로 하위 호환성 유지
 
 **Step 1: 공유 enum 추출** ✅ 완료
 - `lib/core/models/shared_enums.dart` 생성
@@ -135,11 +136,31 @@ features/[domain]/
 - `lib/core/models/models.dart` barrel file 생성
 - 기존 파일에서 re-export 설정 (하위 호환성 유지)
 
-**Step 2: Feature 전용 모델 이동** (진행 중)
-- [x] practice_repertoire.dart → features/practice/domain/entities/
-- [x] tip_template.dart → features/lessons/domain/entities/
-- [ ] 나머지 feature 전용 모델 이동 (piece, payment, recording 등)
-- **난이도**: 중
+**Step 2: Feature 전용 모델 이동** ✅ 완료
+
+| 모델 | 이동 위치 | 비고 |
+|------|----------|------|
+| practice_repertoire.dart | practice/domain/entities/ | |
+| tip_template.dart | lessons/domain/entities/ | |
+| parent.dart | parent_home/domain/entities/ | |
+| parent_child_relation.dart | parent_home/domain/entities/ | RelationStatus → ParentChildRelationStatus 리네임 |
+| parent_notification_settings.dart | parent_home/domain/entities/ | |
+| parent_visibility_settings.dart | parent_home/domain/entities/ | |
+| invite.dart | profile/domain/entities/ | |
+| review.dart | profile/domain/entities/ | |
+| payment.dart | lessons/domain/entities/ | |
+| notification.dart | notifications/domain/entities/ | 새 feature 생성 |
+| notification_settings.dart | notifications/domain/entities/ | 새 feature 생성 |
+| recording.dart | practice/domain/entities/ | Hive codegen 포함 |
+
+**새로 생성된 Feature:**
+- `lib/features/notifications/domain/entities/` - 알림 관련 모델 (notification, notification_settings)
+
+**커밋:**
+- `dc689aa` - profile/parent_home 도메인 모델 이동
+- `647582a` - parent 관련 모델 parent_home 도메인으로 이동
+- `2f0d230` - 나머지 모델 도메인 레이어로 이동
+- `f999369` - recording 모델 practice 도메인으로 이동 (Hive codegen)
 
 ---
 
@@ -202,9 +223,11 @@ features/[domain]/
     ↓
 5단계: Phase 2.2 Step 1 공유 enum 추출 ✅ 완료
     ↓
-6단계 (다음): Phase 2.2 Step 2 feature 전용 모델 이동
+6단계: Phase 2.2 Step 2 feature 전용 모델 이동 ✅ 완료
     ↓
-7단계 (지속): Phase 3.2, 4 Provider 분산/테스트/문서화
+7단계 (다음): Phase 3.2 Provider 분산 배치
+    ↓
+8단계 (지속): Phase 4 테스트/문서화
 ```
 
 ---
@@ -237,6 +260,11 @@ features/[domain]/
 - [x] 공유 enum lib/core/models/로 추출 (AgeGroup, ConnectionStatus, PracticeLevel)
 - [x] practice_repertoire.dart → features/practice/domain/entities/ 이동
 - [x] tip_template.dart → features/lessons/domain/entities/ 이동
+- [x] parent 관련 모델 → features/parent_home/domain/entities/ 이동
+- [x] invite.dart, review.dart → features/profile/domain/entities/ 이동
+- [x] payment.dart → features/lessons/domain/entities/ 이동
+- [x] notification 관련 모델 → features/notifications/domain/entities/ 이동 (새 feature)
+- [x] recording.dart → features/practice/domain/entities/ 이동 (Hive codegen)
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -267,4 +295,4 @@ features/[domain]/
 | 2026-01-01 | Phase 2.1 practice 도메인 Clean Architecture 적용 완료 |
 | 2026-01-01 | Phase 2.1 lesson, student 도메인 Clean Architecture 확장 완료 |
 | 2026-01-01 | Phase 2.2 Step 1 공유 enum lib/core/models/로 추출 완료 |
-| 2026-01-01 | Phase 2.2 Step 2 practice_repertoire, tip_template 모델 이동 |
+| 2026-01-01 | Phase 2.2 Step 2 모든 feature 전용 모델 이동 완료 (12개 모델) |
