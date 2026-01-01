@@ -21,6 +21,9 @@ void main() async {
   Hive.registerAdapter(StorageStatusAdapter());
   Hive.registerAdapter(RecordingAdapter());
 
+  // Open Hive boxes at startup to ensure persistence
+  await Hive.openBox<Recording>('recordings');
+
   // Initialize date formatting for Korean locale
   await initializeDateFormatting('ko');
 

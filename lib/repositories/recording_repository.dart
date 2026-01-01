@@ -44,6 +44,7 @@ class HiveRecordingRepository implements RecordingRepository {
       return _box!;
     }
     _box = await Hive.openBox<Recording>(_boxName);
+    debugPrint('RecordingRepository: Opened box with ${_box!.length} recordings');
     return _box!;
   }
 
@@ -97,7 +98,8 @@ class HiveRecordingRepository implements RecordingRepository {
   Future<void> saveRecording(Recording recording) async {
     final box = await _recordingsBox;
     await box.put(recording.id, recording);
-    debugPrint('RecordingRepository: Saved recording ${recording.id}');
+    await box.flush(); // Ensure data is written to disk immediately
+    debugPrint('RecordingRepository: Saved recording ${recording.id} (flushed)');
   }
 
   @override
@@ -119,7 +121,8 @@ class HiveRecordingRepository implements RecordingRepository {
 
       // Remove from database
       await box.delete(id);
-      debugPrint('RecordingRepository: Deleted recording $id');
+      await box.flush();
+      debugPrint('RecordingRepository: Deleted recording $id (flushed)');
     }
   }
 
@@ -135,7 +138,8 @@ class HiveRecordingRepository implements RecordingRepository {
       // Set as representative
       final updated = recording.copyWith(isRepresentative: true);
       await box.put(id, updated);
-      debugPrint('RecordingRepository: Set recording $id as representative');
+      await box.flush();
+      debugPrint('RecordingRepository: Set recording $id as representative (flushed)');
     }
   }
 
@@ -149,6 +153,9 @@ class HiveRecordingRepository implements RecordingRepository {
     for (final recording in recordings) {
       final updated = recording.copyWith(isRepresentative: false);
       await box.put(recording.id, updated);
+    }
+    if (recordings.isNotEmpty) {
+      await box.flush();
     }
     debugPrint('RecordingRepository: Cleared representative for repertoire $repertoireId');
   }
@@ -164,7 +171,8 @@ class HiveRecordingRepository implements RecordingRepository {
         storageStatus: StorageStatus.active,
       );
       await box.put(id, updated);
-      debugPrint('RecordingRepository: Marked recording $id as shared');
+      await box.flush();
+      debugPrint('RecordingRepository: Marked recording $id as shared (flushed)');
     }
   }
 }
