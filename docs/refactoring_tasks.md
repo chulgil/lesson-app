@@ -89,26 +89,26 @@
 > 현재: features/[domain]/presentation/
 > 목표: features/[domain]/{data, domain, presentation}/
 
-#### 2.1 Domain 레이어 도입
+#### 2.1 Domain 레이어 도입 ✅ 완료 (practice 도메인)
 ```
 features/practice/
 ├── domain/
-│   ├── entities/         # 비즈니스 엔티티
-│   ├── repositories/     # Repository 인터페이스
-│   └── usecases/         # Use Case 클래스
+│   ├── entities/         # PracticeTask, PracticeLog, PracticeStreak, PracticeStats
+│   └── repositories/     # PracticeRepository 인터페이스
 ├── data/
-│   ├── models/           # DTO, API 모델
-│   ├── datasources/      # Remote/Local 데이터소스
-│   └── repositories/     # Repository 구현체
+│   └── repositories/     # MockPracticeRepository 구현체
 └── presentation/
     ├── screens/
     ├── widgets/
-    └── providers/        # UI 상태 Provider
+    └── providers/        # (기존 lib/providers/practice/ 유지)
 ```
 
-- [ ] practice 도메인부터 시범 적용
-- [ ] 성공 시 다른 도메인으로 확장
-- **난이도**: 높음
+- [x] practice 도메인 시범 적용
+  - Domain 레이어: entities (4개), repository 인터페이스
+  - Data 레이어: MockPracticeRepository 구현체
+  - 하위 호환성: lib/models/practice.dart, lib/repositories/practice_repository.dart re-export
+- [ ] 성공 시 다른 도메인으로 확장 (lesson, student)
+- **커밋**: `c32e2e9`
 
 #### 2.2 Models 분산 배치
 - **현재**: `lib/models/` (중앙집중)
@@ -172,11 +172,13 @@ features/practice/
     ↓
 2단계: Phase 1.2 대형 스크린 분할 ✅ 완료
     ↓
-3단계 (다음): Phase 2.1 practice 도메인 Clean Architecture 적용
+3단계: Phase 2.1 practice 도메인 Clean Architecture ✅ 완료
     ↓
-4단계: Phase 2.2, 3.2 모델/Provider 분산
+4단계 (다음): Phase 2.1 확장 (lesson, student 도메인)
     ↓
-5단계 (지속): Phase 4 테스트 및 문서화
+5단계: Phase 2.2, 3.2 모델/Provider 분산
+    ↓
+6단계 (지속): Phase 4 테스트 및 문서화
 ```
 
 ---
@@ -203,6 +205,7 @@ features/practice/
 - [x] 대형 스크린 파일 분할 (section_detail, lesson_detail, student_detail)
 - [x] deprecated Ref 타입 수정 (26건)
 - [x] deprecated 경고 수정 (PaymentStatus 등)
+- [x] practice 도메인 Clean Architecture 적용 (domain/data 레이어)
 
 ### 즉시 실행 가능
 - [ ] 미사용 import 정리 (선택사항)
@@ -230,3 +233,4 @@ features/practice/
 | 2025-01-01 | Phase 1.1 라우터 분할 완료 (653줄 → 53줄) |
 | 2025-01-01 | Phase 1.2 대형 스크린 분할 완료 (3,692줄 → 2,076줄, -44%) |
 | 2025-01-01 | Phase 3.1 Ref 타입 현대화 완료 (26건) |
+| 2026-01-01 | Phase 2.1 practice 도메인 Clean Architecture 적용 완료 |
