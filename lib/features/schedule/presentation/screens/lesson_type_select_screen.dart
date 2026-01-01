@@ -61,7 +61,7 @@ class LessonTypeSelectScreen extends ConsumerWidget {
               // Lesson type cards
               Expanded(
                 child: ListView(
-                  children: LessonType.values.map((type) {
+                  children: RelationLessonType.values.map((type) {
                     final isAvailable = availableTypes.contains(type);
                     return Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -200,15 +200,15 @@ class LessonTypeSelectScreen extends ConsumerWidget {
     );
   }
 
-  void _onLessonTypeSelected(BuildContext context, LessonType type) {
+  void _onLessonTypeSelected(BuildContext context, RelationLessonType type) {
     switch (type) {
-      case LessonType.trial:
+      case RelationLessonType.trial:
         // Navigate to trial lesson request screen
         context.push(
           '${AppRoutes.trialLessonRequest}?teacherId=$teacherId&teacherName=${Uri.encodeComponent(teacherName)}',
         );
         break;
-      case LessonType.regular:
+      case RelationLessonType.regular:
         // Navigate to regular lesson registration screen
         context.push(
           AppRoutes.registerRegularLesson,
@@ -218,7 +218,7 @@ class LessonTypeSelectScreen extends ConsumerWidget {
           },
         );
         break;
-      case LessonType.oneTime:
+      case RelationLessonType.oneTime:
         // 1회 레슨은 체험 레슨과 동일한 프로세스 사용 (스펙: SingleLessonBooking)
         // lessonType 파라미터로 구분
         context.push(
@@ -231,7 +231,7 @@ class LessonTypeSelectScreen extends ConsumerWidget {
 
 /// Lesson type selection card
 class _LessonTypeCard extends StatelessWidget {
-  final LessonType type;
+  final RelationLessonType type;
   final bool isAvailable;
   final VoidCallback? onTap;
 

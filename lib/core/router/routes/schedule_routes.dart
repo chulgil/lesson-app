@@ -56,8 +56,8 @@ List<GoRoute> scheduleRoutes = [
       final studentId = state.uri.queryParameters['studentId'];
       final lessonTypeStr = state.uri.queryParameters['lessonType'];
       final lessonType = lessonTypeStr == 'oneTime'
-          ? LessonType.oneTime
-          : LessonType.trial;
+          ? RelationLessonType.oneTime
+          : RelationLessonType.trial;
       return TrialLessonRequestScreen(
         teacherId: teacherId,
         teacherName: teacherName,

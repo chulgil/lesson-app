@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/lesson_booking.dart' hide LessonType;
+import '../../../../models/lesson_booking.dart';
 import '../../../../models/student.dart';
 import '../../../../models/teacher_student_relation.dart';
 import '../../../../providers/booking/booking_providers.dart';
@@ -20,14 +20,14 @@ class TrialLessonRequestScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String teacherName;
   final String? studentId;
-  final LessonType lessonType;
+  final RelationLessonType lessonType;
 
   const TrialLessonRequestScreen({
     super.key,
     required this.teacherId,
     required this.teacherName,
     this.studentId,
-    this.lessonType = LessonType.trial,
+    this.lessonType = RelationLessonType.trial,
   });
 
   @override
@@ -53,7 +53,7 @@ class _TrialLessonRequestScreenState
   Student? _currentStudent;
 
   // Helper getters
-  bool get _isTrialLesson => widget.lessonType == LessonType.trial;
+  bool get _isTrialLesson => widget.lessonType == RelationLessonType.trial;
   String get _screenTitle => _isTrialLesson ? '체험레슨 신청' : '1회 레슨 신청';
   String get _priceLabel => _isTrialLesson ? '체험레슨 30,000원' : '1회 레슨 50,000원';
   String get _submitButtonLabel =>
