@@ -129,53 +129,56 @@ class _BpmControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Decrement button
-        _SmallButton(
-          icon: Icons.remove,
-          onPressed: onDecrement,
-        ),
-        const SizedBox(width: AppSpacing.space2),
-
-        // BPM display
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$bpm',
-              style: AppTypography.headingMedium.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
-              ),
-            ),
-            Text(
-              'BPM',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(width: AppSpacing.space2),
-
-        // Increment button
-        _SmallButton(
-          icon: Icons.add,
-          onPressed: onIncrement,
-        ),
-        const SizedBox(width: AppSpacing.space3),
-
-        // Time signature display (same size as BPM)
-        Text(
-          timeSignature,
-          style: AppTypography.headingMedium.copyWith(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primary,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Decrement button
+          _SmallButton(
+            icon: Icons.remove,
+            onPressed: onDecrement,
           ),
-        ),
-      ],
+          const SizedBox(width: AppSpacing.space2),
+
+          // BPM display
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$bpm',
+                style: AppTypography.headingMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              Text(
+                'BPM',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: AppSpacing.space2),
+
+          // Increment button
+          _SmallButton(
+            icon: Icons.add,
+            onPressed: onIncrement,
+          ),
+          const SizedBox(width: AppSpacing.space3),
+
+          // Time signature display (same size as BPM)
+          Text(
+            timeSignature,
+            style: AppTypography.headingMedium.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
