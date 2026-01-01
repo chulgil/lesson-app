@@ -1,8 +1,20 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2025-12-31
+> 마지막 업데이트: 2026-01-01
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
+
+---
+
+## 🔥 핵심 문서 (Claude 필독)
+
+| 문서 | 설명 | 용도 |
+|------|------|------|
+| [architecture.md](architecture.md) | **앱 아키텍처 가이드** | 폴더 구조, Provider 패턴, 코드 위치 |
+| [../CLAUDE.md](../CLAUDE.md) | **프로젝트 가이드** | 명령어, 규칙, 작업 우선순위 |
+| [refactoring_tasks.md](refactoring_tasks.md) | 리팩토링 진행 현황 | Clean Architecture 마이그레이션 |
+
+> **Claude 작업 시작 시**: `architecture.md` → `CLAUDE.md` → 관련 specs 순으로 확인
 
 ---
 
@@ -149,4 +161,8 @@ docs/
 
 ## 관련 문서
 
-- [프로젝트 CLAUDE.md](../CLAUDE.md) - 프로젝트 개발 가이드
+| 문서 | 설명 |
+|------|------|
+| [architecture.md](architecture.md) | 앱 아키텍처 (Clean Architecture, Provider 패턴) |
+| [refactoring_tasks.md](refactoring_tasks.md) | 리팩토링 진행 현황 |
+| [../CLAUDE.md](../CLAUDE.md) | 프로젝트 가이드 (명령어, 규칙)
