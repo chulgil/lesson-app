@@ -90,6 +90,8 @@ class SmartRecordingResultDialog extends StatelessWidget {
     required this.trimmedStart,
     required this.trimmedEnd,
     required this.totalDuration,
+    this.middleSilenceCount = 0,
+    this.middleSilenceDuration = Duration.zero,
     this.onRestore,
     this.onConfirm,
   });
@@ -97,6 +99,8 @@ class SmartRecordingResultDialog extends StatelessWidget {
   final Duration trimmedStart;
   final Duration trimmedEnd;
   final Duration totalDuration;
+  final int middleSilenceCount;
+  final Duration middleSilenceDuration;
   final VoidCallback? onRestore;
   final VoidCallback? onConfirm;
 
@@ -112,8 +116,10 @@ class SmartRecordingResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contentDuration = totalDuration - trimmedStart - trimmedEnd;
+    final contentDuration = totalDuration - trimmedStart - trimmedEnd - middleSilenceDuration;
     final hasTrimming = trimmedStart > Duration.zero || trimmedEnd > Duration.zero;
+    final hasMiddleSilence = middleSilenceCount > 0;
+    final hasAnyTrimming = hasTrimming || hasMiddleSilence;
 
     return AlertDialog(
       title: const Row(
@@ -131,7 +137,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
             '총 길이: ${_formatDuration(contentDuration)}',
             style: AppTypography.bodyLarge,
           ),
-          if (hasTrimming) ...[
+          if (hasAnyTrimming) ...[
             const SizedBox(height: 12),
             const Divider(),
             const SizedBox(height: 12),
@@ -147,7 +153,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
                 children: [
                   const Icon(Icons.content_cut, size: 16, color: Colors.grey),
                   const SizedBox(width: 8),
-                  Text('앞 ${_formatDuration(trimmedStart)} 트림됨'),
+                  Text('앞 ${_formatDuration(trimmedStart)} 트림'),
                 ],
               ),
             if (trimmedEnd > Duration.zero)
@@ -155,7 +161,15 @@ class SmartRecordingResultDialog extends StatelessWidget {
                 children: [
                   const Icon(Icons.content_cut, size: 16, color: Colors.grey),
                   const SizedBox(width: 8),
-                  Text('뒤 ${_formatDuration(trimmedEnd)} 트림됨'),
+                  Text('뒤 ${_formatDuration(trimmedEnd)} 트림'),
+                ],
+              ),
+            if (hasMiddleSilence)
+              Row(
+                children: [
+                  const Icon(Icons.skip_next, size: 16, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Text('중간 무음 $middleSilenceCount구간 스킵 (${_formatDuration(middleSilenceDuration)})'),
                 ],
               ),
           ],
@@ -188,6 +202,8 @@ Future<void> showSmartRecordingResult(
   required Duration trimmedStart,
   required Duration trimmedEnd,
   required Duration totalDuration,
+  int middleSilenceCount = 0,
+  Duration middleSilenceDuration = Duration.zero,
   VoidCallback? onRestore,
   VoidCallback? onConfirm,
 }) {
@@ -197,6 +213,8 @@ Future<void> showSmartRecordingResult(
       trimmedStart: trimmedStart,
       trimmedEnd: trimmedEnd,
       totalDuration: totalDuration,
+      middleSilenceCount: middleSilenceCount,
+      middleSilenceDuration: middleSilenceDuration,
       onRestore: onRestore,
       onConfirm: onConfirm,
     ),

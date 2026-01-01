@@ -40,6 +40,7 @@ enum PaymentStatus {
         return '취소';
       case PaymentStatus.refunded:
         return '환불';
+      // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
         return '완료'; // Legacy
     }
@@ -53,6 +54,7 @@ enum PaymentStatus {
       case PaymentStatus.paid:
         return const Color(0xFF2196F3); // 🔵 Blue
       case PaymentStatus.confirmed:
+      // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
         return const Color(0xFF4CAF50); // 🟢 Green
       case PaymentStatus.overdue:
@@ -69,6 +71,7 @@ enum PaymentStatus {
   /// V2: Check if payment is finalized
   bool get isFinalized =>
       this == PaymentStatus.confirmed ||
+      // ignore: deprecated_member_use_from_same_package
       this == PaymentStatus.completed ||
       this == PaymentStatus.cancelled ||
       this == PaymentStatus.refunded;
@@ -195,6 +198,7 @@ class Payment {
     if (status == PaymentStatus.paid) return '입금됨';
     if (status == PaymentStatus.overdue) return '연체';
     // Legacy status values
+    // ignore: deprecated_member_use_from_same_package
     if (status == PaymentStatus.completed) return '완료';
     if (status == PaymentStatus.cancelled) return '취소';
     if (status == PaymentStatus.refunded) return '환불';
@@ -213,6 +217,7 @@ class Payment {
       return status;
     }
     // V1 to V2 mapping
+    // ignore: deprecated_member_use_from_same_package
     if (status == PaymentStatus.completed) return PaymentStatus.confirmed;
     if (status == PaymentStatus.pending && studentConfirmed) {
       return PaymentStatus.paid;

@@ -448,7 +448,7 @@ class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: _isProcessing ? null : () => _handleReject(context),
+              onPressed: _isProcessing ? null : _handleReject,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
                 side: BorderSide(color: AppColors.borderLight),
@@ -468,7 +468,7 @@ class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
           Expanded(
             child: FilledButton(
               onPressed: canApprove && !_isProcessing
-                  ? () => _handleApprove(context)
+                  ? _handleApprove
                   : null,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
@@ -501,7 +501,7 @@ class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
     );
   }
 
-  Future<void> _handleApprove(BuildContext context) async {
+  Future<void> _handleApprove() async {
     setState(() => _isProcessing = true);
 
     try {
@@ -510,27 +510,25 @@ class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
             selectedOptionId: _selectedOptionId,
           );
 
-      if (mounted) {
-        Navigator.pop(context);
-        widget.onApproved();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${widget.booking.studentName}님의 레슨이 승인되었습니다',
-            ),
-            backgroundColor: AppColors.practiceGood,
+      if (!mounted) return;
+      Navigator.pop(context);
+      widget.onApproved();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${widget.booking.studentName}님의 레슨이 승인되었습니다',
           ),
-        );
-      }
+          backgroundColor: AppColors.practiceGood,
+        ),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('승인 처리 중 오류가 발생했습니다: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('승인 처리 중 오류가 발생했습니다: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -538,51 +536,49 @@ class _ApprovalBottomSheetState extends ConsumerState<_ApprovalBottomSheet> {
     }
   }
 
-  Future<void> _handleReject(BuildContext context) async {
+  Future<void> _handleReject() async {
     final result = await showModalBottomSheet<
         ({UnavailableReason reason, List<TimeSlot> suggestedSlots})>(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _UnavailableBottomSheet(
+      builder: (sheetContext) => _UnavailableBottomSheet(
         teacherId: widget.teacherId,
       ),
     );
 
-    if (result != null && mounted) {
-      setState(() => _isProcessing = true);
+    if (result == null || !mounted) return;
 
-      try {
-        await ref.read(bookingsNotifierProvider.notifier).markUnavailable(
-              widget.booking.id,
-              result.reason,
-              suggestedTimeSlots:
-                  result.suggestedSlots.isNotEmpty ? result.suggestedSlots : null,
-            );
+    setState(() => _isProcessing = true);
 
-        if (mounted) {
-          Navigator.pop(context);
-          widget.onApproved();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result.suggestedSlots.isNotEmpty
-                  ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
-                  : '학생에게 안내가 전달되었습니다'),
-            ),
+    try {
+      await ref.read(bookingsNotifierProvider.notifier).markUnavailable(
+            widget.booking.id,
+            result.reason,
+            suggestedTimeSlots:
+                result.suggestedSlots.isNotEmpty ? result.suggestedSlots : null,
           );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('처리 중 오류가 발생했습니다: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isProcessing = false);
-        }
+
+      if (!mounted) return;
+      Navigator.pop(context);
+      widget.onApproved();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.suggestedSlots.isNotEmpty
+              ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
+              : '학생에게 안내가 전달되었습니다'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('처리 중 오류가 발생했습니다: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
       }
     }
   }

@@ -127,7 +127,7 @@ class SmartRecordingState {
   static const Duration minSilenceDuration = Duration(seconds: 3);
 
   /// Default middle silence threshold for skipping.
-  static const Duration defaultMiddleSilenceThreshold = Duration(seconds: 10);
+  static const Duration defaultMiddleSilenceThreshold = Duration(seconds: 5);
 
   /// Minimum middle silence threshold.
   static const Duration minMiddleSilenceThreshold = Duration(seconds: 5);
@@ -209,7 +209,7 @@ class SmartRecordingSettings {
     this.smartRecordingEnabled = true,
     this.trimThreshold = SmartRecordingState.defaultThreshold,
     this.middleSilenceSkipEnabled = true,
-    this.middleSilenceThreshold = 10,
+    this.middleSilenceThreshold = 5,
   });
 
   /// Whether smart recording is enabled by default.
@@ -236,7 +236,7 @@ class SmartRecordingSettings {
           SmartRecordingState.defaultThreshold,
       middleSilenceSkipEnabled:
           json['middleSilenceSkipEnabled'] as bool? ?? true,
-      middleSilenceThreshold: json['middleSilenceThreshold'] as int? ?? 10,
+      middleSilenceThreshold: json['middleSilenceThreshold'] as int? ?? 5,
     );
   }
 

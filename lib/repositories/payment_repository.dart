@@ -38,7 +38,7 @@ class MockPaymentRepository implements PaymentRepository {
         studentName: '김서연',
         type: PaymentType.regular,
         amount: 200000,
-        status: PaymentStatus.completed,
+        status: PaymentStatus.confirmed,
         method: PaymentMethod.bankTransfer,
         paymentDate: now.subtract(const Duration(days: 5)),
         lessonCount: 4,
@@ -55,7 +55,7 @@ class MockPaymentRepository implements PaymentRepository {
         studentName: '이준호',
         type: PaymentType.regular,
         amount: 240000,
-        status: PaymentStatus.completed,
+        status: PaymentStatus.confirmed,
         method: PaymentMethod.card,
         paymentDate: now.subtract(const Duration(days: 3)),
         lessonCount: 4,
@@ -108,7 +108,7 @@ class MockPaymentRepository implements PaymentRepository {
         studentName: '정하늘',
         type: PaymentType.regular,
         amount: 160000,
-        status: PaymentStatus.completed,
+        status: PaymentStatus.confirmed,
         method: PaymentMethod.cash,
         paymentDate: now.subtract(const Duration(days: 7)),
         lessonCount: 4,
@@ -125,7 +125,7 @@ class MockPaymentRepository implements PaymentRepository {
         studentName: '신유진',
         type: PaymentType.trial,
         amount: 30000,
-        status: PaymentStatus.completed,
+        status: PaymentStatus.confirmed,
         method: PaymentMethod.bankTransfer,
         paymentDate: now.subtract(const Duration(days: 1)),
         lessonCount: 1,
@@ -285,7 +285,7 @@ class MockPaymentRepository implements PaymentRepository {
     }).toList();
 
     final completed =
-        monthPayments.where((p) => p.status == PaymentStatus.completed);
+        monthPayments.where((p) => p.status == PaymentStatus.confirmed);
     final pending =
         monthPayments.where((p) => p.status == PaymentStatus.pending);
     final overdue = pending.where((p) => p.isOverdue);

@@ -7,7 +7,7 @@ part of 'user_profile_provider.dart';
 // **************************************************************************
 
 String _$availableProfileTypesHash() =>
-    r'5d9cd2d7e746287b5f7d867d591d3d9e3b5105aa';
+    r'1644397dd8944142b9304d5b2e18e892be63cfb9';
 
 /// Provider for available profile types the current user can switch to
 ///
@@ -27,7 +27,7 @@ final availableProfileTypesProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AvailableProfileTypesRef = AutoDisposeProviderRef<List<ProfileType>>;
-String _$canSwitchProfilesHash() => r'2a0dac115526390e1dfa2b40c7dc2366047f7d5e';
+String _$canSwitchProfilesHash() => r'de100f2d51a2ce68faf28c28c5f714fb5b564070';
 
 /// Provider for checking if profile switching is available
 ///
@@ -46,7 +46,7 @@ final canSwitchProfilesProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CanSwitchProfilesRef = AutoDisposeProviderRef<bool>;
-String _$activeProfileTypeHash() => r'06d843c20f5dff95d16225289023d6941e897d8d';
+String _$activeProfileTypeHash() => r'391ea48708d992c13d5d47f4bc7cad1ef21f372c';
 
 /// Provider for the active profile type
 ///
@@ -66,7 +66,7 @@ final activeProfileTypeProvider = AutoDisposeProvider<ProfileType>.internal(
 // ignore: unused_element
 typedef ActiveProfileTypeRef = AutoDisposeProviderRef<ProfileType>;
 String _$activeChildProfileHash() =>
-    r'bc25d8176e5d8df05a277e0fef31ee2ee96dab0a';
+    r'6697ff73ef43f828c1bd46e2f0baa44a3230eca6';
 
 /// Provider for the active child profile (when in child mode)
 ///
@@ -86,7 +86,7 @@ final activeChildProfileProvider = AutoDisposeProvider<ChildProfile?>.internal(
 // ignore: unused_element
 typedef ActiveChildProfileRef = AutoDisposeProviderRef<ChildProfile?>;
 String _$isUnconnectedChildModeHash() =>
-    r'97ae15b9df1be9b0b521b5a0ce7e3760a72e194e';
+    r'fa6645b66420f6b7a2cd57628845f2e1c9de47b6';
 
 /// Provider that indicates if the current view should show unconnected child features
 ///
@@ -110,7 +110,7 @@ final isUnconnectedChildModeProvider = AutoDisposeProvider<bool>.internal(
 // ignore: unused_element
 typedef IsUnconnectedChildModeRef = AutoDisposeProviderRef<bool>;
 String _$syncUserProfileChildrenHash() =>
-    r'2f80062a94aee761891009df2952e385fb5a7881';
+    r'739133137d95afe10e3213263da4974ae1951f7c';
 
 /// Copied from Dart SDK
 class _SystemHash {

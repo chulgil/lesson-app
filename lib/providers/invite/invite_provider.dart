@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/invite.dart';
@@ -8,7 +9,7 @@ part 'invite_provider.g.dart';
 
 /// Provider for invite repository
 @Riverpod(keepAlive: true)
-InviteRepository inviteRepository(InviteRepositoryRef ref) {
+InviteRepository inviteRepository(Ref ref) {
   return MockInviteRepository();
 }
 
@@ -103,7 +104,7 @@ class InviteCreator extends _$InviteCreator {
 
 /// Get user's own invites
 @riverpod
-Future<List<Invite>> myInvites(MyInvitesRef ref) async {
+Future<List<Invite>> myInvites(Ref ref) async {
   final repo = ref.watch(inviteRepositoryProvider);
   final userId = ref.watch(currentInviteUserIdProvider);
   return repo.getInvitesByCreator(userId);
@@ -111,7 +112,7 @@ Future<List<Invite>> myInvites(MyInvitesRef ref) async {
 
 /// Get invite by code
 @riverpod
-Future<Invite?> inviteByCode(InviteByCodeRef ref, String code) async {
+Future<Invite?> inviteByCode(Ref ref, String code) async {
   final repo = ref.watch(inviteRepositoryProvider);
   return repo.getInviteByCode(code);
 }
@@ -196,7 +197,7 @@ class ConnectionRequester extends _$ConnectionRequester {
 
 /// Pending requests for current user (as target)
 @riverpod
-Future<List<ConnectionRequest>> pendingRequests(PendingRequestsRef ref) async {
+Future<List<ConnectionRequest>> pendingRequests(Ref ref) async {
   final repo = ref.watch(inviteRepositoryProvider);
   final userId = ref.watch(currentInviteUserIdProvider);
   return repo.getPendingRequestsForUser(userId);
@@ -204,7 +205,7 @@ Future<List<ConnectionRequest>> pendingRequests(PendingRequestsRef ref) async {
 
 /// Sent requests by current user
 @riverpod
-Future<List<ConnectionRequest>> mySentRequests(MySentRequestsRef ref) async {
+Future<List<ConnectionRequest>> mySentRequests(Ref ref) async {
   final repo = ref.watch(inviteRepositoryProvider);
   final userId = ref.watch(currentInviteUserIdProvider);
   return repo.getSentRequestsByUser(userId);
@@ -278,7 +279,7 @@ class ConnectionRequestResponder extends _$ConnectionRequestResponder {
 
 /// Current user's connections
 @riverpod
-Future<List<Connection>> myConnections(MyConnectionsRef ref) async {
+Future<List<Connection>> myConnections(Ref ref) async {
   final repo = ref.watch(inviteRepositoryProvider);
   final userId = ref.watch(currentInviteUserIdProvider);
   return repo.getConnectionsByUser(userId);
@@ -286,7 +287,7 @@ Future<List<Connection>> myConnections(MyConnectionsRef ref) async {
 
 /// Check if connected with specific user
 @riverpod
-Future<bool> isConnectedWith(IsConnectedWithRef ref, String otherUserId) async {
+Future<bool> isConnectedWith(Ref ref, String otherUserId) async {
   final repo = ref.watch(inviteRepositoryProvider);
   final userId = ref.watch(currentInviteUserIdProvider);
   return repo.areConnected(userId, otherUserId);
@@ -337,7 +338,7 @@ class ConnectionManager extends _$ConnectionManager {
 
 /// Pending request count (for badge display)
 @riverpod
-Future<int> pendingRequestCount(PendingRequestCountRef ref) async {
+Future<int> pendingRequestCount(Ref ref) async {
   final requests = await ref.watch(pendingRequestsProvider.future);
   return requests.length;
 }

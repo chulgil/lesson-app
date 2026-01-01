@@ -81,6 +81,12 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
   Duration _middleSilenceThreshold = SmartRecordingState.defaultMiddleSilenceThreshold;
   bool _middleSilenceSkipEnabled = true;
 
+  /// Minimum duration of continuous sound to consider it a real sound (debounce).
+  static const _soundDebounce = Duration(milliseconds: 500);
+
+  /// Tracks when sound tentatively started during ending phase.
+  DateTime? _tentativeSoundStart;
+
   @override
   SmartRecordingState build() {
     final settings = ref.watch(smartRecordingSettingsNotifierProvider);
@@ -114,11 +120,12 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     _middleSilenceSkipEnabled = settings.middleSilenceSkipEnabled;
 
     state = state.resetForNewRecording();
+    _tentativeSoundStart = null;
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _amplitudeSubscription = recorder.normalizedAmplitudeStream.listen(_onAmplitude);
 
-    debugPrint('SmartRecording: Started monitoring (threshold=${state.threshold}, middleSilence=$_middleSilenceThreshold)');
+    debugPrint('SmartRecording: Started monitoring (threshold=${state.threshold}, middleSilence=$_middleSilenceThreshold, skipEnabled=$_middleSilenceSkipEnabled)');
   }
 
   /// Stop monitoring and calculate trim durations.
@@ -155,16 +162,21 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     }
 
     // Finalize any ongoing middle silence
+    // Use 1.5s buffer on each side = 3s total silence kept
+    const middleSilenceBuffer = Duration(milliseconds: 1500);
     List<SilencePeriod> finalSilencePeriods = List.from(state.silencePeriods);
     if (state.middleSilenceStartTime != null && _middleSilenceSkipEnabled) {
       final silenceDuration = now.difference(state.middleSilenceStartTime!);
       if (silenceDuration >= _middleSilenceThreshold) {
         final startOffset = state.middleSilenceStartTime!.difference(_recordingStartTime!);
         final endOffset = now.difference(_recordingStartTime!);
-        finalSilencePeriods.add(SilencePeriod(
-          startTime: startOffset + buffer,
-          endTime: endOffset - buffer,
-        ));
+        // Only add if the skipped portion is positive
+        if (endOffset - startOffset > middleSilenceBuffer * 2) {
+          finalSilencePeriods.add(SilencePeriod(
+            startTime: startOffset + middleSilenceBuffer,
+            endTime: endOffset - middleSilenceBuffer,
+          ));
+        }
       }
     }
 
@@ -214,40 +226,52 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
         );
         debugPrint('SmartRecording: Sound started at ${now.difference(_recordingStartTime!)}');
       } else if (state.phase == RecordingPhase.ending) {
-        // Sound resumed after silence - check if middle silence should be recorded
-        if (state.middleSilenceStartTime != null && _middleSilenceSkipEnabled) {
-          final silenceDuration = now.difference(state.middleSilenceStartTime!);
-          if (silenceDuration >= _middleSilenceThreshold) {
-            // Add silence period (with buffer on each end)
-            const buffer = Duration(seconds: 3);
-            final startOffset = state.middleSilenceStartTime!.difference(_recordingStartTime!);
-            final endOffset = now.difference(_recordingStartTime!);
+        // Sound detected during ending phase - use debounce to avoid noise spikes
+        if (_tentativeSoundStart == null) {
+          // Start tracking tentative sound
+          _tentativeSoundStart = now;
+        } else if (now.difference(_tentativeSoundStart!) >= _soundDebounce) {
+          // Sound has been continuous for debounce duration, consider it real
+          // Check if middle silence should be recorded
+          if (state.middleSilenceStartTime != null && _middleSilenceSkipEnabled) {
+            final silenceDuration = _tentativeSoundStart!.difference(state.middleSilenceStartTime!);
+            if (silenceDuration >= _middleSilenceThreshold) {
+              // Add silence period (with buffer on each end)
+              // Use 1.5s buffer on each side = 3s total silence kept
+              const buffer = Duration(milliseconds: 1500);
+              final startOffset = state.middleSilenceStartTime!.difference(_recordingStartTime!);
+              final endOffset = _tentativeSoundStart!.difference(_recordingStartTime!);
 
-            // Only add if the skipped portion is positive
-            if (endOffset - startOffset > buffer * 2) {
-              final newPeriod = SilencePeriod(
-                startTime: startOffset + buffer,
-                endTime: endOffset - buffer,
-              );
-              final updatedPeriods = [...state.silencePeriods, newPeriod];
-              state = state.copyWith(
-                phase: RecordingPhase.recording,
-                soundEndTime: now,
-                silencePeriods: updatedPeriods,
-                clearMiddleSilenceStartTime: true,
-              );
-              debugPrint('SmartRecording: Added middle silence skip: ${newPeriod.startTime} ~ ${newPeriod.endTime}');
-              return;
+              // Only add if the skipped portion is positive
+              if (endOffset - startOffset > buffer * 2) {
+                final newPeriod = SilencePeriod(
+                  startTime: startOffset + buffer,
+                  endTime: endOffset - buffer,
+                );
+                final updatedPeriods = [...state.silencePeriods, newPeriod];
+                state = state.copyWith(
+                  phase: RecordingPhase.recording,
+                  soundEndTime: now,
+                  silencePeriods: updatedPeriods,
+                  clearMiddleSilenceStartTime: true,
+                );
+                _tentativeSoundStart = null;
+                debugPrint('SmartRecording: Added middle silence skip: ${newPeriod.startTime} ~ ${newPeriod.endTime}');
+                return;
+              }
             }
           }
+          // Resume recording without adding silence period
+          state = state.copyWith(
+            phase: RecordingPhase.recording,
+            soundEndTime: now,
+            clearMiddleSilenceStartTime: true,
+          );
+          _tentativeSoundStart = null;
+          debugPrint('SmartRecording: Sound resumed at ${now.difference(_recordingStartTime!)}');
         }
-        // Resume recording without adding silence period
-        state = state.copyWith(
-          phase: RecordingPhase.recording,
-          soundEndTime: now,
-          clearMiddleSilenceStartTime: true,
-        );
-        debugPrint('SmartRecording: Sound resumed at ${now.difference(_recordingStartTime!)}');
+        // Keep updating soundEndTime during tentative sound
+        state = state.copyWith(soundEndTime: now);
       } else {
         // Update last sound time
         state = state.copyWith(soundEndTime: now);
@@ -260,7 +284,11 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
           phase: RecordingPhase.ending,
           middleSilenceStartTime: now,
         );
+        _tentativeSoundStart = null;
         debugPrint('SmartRecording: Sound ended at ${now.difference(_recordingStartTime!)}');
+      } else if (state.phase == RecordingPhase.ending) {
+        // Reset tentative sound if silence detected again
+        _tentativeSoundStart = null;
       }
     }
   }
@@ -273,6 +301,7 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     _amplitudeSubscription?.cancel();
     _amplitudeSubscription = null;
     _recordingStartTime = null;
+    _tentativeSoundStart = null;
 
     final settings = ref.read(smartRecordingSettingsNotifierProvider);
     state = SmartRecordingState(

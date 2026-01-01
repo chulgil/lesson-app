@@ -874,6 +874,7 @@ class _MenuItem {
   _MenuItem({
     required this.icon,
     required this.label,
+    // ignore: unused_element_parameter
     this.subtitle,
     this.labelColor,
     this.trailing,

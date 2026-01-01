@@ -6,7 +6,7 @@ part of 'invite_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inviteRepositoryHash() => r'98d033c52e9718e36a0601116ffb5ffa3f073da1';
+String _$inviteRepositoryHash() => r'e669a8877c4163e196dc55fe98d7e0da633eb04f';
 
 /// Provider for invite repository
 ///
@@ -25,7 +25,7 @@ final inviteRepositoryProvider = Provider<InviteRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef InviteRepositoryRef = ProviderRef<InviteRepository>;
-String _$myInvitesHash() => r'bf5fa32b0c9566b5be6e40f34685d59a8c0325f3';
+String _$myInvitesHash() => r'fd327fbdb2c1093102f9a8b2f4f7bfbaf4227918';
 
 /// Get user's own invites
 ///
@@ -43,7 +43,7 @@ final myInvitesProvider = AutoDisposeFutureProvider<List<Invite>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MyInvitesRef = AutoDisposeFutureProviderRef<List<Invite>>;
-String _$inviteByCodeHash() => r'287e2ff2419365a7b8a9e6687a787dfa68de2988';
+String _$inviteByCodeHash() => r'22b5b8d00538ea7ea96282001966e9daac1f48d3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -206,7 +206,7 @@ class _InviteByCodeProviderElement
   String get code => (origin as InviteByCodeProvider).code;
 }
 
-String _$pendingRequestsHash() => r'48f6153e4eef97df53fe8be57cff9d0b97590d4e';
+String _$pendingRequestsHash() => r'a3ef36d05976f36aeb4e74b92d1d1495a73aca39';
 
 /// Pending requests for current user (as target)
 ///
@@ -227,7 +227,7 @@ final pendingRequestsProvider =
 // ignore: unused_element
 typedef PendingRequestsRef
     = AutoDisposeFutureProviderRef<List<ConnectionRequest>>;
-String _$mySentRequestsHash() => r'6db99bedb3ee94b41342d12d22fddde7271cc591';
+String _$mySentRequestsHash() => r'74b4db0658530fd9b332f63de0981845d4a2bff0';
 
 /// Sent requests by current user
 ///
@@ -248,7 +248,7 @@ final mySentRequestsProvider =
 // ignore: unused_element
 typedef MySentRequestsRef
     = AutoDisposeFutureProviderRef<List<ConnectionRequest>>;
-String _$myConnectionsHash() => r'b6eda579c099c4363ee5b2a534226eff95c077af';
+String _$myConnectionsHash() => r'75d96c285cafbcd6b48aeabc73cc0957a3195954';
 
 /// Current user's connections
 ///
@@ -268,7 +268,7 @@ final myConnectionsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MyConnectionsRef = AutoDisposeFutureProviderRef<List<Connection>>;
-String _$isConnectedWithHash() => r'a25228999de41a7194f39560e618ffe031a84811';
+String _$isConnectedWithHash() => r'4656313139917d552c5ff46bf2fa877a13068e2b';
 
 /// Check if connected with specific user
 ///
@@ -411,7 +411,7 @@ class _IsConnectedWithProviderElement
 }
 
 String _$pendingRequestCountHash() =>
-    r'ebb5c57fff0b98efa8bd53e235d99dbb461bf4bd';
+    r'b44dc7913bb7fb8c157d808abf6969009970f848';
 
 /// Pending request count (for badge display)
 ///

@@ -1,6 +1,6 @@
-/// Metronome settings model for practice sessions.
-///
-/// Phase 1 implementation - basic BPM and time signature support.
+// Metronome settings model for practice sessions.
+//
+// Phase 1 implementation - basic BPM and time signature support.
 
 /// Beat intensity type for different sounds per beat position.
 enum BeatType {

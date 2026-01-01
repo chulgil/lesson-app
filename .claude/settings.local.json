@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(sc:save)",
+      "mcp__serena__list_memories",
+      "mcp__serena__read_memory",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__write_memory",
+      "mcp__serena__think_about_whether_you_are_done",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "mcp__serena__get_symbols_overview",
+      "Bash(dart run build_runner:*)",
+      "Bash(git add:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "korea-investment",
+    "yahoo-finance",
+    "mysql-stock",
+    "context7",
+    "excel",
+    "figma",
+    "puppeteer",
+    "alpaca",
+    "browsermcp"
+  ]
+}

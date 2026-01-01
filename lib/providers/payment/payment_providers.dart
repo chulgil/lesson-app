@@ -109,7 +109,7 @@ class PaymentsNotifier extends AsyncNotifier<List<Payment>> {
 
     final payment = current.firstWhere((p) => p.id == paymentId);
     await updatePayment(payment.copyWith(
-      status: PaymentStatus.completed,
+      status: PaymentStatus.confirmed,
       paymentDate: DateTime.now(),
       updatedAt: DateTime.now(),
     ));

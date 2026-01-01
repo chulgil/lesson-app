@@ -102,7 +102,7 @@ class _PaymentManagementScreenState
                           .where((p) => p.status == PaymentStatus.pending)
                           .toList()),
                       _buildPaymentList(payments
-                          .where((p) => p.status == PaymentStatus.completed)
+                          .where((p) => p.status == PaymentStatus.confirmed)
                           .toList()),
                     ],
                   ),
@@ -537,6 +537,7 @@ class _PaymentManagementScreenState
         case PaymentStatus.paid:
           color = AppColors.info;
         case PaymentStatus.confirmed:
+        // ignore: deprecated_member_use_from_same_package
         case PaymentStatus.completed:
           color = AppColors.practiceGood;
         case PaymentStatus.overdue:
@@ -581,6 +582,7 @@ class _PaymentManagementScreenState
       case PaymentStatus.paid:
         return AppColors.info;
       case PaymentStatus.confirmed:
+      // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
         return AppColors.practiceGood;
       case PaymentStatus.overdue:

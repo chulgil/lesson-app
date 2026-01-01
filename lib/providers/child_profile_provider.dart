@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/child_profile.dart';
@@ -8,14 +9,14 @@ part 'child_profile_provider.g.dart';
 
 /// Provider for the child profile repository
 @riverpod
-ChildProfileRepository childProfileRepository(ChildProfileRepositoryRef ref) {
+ChildProfileRepository childProfileRepository(Ref ref) {
   return MockChildProfileRepository();
 }
 
 /// Provider for child profiles of a specific parent
 @riverpod
 Future<List<ChildProfile>> childProfiles(
-  ChildProfilesRef ref,
+  Ref ref,
   String parentId,
 ) async {
   final repository = ref.watch(childProfileRepositoryProvider);
@@ -25,7 +26,7 @@ Future<List<ChildProfile>> childProfiles(
 /// Provider for a single child profile
 @riverpod
 Future<ChildProfile?> childProfile(
-  ChildProfileRef ref,
+  Ref ref,
   String childId,
 ) async {
   final repository = ref.watch(childProfileRepositoryProvider);

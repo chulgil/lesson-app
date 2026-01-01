@@ -67,7 +67,7 @@ class _PracticeRecordingScreenState
           if (state.representativeRecording != null &&
               !state.representativeRecording!.isShared)
             TextButton.icon(
-              onPressed: () => _shareWithTeacher(context),
+              onPressed: _shareWithTeacher,
               icon: const Icon(Icons.share),
               label: const Text('공유'),
             ),
@@ -183,19 +183,19 @@ class _PracticeRecordingScreenState
     await notifier.setAsRepresentative(recordingId);
   }
 
-  Future<void> _shareWithTeacher(BuildContext context) async {
+  Future<void> _shareWithTeacher() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('선생님께 공유'),
         content: const Text('대표 녹음을 선생님께 공유하시겠습니까?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(dialogContext, false),
             child: const Text('취소'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('공유'),
           ),
         ],
@@ -207,11 +207,10 @@ class _PracticeRecordingScreenState
         recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
       );
       await notifier.shareWithTeacher();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('선생님께 공유되었습니다')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('선생님께 공유되었습니다')),
+      );
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/recording.dart';
@@ -83,13 +84,13 @@ class RecordingState {
 
 /// Provider for recording repository.
 @Riverpod(keepAlive: true)
-RecordingRepository recordingRepository(RecordingRepositoryRef ref) {
+RecordingRepository recordingRepository(Ref ref) {
   return HiveRecordingRepository();
 }
 
 /// Provider for audio recorder service.
 @Riverpod(keepAlive: true)
-AudioRecorderService audioRecorderService(AudioRecorderServiceRef ref) {
+AudioRecorderService audioRecorderService(Ref ref) {
   final service = AudioRecorderService();
   service.init();
   ref.onDispose(() => service.dispose());
@@ -98,7 +99,7 @@ AudioRecorderService audioRecorderService(AudioRecorderServiceRef ref) {
 
 /// Provider for audio player service.
 @Riverpod(keepAlive: true)
-AudioPlayerService audioPlayerService(AudioPlayerServiceRef ref) {
+AudioPlayerService audioPlayerService(Ref ref) {
   final service = AudioPlayerService();
   service.init();
   ref.onDispose(() => service.dispose());
@@ -107,7 +108,7 @@ AudioPlayerService audioPlayerService(AudioPlayerServiceRef ref) {
 
 /// Provider for checking microphone permission status.
 @riverpod
-Future<bool> microphonePermission(MicrophonePermissionRef ref) async {
+Future<bool> microphonePermission(Ref ref) async {
   final recorder = ref.watch(audioRecorderServiceProvider);
   return await recorder.hasPermission();
 }

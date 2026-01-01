@@ -1,4 +1,4 @@
-/// Notification-related models for the lesson app
+// Notification-related models for the lesson app
 
 /// Notification type enumeration
 enum NotificationType {

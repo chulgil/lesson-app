@@ -7,7 +7,7 @@ part of 'recording_provider.dart';
 // **************************************************************************
 
 String _$recordingRepositoryHash() =>
-    r'b127bfda25c545ab78062e306fed3a6f37694b19';
+    r'8b5080b46841b8ce52fe47b041aaac1c72312203';
 
 /// Provider for recording repository.
 ///
@@ -27,7 +27,7 @@ final recordingRepositoryProvider = Provider<RecordingRepository>.internal(
 // ignore: unused_element
 typedef RecordingRepositoryRef = ProviderRef<RecordingRepository>;
 String _$audioRecorderServiceHash() =>
-    r'e5dcc0b5df378fa18b580888c3fddab9fe5e1f7b';
+    r'3ff32787ba080237c937f9de520e986b5cf8f1c4';
 
 /// Provider for audio recorder service.
 ///
@@ -47,7 +47,7 @@ final audioRecorderServiceProvider = Provider<AudioRecorderService>.internal(
 // ignore: unused_element
 typedef AudioRecorderServiceRef = ProviderRef<AudioRecorderService>;
 String _$audioPlayerServiceHash() =>
-    r'f72636c254ae44c7c7dc62a7b3ee7e5ce5a0b945';
+    r'101d77a30e3547cf864a612adddb0a444f6b87bc';
 
 /// Provider for audio player service.
 ///
@@ -67,7 +67,7 @@ final audioPlayerServiceProvider = Provider<AudioPlayerService>.internal(
 // ignore: unused_element
 typedef AudioPlayerServiceRef = ProviderRef<AudioPlayerService>;
 String _$microphonePermissionHash() =>
-    r'9db1a642b027e4b154481ebfb49b2887ace56bce';
+    r'a0c112647a854774ec00b20723d99bb029abd309';
 
 /// Provider for checking microphone permission status.
 ///

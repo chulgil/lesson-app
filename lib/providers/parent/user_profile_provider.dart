@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/child_profile.dart';
@@ -111,28 +112,28 @@ class CurrentUserProfile extends _$CurrentUserProfile {
 
 /// Provider for available profile types the current user can switch to
 @riverpod
-List<ProfileType> availableProfileTypes(AvailableProfileTypesRef ref) {
+List<ProfileType> availableProfileTypes(Ref ref) {
   final userProfile = ref.watch(currentUserProfileProvider);
   return userProfile.availableProfiles;
 }
 
 /// Provider for checking if profile switching is available
 @riverpod
-bool canSwitchProfiles(CanSwitchProfilesRef ref) {
+bool canSwitchProfiles(Ref ref) {
   final available = ref.watch(availableProfileTypesProvider);
   return available.length > 1;
 }
 
 /// Provider for the active profile type
 @riverpod
-ProfileType activeProfileType(ActiveProfileTypeRef ref) {
+ProfileType activeProfileType(Ref ref) {
   final userProfile = ref.watch(currentUserProfileProvider);
   return userProfile.activeProfile;
 }
 
 /// Provider for the active child profile (when in child mode)
 @riverpod
-ChildProfile? activeChildProfile(ActiveChildProfileRef ref) {
+ChildProfile? activeChildProfile(Ref ref) {
   final userProfile = ref.watch(currentUserProfileProvider);
   return userProfile.activeChild;
 }
@@ -143,7 +144,7 @@ ChildProfile? activeChildProfile(ActiveChildProfileRef ref) {
 /// - User is in child mode AND
 /// - Active child is unconnected
 @riverpod
-bool isUnconnectedChildMode(IsUnconnectedChildModeRef ref) {
+bool isUnconnectedChildMode(Ref ref) {
   final userProfile = ref.watch(currentUserProfileProvider);
   if (userProfile.activeProfile != ProfileType.child) return false;
 
@@ -154,7 +155,7 @@ bool isUnconnectedChildMode(IsUnconnectedChildModeRef ref) {
 /// Provider for syncing user profile with child profiles from repository
 @riverpod
 Future<void> syncUserProfileChildren(
-  SyncUserProfileChildrenRef ref,
+  Ref ref,
   String parentId,
 ) async {
   final children = await ref.watch(childProfilesProvider(parentId).future);

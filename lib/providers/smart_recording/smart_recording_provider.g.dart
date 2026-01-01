@@ -7,7 +7,7 @@ part of 'smart_recording_provider.dart';
 // **************************************************************************
 
 String _$smartRecordingSettingsNotifierHash() =>
-    r'7fa7f4d5edcdd4624a534a809284e656fb2723b9';
+    r'9908595edccaa3a531307dc616192b938efa8ca0';
 
 /// Provider for smart recording settings persistence.
 ///
@@ -27,7 +27,7 @@ final smartRecordingSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SmartRecordingSettingsNotifier
     = AutoDisposeNotifier<SmartRecordingSettings>;
 String _$smartRecordingNotifierHash() =>
-    r'fb09025fffee2dc42e9fef971f40b335c5958b92';
+    r'4c6734aa70a4499ceaa4430484997dbbcf485da2';
 
 /// Provider for smart recording state during active recording.
 /// keepAlive: true to prevent disposal during recording session.

@@ -132,7 +132,7 @@ class _RegisterRegularLessonScreenState
             _buildSectionTitle('요일 선택'),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '주 $_lessonsPerWeek회 레슨 - ${_lessonsPerWeek}개 요일을 선택하세요',
+              '주 $_lessonsPerWeek회 레슨 - $_lessonsPerWeek개 요일을 선택하세요',
               style: AppTypography.caption.copyWith(
                 color: AppColors.textSecondaryLight,
               ),

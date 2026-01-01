@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import 'ab_loop.dart';
@@ -217,6 +218,15 @@ class _ZoomableWaveformProgressBarState
     }
   }
 
+  /// Handle simple tap for desktop (macOS) - works independently of scale gestures
+  void _handleTap(TapDownDetails details, double width) {
+    // On desktop, use tap down for immediate response
+    // This is especially important for macOS where onScaleStart might fire before onTapUp
+    final newProgress = _localXToProgress(details.localPosition.dx, width);
+    debugPrint('ZoomableWaveform: Desktop TAP at progress: $newProgress');
+    widget.onSeek(newProgress);
+  }
+
   /// Reset zoom to default
   void resetZoom() {
     setState(() {
@@ -266,6 +276,10 @@ class _ZoomableWaveformProgressBarState
             // Waveform
             GestureDetector(
               behavior: HitTestBehavior.opaque,
+              // Use onTapDown for desktop (macOS) for immediate click response
+              onTapDown: (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                  ? (details) => _handleTap(details, width)
+                  : null,
               onTapUp: (details) => _handleTapUp(details, width),
               onScaleStart: (details) => _handleScaleStart(details, width),
               onScaleUpdate: (details) => _handleScaleUpdate(details, width),

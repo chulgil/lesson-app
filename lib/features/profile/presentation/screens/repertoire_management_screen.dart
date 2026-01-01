@@ -37,7 +37,7 @@ class _RepertoireManagementScreenState
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _showAddPieceDialog(context),
+            onPressed: _showAddPieceDialog,
           ),
         ],
       ),
@@ -76,7 +76,7 @@ class _RepertoireManagementScreenState
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddPieceDialog(context),
+        onPressed: _showAddPieceDialog,
         icon: const Icon(Icons.add),
         label: const Text('곡 추가'),
       ),
@@ -592,17 +592,16 @@ class _RepertoireManagementScreenState
     );
   }
 
-  void _showAddPieceDialog(BuildContext context) {
+  void _showAddPieceDialog() {
     showDialog(
       context: context,
       builder: (dialogContext) => _PieceDialog(
         onSave: (piece) async {
           await ref.read(piecesNotifierProvider.notifier).addPiece(piece);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')),
-            );
-          }
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')),
+          );
         },
       ),
     );
@@ -615,11 +614,10 @@ class _RepertoireManagementScreenState
         existingPiece: piece,
         onSave: (updatedPiece) async {
           await ref.read(piecesNotifierProvider.notifier).updatePiece(updatedPiece);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('곡 정보가 수정되었습니다')),
-            );
-          }
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('곡 정보가 수정되었습니다')),
+          );
         },
       ),
     );

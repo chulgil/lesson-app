@@ -7,7 +7,7 @@ part of 'teacher_search_provider.dart';
 // **************************************************************************
 
 String _$teacherSearchRepositoryHash() =>
-    r'255874237ad7e5fe363640ab372879f5dccd1181';
+    r'fa0cb08a557dda8c575567bef4ef20353f83769f';
 
 /// Provider for teacher search repository
 ///
@@ -28,7 +28,7 @@ final teacherSearchRepositoryProvider =
 // ignore: unused_element
 typedef TeacherSearchRepositoryRef = ProviderRef<TeacherSearchRepository>;
 String _$teacherPublicProfileHash() =>
-    r'f12aa36a218c44c982f1ecda7220ebbbe1863a13';
+    r'e9caba23fdfec94b632bfa62321fb0e95cba04b4';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -197,7 +197,7 @@ class _TeacherPublicProfileProviderElement
   String get teacherId => (origin as TeacherPublicProfileProvider).teacherId;
 }
 
-String _$featuredTeachersHash() => r'5af9f7246067b22bae70ab098643a7ca1e62b7ce';
+String _$featuredTeachersHash() => r'777030417d311ff6e5419d66e2f3ff1f1005d0c9';
 
 /// Featured teachers provider
 ///
@@ -219,7 +219,7 @@ final featuredTeachersProvider =
 typedef FeaturedTeachersRef
     = AutoDisposeFutureProviderRef<List<TeacherPublicProfile>>;
 String _$availableInstrumentsHash() =>
-    r'22f0ee730e0f4bafa3d67d84695f5838b2cbb6a7';
+    r'8a8ecf8b56ba33a41eb3cb82904f26e13833a294';
 
 /// Available instruments for filter
 ///
@@ -239,7 +239,7 @@ final availableInstrumentsProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AvailableInstrumentsRef = AutoDisposeFutureProviderRef<List<String>>;
-String _$availableAreasHash() => r'1ff6045cebffc7088f736a8645bbb4fe58e724c6';
+String _$availableAreasHash() => r'f00b5c0b64ca4155437faa7f0659910ee7e6e4eb';
 
 /// Available areas for filter
 ///

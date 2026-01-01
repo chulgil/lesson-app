@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/teacher_profile.dart';
@@ -8,7 +9,7 @@ part 'teacher_search_provider.g.dart';
 
 /// Provider for teacher search repository
 @Riverpod(keepAlive: true)
-TeacherSearchRepository teacherSearchRepository(TeacherSearchRepositoryRef ref) {
+TeacherSearchRepository teacherSearchRepository(Ref ref) {
   return MockTeacherSearchRepository();
 }
 
@@ -119,7 +120,7 @@ class TeacherSearchResults extends _$TeacherSearchResults {
 /// Teacher public profile provider
 @riverpod
 Future<TeacherPublicProfile?> teacherPublicProfile(
-    TeacherPublicProfileRef ref, String teacherId) async {
+    Ref ref, String teacherId) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getTeacherPublicProfile(teacherId);
 }
@@ -127,21 +128,21 @@ Future<TeacherPublicProfile?> teacherPublicProfile(
 /// Featured teachers provider
 @riverpod
 Future<List<TeacherPublicProfile>> featuredTeachers(
-    FeaturedTeachersRef ref) async {
+    Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getFeaturedTeachers(limit: 5);
 }
 
 /// Available instruments for filter
 @riverpod
-Future<List<String>> availableInstruments(AvailableInstrumentsRef ref) async {
+Future<List<String>> availableInstruments(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getAvailableInstruments();
 }
 
 /// Available areas for filter
 @riverpod
-Future<List<String>> availableAreas(AvailableAreasRef ref) async {
+Future<List<String>> availableAreas(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getAvailableAreas();
 }

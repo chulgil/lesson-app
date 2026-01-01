@@ -23,8 +23,9 @@ SO THAT 나중에 수동으로 편집하지 않아도 깔끔한 녹음 파일을
 | 처리 방식 | 자동 트리밍 (후처리, 원본 보존) |
 | 적용 범위 | 앞뒤 + 중간 무음 스킵 |
 | 임계값 | 사용자 조절 가능 슬라이더 (기본 40%) |
-| 중간 무음 스킵 | 10초 이상 무음 시 3초만 유지 (5~30초 조절 가능) |
-| 버퍼 | 소리 시작 3초 전, 소리 종료 3초 후 유지 |
+| 중간 무음 스킵 | 5초 이상 무음 시 3초만 유지 (5~30초 조절 가능) |
+| 앞뒤 버퍼 | 소리 시작 3초 전, 소리 종료 3초 후 유지 |
+| 중간 무음 버퍼 | 각 1.5초 (총 3초 유지) |
 | 기능명 | 스마트 녹음 |
 
 ---
@@ -289,6 +290,6 @@ SmartRecordingSettings.defaults = SmartRecordingSettings(
   smartRecordingEnabled: true,         // 기본 활성화
   trimThreshold: 0.40,                 // 40% 임계값
   middleSilenceSkipEnabled: true,      // 중간 무음 스킵 활성화
-  middleSilenceThreshold: 10,          // 10초 이상 무음 스킵
+  middleSilenceThreshold: 5,           // 5초 이상 무음 스킵
 );
 ```

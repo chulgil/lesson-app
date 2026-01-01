@@ -1,4 +1,4 @@
-/// Practice repertoire models for repertoire-based practice system
+// Practice repertoire models for repertoire-based practice system
 
 /// Daily practice status for a section on a specific date
 class DailyPracticeStatus {

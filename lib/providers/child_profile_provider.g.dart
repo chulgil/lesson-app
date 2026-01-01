@@ -7,7 +7,7 @@ part of 'child_profile_provider.dart';
 // **************************************************************************
 
 String _$childProfileRepositoryHash() =>
-    r'7db3265ff78d14f5ff08ca66d05fda3467f42342';
+    r'67e1ddc4a8ebe6220fa6a7afe0f1d0c8267d946e';
 
 /// Provider for the child profile repository
 ///
@@ -28,7 +28,7 @@ final childProfileRepositoryProvider =
 // ignore: unused_element
 typedef ChildProfileRepositoryRef
     = AutoDisposeProviderRef<ChildProfileRepository>;
-String _$childProfilesHash() => r'de43a9cc161dda52eaa87ea68e5b04bf571f236f';
+String _$childProfilesHash() => r'0d9d83d12b08cb7d023f8a7375ca9595e466a58d';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -193,7 +193,7 @@ class _ChildProfilesProviderElement
   String get parentId => (origin as ChildProfilesProvider).parentId;
 }
 
-String _$childProfileHash() => r'8cebea2d0fba5101f3123894314817f2c154597b';
+String _$childProfileHash() => r'319220b27ced0ecae2c752a00ee40cfdc0616fc4';
 
 /// Provider for a single child profile
 ///

@@ -29,8 +29,8 @@ class AudioTrimmerService {
         return TrimResult.noTrim(inputPath);
       }
 
-      // Check if trimming is needed
-      if (trimStart == Duration.zero && trimEnd == Duration.zero) {
+      // Check if trimming is needed (including middle silence)
+      if (trimStart == Duration.zero && trimEnd == Duration.zero && silencePeriods.isEmpty) {
         debugPrint('AudioTrimmer: No trimming needed');
         return TrimResult.noTrim(inputPath);
       }
@@ -195,16 +195,49 @@ class AudioTrimmerService {
       // Calculate playable segments
       List<Map<String, dynamic>> segments = [];
       if (silencePeriods.isNotEmpty) {
-        // Build segments by excluding silence periods
-        Duration currentStart = contentStart;
+        // Filter and adjust silence periods to be within content range
+        final validSilencePeriods = <SilencePeriod>[];
         for (final silence in silencePeriods) {
-          // Add segment before this silence
+          // Skip silence periods that are completely outside content range
+          if (silence.endTime <= contentStart || silence.startTime >= contentEnd) {
+            debugPrint('AudioTrimmer: Skipping silence period outside content range: ${silence.startTime} ~ ${silence.endTime}');
+            continue;
+          }
+
+          // Adjust silence periods that partially overlap with content boundaries
+          Duration adjustedStart = silence.startTime;
+          Duration adjustedEnd = silence.endTime;
+
+          if (adjustedStart < contentStart) {
+            adjustedStart = contentStart;
+          }
+          if (adjustedEnd > contentEnd) {
+            adjustedEnd = contentEnd;
+          }
+
+          // Only add if there's still a valid silence period after adjustment
+          if (adjustedEnd > adjustedStart) {
+            validSilencePeriods.add(SilencePeriod(
+              startTime: adjustedStart,
+              endTime: adjustedEnd,
+            ));
+          }
+        }
+
+        debugPrint('AudioTrimmer: Valid silence periods: ${validSilencePeriods.length} (original: ${silencePeriods.length})');
+
+        // Build segments by excluding valid silence periods
+        Duration currentStart = contentStart;
+        for (final silence in validSilencePeriods) {
+          // Add segment before this silence (only if there's content)
           if (silence.startTime > currentStart) {
             segments.add({
               'start': currentStart.inMilliseconds,
               'end': silence.startTime.inMilliseconds,
             });
+            debugPrint('AudioTrimmer: Added segment ${currentStart.inMilliseconds}ms ~ ${silence.startTime.inMilliseconds}ms');
           }
+          // Move past this silence period
           currentStart = silence.endTime;
         }
         // Add final segment after last silence
@@ -213,6 +246,7 @@ class AudioTrimmerService {
             'start': currentStart.inMilliseconds,
             'end': contentEnd.inMilliseconds,
           });
+          debugPrint('AudioTrimmer: Added final segment ${currentStart.inMilliseconds}ms ~ ${contentEnd.inMilliseconds}ms');
         }
       }
 
@@ -232,8 +266,12 @@ class AudioTrimmerService {
       await metadataFile.writeAsString(jsonEncode(metadata));
 
       debugPrint('AudioTrimmer: Created trim metadata file');
-      if (segments.isNotEmpty) {
-        debugPrint('  Segments: ${segments.length}');
+      debugPrint('  contentStart: ${contentStart.inMilliseconds}ms');
+      debugPrint('  contentEnd: ${contentEnd.inMilliseconds}ms');
+      debugPrint('  Segments: ${segments.length}');
+      for (int i = 0; i < segments.length; i++) {
+        final seg = segments[i];
+        debugPrint('    [$i] ${seg['start']}ms ~ ${seg['end']}ms');
       }
       return inputPath; // Return same path, player will use metadata
     } catch (e) {

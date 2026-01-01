@@ -18,7 +18,6 @@ import '../widgets/metronome/metronome.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';
-import '../widgets/smart_recording/smart_recording_settings.dart';
 
 /// Section detail screen showing section info and recordings
 class SectionDetailScreen extends ConsumerStatefulWidget {
@@ -339,6 +338,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       // Cancel recording if too short
       await recorder.cancelRecording();
       ref.read(smartRecordingNotifierProvider.notifier).reset();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
@@ -381,14 +381,17 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     final metronomeBpm = ref.read(metronomeProvider).settings.bpm;
     final totalDuration = Duration(seconds: _recordingSeconds);
 
-    // Apply smart recording trimming if enabled
+    // Apply smart recording trimming if enabled (including middle silence)
     TrimResult? trimResult;
-    if (smartRecordingState.isEnabled && smartRecordingState.hasTrimming) {
+    final needsTrimming = smartRecordingState.isEnabled &&
+        (smartRecordingState.hasTrimming || smartRecordingState.hasMiddleSilence);
+    if (needsTrimming) {
       trimResult = await AudioTrimmerService.instance.trimAudio(
         inputPath: filePath,
         trimStart: smartRecordingState.trimmedStart,
         trimEnd: smartRecordingState.trimmedEnd,
         totalDuration: totalDuration,
+        silencePeriods: smartRecordingState.silencePeriods,
       );
     }
 
@@ -416,14 +419,23 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
 
-      // Show smart recording result dialog if trimming was applied
-      if (mounted && trimResult?.hasTrimming == true) {
+      // Show smart recording result dialog if trimming or middle silence was applied
+      final hasTrimOrSilence = trimResult?.hasTrimming == true ||
+          smartRecordingState.silencePeriods.isNotEmpty;
+      if (mounted && hasTrimOrSilence) {
+        // Calculate middle silence total duration
+        final middleSilenceDuration = smartRecordingState.silencePeriods.fold(
+          Duration.zero,
+          (sum, period) => sum + period.duration,
+        );
         await showSmartRecordingResult(
           context,
-          trimmedStart: trimResult!.trimmedStart,
-          trimmedEnd: trimResult.trimmedEnd,
+          trimmedStart: trimResult?.trimmedStart ?? Duration.zero,
+          trimmedEnd: trimResult?.trimmedEnd ?? Duration.zero,
           totalDuration: totalDuration,
-          onRestore: trimResult.originalFilePath != null
+          middleSilenceCount: smartRecordingState.silencePeriods.length,
+          middleSilenceDuration: middleSilenceDuration,
+          onRestore: trimResult?.originalFilePath != null
               ? () async {
                   await AudioTrimmerService.instance.restoreOriginal(
                     originalPath: trimResult!.originalFilePath!,
@@ -916,6 +928,10 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
     final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
 
+    // Check smart recording mode
+    final smartSettings = ref.watch(smartRecordingSettingsNotifierProvider);
+    final isSmartMode = smartSettings.smartRecordingEnabled;
+
     return SizedBox(
       width: double.infinity,
       child: ClipRRect(
@@ -945,70 +961,44 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
               ),
             // Foreground content
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space4,
+                vertical: AppSpacing.space6,
+              ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Smart recording indicator (shows phase: waiting, recording, ending)
-                  if (widget.isRecording) ...[
+                  // Smart recording indicator (shows phase: waiting, recording, ending) - only in smart mode
+                  if (widget.isRecording && isSmartMode) ...[
                     SmartRecordingIndicator(isRecording: widget.isRecording),
                     const SizedBox(height: AppSpacing.space2),
                   ],
-                  // Mic input warning banner (no input or quiet) - shown alongside smart recording
-                  if (widget.isRecording && (!_hasMicInput || _isQuiet)) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space3,
-                        vertical: AppSpacing.space2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.warning.withValues(alpha: 0.9),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  if (widget.isRecording) ...[
+                    // Recording indicator - only show in normal mode (not smart mode)
+                    if (!isSmartMode) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            !_hasMicInput ? Icons.mic_external_off : Icons.volume_down,
-                            size: 16,
-                            color: Colors.white,
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: widget.isPaused ? AppColors.warning : AppColors.error,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 8),
                           Text(
-                            !_hasMicInput ? '입력 없음' : '소리가 약함',
-                            style: AppTypography.caption.copyWith(
-                              color: Colors.white,
+                            widget.isPaused ? '일시정지' : '녹음 중',
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: widget.isPaused ? AppColors.warning : AppColors.error,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                  ],
-                  if (widget.isRecording) ...[
-                    // Recording indicator
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: widget.isPaused ? AppColors.warning : AppColors.error,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          widget.isPaused ? '일시정지' : '녹음 중',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: widget.isPaused ? AppColors.warning : AppColors.error,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.space3),
+                      const SizedBox(height: AppSpacing.space3),
+                    ],
                     // Timer
                     Text(
                       _formattedTime,
@@ -1053,9 +1043,6 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                       ],
                     ),
                   ] else ...[
-                    // Smart recording toggle
-                    const SmartRecordingToggle(),
-                    const SizedBox(height: AppSpacing.space3),
                     // Start recording button (2x size, 60% width, centered)
                     Center(
                       child: FractionallySizedBox(
@@ -1079,7 +1066,11 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                             size: 28,
                           ),
                           label: Text(
-                            hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
+                            !hasMicPermission
+                                ? '마이크 권한 필요'
+                                : isSmartMode
+                                    ? '스마트 녹음 시작'
+                                    : '녹음 시작',
                             style: AppTypography.bodyLarge.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -1095,7 +1086,6 @@ class _RecordingControlState extends ConsumerState<_RecordingControl> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.space4),
                   ],
                 ],
               ),
