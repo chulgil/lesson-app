@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/booking_repository.dart';
-
-/// Booking repository provider
-final bookingRepositoryProvider = Provider<BookingRepository>((ref) {
-  return MockBookingRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/lessons/presentation/providers/booking_repository_provider.dart';

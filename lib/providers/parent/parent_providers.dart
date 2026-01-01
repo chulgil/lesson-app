@@ -1,4 +1,2 @@
-// Parent providers barrel file
-export 'parent_repository_provider.dart';
-export 'parent_crud_provider.dart';
-export 'user_profile_provider.dart';
+// Re-export from feature layer for backward compatibility
+export '../../features/parent_home/presentation/providers/parent_providers.dart';

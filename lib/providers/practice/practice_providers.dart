@@ -1,6 +1,2 @@
-// Practice providers barrel file
-export 'practice_repository_provider.dart';
-export 'practice_crud_provider.dart';
-export 'practice_calendar_provider.dart';
-export 'practice_stats_provider.dart';
-export 'practice_streak_provider.dart';
+// Re-export from feature layer for backward compatibility
+export '../../features/practice/presentation/providers/practice_providers.dart';

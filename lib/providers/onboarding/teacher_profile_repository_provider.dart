@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/teacher_profile_repository.dart';
-
-/// Teacher profile repository provider
-final teacherProfileRepositoryProvider = Provider<TeacherProfileRepository>((ref) {
-  return MockTeacherProfileRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/onboarding/presentation/providers/teacher_profile_repository_provider.dart';

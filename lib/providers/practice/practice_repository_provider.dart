@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/practice_repository.dart';
-
-/// Practice repository provider
-final practiceRepositoryProvider = Provider<PracticeRepository>((ref) {
-  return MockPracticeRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/practice/presentation/providers/practice_repository_provider.dart';

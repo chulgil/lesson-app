@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/student_repository.dart';
-
-/// Student repository provider
-final studentRepositoryProvider = Provider<StudentRepository>((ref) {
-  return MockStudentRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/students/presentation/providers/student_repository_provider.dart';

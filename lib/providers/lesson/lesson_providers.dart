@@ -1,5 +1,2 @@
-// Lesson providers barrel file
-export 'lesson_repository_provider.dart';
-export 'lesson_crud_provider.dart';
-export 'lesson_calendar_provider.dart';
-export 'lesson_stats_provider.dart';
+// Re-export from feature layer for backward compatibility
+export '../../features/lessons/presentation/providers/lesson_providers.dart';

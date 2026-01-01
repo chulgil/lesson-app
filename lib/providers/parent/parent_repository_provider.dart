@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/parent_repository.dart';
-
-/// Parent repository provider
-final parentRepositoryProvider = Provider<ParentRepository>((ref) {
-  return MockParentRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/parent_home/presentation/providers/parent_repository_provider.dart';

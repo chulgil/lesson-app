@@ -1,8 +1,2 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../repositories/piece_repository.dart';
-
-/// Piece repository provider
-final pieceRepositoryProvider = Provider<PieceRepository>((ref) {
-  return MockPieceRepository();
-});
+// Re-export from feature layer for backward compatibility
+export '../../features/practice/presentation/providers/piece_repository_provider.dart';
