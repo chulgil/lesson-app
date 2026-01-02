@@ -20,6 +20,8 @@ class CompletionToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasRepresentativeRecording = section.representativeRecording != null;
+
     return Card(
       color: section.isCompleted
           ? AppColors.success.withValues(alpha: 0.1)
@@ -62,6 +64,28 @@ class CompletionToggle extends StatelessWidget {
                         color: AppColors.textSecondaryLight,
                       ),
                     ),
+                    // Show sharing message when there's a representative recording
+                    if (!section.isCompleted && hasRepresentativeRecording) ...[
+                      const SizedBox(height: AppSpacing.space1),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.share,
+                            size: 12,
+                            color: AppColors.info,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              '완료 시 대표녹음이 선생님께 공유됩니다',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.info,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -84,10 +84,13 @@ List<GoRoute> practiceRoutes = [
       final sectionId = state.pathParameters['id'] ?? '';
       final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
+      final dateStr = state.uri.queryParameters['date'];
+      final selectedDate = dateStr != null ? DateTime.tryParse(dateStr) : null;
       return SectionDetailScreen(
         sectionId: sectionId,
         repertoireId: repertoireId,
         studentId: studentId,
+        selectedDate: selectedDate,
       );
     },
   ),

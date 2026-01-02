@@ -692,9 +692,24 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           final recordingIndex =
               section.recordings.indexWhere((r) => r.id == id);
           if (recordingIndex != -1) {
-            final updatedRecordings =
+            final deletedRecording = section.recordings[recordingIndex];
+            final wasRepresentative = deletedRecording.isRepresentative;
+
+            var updatedRecordings =
                 List<PracticeRecording>.from(section.recordings);
             updatedRecordings.removeAt(recordingIndex);
+
+            // Auto-select newest recording as representative if deleted was representative
+            if (wasRepresentative && updatedRecordings.isNotEmpty) {
+              // Sort by createdAt descending and set newest as representative
+              updatedRecordings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+              final newestId = updatedRecordings.first.id;
+              updatedRecordings = updatedRecordings
+                  .map((r) => r.copyWith(isRepresentative: r.id == newestId))
+                  .toList();
+              debugPrint('PracticeRepertoireRepository: Auto-set recording ${newestId.substring(0, 8)}... as representative');
+            }
+
             final updatedSection = section.copyWith(
               recordings: updatedRecordings,
               updatedAt: DateTime.now(),

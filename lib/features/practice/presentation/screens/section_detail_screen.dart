@@ -24,12 +24,14 @@ class SectionDetailScreen extends ConsumerStatefulWidget {
   final String sectionId;
   final String repertoireId;
   final String studentId;
+  final DateTime? selectedDate; // Filter recordings up to this date
 
   const SectionDetailScreen({
     super.key,
     required this.sectionId,
     required this.repertoireId,
     required this.studentId,
+    this.selectedDate,
   });
 
   @override
@@ -113,6 +115,27 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context, PracticeSection section) {
+    // Sort recordings by date (newest first) and filter by selectedDate
+    final sortedRecordings = List.of(section.recordings)
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    // Filter recordings up to selectedDate (inclusive)
+    final filteredRecordings = widget.selectedDate != null
+        ? sortedRecordings.where((r) {
+            final recordingDate = DateTime(
+              r.createdAt.year,
+              r.createdAt.month,
+              r.createdAt.day,
+            );
+            final selectedDateOnly = DateTime(
+              widget.selectedDate!.year,
+              widget.selectedDate!.month,
+              widget.selectedDate!.day,
+            );
+            return !recordingDate.isAfter(selectedDateOnly);
+          }).toList()
+        : sortedRecordings;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
@@ -150,12 +173,12 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           const SizedBox(height: AppSpacing.space6),
 
           // Recordings list
-          if (section.recordings.isNotEmpty) ...[
+          if (filteredRecordings.isNotEmpty) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '녹음 기록 (${section.recordings.length})',
+                  '녹음 기록 (${filteredRecordings.length})',
                   style: AppTypography.headingSmall,
                 ),
                 if (section.representativeRecording != null)
@@ -194,11 +217,11 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: section.recordings.length,
+              itemCount: filteredRecordings.length,
               separatorBuilder: (context, index) =>
                   const SizedBox(height: AppSpacing.space2),
               itemBuilder: (context, index) {
-                final recording = section.recordings[index];
+                final recording = filteredRecordings[index];
                 return SectionRecordingListItem(
                   recording: recording,
                   sectionId: section.id,
