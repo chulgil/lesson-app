@@ -42,10 +42,20 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   bool _isRecording = false;
   bool _isPaused = false;
   int _recordingSeconds = 0;
+  bool _usedMetronome = false; // Track if metronome was used during recording
 
   @override
   Widget build(BuildContext context) {
     final sectionAsync = ref.watch(sectionProvider(widget.sectionId));
+
+    // Listen for metronome state changes during recording
+    ref.listen<MetronomeState>(metronomeProvider, (previous, next) {
+      if (_isRecording && next.isPlaying && !_usedMetronome) {
+        setState(() {
+          _usedMetronome = true;
+        });
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -303,10 +313,14 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       // (must be after startRecording to get fresh amplitude stream)
       ref.read(smartRecordingNotifierProvider.notifier).startMonitoring();
 
+      // Track if metronome was playing when recording started
+      final metronomeState = ref.read(metronomeProvider);
+
       setState(() {
         _isRecording = true;
         _isPaused = false;
         _recordingSeconds = 0;
+        _usedMetronome = metronomeState.isPlaying;
       });
       _startTimer();
     } else {
@@ -344,6 +358,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       _isRecording = false;
       _isPaused = false;
       _recordingSeconds = 0;
+      _usedMetronome = false;
     });
 
     // Wait a moment then start new recording
@@ -395,6 +410,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         _isRecording = false;
         _isPaused = false;
         _recordingSeconds = 0;
+        _usedMetronome = false;
       });
       return;
     }
@@ -419,12 +435,15 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       }
       setState(() {
         _recordingSeconds = 0;
+        _usedMetronome = false;
       });
       return;
     }
 
-    // Capture current metronome BPM
-    final metronomeBpm = ref.read(metronomeProvider).settings.bpm;
+    // Capture metronome BPM only if metronome was used during recording
+    final metronomeBpm = _usedMetronome
+        ? ref.read(metronomeProvider).settings.bpm
+        : null;
     final totalDuration = Duration(seconds: _recordingSeconds);
 
     // Apply smart recording trimming if enabled (including middle silence)
@@ -520,6 +539,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     ref.read(smartRecordingNotifierProvider.notifier).reset();
     setState(() {
       _recordingSeconds = 0;
+      _usedMetronome = false;
     });
   }
 
