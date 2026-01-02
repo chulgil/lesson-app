@@ -22,6 +22,19 @@ dart run build_runner build --delete-conflicting-outputs  # 코드 생성
 flutter analyze                    # 분석
 ```
 
+### iPhone 배포
+
+```bash
+# 데이터 유지하며 배포 (권장)
+flutter run -d <device_id> --release
+
+# 완전 재설치 (앱 데이터 삭제됨 - 녹음 파일 포함)
+flutter install -d <device_id>
+```
+
+> ⚠️ `flutter install`은 앱을 삭제 후 재설치하므로 녹음 파일이 삭제됩니다.
+> 개발 중에는 `flutter run --release`를 사용하세요.
+
 ---
 
 ## 프로젝트 구조 (Clean Architecture)
@@ -347,6 +360,70 @@ class NewModel { ... }
 | 2 | 뱃지 시스템 | 대기 | 높음 |
 | 3 | 백엔드 API (FastAPI) | 대기 | 중간 |
 | 4 | OAuth 연동 | 대기 | 중간 |
+
+---
+
+## GitHub 이슈 관리
+
+이 프로젝트는 GitHub Issues를 태스크 관리 도구로 사용합니다.
+
+### 이슈 명령어
+
+```bash
+# 이슈 생성
+gh issue create --title "제목" --body "내용" --label "라벨"
+
+# 이슈 목록
+gh issue list
+
+# 이슈 닫기
+gh issue close [이슈번호] --comment "완료 내용"
+
+# 라벨 추가
+gh issue edit [이슈번호] --add-label "라벨1,라벨2"
+```
+
+### 라벨 구조
+
+| 카테고리 | 라벨 | 설명 |
+|----------|------|------|
+| **타입** | `bug` | 버그 수정 |
+| | `feature` | 새 기능 |
+| | `enhancement` | 기능 개선 |
+| | `refactor` | 리팩토링 |
+| | `docs` | 문서 작업 |
+| | `test` | 테스트 |
+| **우선순위** | `priority: critical` | 긴급 - 즉시 해결 |
+| | `priority: high` | 높음 |
+| | `priority: medium` | 보통 |
+| | `priority: low` | 낮음 |
+| **상태** | `status: todo` | 시작 전 |
+| | `status: in-progress` | 진행 중 |
+| | `status: review` | 검토 중 |
+| | `status: blocked` | 차단됨 |
+| | `status: done` | 완료 |
+| **도메인** | `domain: lesson` | 레슨 관리 |
+| | `domain: practice` | 연습 기록 |
+| | `domain: recording` | 녹음 기능 |
+| | `domain: student` | 학생 관리 |
+| | `domain: payment` | 결제/정산 |
+| | `domain: parent` | 학부모 연동 |
+| | `domain: schedule` | 스케줄/캘린더 |
+| | `domain: notification` | 알림 |
+| | `domain: metronome` | 메트로놈 |
+| | `domain: auth` | 인증/로그인 |
+| | `domain: profile` | 프로필 관리 |
+| **기타** | `claude` | Claude 작업 |
+
+### 이슈 워크플로우
+
+1. **이슈 생성**: 기능/버그 발견 시 이슈 생성
+2. **라벨 지정**: 타입 + 도메인 + 우선순위 라벨 추가
+3. **작업 시작**: `status: in-progress` 라벨로 변경
+4. **구현 완료**: `status: review` 라벨로 변경 (사용자 확인 대기)
+5. **사용자 확인 후**: `status: done` 라벨 + 이슈 닫기
+
+> ⚠️ **중요**: 기능 구현 후 사용자가 테스트/확인하기 전까지 이슈를 닫지 않습니다.
 
 ---
 

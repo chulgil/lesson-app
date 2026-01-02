@@ -3,7 +3,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../models/metronome_settings.dart';
 
 /// Pastel purple color for paw (per spec).
-const _pawColor = Color(0xFFB8A9C9);
+const _pawColor = AppColors.catAccent;
 
 /// Easing curve per spec: cubic-bezier(0.22, 0.61, 0.36, 1).
 const _dropCurve = Cubic(0.22, 0.61, 0.36, 1);

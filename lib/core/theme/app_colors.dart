@@ -29,6 +29,9 @@ class AppColors {
   static const practicePoor = Color(0xFFDC143C);
   static const practicePaused = Color(0xFF9E9E9E);
 
+  // Cat UI accent (metronome cat paw)
+  static const catAccent = Color(0xFFB8A9C9);
+
   // Light mode
   static const backgroundLight = Color(0xFFFFFAF5);
   static const surfaceLight = Color(0xFFFFFFFF);

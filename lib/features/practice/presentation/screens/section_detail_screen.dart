@@ -144,6 +144,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
             onPauseRecording: _pauseRecording,
             onResumeRecording: _resumeRecording,
             onStopRecording: () => _stopRecording(section),
+            onResetRecording: _resetRecording,
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -303,6 +304,28 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     setState(() {
       _isPaused = true;
     });
+  }
+
+  /// Reset recording - cancel current and restart from now
+  Future<void> _resetRecording() async {
+    final recorder = ref.read(audioRecorderServiceProvider);
+
+    // Cancel current recording
+    await recorder.cancelRecording();
+
+    // Reset smart recording state
+    ref.read(smartRecordingNotifierProvider.notifier).reset();
+
+    // Reset UI state
+    setState(() {
+      _isRecording = false;
+      _isPaused = false;
+      _recordingSeconds = 0;
+    });
+
+    // Wait a moment then start new recording
+    await Future.delayed(const Duration(milliseconds: 100));
+    await _startRecording();
   }
 
   Future<void> _resumeRecording() async {

@@ -22,6 +22,7 @@ class RecordingControl extends ConsumerStatefulWidget {
   final VoidCallback onPauseRecording;
   final VoidCallback onResumeRecording;
   final VoidCallback onStopRecording;
+  final VoidCallback? onResetRecording;
 
   const RecordingControl({
     super.key,
@@ -32,6 +33,7 @@ class RecordingControl extends ConsumerStatefulWidget {
     required this.onPauseRecording,
     required this.onResumeRecording,
     required this.onStopRecording,
+    this.onResetRecording,
   });
 
   @override
@@ -131,6 +133,25 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
     super.dispose();
   }
 
+  /// Build a circular control button with consistent styling
+  Widget _buildControlButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required Color backgroundColor,
+    String? tooltip,
+  }) {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: IconButton.filled(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 40),
+        style: IconButton.styleFrom(backgroundColor: backgroundColor),
+        tooltip: tooltip,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final amplitudeStream = widget.isRecording
@@ -217,31 +238,30 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            width: 80,
-                            height: 80,
-                            child: IconButton.filled(
-                              onPressed: widget.isPaused ? widget.onResumeRecording : widget.onPauseRecording,
-                              icon: Icon(
-                                widget.isPaused ? Icons.play_arrow : Icons.pause,
-                                size: 40,
-                              ),
-                              style: IconButton.styleFrom(
-                                backgroundColor: AppColors.warning,
-                              ),
+                          // Reset button - restart recording from this moment
+                          if (widget.onResetRecording != null) ...[
+                            _buildControlButton(
+                              onPressed: widget.onResetRecording!,
+                              icon: Icons.refresh,
+                              backgroundColor: AppColors.catAccent,
+                              tooltip: '녹음 초기화',
                             ),
+                            const SizedBox(width: AppSpacing.space4),
+                          ],
+                          // Pause/Resume button
+                          _buildControlButton(
+                            onPressed: widget.isPaused
+                                ? widget.onResumeRecording
+                                : widget.onPauseRecording,
+                            icon: widget.isPaused ? Icons.play_arrow : Icons.pause,
+                            backgroundColor: AppColors.warning,
                           ),
                           const SizedBox(width: AppSpacing.space4),
-                          SizedBox(
-                            width: 80,
-                            height: 80,
-                            child: IconButton.filled(
-                              onPressed: widget.onStopRecording,
-                              icon: const Icon(Icons.stop, size: 40),
-                              style: IconButton.styleFrom(
-                                backgroundColor: AppColors.error,
-                              ),
-                            ),
+                          // Stop button
+                          _buildControlButton(
+                            onPressed: widget.onStopRecording,
+                            icon: Icons.stop,
+                            backgroundColor: AppColors.error,
                           ),
                         ],
                       ),
