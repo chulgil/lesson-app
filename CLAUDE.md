@@ -1,10 +1,10 @@
-# CLAUDE.md - Lesson App
+# CLAUDE.md - Lesson App {#overview}
 
 > 마지막 업데이트: 2026-01-03
 
 음악 레슨/연습 관리 앱 (Flutter)
 
-## 빠른 참조
+## 빠른 참조 {#quick-reference}
 
 | 항목 | 값 |
 |------|-----|
@@ -13,7 +13,7 @@
 | 아키텍처 | Clean Architecture + Feature-based |
 | 상태 | Phase 1 완료 (100%) |
 
-## 명령어
+## 명령어 {#commands}
 
 ```bash
 flutter pub get                    # 의존성
@@ -22,7 +22,7 @@ dart run build_runner build --delete-conflicting-outputs  # 코드 생성
 flutter analyze                    # 분석
 ```
 
-### iPhone 배포
+### iPhone 배포 {#iphone-deploy}
 
 ```bash
 # 데이터 유지하며 배포 (권장)
@@ -37,7 +37,7 @@ flutter install -d <device_id>
 
 ---
 
-## 프로젝트 구조 (Clean Architecture)
+## 프로젝트 구조 (Clean Architecture) {#project-structure}
 
 ```
 lib/
@@ -86,7 +86,7 @@ docs/                        # 모든 프로젝트 문서
 
 ---
 
-## Issue 기반 작업
+## Issue 기반 작업 {#issue-workflow}
 
 작업은 GitHub Issue 단위로 진행하여 이력을 관리합니다.
 
@@ -190,7 +190,7 @@ Refs #42"
 
 ---
 
-## Claude 작업 지침
+## Claude 작업 지침 {#claude-guidelines}
 
 ### 📋 작업 시작 전 체크리스트
 
@@ -260,7 +260,7 @@ class NewModel { ... }
 
 ---
 
-## 핵심 규칙
+## 핵심 규칙 {#core-rules}
 
 ### 응답 언어
 - **Claude 응답: 항상 한글로 작성**
@@ -285,7 +285,7 @@ class NewModel { ... }
 
 ---
 
-## Feature별 Provider 매핑
+## Feature별 Provider 매핑 {#provider-mapping}
 
 | Feature | Providers | 설명 |
 |---------|-----------|------|
@@ -301,7 +301,7 @@ class NewModel { ... }
 
 ---
 
-## 문서 구조
+## 문서 구조 {#docs-structure}
 
 | 폴더 | 내용 | Claude 확인 시점 |
 |------|------|----------------|
@@ -315,7 +315,7 @@ class NewModel { ... }
 
 ---
 
-## 주요 모델
+## 주요 모델 {#models}
 
 | 모델 | 위치 | 용도 |
 |------|------|------|
@@ -330,7 +330,7 @@ class NewModel { ... }
 
 ---
 
-## 구현 현황
+## 구현 현황 {#implementation-status}
 
 ### 완료
 - 로그인 UI, 선생님/학생/학부모 대시보드
@@ -362,7 +362,7 @@ class NewModel { ... }
 
 ---
 
-## 작업 우선순위
+## 작업 우선순위 {#priorities}
 
 | 순위 | 작업 | 상태 | 긴급도 |
 |:----:|------|:----:|:------:|
@@ -373,7 +373,7 @@ class NewModel { ... }
 
 ---
 
-## GitHub 이슈 관리
+## GitHub 이슈 관리 {#github-issues}
 
 이 프로젝트는 GitHub Issues를 태스크 관리 도구로 사용합니다.
 
@@ -437,7 +437,7 @@ gh issue edit [이슈번호] --add-label "라벨1,라벨2"
 
 ---
 
-## 문제 해결
+## 문제 해결 {#troubleshooting}
 
 ```bash
 # iOS 빌드 에러
