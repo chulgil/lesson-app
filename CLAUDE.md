@@ -437,6 +437,71 @@ gh issue edit [이슈번호] --add-label "라벨1,라벨2"
 
 ---
 
+## TODO.md 작업 관리 {#todo-management}
+
+복잡한 작업(3시간+, 여러 세션)은 TODO.md로 Phase 기반 관리합니다.
+
+### 도구 선택 기준
+
+| 작업 시간 | 도구 | 이유 |
+|----------|------|------|
+| < 1시간 | Issue + TodoWrite | 자동 추적으로 충분 |
+| 1-3시간 | Issue + TodoWrite | `/sc:spawn` 자동 분해 |
+| > 3시간 | Issue + TODO.md | 세션 간 Phase 유지 필요 |
+
+### TODO.md 형식
+
+```markdown
+## [작업명] (#이슈번호)
+
+**Goal**: 목표
+**Issue**: https://github.com/user/repo/issues/번호
+
+---
+
+### Phase 1: 분석 (예상 시간) ✅ COMPLETE
+
+- [x] 작업 항목
+  - **Result**: 결과 기록
+  - **Commit**: abc1234
+
+### Phase 2: 구현 (예상 시간) → IN PROGRESS
+
+- [x] 완료된 항목
+- [ ] 진행중 항목
+- [ ] 예정 항목
+
+---
+
+## Summary
+**Progress**: Phase 2 (40%)
+**Next**: 다음 작업
+**Blockers**: 없음
+```
+
+### 워크플로우
+
+```
+1. Issue 생성 → 전체 목표 정의
+2. TODO.md에 Phase 계획 작성
+3. 세션별로 해당 Phase 작업
+4. 세션 종료 시 /sc:save로 저장
+5. 완료 시 Issue에 요약 코멘트 → 닫기
+```
+
+### Issue ↔ TODO.md 연동
+
+```markdown
+# TODO.md에서 Issue 참조
+## BookingService 리팩토링 (#55)
+**Issue**: https://github.com/chulgil/lesson-app/issues/55
+
+# 완료 후 Issue에 코멘트
+gh issue comment 55 --body "Phase 2 완료: BookingCreator, BookingNotifier 분리"
+```
+
+---
+
 ## 문제 해결 {#troubleshooting}
 
 ```bash
