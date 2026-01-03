@@ -27,6 +27,44 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
 
   debugPrint('=== Main: Recovering practice recording paths ===');
   debugPrint('  Current base path: $currentBasePath');
+  debugPrint('  Total recordings in box: ${box.length}');
+
+  // Pre-build file map for efficient lookup
+  // Map structure: { fileName: [fullPath1, fullPath2, ...] }
+  final fileMap = <String, List<String>>{};
+  final recordingsDir = Directory('$currentBasePath/recordings');
+
+  if (await recordingsDir.exists()) {
+    debugPrint('  Building file map from recordings directory...');
+    await for (final entity in recordingsDir.list(recursive: true)) {
+      if (entity is File) {
+        final fileName = entity.path.split('/').last;
+        fileMap.putIfAbsent(fileName, () => []).add(entity.path);
+      }
+    }
+    debugPrint('  File map built: ${fileMap.length} unique files found');
+
+    // Log all found files for debugging
+    for (final entry in fileMap.entries) {
+      for (final path in entry.value) {
+        debugPrint('    Found: $path');
+      }
+    }
+  } else {
+    debugPrint('  WARNING: Recordings directory does not exist!');
+  }
+
+  // Also check backup directory
+  final backupDir = Directory('$currentBasePath/recording_backups');
+  if (await backupDir.exists()) {
+    debugPrint('  Also checking backup directory...');
+    await for (final entity in backupDir.list(recursive: true)) {
+      if (entity is File) {
+        final fileName = entity.path.split('/').last;
+        fileMap.putIfAbsent(fileName, () => []).add(entity.path);
+      }
+    }
+  }
 
   for (final recording in box.values.toList()) {
     final storedPath = recording.filePath;
@@ -34,11 +72,13 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
 
     // Skip if file exists at stored path
     if (await file.exists()) {
+      debugPrint('  OK: ${recording.id.substring(0, 8)}... (file exists)');
       continue;
     }
 
     debugPrint('  Checking: ${recording.id.substring(0, 8)}...');
     debugPrint('    Stored path: $storedPath');
+    debugPrint('    Section ID: ${recording.sectionId}');
 
     String? newPath;
 
@@ -48,6 +88,7 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
     if (documentsIndex != -1) {
       final relativePath = storedPath.substring(documentsIndex + '/Documents/'.length);
       final reconstructedPath = '$currentBasePath/$relativePath';
+      debugPrint('    Strategy 1: Trying $reconstructedPath');
       final reconstructedFile = File(reconstructedPath);
       if (await reconstructedFile.exists()) {
         newPath = reconstructedPath;
@@ -55,17 +96,44 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
       }
     }
 
-    // Strategy 2: Search by filename in recordings directory
+    // Strategy 2: Look up in pre-built file map by exact filename
     if (newPath == null) {
       final fileName = storedPath.split('/').last;
-      final recordingsDir = Directory('$currentBasePath/recordings');
-      if (await recordingsDir.exists()) {
-        await for (final entity in recordingsDir.list(recursive: true)) {
-          if (entity is File && entity.path.endsWith(fileName)) {
-            newPath = entity.path;
-            debugPrint('    Strategy 2 (filename search) succeeded');
-            break;
+      debugPrint('    Strategy 2: Looking for filename "$fileName" in file map');
+      final matches = fileMap[fileName];
+      if (matches != null && matches.isNotEmpty) {
+        if (matches.length == 1) {
+          newPath = matches.first;
+          debugPrint('    Strategy 2 (exact match) succeeded');
+        } else {
+          // Multiple matches - try to find one in the same section folder
+          debugPrint('    Strategy 2: Multiple matches (${matches.length}), checking section...');
+          for (final match in matches) {
+            // Check if path contains section ID or repertoire ID pattern
+            if (match.contains(recording.sectionId) ||
+                match.contains('rep_') ||
+                match.contains('/recordings/')) {
+              newPath = match;
+              debugPrint('    Strategy 2 (section match) succeeded: $match');
+              break;
+            }
           }
+          // If still no match, just use first one
+          newPath ??= matches.first;
+          debugPrint('    Strategy 2 (first match) used: $newPath');
+        }
+      }
+    }
+
+    // Strategy 3: Search by recording ID in filename
+    if (newPath == null) {
+      final recordingId = recording.id;
+      debugPrint('    Strategy 3: Searching for ID pattern "$recordingId" in files');
+      for (final entry in fileMap.entries) {
+        if (entry.key.contains(recordingId.substring(0, 8))) {
+          newPath = entry.value.first;
+          debugPrint('    Strategy 3 (ID pattern) succeeded');
+          break;
         }
       }
     }
