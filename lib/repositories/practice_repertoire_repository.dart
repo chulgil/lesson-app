@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
@@ -672,6 +674,37 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   @override
   Future<void> deleteRecording(String id) async {
     await Future.delayed(const Duration(milliseconds: 300));
+
+    // Get file path before deleting from Hive
+    String? filePath;
+    try {
+      final box = await _practiceRecordingsBox;
+      final recording = box.get(id);
+      if (recording != null) {
+        filePath = recording.filePath;
+      }
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to get recording for file deletion: $e');
+    }
+
+    // Delete actual audio file and trim metadata
+    if (filePath != null) {
+      try {
+        final audioFile = File(filePath);
+        if (await audioFile.exists()) {
+          await audioFile.delete();
+          debugPrint('PracticeRepertoireRepository: Deleted audio file: $filePath');
+        }
+        // Also delete .trim metadata file if exists
+        final trimFile = File('$filePath.trim');
+        if (await trimFile.exists()) {
+          await trimFile.delete();
+          debugPrint('PracticeRepertoireRepository: Deleted trim file: $filePath.trim');
+        }
+      } catch (e) {
+        debugPrint('PracticeRepertoireRepository: Failed to delete audio file: $e');
+      }
+    }
 
     // Delete from Hive
     try {

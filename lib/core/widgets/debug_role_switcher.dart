@@ -7,6 +7,7 @@ import '../../providers/auth/user_role_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import 'recording_diagnostic_screen.dart';
 
 /// Get color for user role
 Color _getRoleColor(UserRole role) {
@@ -150,12 +151,16 @@ class _DebugOptionsSheet extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space2),
@@ -320,9 +325,25 @@ class _DebugOptionsSheet extends ConsumerWidget {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.audio_file, color: AppColors.warning),
+            title: const Text('녹음 파일 진단'),
+            subtitle: const Text('녹음 파일과 DB 매칭 상태 확인'),
+            dense: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RecordingDiagnosticScreen(),
+                ),
+              );
+            },
+          ),
 
           const SizedBox(height: AppSpacing.space4),
         ],
+        ),
       ),
     );
   }
