@@ -75,6 +75,13 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
   Duration _trimOffset = Duration.zero;
   Duration _trimEnd = Duration.zero;
 
+  // Original metadata totalDuration for adjustment calculation
+  Duration _metadataTotalDuration = Duration.zero;
+  // trimEnd from metadata (silence duration to skip at end)
+  Duration _trimEndSilence = Duration.zero;
+  // Whether trim end has been adjusted for actual file duration
+  bool _trimAdjusted = false;
+
   // Cache player reference to avoid using ref after dispose
   late final AudioPlayerService _player;
 
@@ -103,6 +110,22 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
 
     // Listen to position updates
     _positionSub = _player.positionStream.listen((rawPos) {
+      // Adjust _trimEnd based on actual file duration (Issue #16 fix)
+      // This is needed because metadata's totalDuration may differ from actual file duration
+      if (!_trimAdjusted && _metadataTotalDuration > Duration.zero && _player.duration > Duration.zero) {
+        final actualDuration = _player.duration;
+        final durationDiff = actualDuration - _metadataTotalDuration;
+        if (durationDiff.abs() > const Duration(milliseconds: 200)) {
+          // Adjust _trimEnd: actualDuration - trimEndSilence
+          _trimEnd = actualDuration - _trimEndSilence;
+          debugPrint('RecordingPlayerSheet: Adjusted trimEnd for actual duration');
+          debugPrint('  Actual file duration: ${actualDuration.inMilliseconds}ms');
+          debugPrint('  Metadata totalDuration: ${_metadataTotalDuration.inMilliseconds}ms');
+          debugPrint('  Adjusted trimEnd: ${_trimEnd.inMilliseconds}ms');
+        }
+        _trimAdjusted = true;
+      }
+
       // Convert raw position to display position (subtract trim offset)
       var displayPos = rawPos - _trimOffset;
       // Clamp to valid range
@@ -110,8 +133,10 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
       if (displayPos > _duration) displayPos = _duration;
       setState(() => _position = displayPos);
 
-      // Stop at content end if trimmed
-      if (_trimEnd > Duration.zero && rawPos >= _trimEnd) {
+      // Stop at content end if trimmed (only for non-segment playback)
+      // Segment-based playback is handled by AudioPlayerService._handleSegmentPlayback
+      final hasSegments = _player.hasSegments;
+      if (!hasSegments && _trimEnd > Duration.zero && rawPos >= _trimEnd) {
         _player.pause();
         _player.seek(_trimOffset); // Reset to content start
       }
@@ -138,15 +163,23 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
       if (metadata != null && metadata.hasTrimming) {
         _trimOffset = metadata.contentStart;
         _trimEnd = metadata.contentEnd;
+        // Save metadata values for later adjustment
+        _metadataTotalDuration = metadata.totalDuration;
+        _trimEndSilence = metadata.trimEnd;
         // Update duration to match actual content duration from metadata
         setState(() {
           _duration = metadata.contentDuration;
         });
-        debugPrint('Loaded trim metadata: offset=${_trimOffset.inMilliseconds}ms, end=${_trimEnd.inMilliseconds}ms, duration=${_duration.inMilliseconds}ms');
+        debugPrint('RecordingPlayerSheet: Loaded trim metadata');
+        debugPrint('  trimOffset=${_trimOffset.inMilliseconds}ms');
+        debugPrint('  trimEnd=${_trimEnd.inMilliseconds}ms');
+        debugPrint('  metadataTotalDuration=${_metadataTotalDuration.inMilliseconds}ms');
+        debugPrint('  trimEndSilence=${_trimEndSilence.inMilliseconds}ms');
+        debugPrint('  displayDuration=${_duration.inMilliseconds}ms');
       }
     } catch (e) {
       // Fail-safe: just use full file
-      debugPrint('Could not load trim metadata: $e');
+      debugPrint('RecordingPlayerSheet: Could not load trim metadata: $e');
     }
   }
 

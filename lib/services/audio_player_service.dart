@@ -144,14 +144,8 @@ class AudioPlayerService {
         return;
       }
 
-      // Check if we've reached the trim end point (for non-segment playback)
-      if (_trimMetadata != null &&
-          _state == PlaybackState.playing &&
-          pos >= _trimMetadata!.contentEnd) {
-        debugPrint('AudioPlayer: Reached trim end, stopping');
-        stop();
-        onComplete?.call();
-      }
+      // Note: Trim end check is handled by recording_player_sheet.dart
+      // which adjusts for actual file duration vs metadata duration
     });
 
     _durationSubscription = _player.onDurationChanged.listen((dur) {
