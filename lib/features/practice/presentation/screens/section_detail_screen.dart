@@ -659,9 +659,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       await ref.read(sectionCrudProvider.notifier).toggleComplete(
             section.id,
             widget.repertoireId,
+            studentId: widget.studentId,
           );
       ref.invalidate(sectionProvider(widget.sectionId));
-      ref.invalidate(studentRepertoiresProvider(widget.studentId));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

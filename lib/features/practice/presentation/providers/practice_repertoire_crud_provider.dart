@@ -217,7 +217,12 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   }
 
   /// Toggle section completion status
-  Future<PracticeSection> toggleComplete(String sectionId, String repertoireId) async {
+  /// Now also syncs with dailyStatuses for today's date
+  Future<PracticeSection> toggleComplete(
+    String sectionId,
+    String repertoireId, {
+    String? studentId,
+  }) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
@@ -226,6 +231,16 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
       // Invalidate related providers
       ref.invalidate(repertoireProvider(repertoireId));
       ref.invalidate(sectionProvider(sectionId));
+
+      // Also invalidate date-based providers if studentId is provided
+      if (studentId != null) {
+        ref.invalidate(studentRepertoiresProvider(studentId));
+        // Invalidate today's date provider for calendar sync
+        final today = DateTime.now();
+        ref.invalidate(repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: today),
+        ));
+      }
 
       state = const AsyncData(null);
       return result;
