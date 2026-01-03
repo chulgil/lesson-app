@@ -1,5 +1,7 @@
 // Section recording list item widget
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
@@ -8,7 +10,7 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../models/practice_repertoire.dart';
 
 /// Recording list item for section detail screen
-class SectionRecordingListItem extends StatelessWidget {
+class SectionRecordingListItem extends StatefulWidget {
   final PracticeRecording recording;
   final String sectionId;
   final String repertoireId;
@@ -27,10 +29,204 @@ class SectionRecordingListItem extends StatelessWidget {
   });
 
   @override
+  State<SectionRecordingListItem> createState() =>
+      _SectionRecordingListItemState();
+}
+
+class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
+  bool? _fileExists;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFileExists();
+  }
+
+  @override
+  void didUpdateWidget(SectionRecordingListItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.recording.filePath != widget.recording.filePath) {
+      _checkFileExists();
+    }
+  }
+
+  Future<void> _checkFileExists() async {
+    final file = File(widget.recording.filePath);
+    final exists = await file.exists();
+    if (mounted) {
+      setState(() {
+        _fileExists = exists;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show loading state while checking
+    if (_fileExists == null) {
+      return _buildLoadingState();
+    }
+
+    // Show file missing state if file doesn't exist
+    if (_fileExists == false) {
+      return _buildFileMissingState(context);
+    }
+
+    return _buildNormalState(context);
+  }
+
+  Widget _buildLoadingState() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSecondaryLight,
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Text(
+              '확인 중...',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileMissingState(BuildContext context) {
+    return Card(
+      color: AppColors.error.withValues(alpha: 0.05),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                color: AppColors.error,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        '파일 없음',
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      if (widget.recording.bpm != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.textSecondaryLight.withValues(alpha: 0.2),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.radiusSmall),
+                          ),
+                          child: Text(
+                            '${widget.recording.bpm} BPM',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${_formatDate(widget.recording.createdAt)} · ${widget.recording.formattedDuration}',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '녹음 파일이 삭제되었거나 찾을 수 없습니다',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.error.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Delete button for orphaned recording
+            IconButton(
+              onPressed: () => _showDeleteConfirmation(context),
+              icon: const Icon(Icons.delete_outline),
+              color: AppColors.error,
+              tooltip: '기록 삭제',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('녹음 기록 삭제'),
+        content: const Text(
+          '이 녹음 기록을 삭제하시겠습니까?\n'
+          '(파일이 이미 없으므로 기록만 삭제됩니다)',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              widget.onDelete();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.error,
+            ),
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNormalState(BuildContext context) {
     return Card(
       child: InkWell(
-        onTap: onPlay,
+        onTap: widget.onPlay,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space3),
@@ -56,12 +252,12 @@ class SectionRecordingListItem extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          recording.formattedDuration,
+                          widget.recording.formattedDuration,
                           style: AppTypography.bodyMedium.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        if (recording.bpm != null) ...[
+                        if (widget.recording.bpm != null) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -74,7 +270,7 @@ class SectionRecordingListItem extends StatelessWidget {
                                   BorderRadius.circular(AppSpacing.radiusSmall),
                             ),
                             child: Text(
-                              '${recording.bpm} BPM',
+                              '${widget.recording.bpm} BPM',
                               style: AppTypography.caption.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
@@ -82,7 +278,7 @@ class SectionRecordingListItem extends StatelessWidget {
                             ),
                           ),
                         ],
-                        if (recording.isRepresentative) ...[
+                        if (widget.recording.isRepresentative) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -107,7 +303,7 @@ class SectionRecordingListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _formatDate(recording.createdAt),
+                      _formatDate(widget.recording.createdAt),
                       style: AppTypography.caption.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),
@@ -118,13 +314,13 @@ class SectionRecordingListItem extends StatelessWidget {
               PopupMenuButton<String>(
                 onSelected: (value) {
                   if (value == 'representative') {
-                    onSetRepresentative();
+                    widget.onSetRepresentative();
                   } else if (value == 'delete') {
-                    onDelete();
+                    widget.onDelete();
                   }
                 },
                 itemBuilder: (context) => [
-                  if (!recording.isRepresentative)
+                  if (!widget.recording.isRepresentative)
                     const PopupMenuItem(
                       value: 'representative',
                       child: Row(

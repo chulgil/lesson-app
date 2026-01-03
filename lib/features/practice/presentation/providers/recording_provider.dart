@@ -17,6 +17,7 @@ class RecordingState {
   const RecordingState({
     this.recordings = const [],
     this.isLoading = false,
+    this.isRecovering = false,
     this.isRecording = false,
     this.isPaused = false,
     this.isPlaying = false,
@@ -27,10 +28,12 @@ class RecordingState {
     this.playbackPosition = Duration.zero,
     this.playbackDuration = Duration.zero,
     this.error,
+    this.recoveryMessage,
   });
 
   final List<Recording> recordings;
   final bool isLoading;
+  final bool isRecovering; // true during path recovery
   final bool isRecording;
   final bool isPaused;
   final bool isPlaying;
@@ -41,6 +44,7 @@ class RecordingState {
   final Duration playbackPosition;
   final Duration playbackDuration;
   final String? error;
+  final String? recoveryMessage; // Message to show after recovery
 
   /// Get representative recording.
   Recording? get representativeRecording {
@@ -54,6 +58,7 @@ class RecordingState {
   RecordingState copyWith({
     List<Recording>? recordings,
     bool? isLoading,
+    bool? isRecovering,
     bool? isRecording,
     bool? isPaused,
     bool? isPlaying,
@@ -64,10 +69,13 @@ class RecordingState {
     Duration? playbackPosition,
     Duration? playbackDuration,
     String? error,
+    String? recoveryMessage,
+    bool clearRecoveryMessage = false,
   }) {
     return RecordingState(
       recordings: recordings ?? this.recordings,
       isLoading: isLoading ?? this.isLoading,
+      isRecovering: isRecovering ?? this.isRecovering,
       isRecording: isRecording ?? this.isRecording,
       isPaused: isPaused ?? this.isPaused,
       isPlaying: isPlaying ?? this.isPlaying,
@@ -78,6 +86,7 @@ class RecordingState {
       playbackPosition: playbackPosition ?? this.playbackPosition,
       playbackDuration: playbackDuration ?? this.playbackDuration,
       error: error,
+      recoveryMessage: clearRecoveryMessage ? null : (recoveryMessage ?? this.recoveryMessage),
     );
   }
 }
@@ -150,18 +159,49 @@ class RecordingNotifier extends _$RecordingNotifier {
 
   Future<void> _loadRecordings() async {
     try {
+      // Show recovery status
+      state = state.copyWith(isRecovering: true);
+
+      // First, try to recover paths that became invalid
+      final recovered = await _repository.migrateAndRecoverPaths();
+
+      // Then clean up truly orphaned recordings
+      final cleanedUp = await _repository.cleanupOrphanedRecordings();
+
+      // Build recovery message
+      String? message;
+      if (recovered > 0 || cleanedUp > 0) {
+        final parts = <String>[];
+        if (recovered > 0) {
+          parts.add('$recovered개 녹음 복구됨');
+        }
+        if (cleanedUp > 0) {
+          parts.add('$cleanedUp개 누락 파일 정리됨');
+        }
+        message = parts.join(', ');
+        debugPrint('RecordingProvider: $message');
+      }
+
       final recordings = await _repository.getRecordingsForRepertoire(_repertoireId);
       state = state.copyWith(
         recordings: recordings,
         isLoading: false,
+        isRecovering: false,
+        recoveryMessage: message,
       );
     } catch (e) {
       debugPrint('RecordingProvider: Failed to load recordings: $e');
       state = state.copyWith(
         isLoading: false,
+        isRecovering: false,
         error: 'Failed to load recordings',
       );
     }
+  }
+
+  /// Clear the recovery message after showing it to the user.
+  void clearRecoveryMessage() {
+    state = state.copyWith(clearRecoveryMessage: true);
   }
 
   /// Start recording.

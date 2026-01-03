@@ -60,6 +60,23 @@ class _PracticeRecordingScreenState
 
     debugPrint('PracticeRecordingScreen: build - isRecording=${state.isRecording}, isPaused=${state.isPaused}');
 
+    // Show recovery message as snackbar
+    if (state.recoveryMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(state.recoveryMessage!),
+            backgroundColor: AppColors.primary,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        ref
+            .read(recordingNotifierProvider(widget.repertoireId, widget.studentId)
+                .notifier)
+            .clearRecoveryMessage();
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.repertoireName),
@@ -74,7 +91,23 @@ class _PracticeRecordingScreenState
         ],
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  if (state.isRecovering) ...[
+                    SizedBox(height: AppSpacing.space3),
+                    Text(
+                      '녹음 파일 복구 중...',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            )
           : Column(
               children: [
                 // Recording section

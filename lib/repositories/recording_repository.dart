@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/recording.dart';
 
 /// Repository for managing recording data with local storage.
@@ -31,6 +32,15 @@ abstract class RecordingRepository {
 
   /// Mark recording as shared.
   Future<void> markAsShared(String id);
+
+  /// Clean up orphaned recordings (DB entries without actual files).
+  /// Returns the number of cleaned up recordings.
+  Future<int> cleanupOrphanedRecordings();
+
+  /// Migrate and recover recording paths.
+  /// Tries to fix paths that became invalid due to container UUID changes.
+  /// Returns the number of recovered recordings.
+  Future<int> migrateAndRecoverPaths();
 }
 
 /// Hive-based implementation of RecordingRepository.
@@ -194,6 +204,114 @@ class HiveRecordingRepository implements RecordingRepository {
       debugPrint('RecordingRepository: Marked recording $id as shared (flushed)');
     }
   }
+
+  @override
+  Future<int> cleanupOrphanedRecordings() async {
+    // Note: migrateAndRecoverPaths() should be called separately before this
+    final box = await _recordingsBox;
+    final orphanedIds = <String>[];
+
+    debugPrint('=== RecordingRepository: Checking for orphaned recordings ===');
+
+    for (final recording in box.values) {
+      final file = File(recording.localPath);
+      if (!await file.exists()) {
+        orphanedIds.add(recording.id);
+        debugPrint('  Orphaned: ${recording.id.substring(0, 8)}... (file not found: ${recording.localPath})');
+      }
+    }
+
+    if (orphanedIds.isEmpty) {
+      debugPrint('  No orphaned recordings found');
+      return 0;
+    }
+
+    // Delete orphaned recordings from DB
+    for (final id in orphanedIds) {
+      await box.delete(id);
+    }
+    await box.flush();
+
+    debugPrint('  Cleaned up ${orphanedIds.length} orphaned recordings');
+    debugPrint('=== Cleanup complete ===');
+
+    return orphanedIds.length;
+  }
+
+  @override
+  Future<int> migrateAndRecoverPaths() async {
+    final box = await _recordingsBox;
+    final appDir = await getApplicationDocumentsDirectory();
+    final currentBasePath = appDir.path;
+    int recoveredCount = 0;
+
+    debugPrint('=== RecordingRepository: Migrating and recovering paths ===');
+    debugPrint('  Current base path: $currentBasePath');
+
+    for (final recording in box.values.toList()) {
+      final storedPath = recording.localPath;
+      final file = File(storedPath);
+
+      // Skip if file exists at stored path
+      if (await file.exists()) {
+        continue;
+      }
+
+      debugPrint('  Checking: ${recording.id.substring(0, 8)}...');
+      debugPrint('    Stored path: $storedPath');
+
+      // Try to recover the path
+      String? newPath;
+
+      // Strategy 1: Extract relative path and reconstruct with current base
+      // iOS path format: /var/mobile/Containers/Data/Application/[UUID]/Documents/recordings/...
+      final documentsIndex = storedPath.indexOf('/Documents/');
+      if (documentsIndex != -1) {
+        final relativePath = storedPath.substring(documentsIndex + '/Documents/'.length);
+        final reconstructedPath = '$currentBasePath/$relativePath';
+        final reconstructedFile = File(reconstructedPath);
+        if (await reconstructedFile.exists()) {
+          newPath = reconstructedPath;
+          debugPrint('    Strategy 1 (path reconstruction) succeeded');
+        }
+      }
+
+      // Strategy 2: Search by filename in recordings directory
+      if (newPath == null) {
+        final fileName = storedPath.split('/').last;
+        final recordingsDir = Directory('$currentBasePath/recordings');
+        if (await recordingsDir.exists()) {
+          await for (final entity in recordingsDir.list(recursive: true)) {
+            if (entity is File && entity.path.endsWith(fileName)) {
+              newPath = entity.path;
+              debugPrint('    Strategy 2 (filename search) succeeded');
+              break;
+            }
+          }
+        }
+      }
+
+      // Update path if recovered
+      if (newPath != null) {
+        debugPrint('    Recovered path: $newPath');
+        final updated = recording.copyWith(localPath: newPath);
+        await box.put(recording.id, updated);
+        recoveredCount++;
+      } else {
+        debugPrint('    Could not recover - file may be deleted');
+      }
+    }
+
+    if (recoveredCount > 0) {
+      await box.flush();
+      debugPrint('  Recovered $recoveredCount recordings');
+    } else {
+      debugPrint('  No paths needed recovery');
+    }
+
+    debugPrint('=== Migration complete ===');
+    return recoveredCount;
+  }
 }
 
 /// Mock implementation for testing.
@@ -271,5 +389,17 @@ class MockRecordingRepository implements RecordingRepository {
         storageStatus: StorageStatus.active,
       );
     }
+  }
+
+  @override
+  Future<int> cleanupOrphanedRecordings() async {
+    // Mock implementation - no actual file system access
+    return 0;
+  }
+
+  @override
+  Future<int> migrateAndRecoverPaths() async {
+    // Mock implementation - no actual file system access
+    return 0;
   }
 }

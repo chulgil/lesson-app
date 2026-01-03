@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
+import '../../../../main.dart' show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
@@ -26,6 +27,46 @@ class StudentHomeScreen extends StatefulWidget {
 
 class _StudentHomeScreenState extends State<StudentHomeScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Show recording recovery message if any recordings were recovered at startup
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final result = getStartupRecoveryResult();
+      if (result != null && mounted) {
+        // Always show diagnostic message if there are recordings in DB
+        if (result.total > 0) {
+          String message;
+          Color bgColor;
+
+          if (result.recovered > 0 || result.cleanedUp > 0) {
+            final parts = <String>[];
+            if (result.recovered > 0) {
+              parts.add('${result.recovered}개 복구');
+            }
+            if (result.cleanedUp > 0) {
+              parts.add('${result.cleanedUp}개 정리');
+            }
+            message = '녹음 파일: ${parts.join(', ')} (전체 ${result.total}개)';
+            bgColor = AppColors.success;
+          } else {
+            message = '녹음 파일 ${result.total}개 확인됨 (복구 불필요)';
+            bgColor = AppColors.info;
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              duration: const Duration(seconds: 4),
+              backgroundColor: bgColor,
+            ),
+          );
+        }
+        clearStartupRecoveryResult();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
