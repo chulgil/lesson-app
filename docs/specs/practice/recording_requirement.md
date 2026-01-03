@@ -670,6 +670,173 @@ iOS에서 앱 삭제 시 Documents 폴더도 함께 삭제됩니다. 데이터 �
 - 학생별/곡별 녹음을 ZIP으로 압축하여 내보내기
 - 사용자가 원하는 위치에 저장
 
+---
+
+## iOS 녹음 경로 복구 (Issue #9)
+
+> 구현 완료: 2026-01-03
+
+### 문제 상황
+
+iOS에서 앱을 개발 모드로 재배포하면 앱 컨테이너 UUID가 변경됩니다:
+
+```
+이전 경로: /var/mobile/.../Application/OLD-UUID/Documents/recordings/...
+새 경로:   /var/mobile/.../Application/NEW-UUID/Documents/recordings/...
+```
+
+이로 인해 Hive DB에 저장된 녹음 파일 경로가 무효화되어 재생이 불가능해집니다.
+
+### 해결 방안
+
+앱 시작 시 자동 경로 복구 로직 실행 (`main.dart`):
+
+```dart
+Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
+  // 1. 현재 Documents 디렉토리 경로 획득
+  // 2. recordings/ 폴더 스캔하여 파일 맵 구축
+  // 3. DB 기록 순회하며 경로 복구 시도
+}
+```
+
+#### 복구 전략
+
+| 순서 | 전략 | 설명 |
+|:---:|------|------|
+| 1 | 상대 경로 재구성 | `/Documents/` 이후 경로 추출 → 현재 base path와 결합 |
+| 2 | 파일명 검색 | 파일명으로 파일 맵에서 검색 |
+| 3 | ID 패턴 검색 | 녹음 ID 앞 8자리로 파일명 패턴 매칭 |
+
+#### 복구 후 정리
+
+- 복구 불가능한 고아 기록은 DB에서 자동 삭제
+- 앱 시작 시 복구 결과 로깅
+
+### 파일 없음 UI
+
+녹음 파일이 존재하지 않는 경우 "파일 없음" 상태 표시:
+
+```
+┌─────────────────────────────────────────┐
+│ ⚠️ 파일 없음                             │
+│ 2026.01.01 14:30 · 2:45                 │
+│ 녹음 파일이 삭제되었거나 찾을 수 없습니다  │
+│                                    [🗑]  │
+└─────────────────────────────────────────┘
+```
+
+- 재생 버튼 대신 경고 아이콘 표시
+- 삭제 버튼으로 DB 기록 정리 가능
+
+---
+
+## 녹음 진단 화면 (디버그 모드)
+
+> 구현 완료: 2026-01-03
+
+### 접근 방법
+
+1. 디버그 FAB (역할 전환 버튼) **길게 누르기**
+2. 개발자 옵션 시트 → "녹음 파일 진단" 선택
+
+### 진단 정보
+
+| 항목 | 설명 |
+|------|------|
+| 기본 경로 | 현재 Documents 디렉토리 경로 |
+| 실제 파일 수 | recordings/ 폴더 내 오디오 파일 수 |
+| DB 기록 수 | Hive practice_recordings box 기록 수 |
+| 매칭됨 | DB 기록 중 파일이 존재하는 수 |
+| DB 불일치 | DB 기록 중 파일이 없는 수 |
+| 고아 파일 | 파일은 있으나 DB에 없는 수 |
+
+### 고아 파일 관리
+
+디스크에는 존재하지만 DB에 기록이 없는 파일들:
+
+- 개별 삭제: 각 파일 옆 삭제 버튼
+- 전체 삭제: "고아 파일 전체 삭제" 버튼
+
+```dart
+// 고아 파일 = 실제 파일 - DB 기록 파일
+_orphanedFiles = _physicalFiles.where(
+  (path) => !dbFilePaths.contains(path)
+).toList();
+```
+
+### UI 구성
+
+```
+┌─────────────────────────────────────────┐
+│ 녹음 파일 진단                      [↻] │
+├─────────────────────────────────────────┤
+│ 요약                                    │
+│ ─────────────────────────────────────── │
+│ 기본 경로: /var/.../Documents           │
+│ 실제 파일 수: 51개                      │
+│ DB 기록 수: 19개                        │
+│ 매칭됨: 19개 ✅                         │
+│ DB 불일치: 0개 ✅                       │
+│ 고아 파일: 32개 ⚠️                      │
+├─────────────────────────────────────────┤
+│ 고아 파일 - DB에 없음 (32개)            │
+│ [고아 파일 전체 삭제 (32개)]            │
+│ ⚠️ file1.m4a                       [🗑] │
+│ ⚠️ file2.m4a                       [🗑] │
+│ ...                                     │
+├─────────────────────────────────────────┤
+│ 파일 존재 (19개)                        │
+│ ✅ recording1.m4a                       │
+│ ...                                     │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 녹음 완전 삭제
+
+> 구현 완료: 2026-01-03
+
+### 이전 동작
+- DB 기록만 삭제
+- 실제 파일은 디스크에 남음 → 고아 파일 발생
+
+### 현재 동작
+녹음 삭제 시 모든 관련 파일 삭제:
+
+```dart
+Future<void> deleteRecording(String id) async {
+  // 1. DB에서 파일 경로 조회
+  final recording = box.get(id);
+  final filePath = recording?.filePath;
+
+  // 2. 실제 파일 삭제
+  if (filePath != null) {
+    final audioFile = File(filePath);
+    if (await audioFile.exists()) {
+      await audioFile.delete();
+    }
+    // .trim 메타데이터 파일도 삭제
+    final trimFile = File('$filePath.trim');
+    if (await trimFile.exists()) {
+      await trimFile.delete();
+    }
+  }
+
+  // 3. DB 기록 삭제
+  await box.delete(id);
+}
+```
+
+### 삭제 대상 파일
+
+| 파일 | 설명 |
+|------|------|
+| `*.m4a` | 오디오 파일 |
+| `*.m4a.trim` | 스마트 녹음 트림 메타데이터 |
+
+---
+
 ### 메타데이터 파일 형식
 
 `.trim` 파일은 JSON 형식으로 저장:
@@ -710,9 +877,13 @@ iOS에서 앱 삭제 시 Documents 폴더도 함께 삭제됩니다. 데이터 �
 - [x] 메트로놈 연동 BPM 표시 (미사용 시 null)
 - [x] A-B 루프 재생, 속도 조절, 핀치 줌
 
-### Phase 1.5 (버그 수정/개선) - 🔄 진행중
+### Phase 1.5 (버그 수정/개선) - ✅ 완료
 - [x] 녹음 파일 영속성 (Hive 동기화)
 - [x] 연습완료 시 대표녹음 공유 안내 메시지
+- [x] iOS 컨테이너 UUID 변경 시 녹음 경로 자동 복구 (Issue #9)
+- [x] 녹음 삭제 시 실제 파일도 함께 삭제 (완전 삭제)
+- [x] 녹음 진단 화면 추가 (디버그 모드)
+- [x] 파일 없음 UI 표시 및 고아 파일 관리
 - [ ] 트림 후 실제 재생 시간 표시 (Issue #7)
 - [ ] 연습완료 날짜별 동기화 (Issue #8)
 
@@ -743,31 +914,42 @@ iOS에서 앱 삭제 시 Documents 폴더도 함께 삭제됩니다. 데이터 �
 
 ---
 
-## 관련 파일 (예정)
+## 관련 파일
 
 ```
 lib/
+├── core/
+│   └── widgets/
+│       ├── debug_role_switcher.dart        # 디버그 옵션 시트 (진단 화면 연결)
+│       └── recording_diagnostic_screen.dart # 녹음 진단 화면 ✅ NEW
 ├── models/
 │   ├── recording.dart
+│   ├── practice_repertoire.dart            # PracticeRecording 모델
 │   ├── downloaded_recording.dart
 │   └── reference_audio.dart
 ├── repositories/
 │   ├── recording_repository.dart
+│   ├── practice_repertoire_repository.dart # deleteRecording (완전 삭제) ✅ 수정
 │   └── downloaded_recording_repository.dart
 ├── providers/
 │   └── recording/
 ├── services/
 │   ├── audio_recorder_service.dart
+│   ├── audio_trimmer_service.dart          # 스마트 녹음 트리밍
 │   ├── speech_to_text_service.dart
 │   ├── audio_upload_service.dart
 │   └── audio_download_service.dart
+├── main.dart                               # 앱 시작 시 경로 복구 로직 ✅ 수정
 └── features/
     └── practice/
         └── presentation/
             ├── screens/
             │   ├── practice_recording_screen.dart
+            │   ├── section_detail_screen.dart
             │   └── downloaded_recordings_screen.dart
             └── widgets/
+                ├── section_detail/
+                │   └── section_recording_list_item.dart  # 파일 없음 UI ✅ 수정
                 ├── recording_list_widget.dart
                 ├── audio_player_widget.dart
                 └── download_button_widget.dart
