@@ -8,6 +8,10 @@ import '../../../features/practice/presentation/screens/repertoire_detail_screen
 import '../../../features/practice/presentation/screens/practice_recording_screen.dart';
 import '../../../features/practice/presentation/screens/add_section_screen.dart';
 import '../../../features/practice/presentation/screens/section_detail_screen.dart';
+import '../../../features/practice/presentation/screens/repertoire_archive_screen.dart';
+import '../../../features/practice/presentation/screens/practice_note_list_screen.dart';
+import '../../../features/practice/presentation/screens/practice_goal_setting_screen.dart';
+import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
 import '../app_routes.dart';
 
 /// Practice routes
@@ -92,6 +96,50 @@ List<GoRoute> practiceRoutes = [
         studentId: studentId,
         selectedDate: selectedDate,
       );
+    },
+  ),
+
+  // Practice Archive
+  GoRoute(
+    path: AppRoutes.practiceArchive,
+    name: 'practiceArchive',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return RepertoireArchiveScreen(studentId: studentId);
+    },
+  ),
+
+  // Practice Notes
+  GoRoute(
+    path: AppRoutes.practiceNotes,
+    name: 'practiceNotes',
+    builder: (context, state) {
+      final sectionId = state.pathParameters['sectionId'] ?? '';
+      final sectionName = state.uri.queryParameters['name'] ?? '';
+      return PracticeNoteListScreen(
+        sectionId: sectionId,
+        sectionName: sectionName,
+      );
+    },
+  ),
+
+  // Practice Goal Settings
+  GoRoute(
+    path: AppRoutes.practiceGoalSettings,
+    name: 'practiceGoalSettings',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return PracticeGoalSettingScreen(studentId: studentId);
+    },
+  ),
+
+  // Practice Stats
+  GoRoute(
+    path: AppRoutes.practiceStats,
+    name: 'practiceStats',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return PracticeStatsScreen(studentId: studentId);
     },
   ),
 ];

@@ -11,6 +11,7 @@ import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart' show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
 import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
@@ -190,6 +191,18 @@ class _StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // Practice Goal Widget
+          GoalProgressWidget(
+            studentId: currentStudentId,
+            onSettingsTap: () {
+              context.push(
+                '${AppRoutes.practiceGoalSettings}?studentId=$currentStudentId',
+              );
+            },
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // Next Lesson Card
           _buildNextLessonCard(context),
 
@@ -212,10 +225,23 @@ class _StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Weekly Progress
-          Text('이번 주 연습 현황', style: AppTypography.headingMedium),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('이번 주 연습 현황', style: AppTypography.headingMedium),
+              TextButton(
+                onPressed: () {
+                  context.push(
+                    '${AppRoutes.practiceStats}?studentId=$currentStudentId',
+                  );
+                },
+                child: const Text('통계 보기'),
+              ),
+            ],
+          ),
           const SizedBox(height: AppSpacing.space3),
 
-          _buildWeeklyProgress(),
+          _buildWeeklyProgress(context, currentStudentId),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -364,12 +390,16 @@ class _StudentDashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildWeeklyProgress() {
+  Widget _buildWeeklyProgress(BuildContext context, String studentId) {
     final days = ['월', '화', '수', '목', '금', '토', '일'];
     final progress = [1.0, 0.8, 0.6, 0.0, 0.0, 0.0, 0.0]; // 0-1 scale
     final today = DateTime.now().weekday - 1; // 0-indexed
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        context.push('${AppRoutes.practiceStats}?studentId=$studentId');
+      },
+      child: Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -464,6 +494,7 @@ class _StudentDashboardTab extends ConsumerWidget {
             }),
           ),
         ],
+      ),
       ),
     );
   }

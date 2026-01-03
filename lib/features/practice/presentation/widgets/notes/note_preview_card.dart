@@ -1,0 +1,149 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
+import '../../../domain/entities/entities.dart';
+import '../../providers/practice_note_provider.dart';
+
+/// Preview card showing the latest note for a section
+class NotePreviewCard extends ConsumerWidget {
+  final String sectionId;
+  final VoidCallback onTap;
+
+  const NotePreviewCard({
+    super.key,
+    required this.sectionId,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notesAsync = ref.watch(sectionNotesProvider(sectionId));
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceSecondaryLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: notesAsync.when(
+          data: (notes) => _buildContent(notes),
+          loading: () => _buildLoading(),
+          error: (_, __) => _buildEmpty(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(List<PracticeNote> notes) {
+    if (notes.isEmpty) {
+      return _buildEmpty();
+    }
+
+    final latestNote = notes.first;
+
+    return Row(
+      children: [
+        Icon(
+          Icons.edit_note,
+          color: AppColors.primary,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '최근 연습노트',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(
+                    latestNote.timeText,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                latestNote.content,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textPrimaryLight,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        Icon(
+          Icons.chevron_right,
+          color: AppColors.textTertiaryLight,
+          size: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Row(
+      children: [
+        Icon(
+          Icons.edit_note,
+          color: AppColors.textTertiaryLight,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            '연습노트가 없습니다. 터치하여 추가하세요.',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ),
+        Icon(
+          Icons.chevron_right,
+          color: AppColors.textTertiaryLight,
+          size: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoading() {
+    return Row(
+      children: [
+        Icon(
+          Icons.edit_note,
+          color: AppColors.textTertiaryLight,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Container(
+            height: 16,
+            decoration: BoxDecoration(
+              color: AppColors.borderLight,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -9,6 +9,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../domain/entities/section_sort_type.dart';
+import '../providers/repertoire_archive_provider.dart';
+import '../providers/section_sort_provider.dart';
+import '../widgets/section_management/section_sort_dropdown.dart';
 
 /// Repertoire detail screen with date settings and aggregated stats
 class RepertoireDetailScreen extends ConsumerStatefulWidget {
@@ -51,6 +55,23 @@ class _RepertoireDetailScreenState
               onPressed: _saveChanges,
               child: const Text('저장'),
             ),
+          // More menu with archive option
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) => _handleMenuAction(value),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'archive',
+                child: Row(
+                  children: [
+                    Icon(Icons.inventory_2_outlined),
+                    SizedBox(width: 8),
+                    Text('아카이브로 이동'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: repertoireAsync.when(
@@ -307,6 +328,10 @@ class _RepertoireDetailScreenState
   }
 
   Widget _buildSectionsSection(PracticeRepertoire repertoire) {
+    // Watch sorted sections
+    final sortedSections =
+        ref.watch(sortedSectionsProvider(widget.repertoireId));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -325,8 +350,11 @@ class _RepertoireDetailScreenState
             ),
           ],
         ),
+        const SizedBox(height: AppSpacing.space2),
+        // Sort dropdown
+        SectionSortDropdown(repertoireId: widget.repertoireId),
         const SizedBox(height: AppSpacing.space3),
-        if (repertoire.sections.isEmpty)
+        if (sortedSections.isEmpty)
           Container(
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
@@ -360,13 +388,52 @@ class _RepertoireDetailScreenState
             ),
           )
         else
-          ...repertoire.sections.map((section) => _SectionListTile(
-                section: section,
-                repertoireId: widget.repertoireId,
-                studentId: widget.studentId,
-              )),
+          _buildSectionList(sortedSections),
       ],
     );
+  }
+
+  Widget _buildSectionList(List<PracticeSection> sections) {
+    final sortType = ref.watch(sectionSortTypeProvider);
+    final isCustomSort = sortType == SectionSortType.custom;
+
+    if (isCustomSort) {
+      // Reorderable list for custom sort
+      return ReorderableListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: sections.length,
+        buildDefaultDragHandles: false, // We'll add our own drag handle
+        onReorder: (oldIndex, newIndex) {
+          // Adjust newIndex for the remove-before-insert behavior
+          if (newIndex > oldIndex) newIndex--;
+          ref.read(sectionOrderNotifierProvider.notifier).reorderSections(
+                widget.repertoireId,
+                oldIndex,
+                newIndex,
+              );
+        },
+        itemBuilder: (context, index) {
+          final section = sections[index];
+          return _ReorderableSectionTile(
+            key: ValueKey(section.id),
+            index: index,
+            section: section,
+            repertoireId: widget.repertoireId,
+            studentId: widget.studentId,
+          );
+        },
+      );
+    } else {
+      // Normal list for other sort types
+      return Column(
+        children: sections.map((section) => _SectionListTile(
+              section: section,
+              repertoireId: widget.repertoireId,
+              studentId: widget.studentId,
+            )).toList(),
+      );
+    }
   }
 
   void _selectDate({required bool isStartDate}) {
@@ -440,6 +507,50 @@ class _RepertoireDetailScreenState
     context.push(
       '${AppRoutes.practiceRecording.replaceFirst(':repertoireId', widget.repertoireId)}'
       '?studentId=${widget.studentId}&name=${Uri.encodeComponent(repertoireName)}',
+    );
+  }
+
+  void _handleMenuAction(String action) {
+    switch (action) {
+      case 'archive':
+        _showArchiveDialog();
+        break;
+    }
+  }
+
+  void _showArchiveDialog() {
+    final repertoire =
+        ref.read(repertoireProvider(widget.repertoireId)).valueOrNull;
+    if (repertoire == null) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('아카이브'),
+        content: Text(
+            '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await ref
+                  .read(repertoireArchiveNotifierProvider.notifier)
+                  .archive(widget.repertoireId, widget.studentId);
+
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+              );
+              context.pop(); // Go back to repertoire list
+            },
+            child: const Text('아카이브'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -606,6 +717,145 @@ class _SectionListTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMiniStat({required IconData icon, required String value}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: AppColors.textSecondaryLight),
+          const SizedBox(width: 2),
+          Text(
+            value,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Reorderable section tile with drag handle
+class _ReorderableSectionTile extends StatelessWidget {
+  final int index;
+  final PracticeSection section;
+  final String repertoireId;
+  final String studentId;
+
+  const _ReorderableSectionTile({
+    super.key,
+    required this.index,
+    required this.section,
+    required this.repertoireId,
+    required this.studentId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          // Drag handle
+          ReorderableDragStartListener(
+            index: index,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space3,
+              ),
+              child: Icon(
+                Icons.drag_handle,
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ),
+
+          // Section content
+          Expanded(
+            child: InkWell(
+              onTap: () {
+                context.push(
+                  '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}'
+                  '?repertoireId=$repertoireId&studentId=$studentId',
+                );
+              },
+              borderRadius: const BorderRadius.horizontal(
+                right: Radius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: AppSpacing.space3,
+                  right: AppSpacing.space3,
+                  bottom: AppSpacing.space3,
+                ),
+                child: Row(
+                  children: [
+                    // Section info
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            section.pieceName,
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.space1),
+                          Text(
+                            section.measureRangeText,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Stats
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildMiniStat(
+                          icon: Icons.repeat,
+                          value: '${section.practiceCount}',
+                        ),
+                        const SizedBox(width: AppSpacing.space2),
+                        _buildMiniStat(
+                          icon: Icons.mic,
+                          value: '${section.recordings.length}',
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(width: AppSpacing.space2),
+                    Icon(
+                      Icons.chevron_right,
+                      color: AppColors.textTertiaryLight,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

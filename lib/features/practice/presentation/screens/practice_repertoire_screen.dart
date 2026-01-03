@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../providers/repertoire_archive_provider.dart';
 
 /// Main practice repertoire screen showing all repertoires and sections
 class PracticeRepertoireScreen extends ConsumerWidget {
@@ -25,9 +27,18 @@ class PracticeRepertoireScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('연습'),
         actions: [
+          // Archive button
+          IconButton(
+            icon: const Icon(Icons.inventory_2_outlined),
+            onPressed: () =>
+                context.push('${AppRoutes.practiceArchive}?studentId=$studentId'),
+            tooltip: '아카이브',
+          ),
+          // Add repertoire button
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => context.push('/practice/repertoire/add?studentId=$studentId'),
+            onPressed: () =>
+                context.push('/practice/repertoire/add?studentId=$studentId'),
             tooltip: '레퍼토리 추가',
           ),
         ],
@@ -175,6 +186,8 @@ class _RepertoireCard extends ConsumerWidget {
                   onSelected: (value) {
                     if (value == 'edit') {
                       // TODO: Edit repertoire
+                    } else if (value == 'archive') {
+                      _showArchiveConfirmation(context, ref);
                     } else if (value == 'delete') {
                       _showDeleteConfirmation(context, ref);
                     }
@@ -187,6 +200,16 @@ class _RepertoireCard extends ConsumerWidget {
                           Icon(Icons.edit, size: 20),
                           SizedBox(width: 8),
                           Text('수정'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'archive',
+                      child: Row(
+                        children: [
+                          Icon(Icons.inventory_2_outlined, size: 20),
+                          SizedBox(width: 8),
+                          Text('아카이브'),
                         ],
                       ),
                     ),
@@ -283,6 +306,38 @@ class _RepertoireCard extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showArchiveConfirmation(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('아카이브'),
+        content: Text(
+            '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await ref
+                  .read(repertoireArchiveNotifierProvider.notifier)
+                  .archive(repertoire.id, studentId);
+              ref.invalidate(studentRepertoiresProvider(studentId));
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+                );
+              }
+            },
+            child: const Text('아카이브'),
           ),
         ],
       ),

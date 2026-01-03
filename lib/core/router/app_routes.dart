@@ -42,6 +42,10 @@ class AppRoutes {
   static const practiceRecording = '/practice/recording/:repertoireId';
   static const addSection = '/practice/section/add';
   static const sectionDetail = '/practice/section/:id';
+  static const practiceArchive = '/practice/archive';
+  static const practiceNotes = '/practice/section/:sectionId/notes';
+  static const practiceGoalSettings = '/practice/goal/settings';
+  static const practiceStats = '/practice/stats';
 
   // Profile routes
   static const profile = '/profile';

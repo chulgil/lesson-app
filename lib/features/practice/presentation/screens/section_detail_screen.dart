@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -15,6 +17,7 @@ import '../../../../providers/recording/recording_provider.dart';
 import '../../../../providers/smart_recording/smart_recording_provider.dart';
 import '../../../../services/audio_trimmer_service.dart';
 import '../widgets/metronome/metronome.dart';
+import '../widgets/notes/note_preview_card.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';
@@ -153,6 +156,23 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         children: [
           // Section info card
           SectionInfoCard(section: section),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // Practice notes preview
+          Row(
+            children: [
+              Text(
+                '연습노트',
+                style: AppTypography.headingSmall,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          NotePreviewCard(
+            sectionId: section.id,
+            onTap: () => _navigateToNotes(section),
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -672,6 +692,14 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         );
       }
     }
+  }
+
+  void _navigateToNotes(PracticeSection section) {
+    final sectionName = '${section.pieceName} ${section.measureRangeText}';
+    context.push(
+      '${AppRoutes.practiceNotes.replaceFirst(':sectionId', section.id)}'
+      '?name=${Uri.encodeComponent(sectionName)}',
+    );
   }
 
   void _showDeleteConfirmation(BuildContext context) {

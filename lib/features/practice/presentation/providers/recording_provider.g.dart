@@ -86,7 +86,7 @@ final microphonePermissionProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef MicrophonePermissionRef = AutoDisposeFutureProviderRef<bool>;
-String _$recordingNotifierHash() => r'ef0e143fb6b045734f966b86fa1dca8179403e02';
+String _$recordingNotifierHash() => r'68efa7f660d65f88901c5b734fdb2e2a549385e8';
 
 /// Copied from Dart SDK
 class _SystemHash {

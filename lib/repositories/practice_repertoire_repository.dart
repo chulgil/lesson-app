@@ -17,6 +17,13 @@ abstract class PracticeRepertoireRepository {
   Future<PracticeRepertoire> updateRepertoire(PracticeRepertoire repertoire);
   Future<void> deleteRepertoire(String id);
 
+  // Archive methods
+  Future<List<PracticeRepertoire>> getActiveRepertoires(String studentId);
+  Future<List<PracticeRepertoire>> getArchivedRepertoires(String studentId);
+  Future<PracticeRepertoire> archiveRepertoire(String id);
+  Future<PracticeRepertoire> restoreRepertoire(String id);
+  Future<void> permanentlyDeleteRepertoire(String id);
+
   // Section methods
   Future<PracticeSection?> getSection(String id);
   Future<PracticeSection> createSection(PracticeSection section);
@@ -36,6 +43,11 @@ abstract class PracticeRepertoireRepository {
   Future<void> deleteRecording(String id);
   Future<PracticeSection> setRepresentativeRecording(
       String sectionId, String recordingId);
+
+  // Section order methods
+  Future<void> updateSectionOrders(
+      String repertoireId, List<String> sectionIds);
+  Future<PracticeSection> updateLastPracticedAt(String sectionId);
 }
 
 /// Mock implementation for development
@@ -819,6 +831,176 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           repertoires[i] = repertoire.copyWith(
             sections: updatedSections,
             updatedAt: DateTime.now(),
+          );
+          return updatedSection;
+        }
+      }
+    }
+    throw Exception('Section not found');
+  }
+
+  // Archive methods implementation
+  @override
+  Future<List<PracticeRepertoire>> getActiveRepertoires(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final repertoires = _repertoires[studentId] ?? [];
+    return repertoires.where((r) => !r.isArchived).toList();
+  }
+
+  @override
+  Future<List<PracticeRepertoire>> getArchivedRepertoires(String studentId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final repertoires = _repertoires[studentId] ?? [];
+    return repertoires.where((r) => r.isArchived).toList();
+  }
+
+  @override
+  Future<PracticeRepertoire> archiveRepertoire(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final now = DateTime.now();
+
+    for (final repertoires in _repertoires.values) {
+      final index = repertoires.indexWhere((r) => r.id == id);
+      if (index != -1) {
+        final updated = repertoires[index].copyWith(
+          isArchived: true,
+          archivedAt: now,
+          updatedAt: now,
+        );
+        repertoires[index] = updated;
+        return updated;
+      }
+    }
+    throw Exception('Repertoire not found');
+  }
+
+  @override
+  Future<PracticeRepertoire> restoreRepertoire(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final now = DateTime.now();
+
+    for (final repertoires in _repertoires.values) {
+      final index = repertoires.indexWhere((r) => r.id == id);
+      if (index != -1) {
+        final updated = repertoires[index].copyWith(
+          isArchived: false,
+          updatedAt: now,
+        );
+        // Clear archivedAt by recreating
+        final cleared = PracticeRepertoire(
+          id: updated.id,
+          studentId: updated.studentId,
+          name: updated.name,
+          description: updated.description,
+          startDate: updated.startDate,
+          endDate: updated.endDate,
+          sections: updated.sections,
+          createdAt: updated.createdAt,
+          updatedAt: now,
+          isArchived: false,
+          archivedAt: null,
+        );
+        repertoires[index] = cleared;
+        return cleared;
+      }
+    }
+    throw Exception('Repertoire not found');
+  }
+
+  @override
+  Future<void> permanentlyDeleteRepertoire(String id) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    for (final repertoires in _repertoires.values) {
+      final index = repertoires.indexWhere((r) => r.id == id);
+      if (index != -1) {
+        // Delete all recordings associated with this repertoire
+        final repertoire = repertoires[index];
+        for (final section in repertoire.sections) {
+          for (final recording in section.recordings) {
+            try {
+              final audioFile = File(recording.filePath);
+              if (await audioFile.exists()) {
+                await audioFile.delete();
+              }
+              final trimFile = File('${recording.filePath}.trim');
+              if (await trimFile.exists()) {
+                await trimFile.delete();
+              }
+              // Delete from Hive
+              final box = await _practiceRecordingsBox;
+              await box.delete(recording.id);
+            } catch (e) {
+              debugPrint('Failed to delete recording file: $e');
+            }
+          }
+        }
+        repertoires.removeAt(index);
+        return;
+      }
+    }
+  }
+
+  // Section order methods implementation
+  @override
+  Future<void> updateSectionOrders(
+      String repertoireId, List<String> sectionIds) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    for (final repertoires in _repertoires.values) {
+      final repIndex = repertoires.indexWhere((r) => r.id == repertoireId);
+      if (repIndex != -1) {
+        final repertoire = repertoires[repIndex];
+        final updatedSections = <PracticeSection>[];
+
+        for (int i = 0; i < sectionIds.length; i++) {
+          final sectionId = sectionIds[i];
+          try {
+            final section = repertoire.sections.firstWhere((s) => s.id == sectionId);
+            updatedSections.add(section.copyWith(sortOrder: i));
+          } catch (_) {
+            continue;
+          }
+        }
+
+        // Add any sections not in the list (shouldn't happen but safety)
+        for (final section in repertoire.sections) {
+          if (!sectionIds.contains(section.id)) {
+            updatedSections.add(section.copyWith(sortOrder: updatedSections.length));
+          }
+        }
+
+        repertoires[repIndex] = repertoire.copyWith(
+          sections: updatedSections,
+          updatedAt: DateTime.now(),
+        );
+        return;
+      }
+    }
+    throw Exception('Repertoire not found');
+  }
+
+  @override
+  Future<PracticeSection> updateLastPracticedAt(String sectionId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    final now = DateTime.now();
+
+    for (final repertoires in _repertoires.values) {
+      for (int i = 0; i < repertoires.length; i++) {
+        final repertoire = repertoires[i];
+        final sectionIndex =
+            repertoire.sections.indexWhere((s) => s.id == sectionId);
+        if (sectionIndex != -1) {
+          final section = repertoire.sections[sectionIndex];
+          final updatedSection = section.copyWith(
+            lastPracticedAt: now,
+            updatedAt: now,
+          );
+          final updatedSections = List<PracticeSection>.from(repertoire.sections);
+          updatedSections[sectionIndex] = updatedSection;
+          repertoires[i] = repertoire.copyWith(
+            sections: updatedSections,
+            updatedAt: now,
           );
           return updatedSection;
         }

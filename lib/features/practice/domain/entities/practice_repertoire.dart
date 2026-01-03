@@ -3,6 +3,8 @@
 
 import 'package:hive/hive.dart';
 
+import 'practice_note.dart';
+
 part 'practice_repertoire.g.dart';
 
 /// Daily practice status for a section on a specific date
@@ -140,9 +142,12 @@ class PracticeSection {
   final int totalPracticeSeconds;
   final List<PracticeRecording> recordings;
   final List<DailyPracticeStatus> dailyStatuses; // Daily completion tracking
+  final List<PracticeNote> notes; // Practice notes for this section
   final DateTime createdAt;
   final DateTime? updatedAt;
   final DateTime? completedAt;
+  final int? sortOrder; // Custom sort order for drag and drop
+  final DateTime? lastPracticedAt; // Last practice time for sorting
 
   const PracticeSection({
     required this.id,
@@ -157,9 +162,12 @@ class PracticeSection {
     this.totalPracticeSeconds = 0,
     this.recordings = const [],
     this.dailyStatuses = const [],
+    this.notes = const [],
     required this.createdAt,
     this.updatedAt,
     this.completedAt,
+    this.sortOrder,
+    this.lastPracticedAt,
   });
 
   /// Get measure range display string (e.g., "1~4 마디")
@@ -186,6 +194,26 @@ class PracticeSection {
       return '$hours시간 $minutes분';
     }
     return '$minutes분';
+  }
+
+  /// Get the latest note
+  PracticeNote? get latestNote {
+    if (notes.isEmpty) return null;
+    return notes.reduce((a, b) => a.createdAt.isAfter(b.createdAt) ? a : b);
+  }
+
+  /// Get notes grouped by date
+  Map<String, List<PracticeNote>> get notesByDate {
+    final grouped = <String, List<PracticeNote>>{};
+    for (final note in notes) {
+      final dateKey = note.dateText;
+      grouped.putIfAbsent(dateKey, () => []).add(note);
+    }
+    // Sort each group by time (newest first)
+    for (final list in grouped.values) {
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return grouped;
   }
 
   /// Check if this section is completed for a specific date
@@ -228,9 +256,12 @@ class PracticeSection {
     int? totalPracticeSeconds,
     List<PracticeRecording>? recordings,
     List<DailyPracticeStatus>? dailyStatuses,
+    List<PracticeNote>? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? completedAt,
+    int? sortOrder,
+    DateTime? lastPracticedAt,
   }) {
     return PracticeSection(
       id: id ?? this.id,
@@ -245,9 +276,12 @@ class PracticeSection {
       totalPracticeSeconds: totalPracticeSeconds ?? this.totalPracticeSeconds,
       recordings: recordings ?? this.recordings,
       dailyStatuses: dailyStatuses ?? this.dailyStatuses,
+      notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       completedAt: completedAt ?? this.completedAt,
+      sortOrder: sortOrder ?? this.sortOrder,
+      lastPracticedAt: lastPracticedAt ?? this.lastPracticedAt,
     );
   }
 
@@ -273,6 +307,8 @@ class PracticeRepertoire {
   final List<PracticeSection> sections;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final bool isArchived; // Archive status
+  final DateTime? archivedAt; // When this repertoire was archived
 
   const PracticeRepertoire({
     required this.id,
@@ -284,7 +320,12 @@ class PracticeRepertoire {
     this.sections = const [],
     required this.createdAt,
     this.updatedAt,
+    this.isArchived = false,
+    this.archivedAt,
   });
+
+  /// Check if this repertoire is active (not archived)
+  bool get isActive => !isArchived;
 
   /// Get completion rate (0.0 to 1.0)
   double get completionRate {
@@ -361,6 +402,8 @@ class PracticeRepertoire {
     List<PracticeSection>? sections,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? isArchived,
+    DateTime? archivedAt,
   }) {
     return PracticeRepertoire(
       id: id ?? this.id,
@@ -372,6 +415,8 @@ class PracticeRepertoire {
       sections: sections ?? this.sections,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isArchived: isArchived ?? this.isArchived,
+      archivedAt: archivedAt ?? this.archivedAt,
     );
   }
 
