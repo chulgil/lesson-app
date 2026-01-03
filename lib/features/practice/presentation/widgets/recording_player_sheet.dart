@@ -8,6 +8,7 @@ import '../../../../models/recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/recording/recording_provider.dart';
 import '../../../../services/audio_player_service.dart';
+import '../../../../services/audio_trimmer_service.dart';
 import 'recording_waveform.dart' show ABLoop, ZoomableWaveformProgressBar;
 
 /// Playback speed options.
@@ -70,6 +71,10 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<PlaybackState>? _stateSub;
 
+  // Trim metadata offset (contentStart in raw file)
+  Duration _trimOffset = Duration.zero;
+  Duration _trimEnd = Duration.zero;
+
   // Cache player reference to avoid using ref after dispose
   late final AudioPlayerService _player;
 
@@ -88,13 +93,32 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     // Reset playback speed to default (1.0x) for new recording
     await _player.setSpeed(1.0);
 
-    // Listen to position updates
-    _positionSub = _player.positionStream.listen((pos) {
-      setState(() => _position = pos);
+    // Load trim metadata (fail-safe: ignore errors)
+    await _loadTrimMetadata();
 
-      // Handle A-B loop
-      if (_abLoop.isActive && pos >= _abLoop.pointB!) {
-        _player.seek(_abLoop.pointA!);
+    // Seek to content start if trimmed
+    if (_trimOffset > Duration.zero) {
+      await _player.seek(_trimOffset);
+    }
+
+    // Listen to position updates
+    _positionSub = _player.positionStream.listen((rawPos) {
+      // Convert raw position to display position (subtract trim offset)
+      var displayPos = rawPos - _trimOffset;
+      // Clamp to valid range
+      if (displayPos < Duration.zero) displayPos = Duration.zero;
+      if (displayPos > _duration) displayPos = _duration;
+      setState(() => _position = displayPos);
+
+      // Stop at content end if trimmed
+      if (_trimEnd > Duration.zero && rawPos >= _trimEnd) {
+        _player.pause();
+        _player.seek(_trimOffset); // Reset to content start
+      }
+
+      // Handle A-B loop (using display positions, convert back for seek)
+      if (_abLoop.isActive && displayPos >= _abLoop.pointB!) {
+        _player.seek(_abLoop.pointA! + _trimOffset);
       }
     });
 
@@ -104,6 +128,26 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
         _isPlaying = state == PlaybackState.playing;
       });
     });
+  }
+
+  /// Load trim metadata from companion .trim file.
+  Future<void> _loadTrimMetadata() async {
+    try {
+      final metadata = await AudioTrimmerService.instance
+          .readTrimMetadata(widget.recording.localPath);
+      if (metadata != null && metadata.hasTrimming) {
+        _trimOffset = metadata.contentStart;
+        _trimEnd = metadata.contentEnd;
+        // Update duration to match actual content duration from metadata
+        setState(() {
+          _duration = metadata.contentDuration;
+        });
+        debugPrint('Loaded trim metadata: offset=${_trimOffset.inMilliseconds}ms, end=${_trimEnd.inMilliseconds}ms, duration=${_duration.inMilliseconds}ms');
+      }
+    } catch (e) {
+      // Fail-safe: just use full file
+      debugPrint('Could not load trim metadata: $e');
+    }
   }
 
   @override
@@ -134,10 +178,13 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
   }
 
   Future<void> _seek(double progress) async {
-    final newPos = Duration(
+    // Calculate display position from progress
+    final displayPos = Duration(
       milliseconds: (_duration.inMilliseconds * progress).round(),
     );
-    await _player.seek(newPos);
+    // Convert to raw position by adding trim offset
+    final rawPos = displayPos + _trimOffset;
+    await _player.seek(rawPos);
   }
 
   /// Toggle point A: set if not set, clear if already set
@@ -195,8 +242,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     _player.setSpeed(speed.value);
   }
 
-  /// Handle A-B marker drag
+  /// Handle A-B marker drag (using display positions)
   void _handleMarkerDrag(bool isA, double newProgress) {
+    // A-B loop uses display positions (0 to _duration)
     final newPosition = Duration(
       milliseconds: (_duration.inMilliseconds * newProgress).round(),
     );

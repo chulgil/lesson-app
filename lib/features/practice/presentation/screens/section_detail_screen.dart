@@ -460,10 +460,20 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       );
     }
 
-    // Calculate actual duration after trimming
-    final actualDuration = trimResult?.hasTrimming == true
-        ? _recordingSeconds - trimResult!.trimmedStart.inSeconds - trimResult.trimmedEnd.inSeconds
-        : _recordingSeconds;
+    // Calculate actual duration after trimming (start/end + middle silence)
+    int actualDuration = _recordingSeconds;
+    if (trimResult?.hasTrimming == true) {
+      actualDuration -= trimResult!.trimmedStart.inSeconds;
+      actualDuration -= trimResult.trimmedEnd.inSeconds;
+    }
+    // Also subtract middle silence periods
+    if (smartRecordingState.silencePeriods.isNotEmpty) {
+      final middleSilenceSeconds = smartRecordingState.silencePeriods
+          .fold<int>(0, (sum, period) => sum + period.duration.inSeconds);
+      actualDuration -= middleSilenceSeconds;
+    }
+    // Ensure duration is at least 1 second
+    if (actualDuration < 1) actualDuration = 1;
 
     try {
       await ref.read(recordingCrudProvider.notifier).createRecording(
