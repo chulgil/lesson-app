@@ -151,7 +151,18 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section info card
-          SectionInfoCard(section: section),
+          SectionInfoCard(
+            section: section,
+            onEditTap: () {
+              context.push(
+                AppRoutes.editSection.replaceAll(':id', section.id),
+                extra: {
+                  'repertoireId': widget.repertoireId,
+                  'studentId': widget.studentId,
+                },
+              );
+            },
+          ),
 
           const SizedBox(height: AppSpacing.space4),
 

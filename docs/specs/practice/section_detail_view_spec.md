@@ -351,13 +351,14 @@ lib/features/practice/
 - [x] section_detail_screen에 필터 적용
 - [x] "대표녹음 있음" 배지 제거 (필터 드롭다운으로 대체)
 
-### Phase 2: 연습 통계
-- [ ] formattedTotalTime 개선
-- [ ] practice_stats_card 업데이트
+### Phase 2: 연습 통계 ✅ 완료
+- [x] formattedTotalTime 개선
+- [x] practice_stats_card 업데이트
 
-### Phase 3: 섹션 정보 카드 개선
-- [ ] 반복 정보 표시 추가
-- [ ] 기간 표시 추가
+### Phase 3: 섹션 정보 카드 개선 ✅ 완료
+- [x] 반복 정보 표시 추가 (isRepeat → "매일 반복", repeatCount → "N회 반복")
+- [x] 기간 표시 추가 (startDate ~ endDate/진행중)
+- [x] 편집 버튼 추가 (onEditTap → EditSectionScreen 이동)
 
 ---
 
@@ -369,3 +370,4 @@ lib/features/practice/
 | 1.1 | 2026-01-04 | Phase 1 구현 완료 - RecordingFilterType, RecordingFilterDropdown, 필터 로직 적용 |
 | 1.2 | 2026-01-04 | 레이아웃 변경 - 연습 완료 UI를 녹음 섹션 위로 이동, 필터 기본값을 '당일'로 표시 |
 | 1.3 | 2026-01-04 | DateRow 위젯 개선 - X버튼 터치 인식 개선 (TextButton 사용), 날짜 선택 Material 달력으로 통일 |
+| 1.4 | 2026-01-04 | Phase 2 & 3 구현 완료 - 섹션 정보 카드에 반복 정보, 기간 표시, 편집 버튼 추가 (Issue #20) |
