@@ -62,6 +62,7 @@ class StabilityFilter {
   double _smoothedFrequency = 0;
   int _stableCount = 0;
   double _lastStableFrequency = 0;
+  double _lastRawFrequency = 0; // Track raw frequency before correction
 
   /// Process a new pitch detection result.
   ///
@@ -125,24 +126,38 @@ class StabilityFilter {
 
   /// Correct octave errors where YIN detects 2x the actual frequency.
   ///
-  /// This commonly happens at high frequencies (above ~1500Hz).
-  /// YIN algorithm often detects 2nd harmonic instead of fundamental.
-  /// Uses ratio comparison only - if frequency suddenly jumps to 2x,
-  /// it's likely an octave error.
+  /// YIN algorithm sometimes detects 2nd harmonic instead of fundamental.
+  /// Uses multiple strategies:
+  /// 1. Ratio comparison with previous stable frequency
+  /// 2. Continuity check with previous raw frequency
   double _correctOctaveError(double frequency) {
-    // Only use ratio comparison to detect octave errors
-    // This allows distinguishing between:
-    // - Playing G6 (1568Hz) and YIN detects 3136Hz (error, should correct)
-    // - Playing G7 (3136Hz) directly (not an error, should not correct)
+    final halfFreq = frequency / 2;
 
-    if (_lastStableFrequency > 0 && frequency >= 1400) {
+    // Strategy 1: Compare with last stable frequency
+    if (_lastStableFrequency > 0) {
       final ratio = frequency / _lastStableFrequency;
       // If ratio is between 1.9 and 2.1, it's likely an octave error
       if (ratio >= 1.9 && ratio <= 2.1) {
-        return frequency / 2;
+        _lastRawFrequency = frequency;
+        return halfFreq;
       }
     }
 
+    // Strategy 2: Compare both f and f/2 with previous raw frequency
+    // Choose the one that's closer (more continuous)
+    if (_lastRawFrequency > 0) {
+      final diffFull = (frequency - _lastRawFrequency).abs();
+      final diffHalf = (halfFreq - _lastRawFrequency).abs();
+
+      // If f/2 is significantly closer to previous frequency, use it
+      // This catches cases where YIN suddenly jumps to 2x
+      if (diffHalf < diffFull * 0.5 && halfFreq > 50) {
+        _lastRawFrequency = halfFreq;
+        return halfFreq;
+      }
+    }
+
+    _lastRawFrequency = frequency;
     return frequency;
   }
 
@@ -178,6 +193,7 @@ class StabilityFilter {
     _stableCount = 0;
     _smoothedFrequency = 0;
     _lastStableFrequency = 0;
+    _lastRawFrequency = 0;
   }
 
   /// Reset the filter state.

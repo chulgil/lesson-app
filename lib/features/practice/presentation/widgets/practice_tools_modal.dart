@@ -353,32 +353,65 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
   Widget build(BuildContext context) {
     final tunerState = ref.watch(tunerProvider);
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.space6,
-        vertical: AppSpacing.space4,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Circular tuner with cat in center - 2x larger size
-          CircularTunerIndicator(
-            size: 450,
-            centerChild: const TunerCatIndicator(size: 180),
-          ),
-          SizedBox(height: AppSpacing.space6),
+    return Column(
+      children: [
+        // Main tuner area - responsive to screen size
+        Expanded(
+          child: LayoutBuilder(
+              builder: (context, constraints) {
+                final availableWidth = constraints.maxWidth;
+                final availableHeight = constraints.maxHeight;
 
-          // Info bar
-          const TunerInfoBar(),
-          SizedBox(height: AppSpacing.space6),
+                // Use the smaller dimension with padding
+                final availableSize = (availableWidth < availableHeight
+                    ? availableWidth
+                    : availableHeight) - 32; // 16px padding each side
 
-          // Start/Stop button
-          _TunerButton(
+                // Circle size fills available space (indicators are inside)
+                final circleSize = availableSize * 1.1; // 110% for circle (bigger for font 72)
+                final catSize = circleSize * 0.40; // Cat is 40% of circle (smaller)
+
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Circle with cat (no note inside, speech bubble next to cat)
+                    CircularTunerIndicator(
+                      size: circleSize,
+                      centerChild: TunerCatIndicator(
+                        size: catSize,
+                        showNote: false, // Don't show note inside cat
+                        showSpeechBubble: true, // Show speech bubble next to cat
+                      ),
+                    ),
+                    // Current note display (overlaid below cat face)
+                    Positioned(
+                      bottom: circleSize * 0.05, // Lower position for note display
+                      child: _CurrentNoteDisplay(scale: circleSize / 280), // Scale based on circle size
+                    ),
+                  ],
+                );
+              },
+            ),
+        ),
+
+        SizedBox(height: AppSpacing.space4),
+
+        // Info bar
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.space6),
+          child: const TunerInfoBar(),
+        ),
+        SizedBox(height: AppSpacing.space4),
+
+        // Start/Stop button
+        Padding(
+          padding: EdgeInsets.only(bottom: AppSpacing.space6),
+          child: _TunerButton(
             isListening: tunerState.isListening,
             onPressed: () => ref.read(tunerProvider.notifier).toggle(),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -418,6 +451,65 @@ class _TunerButton extends StatelessWidget {
           color: Colors.white,
         ),
       ),
+    );
+  }
+}
+
+/// Current note display widget (fixed position outside circle).
+class _CurrentNoteDisplay extends ConsumerWidget {
+  const _CurrentNoteDisplay({this.scale = 1.0});
+
+  final double scale;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tunerState = ref.watch(tunerProvider);
+    final currentNote = tunerState.currentNote;
+    final isPerfect = tunerState.isPerfect;
+
+    // Base font sizes (will be scaled)
+    final noteFontSize = 72 * scale;
+    final octaveFontSize = 42 * scale;
+
+    if (currentNote == null) {
+      // No note detected - show placeholder dash
+      return Text(
+        '—',
+        style: TextStyle(
+          fontSize: noteFontSize,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey[400],
+        ),
+      );
+    }
+
+    final noteColor = isPerfect ? Colors.green : AppColors.primary;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        // Note name
+        Text(
+          currentNote.name.sharpName,
+          style: TextStyle(
+            fontSize: noteFontSize,
+            fontWeight: FontWeight.bold,
+            color: noteColor,
+          ),
+        ),
+        // Octave
+        Text(
+          '${currentNote.octave}',
+          style: TextStyle(
+            fontSize: octaveFontSize,
+            fontWeight: FontWeight.w600,
+            color: noteColor.withValues(alpha: 0.7),
+          ),
+        ),
+        // Cent display removed - shown in TunerInfoBar below
+      ],
     );
   }
 }

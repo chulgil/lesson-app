@@ -59,9 +59,10 @@ class CircularTunerIndicator extends ConsumerWidget {
       width: size,
       height: size,
       child: Stack(
+        clipBehavior: Clip.none, // Allow indicators to overflow outside
         alignment: Alignment.center,
         children: [
-          // Background circle
+          // Background circle (centered, original size)
           CustomPaint(
             size: Size(size, size),
             painter: _CircleBackgroundPainter(),
@@ -70,6 +71,7 @@ class CircularTunerIndicator extends ConsumerWidget {
           // Note labels around the circle
           for (var i = 0; i < NoteName.values.length; i++)
             _NoteLabel(
+              key: ValueKey('note_${i}_$size'), // Force rebuild on size change
               note: NoteName.values[i],
               index: i,
               totalNotes: NoteName.values.length,
@@ -88,13 +90,8 @@ class CircularTunerIndicator extends ConsumerWidget {
               circleSize: size,
             ),
 
-          // Center content
-          if (centerChild != null)
-            SizedBox(
-              width: size * 0.45,
-              height: size * 0.45,
-              child: centerChild,
-            ),
+          // Center content (uses its own size, not constrained)
+          if (centerChild != null) centerChild!,
         ],
       ),
     );
@@ -106,7 +103,7 @@ class _CircleBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 30; // Leave room for note labels
+    final radius = size.width / 2 - 10; // Circle close to edge (1.4x bigger)
 
     final paint = Paint()
       ..color = TunerColors.circleStroke
@@ -123,6 +120,7 @@ class _CircleBackgroundPainter extends CustomPainter {
 /// Individual note label widget.
 class _NoteLabel extends StatelessWidget {
   const _NoteLabel({
+    super.key,
     required this.note,
     required this.index,
     required this.totalNotes,
@@ -145,7 +143,7 @@ class _NoteLabel extends StatelessWidget {
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
     final angle = (2 * math.pi * index / totalNotes) - (math.pi / 2);
-    final radius = circleSize / 2 - 45; // Position near edge (adjusted for larger buttons)
+    final radius = circleSize / 2 - 25; // Position inside the circle
 
     final x = radius * math.cos(angle);
     final y = radius * math.sin(angle);
@@ -160,14 +158,27 @@ class _NoteLabel extends StatelessWidget {
         ? TunerColors.accidentalNoteActive
         : TunerColors.naturalNoteActive;
 
+    // Scale sizes based on circle size (base size 280), increased by 1.2x
+    final scale = circleSize / 280.0;
+    final activeFontSize = 16.8 * scale;  // 14 * 1.2
+    final inactiveFontSize = 14.4 * scale;  // 12 * 1.2
+    final horizontalPadding = 10.8 * scale;  // 9 * 1.2
+    final verticalPadding = 6.0 * scale;  // 5 * 1.2
+    final borderRadius = 6.0 * scale;  // 5 * 1.2
+
+    // Debug: print circle size
+    // debugPrint('NoteLabel $index: circleSize=$circleSize, scale=$scale, fontSize=$inactiveFontSize');
+
     return Transform.translate(
       offset: Offset(x, y),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
+        ),
         decoration: BoxDecoration(
           color: isActive ? activeColor : baseColor.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(borderRadius),
           border: isActive
               ? Border.all(
                   color: isPerfect ? TunerColors.glowPerfect : activeColor,
@@ -178,8 +189,8 @@ class _NoteLabel extends StatelessWidget {
               ? [
                   BoxShadow(
                     color: TunerColors.glowPerfect,
-                    blurRadius: 15,
-                    spreadRadius: 3,
+                    blurRadius: 15 * scale,
+                    spreadRadius: 3 * scale,
                   ),
                 ]
               : null,
@@ -187,7 +198,7 @@ class _NoteLabel extends StatelessWidget {
         child: Text(
           displayText,
           style: TextStyle(
-            fontSize: isActive ? 22 : 18,
+            fontSize: isActive ? activeFontSize : inactiveFontSize,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             color: isActive ? Colors.white : Colors.grey[600],
           ),
@@ -250,10 +261,13 @@ class _GlowEffectState extends State<_GlowEffect>
 
   @override
   Widget build(BuildContext context) {
-    // Calculate position
+    // Scale based on circle size (base size 280)
+    final scale = widget.circleSize / 280.0;
+
+    // Calculate position (inside the circle)
     final angle =
         (2 * math.pi * widget.noteIndex / widget.totalNotes) - (math.pi / 2);
-    final radius = widget.circleSize / 2 - 25;
+    final radius = widget.circleSize / 2 - (25 * scale);
 
     final x = radius * math.cos(angle);
     final y = radius * math.sin(angle);
@@ -264,15 +278,15 @@ class _GlowEffectState extends State<_GlowEffect>
         return Transform.translate(
           offset: Offset(x, y),
           child: Container(
-            width: 50,
-            height: 30,
+            width: 50 * scale,
+            height: 30 * scale,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8 * scale),
               boxShadow: [
                 BoxShadow(
                   color: TunerColors.glowPerfect.withValues(alpha: _animation.value),
-                  blurRadius: 20 * _animation.value,
-                  spreadRadius: 5 * _animation.value,
+                  blurRadius: 20 * scale * _animation.value,
+                  spreadRadius: 5 * scale * _animation.value,
                 ),
               ],
             ),

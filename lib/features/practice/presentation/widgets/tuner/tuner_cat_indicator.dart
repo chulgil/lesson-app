@@ -67,9 +67,13 @@ class TunerCatIndicator extends ConsumerStatefulWidget {
   const TunerCatIndicator({
     super.key,
     this.size = 120,
+    this.showNote = true,
+    this.showSpeechBubble = false, // Show speech bubble next to cat
   });
 
   final double size;
+  final bool showNote; // Whether to show current note inside cat area
+  final bool showSpeechBubble; // Whether to show speech bubble next to cat face
 
   @override
   ConsumerState<TunerCatIndicator> createState() => _TunerCatIndicatorState();
@@ -103,7 +107,7 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   static const _scaleStartSeconds = 1.0; // Cat grows after 1 second
   static const _particleStartSeconds = 2.0; // 1 second after scale starts
   static const _starburstStartSeconds = 6.0; // 4 seconds after particles start
-  static const _maxScale = 1.5;
+  static const _maxScale = 1.25; // 1.04 * 1.2 = 1.248 ≈ 1.25
   static const _maxParticles = 500;
 
   // Starburst animation
@@ -156,20 +160,20 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
 
     // Ecstasy bounce: slow bounce from below like floating up with joy
     _ecstasyController = AnimationController(
-      duration: const Duration(milliseconds: 3500),
+      duration: const Duration(milliseconds: 5000),
       vsync: this,
     );
-    // Scale animation for subtle size change
+    // Scale animation: gradually grow from 1.0 to 1.15 and back
     _ecstasyAnimation = TweenSequence<double>([
-      // Slowly rise with subtle scale
+      // Slowly grow bigger
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.08)
+        tween: Tween<double>(begin: 1.0, end: 1.15)
             .chain(CurveTween(curve: Curves.easeOutQuad)),
         weight: 50,
       ),
-      // Gentle settle back
+      // Slowly shrink back
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.08, end: 1.0)
+        tween: Tween<double>(begin: 1.15, end: 1.0)
             .chain(CurveTween(curve: Curves.easeInOutQuad)),
         weight: 50,
       ),
@@ -179,14 +183,14 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     _ecstasyYAnimation = TweenSequence<double>([
       // Float up from below
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: -12.0)
+        tween: Tween<double>(begin: 0.0, end: -15.0)
             .chain(CurveTween(curve: Curves.easeOutQuad)),
         weight: 50,
       ),
-      // Gentle bounce back down
+      // Gentle float back down
       TweenSequenceItem(
-        tween: Tween<double>(begin: -12.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.bounceOut)),
+        tween: Tween<double>(begin: -15.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOutQuad)),
         weight: 50,
       ),
     ]).animate(_ecstasyController);
@@ -279,8 +283,8 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     // This ensures particles appear behind the semi-transparent cat face
     final startRadius = catRadius * 1.1;
 
-    // Max radius (well beyond the circular tuner edge)
-    final maxRadius = widget.size * 1.2; // Far past the circle edge
+    // Max radius (extends to curtain layer edge)
+    final maxRadius = widget.size * 2.0; // Match curtain coverage
 
     // Random angle for radial direction
     final angle = _random.nextDouble() * math.pi * 2;
@@ -390,8 +394,26 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
       width: widget.size,
       height: widget.size,
       child: Stack(
+        clipBehavior: Clip.none, // Allow speech bubble to overflow
         alignment: Alignment.center,
         children: [
+          // Speech bubble above cat head (Layer 0 - behind starburst and hearts)
+          if (widget.showSpeechBubble)
+            Positioned(
+              top: -catSize * 0.3, // Above cat head
+              left: 0,
+              right: 0,
+              child: Center(
+                child: _CatSpeechBubble(
+                  isListening: tunerState.isListening,
+                  hasNote: tunerState.currentNote != null,
+                  isPerfect: isPerfect,
+                  comboTier: tier,
+                  scale: (widget.size / 120) / 1.4, // 1.4x smaller
+                ),
+              ),
+            ),
+
           // Rotating starburst (behind everything) - grows to cover screen
           if (_showStarburst)
             Positioned.fill(
@@ -410,12 +432,12 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                     // Size progress: 0 to 1 over 5 seconds
                     final sizeProgress = (starburstMs / 5000.0).clamp(0.0, 1.0);
 
-                    // Color progress: 0 to 0.9 over 8 seconds (all yellow at 8s)
+                    // Color progress: 0 to 1.0 over 8 seconds (all yellow at 8s)
                     // Phase 1 (0-2.7s): pattern with transparent
                     // Phase 2 (2.7-5.3s): transparent disappears
                     // Phase 3 (5.3-8s): white becomes yellow
                     // Stays yellow while pitch is accurate
-                    final colorProgress = ((starburstMs / 8000.0) * 0.9).clamp(0.0, 0.9);
+                    final colorProgress = (starburstMs / 8000.0).clamp(0.0, 1.0);
 
                     // Track fade out when pitch becomes inaccurate
                     if (!isPerfect && _showStarburst) {
@@ -505,28 +527,29 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                 ),
               ),
 
-              // Status message speech bubble
-              if (showExtras) ...[
-                const SizedBox(height: 8),
-                _StatusBubble(
-                  isListening: tunerState.isListening,
-                  hasNote: tunerState.currentNote != null,
-                  isPerfect: isPerfect,
-                ),
-              ],
-
-              // Cent display - only if enough space
-              if (tunerState.currentNote != null && showExtras) ...[
+              // Status message or current note display with cent
+              if (showExtras && widget.showNote) ...[
                 const SizedBox(height: 4),
-                _CentDisplay(
-                  centDeviation: tunerState.centDeviation,
-                  isPerfect: isPerfect,
-                ),
+                if (tunerState.currentNote != null)
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: _NoteWithCent(
+                      note: tunerState.currentNote!,
+                      isPerfect: isPerfect,
+                    ),
+                  )
+                else
+                  _StatusBubble(
+                    isListening: tunerState.isListening,
+                    hasNote: false,
+                    isPerfect: isPerfect,
+                  ),
               ],
             ],
               ),
             ),
           ),
+
         ],
       ),
     );
@@ -591,12 +614,12 @@ class _StarburstPainter extends CustomPainter {
 
     List<Color> colors;
 
-    if (colorProgress < 0.3) {
-      // Phase 1: Initial pattern T25%, W45%, Y30% per quadrant
+    if (colorProgress < 0.33) {
+      // Phase 1 (0-2.7s): Initial pattern T25%, W50%, Y25% per quadrant
       colors = List.generate(beamCount, (i) => getPatternColor(i, overallOpacity));
-    } else if (colorProgress < 0.6) {
-      // Phase 2: Transparent disappears, filled with white/yellow
-      final t = ((colorProgress - 0.3) / 0.3).clamp(0.0, 1.0);
+    } else if (colorProgress < 0.67) {
+      // Phase 2 (2.7-5.3s): Transparent disappears, filled with white/yellow
+      final t = ((colorProgress - 0.33) / 0.34).clamp(0.0, 1.0);
       colors = List.generate(beamCount, (i) {
         if (isTransparentPosition(i)) {
           // Transparent becomes yellow gradually
@@ -607,9 +630,9 @@ class _StarburstPainter extends CustomPainter {
           return Colors.yellow.withValues(alpha: overallOpacity);
         }
       });
-    } else if (colorProgress < 0.9) {
-      // Phase 3: White becomes yellow - all fills with yellow
-      final t = ((colorProgress - 0.6) / 0.3).clamp(0.0, 1.0);
+    } else {
+      // Phase 3 (5.3-8s): White becomes yellow - all fills with yellow
+      final t = ((colorProgress - 0.67) / 0.33).clamp(0.0, 1.0);
       colors = List.generate(beamCount, (i) {
         if (isWhitePosition(i)) {
           // Blend from white to yellow
@@ -618,15 +641,21 @@ class _StarburstPainter extends CustomPainter {
           return Colors.yellow.withValues(alpha: overallOpacity);
         }
       });
-    } else {
-      // Phase 4: All yellow (stays until pitch becomes inaccurate)
-      colors = List.generate(
-        beamCount,
-        (_) => Colors.yellow.withValues(alpha: overallOpacity),
-      );
+    }
+
+    // When nearly all yellow (8s+), draw a solid filled circle
+    if (colorProgress >= 0.98) {
+      final paint = Paint()
+        ..color = Colors.yellow.withValues(alpha: overallOpacity)
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, radius, paint);
+      return;
     }
 
     final anglePerBeam = math.pi * 2 / beamCount;
+
+    // Beam width increases as we approach all yellow (0.85 -> 1.0)
+    final beamWidthRatio = 0.85 + (colorProgress * 0.15);
 
     for (var i = 0; i < beamCount; i++) {
       final baseAngle = i * anglePerBeam + rotation;
@@ -639,12 +668,12 @@ class _StarburstPainter extends CustomPainter {
         ..color = color
         ..style = PaintingStyle.fill;
 
-      // Draw straight triangular beam
+      // Draw straight triangular beam (width increases over time)
       final path = Path();
       path.moveTo(center.dx, center.dy);
 
       final angle1 = baseAngle;
-      final angle2 = baseAngle + anglePerBeam * 0.85;
+      final angle2 = baseAngle + anglePerBeam * beamWidthRatio;
 
       path.lineTo(
         center.dx + math.cos(angle1) * radius,
@@ -783,6 +812,75 @@ class _StatusBubble extends StatelessWidget {
         message,
         style: TextStyle(
           fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+}
+
+/// Speech bubble that appears next to cat face.
+class _CatSpeechBubble extends StatelessWidget {
+  const _CatSpeechBubble({
+    required this.isListening,
+    this.hasNote = false,
+    this.isPerfect = false,
+    this.comboTier = ComboTier.none,
+    this.scale = 1.0,
+  });
+
+  final bool isListening;
+  final bool hasNote;
+  final bool isPerfect;
+  final ComboTier comboTier;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    String message;
+    Color backgroundColor;
+    Color textColor;
+
+    if (!isListening) {
+      message = '마이크를 켜주세요';
+      backgroundColor = Colors.grey[200]!;
+      textColor = Colors.grey[600]!;
+    } else if (!hasNote) {
+      message = '소리 감지 대기...';
+      backgroundColor = const Color(0xFFB8E3C8); // Light green
+      textColor = Colors.grey[600]!;
+    } else if (isPerfect) {
+      // Use combo message if available
+      message = comboTier != ComboTier.none ? comboTier.message : '완벽해요! 🎵';
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    } else {
+      message = '조금만 더...';
+      backgroundColor = Colors.orange[50]!;
+      textColor = Colors.orange[800]!;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12 * scale,
+        vertical: 8 * scale,
+      ),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20 * scale), // More rounded
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        message,
+        style: TextStyle(
+          fontSize: 10 * scale,
           fontWeight: FontWeight.w600,
           color: textColor,
         ),
@@ -941,19 +1039,30 @@ class _CatFacePainter extends CustomPainter {
   }
 
   void _drawEcstaticEye(Canvas canvas, Offset center, double radius, Paint paint) {
-    // Ecstatic eyes: tighter curve (more squeezed happy look)
-    final thickerPaint = Paint()
+    // Ecstatic eyes: wave-like shape (~~) for dreamy/ecstatic look
+    final wavePaint = Paint()
       ..color = paint.color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5
+      ..strokeWidth = 3.0
       ..strokeCap = StrokeCap.round;
 
     final path = Path();
-    path.moveTo(center.dx - radius, center.dy);
-    // Higher curve for more intense happiness
+    final waveHeight = radius * 0.5;
+    final startX = center.dx - radius;
+    final endX = center.dx + radius;
+    final midX1 = center.dx - radius * 0.5;
+    final midX2 = center.dx + radius * 0.5;
+
+    // Wave shape: up-down-up pattern
+    path.moveTo(startX, center.dy);
     path.quadraticBezierTo(
-        center.dx, center.dy - radius * 1.1, center.dx + radius, center.dy);
-    canvas.drawPath(path, thickerPaint);
+        midX1 - radius * 0.25, center.dy - waveHeight, midX1, center.dy);
+    path.quadraticBezierTo(
+        center.dx, center.dy + waveHeight * 0.6, midX2, center.dy);
+    path.quadraticBezierTo(
+        midX2 + radius * 0.25, center.dy - waveHeight, endX, center.dy);
+
+    canvas.drawPath(path, wavePaint);
   }
 
   void _drawBlush(Canvas canvas, Offset center, double radius) {
@@ -1071,6 +1180,68 @@ class _SpeechBubble extends StatelessWidget {
   }
 }
 
+/// Note display with cent (note above, cent below).
+class _NoteWithCent extends StatelessWidget {
+  const _NoteWithCent({
+    required this.note,
+    required this.isPerfect,
+  });
+
+  final TunerNote note;
+  final bool isPerfect;
+
+  @override
+  Widget build(BuildContext context) {
+    final noteColor = isPerfect ? Colors.green : AppColors.primary;
+    final centColor = isPerfect
+        ? Colors.green
+        : (note.centDeviation < 0 ? Colors.red : Colors.orange);
+
+    final centText = '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Note name with octave (horizontal)
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            // Note name (large)
+            Text(
+              note.name.sharpName,
+              style: TextStyle(
+                fontSize: 72,  // Increased to 72
+                fontWeight: FontWeight.bold,
+                color: noteColor,
+              ),
+            ),
+            // Octave
+            Text(
+              '${note.octave}',
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.w600,
+                color: noteColor.withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+        // Cent deviation (below, closer)
+        Text(
+          centText,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: centColor,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 /// Cent deviation display.
 class _CentDisplay extends StatelessWidget {
   const _CentDisplay({
@@ -1098,7 +1269,7 @@ class _CentDisplay extends StatelessWidget {
           Text(
             arrow,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 12,
               color: color,
               fontWeight: FontWeight.bold,
             ),
@@ -1106,7 +1277,7 @@ class _CentDisplay extends StatelessWidget {
         Text(
           '${centDeviation >= 0 ? '+' : ''}${centDeviation.toStringAsFixed(1)}¢',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: color,
           ),

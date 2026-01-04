@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../practice/domain/entities/tuner_types.dart';
 import '../providers/tuner_provider.dart';
 import '../widgets/tuner/circular_tuner_indicator.dart';
 import '../widgets/tuner/tuner_cat_indicator.dart';
@@ -52,15 +53,35 @@ class _TunerScreenState extends ConsumerState<TunerScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Main tuner area
+            // Main tuner area - responsive to screen size
             Expanded(
-              child: Center(
-                child: CircularTunerIndicator(
-                  size: 300,
-                  centerChild: const TunerCatIndicator(size: 100),
-                ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final availableWidth = constraints.maxWidth;
+                  final availableHeight = constraints.maxHeight;
+
+                  // Use the smaller dimension
+                  final availableSize = availableWidth < availableHeight
+                      ? availableWidth
+                      : availableHeight;
+
+                  // Calculate scale factor (base size 400 for circle + indicators)
+                  final scaleFactor = (availableSize / 450).clamp(0.5, 1.2);
+
+                  return Center(
+                    child: Transform.scale(
+                      scale: scaleFactor,
+                      child: const CircularTunerIndicator(
+                        size: 280,
+                        centerChild: TunerCatIndicator(size: 200),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
+
+            const SizedBox(height: 16),
 
             // Info bar
             const Padding(
