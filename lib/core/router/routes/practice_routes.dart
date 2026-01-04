@@ -14,6 +14,7 @@ import '../../../features/practice/presentation/screens/repertoire_archive_scree
 import '../../../features/practice/presentation/screens/practice_note_list_screen.dart';
 import '../../../features/practice/presentation/screens/practice_goal_setting_screen.dart';
 import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
+import '../../../features/practice/presentation/screens/tuner_screen.dart';
 import '../app_routes.dart';
 
 /// Practice routes
@@ -173,5 +174,12 @@ List<GoRoute> practiceRoutes = [
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return PracticeStatsScreen(studentId: studentId);
     },
+  ),
+
+  // Tuner
+  GoRoute(
+    path: AppRoutes.tuner,
+    name: 'tuner',
+    builder: (context, state) => const TunerScreen(),
   ),
 ];

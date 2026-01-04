@@ -20,6 +20,7 @@ import '../../domain/entities/recording_filter_type.dart';
 import '../widgets/metronome/metronome.dart';
 import '../widgets/section_detail/recording_filter_dropdown.dart';
 import '../widgets/notes/note_preview_card.dart';
+import '../widgets/practice_tools_modal.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';
@@ -104,7 +105,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         ],
       ),
       bottomNavigationBar: MetronomeControllerBar(
-        onExpand: () => MetronomeFullScreenModal.show(context),
+        onExpand: () => PracticeToolsModal.show(context),
       ),
       body: sectionAsync.when(
         data: (section) {

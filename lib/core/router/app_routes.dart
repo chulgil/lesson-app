@@ -48,6 +48,7 @@ class AppRoutes {
   static const practiceNotes = '/practice/section/:sectionId/notes';
   static const practiceGoalSettings = '/practice/goal/settings';
   static const practiceStats = '/practice/stats';
+  static const tuner = '/practice/tuner';
 
   // Profile routes
   static const profile = '/profile';
