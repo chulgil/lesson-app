@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../features/practice/presentation/screens/practice_repertoire_screen.dart';
 import '../../../features/practice/presentation/screens/add_repertoire_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_detail_screen.dart';
+import '../../../features/practice/presentation/screens/edit_repertoire_screen.dart';
 import '../../../features/practice/presentation/screens/practice_recording_screen.dart';
 import '../../../features/practice/presentation/screens/add_section_screen.dart';
 import '../../../features/practice/presentation/screens/edit_section_screen.dart';
@@ -45,6 +46,20 @@ List<GoRoute> practiceRoutes = [
       final repertoireId = state.pathParameters['id'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return RepertoireDetailScreen(
+        repertoireId: repertoireId,
+        studentId: studentId,
+      );
+    },
+  ),
+
+  // Edit Repertoire
+  GoRoute(
+    path: AppRoutes.editRepertoire,
+    name: 'editRepertoire',
+    builder: (context, state) {
+      final repertoireId = state.pathParameters['id'] ?? '';
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return EditRepertoireScreen(
         repertoireId: repertoireId,
         studentId: studentId,
       );

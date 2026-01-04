@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -56,11 +57,21 @@ class _RepertoireDetailScreenState
               onPressed: _saveChanges,
               child: const Text('저장'),
             ),
-          // More menu with archive option
+          // More menu with edit and archive options
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) => _handleMenuAction(value),
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit_outlined),
+                    SizedBox(width: 8),
+                    Text('편집'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'archive',
                 child: Row(
@@ -392,10 +403,26 @@ class _RepertoireDetailScreenState
 
   void _handleMenuAction(String action) {
     switch (action) {
+      case 'edit':
+        _openEditScreen();
+        break;
       case 'archive':
         _showArchiveDialog();
         break;
     }
+  }
+
+  void _openEditScreen() {
+    final editPath = AppRoutes.editRepertoire.replaceFirst(':id', widget.repertoireId);
+    context.push('$editPath?studentId=${widget.studentId}').then((result) {
+      if (result == true) {
+        // Refresh the data after edit
+        ref.invalidate(repertoireProvider(widget.repertoireId));
+        setState(() {
+          _initialized = false; // Reset to reload dates from updated repertoire
+        });
+      }
+    });
   }
 
   void _showArchiveDialog() {

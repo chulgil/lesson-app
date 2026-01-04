@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -26,6 +28,10 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   final _descriptionController = TextEditingController();
   bool _isLoading = false;
 
+  // Date fields
+  DateTime _startDate = DateTime.now();
+  DateTime? _endDate;
+
   // Predefined repertoire suggestions
   final List<_RepertoireSuggestion> _suggestions = [
     _RepertoireSuggestion('스즈키 1권', '스즈키 바이올린 교본 1권'),
@@ -48,22 +54,32 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  Future<void> _submit({bool addSectionAfter = false}) async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(repertoireCrudProvider.notifier).createRepertoire(
+      final repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
             studentId: widget.studentId,
             name: _nameController.text.trim(),
             description: _descriptionController.text.trim().isEmpty
                 ? null
                 : _descriptionController.text.trim(),
+            startDate: _startDate,
+            endDate: _endDate,
           );
 
       if (mounted) {
-        context.pop(true);
+        if (addSectionAfter) {
+          // Navigate to add section screen with the newly created repertoire
+          context.pop(true);
+          context.push(
+            '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=${widget.studentId}',
+          );
+        } else {
+          context.pop(true);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -79,6 +95,42 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Future<void> _selectStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      helpText: '시작일 선택',
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+        // If end date is before start date, clear it
+        if (_endDate != null && _endDate!.isBefore(_startDate)) {
+          _endDate = null;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _endDate ?? _startDate,
+      firstDate: _startDate,
+      lastDate: DateTime(2030),
+      helpText: '종료일 선택',
+    );
+    if (picked != null) {
+      setState(() => _endDate = picked);
+    }
+  }
+
+  void _clearEndDate() {
+    setState(() => _endDate = null);
   }
 
   void _selectSuggestion(_RepertoireSuggestion suggestion) {
@@ -132,6 +184,69 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
+              // Period section
+              Text(
+                '📅 기간 설정',
+                style: AppTypography.headingSmall,
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                '레퍼토리의 활성 기간을 설정합니다',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Date pickers row
+              Row(
+                children: [
+                  Expanded(
+                    child: _DatePickerField(
+                      label: '시작일',
+                      date: _startDate,
+                      onTap: _selectStartDate,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+                    child: Icon(Icons.arrow_forward, size: 20, color: AppColors.textSecondaryLight),
+                  ),
+                  Expanded(
+                    child: _DatePickerField(
+                      label: '종료일',
+                      date: _endDate,
+                      placeholder: '미지정',
+                      onTap: _selectEndDate,
+                      onClear: _endDate != null ? _clearEndDate : null,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              if (_endDate == null)
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.space2),
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.repeat, size: 16, color: AppColors.info),
+                      const SizedBox(width: AppSpacing.space1),
+                      Expanded(
+                        child: Text(
+                          '종료일 미설정 시 매일 반복됩니다',
+                          style: AppTypography.bodySmall.copyWith(color: AppColors.info),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: AppSpacing.space6),
+
               // Suggestions section
               Text(
                 '빠른 선택',
@@ -166,7 +281,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
-                  onPressed: _isLoading ? null : _submit,
+                  onPressed: _isLoading ? null : () => _submit(),
                   child: _isLoading
                       ? const SizedBox(
                           height: 20,
@@ -179,8 +294,100 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                       : const Text('레퍼토리 추가'),
                 ),
               ),
+
+              const SizedBox(height: AppSpacing.space3),
+
+              // Add section after save button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isLoading ? null : () => _submit(addSectionAfter: true),
+                  icon: const Icon(Icons.playlist_add),
+                  label: const Text('저장 후 섹션 추가하기'),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                '💡 레퍼토리 저장 후 섹션 추가 화면으로 이동합니다',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Date picker field widget
+class _DatePickerField extends StatelessWidget {
+  final String label;
+  final DateTime? date;
+  final String? placeholder;
+  final VoidCallback onTap;
+  final VoidCallback? onClear;
+
+  const _DatePickerField({
+    required this.label,
+    required this.date,
+    this.placeholder,
+    required this.onTap,
+    this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateFormat = DateFormat('yyyy.MM.dd');
+    final displayText = date != null ? dateFormat.format(date!) : (placeholder ?? '미지정');
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.borderLight),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    displayText,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: date != null ? AppColors.textPrimaryLight : AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (onClear != null)
+              IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                onPressed: onClear,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                color: AppColors.textSecondaryLight,
+              )
+            else
+              const Icon(Icons.calendar_today, size: 18, color: AppColors.textSecondaryLight),
+          ],
         ),
       ),
     );
