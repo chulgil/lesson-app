@@ -1,14 +1,25 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/audio/mock_tuner_engine.dart';
+import '../../../../core/audio/pitch_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
 
 part 'tuner_provider.g.dart';
+
+/// Engine type for tuner.
+enum TunerEngineType {
+  /// Mock engine for development/testing
+  mock,
+
+  /// Real pitch detection engine using microphone
+  pitch,
+}
 
 /// State for the tuner.
 @immutable
@@ -20,6 +31,7 @@ class TunerProviderState {
     this.status = TuningStatus.idle,
     this.isInitialized = false,
     this.error,
+    this.engineType = TunerEngineType.pitch,
   });
 
   /// Current tuner settings.
@@ -40,6 +52,9 @@ class TunerProviderState {
   /// Error message if any.
   final String? error;
 
+  /// Current engine type.
+  final TunerEngineType engineType;
+
   /// Cent deviation of current note (0 if no note).
   double get centDeviation => currentNote?.centDeviation ?? 0;
 
@@ -55,6 +70,7 @@ class TunerProviderState {
     TuningStatus? status,
     bool? isInitialized,
     String? error,
+    TunerEngineType? engineType,
     bool clearNote = false,
     bool clearError = false,
   }) {
@@ -65,6 +81,7 @@ class TunerProviderState {
       status: status ?? this.status,
       isInitialized: isInitialized ?? this.isInitialized,
       error: clearError ? null : (error ?? this.error),
+      engineType: engineType ?? this.engineType,
     );
   }
 }
@@ -72,20 +89,55 @@ class TunerProviderState {
 /// Tuner state management with Riverpod.
 ///
 /// Provides pitch detection using the device microphone.
-/// Uses MockTunerEngine for development/testing.
+/// Supports both MockTunerEngine (for development) and PitchTunerEngine (real detection).
 @Riverpod(keepAlive: true)
 class Tuner extends _$Tuner {
   TunerEngine? _engine;
   StreamSubscription<TunerNote?>? _noteSubscription;
   bool _initialized = false;
+  TunerEngineType _currentEngineType = TunerEngineType.pitch;
 
   @override
   TunerProviderState build() {
-    // Use MockTunerEngine for development (switch to RecordTunerEngine for production)
-    debugPrint('Tuner: Creating MockTunerEngine for development');
-    _engine = MockTunerEngine(
-      simulationMode: MockSimulationMode.random,
-    );
+    // Determine default engine type
+    // Use pitch detection on mobile (iOS/Android), mock on desktop
+    final defaultType = _isDesktop() ? TunerEngineType.mock : TunerEngineType.pitch;
+    _currentEngineType = defaultType;
+
+    _createEngine(defaultType);
+
+    ref.onDispose(() {
+      debugPrint('Tuner: disposing');
+      _noteSubscription?.cancel();
+      _engine?.dispose();
+      _engine = null;
+    });
+
+    return TunerProviderState(engineType: defaultType);
+  }
+
+  /// Check if running on desktop platform.
+  bool _isDesktop() {
+    try {
+      return Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+    } catch (_) {
+      // Platform not available (e.g., web)
+      return true;
+    }
+  }
+
+  /// Create and configure the tuner engine.
+  void _createEngine(TunerEngineType type) {
+    debugPrint('Tuner: Creating engine type: $type');
+
+    _engine = switch (type) {
+      TunerEngineType.mock => MockTunerEngine(
+          simulationMode: MockSimulationMode.tuningApproach,
+        ),
+      TunerEngineType.pitch => PitchTunerEngine(
+          referenceFrequency: state.settings.referenceFrequency,
+        ),
+    };
 
     _engine!.onPitchDetected = _onPitchDetected;
     _engine!.onError = _onError;
@@ -95,15 +147,6 @@ class Tuner extends _$Tuner {
 
     // Initialize engine
     _initAsync();
-
-    ref.onDispose(() {
-      debugPrint('Tuner: disposing');
-      _noteSubscription?.cancel();
-      _engine?.dispose();
-      _engine = null;
-    });
-
-    return const TunerProviderState();
   }
 
   Future<void> _initAsync() async {
@@ -239,6 +282,39 @@ class Tuner extends _$Tuner {
     debugPrint('Tuner: updateSettings');
     state = state.copyWith(settings: settings);
     _engine?.referenceFrequency = settings.referenceFrequency;
+  }
+
+  /// Switch between tuner engines.
+  Future<void> switchEngine(TunerEngineType type) async {
+    if (_currentEngineType == type) return;
+
+    debugPrint('Tuner: Switching engine from $_currentEngineType to $type');
+
+    // Stop current engine
+    final wasListening = state.isListening;
+    if (wasListening) {
+      await stop();
+    }
+
+    // Dispose current engine
+    _noteSubscription?.cancel();
+    _engine?.dispose();
+    _initialized = false;
+
+    // Create new engine
+    _currentEngineType = type;
+    _createEngine(type);
+
+    // Update state
+    state = state.copyWith(
+      engineType: type,
+      isInitialized: false,
+    );
+
+    // Restart if was listening
+    if (wasListening) {
+      await start();
+    }
   }
 
   /// Clear any error state.

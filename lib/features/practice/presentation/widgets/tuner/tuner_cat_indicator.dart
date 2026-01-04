@@ -84,54 +84,47 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     final isPerfect = tunerState.isPerfect;
     final tier = comboState.tier;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Speech bubble
-        if (comboState.lastJudgement != null && tunerState.isListening)
-          _SpeechBubble(
-            judgement: comboState.lastJudgement!,
-            comboTier: tier,
+    // Calculate sizes based on widget.size
+    final catSize = widget.size * 0.6; // Cat takes 60% of space
+    final showExtras = widget.size >= 100; // Only show extras if enough space
+
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Cat face with animations
+          AnimatedBuilder(
+            animation: Listenable.merge([_jumpAnimation, _pulseAnimation]),
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _jumpAnimation.value),
+                child: Transform.scale(
+                  scale: isPerfect ? _pulseAnimation.value : 1.0,
+                  child: child,
+                ),
+              );
+            },
+            child: _CatFace(
+              size: catSize,
+              status: status,
+              isPerfect: isPerfect,
+              comboTier: tier,
+            ),
           ),
 
-        const SizedBox(height: 8),
-
-        // Cat face with animations
-        AnimatedBuilder(
-          animation: Listenable.merge([_jumpAnimation, _pulseAnimation]),
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(0, _jumpAnimation.value),
-              child: Transform.scale(
-                scale: isPerfect ? _pulseAnimation.value : 1.0,
-                child: child,
-              ),
-            );
-          },
-          child: _CatFace(
-            size: widget.size,
-            status: status,
-            isPerfect: isPerfect,
-            comboTier: tier,
-          ),
-        ),
-
-        const SizedBox(height: 8),
-
-        // Cent display
-        if (tunerState.currentNote != null)
-          _CentDisplay(
-            centDeviation: tunerState.centDeviation,
-            isPerfect: isPerfect,
-          ),
-
-        // Combo counter
-        if (comboState.count > 0 && tunerState.settings.showCombo)
-          _ComboCounter(
-            count: comboState.count,
-            tier: tier,
-          ),
-      ],
+          // Cent display - only if enough space
+          if (tunerState.currentNote != null && showExtras) ...[
+            const SizedBox(height: 4),
+            _CentDisplay(
+              centDeviation: tunerState.centDeviation,
+              isPerfect: isPerfect,
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

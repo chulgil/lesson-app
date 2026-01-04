@@ -44,12 +44,12 @@ final tunerInfoDisplayProvider = AutoDisposeProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TunerInfoDisplayRef = AutoDisposeProviderRef<String>;
-String _$tunerHash() => r'ba4238b2df57679b8e02df4d936128e8cb717981';
+String _$tunerHash() => r'3d2c7f40dd8587caa918e4657031499a5a73010c';
 
 /// Tuner state management with Riverpod.
 ///
 /// Provides pitch detection using the device microphone.
-/// Uses MockTunerEngine for development/testing.
+/// Supports both MockTunerEngine (for development) and PitchTunerEngine (real detection).
 ///
 /// Copied from [Tuner].
 @ProviderFor(Tuner)
