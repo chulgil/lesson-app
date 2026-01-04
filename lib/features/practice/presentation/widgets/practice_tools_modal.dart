@@ -100,6 +100,14 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                     indicatorColor: AppColors.primary,
                     indicatorWeight: 3,
                     labelPadding: EdgeInsets.zero,
+                    labelStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                    ),
                     tabs: const [
                       Tab(text: '메트로놈'),
                       Tab(text: '튜너'),
@@ -353,10 +361,10 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Circular tuner with cat in center - larger size
+          // Circular tuner with cat in center - 2x larger size
           CircularTunerIndicator(
-            size: 320,
-            centerChild: const TunerCatIndicator(size: 120),
+            size: 450,
+            centerChild: const TunerCatIndicator(size: 180),
           ),
           SizedBox(height: AppSpacing.space6),
 

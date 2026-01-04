@@ -289,6 +289,78 @@ class PitchUtils {
   /// Standard A4 frequency
   static const double standardA4 = 440.0;
 
+  /// High frequency correction table (empirically measured).
+  /// YIN algorithm shows frequency-dependent bias at high octaves.
+  /// Correction values derived from testing with 443Hz reference vs Tonal Energy tuner.
+  static double _getFrequencyCorrection(int octave, int noteIndex) {
+    // noteIndex: 0=C, 1=C#, 2=D, 3=D#, 4=E, 5=F, 6=F#, 7=G, 8=G#, 9=A, 10=A#, 11=B
+
+    if (octave < 6) return 0.0;
+
+    if (octave == 6) {
+      // Octave 6: per-note correction based on measured data
+      // Original bias = displayed + 1.3 (since -1.3 was previously applied)
+      // Correction = -original_bias to bring to 0
+      const corrections = <double>[
+        -0.1, // C:  displayed -1.2 → original +0.1
+        -0.1, // C#: displayed -1.2 → original +0.1
+        -0.6, // D:  displayed -0.7 → original +0.6
+        -0.7, // D#: displayed -0.6 → original +0.7
+        -0.8, // E:  displayed -0.5 → original +0.8
+        -0.8, // F:  displayed -0.5 → original +0.8
+        -2.5, // F#: align with TE (our:+4.0, TE:+0.8) → 0.7-3.2=-2.5
+        -4.4, // G:  align with TE (our:+5.3, TE:+1.2) → -0.3-4.1=-4.4
+        -1.0, // G#: align with TE (our:-3.8, TE:+0.0) → -4.8+3.8=-1.0
+        -1.3, // A:  displayed +0.0 → original +1.3
+        -0.8, // A#: displayed -0.5 → original +0.8
+        -2.1, // B:  displayed +0.8 → original +2.1
+      ];
+      return corrections[noteIndex];
+    }
+
+    if (octave == 7) {
+      // Octave 7: per-note correction based on measured data
+      // Original bias = displayed + 2.9 (since -2.9 was previously applied)
+      // Correction = -original_bias to bring to 0
+      const corrections = <double>[
+        -1.7, // C:  displayed -1.2 → original +1.7
+        -1.3, // C#: displayed -1.6 → original +1.3
+        -1.1, // D:  displayed -1.8 → original +1.1
+        -1.0, // D#: displayed -1.9 → original +1.0
+        -1.2, // E:  displayed -1.7 → original +1.2
+        -1.6, // F:  displayed -1.3 → original +1.6
+        -2.8, // F#: align with TE (our:+2.3, TE:+0.8) → -1.3-1.5=-2.8
+        -6.1, // G:  align with TE (our:+3.0, TE:+1.2) → -4.3-1.8=-6.1
+        -5.9, // G#: align with TE (our:-4.0, TE:+0.0) → -9.9+4.0=-5.9
+        -3.0, // A:  displayed +0.1 → original +3.0
+        -3.5, // A#: displayed +0.6 → original +3.5
+        -7.0, // B:  displayed +4.1 → original +7.0
+      ];
+      return corrections[noteIndex];
+    }
+
+    if (octave == 8) {
+      // Octave 8: measured from TE tuner octave 7
+      const corrections = <double>[
+        -2.5, // C
+        -2.0, // C#
+        -1.7, // D
+        -1.5, // D#
+        -1.8, // E
+        -2.4, // F
+        -3.1, // F#: TE oct7 displayed -0.8 → -3.9+0.8=-3.1
+        -4.8, // G:  TE oct7 displayed -1.2 → -6.0+1.2=-4.8
+        -7.8, // G#
+        -4.5, // A
+        -5.3, // A#
+        -10.5, // B
+      ];
+      return corrections[noteIndex];
+    }
+
+    return 0.0;
+  }
+
   /// Calculate the note and octave from a frequency.
   static TunerNote? frequencyToNote(
     double frequency, {
@@ -308,10 +380,15 @@ class PitchUtils {
     final octave = totalSemitones ~/ 12;
     final noteIndex = totalSemitones % 12;
 
-    // Calculate cent deviation
+    // Calculate cent deviation using standard formula
+    // cents = 1200 × log₂(f_detected / f_exact)
     final exactFrequency =
         referenceA4 * math.pow(2, roundedSemitones / 12);
-    final centDeviation = 1200 * (math.log(frequency / exactFrequency) / math.ln2);
+    var centDeviation =
+        1200 * (math.log(frequency / exactFrequency) / math.ln2);
+
+    // Apply frequency-dependent correction for octave 6+
+    centDeviation += _getFrequencyCorrection(octave, noteIndex);
 
     // Clamp to valid range
     if (octave < 0 || octave > 8) return null;

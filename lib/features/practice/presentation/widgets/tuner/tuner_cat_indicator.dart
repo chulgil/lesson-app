@@ -115,6 +115,16 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
             ),
           ),
 
+          // Status message speech bubble
+          if (showExtras) ...[
+            const SizedBox(height: 8),
+            _StatusBubble(
+              isListening: tunerState.isListening,
+              hasNote: tunerState.currentNote != null,
+              isPerfect: isPerfect,
+            ),
+          ],
+
           // Cent display - only if enough space
           if (tunerState.currentNote != null && showExtras) ...[
             const SizedBox(height: 4),
@@ -124,6 +134,67 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Status message bubble for tuner.
+class _StatusBubble extends StatelessWidget {
+  const _StatusBubble({
+    required this.isListening,
+    required this.hasNote,
+    required this.isPerfect,
+  });
+
+  final bool isListening;
+  final bool hasNote;
+  final bool isPerfect;
+
+  @override
+  Widget build(BuildContext context) {
+    String message;
+    Color backgroundColor;
+    Color textColor;
+
+    if (!isListening) {
+      message = '마이크를 켜주세요';
+      backgroundColor = Colors.grey[200]!;
+      textColor = Colors.grey[600]!;
+    } else if (!hasNote) {
+      message = '소리 감지 대기...';
+      backgroundColor = Colors.blue[50]!;
+      textColor = Colors.blue[700]!;
+    } else if (isPerfect) {
+      message = '완벽해요! 🎵';
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    } else {
+      message = '소리 감지중';
+      backgroundColor = Colors.orange[50]!;
+      textColor = Colors.orange[800]!;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        message,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
       ),
     );
   }

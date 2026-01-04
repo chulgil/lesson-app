@@ -87,26 +87,29 @@ class StabilityFilter {
       );
     }
 
+    // Correct octave errors (YIN sometimes detects 2x frequency)
+    var correctedFrequency = _correctOctaveError(frequency);
+
     // Apply exponential moving average smoothing
     if (_smoothedFrequency == 0) {
-      _smoothedFrequency = frequency;
+      _smoothedFrequency = correctedFrequency;
     } else {
-      _smoothedFrequency = config.smoothingFactor * frequency +
+      _smoothedFrequency = config.smoothingFactor * correctedFrequency +
           (1 - config.smoothingFactor) * _smoothedFrequency;
     }
 
     // Check if frequency is consistent with previous
-    final isConsistent = _isConsistent(frequency);
+    final isConsistent = _isConsistent(correctedFrequency);
 
     if (isConsistent) {
       _stableCount++;
     } else {
       _stableCount = 1;
-      _lastStableFrequency = frequency;
+      _lastStableFrequency = correctedFrequency;
     }
 
     // Update buffer
-    _frequencyBuffer.addLast(frequency);
+    _frequencyBuffer.addLast(correctedFrequency);
     if (_frequencyBuffer.length > config.stabilityFrames * 2) {
       _frequencyBuffer.removeFirst();
     }
@@ -118,6 +121,29 @@ class StabilityFilter {
       isStable: isStable,
       confidence: probability,
     );
+  }
+
+  /// Correct octave errors where YIN detects 2x the actual frequency.
+  ///
+  /// This commonly happens at high frequencies (above ~1500Hz).
+  /// YIN algorithm often detects 2nd harmonic instead of fundamental.
+  /// Uses ratio comparison only - if frequency suddenly jumps to 2x,
+  /// it's likely an octave error.
+  double _correctOctaveError(double frequency) {
+    // Only use ratio comparison to detect octave errors
+    // This allows distinguishing between:
+    // - Playing G6 (1568Hz) and YIN detects 3136Hz (error, should correct)
+    // - Playing G7 (3136Hz) directly (not an error, should not correct)
+
+    if (_lastStableFrequency > 0 && frequency >= 1400) {
+      final ratio = frequency / _lastStableFrequency;
+      // If ratio is between 1.9 and 2.1, it's likely an octave error
+      if (ratio >= 1.9 && ratio <= 2.1) {
+        return frequency / 2;
+      }
+    }
+
+    return frequency;
   }
 
   bool _isConsistent(double frequency) {

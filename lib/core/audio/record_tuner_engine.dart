@@ -1,42 +1,68 @@
 // Record-based tuner engine
-// Uses the record package for audio input with FFT pitch detection
+// Uses the record package for audio input (supports all platforms)
+// Uses pitch_detector_dart (YIN algorithm) for pitch detection
 
 import 'dart:async';
-import 'dart:math' as math;
 
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pitch_detector_dart/pitch_detector.dart';
 import 'package:record/record.dart';
 
-import 'package:lesson_app/features/practice/domain/entities/tuner_settings.dart';
 import 'package:lesson_app/features/practice/domain/entities/tuner_types.dart';
 
+import 'pitch_detection/stability_filter.dart';
 import 'tuner_engine.dart';
+
+/// Configuration for the record tuner engine.
+class RecordTunerConfig {
+  const RecordTunerConfig({
+    this.sampleRate = 44100,
+    this.bufferSize = 2048,
+    this.minProbability = 0.70, // Lowered for better high-frequency detection
+    this.stabilityFrames = 2, // Reduced for faster response
+    this.amplitudeThreshold = 0.01, // Very sensitive for quiet sounds
+  });
+
+  final int sampleRate;
+  final int bufferSize;
+  final double minProbability;
+  final int stabilityFrames;
+  final double amplitudeThreshold;
+}
 
 /// Tuner engine using the record package for audio input.
 ///
 /// This engine uses the device microphone to detect pitch in real-time.
-/// It uses amplitude monitoring and frequency estimation to detect notes.
+/// Uses YIN algorithm via pitch_detector_dart for accurate pitch detection.
+/// Works on all platforms (iOS, Android, macOS, Windows, Linux).
 class RecordTunerEngine implements TunerEngine {
   RecordTunerEngine({
-    TunerEngineConfig? config,
-  }) : _config = config ?? const TunerEngineConfig();
+    RecordTunerConfig? config,
+    double referenceFrequency = 440.0,
+  })  : _config = config ?? const RecordTunerConfig(),
+        _referenceFrequency = referenceFrequency;
 
-  final TunerEngineConfig _config;
+  final RecordTunerConfig _config;
   final AudioRecorder _recorder = AudioRecorder();
   final _streamController = StreamController<TunerNote?>.broadcast();
 
-  StreamSubscription<Amplitude>? _amplitudeSubscription;
-  Timer? _processingTimer;
+  StreamSubscription<Uint8List>? _audioSubscription;
+
+  // Pitch detector (YIN algorithm)
+  late PitchDetector _pitchDetector;
+
+  // Filters
+  late StabilityFilter _stabilityFilter;
+  late AmplitudeGate _amplitudeGate;
 
   bool _isListening = false;
   bool _isInitialized = false;
   TunerNote? _currentNote;
-  double _referenceFrequency = 440.0;
+  double _referenceFrequency;
   double _sensitivity = 0.5;
 
-  // Amplitude history for frequency estimation
-  final List<double> _amplitudeHistory = [];
-  static const int _historySize = 64;
+  // Buffer for accumulating audio samples
+  final List<double> _sampleBuffer = [];
 
   @override
   Stream<TunerNote?> get noteStream => _streamController.stream;
@@ -52,7 +78,7 @@ class RecordTunerEngine implements TunerEngine {
 
   @override
   set referenceFrequency(double value) {
-    _referenceFrequency = TunerSettings.clampFrequency(value);
+    _referenceFrequency = value.clamp(400.0, 480.0);
   }
 
   @override
@@ -61,6 +87,9 @@ class RecordTunerEngine implements TunerEngine {
   @override
   set sensitivity(double value) {
     _sensitivity = value.clamp(0.0, 1.0);
+    _amplitudeGate = AmplitudeGate(
+      threshold: 0.01 + (1 - _sensitivity) * 0.19, // 0.01 ~ 0.2
+    );
   }
 
   @override
@@ -73,22 +102,43 @@ class RecordTunerEngine implements TunerEngine {
   Future<bool> init() async {
     if (_isInitialized) return true;
 
-    // Request microphone permission
-    final status = await Permission.microphone.request();
-    if (!status.isGranted) {
-      onError?.call('Microphone permission denied');
+    try {
+      debugPrint('RecordTunerEngine: Initializing...');
+
+      // Check microphone permission
+      final hasPermission = await _recorder.hasPermission();
+      if (!hasPermission) {
+        debugPrint('RecordTunerEngine: No microphone permission');
+        onError?.call('Microphone permission denied');
+        return false;
+      }
+
+      // Initialize pitch detector (YIN algorithm)
+      _pitchDetector = PitchDetector(
+        audioSampleRate: _config.sampleRate.toDouble(),
+        bufferSize: _config.bufferSize,
+      );
+
+      // Initialize filters
+      _stabilityFilter = StabilityFilter(
+        config: StabilityConfig(
+          minProbability: _config.minProbability,
+          stabilityFrames: _config.stabilityFrames,
+        ),
+      );
+
+      _amplitudeGate = AmplitudeGate(
+        threshold: _config.amplitudeThreshold,
+      );
+
+      _isInitialized = true;
+      debugPrint('RecordTunerEngine: Initialized successfully');
+      return true;
+    } catch (e) {
+      debugPrint('RecordTunerEngine: Init failed - $e');
+      onError?.call('Failed to initialize: $e');
       return false;
     }
-
-    // Check if recording is supported
-    final hasPermission = await _recorder.hasPermission();
-    if (!hasPermission) {
-      onError?.call('Recording not available');
-      return false;
-    }
-
-    _isInitialized = true;
-    return true;
   }
 
   @override
@@ -100,49 +150,58 @@ class RecordTunerEngine implements TunerEngine {
     }
 
     try {
-      // Start recording with amplitude monitoring
-      await _recorder.start(
-        const RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
-          sampleRate: 44100,
-          numChannels: 1,
-        ),
-        path: '', // Empty path for stream-only mode
-      );
+      debugPrint('RecordTunerEngine: Starting audio capture...');
 
       _isListening = true;
-      _amplitudeHistory.clear();
+      _stabilityFilter.reset();
+      _amplitudeGate.reset();
+      _sampleBuffer.clear();
 
-      // Monitor amplitude at 60Hz
-      _processingTimer = Timer.periodic(
-        const Duration(milliseconds: 16),
-        (_) => _processAudio(),
+      // Start streaming audio as PCM16
+      final stream = await _recorder.startStream(
+        RecordConfig(
+          encoder: AudioEncoder.pcm16bits,
+          sampleRate: _config.sampleRate,
+          numChannels: 1,
+        ),
       );
+
+      _audioSubscription = stream.listen(
+        _onAudioData,
+        onError: _onAudioError,
+      );
+
+      debugPrint('RecordTunerEngine: Audio capture started');
     } catch (e) {
-      onError?.call('Failed to start recording: $e');
+      _isListening = false;
+      debugPrint('RecordTunerEngine: Start failed - $e');
+      onError?.call('Failed to start audio capture: $e');
     }
   }
 
   @override
   Future<void> stop() async {
-    _processingTimer?.cancel();
-    _processingTimer = null;
-    _amplitudeSubscription?.cancel();
-    _amplitudeSubscription = null;
+    if (!_isListening) return;
 
-    if (_isListening) {
-      try {
-        await _recorder.stop();
-      } catch (_) {
-        // Ignore stop errors
-      }
+    try {
+      debugPrint('RecordTunerEngine: Stopping audio capture...');
+
+      await _audioSubscription?.cancel();
+      _audioSubscription = null;
+      await _recorder.stop();
+
+      _isListening = false;
+      _currentNote = null;
+      _sampleBuffer.clear();
+
+      _streamController.add(null);
+      onPitchDetected?.call(null);
+
+      debugPrint('RecordTunerEngine: Audio capture stopped');
+    } catch (e) {
+      debugPrint('RecordTunerEngine: Stop failed - $e');
+      onError?.call('Failed to stop audio capture: $e');
     }
-
-    _isListening = false;
-    _currentNote = null;
-    _amplitudeHistory.clear();
-    _streamController.add(null);
-    onPitchDetected?.call(null);
   }
 
   @override
@@ -156,109 +215,124 @@ class RecordTunerEngine implements TunerEngine {
 
   @override
   void dispose() {
-    _processingTimer?.cancel();
-    _amplitudeSubscription?.cancel();
+    stop();
     _recorder.dispose();
     _streamController.close();
   }
 
-  Future<void> _processAudio() async {
-    if (!_isListening) return;
-
+  /// Process incoming audio data (PCM16 format).
+  Future<void> _onAudioData(Uint8List data) async {
     try {
-      final amplitude = await _recorder.getAmplitude();
-      final currentDb = amplitude.current;
+      // Convert PCM16 bytes to float samples
+      final samples = _convertPcm16ToFloat(data);
 
-      // Convert dB to linear amplitude (0-1)
-      // -160 dB is silence, 0 dB is max
-      final linearAmp = math.pow(10, currentDb / 20).clamp(0.0, 1.0);
+      if (samples.isEmpty) return;
 
-      // Check if amplitude is above threshold
-      final threshold = (1 - _sensitivity) * 0.1; // Adjusted for sensitivity
-      if (linearAmp < threshold) {
-        _emitNote(null);
-        return;
-      }
+      // Accumulate samples until we have enough for analysis
+      _sampleBuffer.addAll(samples);
 
-      // Add to history for frequency estimation
-      _amplitudeHistory.add(linearAmp.toDouble());
-      if (_amplitudeHistory.length > _historySize) {
-        _amplitudeHistory.removeAt(0);
-      }
+      // Process when we have enough samples
+      while (_sampleBuffer.length >= _config.bufferSize) {
+        final bufferToProcess =
+            _sampleBuffer.sublist(0, _config.bufferSize).toList();
+        _sampleBuffer.removeRange(0, _config.bufferSize ~/ 2); // 50% overlap
 
-      // TODO: Implement proper FFT-based pitch detection
-      // For now, we use a simplified frequency estimation
-      // This is a placeholder that should be replaced with proper FFT analysis
-
-      // Estimate frequency from amplitude pattern
-      // This is a very rough approximation and should be replaced
-      final estimatedFreq = _estimateFrequency();
-
-      if (estimatedFreq != null &&
-          estimatedFreq >= _config.minFrequency &&
-          estimatedFreq <= _config.maxFrequency) {
-        final note = PitchUtils.frequencyToNote(
-          estimatedFreq,
-          referenceA4: _referenceFrequency,
-        );
-        _emitNote(note);
-      } else {
-        _emitNote(null);
+        await _processBuffer(bufferToProcess);
       }
     } catch (e) {
-      // Silently handle amplitude reading errors
+      debugPrint('RecordTunerEngine: Audio processing error - $e');
     }
   }
 
-  /// Estimate frequency from amplitude history.
-  ///
-  /// NOTE: This is a placeholder implementation.
-  /// Real pitch detection requires proper FFT or autocorrelation analysis.
-  double? _estimateFrequency() {
-    if (_amplitudeHistory.length < _historySize ~/ 2) {
-      return null;
+  Future<void> _processBuffer(List<double> samples) async {
+    // Check amplitude (noise gate)
+    final amplitude = _calculateAmplitude(samples);
+    if (!_amplitudeGate.check(amplitude)) {
+      _emitNote(null);
+      return;
     }
 
-    // TODO: Implement proper pitch detection algorithm
-    // Options:
-    // 1. FFT with peak detection
-    // 2. Autocorrelation
-    // 3. YIN algorithm
-    // 4. McLeod Pitch Method
+    // Detect pitch using YIN algorithm
+    final pitchResult = await _pitchDetector.getPitchFromFloatBuffer(samples);
 
-    // For now, return a dummy frequency based on amplitude pattern
-    // This should be replaced with actual pitch detection
+    // Debug log
+    if (pitchResult.pitched && pitchResult.pitch > 0) {
+      debugPrint('Pitch: ${pitchResult.pitch.toStringAsFixed(1)}Hz');
+    }
 
-    // Placeholder: detect zero crossings (very rough approximation)
-    int zeroCrossings = 0;
-    for (int i = 1; i < _amplitudeHistory.length; i++) {
-      final prev = _amplitudeHistory[i - 1] - 0.5;
-      final curr = _amplitudeHistory[i] - 0.5;
-      if (prev * curr < 0) {
-        zeroCrossings++;
+    // Apply stability filter
+    final stabilityResult = _stabilityFilter.process(
+      frequency: pitchResult.pitch,
+      probability: pitchResult.probability,
+      pitched: pitchResult.pitched,
+    );
+
+    // Only emit if stable
+    if (stabilityResult.isStable && stabilityResult.frequency > 0) {
+      final note = _frequencyToNote(stabilityResult.frequency);
+      if (note != null) {
+        _emitNote(note);
       }
     }
+  }
 
-    if (zeroCrossings < 2) return null;
+  void _onAudioError(Object error) {
+    debugPrint('RecordTunerEngine: Audio error - $error');
+    onError?.call('Audio capture error: $error');
+  }
 
-    // Estimate frequency from zero crossings
-    // This is highly inaccurate but serves as a placeholder
-    final samplesPerCycle = _amplitudeHistory.length / (zeroCrossings / 2);
-    final estimatedFreq = _config.sampleRate / 60 / samplesPerCycle;
+  /// Convert PCM16 bytes to float samples (-1.0 to 1.0).
+  List<double> _convertPcm16ToFloat(Uint8List bytes) {
+    final samples = <double>[];
 
-    // Validate range
-    if (estimatedFreq < 50 || estimatedFreq > 2000) {
-      return null;
+    // PCM16 is 2 bytes per sample, little-endian
+    for (int i = 0; i < bytes.length - 1; i += 2) {
+      // Read 16-bit signed integer (little-endian)
+      int sample = bytes[i] | (bytes[i + 1] << 8);
+
+      // Convert to signed
+      if (sample > 32767) {
+        sample -= 65536;
+      }
+
+      // Normalize to -1.0 to 1.0
+      samples.add(sample / 32768.0);
     }
 
-    return estimatedFreq;
+    return samples;
+  }
+
+  /// Calculate RMS amplitude of samples.
+  double _calculateAmplitude(List<double> samples) {
+    if (samples.isEmpty) return 0;
+
+    double sum = 0;
+    for (final sample in samples) {
+      sum += sample * sample;
+    }
+    return _sqrt(sum / samples.length);
+  }
+
+  double _sqrt(double x) {
+    if (x <= 0) return 0;
+    double guess = x / 2;
+    for (int i = 0; i < 10; i++) {
+      guess = (guess + x / guess) / 2;
+    }
+    return guess;
+  }
+
+  /// Convert frequency to TunerNote.
+  TunerNote? _frequencyToNote(double frequency) {
+    return PitchUtils.frequencyToNote(
+      frequency,
+      referenceA4: _referenceFrequency,
+    );
   }
 
   void _emitNote(TunerNote? note) {
-    if (_currentNote != note) {
-      _currentNote = note;
-      _streamController.add(note);
-      onPitchDetected?.call(note);
-    }
+    _currentNote = note;
+    _streamController.add(note);
+    onPitchDetected?.call(note);
   }
 }

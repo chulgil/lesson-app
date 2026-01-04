@@ -145,7 +145,7 @@ class _NoteLabel extends StatelessWidget {
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
     final angle = (2 * math.pi * index / totalNotes) - (math.pi / 2);
-    final radius = circleSize / 2 - 25; // Position near edge
+    final radius = circleSize / 2 - 45; // Position near edge (adjusted for larger buttons)
 
     final x = radius * math.cos(angle);
     final y = radius * math.sin(angle);
@@ -164,7 +164,7 @@ class _NoteLabel extends StatelessWidget {
       offset: Offset(x, y),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? activeColor : baseColor.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(8),
@@ -187,7 +187,7 @@ class _NoteLabel extends StatelessWidget {
         child: Text(
           displayText,
           style: TextStyle(
-            fontSize: isActive ? 14 : 12,
+            fontSize: isActive ? 22 : 18,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             color: isActive ? Colors.white : Colors.grey[600],
           ),

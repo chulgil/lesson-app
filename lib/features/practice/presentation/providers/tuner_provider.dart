@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/audio/mock_tuner_engine.dart';
-import '../../../../core/audio/pitch_tuner_engine.dart';
+import '../../../../core/audio/record_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
@@ -17,8 +16,8 @@ enum TunerEngineType {
   /// Mock engine for development/testing
   mock,
 
-  /// Real pitch detection engine using microphone
-  pitch,
+  /// Real pitch detection engine using record package (all platforms)
+  record,
 }
 
 /// State for the tuner.
@@ -31,7 +30,7 @@ class TunerProviderState {
     this.status = TuningStatus.idle,
     this.isInitialized = false,
     this.error,
-    this.engineType = TunerEngineType.pitch,
+    this.engineType = TunerEngineType.record,
   });
 
   /// Current tuner settings.
@@ -95,16 +94,22 @@ class Tuner extends _$Tuner {
   TunerEngine? _engine;
   StreamSubscription<TunerNote?>? _noteSubscription;
   bool _initialized = false;
-  TunerEngineType _currentEngineType = TunerEngineType.pitch;
+  TunerEngineType _currentEngineType = TunerEngineType.record;
 
   @override
   TunerProviderState build() {
-    // Determine default engine type
-    // Use pitch detection on mobile (iOS/Android), mock on desktop
-    final defaultType = _isDesktop() ? TunerEngineType.mock : TunerEngineType.pitch;
+    // Use RecordTunerEngine for all platforms (uses record package)
+    const defaultType = TunerEngineType.record;
     _currentEngineType = defaultType;
 
-    _createEngine(defaultType);
+    // Create initial state first
+    final initialState = TunerProviderState(engineType: defaultType);
+
+    // Create engine with default settings (state not yet available in build)
+    _createEngine(defaultType, initialState.settings.referenceFrequency);
+
+    // Initialize engine after build completes
+    Future.microtask(_initAsync);
 
     ref.onDispose(() {
       debugPrint('Tuner: disposing');
@@ -113,29 +118,22 @@ class Tuner extends _$Tuner {
       _engine = null;
     });
 
-    return TunerProviderState(engineType: defaultType);
-  }
-
-  /// Check if running on desktop platform.
-  bool _isDesktop() {
-    try {
-      return Platform.isMacOS || Platform.isWindows || Platform.isLinux;
-    } catch (_) {
-      // Platform not available (e.g., web)
-      return true;
-    }
+    return initialState;
   }
 
   /// Create and configure the tuner engine.
-  void _createEngine(TunerEngineType type) {
+  void _createEngine(TunerEngineType type, [double? referenceFrequency]) {
     debugPrint('Tuner: Creating engine type: $type');
+
+    // Use provided frequency or fall back to current state settings
+    final refFreq = referenceFrequency ?? state.settings.referenceFrequency;
 
     _engine = switch (type) {
       TunerEngineType.mock => MockTunerEngine(
           simulationMode: MockSimulationMode.tuningApproach,
         ),
-      TunerEngineType.pitch => PitchTunerEngine(
-          referenceFrequency: state.settings.referenceFrequency,
+      TunerEngineType.record => RecordTunerEngine(
+          referenceFrequency: refFreq,
         ),
     };
 
@@ -144,9 +142,6 @@ class Tuner extends _$Tuner {
 
     // Subscribe to note stream
     _noteSubscription = _engine!.noteStream.listen(_onPitchDetected);
-
-    // Initialize engine
-    _initAsync();
   }
 
   Future<void> _initAsync() async {
