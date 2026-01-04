@@ -1,0 +1,291 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../../../core/audio/mock_tuner_engine.dart';
+import '../../../../core/audio/tuner_engine.dart';
+import '../../domain/entities/tuner_settings.dart';
+import '../../domain/entities/tuner_types.dart';
+
+part 'tuner_provider.g.dart';
+
+/// State for the tuner.
+@immutable
+class TunerProviderState {
+  const TunerProviderState({
+    this.settings = const TunerSettings(),
+    this.isListening = false,
+    this.currentNote,
+    this.status = TuningStatus.idle,
+    this.isInitialized = false,
+    this.error,
+  });
+
+  /// Current tuner settings.
+  final TunerSettings settings;
+
+  /// Whether the tuner is actively listening.
+  final bool isListening;
+
+  /// Currently detected note (null if none).
+  final TunerNote? currentNote;
+
+  /// Current tuning status.
+  final TuningStatus status;
+
+  /// Whether the engine is initialized.
+  final bool isInitialized;
+
+  /// Error message if any.
+  final String? error;
+
+  /// Cent deviation of current note (0 if no note).
+  double get centDeviation => currentNote?.centDeviation ?? 0;
+
+  /// Whether tuning is perfect (within tight threshold).
+  bool get isPerfect =>
+      currentNote != null && currentNote!.centDeviation.abs() <= 5;
+
+  TunerProviderState copyWith({
+    TunerSettings? settings,
+    bool? isListening,
+    TunerNote? currentNote,
+    TuningStatus? status,
+    bool? isInitialized,
+    String? error,
+    bool clearNote = false,
+    bool clearError = false,
+  }) {
+    return TunerProviderState(
+      settings: settings ?? this.settings,
+      isListening: isListening ?? this.isListening,
+      currentNote: clearNote ? null : (currentNote ?? this.currentNote),
+      status: status ?? this.status,
+      isInitialized: isInitialized ?? this.isInitialized,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+/// Tuner state management with Riverpod.
+///
+/// Provides pitch detection using the device microphone.
+/// Uses MockTunerEngine for development/testing.
+@Riverpod(keepAlive: true)
+class Tuner extends _$Tuner {
+  TunerEngine? _engine;
+  StreamSubscription<TunerNote?>? _noteSubscription;
+  bool _initialized = false;
+
+  @override
+  TunerProviderState build() {
+    // Use MockTunerEngine for development (switch to RecordTunerEngine for production)
+    debugPrint('Tuner: Creating MockTunerEngine for development');
+    _engine = MockTunerEngine(
+      simulationMode: MockSimulationMode.random,
+    );
+
+    _engine!.onPitchDetected = _onPitchDetected;
+    _engine!.onError = _onError;
+
+    // Subscribe to note stream
+    _noteSubscription = _engine!.noteStream.listen(_onPitchDetected);
+
+    // Initialize engine
+    _initAsync();
+
+    ref.onDispose(() {
+      debugPrint('Tuner: disposing');
+      _noteSubscription?.cancel();
+      _engine?.dispose();
+      _engine = null;
+    });
+
+    return const TunerProviderState();
+  }
+
+  Future<void> _initAsync() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    debugPrint('Tuner: _initAsync started');
+    final success = await _engine!.init();
+
+    if (success) {
+      _engine!.referenceFrequency = state.settings.referenceFrequency;
+      state = state.copyWith(isInitialized: true);
+      debugPrint('Tuner: _initAsync completed successfully');
+    } else {
+      state = state.copyWith(error: 'Failed to initialize tuner');
+      debugPrint('Tuner: _initAsync failed');
+    }
+  }
+
+  void _onPitchDetected(TunerNote? note) {
+    if (note == null) {
+      state = state.copyWith(
+        currentNote: null,
+        status: TuningStatus.idle,
+        clearNote: true,
+      );
+    } else {
+      state = state.copyWith(
+        currentNote: note,
+        status: note.status,
+      );
+    }
+  }
+
+  void _onError(String message) {
+    debugPrint('Tuner error: $message');
+    state = state.copyWith(error: message);
+  }
+
+  /// Start listening for pitch.
+  Future<void> start() async {
+    if (state.isListening) return;
+
+    debugPrint('Tuner: start called');
+    state = state.copyWith(
+      isListening: true,
+      status: TuningStatus.listening,
+      clearError: true,
+    );
+
+    await _engine?.start();
+  }
+
+  /// Stop listening.
+  Future<void> stop() async {
+    if (!state.isListening) return;
+
+    debugPrint('Tuner: stop called');
+    state = state.copyWith(
+      isListening: false,
+      status: TuningStatus.idle,
+      clearNote: true,
+    );
+
+    await _engine?.stop();
+  }
+
+  /// Toggle listening state.
+  Future<void> toggle() async {
+    if (state.isListening) {
+      await stop();
+    } else {
+      await start();
+    }
+  }
+
+  /// Update reference frequency (430-450Hz).
+  void setReferenceFrequency(double frequency) {
+    final clamped = TunerSettings.clampFrequency(frequency);
+    debugPrint('Tuner: setReferenceFrequency $clamped');
+
+    state = state.copyWith(
+      settings: state.settings.copyWith(referenceFrequency: clamped),
+    );
+
+    _engine?.referenceFrequency = clamped;
+  }
+
+  /// Update transposition setting.
+  void setTransposition(Transposition transposition) {
+    debugPrint('Tuner: setTransposition $transposition');
+    state = state.copyWith(
+      settings: state.settings.copyWith(transposition: transposition),
+    );
+  }
+
+  /// Update enharmonic display mode.
+  void setEnharmonicMode(EnharmonicMode mode) {
+    debugPrint('Tuner: setEnharmonicMode $mode');
+    state = state.copyWith(
+      settings: state.settings.copyWith(enharmonicMode: mode),
+    );
+  }
+
+  /// Update difficulty level.
+  void setDifficulty(TunerDifficulty difficulty) {
+    debugPrint('Tuner: setDifficulty $difficulty');
+    state = state.copyWith(
+      settings: state.settings.copyWith(difficulty: difficulty),
+    );
+  }
+
+  /// Toggle combo counter visibility.
+  void toggleShowCombo() {
+    state = state.copyWith(
+      settings: state.settings.copyWith(showCombo: !state.settings.showCombo),
+    );
+  }
+
+  /// Toggle vibration feedback.
+  void toggleVibrationFeedback() {
+    state = state.copyWith(
+      settings: state.settings.copyWith(
+        vibrationFeedback: !state.settings.vibrationFeedback,
+      ),
+    );
+  }
+
+  /// Update all settings at once.
+  void updateSettings(TunerSettings settings) {
+    debugPrint('Tuner: updateSettings');
+    state = state.copyWith(settings: settings);
+    _engine?.referenceFrequency = settings.referenceFrequency;
+  }
+
+  /// Clear any error state.
+  void clearError() {
+    state = state.copyWith(clearError: true);
+  }
+}
+
+/// Provider for current note display name.
+@riverpod
+String? currentNoteName(CurrentNoteNameRef ref) {
+  final tunerState = ref.watch(tunerProvider);
+  final note = tunerState.currentNote;
+  if (note == null) return null;
+
+  final settings = tunerState.settings;
+
+  // Get display name based on enharmonic mode
+  final displayName = switch (settings.enharmonicMode) {
+    EnharmonicMode.sharpOnly => note.name.sharpName,
+    EnharmonicMode.flatOnly => note.name.flatName,
+    EnharmonicMode.both => note.name.enharmonicName,
+  };
+
+  // Apply transposition display if not concert pitch
+  if (settings.transposition != Transposition.c) {
+    final transposed = settings.transposition.transpose(note.name);
+    final transposedName = settings.enharmonicMode == EnharmonicMode.flatOnly
+        ? transposed.flatName
+        : transposed.sharpName;
+    return '$displayName ($transposedName${note.octave})';
+  }
+
+  return '$displayName${note.octave}';
+}
+
+/// Provider for tuner info display string (e.g., "A4 · 442Hz · +5¢").
+@riverpod
+String tunerInfoDisplay(TunerInfoDisplayRef ref) {
+  final tunerState = ref.watch(tunerProvider);
+  final note = tunerState.currentNote;
+  final settings = tunerState.settings;
+
+  if (note == null) {
+    return 'A4 = ${settings.referenceFrequency.toStringAsFixed(0)}Hz';
+  }
+
+  final noteName = ref.watch(currentNoteNameProvider) ?? '';
+  final hz = note.frequency.toStringAsFixed(1);
+  final cent = note.centDisplayString;
+
+  return '$noteName · ${hz}Hz · $cent¢';
+}
