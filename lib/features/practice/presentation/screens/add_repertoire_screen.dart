@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../widgets/section_form/date_range_section.dart';
 
 /// Screen for adding a new repertoire
 class AddRepertoireScreen extends ConsumerStatefulWidget {
@@ -184,66 +184,16 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Period section
-              Text(
-                '📅 기간 설정',
-                style: AppTypography.headingSmall,
+              // Period section using DateRangeSection
+              DateRangeSection(
+                startDate: _startDate,
+                endDate: _endDate,
+                onStartDateTap: _selectStartDate,
+                onEndDateTap: _selectEndDate,
+                onEndDateClear: _clearEndDate,
+                endDatePlaceholder: '설정 안함 (매일 반복)',
+                showHintMessage: true,
               ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '레퍼토리의 활성 기간을 설정합니다',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Date pickers row
-              Row(
-                children: [
-                  Expanded(
-                    child: _DatePickerField(
-                      label: '시작일',
-                      date: _startDate,
-                      onTap: _selectStartDate,
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.space2),
-                    child: Icon(Icons.arrow_forward, size: 20, color: AppColors.textSecondaryLight),
-                  ),
-                  Expanded(
-                    child: _DatePickerField(
-                      label: '종료일',
-                      date: _endDate,
-                      placeholder: '미지정',
-                      onTap: _selectEndDate,
-                      onClear: _endDate != null ? _clearEndDate : null,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              if (_endDate == null)
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.space2),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.repeat, size: 16, color: AppColors.info),
-                      const SizedBox(width: AppSpacing.space1),
-                      Expanded(
-                        child: Text(
-                          '종료일 미설정 시 매일 반복됩니다',
-                          style: AppTypography.bodySmall.copyWith(color: AppColors.info),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -316,78 +266,6 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Date picker field widget
-class _DatePickerField extends StatelessWidget {
-  final String label;
-  final DateTime? date;
-  final String? placeholder;
-  final VoidCallback onTap;
-  final VoidCallback? onClear;
-
-  const _DatePickerField({
-    required this.label,
-    required this.date,
-    this.placeholder,
-    required this.onTap,
-    this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy.MM.dd');
-    final displayText = date != null ? dateFormat.format(date!) : (placeholder ?? '미지정');
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    displayText,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: date != null ? AppColors.textPrimaryLight : AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (onClear != null)
-              IconButton(
-                icon: const Icon(Icons.close, size: 18),
-                onPressed: onClear,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                color: AppColors.textSecondaryLight,
-              )
-            else
-              const Icon(Icons.calendar_today, size: 18, color: AppColors.textSecondaryLight),
-          ],
         ),
       ),
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-import '../../../../core/router/app_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -12,7 +12,6 @@ import '../../../../providers/practice_repertoire/practice_repertoire_crud_provi
 import '../../domain/entities/section_sort_type.dart';
 import '../providers/repertoire_archive_provider.dart';
 import '../providers/section_sort_provider.dart';
-import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_management/section_sort_dropdown.dart';
 
 /// Repertoire detail screen with date settings and aggregated stats
@@ -33,11 +32,6 @@ class RepertoireDetailScreen extends ConsumerStatefulWidget {
 
 class _RepertoireDetailScreenState
     extends ConsumerState<RepertoireDetailScreen> {
-  DateTime? _startDate;
-  DateTime? _endDate;
-  bool _hasChanges = false;
-  bool _initialized = false;
-
   @override
   Widget build(BuildContext context) {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
@@ -52,11 +46,6 @@ class _RepertoireDetailScreenState
             icon: const Icon(Icons.mic),
             tooltip: '녹음',
           ),
-          if (_hasChanges)
-            TextButton(
-              onPressed: _saveChanges,
-              child: const Text('저장'),
-            ),
           // More menu with edit and archive options
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
@@ -90,12 +79,6 @@ class _RepertoireDetailScreenState
         data: (repertoire) {
           if (repertoire == null) {
             return const Center(child: Text('레퍼토리를 찾을 수 없습니다'));
-          }
-          // Initialize only once to preserve user edits
-          if (!_initialized) {
-            _startDate = repertoire.startDate;
-            _endDate = repertoire.endDate;
-            _initialized = true;
           }
           return _buildContent(repertoire);
         },
@@ -131,23 +114,8 @@ class _RepertoireDetailScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Date Range Section (공통 위젯 사용)
-          DateRangeSection(
-            startDate: _startDate,
-            endDate: _endDate,
-            onStartDateTap: () => _showDatePicker(isStart: true),
-            onEndDateTap: () => _showDatePicker(isStart: false),
-            onEndDateClear: () {
-              setState(() {
-                _endDate = null;
-                _hasChanges = true;
-              });
-            },
-            endDatePlaceholder: '설정 안함 (계속 진행)',
-            showHintMessage: true,
-            endDateNullHint: '종료일 미설정 시 매일 반복됩니다',
-            endDateSetHint: '종료일까지만 연습 목록에 표시됩니다',
-          ),
+          // Period display (read-only)
+          _buildPeriodSection(repertoire),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -358,37 +326,57 @@ class _RepertoireDetailScreenState
     }
   }
 
-  Future<void> _showDatePicker({required bool isStart}) async {
-    final now = DateTime.now();
-    final firstDate = now.subtract(const Duration(days: 365));
-    final lastDate = now.add(const Duration(days: 365 * 2));
+  Widget _buildPeriodSection(PracticeRepertoire repertoire) {
+    final dateFormat = DateFormat('yyyy.MM.dd');
+    final startStr = dateFormat.format(repertoire.startDate);
+    final endStr = repertoire.endDate != null
+        ? dateFormat.format(repertoire.endDate!)
+        : '진행중';
 
-    final initialDate = isStart
-        ? (_startDate ?? now)
-        : (_endDate ?? _startDate ?? now);
-
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-      locale: const Locale('ko', 'KR'),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.calendar_today,
+            size: 20,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '연습 기간',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space1),
+                Text(
+                  '$startStr ~ $endStr',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Edit button hint
+          IconButton(
+            onPressed: _openEditScreen,
+            icon: const Icon(Icons.edit_outlined, size: 20),
+            tooltip: '기간 편집',
+            color: AppColors.textSecondaryLight,
+          ),
+        ],
+      ),
     );
-
-    if (picked != null && mounted) {
-      setState(() {
-        if (isStart) {
-          _startDate = picked;
-          // Auto-adjust end date if needed
-          if (_endDate != null && _endDate!.isBefore(picked)) {
-            _endDate = picked;
-          }
-        } else {
-          _endDate = picked;
-        }
-        _hasChanges = true;
-      });
-    }
   }
 
   void _openRecordingScreen(BuildContext context) {
@@ -418,9 +406,6 @@ class _RepertoireDetailScreenState
       if (result == true) {
         // Refresh the data after edit
         ref.invalidate(repertoireProvider(widget.repertoireId));
-        setState(() {
-          _initialized = false; // Reset to reload dates from updated repertoire
-        });
       }
     });
   }
@@ -459,40 +444,6 @@ class _RepertoireDetailScreenState
         ],
       ),
     );
-  }
-
-  Future<void> _saveChanges() async {
-    final repertoire =
-        ref.read(repertoireProvider(widget.repertoireId)).valueOrNull;
-    if (repertoire == null) return;
-
-    final updatedRepertoire = PracticeRepertoire(
-      id: repertoire.id,
-      studentId: repertoire.studentId,
-      name: repertoire.name,
-      description: repertoire.description,
-      startDate: _startDate ?? DateTime.now(),
-      endDate: _endDate,
-      createdAt: repertoire.createdAt,
-      sections: repertoire.sections,
-    );
-
-    await ref
-        .read(repertoireCrudProvider.notifier)
-        .updateRepertoire(updatedRepertoire);
-
-    setState(() {
-      _hasChanges = false;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('저장되었습니다'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
   }
 
   _RepertoireStats _calculateStats(PracticeRepertoire repertoire) {

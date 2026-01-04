@@ -6,16 +6,17 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../models/practice_repertoire.dart';
+import '../../../domain/entities/practice_repertoire.dart';
 
 /// Section info card showing piece name, measure range, repeat settings, and period
 class SectionInfoCard extends StatelessWidget {
   final PracticeSection section;
-  final VoidCallback? onEditTap;
+  final DateTime? repertoireStartDate; // Fallback for section start date
 
   const SectionInfoCard({
     super.key,
     required this.section,
-    this.onEditTap,
+    this.repertoireStartDate,
   });
 
   @override
@@ -26,7 +27,7 @@ class SectionInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: Piece name and edit button
+            // Header: Piece name
             Row(
               children: [
                 Container(
@@ -71,11 +72,6 @@ class SectionInfoCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (onEditTap != null)
-                  TextButton(
-                    onPressed: onEditTap,
-                    child: const Text('편집'),
-                  ),
               ],
             ),
 
@@ -83,33 +79,25 @@ class SectionInfoCard extends StatelessWidget {
             const Divider(height: 1),
             const SizedBox(height: AppSpacing.space4),
 
-            // Section details
-            _buildInfoRow(
-              icon: Icons.straighten,
-              label: section.measureRangeText,
-            ),
-
-            // Repeat info (isRepeat)
-            if (section.isRepeat) ...[
-              const SizedBox(height: AppSpacing.space2),
+            // Section details - range info (only if not "전체")
+            if (section.rangeType != SectionRangeType.full) ...[
               _buildInfoRow(
-                icon: Icons.repeat,
-                label: '매일 반복',
-                iconColor: AppColors.success,
+                icon: Icons.straighten,
+                label: section.rangeText,
               ),
+              const SizedBox(height: AppSpacing.space2),
             ],
 
             // N회 반복 (repeatCount)
             if (section.hasRepeatCount) ...[
-              const SizedBox(height: AppSpacing.space2),
               _buildInfoRow(
                 emoji: '🐾',
                 label: '${section.repeatCount}회 반복',
               ),
+              const SizedBox(height: AppSpacing.space2),
             ],
 
             // Period (startDate ~ endDate)
-            const SizedBox(height: AppSpacing.space2),
             _buildInfoRow(
               icon: Icons.calendar_today,
               label: _formatPeriod(),
@@ -150,12 +138,16 @@ class SectionInfoCard extends StatelessWidget {
   }
 
   String _formatPeriod() {
-    final startStr = section.startDate != null
-        ? '${section.startDate!.year}.${section.startDate!.month.toString().padLeft(2, '0')}.${section.startDate!.day.toString().padLeft(2, '0')}'
+    // Use section's startDate, fallback to repertoire's startDate
+    final effectiveStartDate = section.startDate ?? repertoireStartDate;
+    final startStr = effectiveStartDate != null
+        ? '${effectiveStartDate.year}.${effectiveStartDate.month.toString().padLeft(2, '0')}.${effectiveStartDate.day.toString().padLeft(2, '0')}'
         : '시작일 미정';
 
     if (section.endDate == null) {
-      return '$startStr ~ 진행중';
+      // Show "진행중 (매일반복)" when section repeats daily
+      final suffix = section.isRepeat ? '진행중 (매일반복)' : '진행중';
+      return '$startStr ~ $suffix';
     }
 
     final endStr =

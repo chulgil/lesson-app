@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../widgets/section_form/date_range_section.dart';
 
 /// Screen for editing an existing repertoire
 class EditRepertoireScreen extends ConsumerStatefulWidget {
@@ -310,49 +310,16 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
 
                   const SizedBox(height: AppSpacing.space6),
 
-                  // Period section
-                  Text(
-                    '📅 기간 설정',
-                    style: AppTypography.headingSmall,
+                  // Period section using DateRangeSection
+                  DateRangeSection(
+                    startDate: _startDate,
+                    endDate: _endDate,
+                    onStartDateTap: _selectStartDate,
+                    onEndDateTap: _selectEndDate,
+                    onEndDateClear: _clearEndDate,
+                    endDatePlaceholder: '설정 안함 (매일 반복)',
+                    showHintMessage: true,
                   ),
-                  const SizedBox(height: AppSpacing.space3),
-
-                  // Date pickers
-                  _DatePickerTile(
-                    label: '시작일',
-                    date: _startDate,
-                    onTap: _selectStartDate,
-                  ),
-                  const Divider(height: 1),
-                  _DatePickerTile(
-                    label: '종료일',
-                    date: _endDate,
-                    placeholder: '미지정 (매일 반복)',
-                    onTap: _selectEndDate,
-                    onClear: _endDate != null ? _clearEndDate : null,
-                  ),
-
-                  const SizedBox(height: AppSpacing.space2),
-                  if (_endDate == null)
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.space2),
-                      decoration: BoxDecoration(
-                        color: AppColors.info.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.repeat, size: 16, color: AppColors.info),
-                          const SizedBox(width: AppSpacing.space1),
-                          Expanded(
-                            child: Text(
-                              '종료일 미설정 시 매일 반복됩니다',
-                              style: AppTypography.bodySmall.copyWith(color: AppColors.info),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
                   const SizedBox(height: AppSpacing.space8),
 
@@ -412,56 +379,6 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
           );
         },
       ),
-    );
-  }
-}
-
-/// Date picker tile widget
-class _DatePickerTile extends StatelessWidget {
-  final String label;
-  final DateTime? date;
-  final String? placeholder;
-  final VoidCallback onTap;
-  final VoidCallback? onClear;
-
-  const _DatePickerTile({
-    required this.label,
-    required this.date,
-    this.placeholder,
-    required this.onTap,
-    this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy.MM.dd');
-    final displayText = date != null ? dateFormat.format(date!) : (placeholder ?? '미지정');
-
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(label),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            displayText,
-            style: AppTypography.bodyMedium.copyWith(
-              color: date != null ? AppColors.textPrimaryLight : AppColors.textSecondaryLight,
-            ),
-          ),
-          if (onClear != null) ...[
-            IconButton(
-              icon: const Icon(Icons.close, size: 18),
-              onPressed: onClear,
-              color: AppColors.textSecondaryLight,
-            ),
-          ] else ...[
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: AppColors.textSecondaryLight),
-          ],
-        ],
-      ),
-      onTap: onTap,
     );
   }
 }

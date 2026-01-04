@@ -134,6 +134,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context, PracticeSection section) {
+    // Get repertoire to access its start date
+    final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
+    final repertoireStartDate = repertoireAsync.valueOrNull?.startDate;
+
     // Sort recordings by date (newest first)
     final sortedRecordings = List.of(section.recordings)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -153,15 +157,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           // Section info card
           SectionInfoCard(
             section: section,
-            onEditTap: () {
-              context.push(
-                AppRoutes.editSection.replaceAll(':id', section.id),
-                extra: {
-                  'repertoireId': widget.repertoireId,
-                  'studentId': widget.studentId,
-                },
-              );
-            },
+            repertoireStartDate: repertoireStartDate,
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -185,15 +181,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
           // Practice stats
           PracticeStatsCard(section: section),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          // Completion toggle (moved above recording section)
-          CompletionToggle(
-            section: section,
-            onToggle: () => _toggleCompletion(section),
-            selectedDate: widget.selectedDate,
-          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -309,6 +296,15 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
                 ],
               ),
             ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Completion toggle (below recording list)
+          CompletionToggle(
+            section: section,
+            onToggle: () => _toggleCompletion(section),
+            selectedDate: widget.selectedDate,
+          ),
         ],
       ),
     );
