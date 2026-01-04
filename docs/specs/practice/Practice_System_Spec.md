@@ -1,9 +1,22 @@
-# 연습 시스템 상세 스펙
+# 연습 시스템 개요
 
-> **문서 버전**: 1.2
-> **최종 수정**: 2026-01-04
-> **상태**: Phase 1-2 완료, 섹션 CRUD 확장 구현 완료
-> **관련 스펙**: [repertoire_section_crud_spec.md](./repertoire_section_crud_spec.md), [section_detail_view_spec.md](./section_detail_view_spec.md)
+> **문서 버전**: 2.0
+> **최종 수정**: 2026-01-05
+> **상태**: 구현 완료
+> **역할**: 연습 시스템 전체 개요 및 아키텍처
+
+---
+
+## 관련 문서
+
+| 문서 | 내용 |
+|------|------|
+| [practice_screen_spec.md](./practice_screen_spec.md) | 연습 화면 (탭, 날짜 선택, 리스트) |
+| [repertoire_detail_spec.md](./repertoire_detail_spec.md) | 레퍼토리 상세 (CRUD, 아카이브) |
+| [section_detail_spec.md](./section_detail_spec.md) | 섹션 상세/편집 (View, Add, Edit) |
+| [recording_requirement.md](./recording_requirement.md) | 녹음 기능 상세 |
+
+---
 
 ## 목차
 
