@@ -67,7 +67,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'edit') {
-                // TODO: Edit section
+                context.push(
+                  '${AppRoutes.editSection.replaceFirst(':id', widget.sectionId)}'
+                  '?repertoireId=${widget.repertoireId}&studentId=${widget.studentId}',
+                );
               } else if (value == 'delete') {
                 _showDeleteConfirmation(context);
               }
@@ -301,6 +304,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           CompletionToggle(
             section: section,
             onToggle: () => _toggleCompletion(section),
+            selectedDate: widget.selectedDate,
           ),
         ],
       ),
@@ -676,11 +680,22 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
   Future<void> _toggleCompletion(PracticeSection section) async {
     try {
-      await ref.read(sectionCrudProvider.notifier).toggleComplete(
-            section.id,
-            widget.repertoireId,
-            studentId: widget.studentId,
-          );
+      // Use toggleDailyCompletion for N회 반복 sections, toggleComplete for standard
+      if (section.hasRepeatCount) {
+        final today = widget.selectedDate ?? DateTime.now();
+        await ref.read(sectionCrudProvider.notifier).toggleDailyCompletion(
+              section.id,
+              widget.repertoireId,
+              widget.studentId,
+              today,
+            );
+      } else {
+        await ref.read(sectionCrudProvider.notifier).toggleComplete(
+              section.id,
+              widget.repertoireId,
+              studentId: widget.studentId,
+            );
+      }
       ref.invalidate(sectionProvider(widget.sectionId));
     } catch (e) {
       if (mounted) {

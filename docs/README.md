@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2026-01-01
+> 마지막 업데이트: 2026-01-04
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -12,6 +12,7 @@
 |------|------|------|
 | [architecture.md](architecture.md) | **앱 아키텍처 가이드** | 폴더 구조, Provider 패턴, 코드 위치 |
 | [../CLAUDE.md](../CLAUDE.md) | **프로젝트 가이드** | 명령어, 규칙, 작업 우선순위 |
+| [registry.md](registry.md) | **문서 레지스트리** | 토큰/컴포넌트/패턴 의존성 추적 |
 | [refactoring_tasks.md](refactoring_tasks.md) | 리팩토링 진행 현황 | Clean Architecture 마이그레이션 |
 
 > **Claude 작업 시작 시**: `architecture.md` → `CLAUDE.md` → 관련 specs 순으로 확인
@@ -22,6 +23,27 @@
 
 ```
 docs/
+├── _tokens/              # 🔑 디자인 토큰 (Single Source of Truth)
+│   ├── colors.md         # 색상 토큰
+│   ├── typography.md     # 타이포그래피 토큰
+│   ├── spacing.md        # 스페이싱 토큰
+│   ├── icons.md          # 아이콘 토큰
+│   └── status.md         # 상태 토큰
+├── _components/          # 🔑 공통 컴포넌트 스펙
+│   ├── form_field.md     # 폼 입력 필드
+│   ├── measure_picker.md # 마디 선택기
+│   ├── date_range_picker.md # 날짜 범위 선택기
+│   ├── repeat_toggle.md  # 반복 토글
+│   ├── submit_button.md  # 제출 버튼
+│   ├── bottom_sheet.md   # 바텀 시트
+│   ├── list_card.md      # 리스트 카드
+│   ├── confirm_dialog.md # 확인 다이얼로그
+│   └── empty_state.md    # 빈 상태
+├── _patterns/            # 🔑 공통 패턴
+│   ├── crud_form.md      # CRUD 폼 패턴
+│   ├── list_detail.md    # 리스트-상세 패턴
+│   └── date_constraint.md # 날짜 제약 패턴
+├── registry.md           # 📋 문서 의존성 레지스트리
 ├── requirement/          # 요구사항 및 현황
 ├── proposal/             # 기획 제안서
 ├── specs/                # 기능 명세서
@@ -38,6 +60,32 @@ docs/
 │   └── dev/              # 개발 가이드
 └── session/              # 작업 세션 기록
 ```
+
+---
+
+## 모듈러 문서 시스템
+
+### 원칙
+- **Single Source of Truth**: 토큰/컴포넌트/패턴은 한 곳에서만 정의
+- **의존성 추적**: 스펙 문서는 사용하는 모듈을 헤더에 선언
+- **변경 전파**: 모듈 변경 시 registry.md로 영향 범위 파악
+
+### 사용 방법
+
+스펙 문서 상단에 의존성 선언:
+```markdown
+<!-- @uses: tokens/colors, tokens/typography -->
+<!-- @uses: components/form_field, components/submit_button -->
+<!-- @uses: patterns/crud_form -->
+```
+
+### 공통 모듈
+
+| 폴더 | 설명 | 예시 |
+|------|------|------|
+| `_tokens/` | 디자인 토큰 (색상, 폰트, 간격) | `tokens/colors` |
+| `_components/` | 재사용 UI 컴포넌트 | `components/form_field` |
+| `_patterns/` | 공통 UX 패턴 | `patterns/crud_form` |
 
 ---
 

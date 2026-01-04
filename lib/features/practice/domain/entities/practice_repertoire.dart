@@ -7,6 +7,12 @@ import 'practice_note.dart';
 
 part 'practice_repertoire.g.dart';
 
+/// Range type for practice section (line or measure)
+enum SectionRangeType {
+  line, // 줄 단위 (1~3줄)
+  measure, // 마디 단위 (1~10마디)
+}
+
 /// Daily practice status for a section on a specific date
 class DailyPracticeStatus {
   final String id;
@@ -133,11 +139,31 @@ class PracticeSection {
   final String id;
   final String repertoireId;
   final String pieceName;
+
+  // Range type (line or measure)
+  final SectionRangeType rangeType;
+
+  // Measure range (when rangeType == measure)
   final int startMeasure;
   final int endMeasure;
+
+  // Line range (when rangeType == line)
+  final int? startLine;
+  final int? endLine;
+
   final String? sectionName;
   final bool isCompleted;
   final bool isRepeat; // If true, shows every day with daily reset
+
+  // N회 반복 설정 (null = 사용 안 함, 2~10 = 해당 횟수)
+  final int? repeatCount;
+  // 날짜별 반복 완료 횟수 (key: 'YYYY-MM-DD', value: 완료한 횟수)
+  final Map<String, int> dailyRepeatCounts;
+
+  // Section-level active period (optional, within repertoire dates)
+  final DateTime? startDate;
+  final DateTime? endDate;
+
   final int practiceCount;
   final int totalPracticeSeconds;
   final List<PracticeRecording> recordings;
@@ -153,11 +179,18 @@ class PracticeSection {
     required this.id,
     required this.repertoireId,
     required this.pieceName,
+    this.rangeType = SectionRangeType.measure, // Default to measure
     required this.startMeasure,
     required this.endMeasure,
+    this.startLine,
+    this.endLine,
     this.sectionName,
     this.isCompleted = false,
     this.isRepeat = true, // Default to repeat
+    this.repeatCount,
+    this.dailyRepeatCounts = const {},
+    this.startDate,
+    this.endDate,
     this.practiceCount = 0,
     this.totalPracticeSeconds = 0,
     this.recordings = const [],
@@ -173,8 +206,41 @@ class PracticeSection {
   /// Get measure range display string (e.g., "1~4 마디")
   String get measureRangeText => '$startMeasure~$endMeasure 마디';
 
+  /// Get line range display string (e.g., "1~3줄")
+  String get lineRangeText =>
+      startLine != null && endLine != null ? '$startLine~$endLine줄' : '';
+
+  /// Get range display string based on rangeType
+  String get rangeText {
+    if (rangeType == SectionRangeType.line) {
+      return lineRangeText;
+    }
+    return measureRangeText;
+  }
+
   /// Get display name (section name or auto-generated)
-  String get displayName => sectionName ?? measureRangeText;
+  String get displayName => sectionName ?? rangeText;
+
+  /// Check if N회 반복 is enabled
+  bool get hasRepeatCount => repeatCount != null && repeatCount! >= 2;
+
+  /// Get completed repeat count for a specific date
+  int getRepeatCompletedCount(DateTime date) {
+    final dateKey =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return dailyRepeatCounts[dateKey] ?? 0;
+  }
+
+  /// Check if all repeats are completed for a date
+  bool isAllRepeatsCompletedForDate(DateTime date) {
+    if (!hasRepeatCount) return isCompletedForDate(date);
+    return getRepeatCompletedCount(date) >= repeatCount!;
+  }
+
+  /// Get date key string for dailyRepeatCounts
+  static String dateToKey(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
 
   /// Get representative recording if exists
   PracticeRecording? get representativeRecording {
@@ -247,11 +313,21 @@ class PracticeSection {
     String? id,
     String? repertoireId,
     String? pieceName,
+    SectionRangeType? rangeType,
     int? startMeasure,
     int? endMeasure,
+    int? startLine,
+    int? endLine,
     String? sectionName,
     bool? isCompleted,
     bool? isRepeat,
+    int? repeatCount,
+    bool clearRepeatCount = false,
+    Map<String, int>? dailyRepeatCounts,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool clearStartDate = false,
+    bool clearEndDate = false,
     int? practiceCount,
     int? totalPracticeSeconds,
     List<PracticeRecording>? recordings,
@@ -267,11 +343,18 @@ class PracticeSection {
       id: id ?? this.id,
       repertoireId: repertoireId ?? this.repertoireId,
       pieceName: pieceName ?? this.pieceName,
+      rangeType: rangeType ?? this.rangeType,
       startMeasure: startMeasure ?? this.startMeasure,
       endMeasure: endMeasure ?? this.endMeasure,
+      startLine: startLine ?? this.startLine,
+      endLine: endLine ?? this.endLine,
       sectionName: sectionName ?? this.sectionName,
       isCompleted: isCompleted ?? this.isCompleted,
       isRepeat: isRepeat ?? this.isRepeat,
+      repeatCount: clearRepeatCount ? null : (repeatCount ?? this.repeatCount),
+      dailyRepeatCounts: dailyRepeatCounts ?? this.dailyRepeatCounts,
+      startDate: clearStartDate ? null : (startDate ?? this.startDate),
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
       practiceCount: practiceCount ?? this.practiceCount,
       totalPracticeSeconds: totalPracticeSeconds ?? this.totalPracticeSeconds,
       recordings: recordings ?? this.recordings,

@@ -7,6 +7,7 @@ import '../../../features/practice/presentation/screens/add_repertoire_screen.da
 import '../../../features/practice/presentation/screens/repertoire_detail_screen.dart';
 import '../../../features/practice/presentation/screens/practice_recording_screen.dart';
 import '../../../features/practice/presentation/screens/add_section_screen.dart';
+import '../../../features/practice/presentation/screens/edit_section_screen.dart';
 import '../../../features/practice/presentation/screens/section_detail_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_archive_screen.dart';
 import '../../../features/practice/presentation/screens/practice_note_list_screen.dart';
@@ -74,6 +75,22 @@ List<GoRoute> practiceRoutes = [
       final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return AddSectionScreen(
+        repertoireId: repertoireId,
+        studentId: studentId,
+      );
+    },
+  ),
+
+  // Edit Section
+  GoRoute(
+    path: AppRoutes.editSection,
+    name: 'editSection',
+    builder: (context, state) {
+      final sectionId = state.pathParameters['id'] ?? '';
+      final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return EditSectionScreen(
+        sectionId: sectionId,
         repertoireId: repertoireId,
         studentId: studentId,
       );

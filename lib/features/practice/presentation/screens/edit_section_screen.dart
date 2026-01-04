@@ -10,26 +10,32 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
 
-/// Screen for adding a new practice section with measure/line range selection
-class AddSectionScreen extends ConsumerStatefulWidget {
+/// Screen for editing an existing practice section
+class EditSectionScreen extends ConsumerStatefulWidget {
+  final String sectionId;
   final String repertoireId;
   final String studentId;
 
-  const AddSectionScreen({
+  const EditSectionScreen({
     super.key,
+    required this.sectionId,
     required this.repertoireId,
     required this.studentId,
   });
 
   @override
-  ConsumerState<AddSectionScreen> createState() => _AddSectionScreenState();
+  ConsumerState<EditSectionScreen> createState() => _EditSectionScreenState();
 }
 
-class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
+class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pieceNameController = TextEditingController();
   final _sectionNameController = TextEditingController();
   bool _isLoading = false;
+  bool _isInitialized = false;
+
+  // Original section for comparison
+  PracticeSection? _originalSection;
 
   // Range type selection
   SectionRangeType _rangeType = SectionRangeType.measure;
@@ -48,41 +54,46 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
   // Repeat settings
   bool _isRepeat = true;
-  int? _repeatCount; // null = 없음, 2~10
+  int? _repeatCount;
 
   // Repertoire date constraints
   DateTime? _repertoireStartDate;
   DateTime? _repertoireEndDate;
 
-  // Common piece suggestions based on repertoire
-  final List<String> _pieceSuggestions = [
-    '1번',
-    '2번',
-    '3번',
-    '4번',
-    '5번',
-    'Allegro',
-    'Andante',
-    'Minuet',
-    'Gavotte',
-    'Etude No.1',
-    'Etude No.2',
-    'Scale C Major',
-  ];
-
   @override
   void initState() {
     super.initState();
-    _loadRepertoireDates();
+    _loadSectionData();
   }
 
-  Future<void> _loadRepertoireDates() async {
+  Future<void> _loadSectionData() async {
+    // Load repertoire dates
     final repertoire =
         await ref.read(repertoireProvider(widget.repertoireId).future);
     if (repertoire != null && mounted) {
       setState(() {
         _repertoireStartDate = repertoire.startDate;
         _repertoireEndDate = repertoire.endDate;
+      });
+    }
+
+    // Load section data
+    final section = await ref.read(sectionProvider(widget.sectionId).future);
+    if (section != null && mounted) {
+      setState(() {
+        _originalSection = section;
+        _pieceNameController.text = section.pieceName;
+        _sectionNameController.text = section.sectionName ?? '';
+        _rangeType = section.rangeType;
+        _startMeasure = section.startMeasure;
+        _endMeasure = section.endMeasure;
+        _startLine = section.startLine ?? 1;
+        _endLine = section.endLine ?? 2;
+        _startDate = section.startDate;
+        _endDate = section.endDate;
+        _isRepeat = section.isRepeat;
+        _repeatCount = section.repeatCount;
+        _isInitialized = true;
       });
     }
   }
@@ -96,6 +107,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_originalSection == null) return;
 
     // Validate range based on type
     if (_rangeType == SectionRangeType.measure) {
@@ -136,27 +148,32 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(sectionCrudProvider.notifier).createSection(
-            repertoireId: widget.repertoireId,
-            pieceName: _pieceNameController.text.trim(),
-            rangeType: _rangeType,
-            startMeasure:
-                _rangeType == SectionRangeType.measure ? _startMeasure : 1,
-            endMeasure:
-                _rangeType == SectionRangeType.measure ? _endMeasure : 1,
-            startLine:
-                _rangeType == SectionRangeType.line ? _startLine : null,
-            endLine: _rangeType == SectionRangeType.line ? _endLine : null,
-            sectionName: _sectionNameController.text.trim().isEmpty
-                ? null
-                : _sectionNameController.text.trim(),
-            isRepeat: _isRepeat,
-            repeatCount: _repeatCount,
-            startDate: _startDate,
-            endDate: _endDate,
-          );
+      final updatedSection = _originalSection!.copyWith(
+        pieceName: _pieceNameController.text.trim(),
+        rangeType: _rangeType,
+        startMeasure:
+            _rangeType == SectionRangeType.measure ? _startMeasure : 1,
+        endMeasure: _rangeType == SectionRangeType.measure ? _endMeasure : 1,
+        startLine: _rangeType == SectionRangeType.line ? _startLine : null,
+        endLine: _rangeType == SectionRangeType.line ? _endLine : null,
+        sectionName: _sectionNameController.text.trim().isEmpty
+            ? null
+            : _sectionNameController.text.trim(),
+        isRepeat: _isRepeat,
+        repeatCount: _repeatCount,
+        clearRepeatCount: _repeatCount == null,
+        startDate: _startDate,
+        endDate: _endDate,
+        clearStartDate: _startDate == null,
+        clearEndDate: _endDate == null,
+        updatedAt: DateTime.now(),
+      );
 
-      // Invalidate repertoires to refresh the list
+      await ref.read(sectionCrudProvider.notifier).updateSection(updatedSection);
+
+      // Invalidate providers to refresh
+      ref.invalidate(sectionProvider(widget.sectionId));
+      ref.invalidate(repertoireProvider(widget.repertoireId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
 
       if (mounted) {
@@ -166,7 +183,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('섹션 추가에 실패했습니다: $e'),
+            content: Text('섹션 수정에 실패했습니다: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -252,7 +269,6 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       setState(() {
         if (isStart) {
           _startDate = picked;
-          // Auto-adjust end date if needed
           if (_endDate != null && _endDate!.isBefore(picked)) {
             _endDate = picked;
           }
@@ -273,9 +289,16 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('섹션 수정')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('섹션 추가'),
+        title: const Text('섹션 수정'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -309,21 +332,6 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                   }
                   return null;
                 },
-              ),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              // Quick piece selection
-              Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space1,
-                children: _pieceSuggestions.take(8).map((name) {
-                  return ActionChip(
-                    label: Text(name, style: const TextStyle(fontSize: 12)),
-                    onPressed: () => _pieceNameController.text = name,
-                    visualDensity: VisualDensity.compact,
-                  );
-                }).toList(),
               ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -479,7 +487,6 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
               Row(
                 children: [
-                  // Start date picker
                   Expanded(
                     child: _DatePickerButton(
                       label: '시작일',
@@ -499,7 +506,6 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
-                  // End date picker
                   Expanded(
                     child: _DatePickerButton(
                       label: '종료일',
@@ -596,8 +602,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.secondary.withValues(alpha: 0.1),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Row(
                     children: [
@@ -632,7 +637,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('섹션 추가'),
+                      : const Text('변경사항 저장'),
                 ),
               ),
 
@@ -907,7 +912,7 @@ class _RangePickerSheetState extends State<_RangePickerSheet> {
     super.initState();
     _selectedValue = widget.initialValue;
     _scrollController = FixedExtentScrollController(
-      initialItem: _selectedValue - 1, // 0-indexed
+      initialItem: _selectedValue - 1,
     );
   }
 
@@ -929,7 +934,6 @@ class _RangePickerSheetState extends State<_RangePickerSheet> {
       ),
       child: Column(
         children: [
-          // Header
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space4,
@@ -961,15 +965,13 @@ class _RangePickerSheetState extends State<_RangePickerSheet> {
               ],
             ),
           ),
-
-          // Picker
           Expanded(
             child: CupertinoPicker(
               scrollController: _scrollController,
               itemExtent: 50,
               onSelectedItemChanged: (index) {
                 setState(() {
-                  _selectedValue = index + 1; // 1-indexed
+                  _selectedValue = index + 1;
                 });
               },
               children: List.generate(

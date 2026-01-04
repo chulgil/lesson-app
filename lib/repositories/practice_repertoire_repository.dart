@@ -569,6 +569,7 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
       String sectionId, DateTime date) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final dateOnly = DateTime(date.year, date.month, date.day);
+    final dateKey = PracticeSection.dateToKey(dateOnly);
 
     for (final repertoires in _repertoires.values) {
       for (int i = 0; i < repertoires.length; i++) {
@@ -578,37 +579,86 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
         if (sectionIndex != -1) {
           final section = repertoire.sections[sectionIndex];
 
-          // Find existing status for this date
-          final existingIndex = section.dailyStatuses.indexWhere(
-              (s) => s.dateOnly == dateOnly);
+          PracticeSection updatedSection;
 
-          List<DailyPracticeStatus> updatedStatuses;
-          if (existingIndex != -1) {
-            // Toggle existing status
-            final existing = section.dailyStatuses[existingIndex];
-            updatedStatuses = List.from(section.dailyStatuses);
-            updatedStatuses[existingIndex] = existing.copyWith(
-              isCompleted: !existing.isCompleted,
-              completedAt: !existing.isCompleted ? DateTime.now() : null,
+          // Handle N회 반복 mode
+          if (section.hasRepeatCount) {
+            final currentCount = section.getRepeatCompletedCount(dateOnly);
+            final maxCount = section.repeatCount!;
+
+            // Increment count (cycle: 0 -> 1 -> 2 -> ... -> max -> 0)
+            final newCount = (currentCount >= maxCount) ? 0 : currentCount + 1;
+            final updatedCounts = Map<String, int>.from(section.dailyRepeatCounts);
+            if (newCount == 0) {
+              updatedCounts.remove(dateKey);
+            } else {
+              updatedCounts[dateKey] = newCount;
+            }
+
+            // Also update dailyStatuses for compatibility
+            final existingIndex = section.dailyStatuses.indexWhere(
+                (s) => s.dateOnly == dateOnly);
+            List<DailyPracticeStatus> updatedStatuses;
+            final isNowCompleted = newCount >= maxCount;
+
+            if (existingIndex != -1) {
+              updatedStatuses = List.from(section.dailyStatuses);
+              updatedStatuses[existingIndex] = section.dailyStatuses[existingIndex].copyWith(
+                isCompleted: isNowCompleted,
+                completedAt: isNowCompleted ? DateTime.now() : null,
+              );
+            } else if (isNowCompleted) {
+              updatedStatuses = [
+                ...section.dailyStatuses,
+                DailyPracticeStatus(
+                  id: _uuid.v4(),
+                  sectionId: sectionId,
+                  date: dateOnly,
+                  isCompleted: true,
+                  completedAt: DateTime.now(),
+                ),
+              ];
+            } else {
+              updatedStatuses = section.dailyStatuses;
+            }
+
+            updatedSection = section.copyWith(
+              dailyRepeatCounts: updatedCounts,
+              dailyStatuses: updatedStatuses,
+              updatedAt: DateTime.now(),
             );
           } else {
-            // Create new status as completed
-            updatedStatuses = [
-              ...section.dailyStatuses,
-              DailyPracticeStatus(
-                id: _uuid.v4(),
-                sectionId: sectionId,
-                date: dateOnly,
-                isCompleted: true,
-                completedAt: DateTime.now(),
-              ),
-            ];
+            // Standard toggle mode (existing behavior)
+            final existingIndex = section.dailyStatuses.indexWhere(
+                (s) => s.dateOnly == dateOnly);
+
+            List<DailyPracticeStatus> updatedStatuses;
+            if (existingIndex != -1) {
+              final existing = section.dailyStatuses[existingIndex];
+              updatedStatuses = List.from(section.dailyStatuses);
+              updatedStatuses[existingIndex] = existing.copyWith(
+                isCompleted: !existing.isCompleted,
+                completedAt: !existing.isCompleted ? DateTime.now() : null,
+              );
+            } else {
+              updatedStatuses = [
+                ...section.dailyStatuses,
+                DailyPracticeStatus(
+                  id: _uuid.v4(),
+                  sectionId: sectionId,
+                  date: dateOnly,
+                  isCompleted: true,
+                  completedAt: DateTime.now(),
+                ),
+              ];
+            }
+
+            updatedSection = section.copyWith(
+              dailyStatuses: updatedStatuses,
+              updatedAt: DateTime.now(),
+            );
           }
 
-          final updatedSection = section.copyWith(
-            dailyStatuses: updatedStatuses,
-            updatedAt: DateTime.now(),
-          );
           final updatedSections =
               List<PracticeSection>.from(repertoire.sections);
           updatedSections[sectionIndex] = updatedSection;

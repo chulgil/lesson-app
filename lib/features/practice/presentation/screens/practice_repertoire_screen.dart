@@ -388,6 +388,10 @@ class _SectionListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final today = DateTime.now();
+    final completedCount = section.getRepeatCompletedCount(today);
+    final hasRepeatCount = section.hasRepeatCount;
+
     return InkWell(
       onTap: () => context.push(
         '/practice/section/${section.id}?repertoireId=$repertoireId&studentId=$studentId',
@@ -399,20 +403,36 @@ class _SectionListItem extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            // Piece name and measure range
+            // Piece name and range (line or measure)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    section.pieceName,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          section.pieceName,
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      // Repeat indicator
+                      if (section.isRepeat) ...[
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.repeat,
+                          size: 14,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    section.measureRangeText,
+                    section.rangeText, // Uses rangeType to show line or measure
                     style: AppTypography.caption.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
@@ -457,21 +477,37 @@ class _SectionListItem extends ConsumerWidget {
                 ),
               ),
 
-            // Completion checkbox
-            Transform.scale(
-              scale: 1.2,
-              child: Checkbox(
-                value: section.isCompleted,
-                onChanged: (value) async {
-                  await ref.read(sectionCrudProvider.notifier).toggleComplete(
+            // Completion indicator: 🐾 paw stamps for N회 반복, checkbox otherwise
+            if (hasRepeatCount)
+              _PawStampRow(
+                totalCount: section.repeatCount!,
+                completedCount: completedCount,
+                onTap: () async {
+                  await ref.read(sectionCrudProvider.notifier).toggleDailyCompletion(
                         section.id,
                         repertoireId,
+                        studentId,
+                        today,
                       );
                   ref.invalidate(studentRepertoiresProvider(studentId));
                 },
-                activeColor: AppColors.success,
+              )
+            else
+              Transform.scale(
+                scale: 1.2,
+                child: Checkbox(
+                  value: section.isCompleted,
+                  onChanged: (value) async {
+                    await ref.read(sectionCrudProvider.notifier).toggleComplete(
+                          section.id,
+                          repertoireId,
+                          studentId: studentId,
+                        );
+                    ref.invalidate(studentRepertoiresProvider(studentId));
+                  },
+                  activeColor: AppColors.success,
+                ),
               ),
-            ),
 
             // Arrow
             const Icon(
@@ -480,6 +516,44 @@ class _SectionListItem extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// 🐾 Paw stamp row for N회 반복 feature
+class _PawStampRow extends StatelessWidget {
+  final int totalCount;
+  final int completedCount;
+  final VoidCallback onTap;
+
+  const _PawStampRow({
+    required this.totalCount,
+    required this.completedCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(totalCount, (index) {
+          final isCompleted = index < completedCount;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 1),
+            child: Opacity(
+              opacity: isCompleted ? 1.0 : 0.3,
+              child: Text(
+                '🐾',
+                style: TextStyle(
+                  fontSize: totalCount <= 5 ? 16 : 12,
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }

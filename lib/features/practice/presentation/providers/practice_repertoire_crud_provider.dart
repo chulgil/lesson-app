@@ -151,9 +151,16 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   Future<PracticeSection> createSection({
     required String repertoireId,
     required String pieceName,
-    required int startMeasure,
-    required int endMeasure,
+    SectionRangeType rangeType = SectionRangeType.measure,
+    int startMeasure = 1,
+    int endMeasure = 1,
+    int? startLine,
+    int? endLine,
     String? sectionName,
+    bool isRepeat = true,
+    int? repeatCount,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     state = const AsyncLoading();
     try {
@@ -162,9 +169,16 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
         id: '',
         repertoireId: repertoireId,
         pieceName: pieceName,
+        rangeType: rangeType,
         startMeasure: startMeasure,
         endMeasure: endMeasure,
+        startLine: startLine,
+        endLine: endLine,
         sectionName: sectionName,
+        isRepeat: isRepeat,
+        repeatCount: repeatCount,
+        startDate: startDate,
+        endDate: endDate,
         createdAt: DateTime.now(),
       );
       final result = await repository.createSection(section);

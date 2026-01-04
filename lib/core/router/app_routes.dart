@@ -41,6 +41,7 @@ class AppRoutes {
   static const repertoireDetail = '/practice/repertoire/:id';
   static const practiceRecording = '/practice/recording/:repertoireId';
   static const addSection = '/practice/section/add';
+  static const editSection = '/practice/section/:id/edit';
   static const sectionDetail = '/practice/section/:id';
   static const practiceArchive = '/practice/archive';
   static const practiceNotes = '/practice/section/:sectionId/notes';
@@ -59,6 +60,9 @@ class AppRoutes {
   static const careerEdit = '/profile/career/edit';
   static const certificateEdit = '/profile/certificate/edit';
   static const profileVisibility = '/profile/visibility';
+
+  // Settings routes
+  static const backupSettings = '/settings/backup';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
