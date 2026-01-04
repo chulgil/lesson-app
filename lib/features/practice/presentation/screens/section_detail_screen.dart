@@ -16,7 +16,9 @@ import '../../../../providers/practice_repertoire/practice_repertoire_crud_provi
 import '../../../../providers/recording/recording_provider.dart';
 import '../../../../providers/smart_recording/smart_recording_provider.dart';
 import '../../../../services/audio_trimmer_service.dart';
+import '../../domain/entities/recording_filter_type.dart';
 import '../widgets/metronome/metronome.dart';
+import '../widgets/section_detail/recording_filter_dropdown.dart';
 import '../widgets/notes/note_preview_card.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
@@ -46,6 +48,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   bool _isPaused = false;
   int _recordingSeconds = 0;
   bool _usedMetronome = false; // Track if metronome was used during recording
+  RecordingFilterType _recordingFilter = RecordingFilterType.daily; // Default to daily
 
   @override
   Widget build(BuildContext context) {
@@ -131,26 +134,16 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context, PracticeSection section) {
-    // Sort recordings by date (newest first) and filter by selectedDate
+    // Sort recordings by date (newest first)
     final sortedRecordings = List.of(section.recordings)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-    // Filter recordings up to selectedDate (inclusive)
-    final filteredRecordings = widget.selectedDate != null
-        ? sortedRecordings.where((r) {
-            final recordingDate = DateTime(
-              r.createdAt.year,
-              r.createdAt.month,
-              r.createdAt.day,
-            );
-            final selectedDateOnly = DateTime(
-              widget.selectedDate!.year,
-              widget.selectedDate!.month,
-              widget.selectedDate!.day,
-            );
-            return !recordingDate.isAfter(selectedDateOnly);
-          }).toList()
-        : sortedRecordings;
+    // Apply recording filter based on selected filter type and date
+    final filteredRecordings = _filterRecordings(
+      recordings: sortedRecordings,
+      filter: _recordingFilter,
+      selectedDate: widget.selectedDate,
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -184,6 +177,15 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Completion toggle (moved above recording section)
+          CompletionToggle(
+            section: section,
+            onToggle: () => _toggleCompletion(section),
+            selectedDate: widget.selectedDate,
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
           // Recording section
           Text(
             '녹음',
@@ -206,7 +208,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           const SizedBox(height: AppSpacing.space6),
 
           // Recordings list
-          if (filteredRecordings.isNotEmpty) ...[
+          if (section.recordings.isNotEmpty) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -214,57 +216,56 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
                   '녹음 기록 (${filteredRecordings.length})',
                   style: AppTypography.headingSmall,
                 ),
-                if (section.representativeRecording != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space2,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          size: 14,
-                          color: AppColors.success,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '대표 녹음 있음',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                // Recording filter dropdown (replaces "대표 녹음 있음" badge)
+                RecordingFilterDropdown(
+                  selectedFilter: _recordingFilter,
+                  onFilterChanged: (filter) {
+                    setState(() {
+                      _recordingFilter = filter;
+                    });
+                  },
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
 
-            // Recordings list
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filteredRecordings.length,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: AppSpacing.space2),
-              itemBuilder: (context, index) {
-                final recording = filteredRecordings[index];
-                return SectionRecordingListItem(
-                  recording: recording,
-                  sectionId: section.id,
-                  repertoireId: widget.repertoireId,
-                  onSetRepresentative: () => _setRepresentative(recording.id),
-                  onDelete: () => _deleteRecording(recording.id),
-                  onPlay: () => _playRecording(recording),
-                );
-              },
-            ),
+            // Recordings list or empty filter message
+            if (filteredRecordings.isNotEmpty)
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filteredRecordings.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: AppSpacing.space2),
+                itemBuilder: (context, index) {
+                  final recording = filteredRecordings[index];
+                  return SectionRecordingListItem(
+                    recording: recording,
+                    sectionId: section.id,
+                    repertoireId: widget.repertoireId,
+                    onSetRepresentative: () => _setRepresentative(recording.id),
+                    onDelete: () => _deleteRecording(recording.id),
+                    onPlay: () => _playRecording(recording),
+                  );
+                },
+              )
+            else
+              // Empty filtered result (but recordings exist)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Text(
+                  '${_recordingFilter.displayLabel} 녹음이 없습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
           ] else
             Container(
               width: double.infinity,
@@ -297,18 +298,60 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
                 ],
               ),
             ),
-
-          const SizedBox(height: AppSpacing.space8),
-
-          // Completion toggle
-          CompletionToggle(
-            section: section,
-            onToggle: () => _toggleCompletion(section),
-            selectedDate: widget.selectedDate,
-          ),
         ],
       ),
     );
+  }
+
+  /// Filter recordings based on filter type and selected date
+  List<PracticeRecording> _filterRecordings({
+    required List<PracticeRecording> recordings,
+    required RecordingFilterType filter,
+    required DateTime? selectedDate,
+  }) {
+    final referenceDate = selectedDate ?? DateTime.now();
+
+    switch (filter) {
+      case RecordingFilterType.all:
+        // Show all recordings up to selected date (if set)
+        if (selectedDate != null) {
+          return recordings.where((r) {
+            final recordingDate = DateTime(
+              r.createdAt.year,
+              r.createdAt.month,
+              r.createdAt.day,
+            );
+            final selectedDateOnly = DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+            );
+            return !recordingDate.isAfter(selectedDateOnly);
+          }).toList();
+        }
+        return recordings;
+
+      case RecordingFilterType.weekly:
+        // Show recordings from the week containing the reference date (Mon-Sun)
+        final weekday = referenceDate.weekday; // 1=Mon, 7=Sun
+        final monday = referenceDate.subtract(Duration(days: weekday - 1));
+        final sunday = monday.add(const Duration(days: 6));
+        final weekStart = DateTime(monday.year, monday.month, monday.day);
+        final weekEnd = DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59);
+
+        return recordings.where((r) {
+          return r.createdAt.isAfter(weekStart.subtract(const Duration(seconds: 1))) &&
+              r.createdAt.isBefore(weekEnd.add(const Duration(seconds: 1)));
+        }).toList();
+
+      case RecordingFilterType.daily:
+        // Show recordings from the reference date only
+        return recordings.where((r) {
+          return r.createdAt.year == referenceDate.year &&
+              r.createdAt.month == referenceDate.month &&
+              r.createdAt.day == referenceDate.day;
+        }).toList();
+    }
   }
 
   Future<void> _startRecording() async {

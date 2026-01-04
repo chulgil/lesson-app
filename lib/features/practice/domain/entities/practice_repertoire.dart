@@ -7,8 +7,9 @@ import 'practice_note.dart';
 
 part 'practice_repertoire.g.dart';
 
-/// Range type for practice section (line or measure)
+/// Range type for practice section (full, line, or measure)
 enum SectionRangeType {
+  full, // 전체 (범위 지정 없음)
   line, // 줄 단위 (1~3줄)
   measure, // 마디 단위 (1~10마디)
 }
@@ -212,10 +213,14 @@ class PracticeSection {
 
   /// Get range display string based on rangeType
   String get rangeText {
-    if (rangeType == SectionRangeType.line) {
-      return lineRangeText;
+    switch (rangeType) {
+      case SectionRangeType.full:
+        return '전체';
+      case SectionRangeType.line:
+        return lineRangeText;
+      case SectionRangeType.measure:
+        return measureRangeText;
     }
-    return measureRangeText;
   }
 
   /// Get display name (section name or auto-generated)

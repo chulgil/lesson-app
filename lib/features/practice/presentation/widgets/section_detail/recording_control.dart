@@ -267,26 +267,38 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                       ),
                     ] else ...[
                       Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.6,
-                          child: FilledButton.icon(
-                            onPressed: hasMicPermission ? widget.onStartRecording : () async {
-                              final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
-                              if (granted) {
-                                ref.invalidate(microphonePermissionProvider);
-                              } else {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
-                                  );
-                                }
-                              }
-                            },
-                            icon: Icon(
+                        child: FilledButton(
+                        onPressed: hasMicPermission ? widget.onStartRecording : () async {
+                          final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
+                          if (granted) {
+                            ref.invalidate(microphonePermissionProvider);
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
+                              );
+                            }
+                          }
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor: hasMicPermission ? AppColors.error : AppColors.textSecondaryLight,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.space8,
+                            vertical: AppSpacing.space4,
+                          ),
+                          fixedSize: const Size.fromHeight(56),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
                               hasMicPermission ? Icons.mic : Icons.mic_off,
                               size: 28,
+                              color: Colors.white,
                             ),
-                            label: Text(
+                            const SizedBox(width: AppSpacing.space2),
+                            Text(
                               !hasMicPermission
                                   ? '마이크 권한 필요'
                                   : isSmartMode
@@ -297,16 +309,10 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: hasMicPermission ? AppColors.error : AppColors.textSecondaryLight,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.space8,
-                                vertical: AppSpacing.space5,
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ),
+                    ),
                     ],
                   ],
                 ),

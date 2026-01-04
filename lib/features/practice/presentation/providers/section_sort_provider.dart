@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/entities.dart';
+import 'practice_repertoire_crud_provider.dart';
 import 'practice_repertoire_repository_provider.dart';
 
 /// Current section sort type provider
@@ -11,19 +12,12 @@ final sectionSortTypeProvider = StateProvider<SectionSortType>((ref) {
 /// Sorted sections provider for a repertoire
 final sortedSectionsProvider =
     Provider.family<List<PracticeSection>, String>((ref, repertoireId) {
-  final repertoire =
-      ref.watch(singleRepertoireProvider(repertoireId)).valueOrNull;
+  // Use the same repertoireProvider as the detail screen
+  final repertoire = ref.watch(repertoireProvider(repertoireId)).valueOrNull;
   final sortType = ref.watch(sectionSortTypeProvider);
 
   if (repertoire == null) return [];
   return repertoire.sections.sortBy(sortType);
-});
-
-/// Single repertoire provider for section sorting
-final singleRepertoireProvider =
-    FutureProvider.family<PracticeRepertoire?, String>((ref, id) async {
-  final repository = ref.watch(practiceRepertoireRepositoryProvider);
-  return repository.getRepertoire(id);
 });
 
 /// Section order notifier for drag and drop
@@ -55,9 +49,8 @@ class SectionOrderNotifier extends AsyncNotifier<void> {
       // Update order in repository
       await repository.updateSectionOrders(repertoireId, sectionIds);
 
-      // Invalidate to refresh
-      ref.invalidate(singleRepertoireProvider(repertoireId));
-      ref.invalidate(sortedSectionsProvider(repertoireId));
+      // Invalidate to refresh UI
+      ref.invalidate(repertoireProvider(repertoireId));
 
       state = const AsyncData(null);
     } catch (e, st) {
@@ -85,8 +78,8 @@ class SectionOrderNotifier extends AsyncNotifier<void> {
       // Apply current order as sortOrder
       await repository.updateSectionOrders(repertoireId, sectionIds);
 
-      ref.invalidate(singleRepertoireProvider(repertoireId));
-      ref.invalidate(sortedSectionsProvider(repertoireId));
+      // Invalidate to refresh UI
+      ref.invalidate(repertoireProvider(repertoireId));
 
       state = const AsyncData(null);
     } catch (e, st) {

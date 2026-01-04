@@ -1,8 +1,9 @@
 # 연습 시스템 상세 스펙
 
-> **문서 버전**: 1.1
-> **최종 수정**: 2024-12-24
-> **상태**: Phase 1-2 구현 완료
+> **문서 버전**: 1.2
+> **최종 수정**: 2026-01-04
+> **상태**: Phase 1-2 완료, 섹션 CRUD 확장 구현 완료
+> **관련 스펙**: [repertoire_section_crud_spec.md](./repertoire_section_crud_spec.md), [section_detail_view_spec.md](./section_detail_view_spec.md)
 
 ## 목차
 
@@ -801,6 +802,7 @@ class BadgeChecker {
 |------|------|----------|
 | 1.0 | 2024-12-24 | 초안 작성 |
 | 1.1 | 2024-12-24 | Phase 1-2 구현 완료, 다중 구간 지원 추가 |
+| 1.2 | 2026-01-04 | 섹션 CRUD 확장: 범위 유형(전체/줄/마디), 녹음 필터(전체/주간/당일), 연습 완료 UI 위치 변경(녹음 위). 상세 스펙은 repertoire_section_crud_spec.md, section_detail_view_spec.md 참조 |
 
 ### C. 미결정 사항
 
