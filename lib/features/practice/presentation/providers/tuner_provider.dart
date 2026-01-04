@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/audio/mock_tuner_engine.dart';
 import '../../../../core/audio/record_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
+import '../../../../services/tuner_storage_service.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
 
@@ -95,6 +96,7 @@ class Tuner extends _$Tuner {
   StreamSubscription<TunerNote?>? _noteSubscription;
   bool _initialized = false;
   TunerEngineType _currentEngineType = TunerEngineType.record;
+  final _storageService = TunerStorageService();
 
   @override
   TunerProviderState build() {
@@ -108,7 +110,7 @@ class Tuner extends _$Tuner {
     // Create engine with default settings (state not yet available in build)
     _createEngine(defaultType, initialState.settings.referenceFrequency);
 
-    // Initialize engine after build completes
+    // Initialize engine and load settings after build completes
     Future.microtask(_initAsync);
 
     ref.onDispose(() {
@@ -149,6 +151,16 @@ class Tuner extends _$Tuner {
     _initialized = true;
 
     debugPrint('Tuner: _initAsync started');
+
+    // Load saved settings from Hive
+    try {
+      final savedSettings = await _storageService.loadSettings();
+      state = state.copyWith(settings: savedSettings);
+      debugPrint('Tuner: Loaded settings - refFreq: ${savedSettings.referenceFrequency}');
+    } catch (e) {
+      debugPrint('Tuner: Failed to load settings: $e');
+    }
+
     final success = await _engine!.init();
 
     if (success) {
@@ -158,6 +170,16 @@ class Tuner extends _$Tuner {
     } else {
       state = state.copyWith(error: 'Failed to initialize tuner');
       debugPrint('Tuner: _initAsync failed');
+    }
+  }
+
+  /// Save current settings to persistent storage.
+  Future<void> _saveSettings() async {
+    try {
+      await _storageService.saveSettings(state.settings);
+      debugPrint('Tuner: Settings saved');
+    } catch (e) {
+      debugPrint('Tuner: Failed to save settings: $e');
     }
   }
 
@@ -230,6 +252,7 @@ class Tuner extends _$Tuner {
     );
 
     _engine?.referenceFrequency = clamped;
+    _saveSettings();
   }
 
   /// Update transposition setting.
@@ -238,6 +261,7 @@ class Tuner extends _$Tuner {
     state = state.copyWith(
       settings: state.settings.copyWith(transposition: transposition),
     );
+    _saveSettings();
   }
 
   /// Update enharmonic display mode.
@@ -246,6 +270,7 @@ class Tuner extends _$Tuner {
     state = state.copyWith(
       settings: state.settings.copyWith(enharmonicMode: mode),
     );
+    _saveSettings();
   }
 
   /// Update difficulty level.
@@ -254,6 +279,7 @@ class Tuner extends _$Tuner {
     state = state.copyWith(
       settings: state.settings.copyWith(difficulty: difficulty),
     );
+    _saveSettings();
   }
 
   /// Toggle combo counter visibility.
@@ -261,6 +287,7 @@ class Tuner extends _$Tuner {
     state = state.copyWith(
       settings: state.settings.copyWith(showCombo: !state.settings.showCombo),
     );
+    _saveSettings();
   }
 
   /// Toggle vibration feedback.
@@ -270,6 +297,7 @@ class Tuner extends _$Tuner {
         vibrationFeedback: !state.settings.vibrationFeedback,
       ),
     );
+    _saveSettings();
   }
 
   /// Update all settings at once.
@@ -277,6 +305,7 @@ class Tuner extends _$Tuner {
     debugPrint('Tuner: updateSettings');
     state = state.copyWith(settings: settings);
     _engine?.referenceFrequency = settings.referenceFrequency;
+    _saveSettings();
   }
 
   /// Switch between tuner engines.
