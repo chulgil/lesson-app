@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +11,7 @@ import '../../../../providers/practice_repertoire/practice_repertoire_crud_provi
 import '../../domain/entities/section_sort_type.dart';
 import '../providers/repertoire_archive_provider.dart';
 import '../providers/section_sort_provider.dart';
+import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_management/section_sort_dropdown.dart';
 
 /// Repertoire detail screen with date settings and aggregated stats
@@ -35,6 +35,7 @@ class _RepertoireDetailScreenState
   DateTime? _startDate;
   DateTime? _endDate;
   bool _hasChanges = false;
+  bool _initialized = false;
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +80,12 @@ class _RepertoireDetailScreenState
           if (repertoire == null) {
             return const Center(child: Text('레퍼토리를 찾을 수 없습니다'));
           }
-          _startDate ??= repertoire.startDate;
-          _endDate ??= repertoire.endDate;
+          // Initialize only once to preserve user edits
+          if (!_initialized) {
+            _startDate = repertoire.startDate;
+            _endDate = repertoire.endDate;
+            _initialized = true;
+          }
           return _buildContent(repertoire);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -115,8 +120,23 @@ class _RepertoireDetailScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Date Range Section
-          _buildDateRangeSection(),
+          // Date Range Section (공통 위젯 사용)
+          DateRangeSection(
+            startDate: _startDate,
+            endDate: _endDate,
+            onStartDateTap: () => _showDatePicker(isStart: true),
+            onEndDateTap: () => _showDatePicker(isStart: false),
+            onEndDateClear: () {
+              setState(() {
+                _endDate = null;
+                _hasChanges = true;
+              });
+            },
+            endDatePlaceholder: '설정 안함 (계속 진행)',
+            showHintMessage: true,
+            endDateNullHint: '종료일 미설정 시 매일 반복됩니다',
+            endDateSetHint: '종료일까지만 연습 목록에 표시됩니다',
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -128,115 +148,6 @@ class _RepertoireDetailScreenState
           // Sections List
           _buildSectionsSection(repertoire),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDateRangeSection() {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.date_range, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.space2),
-              Text('연습 기간', style: AppTypography.headingSmall),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space4),
-
-          // Start Date
-          _buildDateRow(
-            label: '시작일',
-            date: _startDate,
-            onTap: () => _selectDate(isStartDate: true),
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // End Date
-          _buildDateRow(
-            label: '종료일',
-            date: _endDate,
-            placeholder: '설정 안함 (계속 진행)',
-            onTap: () => _selectDate(isStartDate: false),
-            canClear: _endDate != null,
-            onClear: () {
-              setState(() {
-                _endDate = null;
-                _hasChanges = true;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateRow({
-    required String label,
-    required DateTime? date,
-    String? placeholder,
-    required VoidCallback onTap,
-    bool canClear = false,
-    VoidCallback? onClear,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        child: Row(
-          children: [
-            Text(
-              label,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const Spacer(),
-            Text(
-              date != null
-                  ? '${date.year}년 ${date.month}월 ${date.day}일'
-                  : placeholder ?? '선택',
-              style: AppTypography.bodyMedium.copyWith(
-                color: date != null
-                    ? AppColors.textPrimaryLight
-                    : AppColors.textTertiaryLight,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            if (canClear)
-              GestureDetector(
-                onTap: onClear,
-                child: Icon(
-                  Icons.close,
-                  size: 18,
-                  color: AppColors.textSecondaryLight,
-                ),
-              )
-            else
-              Icon(
-                Icons.chevron_right,
-                size: 20,
-                color: AppColors.textSecondaryLight,
-              ),
-          ],
-        ),
       ),
     );
   }
@@ -436,68 +347,37 @@ class _RepertoireDetailScreenState
     }
   }
 
-  void _selectDate({required bool isStartDate}) {
-    final initialDate =
-        (isStartDate ? _startDate : _endDate) ?? DateTime.now();
+  Future<void> _showDatePicker({required bool isStart}) async {
+    final now = DateTime.now();
+    final firstDate = now.subtract(const Duration(days: 365));
+    final lastDate = now.add(const Duration(days: 365 * 2));
 
-    showCupertinoModalPopup<void>(
+    final initialDate = isStart
+        ? (_startDate ?? now)
+        : (_endDate ?? _startDate ?? now);
+
+    final picked = await showDatePicker(
       context: context,
-      builder: (context) => Container(
-        height: 300,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CupertinoButton(
-                    child: const Text('취소'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  Text(
-                    isStartDate ? '시작일 선택' : '종료일 선택',
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  CupertinoButton(
-                    child: const Text('확인'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: CupertinoDatePicker(
-                  initialDateTime: initialDate,
-                  mode: CupertinoDatePickerMode.date,
-                  minimumDate: isStartDate ? null : _startDate,
-                  onDateTimeChanged: (DateTime newDate) {
-                    setState(() {
-                      if (isStartDate) {
-                        _startDate = newDate;
-                        // Adjust end date if needed
-                        if (_endDate != null && _endDate!.isBefore(newDate)) {
-                          _endDate = newDate;
-                        }
-                      } else {
-                        _endDate = newDate;
-                      }
-                      _hasChanges = true;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      locale: const Locale('ko', 'KR'),
     );
+
+    if (picked != null && mounted) {
+      setState(() {
+        if (isStart) {
+          _startDate = picked;
+          // Auto-adjust end date if needed
+          if (_endDate != null && _endDate!.isBefore(picked)) {
+            _endDate = picked;
+          }
+        } else {
+          _endDate = picked;
+        }
+        _hasChanges = true;
+      });
+    }
   }
 
   void _openRecordingScreen(BuildContext context) {

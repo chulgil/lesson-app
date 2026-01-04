@@ -1,14 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../widgets/section_form/date_range_section.dart';
+import '../widgets/section_form/range_picker_button.dart';
+import '../widgets/section_form/range_picker_sheet.dart';
 
 /// Screen for editing an existing practice section
 class EditSectionScreen extends ConsumerStatefulWidget {
@@ -52,8 +53,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   DateTime? _startDate;
   DateTime? _endDate;
 
-  // Repeat settings
-  bool _isRepeat = true;
+  // Repeat settings (isRepeat is derived from endDate: null = repeat)
   int? _repeatCount;
 
   // Repertoire date constraints
@@ -91,7 +91,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _endLine = section.endLine ?? 2;
         _startDate = section.startDate;
         _endDate = section.endDate;
-        _isRepeat = section.isRepeat;
+        // isRepeat is derived from endDate (null = repeat)
         _repeatCount = section.repeatCount;
         _isInitialized = true;
       });
@@ -159,7 +159,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         sectionName: _sectionNameController.text.trim().isEmpty
             ? null
             : _sectionNameController.text.trim(),
-        isRepeat: _isRepeat,
+        isRepeat: _endDate == null, // 종료일 없으면 매일 반복
         repeatCount: _repeatCount,
         clearRepeatCount: _repeatCount == null,
         startDate: _startDate,
@@ -200,7 +200,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => _RangePickerSheet(
+      builder: (context) => RangePickerSheet(
         title: isStart ? '시작 마디' : '끝 마디',
         unit: '마디',
         initialValue: initialValue,
@@ -226,7 +226,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => _RangePickerSheet(
+      builder: (context) => RangePickerSheet(
         title: isStart ? '시작 줄' : '끝 줄',
         unit: '줄',
         initialValue: initialValue,
@@ -336,14 +336,35 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Range type selector (줄/마디)
+              // ========================================
+              // 📅 연습 기간 섹션 (공통 위젯 사용)
+              // ========================================
+              DateRangeSection(
+                startDate: _startDate,
+                endDate: _endDate,
+                onStartDateTap: () => _showDatePicker(isStart: true),
+                onEndDateTap: () => _showDatePicker(isStart: false),
+                onEndDateClear: () => setState(() => _endDate = null),
+                startDatePlaceholder: '레퍼토리 시작일 사용',
+                endDatePlaceholder: '설정 안함 (매일 반복)',
+                showHintMessage: true,
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Range type selector (전체/줄/마디)
               Text(
-                '범위 유형 *',
+                '범위 유형',
                 style: AppTypography.headingSmall,
               ),
               const SizedBox(height: AppSpacing.space2),
               SegmentedButton<SectionRangeType>(
                 segments: const [
+                  ButtonSegment(
+                    value: SectionRangeType.full,
+                    label: Text('전체'),
+                    icon: Icon(Icons.select_all),
+                  ),
                   ButtonSegment(
                     value: SectionRangeType.line,
                     label: Text('줄'),
@@ -363,10 +384,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 },
               ),
 
-              const SizedBox(height: AppSpacing.space4),
-
-              // Range input based on type
+              // Range input based on type (hidden when 'full' is selected)
               if (_rangeType == SectionRangeType.measure) ...[
+                const SizedBox(height: AppSpacing.space4),
                 Text(
                   '마디 범위 *',
                   style: AppTypography.headingSmall,
@@ -388,7 +408,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   onStartTap: () => _showMeasurePicker(isStart: true),
                   onEndTap: () => _showMeasurePicker(isStart: false),
                 ),
-              ] else ...[
+              ] else if (_rangeType == SectionRangeType.line) ...[
+                const SizedBox(height: AppSpacing.space4),
                 Text(
                   '줄 범위 *',
                   style: AppTypography.headingSmall,
@@ -411,161 +432,83 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   onEndTap: () => _showLinePicker(isStart: false),
                 ),
               ],
+              // When 'full' is selected, no range input is shown
 
-              const SizedBox(height: AppSpacing.space2),
+              // Section name preview and alias field (only for line/measure types)
+              if (_rangeType != SectionRangeType.full) ...[
+                const SizedBox(height: AppSpacing.space2),
 
-              // Auto-generated section name preview
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.info_outline,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Text(
-                      '섹션 이름: ${_getRangePreviewText()}',
-                      style: AppTypography.bodySmall.copyWith(
+                // Auto-generated section name preview
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 18,
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: AppSpacing.space2),
+                      Text(
+                        '섹션 이름: ${_getRangePreviewText()}',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: AppSpacing.space6),
+                const SizedBox(height: AppSpacing.space6),
 
-              // Optional section name field
-              TextFormField(
-                controller: _sectionNameController,
-                decoration: InputDecoration(
-                  labelText: '섹션 별칭 (선택)',
-                  hintText: '예: 도입부, 주제 A, 코다',
-                  helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
-                  prefixIcon: const Icon(Icons.label_outline),
+                // Optional section name field
+                TextFormField(
+                  controller: _sectionNameController,
+                  decoration: InputDecoration(
+                    labelText: '섹션 별칭 (선택)',
+                    hintText: '예: 도입부, 주제 A, 코다',
+                    helperText: '비워두면 "${_getRangePreviewText()}"로 표시됩니다',
+                    prefixIcon: const Icon(Icons.label_outline),
+                  ),
+                  textInputAction: TextInputAction.done,
                 ),
-                textInputAction: TextInputAction.done,
-              ),
+              ],
 
               const SizedBox(height: AppSpacing.space8),
 
               // ========================================
-              // 📅 기간 설정 섹션
+              // 🐾 N회 반복 설정 (선택)
               // ========================================
-              _buildSectionHeader(
-                icon: '📅',
-                title: '기간 설정',
-                subtitle: '활성 기간 설정 (선택)',
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              Text(
-                '이 섹션이 활성화되는 기간을 지정할 수 있습니다.',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              if (_repertoireStartDate != null) ...[
-                const SizedBox(height: AppSpacing.space1),
-                Text(
-                  '레퍼토리 기간: ${DateFormat('M/d').format(_repertoireStartDate!)}~${_repertoireEndDate != null ? DateFormat('M/d').format(_repertoireEndDate!) : '계속'}',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-
-              const SizedBox(height: AppSpacing.space4),
-
               Row(
                 children: [
-                  Expanded(
-                    child: _DatePickerButton(
-                      label: '시작일',
-                      value: _startDate,
-                      placeholder: '레퍼토리 시작일',
-                      onTap: () => _showDatePicker(isStart: true),
-                      onClear: _startDate != null
-                          ? () => setState(() => _startDate = null)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
+                  const Text('🐾', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text('N회 반복', style: AppTypography.headingSmall),
+                  const Spacer(),
                   Text(
-                    '~',
-                    style: AppTypography.headingMedium.copyWith(
+                    '선택',
+                    style: AppTypography.caption.copyWith(
                       color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Expanded(
-                    child: _DatePickerButton(
-                      label: '종료일',
-                      value: _endDate,
-                      placeholder: '레퍼토리 종료일',
-                      onTap: () => _showDatePicker(isStart: false),
-                      onClear: _endDate != null
-                          ? () => setState(() => _endDate = null)
-                          : null,
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: AppSpacing.space8),
-
-              // ========================================
-              // 🔁 반복 설정 섹션
-              // ========================================
-              _buildSectionHeader(
-                icon: '🔁',
-                title: '반복 설정',
-                subtitle: '매일 반복 및 횟수 설정',
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Daily repeat toggle
-              SwitchListTile(
-                title: const Text('매일 반복'),
-                subtitle: Text(
-                  _isRepeat
-                      ? '완료해도 매일 다시 표시됩니다'
-                      : '한 번 완료하면 사라집니다',
-                  style: AppTypography.caption,
-                ),
-                value: _isRepeat,
-                onChanged: (value) {
-                  setState(() {
-                    _isRepeat = value;
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.primary,
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-
-              // Repeat count dropdown
-              Text(
-                '반복 횟수 (선택)',
-                style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: AppSpacing.space1),
+              const SizedBox(height: AppSpacing.space2),
               Text(
                 '하루에 여러 번 연습해야 하는 경우 설정하세요',
                 style: AppTypography.caption.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
-              const SizedBox(height: AppSpacing.space2),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Repeat count dropdown
               DropdownButtonFormField<int?>(
                 value: _repeatCount,
                 decoration: const InputDecoration(
@@ -702,7 +645,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
     return Row(
       children: [
         Expanded(
-          child: _RangePickerButton(
+          child: RangePickerButton(
             label: startLabel,
             value: startValue,
             unit: unit,
@@ -724,7 +667,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ),
         const SizedBox(width: AppSpacing.space4),
         Expanded(
-          child: _RangePickerButton(
+          child: RangePickerButton(
             label: endLabel,
             value: endValue,
             unit: unit,
@@ -732,261 +675,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Button that shows the current range value and opens the picker
-class _RangePickerButton extends StatelessWidget {
-  final String label;
-  final int value;
-  final String unit;
-  final VoidCallback onTap;
-
-  const _RangePickerButton({
-    required this.label,
-    required this.value,
-    required this.unit,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space4,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space1),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$value',
-                  style: AppTypography.headingLarge.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  unit,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Date picker button with clear functionality
-class _DatePickerButton extends StatelessWidget {
-  final String label;
-  final DateTime? value;
-  final String placeholder;
-  final VoidCallback onTap;
-  final VoidCallback? onClear;
-
-  const _DatePickerButton({
-    required this.label,
-    required this.value,
-    required this.placeholder,
-    required this.onTap,
-    this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space2,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-                if (onClear != null)
-                  GestureDetector(
-                    onTap: onClear,
-                    child: Icon(
-                      Icons.close,
-                      size: 16,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space1),
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color:
-                      value != null ? AppColors.primary : AppColors.textSecondaryLight,
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    value != null
-                        ? DateFormat('M/d').format(value!)
-                        : placeholder,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: value != null
-                          ? AppColors.textPrimaryLight
-                          : AppColors.textSecondaryLight,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Bottom sheet with iOS-style wheel picker for range selection
-class _RangePickerSheet extends StatefulWidget {
-  final String title;
-  final String unit;
-  final int initialValue;
-  final int maxValue;
-  final ValueChanged<int> onSelected;
-
-  const _RangePickerSheet({
-    required this.title,
-    required this.unit,
-    required this.initialValue,
-    required this.maxValue,
-    required this.onSelected,
-  });
-
-  @override
-  State<_RangePickerSheet> createState() => _RangePickerSheetState();
-}
-
-class _RangePickerSheetState extends State<_RangePickerSheet> {
-  late int _selectedValue;
-  late FixedExtentScrollController _scrollController;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedValue = widget.initialValue;
-    _scrollController = FixedExtentScrollController(
-      initialItem: _selectedValue - 1,
-    );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 350,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusLarge),
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space4,
-              vertical: AppSpacing.space3,
-            ),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: AppColors.borderLight),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('취소'),
-                ),
-                Text(
-                  widget.title,
-                  style: AppTypography.headingSmall,
-                ),
-                TextButton(
-                  onPressed: () {
-                    widget.onSelected(_selectedValue);
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('확인'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: CupertinoPicker(
-              scrollController: _scrollController,
-              itemExtent: 50,
-              onSelectedItemChanged: (index) {
-                setState(() {
-                  _selectedValue = index + 1;
-                });
-              },
-              children: List.generate(
-                widget.maxValue,
-                (index) => Center(
-                  child: Text(
-                    '${index + 1} ${widget.unit}',
-                    style: AppTypography.headingMedium,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
