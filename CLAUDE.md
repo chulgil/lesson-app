@@ -383,6 +383,9 @@ class NewModel { ... }
 # 이슈 생성
 gh issue create --title "제목" --body "내용" --label "라벨"
 
+# 이슈 보기
+gh issue view [이슈번호] --json title,body,labels
+
 # 이슈 목록
 gh issue list
 
