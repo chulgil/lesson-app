@@ -385,7 +385,7 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
                     ),
                     // Current note display (overlaid below cat face)
                     Positioned(
-                      bottom: circleSize * 0.05, // Lower position for note display
+                      bottom: circleSize * 0.15, // Move up a bit
                       child: _CurrentNoteDisplay(scale: circleSize / 280), // Scale based on circle size
                     ),
                   ],

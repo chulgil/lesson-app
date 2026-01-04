@@ -25,6 +25,10 @@ class TunerSettingsSheet extends ConsumerWidget {
     final settings = tunerState.settings;
 
     return Container(
+      // Limit height to 60% of screen so it doesn't go too high
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.6,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
