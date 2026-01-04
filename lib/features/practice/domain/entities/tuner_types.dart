@@ -190,9 +190,15 @@ class TunerNote {
   /// Full note name with octave using flat notation
   String get fullNameFlat => '${name.flatName}$octave';
 
-  /// Get tuning status based on cent deviation
-  TuningStatus get status {
-    if (centDeviation.abs() <= 5) return TuningStatus.tuned;
+  /// Get tuning status based on cent deviation.
+  ///
+  /// Uses [TunerDifficulty.intermediate] threshold (10 cents) by default.
+  /// For difficulty-aware status, use [statusForDifficulty].
+  TuningStatus get status => statusForDifficulty(TunerDifficulty.intermediate);
+
+  /// Get tuning status for a specific difficulty level.
+  TuningStatus statusForDifficulty(TunerDifficulty difficulty) {
+    if (centDeviation.abs() <= difficulty.perfectCent) return TuningStatus.tuned;
     if (centDeviation < 0) return TuningStatus.flat;
     return TuningStatus.sharp;
   }

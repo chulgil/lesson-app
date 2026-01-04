@@ -43,9 +43,10 @@ class TunerProviderState {
   /// Cent deviation of current note (0 if no note).
   double get centDeviation => currentNote?.centDeviation ?? 0;
 
-  /// Whether tuning is perfect (within tight threshold).
+  /// Whether tuning is perfect (based on difficulty setting).
   bool get isPerfect =>
-      currentNote != null && currentNote!.centDeviation.abs() <= 5;
+      currentNote != null &&
+      currentNote!.centDeviation.abs() <= settings.difficulty.perfectCent;
 
   TunerProviderState copyWith({
     TunerSettings? settings,
@@ -130,9 +131,11 @@ class Tuner extends _$Tuner {
         clearNote: true,
       );
     } else {
+      // Use difficulty-aware status for consistency with isPerfect
+      final status = note.statusForDifficulty(state.settings.difficulty);
       state = state.copyWith(
         currentNote: note,
-        status: note.status,
+        status: status,
       );
     }
   }
