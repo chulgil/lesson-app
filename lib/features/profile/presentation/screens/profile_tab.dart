@@ -102,6 +102,11 @@ class ProfileTab extends StatelessWidget {
                 ),
                 onTap: () {},
               ),
+              _MenuItem(
+                icon: Icons.backup_outlined,
+                label: '녹음 백업',
+                onTap: () => context.push(AppRoutes.backupSettings),
+              ),
             ],
           ),
 

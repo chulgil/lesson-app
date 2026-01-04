@@ -359,6 +359,12 @@ class StudentProfileTab extends ConsumerWidget {
           ),
           _buildMenuDivider(),
           _buildMenuItem(
+            icon: Icons.backup_outlined,
+            title: '녹음 백업',
+            onTap: () => context.push(AppRoutes.backupSettings),
+          ),
+          _buildMenuDivider(),
+          _buildMenuItem(
             icon: Icons.help_outline,
             title: '도움말',
             onTap: () {},

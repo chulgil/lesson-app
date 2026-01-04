@@ -72,6 +72,11 @@ class ParentProfileTab extends ConsumerWidget {
                   ),
                   onTap: () {},
                 ),
+                _MenuItem(
+                  icon: Icons.backup_outlined,
+                  label: '녹음 백업',
+                  onTap: () => context.push(AppRoutes.backupSettings),
+                ),
               ],
             ),
 
