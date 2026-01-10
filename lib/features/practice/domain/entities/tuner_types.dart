@@ -99,19 +99,24 @@ enum JudgementResult {
 
 /// Difficulty level for judgement thresholds.
 enum TunerDifficulty {
-  /// Beginner: generous thresholds
-  beginner('초보', perfectCent: 15, goodCent: 30),
+  /// Beginner: generous thresholds (very relaxed for beginners)
+  /// 1 second grace period, 3 reactivation chances
+  beginner('초보', perfectCent: 20, goodCent: 40, gracePeriodMs: 1000, reactivationChances: 3),
 
   /// Intermediate: moderate thresholds
-  intermediate('중급', perfectCent: 10, goodCent: 20),
+  /// 0.5 second grace period, 2 reactivation chances
+  intermediate('중급', perfectCent: 15, goodCent: 30, gracePeriodMs: 500, reactivationChances: 2),
 
-  /// Advanced: strict thresholds
-  advanced('고급', perfectCent: 5, goodCent: 10);
+  /// Advanced: strict thresholds (professional level)
+  /// 0.1 second grace period, 1 reactivation chance
+  advanced('고급', perfectCent: 5, goodCent: 10, gracePeriodMs: 100, reactivationChances: 1);
 
   const TunerDifficulty(
     this.label, {
     required this.perfectCent,
     required this.goodCent,
+    required this.gracePeriodMs,
+    required this.reactivationChances,
   });
 
   final String label;
@@ -121,6 +126,14 @@ enum TunerDifficulty {
 
   /// Maximum cent deviation for Good judgement
   final int goodCent;
+
+  /// Grace period in milliseconds for same-note continuity
+  /// (how long a gap/pause is allowed before breaking the animation streak)
+  final int gracePeriodMs;
+
+  /// Number of reactivation chances during revert animation
+  /// (how many times user can resume animation after it starts reverting)
+  final int reactivationChances;
 
   /// Judge the cent deviation
   JudgementResult judge(double centDeviation) {

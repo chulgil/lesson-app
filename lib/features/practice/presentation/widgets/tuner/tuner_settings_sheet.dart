@@ -99,6 +99,16 @@ class TunerSettingsSheet extends ConsumerWidget {
 
                     const SizedBox(height: 24),
 
+                    // Clef type
+                    _ClefSection(
+                      currentClef: settings.clefType,
+                      onChanged: (clef) {
+                        ref.read(tunerProvider.notifier).setClefType(clef);
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
                     // Enharmonic mode
                     _EnharmonicSection(
                       currentMode: settings.enharmonicMode,
@@ -406,6 +416,64 @@ class _EnharmonicSection extends StatelessWidget {
                 color: isSelected ? AppColors.primary : Colors.grey[700],
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 12,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+/// Clef type selection section.
+class _ClefSection extends StatelessWidget {
+  const _ClefSection({
+    required this.currentClef,
+    required this.onChanged,
+  });
+
+  final ClefType currentClef;
+  final ValueChanged<ClefType> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '음자리표',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '오선지 표기 방식을 선택합니다 (악기별 기본값 적용)',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: ClefType.values.map((clef) {
+            final isSelected = currentClef == clef;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                  label: Text('${clef.symbol} ${clef.label}'),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(clef),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color: isSelected ? AppColors.primary : Colors.grey[700],
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             );
           }).toList(),

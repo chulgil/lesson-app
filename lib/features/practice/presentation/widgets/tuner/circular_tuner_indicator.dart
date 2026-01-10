@@ -7,6 +7,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
+import 'tuner_fish_indicator.dart';
 
 /// Colors for tuner indicator.
 class TunerColors {
@@ -52,7 +53,6 @@ class CircularTunerIndicator extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tunerState = ref.watch(tunerProvider);
-    final currentNote = tunerState.currentNote;
     final settings = tunerState.settings;
 
     return SizedBox(
@@ -68,7 +68,7 @@ class CircularTunerIndicator extends ConsumerWidget {
             painter: _CircleBackgroundPainter(),
           ),
 
-          // Note labels around the circle
+          // Note labels around the circle (tappable for future sound playback)
           for (var i = 0; i < NoteName.values.length; i++)
             _NoteLabel(
               key: ValueKey('note_${i}_$size'), // Force rebuild on size change
@@ -76,19 +76,15 @@ class CircularTunerIndicator extends ConsumerWidget {
               index: i,
               totalNotes: NoteName.values.length,
               circleSize: size,
-              isActive: currentNote?.name == NoteName.values[i],
-              isPerfect:
-                  currentNote?.name == NoteName.values[i] && tunerState.isPerfect,
               enharmonicMode: settings.enharmonicMode,
+              onTap: () {
+                // TODO: Play note sound when tapped
+                debugPrint('Note tapped: ${NoteName.values[i].sharpName}');
+              },
             ),
 
-          // Active note glow effect
-          if (currentNote != null && tunerState.isPerfect)
-            _GlowEffect(
-              noteIndex: currentNote.name.index,
-              totalNotes: NoteName.values.length,
-              circleSize: size,
-            ),
+          // Fish indicator (follows around the circle)
+          TunerFishIndicator(circleSize: size),
 
           // Center content (uses its own size, not constrained)
           if (centerChild != null) centerChild!,
@@ -118,32 +114,41 @@ class _CircleBackgroundPainter extends CustomPainter {
 }
 
 /// Individual note label widget.
-class _NoteLabel extends StatelessWidget {
+class _NoteLabel extends ConsumerStatefulWidget {
   const _NoteLabel({
     super.key,
     required this.note,
     required this.index,
     required this.totalNotes,
     required this.circleSize,
-    required this.isActive,
-    required this.isPerfect,
     required this.enharmonicMode,
+    this.onTap,
   });
 
   final NoteName note;
   final int index;
   final int totalNotes;
   final double circleSize;
-  final bool isActive;
-  final bool isPerfect;
   final EnharmonicMode enharmonicMode;
+  final VoidCallback? onTap;
+
+  @override
+  ConsumerState<_NoteLabel> createState() => _NoteLabelState();
+}
+
+class _NoteLabelState extends ConsumerState<_NoteLabel> {
+  bool _isTapped = false;
 
   @override
   Widget build(BuildContext context) {
+    // Watch tuner state for perfect highlight
+    final tunerState = ref.watch(tunerProvider);
+    final isPerfectMatch = tunerState.isPerfect &&
+        tunerState.currentNote?.name == widget.note;
     // Calculate position on circle
     // Start from top (12 o'clock = C) and go clockwise
-    final angle = (2 * math.pi * index / totalNotes) - (math.pi / 2);
-    final radius = circleSize / 2 - 25; // Position inside the circle
+    final angle = (2 * math.pi * widget.index / widget.totalNotes) - (math.pi / 2);
+    final radius = widget.circleSize / 2 - 25; // Position inside the circle
 
     final x = radius * math.cos(angle);
     final y = radius * math.sin(angle);
@@ -153,54 +158,74 @@ class _NoteLabel extends StatelessWidget {
 
     // Determine colors
     final baseColor =
-        note.isAccidental ? TunerColors.accidentalNote : TunerColors.naturalNote;
-    final activeColor = note.isAccidental
+        widget.note.isAccidental ? TunerColors.accidentalNote : TunerColors.naturalNote;
+    final activeColor = widget.note.isAccidental
         ? TunerColors.accidentalNoteActive
         : TunerColors.naturalNoteActive;
 
     // Scale sizes based on circle size (base size 280), increased by 1.2x
-    final scale = circleSize / 280.0;
-    final activeFontSize = 16.8 * scale;  // 14 * 1.2
-    final inactiveFontSize = 14.4 * scale;  // 12 * 1.2
+    final scale = widget.circleSize / 280.0;
+    final normalFontSize = 14.4 * scale;  // 12 * 1.2
+    final tappedFontSize = 16.8 * scale;  // 14 * 1.2
     final horizontalPadding = 10.8 * scale;  // 9 * 1.2
     final verticalPadding = 6.0 * scale;  // 5 * 1.2
     final borderRadius = 6.0 * scale;  // 5 * 1.2
 
-    // Debug: print circle size
-    // debugPrint('NoteLabel $index: circleSize=$circleSize, scale=$scale, fontSize=$inactiveFontSize');
+    // Only change style when tapped, not on pitch match
+    final isEnlarged = _isTapped;
+
+    // Color logic: highlight on perfect pitch match (instant, no animation)
+    Color backgroundColor;
+    Color textColor;
+    List<BoxShadow>? boxShadow;
+
+    if (_isTapped) {
+      // Tapped: darker color (no border)
+      backgroundColor = activeColor;
+      textColor = Colors.white;
+    } else if (isPerfectMatch) {
+      // Perfect pitch match: instant bright highlight with subtle glow
+      backgroundColor = TunerColors.centPerfect.withValues(alpha: 0.7);
+      textColor = Colors.green[800]!;
+      boxShadow = [
+        BoxShadow(
+          color: TunerColors.centPerfect.withValues(alpha: 0.5),
+          blurRadius: 8,
+          spreadRadius: 1,
+        ),
+      ];
+    } else {
+      // Normal style
+      backgroundColor = baseColor.withValues(alpha: 0.3);
+      textColor = Colors.grey[600]!;
+    }
 
     return Transform.translate(
       offset: Offset(x, y),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding,
-          vertical: verticalPadding,
-        ),
-        decoration: BoxDecoration(
-          color: isActive ? activeColor : baseColor.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(borderRadius),
-          border: isActive
-              ? Border.all(
-                  color: isPerfect ? TunerColors.glowPerfect : activeColor,
-                  width: isPerfect ? 3 : 2,
-                )
-              : null,
-          boxShadow: isPerfect
-              ? [
-                  BoxShadow(
-                    color: TunerColors.glowPerfect,
-                    blurRadius: 15 * scale,
-                    spreadRadius: 3 * scale,
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          displayText,
-          style: TextStyle(
-            fontSize: isActive ? activeFontSize : inactiveFontSize,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive ? Colors.white : Colors.grey[600],
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isTapped = true),
+        onTapUp: (_) {
+          setState(() => _isTapped = false);
+          widget.onTap?.call();
+        },
+        onTapCancel: () => setState(() => _isTapped = false),
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            boxShadow: boxShadow,
+          ),
+          child: Text(
+            displayText,
+            style: TextStyle(
+              fontSize: isEnlarged ? tappedFontSize : normalFontSize,
+              fontWeight: isEnlarged ? FontWeight.bold : FontWeight.normal,
+              color: textColor,
+            ),
           ),
         ),
       ),
@@ -208,92 +233,14 @@ class _NoteLabel extends StatelessWidget {
   }
 
   String _getDisplayText() {
-    switch (enharmonicMode) {
+    switch (widget.enharmonicMode) {
       case EnharmonicMode.sharpOnly:
-        return note.sharpName;
+        return widget.note.sharpName;
       case EnharmonicMode.flatOnly:
-        return note.flatName;
+        return widget.note.flatName;
       case EnharmonicMode.both:
-        return note.isAccidental ? note.enharmonicName : note.sharpName;
+        return widget.note.isAccidental ? widget.note.enharmonicName : widget.note.sharpName;
     }
-  }
-}
-
-/// Glow effect for perfect tuning.
-class _GlowEffect extends StatefulWidget {
-  const _GlowEffect({
-    required this.noteIndex,
-    required this.totalNotes,
-    required this.circleSize,
-  });
-
-  final int noteIndex;
-  final int totalNotes;
-  final double circleSize;
-
-  @override
-  State<_GlowEffect> createState() => _GlowEffectState();
-}
-
-class _GlowEffectState extends State<_GlowEffect>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Scale based on circle size (base size 280)
-    final scale = widget.circleSize / 280.0;
-
-    // Calculate position (inside the circle)
-    final angle =
-        (2 * math.pi * widget.noteIndex / widget.totalNotes) - (math.pi / 2);
-    final radius = widget.circleSize / 2 - (25 * scale);
-
-    final x = radius * math.cos(angle);
-    final y = radius * math.sin(angle);
-
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(x, y),
-          child: Container(
-            width: 50 * scale,
-            height: 30 * scale,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8 * scale),
-              boxShadow: [
-                BoxShadow(
-                  color: TunerColors.glowPerfect.withValues(alpha: _animation.value),
-                  blurRadius: 20 * scale * _animation.value,
-                  spreadRadius: 5 * scale * _animation.value,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 }
 
@@ -312,7 +259,6 @@ class TunerCentGauge extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tunerState = ref.watch(tunerProvider);
     final centDeviation = tunerState.centDeviation;
-    final isPerfect = tunerState.isPerfect;
 
     return SizedBox(
       width: width,
@@ -320,7 +266,6 @@ class TunerCentGauge extends ConsumerWidget {
       child: CustomPaint(
         painter: _CentGaugePainter(
           centDeviation: centDeviation,
-          isPerfect: isPerfect,
         ),
       ),
     );
@@ -330,11 +275,9 @@ class TunerCentGauge extends ConsumerWidget {
 class _CentGaugePainter extends CustomPainter {
   _CentGaugePainter({
     required this.centDeviation,
-    required this.isPerfect,
   });
 
   final double centDeviation;
-  final bool isPerfect;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -367,20 +310,15 @@ class _CentGaugePainter extends CustomPainter {
     );
 
     // Deviation indicator
-    if (centDeviation != 0 || isPerfect) {
+    if (centDeviation != 0) {
       // Normalize cent to -50 to +50 range
       final normalizedCent = centDeviation.clamp(-50.0, 50.0);
       final indicatorX = center.dx + (normalizedCent / 50) * maxWidth;
 
-      // Color based on deviation
-      Color indicatorColor;
-      if (isPerfect) {
-        indicatorColor = TunerColors.centPerfect;
-      } else if (centDeviation < 0) {
-        indicatorColor = TunerColors.centFlat;
-      } else {
-        indicatorColor = TunerColors.centSharp;
-      }
+      // Color based on deviation (flat=red, sharp=orange)
+      final indicatorColor = centDeviation < 0
+          ? TunerColors.centFlat
+          : TunerColors.centSharp;
 
       final indicatorPaint = Paint()
         ..color = indicatorColor
@@ -388,54 +326,70 @@ class _CentGaugePainter extends CustomPainter {
 
       canvas.drawCircle(
         Offset(indicatorX, center.dy),
-        isPerfect ? 10 : 8,
+        8,
         indicatorPaint,
       );
-
-      // Glow for perfect
-      if (isPerfect) {
-        final glowPaint = Paint()
-          ..color = TunerColors.glowPerfect
-          ..style = PaintingStyle.fill;
-
-        canvas.drawCircle(
-          Offset(indicatorX, center.dy),
-          15,
-          glowPaint,
-        );
-      }
     }
   }
 
   @override
   bool shouldRepaint(covariant _CentGaugePainter oldDelegate) {
-    return oldDelegate.centDeviation != centDeviation ||
-        oldDelegate.isPerfect != isPerfect;
+    return oldDelegate.centDeviation != centDeviation;
   }
 }
 
-/// Tuner info bar showing "A4 · 442Hz · +5¢".
+/// Tuner info bar showing reference frequency and cent deviation.
+/// Line 1: "A4=442Hz" (fixed reference)
+/// Line 2: "+5¢" (cent deviation)
 class TunerInfoBar extends ConsumerWidget {
   const TunerInfoBar({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final infoDisplay = ref.watch(tunerInfoDisplayProvider);
+    final tunerState = ref.watch(tunerProvider);
+    final settings = tunerState.settings;
+    final note = tunerState.currentNote;
+
+    // Line 1: Reference frequency (always shown)
+    final freqText = 'A4=${settings.referenceFrequency.toStringAsFixed(0)}Hz';
+
+    // Line 2: Cent deviation (shown when note detected)
+    final centText = note != null ? '${note.centDisplayString}¢' : '--';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderLight),
       ),
-      child: Text(
-        infoDisplay,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          letterSpacing: 1,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            freqText,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            centText,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: note != null
+                  ? (tunerState.isPerfect
+                      ? Colors.green[700]
+                      : (note.centDeviation < 0
+                          ? TunerColors.centFlat
+                          : TunerColors.centSharp))
+                  : Colors.grey[400],
+            ),
+          ),
+        ],
       ),
     );
   }
