@@ -63,6 +63,12 @@ class TunerProviderState {
       currentNote != null &&
       currentNote!.centDeviation.abs() <= settings.difficulty.perfectCent;
 
+  /// Whether tuning is good but not perfect (based on difficulty setting).
+  bool get isGood =>
+      currentNote != null &&
+      !isPerfect &&
+      currentNote!.centDeviation.abs() <= settings.difficulty.goodCent;
+
   TunerProviderState copyWith({
     TunerSettings? settings,
     bool? isListening,
@@ -97,6 +103,10 @@ class Tuner extends _$Tuner {
   bool _initialized = false;
   TunerEngineType _currentEngineType = TunerEngineType.record;
   final _storageService = TunerStorageService();
+
+  // Same-note continuity tracking
+  NoteName? _lastDetectedNoteName;
+  DateTime? _lastNoteTime;
 
   @override
   TunerProviderState build() {
@@ -184,19 +194,64 @@ class Tuner extends _$Tuner {
   }
 
   void _onPitchDetected(TunerNote? note) {
+    // Get grace period from difficulty setting
+    final gracePeriodMs = state.settings.difficulty.gracePeriodMs;
+
     if (note == null) {
+      // Don't immediately clear - check if we're within grace period
+      // This allows brief gaps in sound while maintaining continuity for same note
+      if (gracePeriodMs > 0 && _lastDetectedNoteName != null && _lastNoteTime != null) {
+        final elapsed = DateTime.now().difference(_lastNoteTime!).inMilliseconds;
+        if (elapsed < gracePeriodMs) {
+          // Within grace period - keep current state (don't reset)
+          // The currentNote stays as is, allowing isPerfect to remain true
+          return;
+        }
+      }
+
+      // Grace period expired or no previous note - reset
+      _lastDetectedNoteName = null;
+      _lastNoteTime = null;
       state = state.copyWith(
         currentNote: null,
         status: TuningStatus.idle,
         clearNote: true,
       );
     } else {
+      // Check if this is the same note (continuity) or a new note
+      final isSameNote = _lastDetectedNoteName == note.name;
+      final elapsed = _lastNoteTime != null
+          ? DateTime.now().difference(_lastNoteTime!).inMilliseconds
+          : gracePeriodMs + 1; // If no previous time, treat as expired
+      final wasWithinGrace = gracePeriodMs > 0 && elapsed < gracePeriodMs;
+
+      // If same note but grace period expired, this is a fresh start
+      // Briefly reset to trigger animation restart
+      if (isSameNote && !wasWithinGrace && _lastNoteTime != null) {
+        debugPrint('Tuner: Grace period expired, starting fresh (${note.name.sharpName})');
+        // Reset state to trigger animation restart
+        state = state.copyWith(
+          currentNote: null,
+          status: TuningStatus.idle,
+          clearNote: true,
+        );
+      }
+
+      // Update tracking
+      _lastDetectedNoteName = note.name;
+      _lastNoteTime = DateTime.now();
+
       // Use difficulty-aware status for consistency with isPerfect
       final status = note.statusForDifficulty(state.settings.difficulty);
       state = state.copyWith(
         currentNote: note,
         status: status,
       );
+
+      // Log continuity for debugging
+      if (isSameNote && wasWithinGrace) {
+        debugPrint('Tuner: Same note continuity maintained (${note.name.sharpName})');
+      }
     }
   }
 
@@ -278,6 +333,25 @@ class Tuner extends _$Tuner {
     debugPrint('Tuner: setDifficulty $difficulty');
     state = state.copyWith(
       settings: state.settings.copyWith(difficulty: difficulty),
+    );
+    _saveSettings();
+  }
+
+  /// Update clef type for staff notation.
+  void setClefType(ClefType clefType) {
+    debugPrint('Tuner: setClefType $clefType');
+    state = state.copyWith(
+      settings: state.settings.copyWith(clefType: clefType),
+    );
+    _saveSettings();
+  }
+
+  /// Toggle auto-switch clef (for instruments like cello that use both clefs).
+  void toggleAutoSwitchClef() {
+    state = state.copyWith(
+      settings: state.settings.copyWith(
+        autoSwitchClef: !state.settings.autoSwitchClef,
+      ),
     );
     _saveSettings();
   }

@@ -11,6 +11,7 @@ class ComboState {
     this.count = 0,
     this.maxCount = 0,
     this.lastJudgement,
+    this.perfectStartTime,
   });
 
   /// Current combo count (Perfect streak).
@@ -21,6 +22,18 @@ class ComboState {
 
   /// Last judgement result.
   final JudgementResult? lastJudgement;
+
+  /// Time when perfect streak started (for curtain effect).
+  final DateTime? perfectStartTime;
+
+  /// Duration of current perfect streak in seconds.
+  double get perfectDuration {
+    if (perfectStartTime == null) return 0;
+    return DateTime.now().difference(perfectStartTime!).inMilliseconds / 1000;
+  }
+
+  /// Whether the yellow curtain is fully covering (8+ seconds of perfect).
+  bool get isCurtainFullyCovered => perfectDuration >= 8.0;
 
   /// Combo tier based on count.
   ComboTier get tier {
@@ -35,12 +48,15 @@ class ComboState {
     int? count,
     int? maxCount,
     JudgementResult? lastJudgement,
+    DateTime? perfectStartTime,
     bool clearJudgement = false,
+    bool clearPerfectStartTime = false,
   }) {
     return ComboState(
       count: count ?? this.count,
       maxCount: maxCount ?? this.maxCount,
       lastJudgement: clearJudgement ? null : (lastJudgement ?? this.lastJudgement),
+      perfectStartTime: clearPerfectStartTime ? null : (perfectStartTime ?? this.perfectStartTime),
     );
   }
 }
@@ -101,8 +117,14 @@ class TunerCombo extends _$TunerCombo {
   }
 
   void _onNoteChanged(TunerProviderState? previous, TunerProviderState next) {
-    // Only process when we have a stable note
-    if (next.currentNote == null) return;
+    // Reset perfect time tracking when tuner stops or no note detected
+    if (!next.isListening || next.currentNote == null) {
+      // Only reset if we were tracking perfect time
+      if (state.perfectStartTime != null) {
+        state = state.copyWith(clearPerfectStartTime: true);
+      }
+      return;
+    }
 
     // Get difficulty from settings
     final difficulty = next.settings.difficulty;
@@ -118,23 +140,27 @@ class TunerCombo extends _$TunerCombo {
       case JudgementResult.perfect:
         // Increment combo on Perfect
         final newCount = state.count + 1;
+        // Start tracking perfect time if not already tracking
+        final startTime = state.perfectStartTime ?? DateTime.now();
         state = state.copyWith(
           count: newCount,
           maxCount: newCount > state.maxCount ? newCount : state.maxCount,
           lastJudgement: judgement,
+          perfectStartTime: startTime,
         );
         break;
 
       case JudgementResult.good:
-        // Maintain combo on Good (don't increment or reset)
+        // Maintain combo on Good (don't increment or reset, keep perfect time tracking)
         state = state.copyWith(lastJudgement: judgement);
         break;
 
       case JudgementResult.miss:
-        // Reset combo on Miss
+        // Reset combo and perfect time on Miss
         state = state.copyWith(
           count: 0,
           lastJudgement: judgement,
+          clearPerfectStartTime: true,
         );
         break;
     }
@@ -142,7 +168,7 @@ class TunerCombo extends _$TunerCombo {
 
   /// Reset combo counter (e.g., when stopping tuner).
   void reset() {
-    state = state.copyWith(count: 0, clearJudgement: true);
+    state = state.copyWith(count: 0, clearJudgement: true, clearPerfectStartTime: true);
   }
 
   /// Reset session (including max count).
@@ -169,4 +195,12 @@ String? comboMessage(ComboMessageRef ref) {
 
   if (comboState.tier == ComboTier.none) return null;
   return comboState.tier.message;
+}
+
+/// Provider for whether the yellow curtain is fully covering the screen.
+/// Returns true when perfect pitch has been maintained for 8+ seconds.
+@riverpod
+bool isCurtainFullyCovered(IsCurtainFullyCoveredRef ref) {
+  final comboState = ref.watch(tunerComboProvider);
+  return comboState.isCurtainFullyCovered;
 }

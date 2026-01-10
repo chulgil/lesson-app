@@ -99,6 +99,20 @@ class TunerSettingsSheet extends ConsumerWidget {
 
                     const SizedBox(height: 24),
 
+                    // Clef type
+                    _ClefSection(
+                      currentClef: settings.clefType,
+                      autoSwitchClef: settings.autoSwitchClef,
+                      onChanged: (clef) {
+                        ref.read(tunerProvider.notifier).setClefType(clef);
+                      },
+                      onAutoSwitchChanged: () {
+                        ref.read(tunerProvider.notifier).toggleAutoSwitchClef();
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
                     // Enharmonic mode
                     _EnharmonicSection(
                       currentMode: settings.enharmonicMode,
@@ -409,6 +423,111 @@ class _EnharmonicSection extends StatelessWidget {
               ),
             );
           }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+/// Clef type selection section.
+class _ClefSection extends StatelessWidget {
+  const _ClefSection({
+    required this.currentClef,
+    required this.autoSwitchClef,
+    required this.onChanged,
+    required this.onAutoSwitchChanged,
+  });
+
+  final ClefType currentClef;
+  final bool autoSwitchClef;
+  final ValueChanged<ClefType> onChanged;
+  final VoidCallback onAutoSwitchChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '음자리표',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '오선지 표기 방식을 선택합니다',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: ClefType.values.map((clef) {
+            final isSelected = currentClef == clef;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: ChoiceChip(
+                  label: Text('${clef.symbol} ${clef.label}'),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(clef),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color: isSelected ? AppColors.primary : Colors.grey[700],
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+
+        const SizedBox(height: 12),
+
+        // Auto-switch toggle
+        InkWell(
+          onTap: onAutoSwitchChanged,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: autoSwitchClef,
+                  onChanged: (_) => onAutoSwitchChanged(),
+                  activeColor: AppColors.primary,
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '자동 전환',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        '음역대에 따라 음자리표 자동 전환 (첼로 등)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

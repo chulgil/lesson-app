@@ -9,6 +9,8 @@ class TunerStorageService {
   static const String _transpositionKey = 'transposition';
   static const String _enharmonicModeKey = 'enharmonicMode';
   static const String _difficultyKey = 'difficulty';
+  static const String _clefTypeKey = 'clefType';
+  static const String _autoSwitchClefKey = 'autoSwitchClef';
   static const String _showComboKey = 'showCombo';
   static const String _vibrationFeedbackKey = 'vibrationFeedback';
 
@@ -32,6 +34,8 @@ class TunerStorageService {
     await _box!.put(_transpositionKey, settings.transposition.index);
     await _box!.put(_enharmonicModeKey, settings.enharmonicMode.index);
     await _box!.put(_difficultyKey, settings.difficulty.index);
+    await _box!.put(_clefTypeKey, settings.clefType.index);
+    await _box!.put(_autoSwitchClefKey, settings.autoSwitchClef);
     await _box!.put(_showComboKey, settings.showCombo);
     await _box!.put(_vibrationFeedbackKey, settings.vibrationFeedback);
   }
@@ -47,6 +51,9 @@ class TunerStorageService {
     final enharmonicModeIndex =
         _box!.get(_enharmonicModeKey, defaultValue: 0) as int;
     final difficultyIndex = _box!.get(_difficultyKey, defaultValue: 1) as int;
+    final clefTypeIndex = _box!.get(_clefTypeKey, defaultValue: 0) as int;
+    final autoSwitchClef =
+        _box!.get(_autoSwitchClefKey, defaultValue: false) as bool;
     final showCombo = _box!.get(_showComboKey, defaultValue: true) as bool;
     final vibrationFeedback =
         _box!.get(_vibrationFeedbackKey, defaultValue: false) as bool;
@@ -59,6 +66,9 @@ class TunerStorageService {
           .values[enharmonicModeIndex.clamp(0, EnharmonicMode.values.length - 1)],
       difficulty: TunerDifficulty
           .values[difficultyIndex.clamp(0, TunerDifficulty.values.length - 1)],
+      clefType: ClefType
+          .values[clefTypeIndex.clamp(0, ClefType.values.length - 1)],
+      autoSwitchClef: autoSwitchClef,
       showCombo: showCombo,
       vibrationFeedback: vibrationFeedback,
     );

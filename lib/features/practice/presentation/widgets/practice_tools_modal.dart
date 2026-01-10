@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/metronome_settings.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
+import '../../domain/entities/tuner_settings.dart';
+import '../../domain/entities/tuner_types.dart';
+import '../providers/tuner_combo_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'metronome/cat_beat_indicator.dart';
 import 'tuner/circular_tuner_indicator.dart';
+import 'tuner/clef_svgs.dart';
 import 'tuner/tuner_cat_indicator.dart';
 import 'tuner/tuner_settings_sheet.dart';
 
@@ -372,21 +377,24 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
                 final catSize = circleSize * 0.40; // Cat is 40% of circle (smaller)
 
                 return Stack(
-                  alignment: Alignment.center,
+                  alignment: Alignment.topCenter,
                   children: [
-                    // Circle with cat (no note inside, speech bubble next to cat)
-                    CircularTunerIndicator(
-                      size: circleSize,
-                      centerChild: TunerCatIndicator(
-                        size: catSize,
-                        showNote: false, // Don't show note inside cat
-                        showSpeechBubble: true, // Show speech bubble next to cat
+                    // Circle with cat (positioned 0px from top)
+                    Positioned(
+                      top: 0,
+                      child: CircularTunerIndicator(
+                        size: circleSize,
+                        centerChild: TunerCatIndicator(
+                          size: catSize,
+                          showNote: false, // Don't show note inside cat
+                          showSpeechBubble: true, // Show speech bubble next to cat
+                        ),
                       ),
                     ),
-                    // Current note display (overlaid below cat face)
+                    // Current note display (below circle, moved up more)
                     Positioned(
-                      bottom: circleSize * 0.15, // Move up a bit
-                      child: _CurrentNoteDisplay(scale: circleSize / 280), // Scale based on circle size
+                      top: circleSize - circleSize * 0.15 - 100,
+                      child: _CurrentNoteDisplay(scale: (circleSize / 280) / 1.1), // 1.1x smaller
                     ),
                   ],
                 );
@@ -396,19 +404,44 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
 
         SizedBox(height: AppSpacing.space4),
 
-        // Info bar
+        // Bottom controls: Info bar (left) - Button (center) - Staff (right)
+        // Stack layout: side widgets behind button's glow effect
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.space6),
-          child: const TunerInfoBar(),
-        ),
-        SizedBox(height: AppSpacing.space4),
-
-        // Start/Stop button
-        Padding(
-          padding: EdgeInsets.only(bottom: AppSpacing.space6),
-          child: _TunerButton(
-            isListening: tunerState.isListening,
-            onPressed: () => ref.read(tunerProvider.notifier).toggle(),
+          padding: EdgeInsets.only(
+            left: AppSpacing.space4,
+            right: AppSpacing.space4,
+            bottom: AppSpacing.space6,
+          ),
+          child: SizedBox(
+            height: 80,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                // Background layer: Staff (left) + Info bar (right) - hide when yellow curtain fully covers
+                if (!ref.watch(isCurtainFullyCoveredProvider))
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Left side: staff (up 80px, inward 30px from edge)
+                      Transform.translate(
+                        offset: const Offset(10, -80),
+                        child: const _TunerStaff(width: 106, height: 80),
+                      ),
+                      // Right side: info bar (up 80px, inward 30px from edge)
+                      Transform.translate(
+                        offset: const Offset(-10, -80),
+                        child: const TunerInfoBar(),
+                      ),
+                    ],
+                  ),
+                // Foreground layer: Button (center) - rendered last (on top, covers side widgets)
+                _TunerButton(
+                  isListening: tunerState.isListening,
+                  onPressed: () => ref.read(tunerProvider.notifier).toggle(),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -467,23 +500,22 @@ class _CurrentNoteDisplay extends ConsumerWidget {
     final currentNote = tunerState.currentNote;
     final isPerfect = tunerState.isPerfect;
 
+    // Apply 1.1x size reduction and scale
+    final adjustedScale = scale / 1.1;
+
     // Base font sizes (will be scaled)
-    final noteFontSize = 72 * scale;
-    final octaveFontSize = 42 * scale;
+    final noteFontSize = 72 * adjustedScale;
+    final octaveFontSize = 42 * adjustedScale;
 
     if (currentNote == null) {
-      // No note detected - show placeholder dash
-      return Text(
-        '—',
-        style: TextStyle(
-          fontSize: noteFontSize,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey[400],
-        ),
-      );
+      // No note detected - show nothing (removed arrows)
+      return const SizedBox.shrink();
     }
 
-    final noteColor = isPerfect ? Colors.green : AppColors.primary;
+    // Green when perfect, primary color otherwise (80% opacity)
+    final noteColor = isPerfect
+        ? Colors.green.withValues(alpha: 0.9)
+        : AppColors.primary.withValues(alpha: 0.8);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -511,5 +543,338 @@ class _CurrentNoteDisplay extends ConsumerWidget {
         // Cent display removed - shown in TunerInfoBar below
       ],
     );
+  }
+}
+
+/// Musical staff with note display for tuner.
+/// Shows the current note on a 5-line staff when pitch is within beginner threshold.
+/// Uses SVG for accurate clef rendering.
+class _TunerStaff extends ConsumerWidget {
+  const _TunerStaff({required this.width, required this.height});
+
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tunerState = ref.watch(tunerProvider);
+    final currentNote = tunerState.currentNote;
+    final clefType = tunerState.settings.clefType;
+    final autoSwitchClef = tunerState.settings.autoSwitchClef;
+
+    // Use beginner-level threshold (±20 cents) for staff display
+    final isWithinBeginnerThreshold = currentNote != null &&
+        currentNote.centDeviation.abs() <= TunerDifficulty.beginner.perfectCent;
+
+    final displayNote = isWithinBeginnerThreshold ? currentNote : null;
+
+    // Determine effective clef (auto-switch only if enabled in settings)
+    final effectiveClef = displayNote != null
+        ? _getEffectiveClef(displayNote, clefType, autoSwitchClef)
+        : clefType;
+
+    // Get SVG for the clef
+    final clefSvg = switch (effectiveClef) {
+      ClefType.treble => trebleClefSvg,
+      ClefType.bass => bassClefSvg,
+      ClefType.alto => altoClefSvg,
+    };
+
+    // Calculate proportions
+    final lineSpacing = height / 6;
+
+    // Clef-specific height (treble clef needs to be 1.5x bigger)
+    final clefHeight = switch (effectiveClef) {
+      ClefType.treble => height * 0.85 * 1.5,
+      ClefType.bass => height * 0.85,
+      ClefType.alto => height * 0.85,
+    };
+
+    // Clef-specific left offset (treble clef needs to be more to the left)
+    final clefLeftOffset = switch (effectiveClef) {
+      ClefType.treble => -20.0,
+      ClefType.bass => 2.0,
+      ClefType.alto => 2.0,
+    };
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Layer 1: Staff lines
+          CustomPaint(
+            size: Size(width, height),
+            painter: _StaffLinesPainter(),
+          ),
+
+          // Layer 2: Clef SVG (only set height, let width auto-calculate to preserve aspect ratio)
+          Positioned(
+            left: clefLeftOffset,
+            top: (height - clefHeight) / 2,
+            child: SvgPicture.string(
+              clefSvg,
+              height: clefHeight,
+              colorFilter: ColorFilter.mode(
+                Colors.grey[600]!,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+
+          // Layer 3: Note
+          if (displayNote != null)
+            CustomPaint(
+              size: Size(width, height),
+              painter: _NotePainter(
+                note: displayNote,
+                effectiveClef: effectiveClef,
+                lineSpacing: lineSpacing,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Get effective clef for displaying a note.
+  /// If autoSwitchClef is enabled, switches based on note range (for cello, etc.)
+  /// Otherwise, always uses the user's preferred clef setting.
+  ClefType _getEffectiveClef(TunerNote note, ClefType preferredClef, bool autoSwitch) {
+    // If auto-switch is disabled, always use preferred clef
+    if (!autoSwitch) {
+      return preferredClef;
+    }
+
+    // Auto-switch mode: check if note is in preferred clef range first
+    final naturalName = note.name.sharpName.replaceAll('#', '');
+    final noteKey = '$naturalName${note.octave}';
+
+    final preferredPositions = _getPositionsForClef(preferredClef);
+    if (preferredPositions.containsKey(noteKey)) {
+      return preferredClef;
+    }
+
+    // Try other clefs if note is outside preferred clef range
+    for (final clef in ClefType.values) {
+      if (clef == preferredClef) continue;
+      final positions = _getPositionsForClef(clef);
+      if (positions.containsKey(noteKey)) {
+        return clef;
+      }
+    }
+
+    return preferredClef; // Fallback
+  }
+
+  static Map<String, double> _getPositionsForClef(ClefType clef) {
+    switch (clef) {
+      case ClefType.treble:
+        return {
+          'C3': 9.5, 'D3': 9.0, 'E3': 8.5, 'F3': 8.0, 'G3': 7.5, 'A3': 7.0, 'B3': 6.5,
+          'C4': 6.0, 'D4': 5.5, 'E4': 5.0, 'F4': 4.5, 'G4': 4.0, 'A4': 3.5, 'B4': 3.0,
+          'C5': 2.5, 'D5': 2.0, 'E5': 1.5, 'F5': 1.0, 'G5': 0.5, 'A5': 0.0, 'B5': -0.5,
+          'C6': -1.0, 'D6': -1.5, 'E6': -2.0, 'F6': -2.5, 'G6': -3.0, 'A6': -3.5, 'B6': -4.0,
+        };
+      case ClefType.bass:
+        // Bass clef: G2 on line 1 (bottom=5.0), D3 on line 3 (middle=3.0), A3 on line 5 (top=1.0)
+        return {
+          'E1': 9.5, 'F1': 9.0, 'G1': 8.5, 'A1': 8.0, 'B1': 7.5,
+          'C2': 7.0, 'D2': 6.5, 'E2': 6.0, 'F2': 5.5, 'G2': 5.0, 'A2': 4.5, 'B2': 4.0,
+          'C3': 3.5, 'D3': 3.0, 'E3': 2.5, 'F3': 2.0, 'G3': 1.5, 'A3': 1.0, 'B3': 0.5,
+          'C4': 0.0, 'D4': -0.5, 'E4': -1.0, 'F4': -1.5, 'G4': -2.0, 'A4': -2.5, 'B4': -3.0,
+        };
+      case ClefType.alto:
+        // Alto clef: F3 on line 1 (bottom), C4 on line 3 (middle), G4 on line 5 (top)
+        return {
+          'C2': 10.0, 'D2': 9.5, 'E2': 9.0, 'F2': 8.5, 'G2': 8.0, 'A2': 7.5, 'B2': 7.0,
+          'C3': 6.5, 'D3': 6.0, 'E3': 5.5, 'F3': 5.0, 'G3': 4.5, 'A3': 4.0, 'B3': 3.5,
+          'C4': 3.0, 'D4': 2.5, 'E4': 2.0, 'F4': 1.5, 'G4': 1.0, 'A4': 0.5, 'B4': 0.0,
+          'C5': -0.5, 'D5': -1.0, 'E5': -1.5, 'F5': -2.0, 'G5': -2.5, 'A5': -3.0, 'B5': -3.5,
+        };
+    }
+  }
+}
+
+/// Painter for staff lines only.
+class _StaffLinesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey[400]!
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final lineSpacing = size.height / 6;
+    final startX = 0.0;
+    final endX = size.width;
+
+    for (var i = 1; i <= 5; i++) {
+      final y = i * lineSpacing;
+      canvas.drawLine(Offset(startX, y), Offset(endX, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Painter for note only.
+class _NotePainter extends CustomPainter {
+  _NotePainter({
+    required this.note,
+    required this.effectiveClef,
+    required this.lineSpacing,
+  });
+
+  final TunerNote note;
+  final ClefType effectiveClef;
+  final double lineSpacing;
+
+  /// Calculate position for any note, even if outside predefined range.
+  double _getPositionForNote(String naturalName, int octave) {
+    final positions = _TunerStaff._getPositionsForClef(effectiveClef);
+    final noteKey = '$naturalName$octave';
+
+    // If note is in predefined range, use it directly
+    if (positions.containsKey(noteKey)) {
+      return positions[noteKey]!;
+    }
+
+    // Find a reference note in the same pitch class but different octave
+    for (int refOctave = 1; refOctave <= 7; refOctave++) {
+      final refKey = '$naturalName$refOctave';
+      if (positions.containsKey(refKey)) {
+        final refPosition = positions[refKey]!;
+        // Each octave is 7 diatonic steps = 3.5 position units
+        final octaveDiff = octave - refOctave;
+        return refPosition - (octaveDiff * 3.5);
+      }
+    }
+
+    return 3.0; // Fallback to middle line
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final naturalName = note.name.sharpName.replaceAll('#', '');
+    final position = _getPositionForNote(naturalName, note.octave);
+
+    final y = position * lineSpacing;
+    final x = size.width * 0.7; // Note in right portion
+    final noteRadius = lineSpacing * 0.55;
+
+    // Draw note head
+    final notePaint = Paint()
+      ..color = AppColors.primary
+      ..style = PaintingStyle.fill;
+
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.rotate(-0.3);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: noteRadius * 2.2,
+        height: noteRadius * 1.6,
+      ),
+      notePaint,
+    );
+    canvas.restore();
+
+    // Draw stem
+    final stemPaint = Paint()
+      ..color = AppColors.primary
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final stemUp = position >= 3.0;
+    final stemLength = lineSpacing * 3.5;
+
+    if (stemUp) {
+      final stemX = x + noteRadius * 0.9;
+      canvas.drawLine(
+        Offset(stemX, y),
+        Offset(stemX, y - stemLength),
+        stemPaint,
+      );
+    } else {
+      final stemX = x - noteRadius * 0.9;
+      canvas.drawLine(
+        Offset(stemX, y),
+        Offset(stemX, y + stemLength),
+        stemPaint,
+      );
+    }
+
+    // Draw ledger lines if needed
+    final ledgerPaint = Paint()
+      ..color = Colors.grey[500]!
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final ledgerWidth = noteRadius * 2.5;
+
+    if (position > 5) {
+      for (var i = 6.0; i <= position; i += 1.0) {
+        final ledgerY = i * lineSpacing;
+        canvas.drawLine(
+          Offset(x - ledgerWidth, ledgerY),
+          Offset(x + ledgerWidth, ledgerY),
+          ledgerPaint,
+        );
+      }
+    }
+
+    if (position < 1) {
+      for (var i = 0.0; i >= position; i -= 1.0) {
+        final ledgerY = i * lineSpacing;
+        canvas.drawLine(
+          Offset(x - ledgerWidth, ledgerY),
+          Offset(x + ledgerWidth, ledgerY),
+          ledgerPaint,
+        );
+      }
+    }
+
+    // Draw sharp symbol if accidental
+    if (note.name.isAccidental) {
+      final accidentalPaint = Paint()
+        ..color = AppColors.primary
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke;
+
+      final accidentalX = x - noteRadius * 2.5;
+      final accidentalSize = lineSpacing * 0.5;
+
+      // Sharp symbol (#)
+      canvas.drawLine(
+        Offset(accidentalX - accidentalSize * 0.3, y - accidentalSize),
+        Offset(accidentalX - accidentalSize * 0.3, y + accidentalSize),
+        accidentalPaint,
+      );
+      canvas.drawLine(
+        Offset(accidentalX + accidentalSize * 0.3, y - accidentalSize),
+        Offset(accidentalX + accidentalSize * 0.3, y + accidentalSize),
+        accidentalPaint,
+      );
+      canvas.drawLine(
+        Offset(accidentalX - accidentalSize * 0.6, y - accidentalSize * 0.3),
+        Offset(accidentalX + accidentalSize * 0.6, y - accidentalSize * 0.5),
+        accidentalPaint,
+      );
+      canvas.drawLine(
+        Offset(accidentalX - accidentalSize * 0.6, y + accidentalSize * 0.3),
+        Offset(accidentalX + accidentalSize * 0.6, y + accidentalSize * 0.1),
+        accidentalPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _NotePainter oldDelegate) {
+    return oldDelegate.note != note || oldDelegate.effectiveClef != effectiveClef;
   }
 }

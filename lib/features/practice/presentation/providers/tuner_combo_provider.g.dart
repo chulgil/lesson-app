@@ -42,7 +42,28 @@ final comboMessageProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ComboMessageRef = AutoDisposeProviderRef<String?>;
-String _$tunerComboHash() => r'43117a068235ca98542a7d737a6a5a5672f58cb1';
+String _$isCurtainFullyCoveredHash() =>
+    r'90871bcc75c325638a482832f908ebee3ee54950';
+
+/// Provider for whether the yellow curtain is fully covering the screen.
+/// Returns true when perfect pitch has been maintained for 8+ seconds.
+///
+/// Copied from [isCurtainFullyCovered].
+@ProviderFor(isCurtainFullyCovered)
+final isCurtainFullyCoveredProvider = AutoDisposeProvider<bool>.internal(
+  isCurtainFullyCovered,
+  name: r'isCurtainFullyCoveredProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$isCurtainFullyCoveredHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef IsCurtainFullyCoveredRef = AutoDisposeProviderRef<bool>;
+String _$tunerComboHash() => r'03caff27a0000722e5dfac4ff9c07ce5a7cd1bf6';
 
 /// Combo counter and judgement management.
 ///

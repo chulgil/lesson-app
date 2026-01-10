@@ -103,10 +103,10 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   final List<_HeartParticle> _particles = [];
   final math.Random _random = math.Random();
 
-  // Thresholds
-  static const _scaleStartSeconds = 1.0; // Cat grows after 1 second
-  static const _particleStartSeconds = 2.0; // 1 second after scale starts
-  static const _starburstStartSeconds = 6.0; // 4 seconds after particles start
+  // Animation timing thresholds (in seconds of perfect tuning)
+  static const _scaleStartSeconds = 1.0; // Start scale after 1 second of perfect
+  static const _particleStartSeconds = 2.0; // Start particles after 2 seconds
+  static const _starburstStartSeconds = 6.0; // Start starburst after 6 seconds
   static const _maxScale = 1.25; // 1.04 * 1.2 = 1.248 ≈ 1.25
   static const _maxParticles = 500;
 
@@ -114,7 +114,17 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   late AnimationController _starburstController;
   bool _showStarburst = false;
   DateTime? _starburstStartTime;
-  DateTime? _starburstFadeStartTime; // When pitch became inaccurate
+
+  // Reverse animation (3 seconds to revert all effects)
+  static const _revertDurationSeconds = 3.0;
+  bool _isReverting = false;
+  DateTime? _revertStartTime;
+  double _revertProgress = 0.0; // 0 = just started reverting, 1 = fully reverted
+
+  // Track the note that was perfect (for reactivation matching)
+  NoteName? _lastPerfectNoteName;
+  // Counter for reactivation attempts (compared against difficulty.reactivationChances)
+  int _reactivationCount = 0;
 
   // Ecstasy pulse animation (stronger pulse when particles appear)
   late AnimationController _ecstasyController;
@@ -221,7 +231,7 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   }
 
   void _onParticleTick(Duration elapsed) {
-    if (!_showParticles || !mounted) {
+    if ((!_showParticles && !_isReverting) || !mounted) {
       _stopParticleTicker();
       return;
     }
@@ -234,6 +244,35 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     if (deltaMs > 100) return;
 
     final deltaProgress = deltaMs / 1000.0; // Convert to seconds
+
+    // Handle reverting mode
+    if (_isReverting) {
+      setState(() {
+        // Update revert progress
+        if (_revertStartTime != null) {
+          _revertProgress = DateTime.now()
+              .difference(_revertStartTime!)
+              .inMilliseconds / (_revertDurationSeconds * 1000);
+          _revertProgress = _revertProgress.clamp(0.0, 1.0);
+        }
+
+        // Move particles back toward center (reverse direction)
+        final revertSpeed = 1.0 / _revertDurationSeconds; // Complete in 3 seconds
+        for (final particle in _particles) {
+          particle.progress -= deltaProgress * revertSpeed * 1.5; // 1.5x speed to reach center
+          particle.rotation -= deltaProgress * 0.1; // Slow reverse rotation
+        }
+
+        // Remove particles that reached center
+        _particles.removeWhere((p) => p.progress <= 0);
+
+        // Check if revert is complete
+        if (_revertProgress >= 1.0 || _particles.isEmpty) {
+          _completeRevert();
+        }
+      });
+      return;
+    }
 
     final perfectDuration = _getPerfectDuration();
     final timeSinceStart = perfectDuration - _particleStartSeconds;
@@ -306,8 +345,27 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     return DateTime.now().difference(_perfectStartTime!).inMilliseconds / 1000;
   }
 
-  void _onPerfectStateChanged(bool isPerfect) {
-    if (isPerfect) {
+  void _onPerfectStateChanged(bool isPerfect, NoteName? currentNoteName, TunerDifficulty difficulty) {
+    if (isPerfect && currentNoteName != null) {
+      // If we were reverting, check reactivation rules
+      if (_isReverting) {
+        final maxChances = difficulty.reactivationChances;
+        debugPrint('Revert check: count=$_reactivationCount, max=$maxChances (${difficulty.label})');
+        // Check if reactivation chances exhausted
+        if (_reactivationCount >= maxChances) {
+          // No more chances - block and let revert continue
+          debugPrint('  -> BLOCKED: used all $maxChances chances');
+          return;
+        }
+        // Still have chances - allow reactivation
+        _reactivationCount++;
+        debugPrint('  -> ALLOWED: reactivation $_reactivationCount/$maxChances');
+        _cancelRevert();
+      }
+
+      // Note can change (A -> D -> G) - animation continues as long as isPerfect
+      _lastPerfectNoteName = currentNoteName;
+
       // Start tracking perfect duration
       _perfectStartTime ??= DateTime.now();
 
@@ -336,20 +394,95 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
         _starburstController.repeat();
       }
     } else {
-      // Reset everything
+      // Start reverting animation instead of immediate reset
+      if (!_isReverting && (_showParticles || _showStarburst || _isScaling)) {
+        _startRevert();
+      } else if (!_isReverting) {
+        // No animations were active, just reset
+        _resetAll();
+      }
+    }
+  }
+
+  /// Start the 3-second reverse animation
+  void _startRevert() {
+    setState(() {
+      _isReverting = true;
+      _revertStartTime = DateTime.now();
+      _revertProgress = 0.0;
+      _showParticles = false; // Stop spawning new particles
+      // NOTE: Do NOT reset _hasReactivatedDuringRevert here!
+      // Once reactivation is used, it stays used until full reset (_resetAll)
+    });
+
+    // Start scale reverse animation (3 seconds)
+    _scaleController.animateTo(
+      0.0,
+      duration: Duration(milliseconds: (_revertDurationSeconds * 1000).toInt()),
+      curve: Curves.easeInOutCubic,
+    );
+
+    // Keep particle ticker running for reverse animation
+    if (_particleTicker == null || !_particleTicker!.isActive) {
+      _startParticleTicker();
+    }
+
+    // Slow down ecstasy animation
+    _ecstasyController.stop();
+  }
+
+  /// Cancel revert and resume normal animation
+  void _cancelRevert() {
+    setState(() {
+      _isReverting = false;
+      _revertStartTime = null;
+      _revertProgress = 0.0;
+    });
+
+    // Resume forward animations from current position
+    if (_scaleController.value < _maxScale) {
+      _scaleController.forward();
+    }
+
+    // Resume ecstasy if particles are showing
+    if (_particles.isNotEmpty) {
+      _showParticles = true;
+      _ecstasyController.repeat();
+    }
+
+    // Resume starburst if it was showing
+    if (_showStarburst && !_starburstController.isAnimating) {
+      _starburstController.repeat();
+    }
+  }
+
+  /// Complete the revert and reset all state
+  void _completeRevert() {
+    _resetAll();
+  }
+
+  /// Reset all animation state
+  void _resetAll() {
+    setState(() {
       _perfectStartTime = null;
       _isScaling = false;
       _showParticles = false;
       _showStarburst = false;
       _starburstStartTime = null;
-      _stopParticleTicker();
+      _isReverting = false;
+      _revertStartTime = null;
+      _revertProgress = 0.0;
+      _lastPerfectNoteName = null; // Reset tracked note
+      _reactivationCount = 0; // Reset reactivation counter
       _particles.clear();
-      _scaleController.reverse();
-      _starburstController.stop();
-      _starburstController.reset();
-      _ecstasyController.stop();
-      _ecstasyController.reset();
-    }
+    });
+
+    _stopParticleTicker();
+    _scaleController.reset();
+    _starburstController.stop();
+    _starburstController.reset();
+    _ecstasyController.stop();
+    _ecstasyController.reset();
   }
 
   void _onComboChanged(ComboState comboState) {
@@ -374,11 +507,13 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
 
     // Listen for perfect state changes
     ref.listen(tunerProvider, (previous, next) {
+      final currentNoteName = next.currentNote?.name;
+      final difficulty = next.settings.difficulty;
       if (previous?.isPerfect != next.isPerfect) {
-        _onPerfectStateChanged(next.isPerfect);
+        _onPerfectStateChanged(next.isPerfect, currentNoteName, difficulty);
       } else if (next.isPerfect) {
         // Still perfect, check duration thresholds
-        _onPerfectStateChanged(true);
+        _onPerfectStateChanged(true, currentNoteName, difficulty);
       }
     });
 
@@ -409,13 +544,14 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                   hasNote: tunerState.currentNote != null,
                   isPerfect: isPerfect,
                   comboTier: tier,
-                  scale: (widget.size / 120) / 1.4, // 1.4x smaller
+                  scale: (widget.size / 120) * 1.1 / 1.4, // 1.1x size
+                  centDeviation: tunerState.centDeviation,
                 ),
               ),
             ),
 
           // Rotating starburst (behind everything) - grows to cover screen
-          if (_showStarburst)
+          if (_showStarburst || (_isReverting && _starburstStartTime != null))
             Positioned.fill(
               child: OverflowBox(
                 maxWidth: widget.size * 4,
@@ -429,32 +565,26 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                             .inMilliseconds
                         : 0;
 
-                    // Size progress: 0 to 1 over 5 seconds
-                    final sizeProgress = (starburstMs / 5000.0).clamp(0.0, 1.0);
+                    // Size progress: 0 to 1 over 5 seconds (forward)
+                    var sizeProgress = (starburstMs / 5000.0).clamp(0.0, 1.0);
 
                     // Color progress: 0 to 1.0 over 8 seconds (all yellow at 8s)
-                    // Phase 1 (0-2.7s): pattern with transparent
-                    // Phase 2 (2.7-5.3s): transparent disappears
-                    // Phase 3 (5.3-8s): white becomes yellow
-                    // Stays yellow while pitch is accurate
-                    final colorProgress = (starburstMs / 8000.0).clamp(0.0, 1.0);
+                    var colorProgress = (starburstMs / 8000.0).clamp(0.0, 1.0);
 
-                    // Track fade out when pitch becomes inaccurate
-                    if (!isPerfect && _showStarburst) {
-                      _starburstFadeStartTime ??= DateTime.now();
-                    } else if (isPerfect) {
-                      _starburstFadeStartTime = null;
+                    // Calculate revert progress (shrink back over 3 seconds)
+                    double fadeOut = 0.0;
+                    if (_isReverting && _revertStartTime != null) {
+                      final revertMs = DateTime.now()
+                          .difference(_revertStartTime!)
+                          .inMilliseconds;
+                      fadeOut = (revertMs / (_revertDurationSeconds * 1000)).clamp(0.0, 1.0);
+
+                      // Reverse size and color during revert
+                      sizeProgress = sizeProgress * (1.0 - fadeOut);
+                      colorProgress = colorProgress * (1.0 - fadeOut);
                     }
 
-                    // Calculate fade out progress (0 to 1 over 1 second)
-                    final fadeOutMs = _starburstFadeStartTime != null
-                        ? DateTime.now()
-                            .difference(_starburstFadeStartTime!)
-                            .inMilliseconds
-                        : 0;
-                    final fadeOut = (fadeOutMs / 1000.0).clamp(0.0, 1.0);
-
-                    // Hide when fully faded out
+                    // Hide when fully reverted
                     if (fadeOut >= 1.0) {
                       return const SizedBox.shrink();
                     }
@@ -474,7 +604,7 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
             ),
 
           // Heart particles (behind cat) - Layer 2
-          if (_showParticles)
+          if (_showParticles || (_isReverting && _particles.isNotEmpty))
             Positioned.fill(
               child: CustomPaint(
                 painter: _HeartParticlePainter(particles: _particles),
@@ -828,6 +958,7 @@ class _CatSpeechBubble extends StatelessWidget {
     this.isPerfect = false,
     this.comboTier = ComboTier.none,
     this.scale = 1.0,
+    this.centDeviation = 0.0,
   });
 
   final bool isListening;
@@ -835,6 +966,7 @@ class _CatSpeechBubble extends StatelessWidget {
   final bool isPerfect;
   final ComboTier comboTier;
   final double scale;
+  final double centDeviation;
 
   @override
   Widget build(BuildContext context) {
@@ -856,19 +988,29 @@ class _CatSpeechBubble extends StatelessWidget {
       backgroundColor = Colors.green[100]!;
       textColor = Colors.green[800]!;
     } else {
-      message = '조금만 더...';
+      // Show direction message with arrow
+      // If flat (negative cent): need to go up
+      // If sharp (positive cent): need to go down
+      if (centDeviation < 0) {
+        message = '조금만 더 위로 ↑';
+      } else {
+        message = '조금만 더 아래로 ↓';
+      }
       backgroundColor = Colors.orange[50]!;
       textColor = Colors.orange[800]!;
     }
 
+    // Apply 1.1x size multiplier
+    final adjustedScale = scale * 1.1;
+
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: 12 * scale,
-        vertical: 8 * scale,
+        horizontal: 12 * adjustedScale,
+        vertical: 8 * adjustedScale,
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(20 * scale), // More rounded
+        borderRadius: BorderRadius.circular(20 * adjustedScale), // More rounded
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -880,7 +1022,7 @@ class _CatSpeechBubble extends StatelessWidget {
       child: Text(
         message,
         style: TextStyle(
-          fontSize: 10 * scale,
+          fontSize: 10 * adjustedScale,
           fontWeight: FontWeight.w600,
           color: textColor,
         ),
