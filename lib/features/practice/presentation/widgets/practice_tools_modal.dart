@@ -190,6 +190,12 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
   /// Timer for auto-start (can be cancelled if user keeps tapping).
   Timer? _autoStartTimer;
 
+  /// Whether tempo explanation bubble is showing.
+  bool _showTempoExplanation = false;
+
+  /// Timer for hiding tempo explanation after 3 seconds.
+  Timer? _tempoExplanationTimer;
+
   @override
   void initState() {
     super.initState();
@@ -238,10 +244,42 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
     return 'Prestissimo';
   }
 
+  /// Get tempo explanation in Korean (transliteration + meaning).
+  /// Returns a tuple: (한글 음역, 한글 의미)
+  (String, String) _getTempoExplanation(int bpm) {
+    if (bpm < 40) return ('그라베', '매우 느리고 장중하게');
+    if (bpm < 60) return ('라르고', '느리고 폭넓게');
+    if (bpm < 66) return ('라르게토', '조금 느리게');
+    if (bpm < 76) return ('아다지오', '천천히 여유있게');
+    if (bpm < 108) return ('안단테', '걷는 빠르기로');
+    if (bpm < 120) return ('모데라토', '보통 빠르기로');
+    if (bpm < 132) return ('알레그레토', '조금 빠르게');
+    if (bpm < 168) return ('알레그로', '빠르고 경쾌하게');
+    if (bpm < 176) return ('비바체', '활발하고 생기있게');
+    if (bpm < 200) return ('프레스토', '매우 빠르게');
+    return ('프레스티시모', '가장 빠르게');
+  }
+
+  /// Handle tap on tempo marking to show explanation.
+  void _onTempoMarkingTap() {
+    _tempoExplanationTimer?.cancel();
+    setState(() {
+      _showTempoExplanation = true;
+      _isBubbleHidden = false; // Show bubble if it was hidden after playback
+    });
+
+    _tempoExplanationTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() => _showTempoExplanation = false);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _tapAnimationController.dispose();
     _autoStartTimer?.cancel();
+    _tempoExplanationTimer?.cancel();
     super.dispose();
   }
 
@@ -354,37 +392,44 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
                     ),
                   ),
                 ),
-                // Tap tempo speech bubble (top left of cat)
+                // Speech bubble (top left of cat)
+                // Shows tempo explanation when tapped, otherwise tap tempo message
                 if (!state.isPlaying && !_isBubbleHidden)
                   Positioned(
                     left: 10,
                     top: 0,
                     child: _TapTempoSpeechBubble(
                       tapCount: _tapTimestamps.length,
+                      tempoExplanation: _showTempoExplanation
+                          ? _getTempoExplanation(state.settings.bpm)
+                          : null,
                     ),
                   ),
                 // BPM display with tempo marking (bottom right of cat) - always visible
                 Positioned(
                   right: 10,
                   bottom: 40,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _getTempoMarking(state.settings.bpm),
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
+                  child: GestureDetector(
+                    onTap: _onTempoMarkingTap,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _getTempoMarking(state.settings.bpm),
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${state.settings.bpm}',
-                        style: AppTypography.displayLarge.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                          fontSize: 40,
+                        Text(
+                          '${state.settings.bpm}',
+                          style: AppTypography.displayLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontSize: 40,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -514,24 +559,34 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
 }
 
 /// Speech bubble for tap tempo hint (cat language style).
+/// Also used for tempo explanation when tempoExplanation is provided.
 class _TapTempoSpeechBubble extends StatelessWidget {
   const _TapTempoSpeechBubble({
     required this.tapCount,
+    this.tempoExplanation,
   });
 
   final int tapCount;
+  /// If provided, shows tempo explanation instead of tap tempo message.
+  /// Format: (한글 음역, 한글 의미)
+  final (String, String)? tempoExplanation;
 
   @override
   Widget build(BuildContext context) {
-    // Cat language messages based on tap count
     final String message;
     final Color backgroundColor;
     final Color textColor;
 
-    if (tapCount == 0) {
+    // If tempo explanation is provided, show it (same style as "좋다냥!")
+    if (tempoExplanation != null) {
+      final (koreanName, koreanMeaning) = tempoExplanation!;
+      message = '$koreanName\n($koreanMeaning)';
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    } else if (tapCount == 0) {
       message = '탭하라냥~';
-      backgroundColor = const Color(0xFFB8E3C8); // Light green (same as tuner)
-      textColor = Colors.grey[600]!;
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
     } else if (tapCount < 4) {
       message = '${4 - tapCount}번 더냥~';
       backgroundColor = Colors.orange[50]!;
@@ -557,11 +612,64 @@ class _TapTempoSpeechBubble extends StatelessWidget {
       ),
       child: Text(
         message,
+        textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: textColor,
         ),
+      ),
+    );
+  }
+}
+
+/// Bubble showing tempo explanation in Korean.
+class _TempoExplanationBubble extends StatelessWidget {
+  const _TempoExplanationBubble({
+    required this.bpm,
+    required this.explanation,
+  });
+
+  final int bpm;
+  final (String, String) explanation;
+
+  @override
+  Widget build(BuildContext context) {
+    final (koreanName, koreanMeaning) = explanation;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            koreanName,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '($koreanMeaning)',
+            style: TextStyle(
+              fontSize: 11,
+              color: Colors.white.withValues(alpha: 0.85),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -632,22 +740,38 @@ class _CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    // Soft ivory text color (not pure white, easier on eyes)
+    const softIvory = Color(0xFFFFFAF0);
+
+    return Container(
       width: 48,
       height: 48,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.primaryLight,
-          foregroundColor: foregroundColor ?? AppColors.primary,
-          shape: const CircleBorder(),
-          padding: EdgeInsets.zero,
-        ),
-        child: Text(
-          label,
-          style: AppTypography.buttonSmall.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+      decoration: BoxDecoration(
+        color: backgroundColor ?? AppColors.primary,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          customBorder: const CircleBorder(),
+          child: Center(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: foregroundColor ?? softIvory,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
       ),
