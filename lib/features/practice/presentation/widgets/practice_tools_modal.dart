@@ -440,10 +440,14 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
           // BPM controls with logarithmic slider
           _LogarithmicBpmSlider(
             bpm: state.settings.bpm,
-            onChanged: (value) =>
-                ref.read(metronomeProvider.notifier).setBpm(value),
-            onIncrement: (delta) =>
-                ref.read(metronomeProvider.notifier).incrementBpm(delta),
+            onChanged: (value) {
+              ref.read(metronomeProvider.notifier).setBpm(value);
+              _onTempoMarkingTap(); // Show tempo explanation
+            },
+            onIncrement: (delta) {
+              ref.read(metronomeProvider.notifier).incrementBpm(delta);
+              _onTempoMarkingTap(); // Show tempo explanation
+            },
           ),
           SizedBox(height: AppSpacing.space8),
 
