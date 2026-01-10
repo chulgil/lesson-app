@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -185,6 +187,9 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
   /// Whether speech bubble is temporarily hidden after "좋다냥".
   bool _isBubbleHidden = false;
 
+  /// Timer for auto-start (can be cancelled if user keeps tapping).
+  Timer? _autoStartTimer;
+
   @override
   void initState() {
     super.initState();
@@ -218,7 +223,7 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
     });
   }
 
-  /// Get tempo marking name based on BPM.
+  /// Get tempo marking name based on BPM (Italian/English).
   String _getTempoMarking(int bpm) {
     if (bpm < 40) return 'Grave';
     if (bpm < 60) return 'Largo';
@@ -236,6 +241,7 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
   @override
   void dispose() {
     _tapAnimationController.dispose();
+    _autoStartTimer?.cancel();
     super.dispose();
   }
 
@@ -245,6 +251,10 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
 
     // Only work when metronome is stopped
     if (state.isPlaying) return;
+
+    // Cancel any pending auto-start (user is still tapping)
+    _autoStartTimer?.cancel();
+    _autoStartTimer = null;
 
     final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -282,26 +292,22 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
       // Apply BPM (will be clamped in the provider)
       ref.read(metronomeProvider.notifier).setBpm(bpm);
 
-      // After "좋다냥": hide bubble after 1.5s, show again after 3s more
+      // After "좋다냥": auto-start metronome after 1.5s (cancellable)
       if (_tapTimestamps.length >= _maxTaps) {
-        // Hide bubble after 1.5 seconds
-        Future.delayed(const Duration(milliseconds: 1500), () {
+        // Cancel any existing timer
+        _autoStartTimer?.cancel();
+
+        // Auto-start metronome after 1.5 seconds (can be cancelled by more taps)
+        _autoStartTimer = Timer(const Duration(milliseconds: 1500), () {
           if (mounted) {
+            // Start metronome automatically
+            ref.read(metronomeProvider.notifier).start();
+
             setState(() {
               _isBubbleHidden = true;
               _tapTimestamps.clear();
             });
           }
-
-          // Show "탭하라냥" again after 3 more seconds
-          Future.delayed(const Duration(milliseconds: 3000), () {
-            if (mounted) {
-              setState(() {
-                _isBubbleHidden = false;
-                _tapTimestamps.clear(); // Ensure clean state
-              });
-            }
-          });
         });
       }
     }
