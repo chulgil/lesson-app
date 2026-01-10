@@ -1,44 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// User role enum for distinguishing teacher/student/parent views
-enum UserRole {
-  teacher,
-  student,
-  parent;
+import '../../domain/entities/user_role.dart';
 
-  String get label {
-    switch (this) {
-      case UserRole.teacher:
-        return '선생님';
-      case UserRole.student:
-        return '학생';
-      case UserRole.parent:
-        return '학부모';
-    }
-  }
-
-  String get emoji {
-    switch (this) {
-      case UserRole.teacher:
-        return '👩‍🏫';
-      case UserRole.student:
-        return '🎻';
-      case UserRole.parent:
-        return '👨‍👩‍👧';
-    }
-  }
-
-  String get homeRoute {
-    switch (this) {
-      case UserRole.teacher:
-        return '/home';
-      case UserRole.student:
-        return '/student-home';
-      case UserRole.parent:
-        return '/parent-home';
-    }
-  }
-}
+export '../../domain/entities/user_role.dart';
 
 /// Current user role state provider
 /// Used to switch between teacher and student views for testing
@@ -58,14 +22,6 @@ final currentUserIdProvider = Provider<String>((ref) {
       return 'parent_1';
   }
 });
-
-/// Mock student data for testing (when in student role)
-class MockStudentInfo {
-  final String id;
-  final String name;
-
-  const MockStudentInfo({required this.id, required this.name});
-}
 
 /// Available mock students for testing
 final mockStudentsProvider = Provider<List<MockStudentInfo>>((ref) {
