@@ -76,6 +76,7 @@ class TunerSettings {
     this.enharmonicMode = EnharmonicMode.sharpOnly,
     this.difficulty = TunerDifficulty.intermediate,
     this.clefType = ClefType.treble,
+    this.autoSwitchClef = false,
     this.showCombo = true,
     this.vibrationFeedback = false,
   });
@@ -94,6 +95,10 @@ class TunerSettings {
 
   /// Clef type for staff notation display.
   final ClefType clefType;
+
+  /// Whether to automatically switch clef based on note range.
+  /// Useful for instruments like cello that use both bass and treble clef.
+  final bool autoSwitchClef;
 
   /// Whether to show combo counter.
   final bool showCombo;
@@ -122,6 +127,7 @@ class TunerSettings {
     EnharmonicMode? enharmonicMode,
     TunerDifficulty? difficulty,
     ClefType? clefType,
+    bool? autoSwitchClef,
     bool? showCombo,
     bool? vibrationFeedback,
   }) {
@@ -131,6 +137,7 @@ class TunerSettings {
       enharmonicMode: enharmonicMode ?? this.enharmonicMode,
       difficulty: difficulty ?? this.difficulty,
       clefType: clefType ?? this.clefType,
+      autoSwitchClef: autoSwitchClef ?? this.autoSwitchClef,
       showCombo: showCombo ?? this.showCombo,
       vibrationFeedback: vibrationFeedback ?? this.vibrationFeedback,
     );

@@ -560,6 +560,7 @@ class _TunerStaff extends ConsumerWidget {
     final tunerState = ref.watch(tunerProvider);
     final currentNote = tunerState.currentNote;
     final clefType = tunerState.settings.clefType;
+    final autoSwitchClef = tunerState.settings.autoSwitchClef;
 
     // Use beginner-level threshold (±20 cents) for staff display
     final isWithinBeginnerThreshold = currentNote != null &&
@@ -567,9 +568,9 @@ class _TunerStaff extends ConsumerWidget {
 
     final displayNote = isWithinBeginnerThreshold ? currentNote : null;
 
-    // Determine effective clef (auto-switch if note out of range)
+    // Determine effective clef (auto-switch only if enabled in settings)
     final effectiveClef = displayNote != null
-        ? _getEffectiveClef(displayNote, clefType)
+        ? _getEffectiveClef(displayNote, clefType, autoSwitchClef)
         : clefType;
 
     // Get SVG for the clef
@@ -637,18 +638,25 @@ class _TunerStaff extends ConsumerWidget {
     );
   }
 
-  /// Get effective clef for displaying a note (auto-switch if out of range).
-  ClefType _getEffectiveClef(TunerNote note, ClefType preferredClef) {
+  /// Get effective clef for displaying a note.
+  /// If autoSwitchClef is enabled, switches based on note range (for cello, etc.)
+  /// Otherwise, always uses the user's preferred clef setting.
+  ClefType _getEffectiveClef(TunerNote note, ClefType preferredClef, bool autoSwitch) {
+    // If auto-switch is disabled, always use preferred clef
+    if (!autoSwitch) {
+      return preferredClef;
+    }
+
+    // Auto-switch mode: check if note is in preferred clef range first
     final naturalName = note.name.sharpName.replaceAll('#', '');
     final noteKey = '$naturalName${note.octave}';
 
-    // Check if note is in preferred clef range
     final preferredPositions = _getPositionsForClef(preferredClef);
     if (preferredPositions.containsKey(noteKey)) {
       return preferredClef;
     }
 
-    // Try other clefs
+    // Try other clefs if note is outside preferred clef range
     for (final clef in ClefType.values) {
       if (clef == preferredClef) continue;
       final positions = _getPositionsForClef(clef);
@@ -724,13 +732,34 @@ class _NotePainter extends CustomPainter {
   final ClefType effectiveClef;
   final double lineSpacing;
 
+  /// Calculate position for any note, even if outside predefined range.
+  double _getPositionForNote(String naturalName, int octave) {
+    final positions = _TunerStaff._getPositionsForClef(effectiveClef);
+    final noteKey = '$naturalName$octave';
+
+    // If note is in predefined range, use it directly
+    if (positions.containsKey(noteKey)) {
+      return positions[noteKey]!;
+    }
+
+    // Find a reference note in the same pitch class but different octave
+    for (int refOctave = 1; refOctave <= 7; refOctave++) {
+      final refKey = '$naturalName$refOctave';
+      if (positions.containsKey(refKey)) {
+        final refPosition = positions[refKey]!;
+        // Each octave is 7 diatonic steps = 3.5 position units
+        final octaveDiff = octave - refOctave;
+        return refPosition - (octaveDiff * 3.5);
+      }
+    }
+
+    return 3.0; // Fallback to middle line
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final naturalName = note.name.sharpName.replaceAll('#', '');
-    final noteKey = '$naturalName${note.octave}';
-
-    final positions = _TunerStaff._getPositionsForClef(effectiveClef);
-    final position = positions[noteKey] ?? 3.0;
+    final position = _getPositionForNote(naturalName, note.octave);
 
     final y = position * lineSpacing;
     final x = size.width * 0.7; // Note in right portion

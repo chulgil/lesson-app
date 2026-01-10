@@ -346,6 +346,16 @@ class Tuner extends _$Tuner {
     _saveSettings();
   }
 
+  /// Toggle auto-switch clef (for instruments like cello that use both clefs).
+  void toggleAutoSwitchClef() {
+    state = state.copyWith(
+      settings: state.settings.copyWith(
+        autoSwitchClef: !state.settings.autoSwitchClef,
+      ),
+    );
+    _saveSettings();
+  }
+
   /// Toggle combo counter visibility.
   void toggleShowCombo() {
     state = state.copyWith(

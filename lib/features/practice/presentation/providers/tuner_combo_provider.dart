@@ -117,8 +117,14 @@ class TunerCombo extends _$TunerCombo {
   }
 
   void _onNoteChanged(TunerProviderState? previous, TunerProviderState next) {
-    // Only process when we have a stable note
-    if (next.currentNote == null) return;
+    // Reset perfect time tracking when tuner stops or no note detected
+    if (!next.isListening || next.currentNote == null) {
+      // Only reset if we were tracking perfect time
+      if (state.perfectStartTime != null) {
+        state = state.copyWith(clearPerfectStartTime: true);
+      }
+      return;
+    }
 
     // Get difficulty from settings
     final difficulty = next.settings.difficulty;
