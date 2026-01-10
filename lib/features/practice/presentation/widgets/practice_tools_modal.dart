@@ -581,24 +581,27 @@ class _TapTempoSpeechBubble extends StatelessWidget {
     final Color backgroundColor;
     final Color textColor;
 
-    // If tempo explanation is provided, show it (same style as "좋다냥!")
+    // If tempo explanation is provided, show it (success style)
     if (tempoExplanation != null) {
       final (koreanName, koreanMeaning) = tempoExplanation!;
       message = '$koreanName\n($koreanMeaning)';
-      backgroundColor = Colors.green[100]!;
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.bubbleSuccessBackground;
+      textColor = AppColors.bubbleSuccessText;
     } else if (tapCount == 0) {
+      // Idle state - same as tuner "소리 감지 대기..."
       message = '탭하라냥~';
-      backgroundColor = Colors.green[100]!;
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.bubbleIdleBackground;
+      textColor = AppColors.bubbleIdleText;
     } else if (tapCount < 4) {
+      // Progress state - warning style
       message = '${4 - tapCount}번 더냥~';
-      backgroundColor = Colors.orange[50]!;
-      textColor = Colors.orange[800]!;
+      backgroundColor = AppColors.bubbleWarningBackground;
+      textColor = AppColors.bubbleWarningText;
     } else {
+      // Success state
       message = '좋다냥! 🎵';
-      backgroundColor = Colors.green[100]!;
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.bubbleSuccessBackground;
+      textColor = AppColors.bubbleSuccessText;
     }
 
     return Container(

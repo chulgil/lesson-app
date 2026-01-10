@@ -32,6 +32,20 @@ class AppColors {
   // Cat UI accent (metronome cat paw)
   static const catAccent = Color(0xFFB8A9C9);
 
+  // Speech bubble colors (shared between metronome and tuner)
+  /// Idle/waiting state - light mint green background
+  static const bubbleIdleBackground = Color(0xFFB8E3C8);
+  /// Idle/waiting state - gray text
+  static const bubbleIdleText = Color(0xFF757575);
+  /// Success state - light green background
+  static const bubbleSuccessBackground = Color(0xFFE8F5E9);
+  /// Success state - dark green text
+  static const bubbleSuccessText = Color(0xFF2E7D32);
+  /// Warning/progress state - light orange background
+  static const bubbleWarningBackground = Color(0xFFFFF3E0);
+  /// Warning/progress state - dark orange text
+  static const bubbleWarningText = Color(0xFFE65100);
+
   // Light mode
   static const backgroundLight = Color(0xFFFFFAF5);
   static const surfaceLight = Color(0xFFFFFFFF);

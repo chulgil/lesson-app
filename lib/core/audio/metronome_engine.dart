@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import '../../models/metronome_settings.dart';
@@ -64,15 +65,22 @@ class MetronomeEngine implements MetronomeEngineInterface {
   }
 
   Future<void> _initAudioPlayers() async {
+    // On Android, lowLatency mode has issues - use mediaPlayer instead
+    // On iOS, lowLatency works well
+    final mode = Platform.isAndroid
+        ? PlayerMode.mediaPlayer
+        : PlayerMode.lowLatency;
+    debugPrint('MetronomeEngine: Using PlayerMode.$mode');
+
     // Create 2 players per beat type for alternating playback
     for (var i = 0; i < 2; i++) {
       final strong = AudioPlayer();
       final medium = AudioPlayer();
       final weak = AudioPlayer();
 
-      await strong.setPlayerMode(PlayerMode.lowLatency);
-      await medium.setPlayerMode(PlayerMode.lowLatency);
-      await weak.setPlayerMode(PlayerMode.lowLatency);
+      await strong.setPlayerMode(mode);
+      await medium.setPlayerMode(mode);
+      await weak.setPlayerMode(mode);
 
       _strongPlayers.add(strong);
       _mediumPlayers.add(medium);
@@ -282,10 +290,19 @@ class MetronomeEngine implements MetronomeEngineInterface {
         ),
     };
 
-    // Play the sound (fire and forget)
-    player.play(AssetSource(asset)).catchError((e) {
-      debugPrint('MetronomeEngine: Failed to play beat: $e');
-    });
+    // On Android, need to stop before each play for reliability
+    if (Platform.isAndroid) {
+      player.stop().then((_) {
+        return player.play(AssetSource(asset));
+      }).catchError((e) {
+        debugPrint('MetronomeEngine: Failed to play beat: $e');
+      });
+    } else {
+      // On iOS, just play directly (more efficient)
+      player.play(AssetSource(asset)).catchError((e) {
+        debugPrint('MetronomeEngine: Failed to play beat: $e');
+      });
+    }
   }
 
   @override
