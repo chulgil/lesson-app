@@ -121,8 +121,6 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   DateTime? _revertStartTime;
   double _revertProgress = 0.0; // 0 = just started reverting, 1 = fully reverted
 
-  // Track the note that was perfect (for reactivation matching)
-  NoteName? _lastPerfectNoteName;
   // Counter for reactivation attempts (compared against difficulty.reactivationChances)
   int _reactivationCount = 0;
 
@@ -364,7 +362,6 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
       }
 
       // Note can change (A -> D -> G) - animation continues as long as isPerfect
-      _lastPerfectNoteName = currentNoteName;
 
       // Start tracking perfect duration
       _perfectStartTime ??= DateTime.now();
@@ -472,7 +469,6 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
       _isReverting = false;
       _revertStartTime = null;
       _revertProgress = 0.0;
-      _lastPerfectNoteName = null; // Reset tracked note
       _reactivationCount = 0; // Reset reactivation counter
       _particles.clear();
     });
@@ -1272,56 +1268,6 @@ class _CatFacePainter extends CustomPainter {
   }
 }
 
-/// Speech bubble for cat feedback.
-class _SpeechBubble extends StatelessWidget {
-  const _SpeechBubble({
-    required this.judgement,
-    required this.comboTier,
-  });
-
-  final JudgementResult judgement;
-  final ComboTier comboTier;
-
-  @override
-  Widget build(BuildContext context) {
-    // Use combo message if available, otherwise judgement message
-    final message =
-        comboTier != ComboTier.none ? comboTier.message : judgement.message;
-
-    final color = switch (judgement) {
-      JudgementResult.perfect => Colors.green[100],
-      JudgementResult.good => Colors.yellow[100],
-      JudgementResult.miss => Colors.grey[200],
-    };
-
-    return AnimatedOpacity(
-      opacity: 1.0,
-      duration: const Duration(milliseconds: 200),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Text(
-          message,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Note display with cent (note above, cent below).
 class _NoteWithCent extends StatelessWidget {
   const _NoteWithCent({
@@ -1377,89 +1323,6 @@ class _NoteWithCent extends StatelessWidget {
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: centColor,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Cent deviation display.
-class _CentDisplay extends StatelessWidget {
-  const _CentDisplay({
-    required this.centDeviation,
-    required this.isPerfect,
-  });
-
-  final double centDeviation;
-  final bool isPerfect;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isPerfect
-        ? Colors.green
-        : (centDeviation < 0 ? Colors.red : Colors.orange);
-
-    final arrow = centDeviation > 3
-        ? '↓'
-        : (centDeviation < -3 ? '↑' : '');
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (arrow.isNotEmpty)
-          Text(
-            arrow,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        Text(
-          '${centDeviation >= 0 ? '+' : ''}${centDeviation.toStringAsFixed(1)}¢',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Combo counter display.
-class _ComboCounter extends StatelessWidget {
-  const _ComboCounter({
-    required this.count,
-    required this.tier,
-  });
-
-  final int count;
-  final ComboTier tier;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Stars based on tier
-        for (var i = 0; i < tier.stars; i++)
-          Icon(
-            Icons.star,
-            size: 16,
-            color: tier.isGolden ? Colors.amber : Colors.yellow[700],
-          ),
-
-        const SizedBox(width: 4),
-
-        Text(
-          'COMBO $count',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: tier.isGolden ? Colors.amber[800] : AppColors.primary,
           ),
         ),
       ],

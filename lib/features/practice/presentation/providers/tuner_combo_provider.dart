@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/tuner_types.dart';
@@ -179,7 +180,7 @@ class TunerCombo extends _$TunerCombo {
 
 /// Provider for whether combo should be shown.
 @riverpod
-bool showCombo(ShowComboRef ref) {
+bool showCombo(Ref ref) {
   final tunerState = ref.watch(tunerProvider);
   final comboState = ref.watch(tunerComboProvider);
 
@@ -190,7 +191,7 @@ bool showCombo(ShowComboRef ref) {
 
 /// Provider for combo message (if any).
 @riverpod
-String? comboMessage(ComboMessageRef ref) {
+String? comboMessage(Ref ref) {
   final comboState = ref.watch(tunerComboProvider);
 
   if (comboState.tier == ComboTier.none) return null;
@@ -200,7 +201,7 @@ String? comboMessage(ComboMessageRef ref) {
 /// Provider for whether the yellow curtain is fully covering the screen.
 /// Returns true when perfect pitch has been maintained for 8+ seconds.
 @riverpod
-bool isCurtainFullyCovered(IsCurtainFullyCoveredRef ref) {
+bool isCurtainFullyCovered(Ref ref) {
   final comboState = ref.watch(tunerComboProvider);
   return comboState.isCurtainFullyCovered;
 }

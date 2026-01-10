@@ -6,7 +6,7 @@ part of 'tuner_combo_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$showComboHash() => r'35ce2551d9cfe6d0251758f565123a0904318c30';
+String _$showComboHash() => r'71b01fe8f6e0659a35cf227dca2cab22b5a63e76';
 
 /// Provider for whether combo should be shown.
 ///
@@ -24,7 +24,7 @@ final showComboProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef ShowComboRef = AutoDisposeProviderRef<bool>;
-String _$comboMessageHash() => r'05fcc66da4005231f3ffcc3e5e0a446822481d8f';
+String _$comboMessageHash() => r'ddf606573e41c66e9675a762ed91a83f8e1a3928';
 
 /// Provider for combo message (if any).
 ///
@@ -43,7 +43,7 @@ final comboMessageProvider = AutoDisposeProvider<String?>.internal(
 // ignore: unused_element
 typedef ComboMessageRef = AutoDisposeProviderRef<String?>;
 String _$isCurtainFullyCoveredHash() =>
-    r'90871bcc75c325638a482832f908ebee3ee54950';
+    r'13205d7a49eb3a1695a71cb89feede287bfba368';
 
 /// Provider for whether the yellow curtain is fully covering the screen.
 /// Returns true when perfect pitch has been maintained for 8+ seconds.
@@ -63,7 +63,7 @@ final isCurtainFullyCoveredProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsCurtainFullyCoveredRef = AutoDisposeProviderRef<bool>;
-String _$tunerComboHash() => r'03caff27a0000722e5dfac4ff9c07ce5a7cd1bf6';
+String _$tunerComboHash() => r'3c355b05f9991717cf0fbd6ad7078a1be4049f0b';
 
 /// Combo counter and judgement management.
 ///

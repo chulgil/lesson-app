@@ -1,6 +1,6 @@
 # CLAUDE.md - Lesson App {#overview}
 
-> 마지막 업데이트: 2026-01-03
+> 마지막 업데이트: 2026-01-10
 
 음악 레슨/연습 관리 앱 (Flutter)
 

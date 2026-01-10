@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../practice/domain/entities/tuner_types.dart';
 import '../providers/tuner_provider.dart';
 import '../widgets/tuner/circular_tuner_indicator.dart';
 import '../widgets/tuner/tuner_cat_indicator.dart';

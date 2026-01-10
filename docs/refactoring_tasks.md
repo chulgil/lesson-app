@@ -1,6 +1,6 @@
 # 레슨 앱 리팩토링 태스크
 
-> 마지막 업데이트: 2026-01-01
+> 마지막 업데이트: 2026-01-10
 > 분석 기준: 최신 Flutter 개발 트렌드 및 Clean Architecture 원칙
 
 ---
@@ -9,14 +9,15 @@
 
 | 항목 | 현재 상태 |
 |------|----------|
-| 파일 수 | 216개 Dart 파일 |
-| 코드량 | ~76,691줄 |
-| 대형 파일 (800줄+) | 15개 이상 |
-| 최대 파일 | 1,510줄 |
-| 아키텍처 | Feature-based (presentation only) |
+| 파일 수 | 413개 Dart 파일 |
+| 코드량 | ~96,230줄 |
+| 대형 파일 (800줄+) | 24개 |
+| 최대 파일 | 1,510줄 (practice_items_section.dart) |
+| 아키텍처 | Feature-based + Clean Architecture (일부) |
 | 상태관리 | Riverpod (@riverpod 코드생성) |
-| 라우팅 | go_router (14.2.0) |
-| 로컬 저장소 | Hive (2.2.3) |
+| 라우팅 | go_router |
+| 로컬 저장소 | Hive |
+| flutter analyze | ✅ 0 issues |
 
 ---
 
@@ -24,18 +25,18 @@
 
 ### 현재 구조의 장점 ✅
 
-1. **Feature-based 폴더 구조**: 도메인별 분리 시도
-2. **Riverpod 코드생성**: 타입 안전한 상태관리
-3. **Repository 패턴**: 인터페이스 + Mock 분리
-4. **일관된 네이밍**: 파일/클래스 네이밍 규칙 준수
+1. **Feature-based 폴더 구조**: 15개 feature 모듈화 완료
+2. **Clean Architecture 레이어**: 8개 feature에 domain 레이어 적용
+3. **Riverpod 코드생성**: 타입 안전한 상태관리
+4. **Repository 패턴**: 인터페이스 + Mock 분리
+5. **Re-export 패턴**: 하위 호환성 유지
+6. **일관된 네이밍**: 파일/클래스 네이밍 규칙 준수
 
 ### 개선이 필요한 영역 ⚠️
 
-1. **대형 파일 다수**: 유지보수 어려움
-2. **레이어 불완전**: presentation만 존재, domain/data 레이어 부재
-3. **중앙집중 모델**: models/ 폴더에 모든 모델 집중
-4. **Provider 구조**: 일부 legacy 패턴 혼재
-5. **테스트 커버리지**: 테스트 코드 부족
+1. **대형 파일 다수**: 24개 파일이 800줄 이상 (분할 필요)
+2. **레이어 불완전**: 7개 feature에 domain 레이어 미적용
+3. **테스트 커버리지**: 테스트 코드 부족
 
 ---
 
@@ -338,3 +339,4 @@ features/[domain]/
 | 2026-01-01 | Phase 3.2 Provider 분산 배치 완료 (20개 그룹 → feature별 providers/) |
 | 2026-01-01 | settings providers 마이그레이션, import 경로 정리 |
 | 2026-01-01 | Phase 4.2 아키텍처 문서 및 Claude 지침서 작성 완료 |
+| 2026-01-10 | 코드 품질 검토: flutter analyze 14개 이슈 해결, 미사용 코드 정리 |

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/audio/mock_tuner_engine.dart';
@@ -423,7 +424,7 @@ class Tuner extends _$Tuner {
 
 /// Provider for current note display name.
 @riverpod
-String? currentNoteName(CurrentNoteNameRef ref) {
+String? currentNoteName(Ref ref) {
   final tunerState = ref.watch(tunerProvider);
   final note = tunerState.currentNote;
   if (note == null) return null;
@@ -451,7 +452,7 @@ String? currentNoteName(CurrentNoteNameRef ref) {
 
 /// Provider for tuner info display string (e.g., "A4 · 442Hz · +5¢").
 @riverpod
-String tunerInfoDisplay(TunerInfoDisplayRef ref) {
+String tunerInfoDisplay(Ref ref) {
   final tunerState = ref.watch(tunerProvider);
   final note = tunerState.currentNote;
   final settings = tunerState.settings;
