@@ -15,14 +15,14 @@ enum BeatType {
 
 /// Accent pattern for metronome beats.
 enum AccentPattern {
-  /// Strong-medium-weak pattern (강 약 중 약 for 4/4).
-  strongMediumWeak('강중약', '첫박 강, 3박 중간'),
-
   /// Uniform pattern - all beats same intensity.
   uniform('균일', '모든 박자 동일'),
 
   /// First beat only strong, rest weak (강 약 약 약).
-  firstBeatOnly('첫박강조', '첫박만 강조');
+  firstBeatOnly('첫박강조', '첫박만 강조'),
+
+  /// Strong-medium-weak pattern (강 약 중 약 for 4/4).
+  strongMediumWeak('강중약', '첫박 강, 3박 중간');
 
   const AccentPattern(this.label, this.description);
 
@@ -109,13 +109,17 @@ class MetronomeSettings {
   final bool vibration;
 
   /// Minimum allowed BPM.
-  static const int minBpm = 40;
+  static const int minBpm = 10;
 
   /// Maximum allowed BPM.
-  static const int maxBpm = 208;
+  static const int maxBpm = 400;
 
-  /// Calculate interval in milliseconds between beats.
+  /// Calculate interval in milliseconds between beats (integer, for legacy).
   int get intervalMs => (60000 / bpm).round();
+
+  /// Calculate precise interval in milliseconds between beats (double).
+  /// Use this for accurate timing calculations to avoid cumulative rounding errors.
+  double get intervalMsPrecise => 60000.0 / bpm;
 
   /// Create a copy with modified values.
   MetronomeSettings copyWith({

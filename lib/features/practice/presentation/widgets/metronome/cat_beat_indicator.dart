@@ -23,6 +23,8 @@ class CatBeatIndicator extends StatelessWidget {
     this.bpm = 100,
     this.size = 80.0,
     this.compact = false,
+    this.forceEyesOpen,
+    this.forceSmile,
   });
 
   final int currentBeat;
@@ -33,6 +35,12 @@ class CatBeatIndicator extends StatelessWidget {
   final double size;
   final bool compact;
 
+  /// Force eyes to be open (neutral expression). Overrides automatic logic.
+  final bool? forceEyesOpen;
+
+  /// Force eyes to be closed/smiling. Overrides automatic logic.
+  final bool? forceSmile;
+
   int get _beatCount => switch (timeSignature) {
         TimeSignature.twoFour => 2,
         TimeSignature.threeFour => 3,
@@ -42,7 +50,14 @@ class CatBeatIndicator extends StatelessWidget {
 
   /// Determine if eyes should be open based on accent pattern.
   bool get _shouldEyesOpen {
-    if (!isPlaying) return false;
+    // Force smile means eyes closed (smiling)
+    if (forceSmile == true) return false;
+
+    // Force eyes open means neutral expression
+    if (forceEyesOpen == true) return true;
+
+    // When not playing and no force, show eyes open (neutral)
+    if (!isPlaying) return true;
 
     return switch (accentPattern) {
       AccentPattern.uniform => false,

@@ -135,6 +135,8 @@ class _MetronomeFullScreenModalState
                     onVibrationChanged: () =>
                         ref.read(metronomeProvider.notifier).toggleVibration(),
                   ),
+                  // Extra bottom padding for safe scrolling
+                  SizedBox(height: AppSpacing.space8),
                 ],
               ),
             ),

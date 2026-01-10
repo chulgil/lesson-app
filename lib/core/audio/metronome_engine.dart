@@ -155,6 +155,12 @@ class MetronomeEngine implements MetronomeEngineInterface {
       await init();
     }
 
+    // Clean up any lingering state from previous run
+    _timer?.cancel();
+    _timer = null;
+    _stopwatch?.stop();
+    _stopwatch = null;
+
     _isPlaying = true;
     _currentBeat = 0;
     _expectedTicks = 0;
@@ -175,12 +181,13 @@ class MetronomeEngine implements MetronomeEngineInterface {
   }
 
   /// Check if it's time to tick based on elapsed time (drift-corrected).
+  /// Uses precise double interval to avoid cumulative rounding errors.
   void _checkAndTick() {
     if (_stopwatch == null) return;
 
     final elapsed = _stopwatch!.elapsedMilliseconds;
-    final intervalMs = _settings.intervalMs;
-    final expectedTime = (_expectedTicks + 1) * intervalMs;
+    final intervalMs = _settings.intervalMsPrecise; // Use precise double interval
+    final expectedTime = ((_expectedTicks + 1) * intervalMs).round();
 
     // If we've reached or passed the expected time, tick
     if (elapsed >= expectedTime) {
@@ -299,6 +306,15 @@ class MetronomeEngine implements MetronomeEngineInterface {
   @override
   Future<void> incrementBpm(int delta) async {
     await setBpm(_settings.bpm + delta);
+  }
+
+  @override
+  Future<void> playTapSound() async {
+    if (!_initialized) {
+      await init();
+    }
+    // Play a strong beat sound for tap feedback
+    _playBeat(BeatType.strong);
   }
 
   @override
