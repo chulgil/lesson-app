@@ -980,13 +980,13 @@ class _CatSpeechBubble extends StatelessWidget {
       textColor = Colors.grey[600]!;
     } else if (!hasNote) {
       message = '소리 감지 대기...';
-      backgroundColor = const Color(0xFFB8E3C8); // Light green
-      textColor = Colors.grey[600]!;
+      backgroundColor = AppColors.bubbleIdleBackground;
+      textColor = AppColors.bubbleIdleText;
     } else if (isPerfect) {
       // Use combo message if available
       message = comboTier != ComboTier.none ? comboTier.message : '완벽해요! 🎵';
-      backgroundColor = Colors.green[100]!;
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.bubbleSuccessBackground;
+      textColor = AppColors.bubbleSuccessText;
     } else {
       // Show direction message with arrow
       // If flat (negative cent): need to go up
@@ -996,8 +996,8 @@ class _CatSpeechBubble extends StatelessWidget {
       } else {
         message = '조금만 더 아래로 ↓';
       }
-      backgroundColor = Colors.orange[50]!;
-      textColor = Colors.orange[800]!;
+      backgroundColor = AppColors.bubbleWarningBackground;
+      textColor = AppColors.bubbleWarningText;
     }
 
     // Apply 1.1x size multiplier
