@@ -190,6 +190,11 @@ class Metronome extends _$Metronome {
     await setBpm(state.settings.bpm + delta);
   }
 
+  /// Play a single tap sound (for tap tempo feedback).
+  Future<void> playTapSound() async {
+    await _engine?.playTapSound();
+  }
+
   /// Set time signature.
   Future<void> setTimeSignature(TimeSignature timeSignature) async {
     debugPrint('Metronome: setTimeSignature called: $timeSignature');

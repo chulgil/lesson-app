@@ -41,6 +41,9 @@ abstract class MetronomeEngineInterface {
   /// Increment BPM.
   Future<void> incrementBpm(int delta);
 
+  /// Play a single tap sound (for tap tempo feedback).
+  Future<void> playTapSound();
+
   /// Dispose resources.
   Future<void> dispose();
 }

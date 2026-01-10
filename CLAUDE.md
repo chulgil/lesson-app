@@ -22,7 +22,16 @@ dart run build_runner build --delete-conflicting-outputs  # 코드 생성
 flutter analyze                    # 분석
 ```
 
-### iPhone 배포 {#iphone-deploy}
+### 기기 배포 {#device-deploy}
+
+#### 연결된 기기 확인
+
+```bash
+flutter devices                    # 모든 기기 목록
+adb devices                        # Android 기기만 확인
+```
+
+#### iPhone 배포
 
 ```bash
 # 데이터 유지하며 배포 (권장)
@@ -34,6 +43,42 @@ flutter install -d <device_id>
 
 > ⚠️ `flutter install`은 앱을 삭제 후 재설치하므로 녹음 파일이 삭제됩니다.
 > 개발 중에는 `flutter run --release`를 사용하세요.
+
+**iPhone 무선 디버깅 설정:**
+1. Mac과 iPhone을 USB로 연결
+2. Xcode → Window → Devices and Simulators
+3. 기기 선택 → "Connect via network" 체크
+4. USB 분리 후에도 무선으로 배포 가능
+
+#### Android 배포
+
+```bash
+# 데이터 유지하며 배포 (권장)
+flutter run -d <device_id> --release
+
+# APK 빌드만 (기기 없이)
+flutter build apk --release
+
+# 완전 재설치
+flutter install -d <device_id>
+```
+
+**Android USB 디버깅 설정:**
+1. 설정 → 휴대전화 정보 → 소프트웨어 정보 → "빌드 번호" 7번 탭
+2. 설정 → 개발자 옵션 → "USB 디버깅" ON
+3. USB 연결 시 "USB 디버깅 허용" 팝업에서 허용
+4. USB 모드를 "파일 전송(MTP)" 또는 "PTP"로 설정
+
+**Android 무선 디버깅 설정 (Android 11+):**
+1. 설정 → 개발자 옵션 → "무선 디버깅" ON
+2. "페어링 코드로 기기 페어링" 클릭
+3. Mac 터미널에서:
+   ```bash
+   adb pair <IP>:<PORT>     # 페어링 코드 입력
+   adb connect <IP>:<PORT>  # 연결
+   ```
+
+> 💡 Android 최소 요구사항: API 21+ (Android 5.0 Lollipop)
 
 ---
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -141,6 +143,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
           Expanded(
             child: TabBarView(
               controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
               children: const [
                 _MetronomePanel(),
                 _TunerPanel(),
@@ -153,82 +156,231 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
   }
 }
 
-/// Metronome panel content.
-class _MetronomePanel extends ConsumerWidget {
+/// Metronome panel content with tap tempo support.
+class _MetronomePanel extends ConsumerStatefulWidget {
   const _MetronomePanel();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MetronomePanel> createState() => _MetronomePanelState();
+}
+
+class _MetronomePanelState extends ConsumerState<_MetronomePanel>
+    with SingleTickerProviderStateMixin {
+  /// Tap timestamps for calculating tempo (last 4 taps).
+  final List<int> _tapTimestamps = [];
+
+  /// Maximum number of taps to track.
+  static const int _maxTaps = 4;
+
+  /// Timeout in ms - reset taps if no tap for this duration.
+  static const int _tapTimeout = 2000;
+
+  /// Animation controller for tap scale effect.
+  late AnimationController _tapAnimationController;
+
+  /// Scale animation.
+  late Animation<double> _scaleAnimation;
+
+  /// Whether cat is currently showing smile (after tap).
+  bool _isSmiling = false;
+
+  /// Whether speech bubble is temporarily hidden after "좋다냥".
+  bool _isBubbleHidden = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tapAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.9),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 0.9, end: 1.0),
+        weight: 60,
+      ),
+    ]).animate(CurvedAnimation(
+      parent: _tapAnimationController,
+      curve: Curves.easeOut,
+    ));
+
+    _tapAnimationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        // Reset smile after animation completes
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            setState(() => _isSmiling = false);
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tapAnimationController.dispose();
+    super.dispose();
+  }
+
+  /// Handle tap on cat for tap tempo.
+  void _onCatTap() {
+    final state = ref.read(metronomeProvider);
+
+    // Only work when metronome is stopped
+    if (state.isPlaying) return;
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // Show bubble immediately on tap
+    if (_isBubbleHidden) {
+      setState(() => _isBubbleHidden = false);
+    }
+
+    // Clear old taps if timeout
+    if (_tapTimestamps.isNotEmpty && now - _tapTimestamps.last > _tapTimeout) {
+      _tapTimestamps.clear();
+    }
+
+    _tapTimestamps.add(now);
+
+    // Keep only last N taps
+    if (_tapTimestamps.length > _maxTaps) {
+      _tapTimestamps.removeAt(0);
+    }
+
+    // Animate, smile, and play sound
+    setState(() => _isSmiling = true);
+    _tapAnimationController.forward(from: 0);
+    ref.read(metronomeProvider.notifier).playTapSound();
+
+    // Calculate BPM if we have at least 2 taps
+    if (_tapTimestamps.length >= 2) {
+      final intervals = <int>[];
+      for (int i = 1; i < _tapTimestamps.length; i++) {
+        intervals.add(_tapTimestamps[i] - _tapTimestamps[i - 1]);
+      }
+      final avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
+      final bpm = (60000 / avgInterval).round();
+
+      // Apply BPM (will be clamped in the provider)
+      ref.read(metronomeProvider.notifier).setBpm(bpm);
+
+      // After "좋다냥": hide bubble after 1.5s, show again after 3s more
+      if (_tapTimestamps.length >= _maxTaps) {
+        // Hide bubble after 1.5 seconds
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) {
+            setState(() {
+              _isBubbleHidden = true;
+              _tapTimestamps.clear();
+            });
+          }
+
+          // Show "탭하라냥" again after 3 more seconds
+          Future.delayed(const Duration(milliseconds: 3000), () {
+            if (mounted) {
+              setState(() {
+                _isBubbleHidden = false;
+                _tapTimestamps.clear(); // Ensure clean state
+              });
+            }
+          });
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(metronomeProvider);
+
+    // When not playing: eyes open (neutral), unless just tapped (smiling)
+    // When playing: use the beat-based logic from CatBeatIndicator
+    final showSmilingOverride = !state.isPlaying && _isSmiling;
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(AppSpacing.space6),
       child: Column(
         children: [
-          // Cat beat indicator
-          CatBeatIndicator(
-            currentBeat: state.currentBeat,
-            timeSignature: state.settings.timeSignature,
-            isPlaying: state.isPlaying,
-            accentPattern: state.settings.accentPattern,
+          // Cat beat indicator with tap gesture and speech bubble
+          SizedBox(
+            height: 210, // Fixed height for cat + bubble area + paws
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // Cat indicator
+                GestureDetector(
+                  onTap: _onCatTap,
+                  child: AnimatedBuilder(
+                    animation: _scaleAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: state.isPlaying ? 1.0 : _scaleAnimation.value,
+                        child: child,
+                      );
+                    },
+                    child: CatBeatIndicator(
+                      currentBeat: state.currentBeat,
+                      timeSignature: state.settings.timeSignature,
+                      isPlaying: state.isPlaying,
+                      accentPattern: state.settings.accentPattern,
+                      bpm: state.settings.bpm,
+                      size: 120, // Reduced from 140 to make room for bubble
+                      forceSmile: showSmilingOverride,
+                    ),
+                  ),
+                ),
+                // Tap tempo speech bubble (top left of cat)
+                if (!state.isPlaying && !_isBubbleHidden)
+                  Positioned(
+                    left: 10,
+                    top: 0,
+                    child: _TapTempoSpeechBubble(
+                      tapCount: _tapTimestamps.length,
+                    ),
+                  ),
+                // BPM display (bottom right of cat) when not playing
+                if (!state.isPlaying)
+                  Positioned(
+                    right: 10,
+                    bottom: 40,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'BPM',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        Text(
+                          '${state.settings.bpm}',
+                          style: AppTypography.displayLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                            fontSize: 40,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 44),
+
+          // BPM controls with logarithmic slider
+          _LogarithmicBpmSlider(
             bpm: state.settings.bpm,
-            size: 140,
-          ),
-          SizedBox(height: AppSpacing.space8),
-
-          // BPM display
-          Column(
-            children: [
-              Text(
-                '${state.settings.bpm}',
-                style: AppTypography.displayLarge.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-              ),
-              Text(
-                'BPM',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSpacing.space4),
-
-          // BPM controls
-          Row(
-            children: [
-              _CircleButton(
-                label: '-5',
-                onPressed: () =>
-                    ref.read(metronomeProvider.notifier).incrementBpm(-5),
-              ),
-              SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColors.primary,
-                    inactiveTrackColor: AppColors.primaryLight,
-                    thumbColor: AppColors.primary,
-                    overlayColor: AppColors.primary.withValues(alpha: 0.2),
-                  ),
-                  child: Slider(
-                    value: state.settings.bpm.toDouble(),
-                    min: MetronomeSettings.minBpm.toDouble(),
-                    max: MetronomeSettings.maxBpm.toDouble(),
-                    onChanged: (value) =>
-                        ref.read(metronomeProvider.notifier).setBpm(value.round()),
-                  ),
-                ),
-              ),
-              SizedBox(width: AppSpacing.space2),
-              _CircleButton(
-                label: '+5',
-                onPressed: () =>
-                    ref.read(metronomeProvider.notifier).incrementBpm(5),
-              ),
-            ],
+            onChanged: (value) =>
+                ref.read(metronomeProvider.notifier).setBpm(value),
+            onIncrement: (delta) =>
+                ref.read(metronomeProvider.notifier).incrementBpm(delta),
           ),
           SizedBox(height: AppSpacing.space8),
 
@@ -296,7 +448,106 @@ class _MetronomePanel extends ConsumerWidget {
               ),
             ],
           ),
+          SizedBox(height: AppSpacing.space6),
+
+          // Accent pattern selector
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '박자 패턴',
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space2),
+              Wrap(
+                spacing: AppSpacing.space2,
+                runSpacing: AppSpacing.space2,
+                children: AccentPattern.values.map((pattern) {
+                  final isSelected = pattern == state.settings.accentPattern;
+                  return ChoiceChip(
+                    label: Text(pattern.label),
+                    selected: isSelected,
+                    onSelected: (_) =>
+                        ref.read(metronomeProvider.notifier).setAccentPattern(pattern),
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: AppSpacing.space1),
+              Text(
+                state.settings.accentPattern.description,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.space8),
         ],
+      ),
+    );
+  }
+}
+
+/// Speech bubble for tap tempo hint (cat language style).
+class _TapTempoSpeechBubble extends StatelessWidget {
+  const _TapTempoSpeechBubble({
+    required this.tapCount,
+  });
+
+  final int tapCount;
+
+  @override
+  Widget build(BuildContext context) {
+    // Cat language messages based on tap count
+    final String message;
+    final Color backgroundColor;
+    final Color textColor;
+
+    if (tapCount == 0) {
+      message = '탭하라냥~';
+      backgroundColor = const Color(0xFFB8E3C8); // Light green (same as tuner)
+      textColor = Colors.grey[600]!;
+    } else if (tapCount == 1) {
+      message = '한 번 더냥!';
+      backgroundColor = const Color(0xFFB8E3C8);
+      textColor = Colors.grey[600]!;
+    } else if (tapCount < 4) {
+      message = '${4 - tapCount}번 더냥~';
+      backgroundColor = Colors.orange[50]!;
+      textColor = Colors.orange[800]!;
+    } else {
+      message = '좋다냥! 🎵';
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        message,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
       ),
     );
   }
@@ -304,6 +555,168 @@ class _MetronomePanel extends ConsumerWidget {
 
 class _CircleButton extends StatelessWidget {
   const _CircleButton({
+    required this.label,
+    required this.onPressed,
+    this.backgroundColor,
+    this.foregroundColor,
+  });
+
+  final String label;
+  final VoidCallback onPressed;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 48,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor ?? AppColors.primaryLight,
+          foregroundColor: foregroundColor ?? AppColors.primary,
+          shape: const CircleBorder(),
+          padding: EdgeInsets.zero,
+        ),
+        child: Text(
+          label,
+          style: AppTypography.buttonSmall.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Hybrid BPM slider: 10-200 linear (75%), 200-400 compressed (25%).
+/// Includes +1/-1 buttons for fine-tuning.
+class _LogarithmicBpmSlider extends StatelessWidget {
+  const _LogarithmicBpmSlider({
+    required this.bpm,
+    required this.onChanged,
+    required this.onIncrement,
+  });
+
+  final int bpm;
+  final ValueChanged<int> onChanged;
+  final ValueChanged<int> onIncrement;
+
+  static const double _minBpm = 10;
+  static const double _midBpm = 200; // Transition point
+  static const double _maxBpm = 400;
+  static const double _midPosition = 0.75; // 200 BPM at 75% of slider
+
+  /// Convert BPM to slider position (0-1) using hybrid scale.
+  /// 10-200: linear in 0-0.75 range
+  /// 200-400: compressed in 0.75-1.0 range
+  double _bpmToSlider(int bpm) {
+    final clampedBpm = bpm.clamp(_minBpm.toInt(), _maxBpm.toInt()).toDouble();
+
+    if (clampedBpm <= _midBpm) {
+      // Linear: 10-200 maps to 0-0.75
+      return ((clampedBpm - _minBpm) / (_midBpm - _minBpm) * _midPosition)
+          .clamp(0.0, _midPosition);
+    } else {
+      // Compressed: 200-400 maps to 0.75-1.0
+      return (_midPosition +
+              (clampedBpm - _midBpm) /
+                  (_maxBpm - _midBpm) *
+                  (1.0 - _midPosition))
+          .clamp(_midPosition, 1.0);
+    }
+  }
+
+  /// Convert slider position (0-1) to BPM using hybrid scale.
+  int _sliderToBpm(double position) {
+    if (position <= _midPosition) {
+      // Linear: 0-0.75 maps to 10-200
+      final bpm = _minBpm + (position / _midPosition) * (_midBpm - _minBpm);
+      return bpm.round().clamp(_minBpm.toInt(), _midBpm.toInt());
+    } else {
+      // Compressed: 0.75-1.0 maps to 200-400
+      final bpm = _midBpm +
+          ((position - _midPosition) / (1.0 - _midPosition)) *
+              (_maxBpm - _midBpm);
+      return bpm.round().clamp(_midBpm.toInt(), _maxBpm.toInt());
+    }
+  }
+
+  /// Get color based on BPM intensity (darker = faster).
+  Color _getSliderColor(int bpm) {
+    final intensity = ((bpm - _minBpm) / (_maxBpm - _minBpm)).clamp(0.0, 1.0);
+    return Color.lerp(
+      AppColors.primaryLight,
+      AppColors.primary,
+      intensity,
+    )!;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sliderColor = _getSliderColor(bpm);
+
+    return Column(
+      children: [
+        // Main slider with +5/-5 buttons
+        Row(
+          children: [
+            _CircleButton(
+              label: '-5',
+              onPressed: () => onIncrement(-5),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: sliderColor,
+                  inactiveTrackColor:
+                      AppColors.primaryLight.withValues(alpha: 0.3),
+                  thumbColor: sliderColor,
+                  overlayColor: sliderColor.withValues(alpha: 0.2),
+                  trackHeight: 6,
+                ),
+                child: Slider(
+                  value: _bpmToSlider(bpm),
+                  min: 0,
+                  max: 1,
+                  onChanged: (value) => onChanged(_sliderToBpm(value)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            _CircleButton(
+              label: '+5',
+              onPressed: () => onIncrement(5),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // Fine-tuning +1/-1 buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _SmallButton(
+              label: '-1',
+              onPressed: () => onIncrement(-1),
+            ),
+            const SizedBox(width: 16),
+            _SmallButton(
+              label: '+1',
+              onPressed: () => onIncrement(1),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// Small button for fine BPM adjustment.
+class _SmallButton extends StatelessWidget {
+  const _SmallButton({
     required this.label,
     required this.onPressed,
   });
@@ -314,21 +727,25 @@ class _CircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 48,
-      height: 48,
-      child: ElevatedButton(
+      width: 40,
+      height: 32,
+      child: TextButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
+        style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          shape: const CircleBorder(),
           padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(
+              color: AppColors.primary.withValues(alpha: 0.3),
+            ),
+          ),
         ),
         child: Text(
           label,
-          style: AppTypography.buttonSmall.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
