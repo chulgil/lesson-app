@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -220,6 +218,21 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
     });
   }
 
+  /// Get tempo marking name based on BPM.
+  String _getTempoMarking(int bpm) {
+    if (bpm < 40) return 'Grave';
+    if (bpm < 60) return 'Largo';
+    if (bpm < 66) return 'Larghetto';
+    if (bpm < 76) return 'Adagio';
+    if (bpm < 108) return 'Andante';
+    if (bpm < 120) return 'Moderato';
+    if (bpm < 132) return 'Allegretto';
+    if (bpm < 168) return 'Allegro';
+    if (bpm < 176) return 'Vivace';
+    if (bpm < 200) return 'Presto';
+    return 'Prestissimo';
+  }
+
   @override
   void dispose() {
     _tapAnimationController.dispose();
@@ -344,31 +357,30 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
                       tapCount: _tapTimestamps.length,
                     ),
                   ),
-                // BPM display (bottom right of cat) when not playing
-                if (!state.isPlaying)
-                  Positioned(
-                    right: 10,
-                    bottom: 40,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'BPM',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondaryLight,
-                          ),
+                // BPM display with tempo marking (bottom right of cat) - always visible
+                Positioned(
+                  right: 10,
+                  bottom: 40,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getTempoMarking(state.settings.bpm),
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
                         ),
-                        Text(
-                          '${state.settings.bpm}',
-                          style: AppTypography.displayLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                            fontSize: 40,
-                          ),
+                      ),
+                      Text(
+                        '${state.settings.bpm}',
+                        style: AppTypography.displayLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                          fontSize: 40,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
               ],
             ),
           ),
@@ -514,10 +526,6 @@ class _TapTempoSpeechBubble extends StatelessWidget {
       message = '탭하라냥~';
       backgroundColor = const Color(0xFFB8E3C8); // Light green (same as tuner)
       textColor = Colors.grey[600]!;
-    } else if (tapCount == 1) {
-      message = '한 번 더냥!';
-      backgroundColor = const Color(0xFFB8E3C8);
-      textColor = Colors.grey[600]!;
     } else if (tapCount < 4) {
       message = '${4 - tapCount}번 더냥~';
       backgroundColor = Colors.orange[50]!;
@@ -547,6 +555,56 @@ class _TapTempoSpeechBubble extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: textColor,
+        ),
+      ),
+    );
+  }
+}
+
+/// Speech bubble showing tempo marking based on BPM.
+class _TempoMarkingSpeechBubble extends StatelessWidget {
+  const _TempoMarkingSpeechBubble({
+    required this.bpm,
+  });
+
+  final int bpm;
+
+  /// Get tempo marking name based on BPM.
+  String _getTempoMarking(int bpm) {
+    if (bpm < 40) return 'Grave';
+    if (bpm < 60) return 'Largo';
+    if (bpm < 66) return 'Larghetto';
+    if (bpm < 76) return 'Adagio';
+    if (bpm < 108) return 'Andante';
+    if (bpm < 120) return 'Moderato';
+    if (bpm < 132) return 'Allegretto';
+    if (bpm < 168) return 'Allegro';
+    if (bpm < 176) return 'Vivace';
+    if (bpm < 200) return 'Presto';
+    return 'Prestissimo';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFB8E3C8),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        _getTempoMarking(bpm),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[600],
         ),
       ),
     );
@@ -604,10 +662,10 @@ class _LogarithmicBpmSlider extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final ValueChanged<int> onIncrement;
 
-  static const double _minBpm = 10;
-  static const double _midBpm = 200; // Transition point
-  static const double _maxBpm = 400;
-  static const double _midPosition = 0.75; // 200 BPM at 75% of slider
+  static const double _minBpm = 30;
+  static const double _midBpm = 120; // Transition point
+  static const double _maxBpm = 208;
+  static const double _midPosition = 0.6; // 120 BPM at 60% of slider
 
   /// Convert BPM to slider position (0-1) using hybrid scale.
   /// 10-200: linear in 0-0.75 range

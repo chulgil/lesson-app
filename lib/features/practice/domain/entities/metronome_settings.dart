@@ -109,10 +109,10 @@ class MetronomeSettings {
   final bool vibration;
 
   /// Minimum allowed BPM.
-  static const int minBpm = 10;
+  static const int minBpm = 30;
 
   /// Maximum allowed BPM.
-  static const int maxBpm = 400;
+  static const int maxBpm = 208;
 
   /// Calculate interval in milliseconds between beats (integer, for legacy).
   int get intervalMs => (60000 / bpm).round();
