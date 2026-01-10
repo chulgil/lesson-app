@@ -335,7 +335,7 @@ class NewModel { ... }
 | Feature | Providers | 설명 |
 |---------|-----------|------|
 | **lessons** | lesson, payment, booking, piece, tip_template | 레슨 관련 전체 |
-| **practice** | practice, practice_item, practice_repertoire, metronome, recording, smart_recording | 연습 관련 전체 |
+| **practice** | practice, practice_item, practice_repertoire, metronome, tuner, tuner_combo, recording, smart_recording | 연습 관련 전체 |
 | **students** | student | 학생 관리 |
 | **parent_home** | parent, child_profile, user_profile | 학부모 관련 |
 | **profile** | invite, teacher_extended_profile | 프로필/초대 |
@@ -369,6 +369,8 @@ class NewModel { ... }
 | Payment | `lessons/domain/entities/` | 결제, 입금확인 |
 | PracticeTask | `practice/domain/entities/` | 연습 과제 |
 | Recording | `practice/domain/entities/` | 녹음 파일 |
+| TunerSettings | `practice/domain/entities/` | 튜너 설정 |
+| TunerNote | `practice/domain/entities/` | 튜너 음표 감지 |
 | Parent | `parent_home/domain/entities/` | 학부모 정보 |
 | Invite | `profile/domain/entities/` | 초대 시스템 |
 | Notification | `notifications/domain/entities/` | 알림 |
@@ -383,7 +385,8 @@ class NewModel { ... }
 - 레슨 캘린더 (월/주 뷰), 레슨 노트/녹음
 - 수강료 관리 (2단계 입금확인)
 - 연습 시스템 (레퍼토리 연동, 다중 구간)
-- 메트로놈 시스템 (엔진, UI, 고양이 인디케이터)
+- 메트로놈 시스템 (엔진, UI, 고양이 인디케이터, 템포 마킹)
+- 튜너 시스템 (피치 감지, 원형 12음계, 고양이 피드백, 콤보, 설정 저장)
 - 녹음 재생 시스템 (웨이브폼, A-B 루프, 속도 조절, 핀치 줌)
 - 스마트 녹음 (앞뒤 무음 자동 트리밍)
 - 녹음 초기화 버튼 (전체 녹음 삭제)
