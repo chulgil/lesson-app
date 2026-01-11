@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../practice/domain/entities/tuner_types.dart';
 import '../providers/tuner_provider.dart';
 import '../widgets/tuner/circular_tuner_indicator.dart';
 import '../widgets/tuner/tuner_cat_indicator.dart';
@@ -16,10 +15,13 @@ class TunerScreen extends ConsumerStatefulWidget {
   ConsumerState<TunerScreen> createState() => _TunerScreenState();
 }
 
-class _TunerScreenState extends ConsumerState<TunerScreen> {
+class _TunerScreenState extends ConsumerState<TunerScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    // Register app lifecycle observer
+    WidgetsBinding.instance.addObserver(this);
     // Auto-start listening when screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(tunerProvider.notifier).start();
@@ -28,8 +30,31 @@ class _TunerScreenState extends ConsumerState<TunerScreen> {
 
   @override
   void dispose() {
-    // Stop listening when leaving screen
+    // Remove lifecycle observer
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    final tuner = ref.read(tunerProvider.notifier);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        // App going to background - stop listening
+        tuner.onAppPaused();
+        break;
+      case AppLifecycleState.resumed:
+        // App returning to foreground - resume listening
+        tuner.onAppResumed();
+        break;
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        // Do nothing for these states
+        break;
+    }
   }
 
   @override

@@ -108,6 +108,9 @@ class Tuner extends _$Tuner {
   NoteName? _lastDetectedNoteName;
   DateTime? _lastNoteTime;
 
+  // App lifecycle tracking - was listening before app paused?
+  bool _wasListeningBeforePause = false;
+
   @override
   TunerProviderState build() {
     // Use RecordTunerEngine for all platforms (uses record package)
@@ -418,6 +421,28 @@ class Tuner extends _$Tuner {
   /// Clear any error state.
   void clearError() {
     state = state.copyWith(clearError: true);
+  }
+
+  /// Called when app goes to background (paused).
+  /// Stops listening and remembers state to resume later.
+  Future<void> onAppPaused() async {
+    if (state.isListening) {
+      debugPrint('Tuner: App paused, stopping listening');
+      _wasListeningBeforePause = true;
+      await stop();
+    } else {
+      _wasListeningBeforePause = false;
+    }
+  }
+
+  /// Called when app returns to foreground (resumed).
+  /// Resumes listening if it was active before pause.
+  Future<void> onAppResumed() async {
+    if (_wasListeningBeforePause) {
+      debugPrint('Tuner: App resumed, restarting listening');
+      _wasListeningBeforePause = false;
+      await start();
+    }
   }
 }
 

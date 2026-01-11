@@ -63,7 +63,7 @@ final isCurtainFullyCoveredProvider = AutoDisposeProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef IsCurtainFullyCoveredRef = AutoDisposeProviderRef<bool>;
-String _$tunerComboHash() => r'03caff27a0000722e5dfac4ff9c07ce5a7cd1bf6';
+String _$tunerComboHash() => r'3c355b05f9991717cf0fbd6ad7078a1be4049f0b';
 
 /// Combo counter and judgement management.
 ///

@@ -6,7 +6,7 @@ part of 'metronome_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$metronomeHash() => r'13a024a4520b0304ee0c9b5a27cfe787ab529743';
+String _$metronomeHash() => r'b3279026221fa3327b8da4c47f47ca2f42e4175a';
 
 /// Metronome state management with Riverpod.
 ///

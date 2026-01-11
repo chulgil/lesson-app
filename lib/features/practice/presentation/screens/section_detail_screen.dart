@@ -159,6 +159,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           SectionInfoCard(
             section: section,
             repertoireStartDate: repertoireStartDate,
+            selectedDate: widget.selectedDate,
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -304,6 +305,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           CompletionToggle(
             section: section,
             onToggle: () => _toggleCompletion(section),
+            onCompleteWithCount: (count) => _completeWithCount(section, count),
             selectedDate: widget.selectedDate,
           ),
         ],
@@ -770,6 +772,44 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('상태 변경 실패: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Complete practice with target time × count
+  Future<void> _completeWithCount(PracticeSection section, int count) async {
+    if (!section.hasTargetPracticeTime) return;
+
+    final practiceSeconds = section.targetPracticeSeconds! * count;
+
+    try {
+      // Increment practice count and time
+      await ref.read(sectionCrudProvider.notifier).incrementPractice(
+            widget.sectionId,
+            widget.repertoireId,
+            practiceSeconds,
+          );
+
+      ref.invalidate(sectionProvider(widget.sectionId));
+      ref.invalidate(studentRepertoiresProvider(widget.studentId));
+
+      if (mounted) {
+        final minutes = (practiceSeconds / 60).round();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('연습 완료! (+$minutes분, $count회)'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('연습 기록 실패: $e'),
             backgroundColor: AppColors.error,
           ),
         );

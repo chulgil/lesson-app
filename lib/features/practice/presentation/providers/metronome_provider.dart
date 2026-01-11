@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/audio/metronome_engine.dart';
 import '../../../../core/audio/metronome_engine_interface.dart';
+import '../../../../core/audio/soloud_metronome_engine.dart';
 import '../../../../models/metronome_settings.dart';
 import '../../../../services/metronome_storage_service.dart';
 
@@ -60,7 +60,7 @@ class Metronome extends _$Metronome {
   MetronomeState build() {
     // Use SoLoud-based engine for low-latency audio on all platforms
     debugPrint('Metronome: Using SoLoud engine for low-latency audio');
-    _engine = MetronomeEngine();
+    _engine = SoLoudMetronomeEngine();
 
     _engine!.onBeat = _onBeat;
 
