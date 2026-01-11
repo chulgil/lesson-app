@@ -22,54 +22,39 @@ class PracticeStatsEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '연습 기록',
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          // Practice count
+          Expanded(
+            child: _StatItem(
+              icon: Icons.repeat,
+              label: '연습 횟수',
+              value: '${section.practiceCount}회',
+              onTap: () => _showCountEditor(context),
             ),
-            const SizedBox(height: AppSpacing.space3),
-            Row(
-              children: [
-                // Practice count
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.repeat,
-                    label: '연습 횟수',
-                    value: '${section.practiceCount}회',
-                    onTap: () => _showCountEditor(context),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                // Total practice time
-                Expanded(
-                  child: _StatTile(
-                    icon: Icons.timer,
-                    label: '총 연습 시간',
-                    value: section.formattedTotalTime,
-                    onTap: () => _showTimeEditor(context),
-                  ),
-                ),
-              ],
+          ),
+          Container(
+            width: 1,
+            height: 32,
+            color: AppColors.borderLight,
+          ),
+          // Total practice time
+          Expanded(
+            child: _StatItem(
+              icon: Icons.timer,
+              label: '총 연습 시간',
+              value: section.formattedTotalTime,
+              onTap: () => _showTimeEditor(context),
             ),
-            // Target progress hint
-            if (section.hasTargetPracticeTime) ...[
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '1회 목표: ${section.formattedTargetTime}',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -108,14 +93,14 @@ class PracticeStatsEditor extends StatelessWidget {
   }
 }
 
-/// Individual stat tile widget - neutral gray theme
-class _StatTile extends StatelessWidget {
+/// Simplified stat item - matching NotePreviewCard style
+class _StatItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
   final VoidCallback onTap;
 
-  const _StatTile({
+  const _StatItem({
     required this.icon,
     required this.label,
     required this.value,
@@ -124,46 +109,44 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surfaceSecondaryLight,
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: AppColors.textSecondaryLight),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(icon, size: 14, color: AppColors.textSecondaryLight),
-                  const SizedBox(width: AppSpacing.space1),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
+                  Text(
+                    label,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
-                  Icon(
-                    Icons.edit,
-                    size: 12,
-                    color: AppColors.textTertiaryLight,
+                  Text(
+                    value,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textPrimaryLight,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.space1),
-              Text(
-                value,
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 18,
+              color: AppColors.textTertiaryLight,
+            ),
+          ],
         ),
       ),
     );

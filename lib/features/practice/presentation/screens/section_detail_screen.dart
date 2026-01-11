@@ -185,13 +185,18 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // Practice stats editor (tappable)
+          // Practice stats section
+          Text(
+            '연습 기록',
+            style: AppTypography.headingSmall,
+          ),
+          const SizedBox(height: AppSpacing.space2),
           PracticeStatsEditor(
             section: section,
             onUpdate: (count, seconds) => _updatePracticeStats(section, count, seconds),
           ),
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space4),
 
           // Recording section
           Text(
