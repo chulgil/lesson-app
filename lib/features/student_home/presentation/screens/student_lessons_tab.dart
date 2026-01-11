@@ -9,10 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
-import '../../../../shared/widgets/collapsible_calendar.dart';
-
-/// State provider for student calendar expansion
-final studentCalendarExpandedProvider = StateProvider<bool>((ref) => true);
+import '../widgets/week_calendar_widget.dart';
 
 /// State provider for student selected date
 final studentSelectedDateProvider = StateProvider<DateTime>((ref) {
@@ -33,42 +30,15 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
   static const _currentStudentId = 'student_1';
 
   final ScrollController _scrollController = ScrollController();
-  double _lastScrollOffset = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_handleScroll);
-  }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  void _handleScroll() {
-    final offset = _scrollController.offset;
-    final delta = offset - _lastScrollOffset;
-    final isExpanded = ref.read(studentCalendarExpandedProvider);
-
-    // Only react to significant scroll movements
-    if (delta.abs() > 15) {
-      if (delta > 0 && isExpanded) {
-        // Scrolling down - collapse calendar
-        ref.read(studentCalendarExpandedProvider.notifier).state = false;
-      } else if (delta < 0 && !isExpanded && offset < 100) {
-        // Scrolling up near top - expand calendar
-        ref.read(studentCalendarExpandedProvider.notifier).state = true;
-      }
-      _lastScrollOffset = offset;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isExpanded = ref.watch(studentCalendarExpandedProvider);
     final selectedDate = ref.watch(studentSelectedDateProvider);
     final studentBookings = ref.watch(studentBookingsProvider(_currentStudentId));
 
@@ -129,7 +99,7 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
           ),
         ),
 
-        // Collapsible Calendar
+        // Week Calendar
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
@@ -137,13 +107,12 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
             AppSpacing.screenPadding,
             0,
           ),
-          child: CollapsibleCalendar(
+          child: WeekCalendarWidget(
             selectedDate: selectedDate,
             onDateSelected: (date) {
               ref.read(studentSelectedDateProvider.notifier).state = date;
             },
-            isExpanded: isExpanded,
-            markedDates: markedDates,
+            practicedDates: markedDates,
           ),
         ),
 

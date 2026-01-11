@@ -53,13 +53,12 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   void _previousWeek() {
     setState(() {
       if (_isExpanded) {
-        // Go to previous month
-        final prevMonth = DateTime(
+        // Go to previous month - set to first day of previous month directly
+        _currentWeekStart = DateTime(
           _currentWeekStart.year,
           _currentWeekStart.month - 1,
           1,
         );
-        _currentWeekStart = _getWeekStart(prevMonth);
       } else {
         _currentWeekStart =
             _currentWeekStart.subtract(const Duration(days: 7));
@@ -70,13 +69,12 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   void _nextWeek() {
     setState(() {
       if (_isExpanded) {
-        // Go to next month
-        final nextMonth = DateTime(
+        // Go to next month - set to first day of next month directly
+        _currentWeekStart = DateTime(
           _currentWeekStart.year,
           _currentWeekStart.month + 1,
           1,
         );
-        _currentWeekStart = _getWeekStart(nextMonth);
       } else {
         _currentWeekStart = _currentWeekStart.add(const Duration(days: 7));
       }

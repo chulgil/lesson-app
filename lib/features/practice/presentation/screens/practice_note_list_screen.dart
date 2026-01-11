@@ -26,6 +26,13 @@ class PracticeNoteListScreen extends ConsumerWidget {
     final notesAsync = ref.watch(sectionNotesProvider(sectionId));
     final sectionAsync = ref.watch(sectionProvider(sectionId));
 
+    // Get repertoire info when section is available
+    final section = sectionAsync.valueOrNull;
+    final repertoireAsync = section != null
+        ? ref.watch(repertoireProvider(section.repertoireId))
+        : null;
+    final repertoireName = repertoireAsync?.valueOrNull?.name;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('연습노트'),
@@ -47,7 +54,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
             width: double.infinity,
             child: sectionAsync.when(
               data: (section) => section != null
-                  ? _buildSectionHeader(section)
+                  ? _buildSectionHeader(section, repertoireName)
                   : _buildFallbackHeader(),
               loading: () => _buildFallbackHeader(),
               error: (_, __) => _buildFallbackHeader(),
@@ -67,7 +74,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(dynamic section) {
+  Widget _buildSectionHeader(dynamic section, String? repertoireName) {
     return Row(
       children: [
         Icon(
@@ -80,21 +87,33 @@ class PracticeNoteListScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Repertoire name (piece name)
+              // Repertoire name
+              if (repertoireName != null && repertoireName.isNotEmpty) ...[
+                Text(
+                  repertoireName,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 2),
+              ],
+              // Piece name
               Text(
                 section.pieceName,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 2),
               // Section name + range
-              Text(
-                _formatSectionInfo(section),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+              if (_formatSectionInfo(section).isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  _formatSectionInfo(section),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

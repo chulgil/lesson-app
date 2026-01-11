@@ -68,8 +68,8 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       appBar: AppBar(
         title: Text(
           widget.selectedDate != null
-              ? '섹션 상세 · ${_formatDateForTitle(widget.selectedDate!)}'
-              : '섹션 상세',
+              ? '섹션 · ${_formatDateForTitle(widget.selectedDate!)}'
+              : '섹션',
         ),
         actions: [
           PopupMenuButton<String>(
@@ -139,8 +139,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   Widget _buildContent(BuildContext context, PracticeSection section) {
-    // Get repertoire to access its start date
+    // Get repertoire to access its name and start date
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
+    final repertoireName = repertoireAsync.valueOrNull?.name;
     final repertoireStartDate = repertoireAsync.valueOrNull?.startDate;
 
     // Sort recordings by date (newest first)
@@ -162,6 +163,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           // Section info card
           SectionInfoCard(
             section: section,
+            repertoireName: repertoireName,
             repertoireStartDate: repertoireStartDate,
             selectedDate: widget.selectedDate,
           ),
@@ -182,15 +184,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           const SizedBox(height: AppSpacing.space4),
 
           // Practice notes preview
-          Row(
-            children: [
-              Text(
-                '연습노트',
-                style: AppTypography.headingSmall,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
           NotePreviewCard(
             sectionId: section.id,
             onTap: () => _navigateToNotes(section),

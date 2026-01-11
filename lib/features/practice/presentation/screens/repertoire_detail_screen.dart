@@ -42,8 +42,8 @@ class _RepertoireDetailScreenState
       appBar: AppBar(
         title: Text(
           widget.selectedDate != null
-              ? '레퍼토리 상세 · ${_formatDateForTitle(widget.selectedDate!)}'
-              : '레퍼토리 상세',
+              ? '레퍼토리 · ${_formatDateForTitle(widget.selectedDate!)}'
+              : '레퍼토리',
         ),
         actions: [
           // More menu with edit and archive options
