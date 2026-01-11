@@ -500,7 +500,8 @@ class _SectionTile extends ConsumerWidget {
         onTap: () {
           context.push(
             '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}'
-            '?repertoireId=$repertoireId&studentId=$studentId',
+            '?repertoireId=$repertoireId&studentId=$studentId'
+            '&date=${selectedDate.toIso8601String()}',
           );
         },
         child: Padding(
