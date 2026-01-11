@@ -65,6 +65,7 @@ class AppRoutes {
 
   // Settings routes
   static const backupSettings = '/settings/backup';
+  static const allRecordings = '/settings/recordings';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';

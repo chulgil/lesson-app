@@ -94,10 +94,10 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
 
   /// Restore from a backup file picked by user.
   Future<RestoreResult?> pickAndRestore() async {
-    // Pick file
+    // Pick file - use FileType.any for iOS compatibility
+    // iOS doesn't recognize custom UTIs, so we validate extension after selection
     final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: [BackupService.backupExtension],
+      type: FileType.any,
     );
 
     if (result == null || result.files.isEmpty) {
@@ -107,6 +107,14 @@ class BackupNotifier extends AsyncNotifier<BackupState> {
     final filePath = result.files.first.path;
     if (filePath == null) {
       return RestoreResult.failure('파일 경로를 가져올 수 없습니다.');
+    }
+
+    // Validate file extension
+    final expectedExtension = '.${BackupService.backupExtension}';
+    if (!filePath.toLowerCase().endsWith(expectedExtension.toLowerCase())) {
+      return RestoreResult.failure(
+        '올바른 백업 파일이 아닙니다.\n$expectedExtension 확장자 파일을 선택해주세요.',
+      );
     }
 
     return restoreFromFile(File(filePath));

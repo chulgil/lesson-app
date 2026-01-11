@@ -11,6 +11,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../data/services/backup_service.dart';
 import '../../domain/entities/backup_state.dart';
 import '../providers/backup_provider.dart';
+import '../providers/orphan_recording_provider.dart';
+import 'all_recordings_screen.dart';
 
 /// Screen for backup settings and management.
 class BackupSettingsScreen extends ConsumerWidget {
@@ -367,6 +369,19 @@ class _ActionsSection extends ConsumerWidget {
               ? null
               : () => _restoreBackup(context, ref),
         ),
+        const SizedBox(height: 24),
+        // Orphan recordings section
+        const Text(
+          '녹음 관리',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Orphan recordings button
+        _OrphanRecordingsButton(),
       ],
     );
   }
@@ -800,5 +815,119 @@ class _BackupItem extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       await ref.read(backupStateProvider.notifier).deleteBackup(backup);
     }
+  }
+}
+
+class _OrphanRecordingsButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final orphanedRecordings = ref.watch(orphanedRecordingsProvider);
+
+    return orphanedRecordings.when(
+      data: (recordings) {
+        final count = recordings.length;
+        final hasOrphans = count > 0;
+
+        return Material(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AllRecordingsScreen(),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: hasOrphans ? AppColors.warning : AppColors.borderLight,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: hasOrphans
+                          ? AppColors.warning.withValues(alpha: 0.1)
+                          : AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      hasOrphans ? Icons.link_off : Icons.link,
+                      color: hasOrphans ? AppColors.warning : AppColors.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '연결되지 않은 녹음',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimaryLight,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          hasOrphans
+                              ? '$count개의 녹음이 섹션에 연결되지 않았습니다'
+                              : '모든 녹음이 섹션에 연결되어 있습니다',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: hasOrphans
+                                ? AppColors.warning
+                                : AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (hasOrphans)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.chevron_right,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox(
+        height: 80,
+        child: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => const SizedBox.shrink(),
+    );
   }
 }

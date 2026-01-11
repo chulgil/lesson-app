@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/practice_repertoire.dart';
@@ -48,16 +50,46 @@ abstract class PracticeRepertoireRepository {
   Future<void> updateSectionOrders(
       String repertoireId, List<String> sectionIds);
   Future<PracticeSection> updateLastPracticedAt(String sectionId);
+
+  // Orphan recording methods
+  Future<List<PracticeRecording>> getOrphanedRecordings();
+  Future<void> reassignRecording(String recordingId, String newSectionId);
+  Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
+      getAllSectionsWithRepertoire(String studentId);
+
+  // Get all sections from all users (for orphan recording assignment)
+  Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
+      getAllSectionsForAssignment();
+
+  // Get all recordings with their section and repertoire info
+  Future<List<({PracticeRecording recording, PracticeSection? section, PracticeRepertoire? repertoire})>>
+      getAllRecordingsWithSectionInfo();
+
+  // Import recording from external file
+  Future<PracticeRecording> importRecording(String sourceFilePath, int durationSeconds);
+
+  // Cache management
+  Future<void> reloadFromHive();
+
+  // File path repair (for recordings restored from backup with wrong paths)
+  Future<int> repairRecordingFilePaths();
+
+  // Diagnostic stats
+  Future<Map<String, int>> getRecordingStats();
 }
 
 /// Mock implementation for development
 class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   static const String _recordingsBoxName = 'practice_recordings';
+  static const String _repertoiresBoxName = 'practice_repertoires';
 
   final _uuid = const Uuid();
   final Map<String, List<PracticeRepertoire>> _repertoires = {};
 
   Box<PracticeRecording>? _recordingsBox;
+  Box? _repertoiresBox;
+  bool _isInitialized = false;
+  Future<void>? _initializationFuture;
 
   Future<Box<PracticeRecording>> get _practiceRecordingsBox async {
     if (_recordingsBox != null && _recordingsBox!.isOpen) {
@@ -68,9 +100,96 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
     return _recordingsBox!;
   }
 
+  Future<Box> get _practiceRepertoiresBox async {
+    if (_repertoiresBox != null && _repertoiresBox!.isOpen) {
+      return _repertoiresBox!;
+    }
+    _repertoiresBox = await Hive.openBox(_repertoiresBoxName);
+    debugPrint('PracticeRepertoireRepository: Opened repertoires box with ${_repertoiresBox!.length} entries');
+    return _repertoiresBox!;
+  }
+
   MockPracticeRepertoireRepository() {
     _initMockData();
-    _loadPersistedRecordings();
+    _initializationFuture = _initializeAsync();
+  }
+
+  Future<void> _initializeAsync() async {
+    if (_isInitialized) return;
+    await _loadPersistedRepertoires();
+    await _loadPersistedRecordings();
+    _isInitialized = true;
+    debugPrint('PracticeRepertoireRepository: Initialization complete');
+  }
+
+  /// Ensure initialization is complete before accessing data
+  Future<void> _ensureInitialized() async {
+    if (!_isInitialized && _initializationFuture != null) {
+      await _initializationFuture;
+    }
+  }
+
+  /// Load persisted repertoires from Hive
+  Future<void> _loadPersistedRepertoires() async {
+    try {
+      final box = await _practiceRepertoiresBox;
+      debugPrint('PracticeRepertoireRepository: Loading ${box.length} persisted repertoires');
+
+      for (final key in box.keys) {
+        try {
+          final jsonString = box.get(key) as String?;
+          if (jsonString != null) {
+            final json = jsonDecode(jsonString) as Map<String, dynamic>;
+            final repertoire = PracticeRepertoire.fromJson(json);
+            _repertoires.putIfAbsent(repertoire.studentId, () => []);
+
+            // Check if already exists
+            final existingIndex = _repertoires[repertoire.studentId]!
+                .indexWhere((r) => r.id == repertoire.id);
+            if (existingIndex == -1) {
+              _repertoires[repertoire.studentId]!.add(repertoire);
+            }
+          }
+        } catch (e) {
+          debugPrint('PracticeRepertoireRepository: Failed to parse repertoire $key: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to load persisted repertoires: $e');
+    }
+  }
+
+  /// Save all repertoires to Hive
+  Future<void> _saveRepertoiresToHive() async {
+    try {
+      final box = await _practiceRepertoiresBox;
+
+      // Collect all repertoire IDs that should exist
+      final allRepertoireIds = <String>{};
+
+      for (final repertoires in _repertoires.values) {
+        for (final repertoire in repertoires) {
+          allRepertoireIds.add(repertoire.id);
+          final jsonString = jsonEncode(repertoire.toJson());
+          await box.put(repertoire.id, jsonString);
+        }
+      }
+
+      // Remove deleted repertoires from Hive
+      final keysToRemove = <dynamic>[];
+      for (final key in box.keys) {
+        if (!allRepertoireIds.contains(key)) {
+          keysToRemove.add(key);
+        }
+      }
+      for (final key in keysToRemove) {
+        await box.delete(key);
+      }
+
+      await box.flush();
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to save repertoires to Hive: $e');
+    }
   }
 
   /// Load persisted recordings from Hive and merge with mock sections
@@ -117,197 +236,12 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   }
 
   void _initMockData() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final yesterday = today.subtract(const Duration(days: 1));
-
-    // Student 1 repertoires
-    _repertoires['student_1'] = [
-      PracticeRepertoire(
-        id: 'rep_1',
-        studentId: 'student_1',
-        name: '스즈키 6권',
-        description: '스즈키 바이올린 교본 6권',
-        startDate: now.subtract(const Duration(days: 14)),
-        endDate: now.add(const Duration(days: 30)), // Active for 30 more days
-        sections: [
-          PracticeSection(
-            id: 'sec_1_1',
-            repertoireId: 'rep_1',
-            pieceName: '라 폴리아',
-            startMeasure: 1,
-            endMeasure: 4,
-            isCompleted: false,
-            isRepeat: true, // Shows every day
-            practiceCount: 15,
-            totalPracticeSeconds: 2700, // 45 minutes
-            dailyStatuses: [
-              DailyPracticeStatus(
-                id: 'ds_1_1_1',
-                sectionId: 'sec_1_1',
-                date: yesterday,
-                isCompleted: true,
-                completedAt: yesterday,
-              ),
-            ],
-            recordings: [
-              PracticeRecording(
-                id: 'rec_1_1_1',
-                sectionId: 'sec_1_1',
-                filePath: '/recordings/rec_1_1_1.m4a',
-                durationSeconds: 45,
-                isRepresentative: true,
-                createdAt: now.subtract(const Duration(days: 1)),
-              ),
-              PracticeRecording(
-                id: 'rec_1_1_2',
-                sectionId: 'sec_1_1',
-                filePath: '/recordings/rec_1_1_2.m4a',
-                durationSeconds: 42,
-                isRepresentative: false,
-                createdAt: now.subtract(const Duration(days: 3)),
-              ),
-            ],
-            createdAt: now.subtract(const Duration(days: 14)),
-          ),
-          PracticeSection(
-            id: 'sec_1_2',
-            repertoireId: 'rep_1',
-            pieceName: '가보트',
-            startMeasure: 1,
-            endMeasure: 8,
-            isCompleted: false,
-            isRepeat: true, // Shows every day
-            practiceCount: 8,
-            totalPracticeSeconds: 1440, // 24 minutes
-            dailyStatuses: [],
-            recordings: [
-              PracticeRecording(
-                id: 'rec_1_2_1',
-                sectionId: 'sec_1_2',
-                filePath: '/recordings/rec_1_2_1.m4a',
-                durationSeconds: 58,
-                isRepresentative: true,
-                createdAt: now.subtract(const Duration(days: 1)),
-              ),
-            ],
-            createdAt: now.subtract(const Duration(days: 10)),
-          ),
-        ],
-        createdAt: now.subtract(const Duration(days: 14)),
-      ),
-      PracticeRepertoire(
-        id: 'rep_2',
-        studentId: 'student_1',
-        name: '스케일북',
-        description: '기초 스케일 연습',
-        startDate: now.subtract(const Duration(days: 30)),
-        endDate: null, // Ongoing
-        sections: [
-          PracticeSection(
-            id: 'sec_2_1',
-            repertoireId: 'rep_2',
-            pieceName: 'G장조 스케일',
-            startMeasure: 1,
-            endMeasure: 4,
-            isCompleted: false,
-            isRepeat: true,
-            practiceCount: 20,
-            totalPracticeSeconds: 3600, // 60 minutes
-            dailyStatuses: [
-              DailyPracticeStatus(
-                id: 'ds_2_1_1',
-                sectionId: 'sec_2_1',
-                date: today,
-                isCompleted: true,
-                completedAt: now,
-              ),
-            ],
-            recordings: [
-              PracticeRecording(
-                id: 'rec_2_1_1',
-                sectionId: 'sec_2_1',
-                filePath: '/recordings/rec_2_1_1.m4a',
-                durationSeconds: 72,
-                isRepresentative: true,
-                createdAt: now.subtract(const Duration(days: 2)),
-              ),
-            ],
-            createdAt: now.subtract(const Duration(days: 21)),
-          ),
-          PracticeSection(
-            id: 'sec_2_2',
-            repertoireId: 'rep_2',
-            pieceName: 'D장조 스케일',
-            startMeasure: 1,
-            endMeasure: 4,
-            isCompleted: false,
-            isRepeat: true,
-            practiceCount: 5,
-            totalPracticeSeconds: 900, // 15 minutes
-            dailyStatuses: [],
-            recordings: [],
-            createdAt: now.subtract(const Duration(days: 7)),
-          ),
-        ],
-        createdAt: now.subtract(const Duration(days: 21)),
-      ),
-    ];
-
-    // Student 2 repertoires
-    _repertoires['student_2'] = [
-      PracticeRepertoire(
-        id: 'rep_3',
-        studentId: 'student_2',
-        name: '체르니 100',
-        description: '체르니 100번 연습곡',
-        startDate: now.subtract(const Duration(days: 10)),
-        endDate: null, // Ongoing
-        sections: [
-          PracticeSection(
-            id: 'sec_3_1',
-            repertoireId: 'rep_3',
-            pieceName: '1번',
-            startMeasure: 1,
-            endMeasure: 16,
-            isCompleted: false,
-            isRepeat: false, // Once done, hide
-            practiceCount: 12,
-            totalPracticeSeconds: 1800, // 30 minutes
-            dailyStatuses: [
-              DailyPracticeStatus(
-                id: 'ds_3_1_1',
-                sectionId: 'sec_3_1',
-                date: now.subtract(const Duration(days: 3)),
-                isCompleted: true,
-                completedAt: now.subtract(const Duration(days: 3)),
-              ),
-            ],
-            recordings: [],
-            createdAt: now.subtract(const Duration(days: 10)),
-          ),
-          PracticeSection(
-            id: 'sec_3_2',
-            repertoireId: 'rep_3',
-            pieceName: '2번',
-            startMeasure: 1,
-            endMeasure: 16,
-            isCompleted: false,
-            isRepeat: true,
-            practiceCount: 4,
-            totalPracticeSeconds: 600, // 10 minutes
-            dailyStatuses: [],
-            recordings: [],
-            createdAt: now.subtract(const Duration(days: 5)),
-          ),
-        ],
-        createdAt: now.subtract(const Duration(days: 10)),
-      ),
-    ];
+    // No dummy data - users create their own repertoires and sections
   }
 
   @override
   Future<List<PracticeRepertoire>> getRepertoires(String studentId) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     return _repertoires[studentId] ?? [];
   }
@@ -315,13 +249,15 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   @override
   Future<List<PracticeRepertoire>> getRepertoiresForDate(
       String studentId, DateTime date) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     final repertoires = _repertoires[studentId] ?? [];
-    return repertoires.where((r) => r.isActiveForDate(date)).toList();
+    return repertoires.where((r) => r.isActiveForDate(date) && !r.isArchived).toList();
   }
 
   @override
   Future<PracticeRepertoire?> getRepertoire(String id) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     for (final repertoires in _repertoires.values) {
       try {
@@ -350,6 +286,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
     );
     _repertoires.putIfAbsent(repertoire.studentId, () => []);
     _repertoires[repertoire.studentId]!.add(newRepertoire);
+
+    // Persist to Hive
+    await _saveRepertoiresToHive();
+
     return newRepertoire;
   }
 
@@ -365,6 +305,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
 
     final updated = repertoire.copyWith(updatedAt: DateTime.now());
     repertoires[index] = updated;
+
+    // Persist to Hive
+    await _saveRepertoiresToHive();
+
     return updated;
   }
 
@@ -374,10 +318,14 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
     for (final repertoires in _repertoires.values) {
       repertoires.removeWhere((r) => r.id == id);
     }
+
+    // Persist to Hive
+    await _saveRepertoiresToHive();
   }
 
   @override
   Future<PracticeSection?> getSection(String id) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     for (final repertoires in _repertoires.values) {
       for (final repertoire in repertoires) {
@@ -398,10 +346,17 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
       id: _uuid.v4(),
       repertoireId: section.repertoireId,
       pieceName: section.pieceName,
+      rangeType: section.rangeType,
       startMeasure: section.startMeasure,
       endMeasure: section.endMeasure,
+      startLine: section.startLine,
+      endLine: section.endLine,
       sectionName: section.sectionName,
       isCompleted: false,
+      isRepeat: section.isRepeat,
+      repeatCount: section.repeatCount,
+      startDate: section.startDate,
+      endDate: section.endDate,
       practiceCount: 0,
       totalPracticeSeconds: 0,
       recordings: [],
@@ -419,6 +374,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           sections: updatedSections,
           updatedAt: DateTime.now(),
         );
+
+        // Persist to Hive
+        await _saveRepertoiresToHive();
+
         return newSection;
       }
     }
@@ -442,6 +401,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -464,6 +427,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return;
         }
       }
@@ -526,6 +493,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: now,
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -557,6 +528,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -666,6 +641,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -695,6 +674,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -760,6 +743,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return newRecording;
         }
       }
@@ -850,6 +837,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
               sections: updatedSections,
               updatedAt: DateTime.now(),
             );
+
+            // Persist to Hive
+            await _saveRepertoiresToHive();
+
             return;
           }
         }
@@ -882,6 +873,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: DateTime.now(),
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
@@ -892,6 +887,7 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
   // Archive methods implementation
   @override
   Future<List<PracticeRepertoire>> getActiveRepertoires(String studentId) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     final repertoires = _repertoires[studentId] ?? [];
     return repertoires.where((r) => !r.isArchived).toList();
@@ -899,6 +895,7 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
 
   @override
   Future<List<PracticeRepertoire>> getArchivedRepertoires(String studentId) async {
+    await _ensureInitialized();
     await Future.delayed(const Duration(milliseconds: 200));
     final repertoires = _repertoires[studentId] ?? [];
     return repertoires.where((r) => r.isArchived).toList();
@@ -918,6 +915,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           updatedAt: now,
         );
         repertoires[index] = updated;
+
+        // Persist to Hive
+        await _saveRepertoiresToHive();
+
         return updated;
       }
     }
@@ -951,6 +952,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           archivedAt: null,
         );
         repertoires[index] = cleared;
+
+        // Persist to Hive
+        await _saveRepertoiresToHive();
+
         return cleared;
       }
     }
@@ -986,6 +991,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           }
         }
         repertoires.removeAt(index);
+
+        // Persist to Hive
+        await _saveRepertoiresToHive();
+
         return;
       }
     }
@@ -1024,6 +1033,10 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
           sections: updatedSections,
           updatedAt: DateTime.now(),
         );
+
+        // Persist to Hive
+        await _saveRepertoiresToHive();
+
         return;
       }
     }
@@ -1052,10 +1065,347 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
             sections: updatedSections,
             updatedAt: now,
           );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
           return updatedSection;
         }
       }
     }
     throw Exception('Section not found');
+  }
+
+  // Orphan recording methods implementation
+  @override
+  Future<List<PracticeRecording>> getOrphanedRecordings() async {
+    await _ensureInitialized();
+
+    // First, try to repair file paths
+    await repairRecordingFilePaths();
+
+    // Get all existing section IDs
+    final existingSectionIds = <String>{};
+    int totalRepertoires = 0;
+    for (final repertoires in _repertoires.values) {
+      totalRepertoires += repertoires.length;
+      for (final repertoire in repertoires) {
+        for (final section in repertoire.sections) {
+          existingSectionIds.add(section.id);
+        }
+      }
+    }
+
+    debugPrint('PracticeRepertoireRepository: Loaded $totalRepertoires repertoires with ${existingSectionIds.length} sections');
+
+    // Find recordings whose sectionId doesn't match any existing section
+    // Include ALL orphans regardless of file existence (user can decide to delete if file missing)
+    final orphanedRecordings = <PracticeRecording>[];
+    int totalRecordings = 0;
+    try {
+      final box = await _practiceRecordingsBox;
+      totalRecordings = box.length;
+      debugPrint('PracticeRepertoireRepository: Total recordings in Hive: $totalRecordings');
+
+      for (final recording in box.values) {
+        final hasMatchingSection = existingSectionIds.contains(recording.sectionId);
+        if (!hasMatchingSection) {
+          orphanedRecordings.add(recording);
+          final audioFile = File(recording.filePath);
+          final fileExists = await audioFile.exists();
+          debugPrint('PracticeRepertoireRepository: Orphan found - sectionId: ${recording.sectionId}, fileExists: $fileExists');
+        }
+      }
+    } catch (e) {
+      debugPrint('PracticeRepertoireRepository: Failed to get orphaned recordings: $e');
+    }
+
+    // Sort by creation date (newest first)
+    orphanedRecordings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    debugPrint('PracticeRepertoireRepository: Found ${orphanedRecordings.length} orphaned recordings');
+
+    return orphanedRecordings;
+  }
+
+  @override
+  Future<void> reassignRecording(String recordingId, String newSectionId) async {
+    await _ensureInitialized();
+
+    // Get the recording from Hive
+    final box = await _practiceRecordingsBox;
+    final recording = box.get(recordingId);
+    if (recording == null) {
+      throw Exception('Recording not found');
+    }
+
+    // Create updated recording with new sectionId
+    final updatedRecording = PracticeRecording(
+      id: recording.id,
+      sectionId: newSectionId,
+      filePath: recording.filePath,
+      durationSeconds: recording.durationSeconds,
+      bpm: recording.bpm,
+      isRepresentative: false, // Reset representative status
+      createdAt: recording.createdAt,
+    );
+
+    // Update in Hive
+    await box.put(recordingId, updatedRecording);
+    await box.flush();
+
+    // Add to section in memory
+    for (final repertoires in _repertoires.values) {
+      for (int i = 0; i < repertoires.length; i++) {
+        final repertoire = repertoires[i];
+        final sectionIndex =
+            repertoire.sections.indexWhere((s) => s.id == newSectionId);
+        if (sectionIndex != -1) {
+          final section = repertoire.sections[sectionIndex];
+          final updatedRecordings = List<PracticeRecording>.from(section.recordings)
+            ..add(updatedRecording);
+          final updatedSection = section.copyWith(
+            recordings: updatedRecordings,
+            updatedAt: DateTime.now(),
+          );
+          final updatedSections = List<PracticeSection>.from(repertoire.sections);
+          updatedSections[sectionIndex] = updatedSection;
+          repertoires[i] = repertoire.copyWith(
+            sections: updatedSections,
+            updatedAt: DateTime.now(),
+          );
+
+          // Persist to Hive
+          await _saveRepertoiresToHive();
+
+          debugPrint('PracticeRepertoireRepository: Reassigned recording $recordingId to section $newSectionId');
+          return;
+        }
+      }
+    }
+    throw Exception('Section not found');
+  }
+
+  @override
+  Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
+      getAllSectionsWithRepertoire(String studentId) async {
+    await _ensureInitialized();
+
+    final result = <({PracticeRepertoire repertoire, PracticeSection section})>[];
+    final repertoires = _repertoires[studentId] ?? [];
+
+    for (final repertoire in repertoires) {
+      if (repertoire.isArchived) continue; // Skip archived repertoires
+      for (final section in repertoire.sections) {
+        result.add((repertoire: repertoire, section: section));
+      }
+    }
+
+    return result;
+  }
+
+  @override
+  Future<List<({PracticeRepertoire repertoire, PracticeSection section})>>
+      getAllSectionsForAssignment() async {
+    await _ensureInitialized();
+
+    final result = <({PracticeRepertoire repertoire, PracticeSection section})>[];
+
+    // Iterate through all users' repertoires
+    for (final repertoires in _repertoires.values) {
+      for (final repertoire in repertoires) {
+        if (repertoire.isArchived) continue; // Skip archived repertoires
+        for (final section in repertoire.sections) {
+          result.add((repertoire: repertoire, section: section));
+        }
+      }
+    }
+
+    debugPrint('getAllSectionsForAssignment: Found ${result.length} sections from ${_repertoires.keys.length} users');
+    return result;
+  }
+
+  @override
+  Future<List<({PracticeRecording recording, PracticeSection? section, PracticeRepertoire? repertoire})>>
+      getAllRecordingsWithSectionInfo() async {
+    await _ensureInitialized();
+
+    final box = await _practiceRecordingsBox;
+    final allRecordings = box.values.toList();
+
+    // Build a map of sectionId -> (section, repertoire) for quick lookup
+    final sectionMap = <String, ({PracticeSection section, PracticeRepertoire repertoire})>{};
+    for (final repertoires in _repertoires.values) {
+      for (final repertoire in repertoires) {
+        for (final section in repertoire.sections) {
+          sectionMap[section.id] = (section: section, repertoire: repertoire);
+        }
+      }
+    }
+
+    // Build result with section info
+    final result = <({PracticeRecording recording, PracticeSection? section, PracticeRepertoire? repertoire})>[];
+    for (final recording in allRecordings) {
+      final sectionInfo = sectionMap[recording.sectionId];
+      result.add((
+        recording: recording,
+        section: sectionInfo?.section,
+        repertoire: sectionInfo?.repertoire,
+      ));
+    }
+
+    // Sort by createdAt descending (newest first)
+    result.sort((a, b) => b.recording.createdAt.compareTo(a.recording.createdAt));
+
+    debugPrint('getAllRecordingsWithSectionInfo: Found ${result.length} recordings');
+    return result;
+  }
+
+  @override
+  Future<void> reloadFromHive() async {
+    debugPrint('PracticeRepertoireRepository: Reloading from Hive...');
+
+    // Clear in-memory cache
+    _repertoires.clear();
+    _isInitialized = false;
+
+    // Reload from Hive
+    await _loadPersistedRepertoires();
+    await _loadPersistedRecordings();
+    _isInitialized = true;
+
+    debugPrint('PracticeRepertoireRepository: Reload complete. Repertoires: ${_repertoires.values.expand((r) => r).length}');
+  }
+
+  @override
+  Future<int> repairRecordingFilePaths() async {
+    await _ensureInitialized();
+
+    final box = await _practiceRecordingsBox;
+    final docsDir = await getApplicationDocumentsDirectory();
+    final currentDocsPath = docsDir.path;
+    int repairedCount = 0;
+
+    debugPrint('PracticeRepertoireRepository: Repairing file paths...');
+    debugPrint('PracticeRepertoireRepository: Current docs path: $currentDocsPath');
+
+    for (final recording in box.values.toList()) {
+      final originalPath = recording.filePath;
+
+      // Check if path needs repair (points to different app container)
+      if (!originalPath.startsWith(currentDocsPath)) {
+        // Find 'recordings/' in the path and rebuild
+        final recordingsIndex = originalPath.indexOf('recordings/');
+        if (recordingsIndex != -1) {
+          final relativePath = originalPath.substring(recordingsIndex);
+          final newPath = '$currentDocsPath/$relativePath';
+
+          // Check if file exists at new path
+          final newFile = File(newPath);
+          if (await newFile.exists()) {
+            // Update recording with correct path
+            final updatedRecording = PracticeRecording(
+              id: recording.id,
+              sectionId: recording.sectionId,
+              filePath: newPath,
+              durationSeconds: recording.durationSeconds,
+              bpm: recording.bpm,
+              isRepresentative: recording.isRepresentative,
+              createdAt: recording.createdAt,
+            );
+            await box.put(recording.id, updatedRecording);
+            repairedCount++;
+            debugPrint('PracticeRepertoireRepository: Repaired path for ${recording.id.substring(0, 8)}...');
+          } else {
+            debugPrint('PracticeRepertoireRepository: File not found at new path: $newPath');
+          }
+        }
+      }
+    }
+
+    if (repairedCount > 0) {
+      await box.flush();
+      // Reload to update in-memory cache
+      await reloadFromHive();
+    }
+
+    debugPrint('PracticeRepertoireRepository: Repaired $repairedCount recording paths');
+    return repairedCount;
+  }
+
+  @override
+  Future<Map<String, int>> getRecordingStats() async {
+    await _ensureInitialized();
+
+    // Count total sections
+    int totalSections = 0;
+    for (final repertoires in _repertoires.values) {
+      for (final repertoire in repertoires) {
+        totalSections += repertoire.sections.length;
+      }
+    }
+
+    // Count total recordings in Hive
+    final box = await _practiceRecordingsBox;
+    final totalRecordings = box.length;
+
+    // Count recordings with files that exist
+    int recordingsWithFiles = 0;
+    int recordingsWithMissingFiles = 0;
+    for (final recording in box.values) {
+      final file = File(recording.filePath);
+      if (await file.exists()) {
+        recordingsWithFiles++;
+      } else {
+        recordingsWithMissingFiles++;
+        debugPrint('Stats: Missing file - ${recording.filePath}');
+      }
+    }
+
+    return {
+      'totalRecordings': totalRecordings,
+      'totalSections': totalSections,
+      'recordingsWithFiles': recordingsWithFiles,
+      'recordingsWithMissingFiles': recordingsWithMissingFiles,
+    };
+  }
+
+  @override
+  Future<PracticeRecording> importRecording(String sourceFilePath, int durationSeconds) async {
+    await _ensureInitialized();
+
+    // Create 'imported' directory for imported recordings
+    final appDir = await getApplicationDocumentsDirectory();
+    final importedDir = Directory('${appDir.path}/recordings/imported');
+    if (!await importedDir.exists()) {
+      await importedDir.create(recursive: true);
+    }
+
+    // Copy file to app's recordings directory
+    final sourceFile = File(sourceFilePath);
+    final extension = sourceFilePath.split('.').last;
+    final newFileName = '${_uuid.v4()}.$extension';
+    final newFilePath = '${importedDir.path}/$newFileName';
+
+    await sourceFile.copy(newFilePath);
+    debugPrint('PracticeRepertoireRepository: Copied file to $newFilePath');
+
+    // Create new recording entry with 'imported' as sectionId (will be orphaned)
+    final newRecording = PracticeRecording(
+      id: _uuid.v4(),
+      sectionId: 'imported_${DateTime.now().millisecondsSinceEpoch}', // Unique orphan ID
+      filePath: newFilePath,
+      durationSeconds: durationSeconds,
+      bpm: null,
+      isRepresentative: false,
+      createdAt: DateTime.now(),
+    );
+
+    // Save to Hive
+    final box = await _practiceRecordingsBox;
+    await box.put(newRecording.id, newRecording);
+    await box.flush();
+    debugPrint('PracticeRepertoireRepository: Imported recording saved with id: ${newRecording.id}');
+
+    return newRecording;
   }
 }
