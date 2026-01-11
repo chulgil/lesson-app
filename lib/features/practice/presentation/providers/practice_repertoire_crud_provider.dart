@@ -179,6 +179,7 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
     int? repeatCount,
     DateTime? startDate,
     DateTime? endDate,
+    int? targetPracticeSeconds,
   }) async {
     state = const AsyncLoading();
     try {
@@ -197,6 +198,7 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
         repeatCount: repeatCount,
         startDate: startDate,
         endDate: endDate,
+        targetPracticeSeconds: targetPracticeSeconds,
         createdAt: DateTime.now(),
       );
       final result = await repository.createSection(section);

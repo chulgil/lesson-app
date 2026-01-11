@@ -189,6 +189,7 @@ class PracticeSection {
 
   final int practiceCount;
   final int totalPracticeSeconds;
+  final int? targetPracticeSeconds; // Target practice time in seconds (null = no target)
   final List<PracticeRecording> recordings;
   final List<DailyPracticeStatus> dailyStatuses; // Daily completion tracking
   final List<PracticeNote> notes; // Practice notes for this section
@@ -216,6 +217,7 @@ class PracticeSection {
     this.endDate,
     this.practiceCount = 0,
     this.totalPracticeSeconds = 0,
+    this.targetPracticeSeconds,
     this.recordings = const [],
     this.dailyStatuses = const [],
     this.notes = const [],
@@ -287,6 +289,45 @@ class PracticeSection {
       return '$hours시간 $minutes분';
     }
     return '$minutes분';
+  }
+
+  /// Check if target practice time is set
+  bool get hasTargetPracticeTime =>
+      targetPracticeSeconds != null && targetPracticeSeconds! > 0;
+
+  /// Get formatted target practice time
+  String get formattedTargetTime {
+    if (targetPracticeSeconds == null || targetPracticeSeconds == 0) {
+      return '설정 안함';
+    }
+    final hours = targetPracticeSeconds! ~/ 3600;
+    final minutes = (targetPracticeSeconds! % 3600) ~/ 60;
+    if (hours > 0) {
+      return '$hours시간 $minutes분';
+    }
+    return '$minutes분';
+  }
+
+  /// Get practice progress as percentage (0.0 to 1.0+)
+  double get practiceProgress {
+    if (targetPracticeSeconds == null || targetPracticeSeconds == 0) {
+      return 0.0;
+    }
+    return totalPracticeSeconds / targetPracticeSeconds!;
+  }
+
+  /// Get practice progress text (e.g., "15분 / 30분")
+  String get practiceProgressText {
+    if (!hasTargetPracticeTime) {
+      return formattedTotalTime;
+    }
+    return '$formattedTotalTime / $formattedTargetTime';
+  }
+
+  /// Check if target practice time is achieved
+  bool get isTargetAchieved {
+    if (!hasTargetPracticeTime) return false;
+    return totalPracticeSeconds >= targetPracticeSeconds!;
   }
 
   /// Get the latest note
@@ -388,6 +429,8 @@ class PracticeSection {
     bool clearEndDate = false,
     int? practiceCount,
     int? totalPracticeSeconds,
+    int? targetPracticeSeconds,
+    bool clearTargetPracticeSeconds = false,
     List<PracticeRecording>? recordings,
     List<DailyPracticeStatus>? dailyStatuses,
     List<PracticeNote>? notes,
@@ -415,6 +458,9 @@ class PracticeSection {
       endDate: clearEndDate ? null : (endDate ?? this.endDate),
       practiceCount: practiceCount ?? this.practiceCount,
       totalPracticeSeconds: totalPracticeSeconds ?? this.totalPracticeSeconds,
+      targetPracticeSeconds: clearTargetPracticeSeconds
+          ? null
+          : (targetPracticeSeconds ?? this.targetPracticeSeconds),
       recordings: recordings ?? this.recordings,
       dailyStatuses: dailyStatuses ?? this.dailyStatuses,
       notes: notes ?? this.notes,
@@ -455,6 +501,7 @@ class PracticeSection {
         'endDate': endDate?.toIso8601String(),
         'practiceCount': practiceCount,
         'totalPracticeSeconds': totalPracticeSeconds,
+        'targetPracticeSeconds': targetPracticeSeconds,
         'dailyStatuses': dailyStatuses.map((s) => s.toJson()).toList(),
         'notes': notes.map((n) => _practiceNoteToJson(n)).toList(),
         'createdAt': createdAt.toIso8601String(),
@@ -503,6 +550,7 @@ class PracticeSection {
           : null,
       practiceCount: json['practiceCount'] as int? ?? 0,
       totalPracticeSeconds: json['totalPracticeSeconds'] as int? ?? 0,
+      targetPracticeSeconds: json['targetPracticeSeconds'] as int?,
       dailyStatuses: (json['dailyStatuses'] as List<dynamic>?)
               ?.map((e) => DailyPracticeStatus.fromJson(e as Map<String, dynamic>))
               .toList() ??
