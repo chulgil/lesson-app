@@ -91,6 +91,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
       // Invalidate the repertoires list
       ref.invalidate(studentRepertoiresProvider(studentId));
 
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: studentId, date: today),
+      ));
+
       state = const AsyncData(null);
       return result;
     } catch (e, st) {
@@ -110,6 +116,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
       ref.invalidate(studentRepertoiresProvider(repertoire.studentId));
       ref.invalidate(repertoireProvider(repertoire.id));
 
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: repertoire.studentId, date: today),
+      ));
+
       state = const AsyncData(null);
       return result;
     } catch (e, st) {
@@ -127,6 +139,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
 
       // Invalidate the repertoires list
       ref.invalidate(studentRepertoiresProvider(studentId));
+
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: studentId, date: today),
+      ));
 
       state = const AsyncData(null);
     } catch (e, st) {

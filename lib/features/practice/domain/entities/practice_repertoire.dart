@@ -58,6 +58,28 @@ class DailyPracticeStatus {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// JSON serialization
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'sectionId': sectionId,
+        'date': date.toIso8601String(),
+        'isCompleted': isCompleted,
+        'completedAt': completedAt?.toIso8601String(),
+      };
+
+  /// JSON deserialization
+  factory DailyPracticeStatus.fromJson(Map<String, dynamic> json) {
+    return DailyPracticeStatus(
+      id: json['id'] as String,
+      sectionId: json['sectionId'] as String,
+      date: DateTime.parse(json['date'] as String),
+      isCompleted: json['isCompleted'] as bool? ?? false,
+      completedAt: json['completedAt'] != null
+          ? DateTime.parse(json['completedAt'] as String)
+          : null,
+    );
+  }
 }
 
 /// Practice recording model
@@ -303,11 +325,40 @@ class PracticeSection {
     }
   }
 
+  /// Check if this section is active for a specific date based on date range
+  bool isActiveForDate(DateTime date) {
+    final dateOnly = DateTime(date.year, date.month, date.day);
+
+    // Check startDate if set
+    if (startDate != null) {
+      final start = DateTime(startDate!.year, startDate!.month, startDate!.day);
+      if (dateOnly.isBefore(start)) return false;
+    }
+
+    // Check endDate if set
+    if (endDate != null) {
+      final end = DateTime(endDate!.year, endDate!.month, endDate!.day);
+      if (dateOnly.isAfter(end)) return false;
+    }
+
+    return true;
+  }
+
   /// Check if this section should be visible for a date
-  /// - If repeat is ON: always visible
-  /// - If repeat is OFF: visible only if not completed on any previous day
+  /// - Must be within section's date range (startDate-endDate)
+  /// - If section has both startDate AND endDate: visible every day within range
+  /// - If repeat is ON: visible every day
+  /// - If repeat is OFF and no date range: visible only if not completed on any previous day
   bool isVisibleForDate(DateTime date) {
+    // First check if within section's date range
+    if (!isActiveForDate(date)) return false;
+
+    // If section has a specific date range (both start and end), show every day in range
+    if (startDate != null && endDate != null) return true;
+
+    // If repeat is on, visible every day
     if (isRepeat) return true;
+
     // If repeat is off and completed on a previous day, don't show
     final dateOnly = DateTime(date.year, date.month, date.day);
     return !dailyStatuses
@@ -382,7 +433,105 @@ class PracticeSection {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// JSON serialization (excludes recordings - stored separately in Hive)
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'repertoireId': repertoireId,
+        'pieceName': pieceName,
+        'rangeType': rangeType.name,
+        'startMeasure': startMeasure,
+        'endMeasure': endMeasure,
+        'startLine': startLine,
+        'endLine': endLine,
+        'sectionName': sectionName,
+        'isCompleted': isCompleted,
+        'isRepeat': isRepeat,
+        'repeatCount': repeatCount,
+        'dailyRepeatCounts': dailyRepeatCounts,
+        'startDate': startDate?.toIso8601String(),
+        'endDate': endDate?.toIso8601String(),
+        'practiceCount': practiceCount,
+        'totalPracticeSeconds': totalPracticeSeconds,
+        'dailyStatuses': dailyStatuses.map((s) => s.toJson()).toList(),
+        'notes': notes.map((n) => _practiceNoteToJson(n)).toList(),
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+        'completedAt': completedAt?.toIso8601String(),
+        'sortOrder': sortOrder,
+        'lastPracticedAt': lastPracticedAt?.toIso8601String(),
+      };
+
+  /// JSON deserialization (recordings are loaded separately from Hive)
+  factory PracticeSection.fromJson(Map<String, dynamic> json) {
+    return PracticeSection(
+      id: json['id'] as String,
+      repertoireId: json['repertoireId'] as String,
+      pieceName: json['pieceName'] as String,
+      rangeType: SectionRangeType.values.firstWhere(
+        (e) => e.name == json['rangeType'],
+        orElse: () => SectionRangeType.measure,
+      ),
+      startMeasure: json['startMeasure'] as int? ?? 1,
+      endMeasure: json['endMeasure'] as int? ?? 1,
+      startLine: json['startLine'] as int?,
+      endLine: json['endLine'] as int?,
+      sectionName: json['sectionName'] as String?,
+      isCompleted: json['isCompleted'] as bool? ?? false,
+      isRepeat: json['isRepeat'] as bool? ?? true,
+      repeatCount: json['repeatCount'] as int?,
+      dailyRepeatCounts: (json['dailyRepeatCounts'] as Map<String, dynamic>?)
+              ?.map((k, v) => MapEntry(k, v as int)) ??
+          {},
+      startDate: json['startDate'] != null
+          ? DateTime.parse(json['startDate'] as String)
+          : null,
+      endDate: json['endDate'] != null
+          ? DateTime.parse(json['endDate'] as String)
+          : null,
+      practiceCount: json['practiceCount'] as int? ?? 0,
+      totalPracticeSeconds: json['totalPracticeSeconds'] as int? ?? 0,
+      dailyStatuses: (json['dailyStatuses'] as List<dynamic>?)
+              ?.map((e) => DailyPracticeStatus.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      notes: (json['notes'] as List<dynamic>?)
+              ?.map((e) => _practiceNoteFromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      completedAt: json['completedAt'] != null
+          ? DateTime.parse(json['completedAt'] as String)
+          : null,
+      sortOrder: json['sortOrder'] as int?,
+      lastPracticedAt: json['lastPracticedAt'] != null
+          ? DateTime.parse(json['lastPracticedAt'] as String)
+          : null,
+    );
+  }
 }
+
+/// Helper functions for PracticeNote JSON (since it's HiveObject)
+Map<String, dynamic> _practiceNoteToJson(PracticeNote note) => {
+      'id': note.id,
+      'sectionId': note.sectionId,
+      'content': note.content,
+      'createdAt': note.createdAt.toIso8601String(),
+      'updatedAt': note.updatedAt?.toIso8601String(),
+    };
+
+PracticeNote _practiceNoteFromJson(Map<String, dynamic> json) => PracticeNote(
+      id: json['id'] as String,
+      sectionId: json['sectionId'] as String,
+      content: json['content'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+    );
 
 /// Practice repertoire model (book or piece collection)
 class PracticeRepertoire {
@@ -397,6 +546,7 @@ class PracticeRepertoire {
   final DateTime? updatedAt;
   final bool isArchived; // Archive status
   final DateTime? archivedAt; // When this repertoire was archived
+  final int? sortOrder; // Custom sort order for drag and drop
 
   const PracticeRepertoire({
     required this.id,
@@ -410,6 +560,7 @@ class PracticeRepertoire {
     this.updatedAt,
     this.isArchived = false,
     this.archivedAt,
+    this.sortOrder,
   });
 
   /// Check if this repertoire is active (not archived)
@@ -492,6 +643,7 @@ class PracticeRepertoire {
     DateTime? updatedAt,
     bool? isArchived,
     DateTime? archivedAt,
+    int? sortOrder,
   }) {
     return PracticeRepertoire(
       id: id ?? this.id,
@@ -505,6 +657,7 @@ class PracticeRepertoire {
       updatedAt: updatedAt ?? this.updatedAt,
       isArchived: isArchived ?? this.isArchived,
       archivedAt: archivedAt ?? this.archivedAt,
+      sortOrder: sortOrder ?? this.sortOrder,
     );
   }
 
@@ -517,4 +670,47 @@ class PracticeRepertoire {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// JSON serialization (sections exclude recordings - stored separately)
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'studentId': studentId,
+        'name': name,
+        'description': description,
+        'startDate': startDate.toIso8601String(),
+        'endDate': endDate?.toIso8601String(),
+        'sections': sections.map((s) => s.toJson()).toList(),
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt?.toIso8601String(),
+        'isArchived': isArchived,
+        'archivedAt': archivedAt?.toIso8601String(),
+        'sortOrder': sortOrder,
+      };
+
+  /// JSON deserialization
+  factory PracticeRepertoire.fromJson(Map<String, dynamic> json) {
+    return PracticeRepertoire(
+      id: json['id'] as String,
+      studentId: json['studentId'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      startDate: DateTime.parse(json['startDate'] as String),
+      endDate: json['endDate'] != null
+          ? DateTime.parse(json['endDate'] as String)
+          : null,
+      sections: (json['sections'] as List<dynamic>?)
+              ?.map((e) => PracticeSection.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      isArchived: json['isArchived'] as bool? ?? false,
+      archivedAt: json['archivedAt'] != null
+          ? DateTime.parse(json['archivedAt'] as String)
+          : null,
+      sortOrder: json['sortOrder'] as int?,
+    );
+  }
 }

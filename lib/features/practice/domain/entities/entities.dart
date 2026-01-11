@@ -9,6 +9,7 @@ export 'practice_note.dart';
 export 'practice_progress.dart';
 export 'practice_repertoire.dart';
 export 'practice_stats.dart';
+export 'repertoire_sort_type.dart';
 export 'practice_stats_report.dart';
 export 'practice_streak.dart';
 export 'recording.dart';
