@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../shared/widgets/app_date_picker.dart';
 import '../widgets/section_form/date_range_section.dart';
 
 /// Screen for adding a new repertoire
@@ -98,7 +99,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   }
 
   Future<void> _selectStartDate() async {
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
       initialDate: _startDate,
       firstDate: DateTime(2020),
@@ -117,7 +118,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   }
 
   Future<void> _selectEndDate() async {
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
       initialDate: _endDate ?? _startDate,
       firstDate: _startDate,

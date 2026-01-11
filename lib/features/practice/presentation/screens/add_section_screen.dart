@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_form/range_picker_button.dart';
@@ -49,6 +50,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
   // Repeat settings (isRepeat is derived from endDate: null = repeat)
   int? _repeatCount; // null = 없음, 2~10
+
+  // Target practice time in minutes (null = no target)
+  int? _targetPracticeMinutes;
 
   // Repertoire date constraints
   DateTime? _repertoireStartDate;
@@ -95,6 +99,8 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   }
 
   Future<void> _submit() async {
+    // Prevent duplicate submissions
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     // Validate range based on type
@@ -133,6 +139,41 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       }
     }
 
+    // Check for duplicate section (same name + range)
+    final repertoire =
+        await ref.read(repertoireProvider(widget.repertoireId).future);
+    if (repertoire != null) {
+      final pieceName = _pieceNameController.text.trim();
+      final isDuplicate = repertoire.sections.any((section) {
+        if (section.pieceName != pieceName) return false;
+
+        // Check range based on type
+        switch (_rangeType) {
+          case SectionRangeType.full:
+            return section.rangeType == SectionRangeType.full;
+          case SectionRangeType.measure:
+            return section.rangeType == SectionRangeType.measure &&
+                section.startMeasure == _startMeasure &&
+                section.endMeasure == _endMeasure;
+          case SectionRangeType.line:
+            return section.rangeType == SectionRangeType.line &&
+                section.startLine == _startLine &&
+                section.endLine == _endLine;
+        }
+      });
+
+      if (isDuplicate) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('동일한 곡명과 범위의 섹션이 이미 존재합니다'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -154,10 +195,18 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
             repeatCount: _repeatCount,
             startDate: _startDate,
             endDate: _endDate,
+            targetPracticeSeconds: _targetPracticeMinutes != null
+                ? _targetPracticeMinutes! * 60
+                : null,
           );
 
       // Invalidate repertoires to refresh the list
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: widget.studentId, date: today),
+      ));
 
       if (mounted) {
         context.pop(true);
@@ -240,12 +289,12 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
         ? (_startDate ?? firstDate)
         : (_endDate ?? _startDate ?? firstDate);
 
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
-      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
+      initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      locale: const Locale('ko', 'KR'),
+      helpText: isStart ? '시작일 선택' : '종료일 선택',
     );
 
     if (picked != null && mounted) {
@@ -549,6 +598,95 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                           '매일 $_repeatCount회 연습을 완료하면 모든 발바닥이 채워집니다',
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.textPrimaryLight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.space8),
+
+              // ========================================
+              // ⏱️ 목표 연습시간 설정 (선택)
+              // ========================================
+              Row(
+                children: [
+                  const Text('⏱️', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text('목표 연습시간', style: AppTypography.headingSmall),
+                  const Spacer(),
+                  Text(
+                    '선택',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                '이 섹션의 목표 연습시간을 설정하세요',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Target practice time dropdown
+              DropdownButtonFormField<int?>(
+                value: _targetPracticeMinutes,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.timer_outlined),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space3,
+                  ),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: Text('설정 안함'),
+                  ),
+                  ...[5, 10, 15, 20, 30, 45, 60, 90, 120].map(
+                    (minutes) => DropdownMenuItem(
+                      value: minutes,
+                      child: Text(minutes >= 60
+                          ? '${minutes ~/ 60}시간${minutes % 60 > 0 ? ' ${minutes % 60}분' : ''}'
+                          : '$minutes분'),
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _targetPracticeMinutes = value;
+                  });
+                },
+              ),
+
+              if (_targetPracticeMinutes != null) ...[
+                const SizedBox(height: AppSpacing.space2),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          '목표시간 달성 시 진행률이 100%로 표시됩니다',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

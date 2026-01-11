@@ -8,7 +8,9 @@ import '../../../../../core/theme/app_typography.dart';
 import '../../../../../models/practice_repertoire.dart';
 
 /// Completion toggle widget for marking section as complete
-/// Supports both standard toggle and N회 반복 mode with 🐾 paw stamps
+/// Supports:
+/// - Standard toggle mode (simple on/off)
+/// - N회 반복 mode (tap to increment paw stamps, shows progress x/n)
 class CompletionToggle extends StatelessWidget {
   final PracticeSection section;
   final VoidCallback onToggle;
@@ -35,7 +37,9 @@ class CompletionToggle extends StatelessWidget {
     return _buildStandardCard(context, hasRepresentativeRecording);
   }
 
-  Widget _buildStandardCard(BuildContext context, bool hasRepresentativeRecording) {
+  /// Standard mode: Simple toggle
+  Widget _buildStandardCard(
+      BuildContext context, bool hasRepresentativeRecording) {
     return Card(
       color: section.isCompleted
           ? AppColors.success.withValues(alpha: 0.1)
@@ -78,27 +82,10 @@ class CompletionToggle extends StatelessWidget {
                         color: AppColors.textSecondaryLight,
                       ),
                     ),
-                    // Show sharing message when there's a representative recording
-                    if (!section.isCompleted && hasRepresentativeRecording) ...[
+                    if (!section.isCompleted &&
+                        hasRepresentativeRecording) ...[
                       const SizedBox(height: AppSpacing.space1),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.share,
-                            size: 12,
-                            color: AppColors.info,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              '완료 시 대표녹음이 선생님께 공유됩니다',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.info,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildShareHint(),
                     ],
                   ],
                 ),
@@ -110,15 +97,15 @@ class CompletionToggle extends StatelessWidget {
     );
   }
 
-  Widget _buildRepeatCountCard(BuildContext context, DateTime date, bool hasRepresentativeRecording) {
+  /// N회 반복 mode: Tap to increment, shows x/n progress
+  Widget _buildRepeatCountCard(
+      BuildContext context, DateTime date, bool hasRepresentativeRecording) {
     final completedCount = section.getRepeatCompletedCount(date);
     final totalCount = section.repeatCount!;
     final isAllCompleted = completedCount >= totalCount;
 
     return Card(
-      color: isAllCompleted
-          ? AppColors.success.withValues(alpha: 0.1)
-          : null,
+      color: isAllCompleted ? AppColors.success.withValues(alpha: 0.1) : null,
       child: InkWell(
         onTap: onToggle,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -126,7 +113,7 @@ class CompletionToggle extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(
             children: [
-              // Paw stamps row
+              // Paw stamps row showing progress
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(totalCount, (index) {
@@ -147,11 +134,11 @@ class CompletionToggle extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.space3),
 
-              // Status text
+              // Progress text (x/n format)
               Text(
                 isAllCompleted
                     ? '오늘 연습 완료! ($completedCount/$totalCount회)'
-                    : '탭하여 연습 기록하기 ($completedCount/$totalCount회)',
+                    : '탭하여 연습 기록 ($completedCount/$totalCount회)',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isAllCompleted
@@ -160,39 +147,41 @@ class CompletionToggle extends StatelessWidget {
                 ),
               ),
               Text(
-                isAllCompleted
-                    ? '탭하여 초기화'
-                    : '하루 $totalCount회 반복 연습',
+                isAllCompleted ? '탭하여 초기화' : '하루 $totalCount회 반복',
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
 
-              // Show sharing message when complete and there's a representative recording
               if (isAllCompleted && hasRepresentativeRecording) ...[
                 const SizedBox(height: AppSpacing.space2),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.share,
-                      size: 12,
-                      color: AppColors.info,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '대표녹음이 선생님께 공유됩니다',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.info,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildShareHint(),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShareHint() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.share,
+          size: 12,
+          color: AppColors.info,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '완료 시 대표녹음이 선생님께 공유됩니다',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.info,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -46,9 +46,12 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final repertoireId = state.pathParameters['id'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
+      final dateStr = state.uri.queryParameters['date'];
+      final selectedDate = dateStr != null ? DateTime.tryParse(dateStr) : null;
       return RepertoireDetailScreen(
         repertoireId: repertoireId,
         studentId: studentId,
+        selectedDate: selectedDate,
       );
     },
   ),

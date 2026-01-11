@@ -291,8 +291,8 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.headphones_outlined,
             title: '레슨 녹음 파일',
-            subtitle: '12개 저장됨',
-            onTap: () {},
+            subtitle: '전체 녹음 관리',
+            onTap: () => context.push(AppRoutes.allRecordings),
           ),
           _buildMenuDivider(),
           _buildMenuItem(

@@ -8,6 +8,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../practice/domain/entities/repertoire_sort_type.dart';
+import '../../../practice/presentation/providers/repertoire_sort_provider.dart';
 import '../widgets/week_calendar_widget.dart';
 
 /// Student practice tab with calendar-based repertoire management
@@ -55,7 +57,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               ),
             ),
 
-            // Date header
+            // Date header with sort option
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
@@ -66,8 +68,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                     _getDateHeaderText(),
                     style: AppTypography.headingSmall,
                   ),
-                  const Spacer(),
-                  if (_isToday())
+                  if (_isToday()) ...[
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -86,6 +88,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                         ),
                       ),
                     ),
+                  ],
+                  const Spacer(),
+                  // Sort dropdown
+                  _buildSortDropdown(),
                 ],
               ),
             ),
@@ -99,7 +105,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   if (repertoires.isEmpty) {
                     return _buildEmptyState();
                   }
-                  return _buildRepertoireList(repertoires);
+                  // Apply sorting
+                  final sortType = ref.watch(repertoireSortTypeProvider);
+                  final sortedRepertoires = repertoires.sortBy(sortType);
+                  return _buildRepertoireList(sortedRepertoires);
                 },
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
@@ -149,6 +158,89 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     return _selectedDate.year == now.year &&
         _selectedDate.month == now.month &&
         _selectedDate.day == now.day;
+  }
+
+  Widget _buildSortDropdown() {
+    final sortType = ref.watch(repertoireSortTypeProvider);
+
+    return PopupMenuButton<RepertoireSortType>(
+      initialValue: sortType,
+      onSelected: (type) {
+        ref.read(repertoireSortTypeProvider.notifier).state = type;
+      },
+      itemBuilder: (context) => RepertoireSortType.values
+          .where((type) => type != RepertoireSortType.custom)
+          .map((type) {
+        return PopupMenuItem<RepertoireSortType>(
+          value: type,
+          child: Row(
+            children: [
+              Icon(
+                _getSortIcon(type),
+                size: 18,
+                color: type == sortType
+                    ? AppColors.primary
+                    : AppColors.textSecondaryLight,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                type.displayName,
+                style: TextStyle(
+                  color: type == sortType
+                      ? AppColors.primary
+                      : AppColors.textPrimaryLight,
+                  fontWeight:
+                      type == sortType ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.borderLight),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _getSortIcon(sortType),
+              size: 16,
+              color: AppColors.textSecondaryLight,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              sortType.displayName,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Icon(
+              Icons.arrow_drop_down,
+              size: 16,
+              color: AppColors.textSecondaryLight,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getSortIcon(RepertoireSortType type) {
+    switch (type) {
+      case RepertoireSortType.createdDesc:
+        return Icons.arrow_downward;
+      case RepertoireSortType.createdAsc:
+        return Icons.arrow_upward;
+      case RepertoireSortType.nameAsc:
+        return Icons.sort_by_alpha;
+      case RepertoireSortType.custom:
+        return Icons.drag_handle;
+    }
   }
 
   Set<DateTime> _getPracticedDates(List<PracticeRepertoire> repertoires) {
@@ -270,7 +362,8 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     onTap: () {
                       context.push(
                         '${AppRoutes.repertoireDetail.replaceFirst(':id', widget.repertoire.id)}'
-                        '?studentId=${widget.studentId}',
+                        '?studentId=${widget.studentId}'
+                        '&date=${widget.selectedDate.toIso8601String()}',
                       );
                     },
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -299,15 +392,32 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                             ],
                           ),
                         ),
-                        Icon(
-                          Icons.chevron_right,
-                          size: 20,
-                          color: AppColors.textTertiaryLight,
-                        ),
                       ],
                     ),
                   ),
                 ),
+                // Add section button - square with purple background
+                GestureDetector(
+                  onTap: () {
+                    context.push(
+                      '${AppRoutes.addSection}?repertoireId=${widget.repertoire.id}&studentId=${widget.studentId}',
+                    );
+                  },
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
                 // Expand/collapse button
                 IconButton(
                   onPressed: () {
@@ -391,7 +501,8 @@ class _SectionTile extends ConsumerWidget {
         onTap: () {
           context.push(
             '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}'
-            '?repertoireId=$repertoireId&studentId=$studentId',
+            '?repertoireId=$repertoireId&studentId=$studentId'
+            '&date=${selectedDate.toIso8601String()}',
           );
         },
         child: Padding(
@@ -450,7 +561,7 @@ class _SectionTile extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      section.measureRangeText,
+                      section.rangeText,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),

@@ -14,78 +14,7 @@ class MockPracticeRepository implements PracticeRepository {
   }
 
   void _initMockData() {
-    final now = DateTime.now();
-
-    // Student 1 practice logs
-    _logs['student_1'] = List.generate(30, (index) {
-      final date = now.subtract(Duration(days: index));
-      final hasPractice = index % 7 != 0 && index % 7 != 6; // Skip some weekends
-      if (!hasPractice && index < 7) return null;
-
-      return PracticeLog(
-        id: 'practice_1_$index',
-        studentId: 'student_1',
-        date: date,
-        totalMinutes: hasPractice ? 45 + (index % 3) * 15 : 0,
-        tasks: hasPractice
-            ? [
-                PracticeTask(
-                  id: 'task_1_${index}_1',
-                  title: '스케일 연습 (G Major)',
-                  targetMinutes: 15,
-                  isCompleted: true,
-                ),
-                PracticeTask(
-                  id: 'task_1_${index}_2',
-                  title: '바흐 파르티타 2번 - 1악장',
-                  targetMinutes: 30,
-                  isCompleted: index % 2 == 0,
-                ),
-                PracticeTask(
-                  id: 'task_1_${index}_3',
-                  title: '비브라토 연습',
-                  targetMinutes: 10,
-                  isCompleted: index % 3 == 0,
-                ),
-              ]
-            : [],
-        createdAt: date,
-      );
-    }).whereType<PracticeLog>().toList();
-
-    // Student 2 practice logs
-    _logs['student_2'] = List.generate(30, (index) {
-      final date = now.subtract(Duration(days: index));
-      final hasPractice = index % 3 != 0;
-      if (!hasPractice) return null;
-
-      return PracticeLog(
-        id: 'practice_2_$index',
-        studentId: 'student_2',
-        date: date,
-        totalMinutes: hasPractice ? 30 + (index % 2) * 15 : 0,
-        tasks: hasPractice
-            ? [
-                PracticeTask(
-                  id: 'task_2_${index}_1',
-                  title: '하논 연습',
-                  targetMinutes: 10,
-                  isCompleted: true,
-                ),
-                PracticeTask(
-                  id: 'task_2_${index}_2',
-                  title: '쇼팽 왈츠 연습',
-                  targetMinutes: 20,
-                  isCompleted: index % 2 == 0,
-                ),
-              ]
-            : [],
-        createdAt: date,
-      );
-    }).whereType<PracticeLog>().toList();
-
-    // Initialize streaks from practice logs
-    _initStreaks();
+    // No dummy data - users create their own practice logs
   }
 
   void _initStreaks() {

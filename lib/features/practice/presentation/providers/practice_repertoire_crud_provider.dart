@@ -91,6 +91,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
       // Invalidate the repertoires list
       ref.invalidate(studentRepertoiresProvider(studentId));
 
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: studentId, date: today),
+      ));
+
       state = const AsyncData(null);
       return result;
     } catch (e, st) {
@@ -110,6 +116,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
       ref.invalidate(studentRepertoiresProvider(repertoire.studentId));
       ref.invalidate(repertoireProvider(repertoire.id));
 
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: repertoire.studentId, date: today),
+      ));
+
       state = const AsyncData(null);
       return result;
     } catch (e, st) {
@@ -127,6 +139,12 @@ class RepertoireCrudNotifier extends AsyncNotifier<void> {
 
       // Invalidate the repertoires list
       ref.invalidate(studentRepertoiresProvider(studentId));
+
+      // Also invalidate date-based provider for practice tab
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: studentId, date: today),
+      ));
 
       state = const AsyncData(null);
     } catch (e, st) {
@@ -161,6 +179,7 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
     int? repeatCount,
     DateTime? startDate,
     DateTime? endDate,
+    int? targetPracticeSeconds,
   }) async {
     state = const AsyncLoading();
     try {
@@ -179,6 +198,7 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
         repeatCount: repeatCount,
         startDate: startDate,
         endDate: endDate,
+        targetPracticeSeconds: targetPracticeSeconds,
         createdAt: DateTime.now(),
       );
       final result = await repository.createSection(section);
@@ -195,7 +215,8 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   }
 
   /// Update an existing section
-  Future<PracticeSection> updateSection(PracticeSection section) async {
+  Future<PracticeSection> updateSection(PracticeSection section,
+      {String? studentId}) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
@@ -204,6 +225,15 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
       // Invalidate related providers
       ref.invalidate(repertoireProvider(section.repertoireId));
       ref.invalidate(sectionProvider(section.id));
+
+      // Also invalidate list providers if studentId is provided
+      if (studentId != null) {
+        ref.invalidate(studentRepertoiresProvider(studentId));
+        final today = DateTime.now();
+        ref.invalidate(repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: today),
+        ));
+      }
 
       state = const AsyncData(null);
       return result;

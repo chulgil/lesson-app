@@ -16,15 +16,7 @@ class MockPracticeGoalRepository implements PracticeGoalRepository {
   }
 
   void _initMockData() {
-    // Initialize some mock daily practice data
-    final now = DateTime.now();
-    final todayKey = _dateKey(now);
-    final yesterdayKey = _dateKey(now.subtract(const Duration(days: 1)));
-
-    _mockDailyData['student_1'] = {
-      todayKey: 1200, // 20 minutes in seconds
-      yesterdayKey: 2400, // 40 minutes in seconds
-    };
+    // No dummy data - practice progress is calculated from actual data
   }
 
   String _dateKey(DateTime date) {

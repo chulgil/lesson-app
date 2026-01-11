@@ -41,6 +41,7 @@ dependencies:
   record: ^6.0.0
   just_audio: ^0.9.39
   audioplayers: ^6.1.0      # For simple audio playback
+  flutter_soloud: ^3.4.8    # Low-latency audio engine for metronome
   pitch_detector_dart: ^0.0.7  # YIN algorithm pitch detection
   flutter_audio_capture: ^1.1.6  # Real-time audio capture for tuner
 

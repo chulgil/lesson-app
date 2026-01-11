@@ -161,7 +161,7 @@ class BackupService {
       // Restore Hive data first
       if (hiveSnapshotFile != null) {
         final hiveJson = jsonDecode(utf8.decode(hiveSnapshotFile.content as List<int>));
-        restoredBoxEntries = await _restoreHiveBoxes(hiveJson);
+        restoredBoxEntries = await _restoreHiveBoxes(hiveJson, docsDir.path);
       }
 
       onProgress?.call(0.4, '녹음 파일 복원 중...');
@@ -301,7 +301,7 @@ class BackupService {
 
     // Export practice_recordings box
     try {
-      final practiceRecordingsBox = Hive.box<PracticeRecording>('practice_recordings');
+      final practiceRecordingsBox = await Hive.openBox<PracticeRecording>('practice_recordings');
       export['practice_recordings'] = practiceRecordingsBox.values
           .map((r) => _practiceRecordingToJson(r))
           .toList();
@@ -309,9 +309,22 @@ class BackupService {
       debugPrint('Could not export practice_recordings: $e');
     }
 
+    // Export practice_repertoires box (NEW)
+    try {
+      final repertoiresBox = await Hive.openBox('practice_repertoires');
+      final repertoireData = <String, dynamic>{};
+      for (final key in repertoiresBox.keys) {
+        repertoireData[key.toString()] = repertoiresBox.get(key);
+      }
+      export['practice_repertoires'] = repertoireData;
+      debugPrint('Exported ${repertoireData.length} repertoires');
+    } catch (e) {
+      debugPrint('Could not export practice_repertoires: $e');
+    }
+
     // Export metronome_settings box
     try {
-      final metronomeBox = Hive.box('metronome_settings');
+      final metronomeBox = await Hive.openBox('metronome_settings');
       export['metronome_settings'] = Map<String, dynamic>.from(metronomeBox.toMap());
     } catch (e) {
       debugPrint('Could not export metronome_settings: $e');
@@ -319,7 +332,7 @@ class BackupService {
 
     // Export smart_recording_settings box
     try {
-      final smartRecordingBox = Hive.box<Map>('smart_recording_settings');
+      final smartRecordingBox = await Hive.openBox<Map>('smart_recording_settings');
       final smartRecordingData = <String, dynamic>{};
       for (final key in smartRecordingBox.keys) {
         smartRecordingData[key.toString()] = smartRecordingBox.get(key);
@@ -332,17 +345,59 @@ class BackupService {
     return export;
   }
 
-  Future<int> _restoreHiveBoxes(Map<String, dynamic> data) async {
+  Future<int> _restoreHiveBoxes(Map<String, dynamic> data, String currentDocsPath) async {
     int restoredCount = 0;
 
-    // Restore practice_recordings
+    // Restore practice_repertoires FIRST (before recordings)
+    // This allows section matching for recordings
+    Map<String, String>? sectionIdMapping; // old sectionId -> new sectionId
+    if (data.containsKey('practice_repertoires')) {
+      try {
+        final box = await Hive.openBox('practice_repertoires');
+        final repertoires = data['practice_repertoires'] as Map<String, dynamic>;
+
+        for (final entry in repertoires.entries) {
+          if (!box.containsKey(entry.key)) {
+            await box.put(entry.key, entry.value);
+            restoredCount++;
+          }
+        }
+        await box.flush();
+        debugPrint('Restored ${repertoires.length} repertoires');
+
+        // Build section ID mapping for recording restoration
+        sectionIdMapping = await _buildSectionIdMapping(repertoires);
+      } catch (e) {
+        debugPrint('Could not restore practice_repertoires: $e');
+      }
+    }
+
+    // Restore practice_recordings (with section matching and path update)
     if (data.containsKey('practice_recordings')) {
       try {
-        final box = Hive.box<PracticeRecording>('practice_recordings');
+        // Use openBox instead of box to ensure box is opened even on fresh install
+        final box = await Hive.openBox<PracticeRecording>('practice_recordings');
         final recordings = data['practice_recordings'] as List;
 
         for (final item in recordings) {
-          final recording = _practiceRecordingFromJson(item);
+          var recording = _practiceRecordingFromJson(item as Map<String, dynamic>);
+
+          // Update file path to current documents directory
+          final updatedFilePath = _updateFilePath(recording.filePath, currentDocsPath);
+          if (updatedFilePath != recording.filePath) {
+            recording = recording.copyWith(filePath: updatedFilePath);
+            debugPrint('Updated file path: ${recording.filePath}');
+          }
+
+          // Try section matching if section doesn't exist
+          if (sectionIdMapping != null && sectionIdMapping.containsKey(recording.sectionId)) {
+            final newSectionId = sectionIdMapping[recording.sectionId]!;
+            if (newSectionId != recording.sectionId) {
+              recording = recording.copyWith(sectionId: newSectionId);
+              debugPrint('Remapped recording ${recording.id.substring(0, 8)}... to section $newSectionId');
+            }
+          }
+
           if (!box.containsKey(recording.id)) {
             await box.put(recording.id, recording);
             restoredCount++;
@@ -357,7 +412,8 @@ class BackupService {
     // Restore metronome_settings
     if (data.containsKey('metronome_settings')) {
       try {
-        final box = Hive.box('metronome_settings');
+        // Use openBox instead of box to ensure box is opened even on fresh install
+        final box = await Hive.openBox('metronome_settings');
         final settings = data['metronome_settings'] as Map<String, dynamic>;
 
         for (final entry in settings.entries) {
@@ -375,7 +431,8 @@ class BackupService {
     // Restore smart_recording_settings
     if (data.containsKey('smart_recording_settings')) {
       try {
-        final box = Hive.box<Map>('smart_recording_settings');
+        // Use openBox instead of box to ensure box is opened even on fresh install
+        final box = await Hive.openBox<Map>('smart_recording_settings');
         final settings = data['smart_recording_settings'] as Map<String, dynamic>;
 
         for (final entry in settings.entries) {
@@ -420,6 +477,102 @@ class BackupService {
   bool _isVersionCompatible(String version) {
     // For now, accept version 1.x
     return version.startsWith('1.');
+  }
+
+  /// Update file path to use current app's documents directory.
+  ///
+  /// When restoring from backup, the original file path points to the old app's
+  /// documents directory. This method extracts the relative path (recordings/...)
+  /// and rebuilds it with the current app's documents directory.
+  String _updateFilePath(String originalPath, String currentDocsPath) {
+    // Find 'recordings/' in the path and extract everything from there
+    final recordingsIndex = originalPath.indexOf('recordings/');
+    if (recordingsIndex != -1) {
+      final relativePath = originalPath.substring(recordingsIndex);
+      return '$currentDocsPath/$relativePath';
+    }
+    // If 'recordings/' not found, return original path
+    return originalPath;
+  }
+
+  /// Build section ID mapping for recording restoration.
+  ///
+  /// When restoring a backup, section IDs may have changed (e.g., after reinstall).
+  /// This method builds a mapping from old section IDs to new section IDs
+  /// by matching sections based on their identifying properties:
+  /// - repertoire name + piece name + range type + range values
+  Future<Map<String, String>> _buildSectionIdMapping(
+    Map<String, dynamic> backupRepertoires,
+  ) async {
+    final mapping = <String, String>{};
+
+    // Get current repertoires from Hive
+    final currentBox = await Hive.openBox('practice_repertoires');
+    final currentRepertoires = <String, Map<String, dynamic>>{};
+    for (final key in currentBox.keys) {
+      final value = currentBox.get(key);
+      if (value is Map) {
+        currentRepertoires[key.toString()] = Map<String, dynamic>.from(value);
+      }
+    }
+
+    // Build section lookup by unique key: repertoireName|pieceName|rangeType|startMeasure|endMeasure|startLine|endLine
+    String buildSectionKey(String repertoireName, Map<String, dynamic> section) {
+      final pieceName = section['pieceName'] as String? ?? '';
+      final rangeType = section['rangeType'] as String? ?? 'measure';
+      final startMeasure = section['startMeasure'] as int? ?? 0;
+      final endMeasure = section['endMeasure'] as int? ?? 0;
+      final startLine = section['startLine'] as int? ?? 0;
+      final endLine = section['endLine'] as int? ?? 0;
+      return '$repertoireName|$pieceName|$rangeType|$startMeasure|$endMeasure|$startLine|$endLine';
+    }
+
+    // Build lookup for current sections: key -> sectionId
+    final currentSectionLookup = <String, String>{};
+    for (final entry in currentRepertoires.entries) {
+      final repertoireData = entry.value;
+      final repertoireName = repertoireData['name'] as String? ?? '';
+      final sections = repertoireData['sections'] as List? ?? [];
+      for (final section in sections) {
+        if (section is Map) {
+          final sectionMap = Map<String, dynamic>.from(section);
+          final key = buildSectionKey(repertoireName, sectionMap);
+          final sectionId = sectionMap['id'] as String?;
+          if (sectionId != null) {
+            currentSectionLookup[key] = sectionId;
+          }
+        }
+      }
+    }
+
+    // Match backup sections to current sections
+    for (final entry in backupRepertoires.entries) {
+      final repertoireData = entry.value;
+      if (repertoireData is! Map) continue;
+
+      final repertoireMap = Map<String, dynamic>.from(repertoireData);
+      final repertoireName = repertoireMap['name'] as String? ?? '';
+      final sections = repertoireMap['sections'] as List? ?? [];
+
+      for (final section in sections) {
+        if (section is! Map) continue;
+
+        final sectionMap = Map<String, dynamic>.from(section);
+        final oldSectionId = sectionMap['id'] as String?;
+        if (oldSectionId == null) continue;
+
+        final key = buildSectionKey(repertoireName, sectionMap);
+        final newSectionId = currentSectionLookup[key];
+
+        if (newSectionId != null && newSectionId != oldSectionId) {
+          mapping[oldSectionId] = newSectionId;
+          debugPrint('Section mapping: $oldSectionId -> $newSectionId ($key)');
+        }
+      }
+    }
+
+    debugPrint('Built section ID mapping with ${mapping.length} entries');
+    return mapping;
   }
 
   Future<DateTime?> _getLastBackupDate() async {

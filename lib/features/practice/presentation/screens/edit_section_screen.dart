@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_form/range_picker_button.dart';
@@ -56,6 +57,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   // Repeat settings (isRepeat is derived from endDate: null = repeat)
   int? _repeatCount;
 
+  // Target practice time in minutes (null = no target)
+  int? _targetPracticeMinutes;
+
   // Repertoire date constraints
   DateTime? _repertoireStartDate;
   DateTime? _repertoireEndDate;
@@ -93,6 +97,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _endDate = section.endDate;
         // isRepeat is derived from endDate (null = repeat)
         _repeatCount = section.repeatCount;
+        _targetPracticeMinutes = section.targetPracticeSeconds != null
+            ? (section.targetPracticeSeconds! / 60).round()
+            : null;
         _isInitialized = true;
       });
     }
@@ -156,6 +163,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         endMeasure: _rangeType == SectionRangeType.measure ? _endMeasure : 1,
         startLine: _rangeType == SectionRangeType.line ? _startLine : null,
         endLine: _rangeType == SectionRangeType.line ? _endLine : null,
+        clearStartLine: _rangeType != SectionRangeType.line,
+        clearEndLine: _rangeType != SectionRangeType.line,
         sectionName: _sectionNameController.text.trim().isEmpty
             ? null
             : _sectionNameController.text.trim(),
@@ -166,15 +175,26 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         endDate: _endDate,
         clearStartDate: _startDate == null,
         clearEndDate: _endDate == null,
+        targetPracticeSeconds: _targetPracticeMinutes != null
+            ? _targetPracticeMinutes! * 60
+            : null,
+        clearTargetPracticeSeconds: _targetPracticeMinutes == null,
         updatedAt: DateTime.now(),
       );
 
-      await ref.read(sectionCrudProvider.notifier).updateSection(updatedSection);
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .updateSection(updatedSection, studentId: widget.studentId);
 
       // Invalidate providers to refresh
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(repertoireProvider(widget.repertoireId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
+      // Also invalidate date-based provider
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: widget.studentId, date: today),
+      ));
 
       if (mounted) {
         context.pop(true);
@@ -257,12 +277,12 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ? (_startDate ?? firstDate)
         : (_endDate ?? _startDate ?? firstDate);
 
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
-      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
+      initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      locale: const Locale('ko', 'KR'),
+      helpText: isStart ? '시작일 선택' : '종료일 선택',
     );
 
     if (picked != null && mounted) {
@@ -556,6 +576,95 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                           '매일 $_repeatCount회 연습을 완료하면 모든 발바닥이 채워집니다',
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.textPrimaryLight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: AppSpacing.space8),
+
+              // ========================================
+              // ⏱️ 목표 연습시간 설정 (선택)
+              // ========================================
+              Row(
+                children: [
+                  const Text('⏱️', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text('목표 연습시간', style: AppTypography.headingSmall),
+                  const Spacer(),
+                  Text(
+                    '선택',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                '이 섹션의 목표 연습시간을 설정하세요',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Target practice time dropdown
+              DropdownButtonFormField<int?>(
+                value: _targetPracticeMinutes,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.timer_outlined),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space3,
+                  ),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    value: null,
+                    child: Text('설정 안함'),
+                  ),
+                  ...[5, 10, 15, 20, 30, 45, 60, 90, 120].map(
+                    (minutes) => DropdownMenuItem(
+                      value: minutes,
+                      child: Text(minutes >= 60
+                          ? '${minutes ~/ 60}시간${minutes % 60 > 0 ? ' ${minutes % 60}분' : ''}'
+                          : '$minutes분'),
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _targetPracticeMinutes = value;
+                  });
+                },
+              ),
+
+              if (_targetPracticeMinutes != null) ...[
+                const SizedBox(height: AppSpacing.space2),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          '목표시간 달성 시 진행률이 100%로 표시됩니다',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
                           ),
                         ),
                       ),

@@ -6,13 +6,14 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/entities.dart';
 import '../providers/practice_note_provider.dart';
+import '../providers/practice_repertoire_crud_provider.dart';
 import '../widgets/notes/note_edit_dialog.dart';
 import '../widgets/notes/note_list_item.dart';
 
 /// Screen for viewing and managing practice notes for a section
 class PracticeNoteListScreen extends ConsumerWidget {
   final String sectionId;
-  final String sectionName;
+  final String sectionName; // Fallback name if section fetch fails
 
   const PracticeNoteListScreen({
     super.key,
@@ -23,6 +24,14 @@ class PracticeNoteListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notesAsync = ref.watch(sectionNotesProvider(sectionId));
+    final sectionAsync = ref.watch(sectionProvider(sectionId));
+
+    // Get repertoire info when section is available
+    final section = sectionAsync.valueOrNull;
+    final repertoireAsync = section != null
+        ? ref.watch(repertoireProvider(section.repertoireId))
+        : null;
+    final repertoireName = repertoireAsync?.valueOrNull?.name;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,28 +47,17 @@ class PracticeNoteListScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section name header
+          // Section info header
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             color: AppColors.surfaceSecondaryLight,
             width: double.infinity,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.library_music,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    sectionName,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ),
-              ],
+            child: sectionAsync.when(
+              data: (section) => section != null
+                  ? _buildSectionHeader(section, repertoireName)
+                  : _buildFallbackHeader(),
+              loading: () => _buildFallbackHeader(),
+              error: (_, __) => _buildFallbackHeader(),
             ),
           ),
 
@@ -73,10 +71,85 @@ class PracticeNoteListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddDialog(context, ref),
-        child: const Icon(Icons.add),
-      ),
+    );
+  }
+
+  Widget _buildSectionHeader(dynamic section, String? repertoireName) {
+    return Row(
+      children: [
+        Icon(
+          Icons.library_music,
+          color: AppColors.primary,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Repertoire name
+              if (repertoireName != null && repertoireName.isNotEmpty) ...[
+                Text(
+                  repertoireName,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: 2),
+              ],
+              // Piece name
+              Text(
+                section.pieceName,
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              // Section name + range
+              if (_formatSectionInfo(section).isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  _formatSectionInfo(section),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatSectionInfo(dynamic section) {
+    final parts = <String>[];
+    if (section.sectionName != null && section.sectionName.isNotEmpty) {
+      parts.add(section.sectionName);
+    }
+    if (section.rangeText != null && section.rangeText.isNotEmpty && section.rangeText != '전체') {
+      parts.add(section.rangeText);
+    }
+    return parts.isEmpty ? '전체' : parts.join(' · ');
+  }
+
+  Widget _buildFallbackHeader() {
+    return Row(
+      children: [
+        Icon(
+          Icons.library_music,
+          color: AppColors.primary,
+          size: 20,
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            sectionName,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

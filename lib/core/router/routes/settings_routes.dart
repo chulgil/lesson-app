@@ -2,6 +2,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/settings/presentation/screens/all_recordings_screen.dart';
 import '../../../features/settings/presentation/screens/backup_settings_screen.dart';
 import '../app_routes.dart';
 
@@ -12,5 +13,11 @@ List<GoRoute> settingsRoutes = [
     path: AppRoutes.backupSettings,
     name: 'backupSettings',
     builder: (context, state) => const BackupSettingsScreen(),
+  ),
+  // All Recordings
+  GoRoute(
+    path: AppRoutes.allRecordings,
+    name: 'allRecordings',
+    builder: (context, state) => const AllRecordingsScreen(),
   ),
 ];
