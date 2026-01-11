@@ -213,7 +213,8 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
   }
 
   /// Update an existing section
-  Future<PracticeSection> updateSection(PracticeSection section) async {
+  Future<PracticeSection> updateSection(PracticeSection section,
+      {String? studentId}) async {
     state = const AsyncLoading();
     try {
       final repository = ref.read(practiceRepertoireRepositoryProvider);
@@ -222,6 +223,15 @@ class SectionCrudNotifier extends AsyncNotifier<void> {
       // Invalidate related providers
       ref.invalidate(repertoireProvider(section.repertoireId));
       ref.invalidate(sectionProvider(section.id));
+
+      // Also invalidate list providers if studentId is provided
+      if (studentId != null) {
+        ref.invalidate(studentRepertoiresProvider(studentId));
+        final today = DateTime.now();
+        ref.invalidate(repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: studentId, date: today),
+        ));
+      }
 
       state = const AsyncData(null);
       return result;

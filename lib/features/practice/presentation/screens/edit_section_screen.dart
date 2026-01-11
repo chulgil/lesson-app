@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_form/range_picker_button.dart';
@@ -156,6 +157,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         endMeasure: _rangeType == SectionRangeType.measure ? _endMeasure : 1,
         startLine: _rangeType == SectionRangeType.line ? _startLine : null,
         endLine: _rangeType == SectionRangeType.line ? _endLine : null,
+        clearStartLine: _rangeType != SectionRangeType.line,
+        clearEndLine: _rangeType != SectionRangeType.line,
         sectionName: _sectionNameController.text.trim().isEmpty
             ? null
             : _sectionNameController.text.trim(),
@@ -169,12 +172,19 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         updatedAt: DateTime.now(),
       );
 
-      await ref.read(sectionCrudProvider.notifier).updateSection(updatedSection);
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .updateSection(updatedSection, studentId: widget.studentId);
 
       // Invalidate providers to refresh
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(repertoireProvider(widget.repertoireId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
+      // Also invalidate date-based provider
+      final today = DateTime.now();
+      ref.invalidate(repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: widget.studentId, date: today),
+      ));
 
       if (mounted) {
         context.pop(true);
@@ -257,12 +267,12 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         ? (_startDate ?? firstDate)
         : (_endDate ?? _startDate ?? firstDate);
 
-    final picked = await showDatePicker(
+    final picked = await AppDatePicker.show(
       context: context,
-      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
+      initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
-      locale: const Locale('ko', 'KR'),
+      helpText: isStart ? '시작일 선택' : '종료일 선택',
     );
 
     if (picked != null && mounted) {

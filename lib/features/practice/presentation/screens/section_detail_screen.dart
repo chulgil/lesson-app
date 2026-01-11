@@ -49,7 +49,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   bool _isPaused = false;
   int _recordingSeconds = 0;
   bool _usedMetronome = false; // Track if metronome was used during recording
-  RecordingFilterType _recordingFilter = RecordingFilterType.daily; // Default to daily
+  RecordingFilterType _recordingFilter = RecordingFilterType.all; // Default to all
 
   @override
   Widget build(BuildContext context) {
@@ -323,16 +323,17 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       case RecordingFilterType.all:
         // Show all recordings up to selected date (if set)
         if (selectedDate != null) {
+          final selectedDateOnly = DateTime(
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
+          );
           return recordings.where((r) {
+            final localCreatedAt = r.createdAt.toLocal();
             final recordingDate = DateTime(
-              r.createdAt.year,
-              r.createdAt.month,
-              r.createdAt.day,
-            );
-            final selectedDateOnly = DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
+              localCreatedAt.year,
+              localCreatedAt.month,
+              localCreatedAt.day,
             );
             return !recordingDate.isAfter(selectedDateOnly);
           }).toList();
@@ -341,23 +342,39 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
       case RecordingFilterType.weekly:
         // Show recordings from the week containing the reference date (Mon-Sun)
+        // Use local time for comparison
         final weekday = referenceDate.weekday; // 1=Mon, 7=Sun
         final monday = referenceDate.subtract(Duration(days: weekday - 1));
         final sunday = monday.add(const Duration(days: 6));
         final weekStart = DateTime(monday.year, monday.month, monday.day);
-        final weekEnd = DateTime(sunday.year, sunday.month, sunday.day, 23, 59, 59);
+        final weekEnd = DateTime(sunday.year, sunday.month, sunday.day);
 
         return recordings.where((r) {
-          return r.createdAt.isAfter(weekStart.subtract(const Duration(seconds: 1))) &&
-              r.createdAt.isBefore(weekEnd.add(const Duration(seconds: 1)));
+          final localCreatedAt = r.createdAt.toLocal();
+          final recordingDate = DateTime(
+            localCreatedAt.year,
+            localCreatedAt.month,
+            localCreatedAt.day,
+          );
+          return !recordingDate.isBefore(weekStart) && !recordingDate.isAfter(weekEnd);
         }).toList();
 
       case RecordingFilterType.daily:
         // Show recordings from the reference date only
+        // Use local time for comparison to handle timezone issues
+        final referenceDateOnly = DateTime(
+          referenceDate.year,
+          referenceDate.month,
+          referenceDate.day,
+        );
         return recordings.where((r) {
-          return r.createdAt.year == referenceDate.year &&
-              r.createdAt.month == referenceDate.month &&
-              r.createdAt.day == referenceDate.day;
+          final localCreatedAt = r.createdAt.toLocal();
+          final recordingDateOnly = DateTime(
+            localCreatedAt.year,
+            localCreatedAt.month,
+            localCreatedAt.day,
+          );
+          return recordingDateOnly == referenceDateOnly;
         }).toList();
     }
   }
@@ -761,7 +778,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
   }
 
   void _navigateToNotes(PracticeSection section) {
-    final sectionName = '${section.pieceName} ${section.measureRangeText}';
+    final sectionName = '${section.pieceName} ${section.rangeText}';
     context.push(
       '${AppRoutes.practiceNotes.replaceFirst(':sectionId', section.id)}'
       '?name=${Uri.encodeComponent(sectionName)}',

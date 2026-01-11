@@ -13,6 +13,7 @@ import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
+import '../../../practice/presentation/widgets/practice_tools_modal.dart';
 import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -84,6 +85,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             ],
           ),
         ),
+        // Show metronome/tuner button on home and lessons tabs
+        floatingActionButton: (_currentIndex == 0 || _currentIndex == 1)
+            ? FloatingActionButton(
+                onPressed: () => PracticeToolsModal.show(context),
+                child: const Icon(Icons.music_note),
+              )
+            : null,
         bottomNavigationBar: _buildBottomNavigation(),
       ),
     );

@@ -168,7 +168,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       onSelected: (type) {
         ref.read(repertoireSortTypeProvider.notifier).state = type;
       },
-      itemBuilder: (context) => RepertoireSortType.values.map((type) {
+      itemBuilder: (context) => RepertoireSortType.values
+          .where((type) => type != RepertoireSortType.custom)
+          .map((type) {
         return PopupMenuItem<RepertoireSortType>(
           value: type,
           child: Row(
@@ -557,7 +559,7 @@ class _SectionTile extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      section.measureRangeText,
+                      section.rangeText,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),

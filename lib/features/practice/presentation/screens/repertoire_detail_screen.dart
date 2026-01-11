@@ -539,7 +539,7 @@ class _SectionListTile extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.space1),
                     Text(
-                      section.measureRangeText,
+                      section.rangeText,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),
@@ -677,7 +677,7 @@ class _ReorderableSectionTile extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSpacing.space1),
                           Text(
-                            section.measureRangeText,
+                            section.rangeText,
                             style: AppTypography.caption.copyWith(
                               color: AppColors.textSecondaryLight,
                             ),

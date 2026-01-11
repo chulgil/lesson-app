@@ -374,6 +374,8 @@ class PracticeSection {
     int? endMeasure,
     int? startLine,
     int? endLine,
+    bool clearStartLine = false,
+    bool clearEndLine = false,
     String? sectionName,
     bool? isCompleted,
     bool? isRepeat,
@@ -402,8 +404,8 @@ class PracticeSection {
       rangeType: rangeType ?? this.rangeType,
       startMeasure: startMeasure ?? this.startMeasure,
       endMeasure: endMeasure ?? this.endMeasure,
-      startLine: startLine ?? this.startLine,
-      endLine: endLine ?? this.endLine,
+      startLine: clearStartLine ? null : (startLine ?? this.startLine),
+      endLine: clearEndLine ? null : (endLine ?? this.endLine),
       sectionName: sectionName ?? this.sectionName,
       isCompleted: isCompleted ?? this.isCompleted,
       isRepeat: isRepeat ?? this.isRepeat,
@@ -464,16 +466,26 @@ class PracticeSection {
 
   /// JSON deserialization (recordings are loaded separately from Hive)
   factory PracticeSection.fromJson(Map<String, dynamic> json) {
+    // Parse startMeasure and endMeasure first
+    final startMeasure = json['startMeasure'] as int? ?? 1;
+    final endMeasure = json['endMeasure'] as int? ?? 1;
+
+    // Parse rangeType - default to 'measure' for backward compatibility
+    final rangeTypeStr = json['rangeType'] as String?;
+    final rangeType = rangeTypeStr != null
+        ? SectionRangeType.values.firstWhere(
+            (e) => e.name == rangeTypeStr,
+            orElse: () => SectionRangeType.measure,
+          )
+        : SectionRangeType.measure; // Legacy data defaults to measure
+
     return PracticeSection(
       id: json['id'] as String,
       repertoireId: json['repertoireId'] as String,
       pieceName: json['pieceName'] as String,
-      rangeType: SectionRangeType.values.firstWhere(
-        (e) => e.name == json['rangeType'],
-        orElse: () => SectionRangeType.measure,
-      ),
-      startMeasure: json['startMeasure'] as int? ?? 1,
-      endMeasure: json['endMeasure'] as int? ?? 1,
+      rangeType: rangeType,
+      startMeasure: startMeasure,
+      endMeasure: endMeasure,
       startLine: json['startLine'] as int?,
       endLine: json['endLine'] as int?,
       sectionName: json['sectionName'] as String?,
