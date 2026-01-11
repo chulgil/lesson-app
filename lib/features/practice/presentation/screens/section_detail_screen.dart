@@ -179,10 +179,13 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
             onTap: () => _navigateToNotes(section),
           ),
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space4),
 
-          // Practice stats
-          PracticeStatsCard(section: section),
+          // Practice stats editor (tappable)
+          PracticeStatsEditor(
+            section: section,
+            onUpdate: (count, seconds) => _updatePracticeStats(section, count, seconds),
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -305,7 +308,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           CompletionToggle(
             section: section,
             onToggle: () => _toggleCompletion(section),
-            onCompleteWithCount: (count) => _completeWithCount(section, count),
             selectedDate: widget.selectedDate,
           ),
         ],
@@ -779,28 +781,31 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     }
   }
 
-  /// Complete practice with target time × count
-  Future<void> _completeWithCount(PracticeSection section, int count) async {
-    if (!section.hasTargetPracticeTime) return;
-
-    final practiceSeconds = section.targetPracticeSeconds! * count;
-
+  /// Update practice count and time manually
+  Future<void> _updatePracticeStats(
+    PracticeSection section,
+    int newCount,
+    int newSeconds,
+  ) async {
     try {
-      // Increment practice count and time
-      await ref.read(sectionCrudProvider.notifier).incrementPractice(
-            widget.sectionId,
-            widget.repertoireId,
-            practiceSeconds,
+      // Create updated section
+      final updatedSection = section.copyWith(
+        practiceCount: newCount,
+        totalPracticeSeconds: newSeconds,
+      );
+
+      await ref.read(sectionCrudProvider.notifier).updateSection(
+            updatedSection,
+            studentId: widget.studentId,
           );
 
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
 
       if (mounted) {
-        final minutes = (practiceSeconds / 60).round();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('연습 완료! (+$minutes분, $count회)'),
+          const SnackBar(
+            content: Text('연습 기록이 수정되었습니다'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -809,7 +814,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('연습 기록 실패: $e'),
+            content: Text('수정 실패: $e'),
             backgroundColor: AppColors.error,
           ),
         );
