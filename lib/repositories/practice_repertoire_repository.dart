@@ -394,7 +394,21 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
         final sectionIndex =
             repertoire.sections.indexWhere((s) => s.id == section.id);
         if (sectionIndex != -1) {
-          final updatedSection = section.copyWith(updatedAt: DateTime.now());
+          final oldSection = repertoire.sections[sectionIndex];
+
+          // Check if repeatCount changed - if so, reset dailyRepeatCounts and practiceCount
+          PracticeSection updatedSection;
+          if (oldSection.repeatCount != section.repeatCount) {
+            // RepeatCount changed - reset daily completion and practice count
+            updatedSection = section.copyWith(
+              dailyRepeatCounts: {},
+              practiceCount: 0,
+              updatedAt: DateTime.now(),
+            );
+          } else {
+            updatedSection = section.copyWith(updatedAt: DateTime.now());
+          }
+
           final updatedSections = List<PracticeSection>.from(repertoire.sections);
           updatedSections[sectionIndex] = updatedSection;
           repertoires[i] = repertoire.copyWith(
@@ -597,9 +611,22 @@ class MockPracticeRepertoireRepository implements PracticeRepertoireRepository {
               updatedStatuses = section.dailyStatuses;
             }
 
+            // Sync practiceCount with paw print changes
+            // When incrementing (0->1, 1->2, etc), add 1 to practiceCount
+            // When resetting (max->0), subtract currentCount from practiceCount
+            int updatedPracticeCount = section.practiceCount;
+            if (newCount > currentCount) {
+              // Incrementing: add 1 to practiceCount
+              updatedPracticeCount += 1;
+            } else if (newCount == 0 && currentCount > 0) {
+              // Resetting: subtract currentCount from practiceCount
+              updatedPracticeCount = (updatedPracticeCount - currentCount).clamp(0, updatedPracticeCount);
+            }
+
             updatedSection = section.copyWith(
               dailyRepeatCounts: updatedCounts,
               dailyStatuses: updatedStatuses,
+              practiceCount: updatedPracticeCount,
               updatedAt: DateTime.now(),
             );
           } else {
