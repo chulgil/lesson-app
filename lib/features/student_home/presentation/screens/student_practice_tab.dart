@@ -362,7 +362,8 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     onTap: () {
                       context.push(
                         '${AppRoutes.repertoireDetail.replaceFirst(':id', widget.repertoire.id)}'
-                        '?studentId=${widget.studentId}',
+                        '?studentId=${widget.studentId}'
+                        '&date=${widget.selectedDate.toIso8601String()}',
                       );
                     },
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),

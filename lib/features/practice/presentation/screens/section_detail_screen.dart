@@ -168,6 +168,19 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // Practice stats section (moved above notes)
+          Text(
+            '연습기록',
+            style: AppTypography.headingSmall,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          PracticeStatsEditor(
+            section: section,
+            onUpdate: (count, seconds) => _updatePracticeStats(section, count, seconds),
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // Practice notes preview
           Row(
             children: [
@@ -181,19 +194,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           NotePreviewCard(
             sectionId: section.id,
             onTap: () => _navigateToNotes(section),
-          ),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // Practice stats section
-          Text(
-            '연습 기록',
-            style: AppTypography.headingSmall,
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          PracticeStatsEditor(
-            section: section,
-            onUpdate: (count, seconds) => _updatePracticeStats(section, count, seconds),
           ),
 
           const SizedBox(height: AppSpacing.space4),

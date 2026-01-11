@@ -74,29 +74,20 @@ class SectionInfoCard extends StatelessWidget {
             const Divider(height: 1),
             const SizedBox(height: AppSpacing.space4),
 
-            // Section details - range info (only if not "전체")
-            if (section.rangeType != SectionRangeType.full) ...[
-              _buildInfoRow(
-                icon: Icons.straighten,
-                label: section.rangeText,
-              ),
-              const SizedBox(height: AppSpacing.space2),
-            ],
-
-            // N회 반복 (repeatCount)
-            if (section.hasRepeatCount) ...[
-              _buildInfoRow(
-                emoji: '🐾',
-                label: '${section.repeatCount}회 반복',
-              ),
-              const SizedBox(height: AppSpacing.space2),
-            ],
-
             // Period (startDate ~ endDate)
             _buildInfoRow(
               icon: Icons.calendar_today,
               label: _formatPeriod(),
             ),
+
+            // Section details - range info (only if not "전체")
+            if (section.rangeType != SectionRangeType.full) ...[
+              const SizedBox(height: AppSpacing.space2),
+              _buildInfoRow(
+                icon: Icons.straighten,
+                label: section.rangeText,
+              ),
+            ],
           ],
         ),
       ),

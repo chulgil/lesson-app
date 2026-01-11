@@ -18,11 +18,13 @@ import '../widgets/section_management/section_sort_dropdown.dart';
 class RepertoireDetailScreen extends ConsumerStatefulWidget {
   final String repertoireId;
   final String studentId;
+  final DateTime? selectedDate;
 
   const RepertoireDetailScreen({
     super.key,
     required this.repertoireId,
     required this.studentId,
+    this.selectedDate,
   });
 
   @override
@@ -38,7 +40,11 @@ class _RepertoireDetailScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('레퍼토리 상세'),
+        title: Text(
+          widget.selectedDate != null
+              ? '레퍼토리 상세 · ${_formatDateForTitle(widget.selectedDate!)}'
+              : '레퍼토리 상세',
+        ),
         actions: [
           // More menu with edit and archive options
           PopupMenuButton<String>(
@@ -371,6 +377,24 @@ class _RepertoireDetailScreenState
         ],
       ),
     );
+  }
+
+  String _formatDateForTitle(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selected = DateTime(date.year, date.month, date.day);
+    final difference = today.difference(selected).inDays;
+
+    final dateStr = '${date.month}월 ${date.day}일';
+
+    if (difference == 0) {
+      return '$dateStr (오늘)';
+    } else if (difference == 1) {
+      return '$dateStr (어제)';
+    } else if (difference == -1) {
+      return '$dateStr (내일)';
+    }
+    return dateStr;
   }
 
   void _handleMenuAction(String action) {
