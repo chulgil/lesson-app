@@ -43,7 +43,6 @@ class PracticeStatsEditor extends StatelessWidget {
                     icon: Icons.repeat,
                     label: '연습 횟수',
                     value: '${section.practiceCount}회',
-                    color: AppColors.primary,
                     onTap: () => _showCountEditor(context),
                   ),
                 ),
@@ -54,7 +53,6 @@ class PracticeStatsEditor extends StatelessWidget {
                     icon: Icons.timer,
                     label: '총 연습 시간',
                     value: section.formattedTotalTime,
-                    color: AppColors.info,
                     onTap: () => _showTimeEditor(context),
                   ),
                 ),
@@ -110,26 +108,24 @@ class PracticeStatsEditor extends StatelessWidget {
   }
 }
 
-/// Individual stat tile widget
+/// Individual stat tile widget - neutral gray theme
 class _StatTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final Color color;
   final VoidCallback onTap;
 
   const _StatTile({
     required this.icon,
     required this.label,
     required this.value,
-    required this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withValues(alpha: 0.1),
+      color: AppColors.surfaceSecondaryLight,
       borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       child: InkWell(
         onTap: onTap,
@@ -141,18 +137,20 @@ class _StatTile extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(icon, size: 14, color: color),
+                  Icon(icon, size: 14, color: AppColors.textSecondaryLight),
                   const SizedBox(width: AppSpacing.space1),
                   Expanded(
                     child: Text(
                       label,
-                      style: AppTypography.caption.copyWith(color: color),
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
                     ),
                   ),
                   Icon(
                     Icons.edit,
                     size: 12,
-                    color: color.withValues(alpha: 0.5),
+                    color: AppColors.textTertiaryLight,
                   ),
                 ],
               ),
@@ -160,8 +158,8 @@ class _StatTile extends StatelessWidget {
               Text(
                 value,
                 style: AppTypography.headingSmall.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

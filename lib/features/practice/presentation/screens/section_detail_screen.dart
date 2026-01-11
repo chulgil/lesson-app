@@ -66,7 +66,11 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('섹션 상세'),
+        title: Text(
+          widget.selectedDate != null
+              ? '섹션 상세 · ${_formatDateForTitle(widget.selectedDate!)}'
+              : '섹션 상세',
+        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -828,6 +832,24 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       '${AppRoutes.practiceNotes.replaceFirst(':sectionId', section.id)}'
       '?name=${Uri.encodeComponent(sectionName)}',
     );
+  }
+
+  String _formatDateForTitle(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selected = DateTime(date.year, date.month, date.day);
+    final difference = today.difference(selected).inDays;
+
+    final dateStr = '${date.month}월 ${date.day}일';
+
+    if (difference == 0) {
+      return '$dateStr (오늘)';
+    } else if (difference == 1) {
+      return '$dateStr (어제)';
+    } else if (difference == -1) {
+      return '$dateStr (내일)';
+    }
+    return dateStr;
   }
 
   void _showDeleteConfirmation(BuildContext context) {

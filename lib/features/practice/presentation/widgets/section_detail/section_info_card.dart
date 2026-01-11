@@ -29,39 +29,6 @@ class SectionInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Selected date badge (if viewing from calendar)
-            if (selectedDate != null) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 14,
-                      color: AppColors.info,
-                    ),
-                    const SizedBox(width: AppSpacing.space1),
-                    Text(
-                      _formatSelectedDate(),
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.info,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-            ],
-
             // Header: Piece name
             Row(
               children: [
@@ -82,25 +49,18 @@ class SectionInfoCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Repertoire name (piece name)
                       Text(
                         section.pieceName,
                         style: AppTypography.headingMedium,
                       ),
+                      // Section name (if exists)
                       if (section.sectionName != null) ...[
                         const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.space2,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.surfaceSecondaryLight,
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSmall),
-                          ),
-                          child: Text(
-                            section.sectionName!,
-                            style: AppTypography.caption,
+                        Text(
+                          section.sectionName!,
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                       ],
@@ -188,34 +148,5 @@ class SectionInfoCard extends StatelessWidget {
     final endStr =
         '${section.endDate!.year}.${section.endDate!.month.toString().padLeft(2, '0')}.${section.endDate!.day.toString().padLeft(2, '0')}';
     return '$startStr ~ $endStr';
-  }
-
-  String _formatSelectedDate() {
-    if (selectedDate == null) return '';
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final selected = DateTime(
-      selectedDate!.year,
-      selectedDate!.month,
-      selectedDate!.day,
-    );
-
-    final difference = today.difference(selected).inDays;
-
-    final dateStr =
-        '${selectedDate!.month}월 ${selectedDate!.day}일';
-
-    if (difference == 0) {
-      return '$dateStr (오늘)';
-    } else if (difference == 1) {
-      return '$dateStr (어제)';
-    } else if (difference == -1) {
-      return '$dateStr (내일)';
-    } else if (difference > 0) {
-      return '$dateStr ($difference일 전)';
-    } else {
-      return '$dateStr (${-difference}일 후)';
-    }
   }
 }
