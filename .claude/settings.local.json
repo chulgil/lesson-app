@@ -68,7 +68,15 @@
       "Bash(lib/features/practice/presentation/screens/section_detail_screen.dart )",
       "Bash(lib/features/student_home/presentation/screens/student_home_screen.dart )",
       "Bash(lib/features/practice/presentation/screens/add_section_screen.dart )",
-      "Bash(lib/features/practice/presentation/screens/edit_section_screen.dart)"
+      "Bash(lib/features/practice/presentation/screens/edit_section_screen.dart)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git push:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)",
+      "Bash(xcrun xcodebuild:*)",
+      "Bash(xcodebuild:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

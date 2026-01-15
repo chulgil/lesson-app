@@ -207,13 +207,14 @@ class StabilityFilter {
 class AmplitudeGate {
   AmplitudeGate({
     this.threshold = 0.05,
-    this.holdTime = const Duration(milliseconds: 200),
+    this.holdTime = const Duration(milliseconds: 500),
   });
 
   /// Minimum amplitude to pass through (0.0-1.0).
   final double threshold;
 
   /// Time to hold gate open after signal drops.
+  /// Increased from 200ms to 500ms for better stability during brief gaps.
   final Duration holdTime;
 
   DateTime? _lastAboveThreshold;

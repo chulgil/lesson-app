@@ -64,6 +64,11 @@ class RecordTunerEngine implements TunerEngine {
   // Buffer for accumulating audio samples
   final List<double> _sampleBuffer = [];
 
+  // Note hold mechanism - keeps last note during brief gaps
+  TunerNote? _lastValidNote;
+  DateTime? _lastValidNoteTime;
+  static const Duration _noteHoldDuration = Duration(milliseconds: 800);
+
   @override
   Stream<TunerNote?> get noteStream => _streamController.stream;
 
@@ -156,6 +161,8 @@ class RecordTunerEngine implements TunerEngine {
       _stabilityFilter.reset();
       _amplitudeGate.reset();
       _sampleBuffer.clear();
+      _lastValidNote = null;
+      _lastValidNoteTime = null;
 
       // Start streaming audio as PCM16
       final stream = await _recorder.startStream(
@@ -193,6 +200,8 @@ class RecordTunerEngine implements TunerEngine {
       _isListening = false;
       _currentNote = null;
       _sampleBuffer.clear();
+      _lastValidNote = null;
+      _lastValidNoteTime = null;
 
       _streamController.add(null);
       onPitchDetected?.call(null);
@@ -248,7 +257,8 @@ class RecordTunerEngine implements TunerEngine {
     // Check amplitude (noise gate)
     final amplitude = _calculateAmplitude(samples);
     if (!_amplitudeGate.check(amplitude)) {
-      _emitNote(null);
+      // Use note hold - emit last valid note if within hold duration
+      _emitWithHold(null);
       return;
     }
 
@@ -271,9 +281,41 @@ class RecordTunerEngine implements TunerEngine {
     if (stabilityResult.isStable && stabilityResult.frequency > 0) {
       final note = _frequencyToNote(stabilityResult.frequency);
       if (note != null) {
+        // Update last valid note and emit
+        _lastValidNote = note;
+        _lastValidNoteTime = DateTime.now();
         _emitNote(note);
+        return;
       }
     }
+
+    // Not stable - use note hold mechanism
+    _emitWithHold(null);
+  }
+
+  /// Emit note with hold mechanism - keeps last note during brief gaps.
+  void _emitWithHold(TunerNote? note) {
+    if (note != null) {
+      _lastValidNote = note;
+      _lastValidNoteTime = DateTime.now();
+      _emitNote(note);
+      return;
+    }
+
+    // Check if we should hold the last valid note
+    if (_lastValidNote != null && _lastValidNoteTime != null) {
+      final elapsed = DateTime.now().difference(_lastValidNoteTime!);
+      if (elapsed < _noteHoldDuration) {
+        // Keep emitting last valid note (don't emit null)
+        // This prevents flickering during brief detection gaps
+        return;
+      }
+    }
+
+    // Hold duration expired - clear note
+    _lastValidNote = null;
+    _lastValidNoteTime = null;
+    _emitNote(null);
   }
 
   void _onAudioError(Object error) {
