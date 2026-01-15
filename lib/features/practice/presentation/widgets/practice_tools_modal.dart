@@ -861,9 +861,14 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final tunerState = ref.watch(tunerProvider);
+  void dispose() {
+    // Auto-stop tuner when leaving panel
+    ref.read(tunerProvider.notifier).stop();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         // Main tuner area - responsive to screen size
@@ -910,86 +915,30 @@ class _TunerPanelState extends ConsumerState<_TunerPanel> {
 
         SizedBox(height: AppSpacing.space4),
 
-        // Bottom controls: Info bar (left) - Button (center) - Staff (right)
-        // Stack layout: side widgets behind button's glow effect
+        // Bottom controls: Staff (left) + Info bar (right) - 1.5x bigger, at bottom
         Padding(
           padding: EdgeInsets.only(
             left: AppSpacing.space4,
             right: AppSpacing.space4,
             bottom: AppSpacing.space6,
           ),
-          child: SizedBox(
-            height: 80,
-            child: Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
+          child: Transform.translate(
+            offset: const Offset(0, -20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Background layer: Staff (left) + Info bar (right) - hide when yellow curtain fully covers
-                if (!ref.watch(isCurtainFullyCoveredProvider))
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Left side: staff (up 80px, inward 30px from edge)
-                      Transform.translate(
-                        offset: const Offset(10, -80),
-                        child: const _TunerStaff(width: 106, height: 80),
-                      ),
-                      // Right side: info bar (up 80px, inward 30px from edge)
-                      Transform.translate(
-                        offset: const Offset(-10, -80),
-                        child: const TunerInfoBar(),
-                      ),
-                    ],
-                  ),
-                // Foreground layer: Button (center) - rendered last (on top, covers side widgets)
-                _TunerButton(
-                  isListening: tunerState.isListening,
-                  onPressed: () => ref.read(tunerProvider.notifier).toggle(),
+                // Staff display (1.24x size)
+                const _TunerStaff(width: 132, height: 99),
+                // Info bar (1.24x size)
+                Transform.scale(
+                  scale: 1.24,
+                  child: const TunerInfoBar(),
                 ),
               ],
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TunerButton extends StatelessWidget {
-  const _TunerButton({
-    required this.isListening,
-    required this.onPressed,
-  });
-
-  final bool isListening;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isListening ? AppColors.error : AppColors.primary,
-          boxShadow: [
-            BoxShadow(
-              color: (isListening ? AppColors.error : AppColors.primary)
-                  .withValues(alpha: 0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Icon(
-          isListening ? Icons.stop : Icons.mic,
-          size: 36,
-          color: Colors.white,
-        ),
-      ),
     );
   }
 }
@@ -1098,7 +1047,7 @@ class _TunerStaff extends ConsumerWidget {
 
     // Clef-specific left offset (treble clef needs to be more to the left)
     final clefLeftOffset = switch (effectiveClef) {
-      ClefType.treble => -20.0,
+      ClefType.treble => -30.0,
       ClefType.bass => 2.0,
       ClefType.alto => 2.0,
     };
@@ -1145,18 +1094,31 @@ class _TunerStaff extends ConsumerWidget {
   }
 
   /// Get effective clef for displaying a note.
-  /// If autoSwitchClef is enabled, switches based on note range (for cello, etc.)
-  /// Otherwise, always uses the user's preferred clef setting.
+  /// Automatically switches to bass clef for low notes (C3 and below in treble)
+  /// to avoid notes going too far below the staff.
   ClefType _getEffectiveClef(TunerNote note, ClefType preferredClef, bool autoSwitch) {
-    // If auto-switch is disabled, always use preferred clef
+    final naturalName = note.name.sharpName.replaceAll('#', '');
+    final noteKey = '$naturalName${note.octave}';
+
+    // Always auto-switch for very low/high notes to keep them on staff
+    // For treble clef: switch to bass for notes below E3
+    if (preferredClef == ClefType.treble && note.octave <= 3) {
+      if (note.octave < 3 || (note.octave == 3 && 'CDEF'.contains(naturalName))) {
+        return ClefType.bass;
+      }
+    }
+
+    // For bass clef: switch to treble for notes above A3
+    if (preferredClef == ClefType.bass && note.octave >= 4) {
+      return ClefType.treble;
+    }
+
+    // If auto-switch is disabled, use preferred clef for mid-range notes
     if (!autoSwitch) {
       return preferredClef;
     }
 
     // Auto-switch mode: check if note is in preferred clef range first
-    final naturalName = note.name.sharpName.replaceAll('#', '');
-    final noteKey = '$naturalName${note.octave}';
-
     final preferredPositions = _getPositionsForClef(preferredClef);
     if (preferredPositions.containsKey(noteKey)) {
       return preferredClef;

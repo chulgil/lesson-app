@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../providers/tuner_provider.dart';
 import '../widgets/tuner/circular_tuner_indicator.dart';
+import '../widgets/tuner/normalized_staff_widget.dart';
 import '../widgets/tuner/tuner_cat_indicator.dart';
 import '../widgets/tuner/tuner_settings_sheet.dart';
 
@@ -30,6 +31,8 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
 
   @override
   void dispose() {
+    // Stop tuner when leaving screen
+    ref.read(tunerProvider.notifier).stop();
     // Remove lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -76,97 +79,74 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
         ],
       ),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Main tuner area - responsive to screen size
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final availableWidth = constraints.maxWidth;
-                  final availableHeight = constraints.maxHeight;
+            // Main content layer (tuner area with starburst animation)
+            Column(
+              children: [
+                // Main tuner area - responsive to screen size
+                Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final availableWidth = constraints.maxWidth;
+                      final availableHeight = constraints.maxHeight;
 
-                  // Use the smaller dimension
-                  final availableSize = availableWidth < availableHeight
-                      ? availableWidth
-                      : availableHeight;
+                      // Use the smaller dimension
+                      final availableSize = availableWidth < availableHeight
+                          ? availableWidth
+                          : availableHeight;
 
-                  // Calculate scale factor (base size 400 for circle + indicators)
-                  final scaleFactor = (availableSize / 450).clamp(0.5, 1.2);
+                      // Calculate scale factor (base size 400 for circle + indicators)
+                      final scaleFactor = (availableSize / 450).clamp(0.5, 1.2);
 
-                  return Center(
-                    child: Transform.scale(
-                      scale: scaleFactor,
-                      child: const CircularTunerIndicator(
-                        size: 280,
-                        centerChild: TunerCatIndicator(size: 200),
-                      ),
+                      return Center(
+                        child: Transform.scale(
+                          scale: scaleFactor,
+                          child: const CircularTunerIndicator(
+                            size: 280,
+                            centerChild: TunerCatIndicator(size: 200),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                // Spacer to match the bottom section height
+                const SizedBox(height: 162), // 16 + 70 + 12 + 32 + 32
+              ],
+            ),
+
+            // Top layer - Staff and Info bar (always visible above starburst)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                color: AppColors.backgroundLight,
+                padding: const EdgeInsets.only(top: 16, bottom: 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Staff display
+                    NormalizedStaffWidget(
+                      note: tunerState.currentNote,
+                      isPerfect: tunerState.isPerfect,
+                      width: 140,
+                      height: 70,
                     ),
-                  );
-                },
-              ),
-            ),
 
-            const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-            // Info bar
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32),
-              child: TunerInfoBar(),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Start/Stop button
-            Padding(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: _TunerButton(
-                isListening: tunerState.isListening,
-                onPressed: () {
-                  ref.read(tunerProvider.notifier).toggle();
-                },
+                    // Info bar
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      child: TunerInfoBar(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Large circular button to start/stop tuner.
-class _TunerButton extends StatelessWidget {
-  const _TunerButton({
-    required this.isListening,
-    required this.onPressed,
-  });
-
-  final bool isListening;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isListening ? AppColors.error : AppColors.primary,
-          boxShadow: [
-            BoxShadow(
-              color: (isListening ? AppColors.error : AppColors.primary)
-                  .withValues(alpha: 0.3),
-              blurRadius: 12,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Icon(
-          isListening ? Icons.stop : Icons.mic,
-          size: 36,
-          color: Colors.white,
         ),
       ),
     );
