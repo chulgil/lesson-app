@@ -69,6 +69,36 @@ abstract class TunerEngine {
     }
   }
 
+  /// Warm up the engine by starting the audio stream without processing.
+  ///
+  /// This pre-configures the audio session and starts the microphone,
+  /// so that enabling processing later is instantaneous.
+  /// Override in implementations that support keep-warm pattern.
+  Future<void> warmUp() async {
+    // Default: just initialize
+    await init();
+  }
+
+  /// Enable pitch processing (stream must be active).
+  ///
+  /// Call after [warmUp] for instant tuner activation.
+  void enableProcessing() {
+    // Default: no-op, override in implementations
+  }
+
+  /// Disable pitch processing but keep the stream active.
+  ///
+  /// This allows instant re-enabling without audio session reconfiguration.
+  void disableProcessing() {
+    // Default: no-op, override in implementations
+  }
+
+  /// Whether the audio stream is active (warmed up or started).
+  bool get isStreamActive => isListening;
+
+  /// Whether pitch processing is enabled.
+  bool get isProcessingEnabled => isListening;
+
   /// Clean up resources.
   ///
   /// Must be called when the engine is no longer needed.

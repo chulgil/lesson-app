@@ -210,6 +210,28 @@ class PitchTunerEngine implements TunerEngine {
     _streamController.close();
   }
 
+  // Keep-warm pattern methods (minimal implementation for PitchTunerEngine)
+  @override
+  Future<void> warmUp() async {
+    await init();
+  }
+
+  @override
+  void enableProcessing() {
+    // No-op - uses standard start/stop
+  }
+
+  @override
+  void disableProcessing() {
+    // No-op - uses standard start/stop
+  }
+
+  @override
+  bool get isStreamActive => _isListening;
+
+  @override
+  bool get isProcessingEnabled => _isListening;
+
   /// Process incoming audio data.
   Future<void> _onAudioData(dynamic data) async {
     try {

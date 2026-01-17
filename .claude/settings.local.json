@@ -76,7 +76,11 @@
       "Bash(git stash:*)",
       "Bash(git stash pop:*)",
       "Bash(xcrun xcodebuild:*)",
-      "Bash(xcodebuild:*)"
+      "Bash(xcodebuild:*)",
+      "Bash(timeout 90 flutter run:*)",
+      "Bash(timeout 60 flutter run:*)",
+      "Bash(timeout 50 flutter run:*)",
+      "WebFetch(domain:github.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
