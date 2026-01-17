@@ -688,120 +688,14 @@ class _TapTempoSpeechBubble extends StatelessWidget {
   }
 }
 
-/// Bubble showing tempo explanation in Korean.
-class _TempoExplanationBubble extends StatelessWidget {
-  const _TempoExplanationBubble({
-    required this.bpm,
-    required this.explanation,
-  });
-
-  final int bpm;
-  final (String, String) explanation;
-
-  @override
-  Widget build(BuildContext context) {
-    final (koreanName, koreanMeaning) = explanation;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            koreanName,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '($koreanMeaning)',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Speech bubble showing tempo marking based on BPM.
-class _TempoMarkingSpeechBubble extends StatelessWidget {
-  const _TempoMarkingSpeechBubble({
-    required this.bpm,
-  });
-
-  final int bpm;
-
-  /// Get tempo marking name based on BPM.
-  String _getTempoMarking(int bpm) {
-    if (bpm < 40) return 'Grave';
-    if (bpm < 60) return 'Largo';
-    if (bpm < 66) return 'Larghetto';
-    if (bpm < 76) return 'Adagio';
-    if (bpm < 108) return 'Andante';
-    if (bpm < 120) return 'Moderato';
-    if (bpm < 132) return 'Allegretto';
-    if (bpm < 168) return 'Allegro';
-    if (bpm < 176) return 'Vivace';
-    if (bpm < 200) return 'Presto';
-    return 'Prestissimo';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFB8E3C8),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Text(
-        _getTempoMarking(bpm),
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: Colors.grey[600],
-        ),
-      ),
-    );
-  }
-}
-
 class _CircleButton extends StatelessWidget {
   const _CircleButton({
     required this.label,
     required this.onPressed,
-    this.backgroundColor,
-    this.foregroundColor,
   });
 
   final String label;
   final VoidCallback onPressed;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -812,7 +706,7 @@ class _CircleButton extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.primary,
+        color: AppColors.primary,
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
@@ -831,8 +725,8 @@ class _CircleButton extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                color: foregroundColor ?? softIvory,
+              style: const TextStyle(
+                color: softIvory,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),

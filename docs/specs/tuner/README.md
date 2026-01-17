@@ -113,14 +113,20 @@ lib/
 
 ```dart
 class TunerSettings {
-  double referenceFrequency;     // 430-450Hz (기본: 442Hz)
+  double referenceFrequency;     // 430-450Hz (기본: 440Hz)
   Transposition transposition;   // C, Bb, F, Eb, A
   EnharmonicMode enharmonicMode; // sharp, flat, both
   TunerDifficulty difficulty;    // beginner, intermediate, advanced
+  ClefType clefType;             // treble, bass
+  bool autoSwitchClef;           // 자동 음자리표 전환
   bool showCombo;                // 콤보 표시 여부
   bool vibrationFeedback;        // 진동 피드백
 }
 ```
+
+### 4.3 Hive 저장
+- 모든 설정값은 `TunerStorageService`를 통해 Hive에 저장됨
+- 앱 재시작 후에도 설정 유지
 
 ### 4.2 난이도별 허용 오차
 
@@ -230,7 +236,24 @@ flutter run -d <device_id> --release
 | 2025-01-04 | 고주파 보정 테이블 추가 (옥타브 6-8, 음별 보정) |
 | 2025-01-04 | 옥타브 에러 보정 추가 (ratio 비교 방식) |
 | 2025-01-04 | TE 튜너 대비 센트 보정 값 정밀 교정 |
+| 2025-01-04 | 튜너 설정값 Hive 저장 (`TunerStorageService`) |
+| 2026-01-12 | 문서 업데이트: 구현 현황 정리, ClefType 추가 |
 
-## 10. TODO
+## 10. 구현 현황
 
-- [ ] 튜너 설정값 Hive DB 저장 (앱 재설치 후에도 유지)
+### 완료된 기능 ✅
+- [x] 크로마틱 튜너 (YIN 알고리즘)
+- [x] 원형 12음계 인디케이터
+- [x] 고양이 캐릭터 + 말풍선 피드백
+- [x] Perfect/Good/Miss 판정 + 콤보 시스템
+- [x] 기준주파수 설정 (430-450Hz)
+- [x] 조옮김 (C, Bb, F, Eb, A)
+- [x] 이명동음 모드 (sharp, flat, both)
+- [x] 난이도별 허용 오차
+- [x] 음자리표 표시 (높은음/낮은음자리표)
+- [x] 튜너 설정값 Hive DB 저장 (`TunerStorageService`)
+- [x] 안정화 필터 + 옥타브 에러 보정
+- [x] 고주파 센트 보정 테이블
+
+### 향후 개선 사항
+- [ ] 턴어라운드 속도 개선 (현재 약간의 지연)

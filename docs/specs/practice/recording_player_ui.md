@@ -1,7 +1,8 @@
 # Recording Player UI Specification
 
 > 작성일: 2025-12-30
-> 상태: 승인됨
+> 최종 수정: 2026-01-12
+> 상태: 구현 완료
 
 ## Overview
 
@@ -203,22 +204,30 @@ class ABLoop {
 
 ---
 
-## 4. Implementation Plan
+## 4. Implementation Status
 
-### Phase 1: 기본 플레이어 UI
-1. `RecordingPlayerBottomSheet` 위젯 생성
-2. 웨이브폼 시각화 (기존 `RecordingWaveform` 활용)
-3. 기본 컨트롤 (재생/정지, seek)
-4. 시간 표시
+### Phase 1: 기본 플레이어 UI ✅
+- [x] `RecordingPlayerBottomSheet` 위젯 생성
+- [x] 웨이브폼 시각화 (`RecordingWaveform`)
+- [x] 기본 컨트롤 (재생/정지, seek)
+- [x] 시간 표시
+- [x] 핀치 줌 (웨이브폼 확대/축소)
 
-### Phase 2: 고급 기능
-1. 재생 속도 조절 구현
-2. A-B Loop 구현
+### Phase 2: 고급 기능 ✅
+- [x] 재생 속도 조절 (0.5x ~ 2.0x)
+- [x] A-B Loop 구간 반복
+- [x] 스마트 녹음 연동 (트림 메타데이터)
 
-### Phase 3: 파일 시스템 정리
-1. UUID 기반 파일명으로 변경
-2. 경로 구조 정리
-3. 기존 파일 마이그레이션 (필요시)
+### Phase 3: 파일 시스템 정리 ✅
+- [x] UUID 기반 파일명
+- [x] 경로 구조 정리 (`recordings/{repertoireId}/`)
+- [x] Hive 메타데이터 저장
+
+### Phase 4: 추가 기능 ✅
+- [x] 날짜별 필터링/정렬
+- [x] 대표녹음 시스템 (첫 녹음 자동 지정)
+- [x] 녹음 초기화 (전체 삭제)
+- [x] 삭제 시 대표녹음 자동 재지정
 
 ---
 
