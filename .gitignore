@@ -77,3 +77,4 @@ coverage/
 .buildlog/
 .history
 .svn/
+.claude/settings.local.json
