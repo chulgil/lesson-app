@@ -11,9 +11,9 @@ import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart' show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../../core/widgets/practice_center_button.dart';
 import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
-import '../../../practice/presentation/widgets/practice_tools_modal.dart';
 import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -85,19 +85,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             ],
           ),
         ),
-        // Show metronome/tuner button on home and lessons tabs
-        floatingActionButton: (_currentIndex == 0 || _currentIndex == 1)
-            ? FloatingActionButton(
-                onPressed: () => PracticeToolsModal.show(context),
-                child: const Icon(Icons.music_note),
-              )
-            : null,
-        bottomNavigationBar: _buildBottomNavigation(),
+        bottomNavigationBar: _buildBottomNavigationWithCenterButton(),
       ),
     );
   }
 
-  Widget _buildBottomNavigation() {
+  Widget _buildBottomNavigationWithCenterButton() {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -108,31 +101,55 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
         ),
       ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: '홈',
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.home_outlined, Icons.home, '홈'),
+              _buildNavItem(1, Icons.school_outlined, Icons.school, '레슨'),
+              // Center practice button (same level as other items)
+              const PracticeCenterButton(size: 48),
+              _buildNavItem(
+                  2, Icons.fitness_center_outlined, Icons.fitness_center, '연습'),
+              _buildNavItem(3, Icons.person_outline, Icons.person, '프로필'),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school_outlined),
-            activeIcon: Icon(Icons.school),
-            label: '레슨',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center_outlined),
-            activeIcon: Icon(Icons.fitness_center),
-            label: '연습',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: '프로필',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(
+      int index, IconData icon, IconData activeIcon, String label) {
+    final isSelected = _currentIndex == index;
+
+    return InkWell(
+      onTap: () => setState(() => _currentIndex = index),
+      child: SizedBox(
+        width: 64,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color:
+                    isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

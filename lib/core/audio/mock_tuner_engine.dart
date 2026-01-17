@@ -115,6 +115,28 @@ class MockTunerEngine implements TunerEngine {
     _streamController.close();
   }
 
+  // Keep-warm pattern methods (no-op for mock engine)
+  @override
+  Future<void> warmUp() async {
+    await init();
+  }
+
+  @override
+  void enableProcessing() {
+    // No-op for mock engine
+  }
+
+  @override
+  void disableProcessing() {
+    // No-op for mock engine
+  }
+
+  @override
+  bool get isStreamActive => _isListening;
+
+  @override
+  bool get isProcessingEnabled => _isListening;
+
   void _simulatePitchDetection() {
     switch (simulationMode) {
       case MockSimulationMode.random:

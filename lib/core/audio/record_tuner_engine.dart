@@ -57,6 +57,8 @@ class RecordTunerEngine implements TunerEngine {
 
   bool _isListening = false;
   bool _isInitialized = false;
+  bool _isProcessingEnabled = false; // Whether to process pitch data
+  bool _isStreamActive = false; // Whether recorder stream is active
   TunerNote? _currentNote;
   double _referenceFrequency;
   double _sensitivity = 0.5;
@@ -158,32 +160,58 @@ class RecordTunerEngine implements TunerEngine {
       debugPrint('RecordTunerEngine: Starting audio capture...');
 
       _isListening = true;
+      _isProcessingEnabled = true;
       _stabilityFilter.reset();
       _amplitudeGate.reset();
       _sampleBuffer.clear();
       _lastValidNote = null;
       _lastValidNoteTime = null;
 
-      // Start streaming audio as PCM16
-      final stream = await _recorder.startStream(
-        RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
-          sampleRate: _config.sampleRate,
-          numChannels: 1,
-        ),
-      );
-
-      _audioSubscription = stream.listen(
-        _onAudioData,
-        onError: _onAudioError,
-      );
+      // Start stream if not already active
+      if (!_isStreamActive) {
+        await _startStream();
+      }
 
       debugPrint('RecordTunerEngine: Audio capture started');
     } catch (e) {
       _isListening = false;
+      _isProcessingEnabled = false;
       debugPrint('RecordTunerEngine: Start failed - $e');
       onError?.call('Failed to start audio capture: $e');
     }
+  }
+
+  /// Start the recorder stream (internal helper).
+  Future<void> _startStream() async {
+    if (_isStreamActive) return;
+
+    final stream = await _recorder.startStream(
+      RecordConfig(
+        encoder: AudioEncoder.pcm16bits,
+        sampleRate: _config.sampleRate,
+        numChannels: 1,
+      ),
+    );
+
+    _audioSubscription = stream.listen(
+      _onAudioData,
+      onError: _onAudioError,
+    );
+
+    _isStreamActive = true;
+    debugPrint('RecordTunerEngine: Stream started');
+  }
+
+  /// Stop the recorder stream (internal helper).
+  Future<void> _stopStream() async {
+    if (!_isStreamActive) return;
+
+    await _audioSubscription?.cancel();
+    _audioSubscription = null;
+    await _recorder.stop();
+
+    _isStreamActive = false;
+    debugPrint('RecordTunerEngine: Stream stopped');
   }
 
   @override
@@ -193,11 +221,12 @@ class RecordTunerEngine implements TunerEngine {
     try {
       debugPrint('RecordTunerEngine: Stopping audio capture...');
 
-      await _audioSubscription?.cancel();
-      _audioSubscription = null;
-      await _recorder.stop();
-
       _isListening = false;
+      _isProcessingEnabled = false;
+
+      // Actually stop the stream
+      await _stopStream();
+
       _currentNote = null;
       _sampleBuffer.clear();
       _lastValidNote = null;
@@ -212,6 +241,85 @@ class RecordTunerEngine implements TunerEngine {
       onError?.call('Failed to stop audio capture: $e');
     }
   }
+
+  /// Warm up the engine by starting the recorder stream without processing.
+  ///
+  /// This pre-configures the audio session and starts the microphone,
+  /// so that enabling processing later is instantaneous and doesn't
+  /// block the main thread or interrupt other audio.
+  @override
+  Future<void> warmUp() async {
+    if (_isStreamActive) {
+      debugPrint('RecordTunerEngine: Already warmed up');
+      return;
+    }
+
+    if (!_isInitialized) {
+      final success = await init();
+      if (!success) return;
+    }
+
+    try {
+      debugPrint('RecordTunerEngine: Warming up (starting stream without processing)...');
+
+      _isProcessingEnabled = false;
+      _stabilityFilter.reset();
+      _amplitudeGate.reset();
+      _sampleBuffer.clear();
+
+      await _startStream();
+
+      debugPrint('RecordTunerEngine: Warm up complete');
+    } catch (e) {
+      debugPrint('RecordTunerEngine: Warm up failed - $e');
+      onError?.call('Failed to warm up: $e');
+    }
+  }
+
+  /// Enable pitch processing (stream must be active from warmUp or start).
+  ///
+  /// This is instantaneous and doesn't block the main thread.
+  @override
+  void enableProcessing() {
+    if (!_isStreamActive) {
+      debugPrint('RecordTunerEngine: Cannot enable processing - stream not active');
+      return;
+    }
+
+    debugPrint('RecordTunerEngine: Enabling processing');
+    _isListening = true;
+    _isProcessingEnabled = true;
+    _stabilityFilter.reset();
+    _amplitudeGate.reset();
+    _sampleBuffer.clear();
+    _lastValidNote = null;
+    _lastValidNoteTime = null;
+  }
+
+  /// Disable pitch processing but keep the stream active.
+  ///
+  /// This allows instant re-enabling without audio session reconfiguration.
+  @override
+  void disableProcessing() {
+    debugPrint('RecordTunerEngine: Disabling processing (keeping stream active)');
+    _isListening = false;
+    _isProcessingEnabled = false;
+    _currentNote = null;
+    _sampleBuffer.clear();
+    _lastValidNote = null;
+    _lastValidNoteTime = null;
+
+    _streamController.add(null);
+    onPitchDetected?.call(null);
+  }
+
+  /// Check if the stream is active (warmed up or started).
+  @override
+  bool get isStreamActive => _isStreamActive;
+
+  /// Check if processing is enabled.
+  @override
+  bool get isProcessingEnabled => _isProcessingEnabled;
 
   @override
   Future<void> toggle() async {
@@ -231,6 +339,9 @@ class RecordTunerEngine implements TunerEngine {
 
   /// Process incoming audio data (PCM16 format).
   Future<void> _onAudioData(Uint8List data) async {
+    // Skip processing if not enabled (keep-warm mode)
+    if (!_isProcessingEnabled) return;
+
     try {
       // Convert PCM16 bytes to float samples
       final samples = _convertPcm16ToFloat(data);

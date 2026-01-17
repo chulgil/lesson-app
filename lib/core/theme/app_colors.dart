@@ -15,6 +15,7 @@ class AppColors {
 
   // Semantic
   static const success = Color(0xFF2E8B57);
+  static const successDark = Color(0xFF1E5C3A);
   static const successLight = Color(0xFFE8F5E9);
   static const warning = Color(0xFFF4A460);
   static const warningLight = Color(0xFFFFF3E0);

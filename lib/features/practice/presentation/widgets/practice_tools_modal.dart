@@ -11,7 +11,6 @@ import '../../../../models/metronome_settings.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
-import '../providers/tuner_combo_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'metronome/cat_beat_indicator.dart';
 import 'tuner/circular_tuner_indicator.dart';
@@ -40,28 +39,87 @@ class PracticeToolsModal extends ConsumerStatefulWidget {
 }
 
 class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     _tabController = TabController(
       length: 2,
       vsync: this,
       initialIndex: widget.initialTab,
     );
 
-    // Pre-warm metronome engine
+    // Listen for tab changes to manage tuner microphone
+    _tabController.addListener(_onTabChanged);
+
+    // Pre-warm both metronome and tuner engines
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
+
+      // Warm up tuner (starts microphone stream without processing)
+      // This is done once when modal opens, so tab switching is instant
+      ref.read(tunerProvider.notifier).warmUp().then((_) {
+        if (!mounted) return;
+
+        // If starting on tuner tab, enable processing after warm-up
+        if (widget.initialTab == 1) {
+          ref.read(tunerProvider.notifier).enableProcessing();
+        }
+      });
     });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
+    // Stop tuner completely when modal closes (including stream)
+    ref.read(tunerProvider.notifier).stopCompletely();
     super.dispose();
+  }
+
+  /// Handle tab changes - toggle tuner processing (instant, no blocking)
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) return;
+
+    final tuner = ref.read(tunerProvider.notifier);
+    if (_tabController.index == 1) {
+      // Switching TO tuner tab - enable processing (instant!)
+      // Stream is already active from warmUp, so no blocking occurs
+      tuner.enableProcessing();
+    } else {
+      // Switching AWAY from tuner tab - disable processing
+      // Stream stays active for instant re-enabling
+      tuner.disableProcessing();
+    }
+  }
+
+  /// Handle app lifecycle changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final tuner = ref.read(tunerProvider.notifier);
+
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+        // App going to background - stop tuner (not recording)
+        tuner.onAppPaused();
+        break;
+      case AppLifecycleState.resumed:
+        // App returning - only resume if on tuner tab
+        if (_tabController.index == 1) {
+          tuner.onAppResumed();
+        }
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   @override
@@ -851,21 +909,8 @@ class _TunerPanel extends ConsumerStatefulWidget {
 }
 
 class _TunerPanelState extends ConsumerState<_TunerPanel> {
-  @override
-  void initState() {
-    super.initState();
-    // Auto-start tuner when panel is shown
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(tunerProvider.notifier).start();
-    });
-  }
-
-  @override
-  void dispose() {
-    // Auto-stop tuner when leaving panel
-    ref.read(tunerProvider.notifier).stop();
-    super.dispose();
-  }
+  // Note: Tuner start/stop is now managed by PracticeToolsModal
+  // to properly handle tab changes and app lifecycle
 
   @override
   Widget build(BuildContext context) {

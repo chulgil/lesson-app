@@ -424,25 +424,88 @@ class Tuner extends _$Tuner {
     state = state.copyWith(clearError: true);
   }
 
+  /// Warm up the tuner engine by starting the microphone stream without processing.
+  ///
+  /// This should be called when the practice tools modal opens.
+  /// It pre-configures the audio session and starts the microphone,
+  /// so that enabling processing later (on tuner tab) is instantaneous
+  /// and doesn't interfere with metronome playback.
+  Future<void> warmUp() async {
+    debugPrint('Tuner: warmUp called');
+
+    if (_engine == null) {
+      debugPrint('Tuner: Engine not ready, initializing first');
+      await _initAsync();
+    }
+
+    await _engine?.warmUp();
+    debugPrint('Tuner: warmUp complete');
+  }
+
+  /// Enable pitch processing (instant, no audio session reconfiguration).
+  ///
+  /// Call this when switching to the tuner tab.
+  /// Requires [warmUp] to have been called first.
+  void enableProcessing() {
+    debugPrint('Tuner: enableProcessing called');
+
+    _engine?.enableProcessing();
+
+    state = state.copyWith(
+      isListening: true,
+      status: TuningStatus.listening,
+      clearError: true,
+    );
+  }
+
+  /// Disable pitch processing but keep the microphone stream active.
+  ///
+  /// Call this when switching away from the tuner tab.
+  /// The stream stays active so re-enabling is instant.
+  void disableProcessing() {
+    debugPrint('Tuner: disableProcessing called');
+
+    _engine?.disableProcessing();
+
+    // Reset continuity tracking
+    _lastDetectedNoteName = null;
+    _lastNoteTime = null;
+
+    state = state.copyWith(
+      isListening: false,
+      status: TuningStatus.idle,
+      clearNote: true,
+    );
+  }
+
+  /// Stop the tuner completely (including the microphone stream).
+  ///
+  /// Call this when the practice tools modal closes.
+  Future<void> stopCompletely() async {
+    debugPrint('Tuner: stopCompletely called');
+    _wasListeningBeforePause = false;
+    await stop();
+  }
+
   /// Called when app goes to background (paused).
-  /// Stops listening and remembers state to resume later.
+  /// Disables processing but keeps stream active for quick resume.
   Future<void> onAppPaused() async {
     if (state.isListening) {
-      debugPrint('Tuner: App paused, stopping listening');
+      debugPrint('Tuner: App paused, disabling processing');
       _wasListeningBeforePause = true;
-      await stop();
+      disableProcessing();
     } else {
       _wasListeningBeforePause = false;
     }
   }
 
   /// Called when app returns to foreground (resumed).
-  /// Resumes listening if it was active before pause.
+  /// Re-enables processing if it was active before pause.
   Future<void> onAppResumed() async {
     if (_wasListeningBeforePause) {
-      debugPrint('Tuner: App resumed, restarting listening');
+      debugPrint('Tuner: App resumed, re-enabling processing');
       _wasListeningBeforePause = false;
-      await start();
+      enableProcessing();
     }
   }
 }

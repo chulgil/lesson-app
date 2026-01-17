@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'core/audio/audio_session_manager.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/practice/domain/entities/practice_repertoire.dart';
@@ -202,6 +203,10 @@ void clearStartupRecoveryResult() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure audio session for simultaneous playback and recording
+  // This prevents metronome interruption when tuner starts
+  await AudioSessionManager.configureForPlayAndRecord();
 
   // Initialize Hive for local storage
   await Hive.initFlutter();
