@@ -575,6 +575,14 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
           ),
           SizedBox(height: AppSpacing.space6),
 
+          // Subdivision selector
+          _SubdivisionSelector(
+            selected: state.settings.subdivision,
+            onChanged: (sub) =>
+                ref.read(metronomeProvider.notifier).setSubdivision(sub),
+          ),
+          SizedBox(height: AppSpacing.space6),
+
           // Accent pattern selector
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1389,5 +1397,163 @@ class _NotePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _NotePainter oldDelegate) {
     return oldDelegate.note != note || oldDelegate.effectiveClef != effectiveClef;
+  }
+}
+
+/// Subdivision selector for metronome.
+class _SubdivisionSelector extends StatelessWidget {
+  const _SubdivisionSelector({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final Subdivision selected;
+  final ValueChanged<Subdivision> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    // Show basic subdivisions (quarter, eighth, triplet, sixteenth) in main row
+    // Show advanced subdivisions in expandable section
+    final basicSubdivisions =
+        Subdivision.values.where((s) => s.isBasic).toList();
+    final advancedSubdivisions =
+        Subdivision.values.where((s) => !s.isBasic).toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '서브디비전',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        // Basic subdivisions row
+        Row(
+          children: basicSubdivisions.map((sub) {
+            final isSelected = sub == selected;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _SubdivisionChip(
+                  subdivision: sub,
+                  isSelected: isSelected,
+                  onSelected: () => onChanged(sub),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        SizedBox(height: AppSpacing.space2),
+        // Advanced subdivisions (5, 6 연음)
+        if (advancedSubdivisions.isNotEmpty) ...[
+          Wrap(
+            spacing: AppSpacing.space2,
+            runSpacing: AppSpacing.space2,
+            children: advancedSubdivisions.map((sub) {
+              final isSelected = sub == selected;
+              return ChoiceChip(
+                label: Text(sub.label),
+                selected: isSelected,
+                onSelected: (_) => onChanged(sub),
+                selectedColor: AppColors.primary,
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: AppSpacing.space2),
+        ],
+        // Visual pattern display
+        Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+            vertical: AppSpacing.space2,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                selected.visualPattern,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 4,
+                ),
+              ),
+              SizedBox(width: AppSpacing.space4),
+              Text(
+                '(${selected.englishName})',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Subdivision chip widget.
+class _SubdivisionChip extends StatelessWidget {
+  const _SubdivisionChip({
+    required this.subdivision,
+    required this.isSelected,
+    required this.onSelected,
+  });
+
+  final Subdivision subdivision;
+  final bool isSelected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onSelected,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              subdivision.visualPattern,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subdivision.label,
+              style: TextStyle(
+                fontSize: 10,
+                color: isSelected
+                    ? Colors.white.withValues(alpha: 0.9)
+                    : AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
