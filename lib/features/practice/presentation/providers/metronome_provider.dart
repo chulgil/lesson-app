@@ -74,15 +74,16 @@ class Metronome extends _$Metronome {
 
   @override
   MetronomeState build() {
-    // Use native engine on iOS (AVAudioEngine with soundPattern support)
-    // Use SoLoud on desktop platforms
-    if (Platform.isIOS) {
-      debugPrint('Metronome: Using NativeMetronomeEngine (iOS AVAudioEngine)');
+    // Use native engine on iOS and Android for low-latency audio
+    // iOS: AVAudioEngine, Android: Oboe
+    // Use SoLoud on desktop platforms (macOS, Windows, Linux)
+    if (Platform.isIOS || Platform.isAndroid) {
+      debugPrint('Metronome: Using NativeMetronomeEngine (${Platform.isIOS ? "iOS AVAudioEngine" : "Android Oboe"})');
       final engine = NativeMetronomeEngine();
       engine.onSubdivision = _onSubdivision;
       _engine = engine;
     } else {
-      debugPrint('Metronome: Using SoLoud engine');
+      debugPrint('Metronome: Using SoLoud engine (desktop)');
       final engine = SoLoudMetronomeEngine();
       engine.onSubdivision = _onSubdivision;
       _engine = engine;
@@ -128,7 +129,9 @@ class Metronome extends _$Metronome {
     _engineReady = true;
 
     // Check if audio is currently interrupted
-    final initialError = AudioSessionManager.isInterrupted ? '다른 앱이 오디오를 사용중' : null;
+    final initialError = AudioSessionManager.isInterrupted
+        ? '다른 앱이 오디오를 사용중'
+        : null;
 
     state = state.copyWith(
       settings: savedSettings,
@@ -194,7 +197,12 @@ class Metronome extends _$Metronome {
     debugPrint('Metronome: start called');
 
     // Update UI state and play first beat immediately for instant feedback
-    state = state.copyWith(isPlaying: true, currentBeat: 1, isAccent: true);
+    // isAccent depends on user's accentPattern setting (not uniform = first beat accented)
+    state = state.copyWith(
+      isPlaying: true,
+      currentBeat: 1,
+      isAccent: state.settings.accentPattern != AccentPattern.uniform,
+    );
 
     // Play first beat sound immediately (synchronous call)
     _engine?.playTapSound();

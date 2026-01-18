@@ -1,22 +1,28 @@
 package com.lessonapp.lesson_app
 
 import android.content.Context
+import android.util.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import com.lessonapp.lesson_app.audio.MetronomeAudioEngine
+import com.lessonapp.lesson_app.audio.OboeMetronomeEngine
 
 /**
- * Flutter plugin for native metronome functionality using AudioTrack.
+ * Flutter plugin for native metronome functionality using Oboe.
+ * Uses low-latency Oboe audio engine for sample-accurate timing.
  */
 class MetronomePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHandler {
+    companion object {
+        private const val TAG = "MetronomePlugin"
+    }
+
     private lateinit var methodChannel: MethodChannel
     private lateinit var eventChannel: EventChannel
     private var eventSink: EventChannel.EventSink? = null
-    private var engine: MetronomeAudioEngine? = null
+    private var engine: OboeMetronomeEngine? = null
     private var context: Context? = null
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -45,6 +51,8 @@ class MetronomePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
             "setBpm" -> handleSetBpm(call, result)
             "setTimeSignature" -> handleSetTimeSignature(call, result)
             "setAccentPattern" -> handleSetAccentPattern(call, result)
+            "setSubdivision" -> handleSetSubdivision(call, result)
+            "setSoundPattern" -> handleSetSoundPattern(call, result)
             "setSound" -> handleSetSound(call, result)
             "playTapSound" -> handlePlayTapSound(result)
             "dispose" -> handleDispose(result)
@@ -68,18 +76,27 @@ class MetronomePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
         }
 
         try {
+            Log.d(TAG, "handleInit: Starting Oboe metronome initialization")
+
             val bpm = (args["bpm"] as? Number)?.toInt() ?: 120
             val beatsPerMeasure = (args["beatsPerMeasure"] as? Number)?.toInt() ?: 4
             val accentPattern = args["accentPattern"] as? String ?: "firstBeatOnly"
+            val subdivision = (args["subdivision"] as? Number)?.toInt() ?: 1
+            @Suppress("UNCHECKED_CAST")
+            val soundPattern = (args["soundPattern"] as? List<Boolean>) ?: listOf(true)
             val strongSound = args["strongSound"] as? String ?: ""
             val mediumSound = args["mediumSound"] as? String ?: ""
             val weakSound = args["weakSound"] as? String ?: ""
 
-            engine = MetronomeAudioEngine(
+            Log.d(TAG, "handleInit: bpm=$bpm, beats=$beatsPerMeasure, subdivision=$subdivision")
+
+            engine = OboeMetronomeEngine(
                 context = ctx,
                 bpm = bpm,
                 beatsPerMeasure = beatsPerMeasure,
                 accentPattern = accentPattern,
+                subdivision = subdivision,
+                soundPattern = soundPattern,
                 strongSoundPath = strongSound,
                 mediumSoundPath = mediumSound,
                 weakSoundPath = weakSound
@@ -87,16 +104,26 @@ class MetronomePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
 
             // Set beat callback
             engine?.onBeat = { beat, isAccent ->
-                android.os.Handler(android.os.Looper.getMainLooper()).post {
-                    eventSink?.success(mapOf(
-                        "beat" to beat,
-                        "isAccent" to isAccent
-                    ))
-                }
+                eventSink?.success(mapOf(
+                    "type" to "beat",
+                    "beat" to beat,
+                    "isAccent" to isAccent
+                ))
             }
 
+            // Set subdivision callback
+            engine?.onSubdivision = { subBeat, isMainBeat ->
+                eventSink?.success(mapOf(
+                    "type" to "subdivision",
+                    "subBeat" to subBeat,
+                    "isMainBeat" to isMainBeat
+                ))
+            }
+
+            Log.d(TAG, "handleInit: Oboe metronome initialized successfully")
             result.success(true)
         } catch (e: Exception) {
+            Log.e(TAG, "handleInit failed: ${e.message}", e)
             result.error("INIT_FAILED", e.message, null)
         }
     }
@@ -151,6 +178,29 @@ class MetronomePlugin : FlutterPlugin, MethodCallHandler, EventChannel.StreamHan
         }
 
         engine?.setAccentPattern(pattern)
+        result.success(true)
+    }
+
+    private fun handleSetSubdivision(call: MethodCall, result: Result) {
+        val subdivision = call.arguments as? Int
+        if (subdivision == null) {
+            result.error("INVALID_ARGS", "Subdivision must be an integer", null)
+            return
+        }
+
+        engine?.setSubdivision(subdivision)
+        result.success(true)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun handleSetSoundPattern(call: MethodCall, result: Result) {
+        val pattern = call.arguments as? List<Boolean>
+        if (pattern == null) {
+            result.error("INVALID_ARGS", "SoundPattern must be a list of booleans", null)
+            return
+        }
+
+        engine?.setSoundPattern(pattern)
         result.success(true)
     }
 

@@ -1,8 +1,8 @@
 # 메트로놈 시스템 스펙
 
 > 작성일: 2025-12-25
-> 최종 수정: 2026-01-12
-> 상태: Phase 2 구현 완료
+> 최종 수정: 2026-01-19
+> 상태: Phase 2 구현 완료 (iOS AVAudioEngine + Android Oboe)
 
 ---
 
@@ -313,16 +313,68 @@ class PracticeLog {
 
 ## 기술 구현
 
-### 오디오 엔진
+### 오디오 엔진 ✅ 네이티브 구현 완료
+
+| 플랫폼 | 엔진 | 특징 |
+|--------|------|------|
+| **iOS** | AVAudioEngine | 저지연, AVAudioUnitSampler 기반 |
+| **Android** | Oboe (C++) | 저지연, 샘플 정확 타이밍 |
+| **macOS** | SoLoud (FFI) | 개발용, flutter_soloud 사용 |
+
+### 네이티브 오디오 아키텍처
+
+```
+Flutter (Dart)
+    ↓ Platform Channel
+Kotlin/Swift Plugin
+    ↓ JNI / Swift Bridge
+C++/Swift Native Engine
+    ↓
+Oboe (Android) / AVAudioEngine (iOS)
+```
+
+#### Android Oboe 엔진 구조
+
+```
+android/app/src/main/
+├── cpp/
+│   ├── CMakeLists.txt          # Oboe 빌드 설정
+│   ├── MetronomeEngine.h       # 엔진 헤더
+│   ├── MetronomeEngine.cpp     # Oboe AudioStreamDataCallback 구현
+│   └── jni_bridge.cpp          # JNI ↔ C++ 브릿지
+└── kotlin/.../audio/
+    ├── OboeMetronomeEngine.kt  # Kotlin JNI 래퍼
+    └── MetronomeAudioEngine.kt # (레거시, 미사용)
+```
+
+#### Oboe 핵심 특징
+
+- **Low-latency audio**: `PerformanceMode::LowLatency` 사용
+- **Exclusive mode**: `SharingMode::Exclusive`로 다른 앱과 공유 없이 단독 사용
+- **Sample-accurate timing**: `onAudioReady()` 콜백에서 샘플 단위 정확도
+- **Beat scheduling**: 샘플 카운터 기반 비트 스케줄링
+
+#### ProGuard 설정
+
+```proguard
+# android/app/proguard-rules.pro
+-keep class com.lessonapp.lesson_app.audio.OboeMetronomeEngine {
+    void onBeatCallback(int, boolean);
+    void onSubdivisionCallback(int, boolean);
+}
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+```
+
+### 오디오 엔진 비교 (레퍼런스)
 
 | 옵션 | 장점 | 단점 |
 |------|------|------|
 | `audioplayers` | 간단, 크로스플랫폼 | 정밀도 낮음 |
 | `just_audio` | 고품질, 스트리밍 | 오버헤드 |
 | `flutter_soloud` | 저지연, 게임용 | 복잡도 |
-| **네이티브 (추천)** | 최고 정밀도 | 플랫폼별 구현 |
-
-**권장**: Phase 1은 `audioplayers`, Phase 2에서 필요시 네이티브 전환
+| **네이티브 (현재)** | 최고 정밀도 | 플랫폼별 구현 필요 |
 
 ### 정밀 타이밍
 
@@ -574,3 +626,4 @@ lib/features/practice/presentation/widgets/metronome/
 | 2025-12-26 | Phase 1.5 완료: 고양이 비트 인디케이터 상세 스펙 추가, 발바닥 애니메이션 구현, 하단 바 깜박임 효과 |
 | 2026-01-04 | Phase 2 완료: 템포 마킹, 13종 사운드 템플릿, BPM null 표시 |
 | 2026-01-12 | 문서 업데이트: 구현 현황 정리 |
+| 2026-01-19 | Android Oboe 엔진 구현: C++ Oboe 기반 저지연 메트로놈, JNI 브릿지, ProGuard 설정 |
