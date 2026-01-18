@@ -37,7 +37,7 @@ class AudioSessionManager {
                   AVAudioSessionCategoryOptions.defaultToSpeaker |
                   AVAudioSessionCategoryOptions.allowBluetooth |
                   AVAudioSessionCategoryOptions.allowBluetoothA2dp,
-          avAudioSessionMode: AVAudioSessionMode.measurement, // Best for tuner
+          avAudioSessionMode: AVAudioSessionMode.defaultMode, // measurement mode reduces speaker volume
           avAudioSessionRouteSharingPolicy:
               AVAudioSessionRouteSharingPolicy.defaultPolicy,
           avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,

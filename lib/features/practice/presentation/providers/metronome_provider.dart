@@ -1,6 +1,9 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/audio/metronome_engine_interface.dart';
+import '../../../../core/audio/metronome_package_engine.dart';
 import '../../../../core/audio/soloud_metronome_engine.dart';
 import '../../../../models/metronome_settings.dart';
 import '../../../../services/metronome_storage_service.dart';
@@ -58,9 +61,17 @@ class Metronome extends _$Metronome {
 
   @override
   MetronomeState build() {
-    // Use SoLoud-based engine for low-latency audio on all platforms
-    debugPrint('Metronome: Using SoLoud engine for low-latency audio');
-    _engine = SoLoudMetronomeEngine();
+    // Use metronome package on mobile (sample-accurate native audio)
+    // - iOS: AVAudioEngine with looping buffer
+    // - Android: AudioTrack with low-latency mode
+    // Use SoLoud on desktop platforms
+    if (Platform.isIOS || Platform.isAndroid) {
+      debugPrint('Metronome: Using MetronomePackageEngine (native audio)');
+      _engine = MetronomePackageEngine();
+    } else {
+      debugPrint('Metronome: Using SoLoud engine');
+      _engine = SoLoudMetronomeEngine();
+    }
 
     _engine!.onBeat = _onBeat;
 
@@ -268,6 +279,24 @@ class Metronome extends _$Metronome {
       await _engine?.updateSettings(newSettings);
     } catch (e) {
       debugPrint('Metronome: setAccentPattern engine error: $e');
+    }
+
+    _saveSettings();
+  }
+
+  /// Set subdivision pattern.
+  Future<void> setSubdivision(Subdivision subdivision) async {
+    debugPrint('Metronome: setSubdivision called: $subdivision');
+    final newSettings = state.settings.copyWith(subdivision: subdivision);
+
+    // Update state first for immediate UI response
+    state = state.copyWith(settings: newSettings);
+
+    // Then update engine (non-blocking for UI)
+    try {
+      await _engine?.updateSettings(newSettings);
+    } catch (e) {
+      debugPrint('Metronome: setSubdivision engine error: $e');
     }
 
     _saveSettings();
