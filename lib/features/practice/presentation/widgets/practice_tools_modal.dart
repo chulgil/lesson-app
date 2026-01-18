@@ -13,6 +13,8 @@ import '../../domain/entities/tuner_settings.dart';
 import '../../domain/entities/tuner_types.dart';
 import '../providers/tuner_provider.dart';
 import 'metronome/cat_beat_indicator.dart';
+import 'metronome/subdivision_picker.dart';
+import 'metronome/time_signature_picker.dart';
 import 'tuner/circular_tuner_indicator.dart';
 import 'tuner/clef_svgs.dart';
 import 'tuner/tuner_cat_indicator.dart';
@@ -451,8 +453,8 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
                   ),
                 ),
                 // Speech bubble (top left of cat)
-                // Shows tempo explanation when tapped, otherwise tap tempo message
-                if (!state.isPlaying && !_isBubbleHidden)
+                // Shows audio error, tempo explanation, or tap tempo message
+                if (state.hasAudioError || (!state.isPlaying && !_isBubbleHidden))
                   Positioned(
                     left: 10,
                     top: 0,
@@ -461,6 +463,7 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
                       tempoExplanation: _showTempoExplanation
                           ? _getTempoExplanation(state.settings.bpm)
                           : null,
+                      audioError: state.audioError,
                     ),
                   ),
                 // BPM display with tempo marking (bottom right of cat) - always visible
@@ -539,7 +542,7 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
           ),
           SizedBox(height: AppSpacing.space8),
 
-          // Time signature selector
+          // Time signature selector (tap to open picker)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -550,26 +553,151 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
                 ),
               ),
               SizedBox(height: AppSpacing.space2),
-              Row(
-                children: TimeSignature.values.map((ts) {
-                  final isSelected = ts == state.settings.timeSignature;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ChoiceChip(
-                        label: Text(ts.label),
-                        selected: isSelected,
-                        onSelected: (_) =>
-                            ref.read(metronomeProvider.notifier).setTimeSignature(ts),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
+              GestureDetector(
+                onTap: () async {
+                  final result = await TimeSignaturePicker.show(
+                    context,
+                    state.settings.timeSignature,
                   );
-                }).toList(),
+                  if (result != null) {
+                    ref.read(metronomeProvider.notifier).setTimeSignature(result);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderLight),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          _buildTimeSignatureDisplay(state.settings.timeSignature),
+                          SizedBox(width: AppSpacing.space3),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                state.settings.timeSignature.isCompound
+                                    ? '복합 박자'
+                                    : '단순 박자',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                              if (state.settings.timeSignature.isCompound)
+                                Text(
+                                  '큰박 ${state.settings.timeSignature.mainBeats}개',
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.space6),
+
+          // Subdivision selector (tap to open picker)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '서브디비전',
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space2),
+              GestureDetector(
+                onTap: () async {
+                  final result = await SubdivisionPicker.show(
+                    context,
+                    state.settings.subdivision,
+                  );
+                  if (result != null) {
+                    ref.read(metronomeProvider.notifier).setSubdivision(result);
+                  }
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                    vertical: AppSpacing.space3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderLight),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          // Note symbol
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                state.settings.subdivision.noteSymbol,
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: AppSpacing.space3),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                state.settings.subdivision.label,
+                                style: AppTypography.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '패턴: ${state.settings.subdivision.visualPattern}',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textSecondaryLight,
+                                  letterSpacing: 2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -579,41 +707,73 @@ class _MetronomePanelState extends ConsumerState<_MetronomePanel>
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '박자 패턴',
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space2,
-                children: AccentPattern.values.map((pattern) {
-                  final isSelected = pattern == state.settings.accentPattern;
-                  return ChoiceChip(
-                    label: Text(pattern.label),
-                    selected: isSelected,
-                    onSelected: (_) =>
-                        ref.read(metronomeProvider.notifier).setAccentPattern(pattern),
-                    selectedColor: AppColors.primary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '첫박 강조',
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: AppSpacing.space1),
-              Text(
-                state.settings.accentPattern.description,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
+                  ),
+                  Switch(
+                    value: state.settings.accentPattern == AccentPattern.firstBeatOnly,
+                    onChanged: (value) {
+                      ref.read(metronomeProvider.notifier).setAccentPattern(
+                        value ? AccentPattern.firstBeatOnly : AccentPattern.uniform,
+                      );
+                    },
+                    activeColor: AppColors.primary,
+                  ),
+                ],
               ),
             ],
           ),
           SizedBox(height: AppSpacing.space8),
+        ],
+      ),
+    );
+  }
+
+  /// Build time signature display widget (stacked numerator/denominator).
+  Widget _buildTimeSignatureDisplay(TimeSignature ts) {
+    final parts = ts.label.split('/');
+    final numerator = parts[0];
+    final denominator = parts[1];
+
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            numerator,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+              height: 1.0,
+            ),
+          ),
+          Container(
+            width: 20,
+            height: 1.5,
+            color: AppColors.primary,
+          ),
+          Text(
+            denominator,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
+              height: 1.0,
+            ),
+          ),
         ],
       ),
     );
@@ -626,12 +786,15 @@ class _TapTempoSpeechBubble extends StatelessWidget {
   const _TapTempoSpeechBubble({
     required this.tapCount,
     this.tempoExplanation,
+    this.audioError,
   });
 
   final int tapCount;
   /// If provided, shows tempo explanation instead of tap tempo message.
   /// Format: (한글 음역, 한글 의미)
   final (String, String)? tempoExplanation;
+  /// If provided, shows audio error message (highest priority).
+  final String? audioError;
 
   @override
   Widget build(BuildContext context) {
@@ -639,8 +802,14 @@ class _TapTempoSpeechBubble extends StatelessWidget {
     final Color backgroundColor;
     final Color textColor;
 
+    // Audio error has highest priority
+    if (audioError != null) {
+      message = '통화중이냥~';
+      backgroundColor = AppColors.errorLight;
+      textColor = AppColors.error;
+    }
     // If tempo explanation is provided, show it (success style)
-    if (tempoExplanation != null) {
+    else if (tempoExplanation != null) {
       final (koreanName, koreanMeaning) = tempoExplanation!;
       message = '$koreanName\n($koreanMeaning)';
       backgroundColor = AppColors.bubbleSuccessBackground;

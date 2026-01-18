@@ -46,11 +46,11 @@ void _timingIsolateEntry(SendPort mainSendPort) {
 
   void startTiming() {
     running = true;
-    expectedTicks = 0;
+    // Start at tick 1 (tick 0 is played immediately by main thread)
+    expectedTicks = 1;
     stopwatch = Stopwatch()..start();
-    // Send first tick immediately
-    mainSendPort.send('tick');
-    // Start the timing loop
+    // Don't send first tick - it's handled by main thread for instant response
+    // Start the timing loop for subsequent ticks
     scheduleNextCheck();
   }
 
@@ -107,6 +107,8 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
 
   MetronomeSettings _settings = const MetronomeSettings();
   int _currentBeat = 0;
+  int _currentSubdivision = 0; // 0-based index within beat
+  int _tickCount = 0; // Total tick count within measure
   bool _isPlaying = false;
   bool _initialized = false;
   bool _soundsLoaded = false;
@@ -114,6 +116,9 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
 
   @override
   BeatCallback? onBeat;
+
+  /// Callback for subdivision ticks (for UI visualization).
+  void Function(int subdivisionIndex, bool isMainBeat)? onSubdivision;
 
   @override
   bool get isPlaying => _isPlaying;
@@ -245,6 +250,15 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
     }
   }
 
+  /// Get interval for subdivision ticks (faster than beat interval).
+  double get _subdivisionIntervalMs =>
+      _settings.intervalMsPrecise / _settings.subdivision.divisionsPerBeat;
+
+  /// Total ticks per measure (beats × subdivisions).
+  int get _ticksPerMeasure =>
+      _settings.timeSignature.beatsPerMeasure *
+      _settings.subdivision.divisionsPerBeat;
+
   @override
   Future<void> start() async {
     if (_isPlaying) return;
@@ -254,19 +268,26 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
 
     _isPlaying = true;
     _currentBeat = 0;
+    _currentSubdivision = 0;
+    _tickCount = 0;
 
-    // Send interval to isolate
-    _isolateSendPort?.send(_settings.intervalMsPrecise);
-    // Start timing in isolate
+    // Play first beat immediately (no waiting for isolate round-trip)
+    _tick();
+
+    // Send subdivision interval to isolate (not beat interval)
+    _isolateSendPort?.send(_subdivisionIntervalMs);
+    // Start timing in isolate (will handle subsequent beats)
     _isolateSendPort?.send('start');
 
-    debugPrint('SoLoudMetronomeEngine: Started at ${_settings.bpm} BPM (Isolate timing)');
+    debugPrint('SoLoudMetronomeEngine: Started at ${_settings.bpm} BPM, subdivision=${_settings.subdivision.label} (interval=${_subdivisionIntervalMs.toStringAsFixed(1)}ms)');
   }
 
   @override
   Future<void> stop() async {
     _isPlaying = false;
     _currentBeat = 0;
+    _currentSubdivision = 0;
+    _tickCount = 0;
     _isolateSendPort?.send('stop');
     debugPrint('SoLoudMetronomeEngine: Stopped');
   }
@@ -283,36 +304,87 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
   void _tick() {
     if (!_isPlaying) return;
 
-    _currentBeat++;
-    if (_currentBeat > _settings.timeSignature.beatsPerMeasure) {
-      _currentBeat = 1;
+    final divisions = _settings.subdivision.divisionsPerBeat;
+
+    // Calculate beat number and subdivision index from tick count
+    _currentSubdivision = _tickCount % divisions;
+    final beatIndex = _tickCount ~/ divisions;
+    _currentBeat = (beatIndex % _settings.timeSignature.beatsPerMeasure) + 1;
+    final isMainBeat = _currentSubdivision == 0;
+
+    // Check if this subdivision should play sound (based on soundPattern)
+    final shouldPlaySound = _settings.subdivision.shouldPlayAt(_currentSubdivision);
+
+    // Determine sound to play
+    final BeatType beatType;
+    if (_settings.accentPattern == AccentPattern.uniform) {
+      // Uniform: all sounds the same (main beats + subdivisions)
+      beatType = BeatType.medium;
+    } else if (isMainBeat) {
+      // Main beat - use accent pattern
+      beatType = _getBeatType(_currentBeat);
+    } else {
+      // Subdivision tick - always weak
+      beatType = BeatType.weak;
     }
 
-    final beatType = _getBeatType(_currentBeat);
-    final isAccent = _currentBeat == 1 &&
-        _settings.accentPattern != AccentPattern.uniform;
+    // Notify callbacks BEFORE playing sound to minimize animation latency
+    // (UI update starts while sound is being triggered)
+    if (isMainBeat && shouldPlaySound) {
+      final isAccent = _isAccentBeat(_currentBeat);
+      onBeat?.call(_currentBeat, isAccent);
+    }
+    onSubdivision?.call(_currentSubdivision, isMainBeat);
 
-    // Play sound using SoLoud (fire and forget - native thread handles audio)
-    _playBeat(beatType);
+    // Play sound only if this subdivision should sound (not a rest)
+    if (shouldPlaySound) {
+      _playBeat(beatType);
+    }
 
-    // Notify listeners
-    onBeat?.call(_currentBeat, isAccent);
+    // Increment tick count
+    _tickCount++;
+    if (_tickCount >= _ticksPerMeasure) {
+      _tickCount = 0;
+    }
+  }
+
+  bool _isAccentBeat(int beat) {
+    final ts = _settings.timeSignature;
+
+    switch (_settings.accentPattern) {
+      case AccentPattern.firstBeatOnly:
+      case AccentPattern.strongMediumWeak:
+        if (ts.isCompound) {
+          // Compound time: accent every 3 beats (1, 4, 7, 10...)
+          return (beat - 1) % 3 == 0;
+        }
+        return beat == 1;
+      case AccentPattern.uniform:
+        return false;
+    }
   }
 
   BeatType _getBeatType(int beat) {
+    final ts = _settings.timeSignature;
+
     switch (_settings.accentPattern) {
       case AccentPattern.uniform:
         return BeatType.medium;
 
       case AccentPattern.firstBeatOnly:
+        if (ts.isCompound) {
+          // Compound time: strong on every 3rd beat (1, 4, 7, 10...)
+          return (beat - 1) % 3 == 0 ? BeatType.strong : BeatType.weak;
+        }
         return beat == 1 ? BeatType.strong : BeatType.weak;
 
       case AccentPattern.strongMediumWeak:
-        if (beat == 1) return BeatType.strong;
-        if (_settings.timeSignature == TimeSignature.fourFour && beat == 3) {
-          return BeatType.medium;
+        if (ts.isCompound) {
+          // Compound time: strong on main beats (1, 4, 7, 10...)
+          return (beat - 1) % 3 == 0 ? BeatType.strong : BeatType.weak;
         }
-        if (_settings.timeSignature == TimeSignature.sixEight && beat == 4) {
+        if (beat == 1) return BeatType.strong;
+        if (ts == TimeSignature.fourFour && beat == 3) {
           return BeatType.medium;
         }
         return BeatType.weak;
@@ -346,8 +418,8 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
     _settings = _settings.copyWith(bpm: clampedBpm);
 
     if (_isPlaying) {
-      // Update interval in isolate
-      _isolateSendPort?.send(_settings.intervalMsPrecise);
+      // Update subdivision interval in isolate
+      _isolateSendPort?.send(_subdivisionIntervalMs);
     }
   }
 
@@ -362,11 +434,19 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
       await init();
     }
 
+    // Fire-and-forget: don't await, just trigger playback immediately
+    playFirstBeatSync();
+  }
+
+  /// Play first beat sound synchronously (no await).
+  /// Used for instant feedback when play button is pressed.
+  void playFirstBeatSync() {
     if (_strongSource != null) {
       try {
-        await _soloud.play(_strongSource!);
+        // Don't await - fire and forget for immediate playback
+        _soloud.play(_strongSource!);
       } catch (e) {
-        debugPrint('SoLoudMetronomeEngine: Failed to play tap sound: $e');
+        debugPrint('SoLoudMetronomeEngine: Failed to play sound: $e');
       }
     }
   }

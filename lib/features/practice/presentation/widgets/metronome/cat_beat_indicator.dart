@@ -46,6 +46,8 @@ class CatBeatIndicator extends StatelessWidget {
         TimeSignature.threeFour => 3,
         TimeSignature.fourFour => 4,
         TimeSignature.sixEight => 6,
+        TimeSignature.nineEight => 9,
+        TimeSignature.twelveEight => 12,
       };
 
   /// Determine if eyes should be open based on accent pattern.
@@ -259,15 +261,16 @@ class _AnimatedPawState extends State<_AnimatedPaw>
   void initState() {
     super.initState();
 
-    // Drop animation: reduced from 140ms to 80ms for snappier response
+    // Pulse animation: instant scale up, then settle back
+    // Using very short duration for immediate visual feedback
     _dropController = AnimationController(
-      duration: const Duration(milliseconds: 80),
+      duration: const Duration(milliseconds: 50),
       vsync: this,
     );
 
-    // Scale animation: reduced from 120ms to 60ms for snappier response
+    // Scale animation for additional emphasis on strong beats
     _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 60),
+      duration: const Duration(milliseconds: 40),
       vsync: this,
     );
 
@@ -275,24 +278,30 @@ class _AnimatedPawState extends State<_AnimatedPaw>
   }
 
   void _setupAnimations() {
-    // Drop animation with spec easing
-    _dropAnimation = Tween<double>(
-      begin: -_dropDistance,
-      end: 0,
-    ).animate(CurvedAnimation(
+    // Pulse animation: quick bounce down and back (feels more immediate than drop)
+    _dropAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0, end: _dropDistance * 0.3),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: _dropDistance * 0.3, end: 0),
+        weight: 70,
+      ),
+    ]).animate(CurvedAnimation(
       parent: _dropController,
-      curve: _dropCurve,
+      curve: Curves.easeOut,
     ));
 
-    // Scale animation: 1.0 → peak → 1.0
+    // Scale animation: instant scale up, then back
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(begin: 1.0, end: _scalePeak),
-        weight: 50,
+        weight: 20,
       ),
       TweenSequenceItem(
         tween: Tween(begin: _scalePeak, end: 1.0),
-        weight: 50,
+        weight: 80,
       ),
     ]).animate(CurvedAnimation(
       parent: _scaleController,

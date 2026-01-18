@@ -67,21 +67,7 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
     debugPrint('MetronomePackageEngine: init started');
 
     try {
-      // For subdivisions, swap the sound paths:
-      // - mainPath (played on non-first beats) = subdivision click (weak)
-      // - accentedPath (played on first beat) = main beat click (strong)
-      final String mainPath;
-      final String accentedPath;
-
-      if (_settings.subdivision.divisionsPerBeat > 1) {
-        // Subdivision mode: weak sound for subdivisions, strong for main beats
-        mainPath = _settings.sound.getAssetPath(BeatType.weak);
-        accentedPath = _settings.sound.getAssetPath(BeatType.strong);
-      } else {
-        // Normal mode: strong for main beats, weak for others
-        mainPath = _settings.sound.getAssetPath(BeatType.strong);
-        accentedPath = _settings.sound.getAssetPath(BeatType.weak);
-      }
+      final (mainPath, accentedPath) = _getSoundPaths(_settings);
 
       debugPrint('MetronomePackageEngine: mainPath=$mainPath');
       debugPrint('MetronomePackageEngine: accentedPath=$accentedPath');
@@ -121,27 +107,59 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
     final beatNumber = beatIndex + 1; // 1-indexed beat number
     final isMainBeat = subdivisionIndex == 0;
 
+    // Check if this subdivision should play sound (based on soundPattern)
+    final shouldPlaySound = _settings.subdivision.shouldPlayAt(subdivisionIndex);
+
     _currentBeat = beatNumber;
     _currentSubdivision = subdivisionIndex;
 
-    // Notify subdivision callback
+    // Notify subdivision callback (always, for UI visualization)
     onSubdivision?.call(subdivisionIndex, isMainBeat);
 
-    // Only call onBeat for main beats (to maintain backward compatibility)
-    if (isMainBeat) {
+    // Only call onBeat for main beats that should sound
+    // Note: Native engine will still play sound; soundPattern affects callbacks only
+    if (isMainBeat && shouldPlaySound) {
       final isAccent = _isAccentBeat(beatNumber);
       onBeat?.call(beatNumber, isAccent);
     }
   }
 
   bool _isAccentBeat(int beat) {
-    // beat is 1-indexed (1,2,3,4)
+    // beat is 1-indexed (1,2,3,4...)
+    final ts = _settings.timeSignature;
+
     switch (_settings.accentPattern) {
       case AccentPattern.firstBeatOnly:
       case AccentPattern.strongMediumWeak:
+        if (ts.isCompound) {
+          // Compound time: accent every 3 beats (1, 4, 7, 10...)
+          // 6/8 has 2 main beats, 9/8 has 3 main beats, 12/8 has 4 main beats
+          return (beat - 1) % 3 == 0;
+        }
         return beat == 1;
       case AccentPattern.uniform:
         return false;
+    }
+  }
+
+  /// Helper to get sound paths based on current settings
+  (String mainPath, String accentedPath) _getSoundPaths(MetronomeSettings settings) {
+    // Uniform pattern: all beats use the same sound (medium)
+    if (settings.accentPattern == AccentPattern.uniform) {
+      final uniformSound = settings.sound.getAssetPath(BeatType.medium);
+      return (uniformSound, uniformSound);
+    } else if (settings.subdivision.divisionsPerBeat > 1) {
+      // Subdivision mode: weak sound for subdivisions, strong for main beats
+      return (
+        settings.sound.getAssetPath(BeatType.weak),
+        settings.sound.getAssetPath(BeatType.strong),
+      );
+    } else {
+      // Normal mode: strong for main beats, weak for others
+      return (
+        settings.sound.getAssetPath(BeatType.strong),
+        settings.sound.getAssetPath(BeatType.weak),
+      );
     }
   }
 
@@ -153,6 +171,8 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
     final bpmChanged = _settings.bpm != newSettings.bpm;
     final subdivisionChanged =
         _settings.subdivision != newSettings.subdivision;
+    final accentPatternChanged =
+        _settings.accentPattern != newSettings.accentPattern;
 
     _settings = newSettings;
 
@@ -161,75 +181,37 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
       return;
     }
 
-    // If subdivision changed, we need to reconfigure everything
-    if (subdivisionChanged) {
-      debugPrint(
-          'MetronomePackageEngine: subdivision changed to ${newSettings.subdivision.label}');
+    // Collect all updates needed
+    final (mainPath, accentedPath) = _getSoundPaths(newSettings);
+    final actualTimeSignature =
+        newSettings.timeSignature.beatsPerMeasure *
+            newSettings.subdivision.divisionsPerBeat;
+    final actualBpm =
+        newSettings.bpm * newSettings.subdivision.divisionsPerBeat;
 
-      // Update sound paths (may need to swap)
-      final String mainPath;
-      final String accentedPath;
+    debugPrint('MetronomePackageEngine: updateSettings - subdivision=${newSettings.subdivision.label}, '
+        'timeSignature=$actualTimeSignature, bpm=$actualBpm');
 
-      if (newSettings.subdivision.divisionsPerBeat > 1) {
-        mainPath = newSettings.sound.getAssetPath(BeatType.weak);
-        accentedPath = newSettings.sound.getAssetPath(BeatType.strong);
-      } else {
-        mainPath = newSettings.sound.getAssetPath(BeatType.strong);
-        accentedPath = newSettings.sound.getAssetPath(BeatType.weak);
-      }
-
-      await _metronome.setAudioFile(
-          mainPath: mainPath, accentedPath: accentedPath);
-
-      // Update BPM and time signature with new multiplier
-      final actualBpm =
-          newSettings.bpm * newSettings.subdivision.divisionsPerBeat;
-      final actualTimeSignature =
-          newSettings.timeSignature.beatsPerMeasure *
-              newSettings.subdivision.divisionsPerBeat;
-
-      await _metronome.setBPM(actualBpm);
-      await _metronome.setTimeSignature(actualTimeSignature);
-
-      debugPrint('MetronomePackageEngine: actualBpm=$actualBpm');
-      debugPrint(
-          'MetronomePackageEngine: actualTimeSignature=$actualTimeSignature');
-      return;
+    // Update all settings without awaiting each one (native calls may block)
+    // Order matters: sounds first, then timeSignature, then BPM
+    if (subdivisionChanged || accentPatternChanged || soundChanged) {
+      debugPrint('MetronomePackageEngine: mainPath=$mainPath, accentedPath=$accentedPath');
+      _metronome.setAudioFile(mainPath: mainPath, accentedPath: accentedPath);
     }
 
-    // Handle other changes
-    if (soundChanged) {
-      final String mainPath;
-      final String accentedPath;
-
-      if (newSettings.subdivision.divisionsPerBeat > 1) {
-        mainPath = newSettings.sound.getAssetPath(BeatType.weak);
-        accentedPath = newSettings.sound.getAssetPath(BeatType.strong);
-      } else {
-        mainPath = newSettings.sound.getAssetPath(BeatType.strong);
-        accentedPath = newSettings.sound.getAssetPath(BeatType.weak);
-      }
-
-      await _metronome.setAudioFile(
-          mainPath: mainPath, accentedPath: accentedPath);
-      debugPrint('MetronomePackageEngine: sound updated');
+    if (subdivisionChanged || timeSignatureChanged) {
+      debugPrint('MetronomePackageEngine: setTimeSignature($actualTimeSignature)');
+      _metronome.setTimeSignature(actualTimeSignature);
     }
 
-    if (timeSignatureChanged) {
-      final actualTimeSignature =
-          newSettings.timeSignature.beatsPerMeasure *
-              newSettings.subdivision.divisionsPerBeat;
-      await _metronome.setTimeSignature(actualTimeSignature);
-      debugPrint(
-          'MetronomePackageEngine: timeSignature updated to $actualTimeSignature');
+    if (subdivisionChanged || bpmChanged) {
+      debugPrint('MetronomePackageEngine: setBPM($actualBpm)');
+      _metronome.setBPM(actualBpm);
     }
 
-    if (bpmChanged) {
-      final actualBpm =
-          newSettings.bpm * newSettings.subdivision.divisionsPerBeat;
-      await _metronome.setBPM(actualBpm);
-      debugPrint('MetronomePackageEngine: BPM updated to $actualBpm');
-    }
+    // Give native side time to process
+    await Future.delayed(const Duration(milliseconds: 50));
+    debugPrint('MetronomePackageEngine: updateSettings completed');
   }
 
   @override

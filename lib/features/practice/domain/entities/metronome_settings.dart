@@ -31,31 +31,68 @@ enum AccentPattern {
 }
 
 /// Subdivision pattern for metronome.
-/// Determines how many clicks per beat.
+/// Determines how many clicks per beat and which subdivisions sound vs rest.
 enum Subdivision {
+  // === Basic subdivisions (all sounds) ===
   /// Quarter notes - 1 click per beat (default).
-  quarter(1, '기본', 'Quarter', '●'),
+  quarter(1, '기본', 'Quarter', '●', '♩', [true]),
 
   /// Eighth notes - 2 clicks per beat.
-  eighth(2, '8분음표', 'Eighth', '● ○'),
+  eighth(2, '8분음표', 'Eighth', '● ●', '♪♪', [true, true]),
 
   /// Triplets - 3 clicks per beat.
-  triplet(3, '셋잇단음', 'Triplet', '● ○ ○'),
+  triplet(3, '셋잇단음', 'Triplet', '● ● ●', '³', [true, true, true]),
 
   /// Sixteenth notes - 4 clicks per beat.
-  sixteenth(4, '16분음표', 'Sixteenth', '● ○ ○ ○'),
+  sixteenth(4, '16분음표', 'Sixteenth', '● ● ● ●', '♬', [true, true, true, true]),
 
   /// Quintuplets - 5 clicks per beat.
-  quintuplet(5, '5연음', 'Quintuplet', '● ○ ○ ○ ○'),
+  quintuplet(5, '5연음', 'Quintuplet', '● ● ● ● ●', '⁵', [true, true, true, true, true]),
 
   /// Sextuplets - 6 clicks per beat.
-  sextuplet(6, '6연음', 'Sextuplet', '● ○ ○ ○ ○ ○');
+  sextuplet(6, '6연음', 'Sextuplet', '● ● ● ● ● ●', '⁶', [true, true, true, true, true, true]),
+
+  // === Eighth note variations ===
+  /// Off-beat only (and of the beat).
+  eighthOffbeat(2, '뒷박', 'Offbeat', '○ ●', '♪', [false, true]),
+
+  // === Triplet variations ===
+  /// Triplet first only.
+  tripletFirst(3, '셋잇단-첫음', 'Triplet 1st', '● ○ ○', '³¹', [true, false, false]),
+
+  /// Triplet last only.
+  tripletLast(3, '셋잇단-끝음', 'Triplet 3rd', '○ ○ ●', '³³', [false, false, true]),
+
+  /// Triplet skip first.
+  tripletSkipFirst(3, '셋잇단-첫음빼고', 'Triplet 2-3', '○ ● ●', '³⁻', [false, true, true]),
+
+  // === Sixteenth variations ===
+  /// Sixteenth off-beats only.
+  sixteenthOffbeat(4, '16분-엇박', '16th Offbeat', '○ ● ○ ●', '♬⁺', [false, true, false, true]),
+
+  /// Sixteenth skip first.
+  sixteenthSkipFirst(4, '16분-1빼고', '16th Skip 1', '○ ● ● ●', '♬⁻', [false, true, true, true]),
+
+  /// Sixteenth first and last only.
+  sixteenthFirstLast(4, '16분-처음끝', '16th 1&4', '● ○ ○ ●', '♬¹⁴', [true, false, false, true]),
+
+  /// Sixteenth middle only.
+  sixteenthMiddle(4, '16분-중간', '16th 2&3', '○ ● ● ○', '♬²³', [false, true, true, false]),
+
+  // === Sextuplet variations ===
+  /// Sextuplet first only.
+  sextupletFirst(6, '6연음-첫음', 'Sext 1st', '● ○ ○ ○ ○ ○', '⁶¹', [true, false, false, false, false, false]),
+
+  /// Sextuplet 3+3 accent pattern.
+  sextupletAccents(6, '6연음-3+3', 'Sext 3+3', '● ○ ○ ● ○ ○', '⁶⁺', [true, false, false, true, false, false]);
 
   const Subdivision(
     this.divisionsPerBeat,
     this.label,
     this.englishName,
     this.visualPattern,
+    this.noteSymbol,
+    this.soundPattern,
   );
 
   /// Number of subdivisions per beat.
@@ -67,24 +104,61 @@ enum Subdivision {
   /// English name.
   final String englishName;
 
-  /// Visual pattern representation.
+  /// Visual pattern representation (● = sound, ○ = rest).
   final String visualPattern;
 
-  /// Whether this is a basic subdivision (shown in main selector).
-  bool get isBasic => divisionsPerBeat <= 4;
+  /// Unicode note symbol for compact display.
+  final String noteSymbol;
+
+  /// Pattern of sounds (true) and rests (false) for each subdivision.
+  final List<bool> soundPattern;
+
+  /// Whether this subdivision should play sound at the given index.
+  bool shouldPlayAt(int index) => soundPattern[index % soundPattern.length];
+
+  /// Whether this is a basic subdivision (no rests).
+  bool get isBasic => !soundPattern.contains(false);
+
+  /// Group name for categorization in picker.
+  String get groupName {
+    if (divisionsPerBeat == 1) return '기본';
+    if (divisionsPerBeat == 2) return '8분음표';
+    if (divisionsPerBeat == 3) return '셋잇단음';
+    if (divisionsPerBeat == 4) return '16분음표';
+    if (divisionsPerBeat == 5) return '5연음';
+    if (divisionsPerBeat == 6) return '6연음';
+    return '기타';
+  }
 }
 
 /// Time signature options for the metronome.
 enum TimeSignature {
-  twoFour('2/4', 2),
-  threeFour('3/4', 3),
-  fourFour('4/4', 4),
-  sixEight('6/8', 6);
+  // Simple time signatures
+  twoFour('2/4', 2, 4),
+  threeFour('3/4', 3, 4),
+  fourFour('4/4', 4, 4),
+  // Compound time signatures
+  sixEight('6/8', 6, 8, isCompound: true),
+  nineEight('9/8', 9, 8, isCompound: true),
+  twelveEight('12/8', 12, 8, isCompound: true);
 
-  const TimeSignature(this.label, this.beatsPerMeasure);
+  const TimeSignature(
+    this.label,
+    this.beatsPerMeasure,
+    this.beatUnit, {
+    this.isCompound = false,
+  });
 
   final String label;
   final int beatsPerMeasure;
+  final int beatUnit;
+  final bool isCompound;
+
+  /// Number of main beats in compound time (6/8 → 2, 9/8 → 3, 12/8 → 4).
+  int get mainBeats => isCompound ? beatsPerMeasure ~/ 3 : beatsPerMeasure;
+
+  /// Whether this is a simple time signature (not compound).
+  bool get isSimple => !isCompound;
 }
 
 /// Available metronome sounds.

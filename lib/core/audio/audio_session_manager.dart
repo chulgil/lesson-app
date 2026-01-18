@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
@@ -14,6 +15,11 @@ class AudioSessionManager {
 
   static AudioSession? _session;
   static bool _isConfigured = false;
+  static bool _isInterrupted = false;
+  static StreamSubscription? _interruptionSubscription;
+
+  /// Callback when audio is interrupted (e.g., phone call).
+  static void Function(bool isInterrupted)? onInterruption;
 
   /// Configure audio session for simultaneous playback and recording.
   ///
@@ -56,6 +62,25 @@ class AudioSessionManager {
         debugPrint('AudioSessionManager: Android configured');
       }
 
+      // Subscribe to interruption events
+      _interruptionSubscription?.cancel();
+      _interruptionSubscription = _session!.interruptionEventStream.listen((event) {
+        debugPrint('AudioSessionManager: Interruption event - begin=${event.begin}, type=${event.type}');
+
+        if (event.begin) {
+          // Audio interrupted (e.g., phone call started)
+          _isInterrupted = true;
+          onInterruption?.call(true);
+        } else {
+          // Interruption ended
+          _isInterrupted = false;
+          onInterruption?.call(false);
+
+          // Re-activate the session after interruption
+          _session?.setActive(true);
+        }
+      });
+
       // Activate the session
       await _session!.setActive(true);
       _isConfigured = true;
@@ -69,6 +94,16 @@ class AudioSessionManager {
   /// Check if audio session is configured.
   static bool get isConfigured => _isConfigured;
 
+  /// Check if audio is currently interrupted.
+  static bool get isInterrupted => _isInterrupted;
+
   /// Get the current audio session instance.
   static AudioSession? get session => _session;
+
+  /// Dispose resources.
+  static Future<void> dispose() async {
+    await _interruptionSubscription?.cancel();
+    _interruptionSubscription = null;
+    onInterruption = null;
+  }
 }

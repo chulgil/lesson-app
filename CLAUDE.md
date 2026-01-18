@@ -419,6 +419,57 @@ class NewModel { ... }
 
 ---
 
+## 메트로놈 개발 지침 {#metronome-guidelines}
+
+> ⚠️ **중요**: 메트로놈 기능은 반드시 커스텀 `MetronomePlugin`을 통해서만 구현합니다.
+
+### 아키텍처
+
+| 레이어 | 파일 | 설명 |
+|--------|------|------|
+| Dart Provider | `metronome_provider.dart` | Riverpod 상태 관리 |
+| Dart Engine | `native_metronome_engine.dart` | Platform Channel 인터페이스 |
+| iOS Plugin | `MetronomePlugin.swift` | Flutter ↔ Native 브릿지 |
+| iOS Engine | `MetronomeAudioEngine.swift` | AVAudioEngine 오디오 처리 |
+
+### 핵심 규칙
+
+1. **MetronomePlugin만 사용**: 외부 패키지(`metronome` 등)가 아닌 커스텀 플러그인 사용
+2. **soundPattern 지원**: 쉼표(rest) 패턴을 위한 `soundPattern: [Bool]` 배열 지원
+3. **AppDelegate 등록 필수**: `MetronomePlugin.register(with: registrar)` 활성화 상태 유지
+
+### 관련 파일 위치
+
+```
+lib/
+├── core/audio/
+│   ├── native_metronome_engine.dart     # Dart ↔ Native 통신
+│   ├── metronome_engine_interface.dart  # 엔진 인터페이스
+│   └── soloud_metronome_engine.dart     # macOS용 (SoLoud)
+├── features/practice/
+│   ├── domain/entities/metronome_settings.dart  # 설정 모델
+│   └── presentation/
+│       ├── providers/metronome_provider.dart    # 상태 관리
+│       └── widgets/metronome/                   # UI 위젯
+
+ios/Runner/
+├── AppDelegate.swift                    # 플러그인 등록
+├── MetronomePlugin.swift                # Flutter 플러그인
+└── Audio/MetronomeAudioEngine.swift     # 네이티브 오디오 엔진
+```
+
+### Subdivision soundPattern 예시
+
+```dart
+// 기본 셋잇단음 (모든 박 소리)
+triplet(3, '셋잇단음', [true, true, true])
+
+// 첫 박만 소리 (쉼표 패턴)
+tripletFirst(3, '셋잇단-첫음', [true, false, false])
+```
+
+---
+
 ## 작업 우선순위 {#priorities}
 
 | 순위 | 작업 | 상태 | 긴급도 |
