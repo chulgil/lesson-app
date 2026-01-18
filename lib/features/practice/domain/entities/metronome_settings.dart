@@ -30,6 +30,50 @@ enum AccentPattern {
   final String description;
 }
 
+/// Subdivision pattern for metronome.
+/// Determines how many clicks per beat.
+enum Subdivision {
+  /// Quarter notes - 1 click per beat (default).
+  quarter(1, '기본', 'Quarter', '●'),
+
+  /// Eighth notes - 2 clicks per beat.
+  eighth(2, '8분음표', 'Eighth', '● ○'),
+
+  /// Triplets - 3 clicks per beat.
+  triplet(3, '셋잇단음', 'Triplet', '● ○ ○'),
+
+  /// Sixteenth notes - 4 clicks per beat.
+  sixteenth(4, '16분음표', 'Sixteenth', '● ○ ○ ○'),
+
+  /// Quintuplets - 5 clicks per beat.
+  quintuplet(5, '5연음', 'Quintuplet', '● ○ ○ ○ ○'),
+
+  /// Sextuplets - 6 clicks per beat.
+  sextuplet(6, '6연음', 'Sextuplet', '● ○ ○ ○ ○ ○');
+
+  const Subdivision(
+    this.divisionsPerBeat,
+    this.label,
+    this.englishName,
+    this.visualPattern,
+  );
+
+  /// Number of subdivisions per beat.
+  final int divisionsPerBeat;
+
+  /// Korean display name.
+  final String label;
+
+  /// English name.
+  final String englishName;
+
+  /// Visual pattern representation.
+  final String visualPattern;
+
+  /// Whether this is a basic subdivision (shown in main selector).
+  bool get isBasic => divisionsPerBeat <= 4;
+}
+
 /// Time signature options for the metronome.
 enum TimeSignature {
   twoFour('2/4', 2),
@@ -86,6 +130,7 @@ class MetronomeSettings {
     this.timeSignature = TimeSignature.fourFour,
     this.sound = MetronomeSound.pen,
     this.accentPattern = AccentPattern.strongMediumWeak,
+    this.subdivision = Subdivision.quarter,
     this.visualFlash = true,
     this.vibration = false,
   });
@@ -101,6 +146,9 @@ class MetronomeSettings {
 
   /// Accent pattern for beat intensity.
   final AccentPattern accentPattern;
+
+  /// Subdivision pattern (quarter, eighth, triplet, etc.).
+  final Subdivision subdivision;
 
   /// Whether to show visual flash on each beat.
   final bool visualFlash;
@@ -127,6 +175,7 @@ class MetronomeSettings {
     TimeSignature? timeSignature,
     MetronomeSound? sound,
     AccentPattern? accentPattern,
+    Subdivision? subdivision,
     bool? visualFlash,
     bool? vibration,
   }) {
@@ -135,6 +184,7 @@ class MetronomeSettings {
       timeSignature: timeSignature ?? this.timeSignature,
       sound: sound ?? this.sound,
       accentPattern: accentPattern ?? this.accentPattern,
+      subdivision: subdivision ?? this.subdivision,
       visualFlash: visualFlash ?? this.visualFlash,
       vibration: vibration ?? this.vibration,
     );
@@ -155,6 +205,7 @@ class MetronomeSettings {
         other.timeSignature == timeSignature &&
         other.sound == sound &&
         other.accentPattern == accentPattern &&
+        other.subdivision == subdivision &&
         other.visualFlash == visualFlash &&
         other.vibration == vibration;
   }
@@ -166,6 +217,7 @@ class MetronomeSettings {
       timeSignature,
       sound,
       accentPattern,
+      subdivision,
       visualFlash,
       vibration,
     );

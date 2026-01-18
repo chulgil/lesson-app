@@ -13,6 +13,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/practice/domain/entities/practice_repertoire.dart';
 import 'models/recording.dart';
+import 'features/practice/presentation/providers/tuner_provider.dart';
 import 'providers/metronome/metronome_provider.dart';
 import 'repositories/recording_repository.dart';
 
@@ -284,9 +285,12 @@ class _LessonAppState extends ConsumerState<LessonApp> {
   @override
   void initState() {
     super.initState();
-    // Pre-initialize metronome engine at app startup to eliminate play delay
+    // Pre-initialize engines at app startup to eliminate first-use delay
     Future.microtask(() {
       ref.read(metronomeProvider.notifier).warmUp();
+      // Warm up tuner (starts microphone stream without processing)
+      // This pre-configures audio session, eliminating delay when opening practice tools
+      ref.read(tunerProvider.notifier).warmUp();
     });
   }
 
