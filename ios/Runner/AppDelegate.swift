@@ -7,13 +7,13 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
+    // Register custom MetronomePlugin BEFORE GeneratedPluginRegistrant
+    // to avoid duplicate registration
+    if let registrar = self.registrar(forPlugin: "com.lessonapp.metronome") {
+      MetronomePlugin.register(with: registrar)
+    }
 
-    // NOTE: Custom MetronomePlugin disabled - using metronome package instead
-    // The metronome package uses AVAudioEngine with looping buffer for sample-accurate timing
-    // if let registrar = self.registrar(forPlugin: "MetronomePlugin") {
-    //   MetronomePlugin.register(with: registrar)
-    // }
+    GeneratedPluginRegistrant.register(with: self)
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

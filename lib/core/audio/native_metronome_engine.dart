@@ -24,6 +24,9 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
   @override
   BeatCallback? onBeat;
 
+  /// Callback for subdivision ticks (for UI visualization).
+  void Function(int subdivisionIndex, bool isMainBeat)? onSubdivision;
+
   @override
   bool get isPlaying => _isPlaying;
 
@@ -48,6 +51,8 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
         'bpm': _settings.bpm,
         'beatsPerMeasure': _settings.timeSignature.beatsPerMeasure,
         'accentPattern': _settings.accentPattern.name,
+        'subdivision': _settings.subdivision.divisionsPerBeat,
+        'soundPattern': _settings.subdivision.soundPattern,
         'strongSound': _settings.sound.getAssetPath(BeatType.strong),
         'mediumSound': _settings.sound.getAssetPath(BeatType.medium),
         'weakSound': _settings.sound.getAssetPath(BeatType.weak),
@@ -79,11 +84,21 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
     _beatSubscription = _eventChannel.receiveBroadcastStream().listen(
       (dynamic event) {
         if (event is Map) {
-          final beat = event['beat'] as int? ?? 0;
-          final isAccent = event['isAccent'] as bool? ?? false;
+          final eventType = event['type'] as String? ?? 'beat';
 
-          _currentBeat = beat;
-          onBeat?.call(beat, isAccent);
+          if (eventType == 'subdivision') {
+            // Subdivision event
+            final subBeat = event['subBeat'] as int? ?? 0;
+            final isMainBeat = event['isMainBeat'] as bool? ?? false;
+            onSubdivision?.call(subBeat, isMainBeat);
+          } else {
+            // Beat event (main beat only)
+            final beat = event['beat'] as int? ?? 0;
+            final isAccent = event['isAccent'] as bool? ?? false;
+
+            _currentBeat = beat;
+            onBeat?.call(beat, isAccent);
+          }
         }
       },
       onError: (dynamic error) {
@@ -104,6 +119,8 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
         _settings.timeSignature != newSettings.timeSignature;
     final accentPatternChanged =
         _settings.accentPattern != newSettings.accentPattern;
+    final subdivisionChanged =
+        _settings.subdivision != newSettings.subdivision;
 
     _settings = newSettings;
 
@@ -128,6 +145,18 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
         await _methodChannel.invokeMethod(
           'setAccentPattern',
           newSettings.accentPattern.name,
+        );
+      }
+
+      if (subdivisionChanged) {
+        await _methodChannel.invokeMethod(
+          'setSubdivision',
+          newSettings.subdivision.divisionsPerBeat,
+        );
+        // Also update sound pattern when subdivision changes
+        await _methodChannel.invokeMethod(
+          'setSoundPattern',
+          newSettings.subdivision.soundPattern,
         );
       }
 

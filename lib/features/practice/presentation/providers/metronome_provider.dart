@@ -2,8 +2,9 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/audio/audio_session_manager.dart';
 import '../../../../core/audio/metronome_engine_interface.dart';
-import '../../../../core/audio/metronome_package_engine.dart';
+import '../../../../core/audio/native_metronome_engine.dart';
 import '../../../../core/audio/soloud_metronome_engine.dart';
 import '../../../../models/metronome_settings.dart';
 import '../../../../services/metronome_storage_service.dart';
@@ -17,33 +18,45 @@ class MetronomeState {
     this.settings = const MetronomeSettings(),
     this.isPlaying = false,
     this.currentBeat = 0,
+    this.currentSubdivision = 0,
     this.isAccent = false,
     this.isLoading = false,
     this.isReady = false,
+    this.audioError,
   });
 
   final MetronomeSettings settings;
   final bool isPlaying;
   final int currentBeat;
+  final int currentSubdivision; // 0-based subdivision index within beat
   final bool isAccent;
   final bool isLoading; // True while toggling play/stop
   final bool isReady; // True when engine is initialized
+  final String? audioError; // Error message when audio unavailable
+
+  /// Whether audio is currently unavailable (phone call, other app using speaker).
+  bool get hasAudioError => audioError != null;
 
   MetronomeState copyWith({
     MetronomeSettings? settings,
     bool? isPlaying,
     int? currentBeat,
+    int? currentSubdivision,
     bool? isAccent,
     bool? isLoading,
     bool? isReady,
+    String? audioError,
+    bool clearAudioError = false,
   }) {
     return MetronomeState(
       settings: settings ?? this.settings,
       isPlaying: isPlaying ?? this.isPlaying,
       currentBeat: currentBeat ?? this.currentBeat,
+      currentSubdivision: currentSubdivision ?? this.currentSubdivision,
       isAccent: isAccent ?? this.isAccent,
       isLoading: isLoading ?? this.isLoading,
       isReady: isReady ?? this.isReady,
+      audioError: clearAudioError ? null : (audioError ?? this.audioError),
     );
   }
 }
@@ -61,19 +74,24 @@ class Metronome extends _$Metronome {
 
   @override
   MetronomeState build() {
-    // Use metronome package on mobile (sample-accurate native audio)
-    // - iOS: AVAudioEngine with looping buffer
-    // - Android: AudioTrack with low-latency mode
+    // Use native engine on iOS (AVAudioEngine with soundPattern support)
     // Use SoLoud on desktop platforms
-    if (Platform.isIOS || Platform.isAndroid) {
-      debugPrint('Metronome: Using MetronomePackageEngine (native audio)');
-      _engine = MetronomePackageEngine();
+    if (Platform.isIOS) {
+      debugPrint('Metronome: Using NativeMetronomeEngine (iOS AVAudioEngine)');
+      final engine = NativeMetronomeEngine();
+      engine.onSubdivision = _onSubdivision;
+      _engine = engine;
     } else {
       debugPrint('Metronome: Using SoLoud engine');
-      _engine = SoLoudMetronomeEngine();
+      final engine = SoLoudMetronomeEngine();
+      engine.onSubdivision = _onSubdivision;
+      _engine = engine;
     }
 
     _engine!.onBeat = _onBeat;
+
+    // Set up audio interruption callback
+    AudioSessionManager.onInterruption = _onAudioInterruption;
 
     // Initialize engine and load saved settings
     _initAsync();
@@ -81,6 +99,7 @@ class Metronome extends _$Metronome {
     ref.onDispose(() {
       _engine?.dispose();
       _engine = null;
+      AudioSessionManager.onInterruption = null;
     });
 
     return const MetronomeState();
@@ -107,7 +126,15 @@ class Metronome extends _$Metronome {
     debugPrint('Metronome: updateSettings done at ${stopwatch.elapsedMilliseconds}ms');
 
     _engineReady = true;
-    state = state.copyWith(settings: savedSettings, isReady: true);
+
+    // Check if audio is currently interrupted
+    final initialError = AudioSessionManager.isInterrupted ? '다른 앱이 오디오를 사용중' : null;
+
+    state = state.copyWith(
+      settings: savedSettings,
+      isReady: true,
+      audioError: initialError,
+    );
     debugPrint('Metronome: _initAsync completed in ${stopwatch.elapsedMilliseconds}ms');
   }
 
@@ -139,14 +166,40 @@ class Metronome extends _$Metronome {
     );
   }
 
+  void _onSubdivision(int subdivisionIndex, bool isMainBeat) {
+    // Only update state on main beats to avoid unnecessary UI rebuilds
+    // The paw animation should only trigger on main beats, not subdivisions
+    // Subdivision sound is already handled by the engine
+  }
+
+  void _onAudioInterruption(bool isInterrupted) {
+    debugPrint('Metronome: Audio interruption - isInterrupted=$isInterrupted');
+
+    if (isInterrupted) {
+      // Stop playback and show error
+      if (state.isPlaying) {
+        stop();
+      }
+      state = state.copyWith(audioError: '다른 앱이 오디오를 사용중');
+    } else {
+      // Clear error when interruption ends
+      state = state.copyWith(clearAudioError: true);
+    }
+  }
+
   /// Start the metronome - immediate response, no waiting.
   void start() {
     if (state.isPlaying) return; // Already playing
 
     debugPrint('Metronome: start called');
-    state = state.copyWith(isPlaying: true);
 
-    // Start engine without blocking - it will catch up
+    // Update UI state and play first beat immediately for instant feedback
+    state = state.copyWith(isPlaying: true, currentBeat: 1, isAccent: true);
+
+    // Play first beat sound immediately (synchronous call)
+    _engine?.playTapSound();
+
+    // Start engine timing (will handle subsequent beats)
     _engine?.start();
   }
 

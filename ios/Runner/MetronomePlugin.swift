@@ -52,6 +52,10 @@ class MetronomePlugin: NSObject, FlutterPlugin {
             handleSetTimeSignature(call: call, result: result)
         case "setAccentPattern":
             handleSetAccentPattern(call: call, result: result)
+        case "setSubdivision":
+            handleSetSubdivision(call: call, result: result)
+        case "setSoundPattern":
+            handleSetSoundPattern(call: call, result: result)
         case "setSound":
             handleSetSound(call: call, result: result)
         case "playTapSound":
@@ -77,6 +81,8 @@ class MetronomePlugin: NSObject, FlutterPlugin {
         let bpm = args["bpm"] as? Int ?? 120
         let beatsPerMeasure = args["beatsPerMeasure"] as? Int ?? 4
         let accentPattern = args["accentPattern"] as? String ?? "firstBeatOnly"
+        let subdivision = args["subdivision"] as? Int ?? 1
+        let soundPattern = args["soundPattern"] as? [Bool] ?? [true]
         let strongSound = args["strongSound"] as? String ?? "assets/sounds/metronome/click_strong.wav"
         let mediumSound = args["mediumSound"] as? String ?? "assets/sounds/metronome/click_medium.wav"
         let weakSound = args["weakSound"] as? String ?? "assets/sounds/metronome/click_weak.wav"
@@ -84,14 +90,19 @@ class MetronomePlugin: NSObject, FlutterPlugin {
         debugPrint("MetronomePlugin: Creating audio engine")
         debugPrint("  BPM: \(bpm)")
         debugPrint("  beatsPerMeasure: \(beatsPerMeasure)")
+        debugPrint("  subdivision: \(subdivision)")
+        debugPrint("  soundPattern: \(soundPattern)")
         debugPrint("  strongSound: \(strongSound)")
 
         // Create audio engine
         audioEngine = MetronomeAudioEngine()
 
-        // Setup beat callback
+        // Setup callbacks
         audioEngine?.onBeat = { [weak self] beat, isAccent in
             self?.sendBeatEvent(beat: beat, isAccent: isAccent)
+        }
+        audioEngine?.onSubdivision = { [weak self] subBeat, isMainBeat in
+            self?.sendSubdivisionEvent(subBeat: subBeat, isMainBeat: isMainBeat)
         }
 
         // Initialize
@@ -100,10 +111,13 @@ class MetronomePlugin: NSObject, FlutterPlugin {
                 bpm: bpm,
                 beatsPerMeasure: beatsPerMeasure,
                 accentPattern: accentPattern,
+                subdivision: subdivision,
                 strongSoundPath: strongSound,
                 mediumSoundPath: mediumSound,
                 weakSoundPath: weakSound
             )
+            // Set sound pattern after setup
+            audioEngine?.setSoundPattern(soundPattern)
             debugPrint("MetronomePlugin: init success")
             result(true)
         } catch {
@@ -158,6 +172,26 @@ class MetronomePlugin: NSObject, FlutterPlugin {
         result(nil)
     }
 
+    private func handleSetSubdivision(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let subdivision = call.arguments as? Int else {
+            result(FlutterError(code: "INVALID_ARGS", message: "Subdivision must be an integer", details: nil))
+            return
+        }
+        debugPrint("MetronomePlugin: setSubdivision \(subdivision)")
+        audioEngine?.setSubdivision(subdivision)
+        result(nil)
+    }
+
+    private func handleSetSoundPattern(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let pattern = call.arguments as? [Bool] else {
+            result(FlutterError(code: "INVALID_ARGS", message: "SoundPattern must be a list of booleans", details: nil))
+            return
+        }
+        debugPrint("MetronomePlugin: setSoundPattern \(pattern)")
+        audioEngine?.setSoundPattern(pattern)
+        result(nil)
+    }
+
     private func handleSetSound(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any] else {
             result(FlutterError(code: "INVALID_ARGS", message: "Invalid arguments", details: nil))
@@ -205,8 +239,20 @@ class MetronomePlugin: NSObject, FlutterPlugin {
         guard let eventSink = eventSink else { return }
 
         let event: [String: Any] = [
+            "type": "beat",
             "beat": beat,
             "isAccent": isAccent
+        ]
+        eventSink(event)
+    }
+
+    private func sendSubdivisionEvent(subBeat: Int, isMainBeat: Bool) {
+        guard let eventSink = eventSink else { return }
+
+        let event: [String: Any] = [
+            "type": "subdivision",
+            "subBeat": subBeat,
+            "isMainBeat": isMainBeat
         ]
         eventSink(event)
     }
