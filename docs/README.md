@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2026-01-04
+> 마지막 업데이트: 2026-01-23
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -51,6 +51,7 @@ docs/
 │   ├── practice/         # 연습 시스템
 │   ├── metronome/        # 메트로놈
 │   ├── payment/          # 결제 시스템
+│   ├── subscription/     # 구독/수강권 시스템 (개인/학원)
 │   ├── user/             # 사용자 (선생님/학부모)
 │   ├── notification/     # 알림 시스템
 │   ├── review/           # 리뷰 시스템
@@ -150,6 +151,14 @@ docs/
 | [payment_system.md](specs/payment/payment_system.md) | ✅ 확정 | 결제 시스템 스펙 |
 | [payment_flow.md](specs/payment/payment_flow.md) | ✅ 확정 | 결제 플로우 |
 | [payment_requirement.md](specs/payment/payment_requirement.md) | ✅ 확정 | 결제 요구사항 |
+
+### 구독 시스템 (subscription/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [subscription_system_spec.md](specs/subscription/subscription_system_spec.md) | 📋 설계 완료 | 수강권 시스템 (개인/학원 모드, 데이터 소유권, 정산) |
+| [terms_of_service.md](specs/subscription/terms_of_service.md) | 📋 초안 | 이용약관 (법률 검토 필요) |
+| [privacy_policy.md](specs/subscription/privacy_policy.md) | 📋 초안 | 개인정보처리방침 (법률 검토 필요) |
 
 ### 사용자 시스템 (user/)
 
