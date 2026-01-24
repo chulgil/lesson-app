@@ -2,6 +2,9 @@
 
 > 마지막 업데이트: 2026-01-24
 
+> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md)
+> 📦 **관련 엔티티**: [student.md](../../schema/entities/student.md), [parent.md](../../schema/entities/parent.md), [payment.md](../../schema/entities/payment.md)
+
 ## 개요
 
 **상호 팔로우(맞팔)** 기반의 연결 시스템입니다.
@@ -286,31 +289,13 @@
 
 #### 학부모 전용 모델
 
-```dart
-class Parent {
-  final String id;
-  final String name;
-  final String? phoneNumber;
-  final List<Child> children;  // 등록된 자녀 목록
-  final DateTime createdAt;
-}
+> 📦 **엔티티 정의**: [parent.md](../../schema/entities/parent.md)
 
-class Child {
-  final String id;
-  final String name;
-  final DateTime birthDate;      // 미성년자 확인용
-  final String? linkedStudentId; // 선생님과 연결된 경우 Student ID
-  final bool hasOwnAccount;      // 본인 계정 전환 여부
-}
-
-// 학부모-선생님 연결 (자녀 통해)
-class ParentTeacherConnection {
-  final String parentId;
-  final String teacherId;
-  final String childId;       // 어떤 자녀를 통한 연결인지
-  final DateTime connectedAt;
-}
-```
+| 엔티티 | 설명 |
+|--------|------|
+| Parent | 학부모 정보, 자녀 목록 |
+| Child | 자녀 정보, 학생 연결 |
+| ParentTeacherConnection | 자녀 통한 학부모-선생님 연결 |
 
 #### 학부모 연결 처리 로직
 
@@ -557,33 +542,20 @@ Future<void> acceptParentInvite({
 
 ### 멤버십 역할
 
-```dart
-/// 학원 멤버십 역할
-enum MembershipRole {
-  owner,      // 👑 원장 - 학원 전체 관리, 멤버 관리, 정산
-  manager,    // 📋 매니저 - 스케줄 관리, 학생 배정
-  instructor, // 🎵 강사 - 본인 학생만 관리
-}
+> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md#membership-학원-멤버십)
 
-/// 학원 멤버십
-class Membership {
-  final String id;
-  final String organizationId;  // 학원 ID
-  final String userId;          // 선생님 ID
-  final MembershipRole role;
-  final MembershipStatus status;
-  final DateTime joinedAt;
-  final DateTime? invitedAt;
-  final String? invitedBy;      // 초대한 사람 ID
-}
+| 역할 | 아이콘 | 권한 |
+|------|:------:|------|
+| owner | 👑 | 학원 전체 관리, 멤버 관리, 정산 |
+| manager | 📋 | 스케줄 관리, 학생 배정 |
+| instructor | 🎵 | 본인 학생만 관리 |
 
-enum MembershipStatus {
-  pending,    // 초대/가입 대기 중
-  active,     // 활성 멤버
-  suspended,  // 일시 정지
-  left,       // 탈퇴
-}
-```
+| 상태 | 설명 |
+|------|------|
+| pending | 초대/가입 대기 중 |
+| active | 활성 멤버 |
+| suspended | 일시 정지 |
+| left | 탈퇴 |
 
 ### 학원 → 선생님 초대
 
@@ -1144,64 +1116,54 @@ TeacherSettingsScreen (/settings)
 
 ### Student 모델 확장
 
-```dart
-class Student {
-  final String id;
-  final String name;
-  final String? phoneNumber;           // +국가번호 형식
-  final ConnectionStatus connectionStatus;  // 연결 상태
-  final PracticeLevel? practiceLevel;  // 연습 성과 (연결된 경우만)
-  final String? connectedUserId;       // 연결된 앱 사용자 ID
-  final DateTime createdAt;
-  final DateTime? connectedAt;
-  final DateTime? disconnectedAt;      // 연결 끊긴 시간
-  // ... 기존 필드
-}
+> 📦 **엔티티 정의**: [student.md](../../schema/entities/student.md), [invite.md](../../schema/entities/invite.md#practicelevel-연습-레벨)
 
-enum ConnectionStatus {
-  offline,        // ⚪ 수기 등록 (앱 미사용)
-  inviteSent,     // 🟡 초대 보냄
-  inviteReceived, // 🔵 초대 받음
-  connected,      // 🟣🟢🟠🔴 앱 연결됨 (연습 성과에 따라 색상 결정)
-  disconnected,   // ⚪ 연결 끊김 (학생이 언팔)
-}
+Student에 추가되는 필드:
 
-enum PracticeLevel {
-  newStudent,   // 🟣 신규 연결 (연습 데이터 없음)
-  excellent,    // 🟢 우수 (5/7일 이상)
-  average,      // 🟠 보통 (3-4/7일)
-  poor,         // 🔴 부족 (1-2/7일)
-  onBreak,      // ⚪ 휴강
-}
-```
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| connectionStatus | ConnectionStatus | 연결 상태 |
+| practiceLevel | PracticeLevel? | 연습 성과 (연결 시만) |
+| connectedUserId | String? | 연결된 앱 사용자 ID |
+| connectedAt | DateTime? | 연결 시점 |
+| disconnectedAt | DateTime? | 연결 해제 시점 |
+
+**ConnectionStatus** (student.md)
+
+| 값 | 아이콘 | 설명 |
+|------|:------:|------|
+| offline | ⚪ | 수기 등록 (앱 미사용) |
+| inviteSent | 🟡 | 초대 보냄 |
+| connected | 🟢 | 앱 연결됨 |
+
+**PracticeLevel** (invite.md)
+
+| 값 | 아이콘 | 조건 |
+|------|:------:|------|
+| newStudent | 🟣 | 신규 연결 (데이터 없음) |
+| excellent | 🟢 | 주 5일 이상 |
+| average | 🟠 | 주 3-4일 |
+| poor | 🔴 | 주 1-2일 |
+| onBreak | ⚪ | 휴강 |
 
 ### Follow 모델 (신규)
 
-```dart
-class Follow {
-  final String id;
-  final String followerId;      // 팔로우하는 사람
-  final FollowUserRole followerRole;
-  final String followeeId;      // 팔로우 받는 사람
-  final FollowUserRole followeeRole;
-  final DateTime createdAt;
-}
+> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md#follow-맞팔-관계)
 
-enum FollowUserRole {
-  teacher,
-  student,
-}
-```
+| 필드 | 설명 |
+|------|------|
+| followerId | 팔로우하는 사람 ID |
+| followerRole | teacher / student |
+| followeeId | 팔로우 받는 사람 ID |
+| followeeRole | teacher / student |
 
 ### TeacherSettings 모델 (확장)
 
-```dart
-class TeacherSettings {
-  final String teacherId;
-  final bool autoAcceptConnection;  // 학생 연결 요청 자동 수락 (기본: true)
-  // ... 기타 설정
-}
-```
+> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md#teachersettings-선생님-설정)
+
+| 필드 | 기본값 | 설명 |
+|------|:------:|------|
+| autoAcceptConnection | true | 학생 연결 요청 자동 수락 |
 
 > **Note**: `autoAcceptConnection`이 `false`인 경우,
 > 학생이 팔로우하면 알림 센터에서 수락/거절할 수 있습니다.
@@ -2139,39 +2101,20 @@ for (final req in pendingRequests) {
     │                         4. 선생님 확인 상태 표시
 ```
 
-#### 결제 상태
+#### 결제 상태 및 모델
 
-```dart
-enum PaymentStatus {
-  pending,    // 청구됨 (입금 대기)
-  paid,       // 입금 기록됨 (학생/학부모가 입력)
-  confirmed,  // 확인 완료 (선생님이 확인)
-  overdue,    // 연체 (마감일 초과)
-}
-```
+> 📦 **엔티티 정의**: [payment.md](../../schema/entities/payment.md)
 
-#### 결제 데이터 모델
+**PaymentStatus**
 
-```dart
-class Payment {
-  final String id;
-  final String studentId;
-  final String teacherId;
-  final int amount;
-  final DateTime dueDate;         // 마감일
-  final PaymentStatus status;
+| 값 | 설명 |
+|------|------|
+| pending | 청구됨 (입금 대기) |
+| studentConfirmed | 입금완료 표시 (학생) |
+| confirmed | 확인 완료 (선생님) |
+| overdue | 연체 (마감일 초과) |
 
-  // 학생/학부모 입력
-  final DateTime? paidAt;         // 입금일 (학생/학부모 기록)
-  final String? paidBy;           // 입금자 (학생 or 학부모 ID)
-
-  // 선생님 확인
-  final DateTime? confirmedAt;    // 확인일
-  final String? confirmedBy;      // 확인자 (선생님 ID)
-
-  final DateTime createdAt;
-}
-```
+> **Note**: 기존 스펙의 `paid` 상태는 구현 시 `studentConfirmed`로 변경됨 (2단계 확인 지원)
 
 #### 연결 상태별 결제 기능
 

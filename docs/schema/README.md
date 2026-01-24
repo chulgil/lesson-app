@@ -28,7 +28,8 @@ docs/schema/
 │   ├── subscription.md         # Subscription (수강권)
 │   ├── teacher_availability.md # TeacherAvailability (가용시간)
 │   ├── review.md               # TeacherReview, LessonFeedback (리뷰)
-│   └── teacher.md              # Teacher, Certificate (선생님)
+│   ├── teacher.md              # Teacher, Certificate (선생님)
+│   └── invite.md               # Follow, Membership (초대/연결)
 └── api/                        # API 스펙 (추후)
     └── ...
 ```
@@ -89,6 +90,15 @@ docs/schema/
 | [ProfileVisibilitySettings](entities/teacher.md#profilevisibilitysettings-공개-범위-설정) | 공개 범위 설정 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
 | [TeacherSearchFilter](entities/teacher.md#teachersearchfilter-검색-필터) | 검색 필터/결과 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
 
+### 초대/연결
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Follow](entities/invite.md#follow-맞팔-관계) | 맞팔 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+| [Membership](entities/invite.md#membership-학원-멤버십) | 학원-사용자 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+| [TeacherSettings](entities/invite.md#teachersettings-선생님-설정) | 선생님 초대 설정 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+| [PracticeLevel](entities/invite.md#practicelevel-연습-레벨) | 연습 레벨 (성과) | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+
 ---
 
 ## Hive TypeId 할당 현황
@@ -107,6 +117,7 @@ docs/schema/
 | TBD | 취소정책 | CancellationPolicy, NoShowPolicy, CancellationRecord, PenaltyResult |
 | TBD | 리뷰 | TeacherReview, ReviewerType, ReviewTrigger, CategoryRatings, LessonFeedback, LessonSatisfaction, TeacherResponse, TeacherReviewSettings, ReviewVisibility, TeacherBadge, TeacherReviewStats |
 | TBD | 선생님 | Teacher, ProfileCompletionLevel, PhoneVerification, Certificate, CertificateStatus, CertificateType, TeacherVerification, VerificationBadge, ProfileVisibilitySettings, ProfileVisibility, Education, Career, FeeRange, LessonType, Video |
+| TBD | 초대 | Follow, FollowUserRole, InviteMethod, TeacherSettings, Membership, MembershipRole, MembershipStatus, PracticeLevel |
 
 ---
 
