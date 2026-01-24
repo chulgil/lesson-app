@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2026-01-23
+> 마지막 업데이트: 2026-01-24
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -52,6 +52,7 @@ docs/
 │   ├── metronome/        # 메트로놈
 │   ├── payment/          # 결제 시스템
 │   ├── subscription/     # 구독/수강권 시스템 (개인/학원)
+│   ├── student/          # 학생 시스템 (클래스/소속)
 │   ├── user/             # 사용자 (선생님/학부모)
 │   ├── notification/     # 알림 시스템
 │   ├── review/           # 리뷰 시스템
@@ -116,6 +117,7 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [three_party_relationship_spec.md](specs/lesson/three_party_relationship_spec.md) | 📋 설계 중 | **3자 관계 UI/UX 설계** (→ 엔티티는 student_class_system.md 참조) |
 | [lesson_schedule.md](specs/lesson/lesson_schedule.md) | ✅ 확정 | 레슨 스케줄 시스템 |
 | [Lesson_Types_Analysis.md](specs/lesson/Lesson_Types_Analysis.md) | ✅ 확정 | 레슨 유형 분석 |
 | [Lesson_Schedule_Design.md](specs/lesson/Lesson_Schedule_Design.md) | ✅ 확정 | 레슨 스케줄 설계 |
@@ -130,6 +132,7 @@ docs/
 | [practice_system.md](specs/practice/practice_system.md) | ✅ 확정 | 연습 시스템 스펙 |
 | [Practice_System_Spec.md](specs/practice/Practice_System_Spec.md) | ✅ 확정 | 연습 시스템 상세 스펙 |
 | [practice_streak_spec.md](specs/practice/practice_streak_spec.md) | ✅ 확정 | 연습 스트릭 스펙 |
+| [quick_recording_spec.md](specs/practice/quick_recording_spec.md) | 📋 설계 완료 | **바로 녹음** (디폴트 섹션, 연습도구 통합) |
 | [recording_requirement.md](specs/practice/recording_requirement.md) | ✅ 확정 | 녹음 기능 요구사항 |
 | [recording_player_ui.md](specs/practice/recording_player_ui.md) | ✅ 확정 | 녹음 재생 UI 스펙 |
 | [waveform_improvements.md](specs/practice/waveform_improvements.md) | ✅ 확정 | 파형 UI 개선 (모듈화, 핀치줌) |
@@ -148,9 +151,10 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
-| [payment_system.md](specs/payment/payment_system.md) | ✅ 확정 | 결제 시스템 스펙 |
-| [payment_flow.md](specs/payment/payment_flow.md) | ✅ 확정 | 결제 플로우 |
-| [payment_requirement.md](specs/payment/payment_requirement.md) | ✅ 확정 | 결제 요구사항 |
+| [payment_unified_spec.md](specs/payment/payment_unified_spec.md) | ✅ 확정 | **통합 결제 스펙** (3자 관계 관점, 상태 enum 통일) |
+| [payment_system.md](specs/payment/payment_system.md) | 📦 레거시 | 결제 시스템 스펙 (→ unified_spec으로 통합) |
+| [payment_flow.md](specs/payment/payment_flow.md) | 📦 레거시 | 결제 플로우 (→ unified_spec으로 통합) |
+| [payment_requirement.md](specs/payment/payment_requirement.md) | 📦 레거시 | 결제 요구사항 (→ unified_spec으로 통합) |
 
 ### 구독 시스템 (subscription/)
 
@@ -167,6 +171,12 @@ docs/
 | [parent_system.md](specs/user/parent_system.md) | ✅ 확정 | 학부모 시스템 |
 | [parent_login_flow.md](specs/user/parent_login_flow.md) | ✅ 확정 | 학부모 로그인 플로우 |
 | [teacher_registration.md](specs/user/teacher_registration.md) | ✅ 확정 | 외부 선생님 등록 |
+
+### 학생 시스템 (student/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [student_class_system.md](specs/student/student_class_system.md) | 📋 설계 완료 | **학생 클래스(소속) 시스템** - LessonClass, ClassMembership, LessonLocation 엔티티 설계 |
 
 ### 알림 시스템 (notification/)
 
@@ -190,13 +200,14 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
-| [invite_system.md](specs/invite/invite_system.md) | - | 초대 시스템 v1 (레거시) |
-| [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | 양방향 초대 시스템 (QR/URL/코드) |
+| [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | **양방향 초대 시스템** (맞팔, QR/URL/코드, 3자 관계) |
+| [invite_system.md](specs/invite/invite_system.md) | ⚠️ DEPRECATED | v1 레거시 (→ v2로 완전 대체됨) |
 
 ### UX/UI 설계 (design/)
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [role_based_screens.md](specs/design/role_based_screens.md) | 📋 설계 완료 | **역할별 화면 통합 설계** (선생님/학생/학부모 앱) |
 | [ux_guidelines.md](specs/design/ux_guidelines.md) | ✅ 확정 | UX 가이드라인 |
 | [figma_templates.md](specs/design/figma_templates.md) | ✅ 확정 | Figma 템플릿 |
 | [competitive_analysis.md](specs/design/competitive_analysis.md) | ✅ 확정 | 경쟁사 분석 |
@@ -212,7 +223,14 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [implementation_roadmap.md](specs/dev/implementation_roadmap.md) | 📋 계획 | **구현 로드맵** (학원/수강권/3자 관계) |
 | [test_scenarios.md](specs/dev/test_scenarios.md) | ✅ 확정 | 로그인 테스트 시나리오 |
+
+### 문서 검증 (review/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [document_verification_report.md](review/document_verification_report.md) | ✅ 완료 | 3자 관계 관점 문서 검증 보고서 |
 
 ---
 

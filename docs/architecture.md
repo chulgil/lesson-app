@@ -1,6 +1,6 @@
 # 레슨 앱 아키텍처
 
-> 마지막 업데이트: 2026-01-01
+> 마지막 업데이트: 2026-01-24
 
 ## 개요
 
@@ -127,10 +127,15 @@ features/practice/
 features/students/
 ├── domain/
 │   └── entities/
-│       └── student.dart
+│       ├── student.dart
+│       ├── lesson_class.dart          # 🆕 클래스/소속 그룹 (학원/개인)
+│       ├── class_membership.dart      # 🆕 학생-클래스 관계 (레슨 정보)
+│       └── lesson_location.dart       # 🆕 레슨 장소
 ├── data/
 │   └── repositories/
-│       └── mock_student_repository.dart
+│       ├── mock_student_repository.dart
+│       ├── mock_lesson_class_repository.dart    # 🆕
+│       └── mock_membership_repository.dart      # 🆕
 └── presentation/
     ├── screens/
     ├── widgets/
@@ -138,8 +143,12 @@ features/students/
     └── providers/
         ├── student_providers.dart
         ├── student_crud_provider.dart
-        └── student_stats_provider.dart
+        ├── student_stats_provider.dart
+        ├── lesson_class_providers.dart          # 🆕
+        └── membership_providers.dart            # 🆕
 ```
+
+> 📐 **엔티티 설계**: [docs/specs/student/student_class_system.md](specs/student/student_class_system.md) 참조
 
 ### parent_home (학부모)
 ```
