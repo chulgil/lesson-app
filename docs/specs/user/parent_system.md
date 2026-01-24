@@ -3,6 +3,7 @@
 > 작성일: 2025-12-27
 > 마지막 업데이트: 2026-01-24
 > 상태: 확정
+> 엔티티 스키마: [parent.md](../../schema/entities/parent.md)
 > 연관 스펙: [invite_system_v2.md](../invite/invite_system_v2.md), [practice_system.md](../practice/practice_system.md), [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md)
 
 ## 개요
@@ -354,23 +355,12 @@
 
 #### 2.5.4 데이터 모델
 
-```dart
-class UserProfile {
-  final String id;
-  final String userId;            // User 계정 FK
-  final ProfileType profileType;  // parent, student, child
-  final String displayName;
-  final String? instrument;       // student/child만
-  final bool isConnected;         // 선생님 연결 여부
-  final DateTime createdAt;
-}
+> 📦 **엔티티 정의**: [parent.md - UserProfile, ProfileType](../../schema/entities/parent.md#userprofile-프로필-전환)
 
-enum ProfileType {
-  parent,   // 학부모 (자녀 관리)
-  student,  // 본인 학생 (성인)
-  child,    // 자녀 프로필 (만 14세 미만)
-}
-```
+| 엔티티 | 설명 |
+|--------|------|
+| UserProfile | 프로필 전환용 모델 (id, userId, profileType, displayName, instrument, isConnected) |
+| ProfileType | 프로필 유형 enum (parent, student, child) |
 
 ### 2.6 미연결 자녀 기능
 
@@ -458,30 +448,21 @@ enum ProfileType {
 
 #### 2.6.4 데이터 모델 확장
 
-```dart
-class Child {
-  // ... 기존 필드 ...
+> 📦 **엔티티 정의**: [parent.md - Child, ConnectionStatus](../../schema/entities/parent.md#child-자녀-프로필)
 
-  /// 선생님 연결 상태
-  final ConnectionStatus connectionStatus;  // offline, inviteSent, connected
+**Child 엔티티 주요 필드:**
 
-  /// 연결된 선생님 ID (null이면 미연결)
-  final String? connectedTeacherId;
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| connectionStatus | ConnectionStatus | 연결 상태 (offline, inviteSent, connected) |
+| connectedTeacherId | String? | 연결된 선생님 ID (null=미연결) |
 
-  /// 미연결 상태에서도 연습 기록 가능 여부
-  bool get canPractice => true;  // 항상 가능
+**기능별 접근 권한:**
 
-  /// 미연결 상태에서 사용 가능한 기능
-  bool get canUseMetronome => true;
-  bool get canTrackStreak => true;
-  bool get canManageRepertoire => true;
-
-  /// 선생님 연결 필요 기능
-  bool get canViewLessonNotes => connectionStatus == ConnectionStatus.connected;
-  bool get canReceiveAssignments => connectionStatus == ConnectionStatus.connected;
-  bool get canReceiveFeedback => connectionStatus == ConnectionStatus.connected;
-}
-```
+| 기능 | 미연결 | 연결됨 |
+|------|:------:|:------:|
+| 연습 기록, 메트로놈, 스트릭, 레퍼토리 | ✓ | ✓ |
+| 레슨 노트, 과제, 피드백 | ✗ | ✓ |
 
 ---
 
@@ -1258,183 +1239,67 @@ class Child {
 
 ### 12.8 UI View Models (학부모 화면용)
 
-> **📌 참조**: 핵심 엔티티 정의 (LessonClass, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
+> 📦 **엔티티 정의**: [parent.md - View Models](../../schema/entities/parent.md#view-models-학부모-화면용)
 >
-> 아래 View Models는 학부모 앱 UI 표시용으로, 핵심 엔티티를 조합한 읽기 전용 모델입니다.
+> **📌 참조**: 핵심 엔티티 정의 (LessonClass, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
 
-```dart
-/// 학부모가 조회하는 자녀 수강권 정보 (읽기 전용 View Model)
-/// - LessonClass, Subscription 엔티티를 조합
-class ChildSubscriptionView {
-  final String childId;
-  final String childName;
-  final String? academyName;           // 학원명 (null이면 개인레슨)
-  final LessonClassType classType;     // academy, private
-  final SubscriptionType subscriptionType;  // trial, monthly, package
-  final int? remainingLessons;         // 잔여 횟수 (회차제)
-  final DateTime? expiresAt;           // 만료일
-  final SubscriptionStatus status;     // active, expiringSoon, expired
+| View Model | 설명 | 주요 필드 |
+|------------|------|----------|
+| ChildSubscriptionView | 자녀 수강권 정보 | childId, academyName, subscriptionType, remainingLessons, expiresAt |
+| ParentPaymentRequestView | 결제 요청 정보 | childId, providerName, amount, dueDate, status |
 
-  /// 만료 임박 여부 (7일 이내)
-  bool get isExpiringSoon =>
-    expiresAt != null &&
-    expiresAt!.difference(DateTime.now()).inDays <= 7;
-
-  /// 잔여 횟수 부족 여부 (2회 이하)
-  bool get isLowRemaining =>
-    remainingLessons != null && remainingLessons! <= 2;
-}
-
-/// 학부모 결제 요청 뷰
-class ParentPaymentRequestView {
-  final String id;
-  final String childId;
-  final String childName;
-  final String providerName;           // 학원명 또는 선생님명
-  final LessonClassType classType;
-  final int amount;
-  final String description;            // "2월 수강권 (8회)"
-  final DateTime requestedAt;
-  final DateTime dueDate;
-  final PaymentMethod? method;         // card, transfer, cash
-  final PaymentStatus status;          // pending, confirmed, overdue
-  final String? bankAccount;           // 계좌이체용 계좌 정보
-}
-```
+**알림 조건:**
+- `isExpiringSoon`: 만료일 7일 이내
+- `isLowRemaining`: 잔여 횟수 2회 이하
 
 ---
 
 ## 13. 학부모 전용 데이터 모델
 
-> **📌 참조**: 공통 엔티티 (LessonClass, ClassMembership, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
+> 📦 **엔티티 정의**: [parent.md](../../schema/entities/parent.md)
 >
-> 이 섹션에는 학부모 시스템 전용 엔티티만 정의합니다.
+> **📌 참조**: 공통 엔티티 (LessonClass, ClassMembership, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
 
-### 13.1 Parent (학부모)
+### 엔티티 목록
 
-```dart
-class Parent {
-  final String id;
-  final String userId;           // User 테이블 FK
-  final String name;
-  final String phone;
-  final String? email;
-  final List<String> childIds;   // 연결된 자녀 ID 목록
-  final DateTime createdAt;
-  final DateTime updatedAt;
-}
-```
+| 엔티티 | TypeId | 설명 |
+|--------|:------:|------|
+| Parent | 63 | 학부모 (userId, name, phone, childIds) |
+| Child | 64 | 자녀 프로필 (parentId, name, birthYear, instrument, connectionStatus) |
+| ParentChildRelation | 65 | 학부모-자녀 관계 (isPrimaryGuardian, isBillingTarget) |
+| ConnectionStatus | 66 | 연결 상태 enum (offline, inviteSent, connected) |
+| ProfileType | 67 | 프로필 유형 enum (parent, student, child) |
+| ParentPermission | 68 | 권한 수준 enum (viewOnly, managePayments, manageLessons, fullAccess) |
+| UserProfile | 69 | 프로필 전환 (이중 역할용) |
+| ParentTeacherConnection | 70 | 학부모-선생님 연결 |
+| ParentVisibilitySettings | 71 | 열람 범위 설정 (선생님이 설정) |
+| ParentNotificationSettings | 72 | 알림 설정 (학부모가 설정) |
 
-### 13.2 Child (자녀 프로필) - V2
+### 열람 범위 기본값 (ParentVisibilitySettings)
 
-> 만 14세 미만 학생을 위한 자녀 프로필 모델
-> invite_system_v2.md 참조
+| 항목 | 기본값 | 설명 |
+|------|--------|------|
+| canViewSchedule | ✓ ON | 레슨 일정 |
+| canViewAssignments | ✓ ON | 과제 현황 |
+| canViewPractice | ✓ ON | 연습 기록 |
+| canViewLessonNotes | ✓ ON | 레슨 노트 |
+| canViewRecordings | ✗ OFF | 연습 녹음 |
+| canViewDetailedFeedback | ✗ OFF | 상세 피드백 |
+| canViewChat | ✗ OFF | 채팅 내역 |
 
-```dart
-class Child {
-  final String id;
-  final String parentId;         // 부모 ID
-  final String name;             // 이름/닉네임
-  final int? birthYear;          // 생년 (만 14세 판단용)
-  final String? instrument;      // 악기
-  final String? level;           // 레벨
-  final DateTime createdAt;
-  final DateTime updatedAt;
-}
-```
+### 알림 설정 기본값 (ParentNotificationSettings)
 
-### 13.3 ParentTeacherConnection (학부모-선생님 연결) - V2
-
-> 학부모가 선생님과 직접 연결하는 경우
-> invite_system_v2.md 참조
-
-```dart
-class ParentTeacherConnection {
-  final String id;
-  final String parentId;
-  final String teacherId;
-  final String? studentId;       // 연결된 자녀 (null이면 자녀 미지정)
-  final ParentPermission permission;
-  final DateTime connectedAt;
-}
-```
-
-### 13.4 ParentPermission (권한 수준) - V2
-
-> invite_system_v2.md 참조
-
-```dart
-enum ParentPermission {
-  viewOnly,       // 열람만 가능
-  managePayments, // 결제 관리
-  manageLessons,  // 레슨 관리
-  fullAccess,     // 전체 권한
-}
-```
-
-### 13.5 ParentChildRelation (학부모-자녀 관계)
-
-```dart
-class ParentChildRelation {
-  final String id;
-  final String parentId;
-  final String studentId;
-  final bool isPrimaryGuardian;  // 주 보호자 여부
-  final bool isBillingTarget;    // 결제 담당 여부
-  final DateTime linkedAt;
-}
-```
-
-### 13.6 ParentVisibilitySettings (열람 범위 설정)
-
-```dart
-class ParentVisibilitySettings {
-  final String id;
-  final String teacherId;
-  final String studentId;
-  final bool canViewSchedule;
-  final bool canViewAssignments;
-  final bool canViewPractice;
-  final bool canViewLessonNotes;
-  final bool canViewRecordings;
-  final bool canViewDetailedFeedback;
-  final bool canViewChat;
-}
-```
-
-### 13.7 ParentNotificationSettings (알림 설정)
-
-```dart
-class ParentNotificationSettings {
-  final String id;
-  final String parentId;
-
-  // 결제 (필수)
-  final bool paymentRequest = true;    // 변경 불가
-  final bool paymentComplete = true;   // 변경 불가
-  final bool paymentDueSoon;
-
-  // 레슨
-  final bool lessonChange;
-  final bool lessonCancel;
-  final bool lessonStart;
-  final bool lessonEnd;
-
-  // 과제/연습
-  final bool newAssignment;
-  final bool assignmentIncomplete;
-  final bool practiceComplete;
-  final bool streakAchievement;
-
-  // 소통
-  final bool teacherMessage;
-  final bool lessonNoteUpdate;
-
-  // 리포트
-  final bool weeklyReport;
-  final bool monthlyReport;
-}
-```
+| 카테고리 | 항목 | 기본값 | 변경 가능 |
+|----------|------|--------|----------|
+| **결제** | paymentRequest, paymentComplete | ON | ✗ (필수) |
+| | paymentDueSoon | ON | ✓ |
+| **레슨** | lessonChange, lessonCancel | ON | ✓ |
+| | lessonStart, lessonEnd | OFF | ✓ |
+| **과제/연습** | newAssignment, assignmentIncomplete | ON | ✓ |
+| | practiceComplete, streakAchievement | OFF | ✓ |
+| **소통** | teacherMessage | ON | ✓ |
+| | lessonNoteUpdate | OFF | ✓ |
+| **리포트** | weeklyReport, monthlyReport | ON | ✓ |
 
 ---
 

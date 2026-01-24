@@ -1,7 +1,9 @@
 # 체험 레슨 시스템 스펙
 
 > 작성일: 2025-12-27
+> 최종 수정: 2026-01-24
 > 상태: 📋 요구사항 정리 중
+> 엔티티 스키마: [teacher_availability.md](../../schema/entities/teacher_availability.md), [cancellation_policy.md](../../schema/entities/cancellation_policy.md)
 
 ---
 
@@ -10,12 +12,25 @@
 체험 레슨은 새로운 학생이 선생님과의 첫 레슨을 경험해보는 시스템입니다.
 본 문서는 선생님과 학생 각각의 관점에서 체험 레슨 시스템을 정리합니다.
 
+### 학원 컨텍스트
+
+체험 레슨은 **개인 선생님**과 **학원 소속 선생님** 모두 지원합니다.
+
+| 컨텍스트 | 특징 |
+|----------|------|
+| **개인 선생님** | 선생님이 직접 체험 레슨 관리 |
+| **학원 소속** | 학원에서 체험 레슨 받음 → 강사 배정 가능 |
+
+> 학원 소속 체험 레슨은 `organizationId`가 설정됩니다.
+> 자세한 내용: [3자 관계 설계](../lesson/three_party_relationship_spec.md)
+
 ### 관련 문서
 
 | 문서 | 참조 내용 |
 |------|----------|
-| [레슨 스케줄 시스템](./lesson_schedule.md) | 예약 상태, 스케줄 플로우 |
-| [수강료 관리 시스템](./payment_system.md) | 체험 레슨 요금, 입금 확인 |
+| [레슨 스케줄 시스템](../lesson/lesson_schedule.md) | 예약 상태, 스케줄 플로우 |
+| [통합 결제 시스템](../payment/payment_unified_spec.md) | 체험 레슨 요금, 입금 확인 |
+| [3자 관계 설계](../lesson/three_party_relationship_spec.md) | 학원-선생님-학생 관계 |
 
 ---
 
@@ -455,54 +470,15 @@ Layer 3: 구글 캘린더 연동 (수동 블로킹)
 
 ### 데이터 모델
 
-```dart
-/// 선생님 가용시간 설정
-class TeacherAvailability {
-  final String teacherId;
-  final int slotDurationMinutes;        // 30, 45, 60 (개인별 설정)
-  final List<WeeklySchedule> weeklySchedules;
-  final List<TimeException> exceptions;
-  final GoogleCalendarSync? googleSync;
-}
+> 📦 **엔티티 정의**: [teacher_availability.md](../../schema/entities/teacher_availability.md)
 
-/// 주간 스케줄 (Layer 1)
-class WeeklySchedule {
-  final int dayOfWeek;                  // 1(월) ~ 7(일)
-  final bool isAvailable;               // 해당 요일 가용 여부
-  final TimeOfDay? startTime;           // 시작 시간
-  final TimeOfDay? endTime;             // 종료 시간
-  final List<TimeRange> excludedRanges; // 제외 시간대 (점심 등)
-}
-
-/// 시간 예외 (Layer 2)
-class TimeException {
-  final String id;
-  final ExceptionType type;
-  final DateTime? startDate;            // 시작일 (periodOff, temporaryAddition)
-  final DateTime? endDate;              // 종료일 (시작일=종료일이면 하루)
-  final int? dayOfWeek;                 // 요일 (recurringOff)
-  final TimeRange? timeRange;           // 시간대 (timeBlocking, temporaryAddition)
-  final String? reason;                 // 사유 (선택)
-  final bool isAddition;                // true=추가, false=제외
-}
-
-/// 예외 유형
-enum ExceptionType {
-  periodOff,          // 기간 휴무 (하루~여러 날)
-  timeBlocking,       // 특정 시간대 블로킹
-  recurringOff,       // 반복 휴무 (매주 특정 요일)
-  temporaryAddition,  // 임시 가용시간 추가
-}
-
-/// 구글 캘린더 연동 (Layer 3)
-class GoogleCalendarSync {
-  final bool isConnected;
-  final String? calendarId;
-  final DateTime? lastSyncTime;
-  final List<GoogleEvent> pendingEvents;  // 블로킹 대기 이벤트
-  final List<GoogleEvent> blockedEvents;  // 블로킹 완료 이벤트
-}
-```
+| 엔티티 | 설명 |
+|--------|------|
+| TeacherAvailability | 선생님 가용시간 설정 (slotDurationMinutes, weeklySchedules, exceptions, googleSync) |
+| WeeklySchedule | 주간 스케줄 Layer 1 (dayOfWeek, startTime, endTime, excludedRanges) |
+| TimeException | 시간 예외 Layer 2 (type, startDate, endDate, timeRange, isAddition) |
+| ExceptionType | 예외 유형 enum (periodOff, timeBlocking, recurringOff, temporaryAddition) |
+| GoogleCalendarSync | 구글 캘린더 연동 Layer 3 (isConnected, pendingEvents, blockedEvents) |
 
 ### Layer 1: 주간 템플릿
 
@@ -695,83 +671,19 @@ class GoogleCalendarSync {
 
 ### 데이터 모델
 
-```dart
-/// 선생님별 취소/노쇼 정책 설정
-class CancellationPolicy {
-  final String teacherId;
-  final int cancellationDeadlineHours;    // 취소 마감 (기본 24시간)
-  final CancellationPenaltyType penaltyType;
-  final int? freeCancellationsPerMonth;   // 무료 취소 횟수 (옵션 C)
-  final NoShowPolicy noShowPolicy;
-  final TeacherNoShowCompensation teacherNoShowCompensation; // 선생님 노쇼 시 보상
-}
+> 📦 **엔티티 정의**: [cancellation_policy.md](../../schema/entities/cancellation_policy.md)
 
-/// 취소 페널티 유형
-enum CancellationPenaltyType {
-  fullCharge,         // A: 100% 과금
-  halfCharge,         // B: 50% 과금
-  freeThenCharge,     // C: 월 n회 무료 후 100% 과금
-  rescheduleOnly,     // D: 취소 불가, 일정변경만 허용
-}
-
-/// 노쇼 정책
-class NoShowPolicy {
-  final int graceMinutes;                 // 노쇼 판정 대기 시간 (기본 15분)
-  final bool chargeFullAmount;            // 100% 과금 여부
-  final int? warningsBeforeBlacklist;     // 블랙리스트 전 경고 횟수 (null=사용안함)
-}
-
-/// 선생님 노쇼 시 학생 보상 설정
-class TeacherNoShowCompensation {
-  final TeacherNoShowOption regularLessonOption;   // 정규레슨 기본 보상
-  final TeacherNoShowOption trialLessonOption;     // 체험레슨 기본 보상
-  final int? extraMinutes;                         // 시간 연장 시 추가 분 (기본 15분)
-}
-
-/// 선생님 노쇼 보상 옵션
-enum TeacherNoShowOption {
-  // 정규 레슨용
-  addLesson,              // A: 레슨 1회 추가
-  extendNextLesson,       // D: 다음 레슨 시간 연장
-
-  // 체험 레슨용
-  freeRebooking,          // A: 무료 재예약
-  freeRebookingWithCoupon, // C: 무료 재예약 + 정규레슨 할인 쿠폰
-}
-
-/// 취소/노쇼 기록
-class CancellationRecord {
-  final String id;
-  final String lessonId;
-  final String studentId;
-  final CancellationType type;            // 취소 or 노쇼
-  final DateTime requestedAt;
-  final int hoursBeforeLesson;            // 레슨 몇 시간 전 취소
-  final bool withinDeadline;              // 마감 내 취소 여부
-  final PenaltyResult? penalty;           // 페널티 결과
-  final bool isEmergencyException;        // 긴급상황 예외 처리 여부
-}
-
-enum CancellationType {
-  cancelled,          // 학생이 취소
-  noShow,             // 학생 노쇼
-  teacherCancelled,   // 선생님이 취소
-  teacherNoShow,      // 선생님 노쇼
-}
-
-/// 페널티 처리 결과
-class PenaltyResult {
-  final PaymentMethod paymentMethod;      // 선결제/후결제
-  final int chargeAmount;                 // 과금 금액
-  final bool lessonDeducted;              // 레슨 차감 여부 (선결제)
-  final String? invoiceId;                // 청구서 ID (후결제)
-}
-
-enum PaymentMethod {
-  prepaid,            // 선결제 (무통장입금 등)
-  postpaid,           // 후결제
-}
-```
+| 엔티티 | 설명 |
+|--------|------|
+| CancellationPolicy | 취소/노쇼 정책 설정 (cancellationDeadlineHours, penaltyType, noShowPolicy) |
+| CancellationPenaltyType | 페널티 유형 enum (fullCharge, halfCharge, freeThenCharge, rescheduleOnly) |
+| NoShowPolicy | 노쇼 정책 (graceMinutes, chargeFullAmount, warningsBeforeBlacklist) |
+| TeacherNoShowCompensation | 선생님 노쇼 보상 설정 |
+| TeacherNoShowOption | 노쇼 보상 옵션 enum (addLesson, extendNextLesson, freeRebooking, freeRebookingWithCoupon) |
+| CancellationRecord | 취소/노쇼 기록 (lessonId, type, hoursBeforeLesson, penalty) |
+| CancellationType | 취소 유형 enum (cancelled, noShow, teacherCancelled, teacherNoShow) |
+| PenaltyResult | 페널티 결과 (chargeAmount, lessonDeducted, invoiceId) |
+| PaymentMethod | 결제 방식 enum (prepaid, postpaid) |
 
 ### 취소 정책 상세
 

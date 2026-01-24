@@ -11,21 +11,23 @@
 
 ```
 docs/schema/
-├── README.md                 # 이 문서
-├── entities/                 # 엔티티 정의
-│   ├── booking.md            # Booking (레슨 예약)
-│   ├── class_membership.md   # ClassMembership (학생-클래스 관계)
-│   ├── lesson_class.md       # LessonClass (학원/개인 클래스)
-│   ├── lesson_location.md    # LessonLocation (레슨 장소)
-│   ├── lesson_schedule.md    # LessonSchedule (스케줄 설정)
-│   ├── parent.md             # Parent (학부모)
-│   ├── payment.md            # Payment, Invoice (결제)
-│   ├── practice_goal.md      # PracticeGoal (연습 목표)
-│   ├── practice_note.md      # PracticeNote (연습노트)
-│   ├── practice_space.md     # PracticeSpace (연습 공간)
-│   ├── student.md            # Student (학생)
-│   └── subscription.md       # Subscription (수강권)
-└── api/                      # API 스펙 (추후)
+├── README.md                   # 이 문서
+├── entities/                   # 엔티티 정의
+│   ├── booking.md              # Booking (레슨 예약)
+│   ├── cancellation_policy.md  # CancellationPolicy (취소/노쇼 정책)
+│   ├── class_membership.md     # ClassMembership (학생-클래스 관계)
+│   ├── lesson_class.md         # LessonClass (학원/개인 클래스)
+│   ├── lesson_location.md      # LessonLocation (레슨 장소)
+│   ├── lesson_schedule.md      # LessonSchedule (스케줄 설정)
+│   ├── parent.md               # Parent (학부모, 자녀, 연결, 설정)
+│   ├── payment.md              # Payment, Invoice (결제)
+│   ├── practice_goal.md        # PracticeGoal (연습 목표)
+│   ├── practice_note.md        # PracticeNote (연습노트)
+│   ├── practice_space.md       # PracticeSpace (연습 공간)
+│   ├── student.md              # Student (학생)
+│   ├── subscription.md         # Subscription (수강권)
+│   └── teacher_availability.md # TeacherAvailability (가용시간)
+└── api/                        # API 스펙 (추후)
     └── ...
 ```
 
@@ -40,14 +42,16 @@ docs/schema/
 | [Booking](entities/booking.md) | 레슨 예약 | [Unified_Lesson_Booking_Spec.md](../specs/lesson/Unified_Lesson_Booking_Spec.md) | 90-93 |
 | [LessonSchedule](entities/lesson_schedule.md) | 스케줄 설정, 5주차 정책 | [lesson_schedule.md](../specs/lesson/lesson_schedule.md) | 94-101 |
 | [LessonClass](entities/lesson_class.md) | 학원/개인레슨 클래스 | [student_class_system.md](../specs/student/student_class_system.md) | 60-62 |
-| [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) | 63-65 |
+| [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) | - |
+| [TeacherAvailability](entities/teacher_availability.md) | 선생님 가용시간 (3계층) | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
+| [CancellationPolicy](entities/cancellation_policy.md) | 취소/노쇼 정책 | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
 
 ### 학생/연습
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
 | [Student](entities/student.md) | 학생 | [student_class_system.md](../specs/student/student_class_system.md) | - |
-| [ClassMembership](entities/class_membership.md) | 학생-클래스 소속 관계 | [student_class_system.md](../specs/student/student_class_system.md) | 66-67 |
+| [ClassMembership](entities/class_membership.md) | 학생-클래스 소속 관계 | [student_class_system.md](../specs/student/student_class_system.md) | TBD |
 | [PracticeSpace](entities/practice_space.md) | 연습 공간, 코치 연결 | [student_centered_architecture.md](../specs/lesson/student_centered_architecture.md) | 81-89 |
 | [PracticeNote](entities/practice_note.md) | 연습노트 | [practice_note_spec.md](../specs/practice/practice_note_spec.md) | 31 |
 | [PracticeGoal](entities/practice_goal.md) | 연습 목표 | [practice_goal_spec.md](../specs/practice/practice_goal_spec.md) | 32 |
@@ -63,7 +67,7 @@ docs/schema/
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
-| [Parent](entities/parent.md) | 학부모 | [parent_system.md](../specs/user/parent_system.md) | - |
+| [Parent](entities/parent.md) | 학부모, 자녀, 연결, 설정 | [parent_system.md](../specs/user/parent_system.md) | 63-72 |
 
 ---
 
@@ -73,11 +77,14 @@ docs/schema/
 |------|--------|--------|
 | 31-32 | 연습 | PracticeNote (31), PracticeGoal (32) |
 | 50-59 | 수강권 | Subscription (55-57) |
-| 60-69 | 클래스 | LessonClass (60-62), LessonLocation (63-65), ClassMembership (66-67) |
-| 70-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
+| 60-62 | 클래스 | LessonClass (60-62) |
+| 63-72 | 학부모 | Parent (63), Child (64), ParentChildRelation (65), ConnectionStatus (66), ProfileType (67), ParentPermission (68), UserProfile (69), ParentTeacherConnection (70), ParentVisibilitySettings (71), ParentNotificationSettings (72) |
+| 73-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
 | 81-89 | 연습공간 | PracticeSpace, CoachConnection, Assignment, InviteCode |
 | 90-93 | 예약 | Booking, LessonType, BookingStatus, TeacherStudentRelation |
 | 94-101 | 스케줄 | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy |
+| TBD | 가용시간 | TeacherAvailability (schema), WeeklySchedule, TimeException, GoogleCalendarSync |
+| TBD | 취소정책 | CancellationPolicy, NoShowPolicy, CancellationRecord, PenaltyResult |
 
 ---
 
