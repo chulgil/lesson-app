@@ -1,9 +1,10 @@
 # 레퍼토리 상세 스펙
 
-> 버전: 1.4
+> 버전: 1.5
 > 작성일: 2026-01-05
+> 최종 수정: 2026-01-24
 > 상태: 구현 완료
-> 관련: [practice_screen_spec.md](./practice_screen_spec.md), [section_detail_spec.md](./section_detail_spec.md)
+> 관련: [practice_screen_spec.md](./practice_screen_spec.md), [section_detail_spec.md](./section_detail_spec.md), [repertoire_quick_edit_spec.md](./repertoire_quick_edit_spec.md)
 
 ---
 
@@ -18,7 +19,11 @@
 | 레퍼토리 상세 | 정보 확인, 섹션 목록, 기간 수정 | ✅ |
 | 레퍼토리 추가 | 새 레퍼토리 생성 (기간 설정 포함) | ✅ |
 | 레퍼토리 편집 | 이름/설명/기간 수정, 아카이브/삭제 | ✅ |
+| **빠른 추가** | 레퍼토리 + 여러 섹션 한 번에 생성 | ✅ |
+| **빠른 편집** | 레퍼토리 + 여러 섹션 한 번에 수정 | ❌ 예정 |
 | 아카이브 목록 | 보관된 레퍼토리 관리 | ✅ |
+
+> **참고**: 빠른 추가/편집 화면 상세는 [repertoire_quick_edit_spec.md](./repertoire_quick_edit_spec.md) 참조
 
 ---
 

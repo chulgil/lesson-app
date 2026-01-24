@@ -128,6 +128,9 @@ docs/
 | [practice_system.md](specs/practice/practice_system.md) | ✅ 확정 | 연습 시스템 스펙 |
 | [Practice_System_Spec.md](specs/practice/Practice_System_Spec.md) | ✅ 확정 | 연습 시스템 상세 스펙 |
 | [practice_streak_spec.md](specs/practice/practice_streak_spec.md) | ✅ 확정 | 연습 스트릭 스펙 |
+| [repertoire_detail_spec.md](specs/practice/repertoire_detail_spec.md) | ✅ 확정 | 레퍼토리 상세/추가/편집 화면 |
+| [repertoire_quick_edit_spec.md](specs/practice/repertoire_quick_edit_spec.md) | 📋 설계 중 | **⭐ 빠른 추가/편집** (레퍼토리+섹션 한 화면) |
+| [section_detail_spec.md](specs/practice/section_detail_spec.md) | ✅ 확정 | 섹션 상세/추가/편집 화면 |
 | [quick_recording_spec.md](specs/practice/quick_recording_spec.md) | 📋 설계 완료 | **바로 녹음** (디폴트 섹션, 연습도구 통합) |
 | [recording_requirement.md](specs/practice/recording_requirement.md) | ✅ 확정 | 녹음 기능 요구사항 |
 | [recording_player_ui.md](specs/practice/recording_player_ui.md) | ✅ 확정 | 녹음 재생 UI 스펙 |

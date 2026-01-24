@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../widgets/section_form/add_section_widgets.dart';
 import '../widgets/section_form/date_range_section.dart';
 
 /// Screen for editing an existing repertoire
@@ -248,18 +248,6 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('레퍼토리 편집'),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : _submit,
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('저장'),
-          ),
-        ],
       ),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -278,6 +266,16 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ========================================
+                  // 📋 기본 정보 섹션
+                  // ========================================
+                  const SectionHeader(
+                    icon: '📋',
+                    title: '기본 정보',
+                    subtitle: '레퍼토리 이름, 설명 설정',
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+
                   // Name field
                   TextFormField(
                     controller: _nameController,
@@ -311,7 +309,9 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
 
                   const SizedBox(height: AppSpacing.space6),
 
-                  // Period section using DateRangeSection
+                  // ========================================
+                  // 📅 연습 기간 섹션
+                  // ========================================
                   DateRangeSection(
                     startDate: _startDate,
                     endDate: _endDate,
@@ -324,56 +324,67 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
 
                   const SizedBox(height: AppSpacing.space8),
 
-                  // Danger zone
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.space4),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '관리',
-                          style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.error,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.space3),
-
-                        // Archive button
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: _isLoading ? null : _archive,
-                            icon: const Icon(Icons.archive_outlined),
-                            label: const Text('아카이브'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.warning,
-                              side: const BorderSide(color: AppColors.warning),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: AppSpacing.space2),
-
-                        // Delete button
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: _isLoading ? null : _delete,
-                            icon: const Icon(Icons.delete_forever),
-                            label: const Text('레퍼토리 삭제'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.error,
-                              side: const BorderSide(color: AppColors.error),
-                            ),
-                          ),
-                        ),
-                      ],
+                  // Submit button
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: _isLoading ? null : _submit,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('변경사항 저장'),
                     ),
                   ),
+
+                  const SizedBox(height: AppSpacing.space8),
+
+                  // ========================================
+                  // 🗄️ 관리 섹션
+                  // ========================================
+                  const SettingSectionHeader(
+                    icon: '🗄️',
+                    title: '관리',
+                    description: '레퍼토리를 아카이브하거나 삭제합니다',
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+
+                  // Archive button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _archive,
+                      icon: const Icon(Icons.archive_outlined),
+                      label: const Text('아카이브'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.warning,
+                        side: const BorderSide(color: AppColors.warning),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.space2),
+
+                  // Delete button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _isLoading ? null : _delete,
+                      icon: const Icon(Icons.delete_forever),
+                      label: const Text('레퍼토리 삭제'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                        side: const BorderSide(color: AppColors.error),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.space4),
                 ],
               ),
             ),

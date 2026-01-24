@@ -6,10 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
-import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../widgets/section_form/add_section_widgets.dart';
-import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_form/range_picker_sheet.dart';
 
 /// Screen for editing an existing practice section
@@ -50,19 +48,11 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   int _startLine = 1;
   int _endLine = 2;
 
-  // Active period (within repertoire dates)
-  DateTime? _startDate;
-  DateTime? _endDate;
-
-  // Repeat settings (isRepeat is derived from endDate: null = repeat)
+  // Repeat settings (N회 반복)
   int? _repeatCount;
 
   // Target practice time in minutes (null = no target)
   int? _targetPracticeMinutes;
-
-  // Repertoire date constraints
-  DateTime? _repertoireStartDate;
-  DateTime? _repertoireEndDate;
 
   @override
   void initState() {
@@ -71,16 +61,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   }
 
   Future<void> _loadSectionData() async {
-    // Load repertoire dates
-    final repertoire =
-        await ref.read(repertoireProvider(widget.repertoireId).future);
-    if (repertoire != null && mounted) {
-      setState(() {
-        _repertoireStartDate = repertoire.startDate;
-        _repertoireEndDate = repertoire.endDate;
-      });
-    }
-
     // Load section data
     final section = await ref.read(sectionProvider(widget.sectionId).future);
     if (section != null && mounted) {
@@ -93,9 +73,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _endMeasure = section.endMeasure;
         _startLine = section.startLine ?? 1;
         _endLine = section.endLine ?? 2;
-        _startDate = section.startDate;
-        _endDate = section.endDate;
-        // isRepeat is derived from endDate (null = repeat)
         _repeatCount = section.repeatCount;
         _targetPracticeMinutes = section.targetPracticeSeconds != null
             ? (section.targetPracticeSeconds! / 60).round()
@@ -139,19 +116,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       }
     }
 
-    // Validate date range if set
-    if (_startDate != null && _endDate != null) {
-      if (_startDate!.isAfter(_endDate!)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('시작일이 종료일보다 늦을 수 없습니다'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-        return;
-      }
-    }
-
     setState(() => _isLoading = true);
 
     try {
@@ -168,13 +132,11 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         sectionName: _sectionNameController.text.trim().isEmpty
             ? null
             : _sectionNameController.text.trim(),
-        isRepeat: _endDate == null, // 종료일 없으면 매일 반복
+        isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
         repeatCount: _repeatCount,
         clearRepeatCount: _repeatCount == null,
-        startDate: _startDate,
-        endDate: _endDate,
-        clearStartDate: _startDate == null,
-        clearEndDate: _endDate == null,
+        clearStartDate: true, // 섹션 날짜는 레퍼토리에서 상속
+        clearEndDate: true,
         targetPracticeSeconds: _targetPracticeMinutes != null
             ? _targetPracticeMinutes! * 60
             : null,
@@ -267,38 +229,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
     );
   }
 
-  Future<void> _showDatePicker({required bool isStart}) async {
-    final now = DateTime.now();
-    final firstDate = _repertoireStartDate ?? now;
-    final lastDate =
-        _repertoireEndDate ?? now.add(const Duration(days: 365 * 2));
-
-    final initialDate = isStart
-        ? (_startDate ?? firstDate)
-        : (_endDate ?? _startDate ?? firstDate);
-
-    final picked = await AppDatePicker.show(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-      helpText: isStart ? '시작일 선택' : '종료일 선택',
-    );
-
-    if (picked != null && mounted) {
-      setState(() {
-        if (isStart) {
-          _startDate = picked;
-          if (_endDate != null && _endDate!.isBefore(picked)) {
-            _endDate = picked;
-          }
-        } else {
-          _endDate = picked;
-        }
-      });
-    }
-  }
-
   String _getRangePreviewText() {
     if (_rangeType == SectionRangeType.measure) {
       return '$_startMeasure~$_endMeasure마디';
@@ -352,22 +282,6 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   }
                   return null;
                 },
-              ),
-
-              const SizedBox(height: AppSpacing.space6),
-
-              // ========================================
-              // 📅 연습 기간 섹션 (공통 위젯 사용)
-              // ========================================
-              DateRangeSection(
-                startDate: _startDate,
-                endDate: _endDate,
-                onStartDateTap: () => _showDatePicker(isStart: true),
-                onEndDateTap: () => _showDatePicker(isStart: false),
-                onEndDateClear: () => setState(() => _endDate = null),
-                startDatePlaceholder: '레퍼토리 시작일 사용',
-                endDatePlaceholder: '설정 안함 (매일 반복)',
-                showHintMessage: true,
               ),
 
               const SizedBox(height: AppSpacing.space6),
