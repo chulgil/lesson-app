@@ -1,6 +1,6 @@
 # 문서 레지스트리
 
-> 버전: 1.1
+> 버전: 1.2
 > 최종 업데이트: 2026-01-24
 
 이 문서는 모든 스펙 문서와 공통 모듈 간의 의존성을 추적합니다.
@@ -139,6 +139,7 @@
 | 패턴 | 사용 위치 |
 |------|----------|
 | `patterns/barrel_file` | `lib/features/lessons/presentation/widgets/lesson_form_widgets.dart` |
+| `patterns/barrel_file` | `lib/features/students/presentation/widgets/student_form_widgets.dart` |
 | `patterns/mixin_split` | `lib/repositories/impl/` (PracticeRepertoireRepository) |
 
 ### 예시: Barrel File 패턴
@@ -191,5 +192,6 @@ class MockPracticeRepertoireRepository extends PracticeRepositoryBase
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.2 | 2026-01-24 | student_form_widgets barrel_file 사용처 추가 |
 | 1.1 | 2026-01-24 | 코드 패턴 섹션 추가 (barrel_file, mixin_split) |
 | 1.0 | 2026-01-04 | 초기 레지스트리 생성 |

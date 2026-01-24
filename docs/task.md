@@ -31,7 +31,7 @@ Phase 4: 배포 & 고도화 📋 예정
 | 인증 하드코딩 제거 | ✅ | `currentUserIdProvider` 통합 |
 | StateNotifier → @riverpod | ✅ | `ReportDate`, `StreakNotifier` 마이그레이션 |
 | 엔티티 색상 통합 | ✅ | 11개 enum → AppColors |
-| 대형 파일 분리 | ✅ | lesson_form_widgets.dart, practice_repertoire_repository.dart |
+| 대형 파일 분리 | ✅ | lesson_form_widgets, student_form_widgets, practice_repertoire_repository |
 
 ### 파일 구조 변경
 
@@ -40,6 +40,13 @@ Phase 4: 배포 & 고도화 📋 예정
 lib/features/lessons/presentation/widgets/
 ├── lesson_form_widgets.dart          # Barrel file
 └── lesson_form/                      # 11개 위젯 파일
+```
+
+**student_form/ (신규)**
+```
+lib/features/students/presentation/widgets/
+├── student_form_widgets.dart         # Barrel file
+└── student_form/                     # 12개 위젯 파일
 ```
 
 **repositories/impl/ (신규)**
