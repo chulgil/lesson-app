@@ -45,9 +45,45 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       body: SafeArea(
         child: Column(
           children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenPadding,
+                AppSpacing.space2,
+                AppSpacing.screenPadding,
+                0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('내 연습', style: AppTypography.headingLarge),
+                  FilledButton.icon(
+                    onPressed: () {
+                      context.push(
+                        '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                      );
+                    },
+                    icon: const Icon(Icons.add, size: 18),
+                    label: const Text('레퍼토리 추가'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space4,
+                        vertical: AppSpacing.space2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             // Calendar
             Padding(
-              padding: const EdgeInsets.all(AppSpacing.space3),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenPadding,
+                AppSpacing.space3,
+                AppSpacing.screenPadding,
+                0,
+              ),
               child: WeekCalendarWidget(
                 selectedDate: _selectedDate,
                 onDateSelected: (date) {
@@ -59,54 +95,63 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               ),
             ),
 
+            const SizedBox(height: AppSpacing.space3),
+
             // Date header with count and sort option
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
               ),
               child: repertoiresAsync.when(
-                data: (repertoires) => Row(
-                  children: [
-                    Text(
-                      _formatDate(_selectedDate),
-                      style: AppTypography.headingSmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                data: (repertoires) {
+                  // Calculate total section count for selected date
+                  final sectionCount = repertoires.fold<int>(
+                    0,
+                    (sum, rep) => sum + rep.getSectionsForDate(_selectedDate).length,
+                  );
+                  return Row(
+                    children: [
+                      Text(
+                        _formatDate(_selectedDate),
+                        style: AppTypography.headingSmall.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
                       ),
-                    ),
-                    if (_isToday()) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusSmall),
-                        ),
-                        child: Text(
-                          '오늘',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                      if (_isToday()) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.radiusSmall),
+                          ),
+                          child: Text(
+                            '오늘',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
+                      ],
+                      const Spacer(),
+                      // Section count
+                      Text(
+                        '$sectionCount개 섹션',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textTertiaryLight,
+                        ),
                       ),
+                      const SizedBox(width: 12),
+                      // Sort dropdown
+                      _buildSortDropdown(),
                     ],
-                    const Spacer(),
-                    // Repertoire count
-                    Text(
-                      '${repertoires.length}개 레퍼토리',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textTertiaryLight,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Sort dropdown
-                    _buildSortDropdown(),
-                  ],
-                ),
+                  );
+                },
                 loading: () => Row(
                   children: [
                     Text(
@@ -133,8 +178,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 ),
               ),
             ),
-
-            const SizedBox(height: AppSpacing.space3),
 
             // Repertoire list
             Expanded(
@@ -289,21 +332,6 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 color: AppColors.textSecondaryLight,
               ),
             ),
-            const SizedBox(height: AppSpacing.space6),
-            if (_isToday())
-              OutlinedButton.icon(
-                onPressed: () {
-                  context.push(
-                    '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('레퍼토리 추가'),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  side: BorderSide(color: AppColors.primary),
-                ),
-              ),
           ],
         ),
       ),
@@ -312,33 +340,14 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
 
   Widget _buildRepertoireList(List<PracticeRepertoire> repertoires, String studentId) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+        AppSpacing.screenPadding,
+        0,
       ),
-      itemCount: repertoires.length + 1, // +1 for add button
+      itemCount: repertoires.length,
       itemBuilder: (context, index) {
-        // Last item is add button
-        if (index == repertoires.length) {
-          return Padding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.space2,
-              bottom: AppSpacing.space4,
-            ),
-            child: OutlinedButton.icon(
-              onPressed: () {
-                context.push(
-                  '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                );
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('레퍼토리 추가'),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                side: BorderSide(color: AppColors.primary),
-              ),
-            ),
-          );
-        }
         final repertoire = repertoires[index];
         return _RepertoireCard(
           repertoire: repertoire,
