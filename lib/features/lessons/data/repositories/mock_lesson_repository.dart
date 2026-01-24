@@ -37,7 +37,7 @@ class MockLessonRepository implements LessonRepository {
           ),
         ],
         location: const LessonLocationInfo(
-          name: '스튜디오 메이트',
+          name: '남부터미널 우드브릿지',
           address: '서울시 강남구 테헤란로 123',
         ),
         feedback: '활 잡는 자세가 많이 좋아졌어요. 다음 시간에는 3번 곡 연습해오세요.',
@@ -138,7 +138,7 @@ class MockLessonRepository implements LessonRepository {
           ),
         ],
         location: const LessonLocationInfo(
-          name: '스튜디오 메이트',
+          name: '남부터미널 우드브릿지',
           address: '서울시 강남구 테헤란로 123',
         ),
         createdAt: today.subtract(const Duration(days: 1)),
@@ -189,7 +189,7 @@ class MockLessonRepository implements LessonRepository {
           ),
         ],
         location: const LessonLocationInfo(
-          name: '스튜디오 메이트',
+          name: '남부터미널 우드브릿지',
           address: '서울시 강남구 테헤란로 123',
         ),
         feedback: '비브라토 연습을 더 해오세요. 손목 힘을 빼고 자연스럽게.',

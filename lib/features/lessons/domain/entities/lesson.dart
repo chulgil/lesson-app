@@ -84,7 +84,7 @@ class LessonRecording {
 
 /// Lesson location info (simplified for display)
 class LessonLocationInfo {
-  final String name; // "스튜디오 메이트", "학생 집"
+  final String name; // "남부터미널 우드브릿지", "학생 집"
   final String? address; // Optional address
 
   const LessonLocationInfo({
