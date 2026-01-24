@@ -18,6 +18,7 @@ import 'routes/parent_routes.dart';
 import 'routes/search_routes.dart';
 import 'routes/invite_routes.dart';
 import 'routes/settings_routes.dart';
+import 'routes/subscription_routes.dart';
 
 // Re-export AppRoutes for convenient imports
 export 'app_routes.dart';
@@ -45,6 +46,7 @@ class AppRouter {
       ...searchRoutes,
       ...inviteRoutes,
       ...settingsRoutes,
+      ...subscriptionRoutes,
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(

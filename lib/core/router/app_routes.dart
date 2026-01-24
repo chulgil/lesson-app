@@ -78,6 +78,10 @@ class AppRoutes {
   static const bookingList = '/schedule/bookings';
   static const bookingDetail = '/schedule/booking/:id';
 
+  // Subscription routes
+  static const subscriptions = '/subscriptions';
+  static const subscriptionDetail = '/subscriptions/:id';
+
   // Parent routes
   static const childProfiles = '/parent/children';
   static const addChildProfile = '/parent/children/add';

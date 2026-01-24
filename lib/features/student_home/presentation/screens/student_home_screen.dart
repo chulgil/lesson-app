@@ -12,8 +12,10 @@ import '../../../../main.dart' show getStartupRecoveryResult, clearStartupRecove
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../../core/widgets/practice_center_button.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
+import '../widgets/student_subscription_summary.dart';
 import '../widgets/weekly_practice_widget.dart';
 import 'student_lessons_tab.dart';
 import 'student_practice_tab.dart';
@@ -164,8 +166,8 @@ class _StudentDashboardTab extends ConsumerWidget {
     final now = DateTime.now();
     final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
 
-    // TODO: Replace with actual student ID from auth
-    const currentStudentId = 'student_1';
+    // Get current student ID from auth provider
+    final currentStudentId = ref.watch(currentUserIdProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -212,7 +214,7 @@ class _StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Practice Streak Card (NEW)
-          const PracticeStreakCard(studentId: currentStudentId),
+          PracticeStreakCard(studentId: currentStudentId),
 
           const SizedBox(height: AppSpacing.space4),
 
@@ -223,6 +225,16 @@ class _StudentDashboardTab extends ConsumerWidget {
               context.push(
                 '${AppRoutes.practiceGoalSettings}?studentId=$currentStudentId',
               );
+            },
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // My Subscriptions (수강권 요약)
+          StudentSubscriptionSummary(
+            studentId: currentStudentId,
+            onViewAll: () {
+              context.push('${AppRoutes.subscriptions}?studentId=$currentStudentId');
             },
           ),
 
