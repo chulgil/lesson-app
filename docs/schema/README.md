@@ -13,12 +13,15 @@
 docs/schema/
 ├── README.md                 # 이 문서
 ├── entities/                 # 엔티티 정의
-│   ├── lesson_class.md       # LessonClass (학원/개인 클래스)
+│   ├── booking.md            # Booking (레슨 예약)
 │   ├── class_membership.md   # ClassMembership (학생-클래스 관계)
-│   ├── subscription.md       # Subscription (수강권)
+│   ├── lesson_class.md       # LessonClass (학원/개인 클래스)
 │   ├── lesson_location.md    # LessonLocation (레슨 장소)
+│   ├── parent.md             # Parent (학부모)
+│   ├── payment.md            # Payment, Invoice (결제)
+│   ├── practice_space.md     # PracticeSpace (연습 공간)
 │   ├── student.md            # Student (학생)
-│   └── parent.md             # Parent (학부모)
+│   └── subscription.md       # Subscription (수강권)
 └── api/                      # API 스펙 (추후)
     └── ...
 ```
@@ -27,14 +30,46 @@ docs/schema/
 
 ## 엔티티 인덱스
 
-| 엔티티 | 설명 | 관련 스펙 |
-|--------|------|----------|
-| [LessonClass](entities/lesson_class.md) | 학원/개인레슨 클래스 | [student_class_system.md](../specs/student/student_class_system.md) |
-| [ClassMembership](entities/class_membership.md) | 학생-클래스 소속 관계 | [student_class_system.md](../specs/student/student_class_system.md) |
-| [Subscription](entities/subscription.md) | 수강권 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) |
-| [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) |
-| [Student](entities/student.md) | 학생 (단순화) | [student_class_system.md](../specs/student/student_class_system.md) |
-| [Parent](entities/parent.md) | 학부모 | [parent_system.md](../specs/user/parent_system.md) |
+### 레슨/예약
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Booking](entities/booking.md) | 레슨 예약 | [Unified_Lesson_Booking_Spec.md](../specs/lesson/Unified_Lesson_Booking_Spec.md) | 90-93 |
+| [LessonClass](entities/lesson_class.md) | 학원/개인레슨 클래스 | [student_class_system.md](../specs/student/student_class_system.md) | 60-62 |
+| [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) | 63-65 |
+
+### 학생/연습
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Student](entities/student.md) | 학생 | [student_class_system.md](../specs/student/student_class_system.md) | - |
+| [ClassMembership](entities/class_membership.md) | 학생-클래스 소속 관계 | [student_class_system.md](../specs/student/student_class_system.md) | 66-67 |
+| [PracticeSpace](entities/practice_space.md) | 연습 공간, 코치 연결 | [student_centered_architecture.md](../specs/lesson/student_centered_architecture.md) | 81-89 |
+
+### 결제/수강권
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Payment](entities/payment.md) | 결제, 청구서 | [payment_unified_spec.md](../specs/payment/payment_unified_spec.md) | 70-80 |
+| [Subscription](entities/subscription.md) | 수강권 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 50-52 |
+
+### 사용자
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Parent](entities/parent.md) | 학부모 | [parent_system.md](../specs/user/parent_system.md) | - |
+
+---
+
+## Hive TypeId 할당 현황
+
+| 범위 | 도메인 | 엔티티 |
+|------|--------|--------|
+| 50-59 | 수강권 | Subscription |
+| 60-69 | 클래스 | LessonClass, LessonLocation, ClassMembership |
+| 70-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
+| 81-89 | 연습공간 | PracticeSpace, CoachConnection, Assignment, InviteCode |
+| 90-99 | 예약 | Booking, LessonType, BookingStatus |
 
 ---
 
@@ -42,11 +77,11 @@ docs/schema/
 
 | 구분 | 위치 | 내용 |
 |------|------|------|
-| **설계 (What)** | `docs/specs/` | 비즈니스 요구사항, 상태 enum, 관계도, UI 설계 |
-| **구현 (How)** | `docs/schema/` | Dart 엔티티, JSON 스키마, 테이블 설계, API 스펙 |
+| **설계 (What)** | `docs/specs/` | 비즈니스 요구사항, 상태 enum 테이블, 관계도, UI 설계 |
+| **구현 (How)** | `docs/schema/` | Dart 엔티티, JSON 스키마, Hive TypeId, API 스펙 |
 
 ### Spec 문서에 남길 내용
-- 상태 enum 이름과 의미 (예: `SubscriptionStatus`)
+- 상태 enum 이름과 의미 (테이블 형식)
 - 엔티티 간 관계도 (ASCII)
 - UI 설계 (ASCII 또는 Figma 링크)
 - 비즈니스 규칙
@@ -55,18 +90,19 @@ docs/schema/
 - 전체 Dart class 코드
 - 필드별 상세 설명 및 타입
 - JSON 직렬화 예시
+- Hive TypeId 할당
 - Repository 메서드 시그니처
-- 마이그레이션 스크립트
 
 ---
 
 ## 파일 위치 규칙
 
 ```dart
-// 엔티티 파일 위치
+// 엔티티 파일 위치 (예시)
 lib/features/students/domain/entities/lesson_class.dart
-lib/features/students/domain/entities/class_membership.dart
-lib/features/subscription/domain/entities/subscription.dart
+lib/features/schedule/domain/entities/booking.dart
+lib/features/lessons/domain/entities/payment.dart
+lib/features/practice/domain/entities/practice_space.dart
 ```
 
 ---
