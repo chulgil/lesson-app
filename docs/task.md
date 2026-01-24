@@ -1,22 +1,60 @@
 # 레슨 앱 개발 태스크
 
 > 음악 레슨/연습 관리 앱 개발 태스크 목록
+> 최종 업데이트: 2026-01-24
 
 ---
 
-## 개발 순서
+## 현재 상태
 
 ```
-Phase 0: UI 설계 & 검증 (2주)
+Phase 0: UI 설계 & 검증 ✅ 완료
     ↓
-Phase 1: API 설계 & 백엔드 (3-4주)
+Phase 1: Flutter 구현 ✅ 완료
     ↓
-Phase 2: Flutter 구현 (3-4주)
+Phase 2: 기능 고도화 🔄 진행중
     ↓
-Phase 3: 녹음 + AI 기능 (3-4주)
+Phase 3: 백엔드 연동 (FastAPI) 📋 예정
     ↓
-Phase 4: 고도화 & 배포 (이후)
+Phase 4: 배포 & 고도화 📋 예정
 ```
+
+---
+
+## 최근 완료 작업 (2026-01-24)
+
+### 코드 품질 개선 ✅
+
+| 작업 | 상태 | 내용 |
+|------|:----:|------|
+| Flutter Analyze 경고 수정 | ✅ | 미사용 코드 삭제 |
+| 인증 하드코딩 제거 | ✅ | `currentUserIdProvider` 통합 |
+| StateNotifier → @riverpod | ✅ | `ReportDate`, `StreakNotifier` 마이그레이션 |
+| 엔티티 색상 통합 | ✅ | 11개 enum → AppColors |
+| 대형 파일 분리 | ✅ | lesson_form_widgets.dart, practice_repertoire_repository.dart |
+
+### 파일 구조 변경
+
+**lesson_form/ (신규)**
+```
+lib/features/lessons/presentation/widgets/
+├── lesson_form_widgets.dart          # Barrel file
+└── lesson_form/                      # 11개 위젯 파일
+```
+
+**repositories/impl/ (신규)**
+```
+lib/repositories/
+├── practice_repertoire_repository.dart  # Interface
+└── impl/
+    ├── practice_repository_base.dart
+    ├── mock_practice_repertoire_impl.dart
+    └── mixins/                          # 6개 mixin 파일
+```
+
+---
+
+## 개발 순서 (원본)
 
 ---
 

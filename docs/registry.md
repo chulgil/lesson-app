@@ -1,7 +1,7 @@
 # 문서 레지스트리
 
-> 버전: 1.0
-> 최종 업데이트: 2026-01-04
+> 버전: 1.1
+> 최종 업데이트: 2026-01-24
 
 이 문서는 모든 스펙 문서와 공통 모듈 간의 의존성을 추적합니다.
 
@@ -125,7 +125,49 @@
 
 ---
 
-## 6. 변경 영향 분석
+## 6. 코드 패턴 (`_patterns/code/`)
+
+### 정의
+
+| 패턴 ID | 파일 | 설명 |
+|---------|------|------|
+| `patterns/barrel_file` | - | 여러 파일을 하나로 re-export |
+| `patterns/mixin_split` | - | 대형 클래스를 mixin으로 분리 |
+
+### 사용처
+
+| 패턴 | 사용 위치 |
+|------|----------|
+| `patterns/barrel_file` | `lib/features/lessons/presentation/widgets/lesson_form_widgets.dart` |
+| `patterns/mixin_split` | `lib/repositories/impl/` (PracticeRepertoireRepository) |
+
+### 예시: Barrel File 패턴
+
+```dart
+/// lib/features/.../widgets/lesson_form_widgets.dart
+export 'lesson_form/lesson_student_info.dart';
+export 'lesson_form/lesson_student_selector.dart';
+// ... 모든 하위 파일 re-export
+```
+
+### 예시: Mixin Split 패턴
+
+```dart
+/// Base class with shared state
+abstract class PracticeRepositoryBase { ... }
+
+/// Mixins for each responsibility
+mixin PracticeRepertoireCrudMixin on PracticeRepositoryBase { ... }
+mixin PracticeSectionMixin on PracticeRepositoryBase { ... }
+
+/// Final class combining all mixins
+class MockPracticeRepertoireRepository extends PracticeRepositoryBase
+    with PracticeRepertoireCrudMixin, PracticeSectionMixin, ... { }
+```
+
+---
+
+## 7. 변경 영향 분석
 
 토큰/컴포넌트/패턴 변경 시 영향받는 문서:
 
@@ -149,4 +191,5 @@
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.1 | 2026-01-24 | 코드 패턴 섹션 추가 (barrel_file, mixin_split) |
 | 1.0 | 2026-01-04 | 초기 레지스트리 생성 |
