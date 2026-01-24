@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 /// Payment type enum (trial vs regular)
 enum PaymentType {
   trial,   // 체험 레슨
@@ -53,18 +55,18 @@ enum PaymentStatus {
   Color get color {
     switch (this) {
       case PaymentStatus.pending:
-        return const Color(0xFFFF9800); // 🟡 Amber
+        return AppColors.warning;
       case PaymentStatus.paid:
-        return const Color(0xFF2196F3); // 🔵 Blue
+        return AppColors.info;
       case PaymentStatus.confirmed:
       // ignore: deprecated_member_use_from_same_package
       case PaymentStatus.completed:
-        return const Color(0xFF4CAF50); // 🟢 Green
+        return AppColors.success;
       case PaymentStatus.overdue:
-        return const Color(0xFFF44336); // 🔴 Red
+        return AppColors.error;
       case PaymentStatus.cancelled:
       case PaymentStatus.refunded:
-        return const Color(0xFF9E9E9E); // ⚪ Grey
+        return AppColors.textTertiaryLight;
     }
   }
 

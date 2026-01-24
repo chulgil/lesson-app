@@ -2,6 +2,8 @@
 // Moved from lib/models/lesson_booking.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
+
+import '../../../../core/theme/app_colors.dart';
 import 'time_slot.dart';
 
 /// Lesson type enum
@@ -24,11 +26,11 @@ enum LessonType {
   Color get color {
     switch (this) {
       case LessonType.trial:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case LessonType.regular:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case LessonType.oneTime:
-        return const Color(0xFF2196F3); // Blue
+        return AppColors.info;
     }
   }
 }
@@ -109,19 +111,19 @@ enum BookingStatus {
   Color get color {
     switch (this) {
       case BookingStatus.pending:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case BookingStatus.confirmed:
-        return const Color(0xFF2196F3); // Blue
+        return AppColors.info;
       case BookingStatus.changeRequested:
-        return const Color(0xFF9C27B0); // Purple
+        return AppColors.primary;
       case BookingStatus.completed:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case BookingStatus.cancelled:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
       case BookingStatus.unavailable:
-        return const Color(0xFFFF7043); // Deep Orange (softer than red)
+        return AppColors.secondary;
       case BookingStatus.expired:
-        return const Color(0xFF78909C); // Blue Grey
+        return AppColors.textSecondaryLight;
     }
   }
 

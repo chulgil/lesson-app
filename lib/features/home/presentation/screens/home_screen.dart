@@ -375,8 +375,7 @@ class _DashboardTab extends ConsumerWidget {
   }
 
   Widget _buildPendingBookingsButton(BuildContext context, WidgetRef ref) {
-    // TODO: Replace with actual teacher ID from auth provider
-    const teacherId = 'teacher_1';
+    final teacherId = ref.watch(currentUserIdProvider);
     final pendingCountAsync = ref.watch(pendingBookingsCountProvider(teacherId));
 
     return pendingCountAsync.when(

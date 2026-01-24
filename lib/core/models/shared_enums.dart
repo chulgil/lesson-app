@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 // ============================================================================
 // Shared Enums - Used across multiple domains
 // ============================================================================
@@ -87,15 +89,15 @@ enum ConnectionStatus {
   Color get color {
     switch (this) {
       case ConnectionStatus.offline:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
       case ConnectionStatus.inviteSent:
-        return const Color(0xFFFFC107); // Amber/Yellow
+        return AppColors.warning;
       case ConnectionStatus.inviteReceived:
-        return const Color(0xFF2196F3); // Blue
+        return AppColors.info;
       case ConnectionStatus.connected:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case ConnectionStatus.disconnected:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
     }
   }
 
@@ -133,15 +135,15 @@ enum PracticeLevel {
   Color get color {
     switch (this) {
       case PracticeLevel.newStudent:
-        return const Color(0xFF6B5B95); // App primary (purple)
+        return AppColors.primary;
       case PracticeLevel.excellent:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case PracticeLevel.average:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case PracticeLevel.poor:
-        return const Color(0xFFF44336); // Red
+        return AppColors.error;
       case PracticeLevel.onBreak:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
     }
   }
 

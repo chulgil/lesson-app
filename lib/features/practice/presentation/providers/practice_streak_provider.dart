@@ -1,68 +1,56 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../models/practice.dart';
+import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 import 'practice_repository_provider.dart';
 
+part 'practice_streak_provider.g.dart';
+
 /// Provider for getting practice streak by student ID
-final practiceStreakProvider =
-    FutureProvider.family<PracticeStreak, String>((ref, studentId) async {
+@riverpod
+Future<PracticeStreak> practiceStreak(
+  Ref ref,
+  String studentId,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getStreak(studentId);
-});
+}
 
 /// Provider for recording practice and updating streak
-final recordPracticeProvider =
-    FutureProvider.family<PracticeStreak, String>((ref, studentId) async {
+@riverpod
+Future<PracticeStreak> recordPractice(
+  Ref ref,
+  String studentId,
+) async {
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.recordPractice(studentId);
-});
+}
 
 /// State notifier for managing streak updates
-class StreakNotifier extends StateNotifier<AsyncValue<PracticeStreak>> {
-  final Ref _ref;
-  final String _studentId;
-
-  StreakNotifier(this._ref, this._studentId) : super(const AsyncValue.loading()) {
-    _loadStreak();
-  }
-
-  Future<void> _loadStreak() async {
-    state = const AsyncValue.loading();
-    try {
-      final repository = _ref.read(practiceRepositoryProvider);
-      final streak = await repository.getStreak(_studentId);
-      state = AsyncValue.data(streak);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+@riverpod
+class StreakNotifier extends _$StreakNotifier {
+  @override
+  Future<PracticeStreak> build(String studentId) async {
+    final repository = ref.watch(practiceRepositoryProvider);
+    return repository.getStreak(studentId);
   }
 
   Future<void> recordPractice() async {
-    try {
-      final repository = _ref.read(practiceRepositoryProvider);
-      final streak = await repository.recordPractice(_studentId);
-      state = AsyncValue.data(streak);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
-    }
+    final repository = ref.read(practiceRepositoryProvider);
+    final streak = await repository.recordPractice(studentId);
+    state = AsyncValue.data(streak);
   }
 
   Future<void> refresh() async {
-    await _loadStreak();
+    ref.invalidateSelf();
   }
 }
 
-/// Provider for streak notifier by student ID
-final streakNotifierProvider = StateNotifierProvider.family<StreakNotifier,
-    AsyncValue<PracticeStreak>, String>(
-  (ref, studentId) => StreakNotifier(ref, studentId),
-);
-
-/// Simple provider for current user's streak (assuming student_1 for now)
-/// In production, this would use the authenticated user's ID
-final currentUserStreakProvider = FutureProvider<PracticeStreak>((ref) async {
-  // TODO: Replace with actual current user ID from auth provider
-  const currentUserId = 'student_1';
+/// Provider for current user's streak
+@riverpod
+Future<PracticeStreak> currentUserStreak(Ref ref) async {
+  final currentUserId = ref.watch(currentUserIdProvider);
   final repository = ref.watch(practiceRepositoryProvider);
   return repository.getStreak(currentUserId);
-});
+}

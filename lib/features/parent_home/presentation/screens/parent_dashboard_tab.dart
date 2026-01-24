@@ -7,13 +7,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/child_profile.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/child_profile_provider.dart';
 
 /// Selected child provider for parent dashboard
 final selectedChildIdProvider = StateProvider<String?>((ref) => null);
-
-/// Parent ID (TODO: Get from auth provider)
-const _parentId = 'parent_1';
 
 /// Parent dashboard tab showing child overview
 class ParentDashboardTab extends ConsumerWidget {
@@ -22,8 +20,9 @@ class ParentDashboardTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch selected child profile
+    final parentId = ref.watch(currentUserIdProvider);
     final selectedProfile = ref.watch(selectedChildProfileProvider);
-    final childrenAsync = ref.watch(childProfilesProvider(_parentId));
+    final childrenAsync = ref.watch(childProfilesProvider(parentId));
 
     // Auto-select first child if none selected
     if (selectedProfile == null) {
@@ -44,7 +43,7 @@ class ParentDashboardTab extends ConsumerWidget {
         actions: [
           // Child selector button
           IconButton(
-            onPressed: () => _showChildSelector(context, ref),
+            onPressed: () => _showChildSelector(context, ref, parentId),
             icon: const Icon(Icons.swap_horiz),
             tooltip: '자녀 전환',
           ),
@@ -55,14 +54,14 @@ class ParentDashboardTab extends ConsumerWidget {
         error: (e, _) => Center(child: Text('오류: $e')),
         data: (profiles) {
           if (profiles.isEmpty) {
-            return _buildEmptyState(context);
+            return _buildEmptyState(context, parentId);
           }
 
           final profile = selectedProfile ?? profiles.first;
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.invalidate(childProfilesProvider(_parentId));
+              ref.invalidate(childProfilesProvider(parentId));
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -132,7 +131,7 @@ class ParentDashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, String parentId) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -160,7 +159,7 @@ class ParentDashboardTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
             ElevatedButton.icon(
               onPressed: () {
-                context.push('${AppRoutes.addChildProfile}?parentId=$_parentId');
+                context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
               },
               icon: const Icon(Icons.add),
               label: const Text('자녀 추가하기'),
@@ -179,7 +178,7 @@ class ParentDashboardTab extends ConsumerWidget {
     );
   }
 
-  void _showChildSelector(BuildContext context, WidgetRef ref) {
+  void _showChildSelector(BuildContext context, WidgetRef ref, String parentId) {
     final selectedChildId = ref.read(selectedChildIdProvider);
 
     showModalBottomSheet(
@@ -189,7 +188,7 @@ class ParentDashboardTab extends ConsumerWidget {
       ),
       builder: (sheetContext) => Consumer(
         builder: (context, sheetRef, _) {
-          final profilesAsync = sheetRef.watch(childProfilesProvider(_parentId));
+          final profilesAsync = sheetRef.watch(childProfilesProvider(parentId));
 
           return Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
@@ -280,7 +279,7 @@ class ParentDashboardTab extends ConsumerWidget {
                   onPressed: () {
                     Navigator.pop(sheetContext);
                     context.push(
-                      '${AppRoutes.addChildProfile}?parentId=$_parentId',
+                      '${AppRoutes.addChildProfile}?parentId=$parentId',
                     );
                   },
                   icon: const Icon(Icons.add),

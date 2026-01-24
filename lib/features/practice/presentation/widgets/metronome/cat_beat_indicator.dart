@@ -5,9 +5,6 @@ import '../../../../../models/metronome_settings.dart';
 /// Pastel purple color for paw (per spec).
 const _pawColor = AppColors.catAccent;
 
-/// Easing curve per spec: cubic-bezier(0.22, 0.61, 0.36, 1).
-const _dropCurve = Cubic(0.22, 0.61, 0.36, 1);
-
 /// Cat beat indicator with animated paw design.
 ///
 /// Visual components:

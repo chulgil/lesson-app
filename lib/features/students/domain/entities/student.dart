@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 // Import shared enums from core layer
 import '../../../../core/models/shared_enums.dart';
 
@@ -30,13 +31,13 @@ enum StudentStatus {
   Color get color {
     switch (this) {
       case StudentStatus.trial:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case StudentStatus.active:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case StudentStatus.paused:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
       case StudentStatus.inactive:
-        return const Color(0xFFE57373); // Red
+        return AppColors.error;
     }
   }
 
@@ -105,13 +106,13 @@ enum PracticeStatus {
   Color get color {
     switch (this) {
       case PracticeStatus.good:
-        return const Color(0xFF2E8B57);
+        return AppColors.practiceGood;
       case PracticeStatus.normal:
-        return const Color(0xFFF4A460);
+        return AppColors.practiceNormal;
       case PracticeStatus.poor:
-        return const Color(0xFFDC143C);
+        return AppColors.practicePoor;
       case PracticeStatus.paused:
-        return const Color(0xFF9E9E9E);
+        return AppColors.practicePaused;
     }
   }
 }

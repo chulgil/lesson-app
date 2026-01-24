@@ -17,13 +17,6 @@ class MockPracticeRepository implements PracticeRepository {
     // No dummy data - users create their own practice logs
   }
 
-  void _initStreaks() {
-    for (final studentId in _logs.keys) {
-      final streak = _calculateStreak(studentId);
-      _streaks[studentId] = streak;
-    }
-  }
-
   /// Check if a date is a weekend (Saturday or Sunday)
   bool _isWeekend(DateTime date) {
     return date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;

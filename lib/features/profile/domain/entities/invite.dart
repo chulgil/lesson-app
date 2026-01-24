@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 // Re-export shared enums for backward compatibility
 export '../../../../core/models/shared_enums.dart'
     show ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
@@ -64,13 +66,13 @@ enum InviteStatus {
   Color get color {
     switch (this) {
       case InviteStatus.active:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case InviteStatus.used:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
       case InviteStatus.expired:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case InviteStatus.revoked:
-        return const Color(0xFFE57373); // Red
+        return AppColors.error;
     }
   }
 

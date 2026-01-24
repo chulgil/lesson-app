@@ -2,15 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../models/tip_template.dart';
 import '../../../../repositories/tip_template_repository.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 
 /// Repository provider
 final tipTemplateRepositoryProvider = Provider<TipTemplateRepository>((ref) {
   return MockTipTemplateRepository();
 });
 
-/// Current teacher ID provider (placeholder - should come from auth)
+/// Current teacher ID provider - uses currentUserIdProvider from auth
 final currentTeacherIdProvider = Provider<String>((ref) {
-  return 'teacher_1'; // TODO: Get from auth
+  return ref.watch(currentUserIdProvider);
 });
 
 /// All templates for current teacher

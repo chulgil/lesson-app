@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/repertoire_sort_type.dart';
 import '../../../practice/presentation/providers/repertoire_sort_provider.dart';
 import '../widgets/week_calendar_widget.dart';
@@ -22,19 +23,19 @@ class StudentPracticeTab extends ConsumerStatefulWidget {
 
 class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   DateTime _selectedDate = DateTime.now();
-  final String _studentId = 'student_1'; // TODO: Get from auth
 
   @override
   Widget build(BuildContext context) {
+    final studentId = ref.watch(currentUserIdProvider);
     final params = RepertoiresForDateParams(
-      studentId: _studentId,
+      studentId: studentId,
       date: _selectedDate,
     );
     final repertoiresAsync = ref.watch(repertoiresForDateProvider(params));
 
     // Get all repertoires to find practiced dates
     final allRepertoiresAsync =
-        ref.watch(studentRepertoiresProvider(_studentId));
+        ref.watch(studentRepertoiresProvider(studentId));
     final practicedDates = allRepertoiresAsync.whenOrNull(
       data: (repertoires) => _getPracticedDates(repertoires),
     );
@@ -103,12 +104,12 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               child: repertoiresAsync.when(
                 data: (repertoires) {
                   if (repertoires.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(studentId);
                   }
                   // Apply sorting
                   final sortType = ref.watch(repertoireSortTypeProvider);
                   final sortedRepertoires = repertoires.sortBy(sortType);
-                  return _buildRepertoireList(sortedRepertoires);
+                  return _buildRepertoireList(sortedRepertoires, studentId);
                 },
                 loading: () =>
                     const Center(child: CircularProgressIndicator()),
@@ -123,7 +124,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.push(
-            '${AppRoutes.addRepertoire}?studentId=$_studentId',
+            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
           );
         },
         child: const Icon(Icons.add),
@@ -257,7 +258,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     return dates;
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(String studentId) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -279,7 +280,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
             FilledButton.icon(
               onPressed: () {
                 context.push(
-                  '${AppRoutes.addRepertoire}?studentId=$_studentId',
+                  '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
                 );
               },
               icon: const Icon(Icons.add),
@@ -290,7 +291,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     );
   }
 
-  Widget _buildRepertoireList(List<PracticeRepertoire> repertoires) {
+  Widget _buildRepertoireList(List<PracticeRepertoire> repertoires, String studentId) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
@@ -301,7 +302,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
         return _RepertoireCard(
           repertoire: repertoire,
           selectedDate: _selectedDate,
-          studentId: _studentId,
+          studentId: studentId,
           isToday: _isToday(),
         );
       },

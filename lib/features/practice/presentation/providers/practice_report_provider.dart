@@ -1,56 +1,63 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/utils/time_format_utils.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_stats_repository.dart';
 
+part 'practice_report_provider.g.dart';
+
 /// Practice stats repository provider
-final practiceReportRepositoryProvider =
-    Provider<PracticeStatsRepository>((ref) {
+@riverpod
+PracticeStatsRepository practiceReportRepository(Ref ref) {
   return MockPracticeStatsRepository();
-});
+}
 
 /// Weekly report params
 typedef WeeklyReportParams = ({String studentId, DateTime weekStart});
 
 /// Weekly report provider
-final weeklyReportProvider =
-    FutureProvider.family<PracticeStatsReport, WeeklyReportParams>(
-  (ref, params) async {
-    final repository = ref.watch(practiceReportRepositoryProvider);
-    return repository.getWeeklyReport(params.studentId, params.weekStart);
-  },
-);
+@riverpod
+Future<PracticeStatsReport> weeklyReport(
+  Ref ref,
+  WeeklyReportParams params,
+) async {
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  return repository.getWeeklyReport(params.studentId, params.weekStart);
+}
 
 /// Monthly report params
 typedef MonthlyReportParams = ({String studentId, int year, int month});
 
 /// Monthly report provider
-final monthlyReportProvider =
-    FutureProvider.family<PracticeStatsReport, MonthlyReportParams>(
-  (ref, params) async {
-    final repository = ref.watch(practiceReportRepositoryProvider);
-    return repository.getMonthlyReport(
-      params.studentId,
-      params.year,
-      params.month,
-    );
-  },
-);
+@riverpod
+Future<PracticeStatsReport> monthlyReport(
+  Ref ref,
+  MonthlyReportParams params,
+) async {
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  return repository.getMonthlyReport(
+    params.studentId,
+    params.year,
+    params.month,
+  );
+}
 
 /// Current week start date provider
-final currentWeekStartProvider = Provider<DateTime>((ref) {
+@riverpod
+DateTime currentWeekStart(Ref ref) {
   return getMondayOfWeek(DateTime.now());
-});
+}
 
 /// Current month provider
-final currentMonthProvider = Provider<({int year, int month})>((ref) {
+@riverpod
+({int year, int month}) currentMonth(Ref ref) {
   final now = DateTime.now();
   return (year: now.year, month: now.month);
-});
+}
 
-/// Selected report date state provider (for navigation)
+/// Selected report date state (for navigation)
 class ReportDateState {
   final DateTime weekStart;
   final int year;
@@ -130,13 +137,16 @@ class ReportDateState {
 }
 
 /// Report date state notifier
-class ReportDateNotifier extends StateNotifier<ReportDateState> {
-  ReportDateNotifier()
-      : super(ReportDateState(
-          weekStart: getMondayOfWeek(DateTime.now()),
-          year: DateTime.now().year,
-          month: DateTime.now().month,
-        ));
+@riverpod
+class ReportDate extends _$ReportDate {
+  @override
+  ReportDateState build() {
+    return ReportDateState(
+      weekStart: getMondayOfWeek(DateTime.now()),
+      year: DateTime.now().year,
+      month: DateTime.now().month,
+    );
+  }
 
   void previousWeek() {
     state = state.previousWeek();
@@ -159,16 +169,6 @@ class ReportDateNotifier extends StateNotifier<ReportDateState> {
   }
 
   void reset() {
-    state = ReportDateState(
-      weekStart: getMondayOfWeek(DateTime.now()),
-      year: DateTime.now().year,
-      month: DateTime.now().month,
-    );
+    state = build();
   }
 }
-
-/// Report date state provider
-final reportDateProvider =
-    StateNotifierProvider<ReportDateNotifier, ReportDateState>(
-  (ref) => ReportDateNotifier(),
-);

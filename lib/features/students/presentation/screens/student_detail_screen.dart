@@ -509,10 +509,11 @@ class _StudentDetailContent extends ConsumerWidget {
     final inviteCode = List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
 
     // Create and save the invitation
+    final teacherId = ref.read(currentUserIdProvider);
     final invitation = ParentInvitation(
       id: 'inv_${DateTime.now().millisecondsSinceEpoch}',
       studentId: student.id,
-      teacherId: 'teacher_1', // TODO: Get from auth
+      teacherId: teacherId,
       source: InvitationSource.teacher,
       parentPhone: '', // Will be filled when parent registers
       invitationCode: inviteCode,
