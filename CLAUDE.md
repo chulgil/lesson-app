@@ -387,6 +387,50 @@ class NewModel { ... }
 
 → [전체 문서 인덱스](docs/README.md)
 
+### 📝 문서 정리 규칙 (Spec vs Schema)
+
+> ⚠️ **중요**: 문서 정리 요청 시 반드시 이 규칙을 따를 것
+
+**분리 원칙**:
+| 위치 | 내용 | 예시 |
+|------|------|------|
+| `docs/specs/` | 비즈니스 로직, UI 설계, 상태 설명 | 플로우, ASCII UI, enum 테이블 |
+| `docs/schema/` | 실제 구현 코드 (엔티티 정의) | @HiveType, @JsonSerializable 클래스 |
+
+**Schema 이동 대상 (필수)**:
+```
+✅ @HiveType(typeId: N) 데코레이터가 있는 클래스
+✅ @JsonSerializable() 데코레이터가 있는 클래스
+✅ extends HiveObject 클래스
+```
+
+**Spec에 유지 (이동 불필요)**:
+```
+❌ 설계 의사코드 (미구현 상태)
+❌ 색상/UI 상수 예시
+❌ 알고리즘 설명용 코드
+❌ Provider/Widget 예시 코드
+```
+
+**문서 정리 체크리스트**:
+```bash
+# 1. @HiveType이 있는 파일 찾기
+grep -r "@HiveType" docs/specs/
+
+# 2. @JsonSerializable이 있는 파일 찾기
+grep -r "@JsonSerializable" docs/specs/
+
+# 3. 해당 파일의 엔티티 코드를 docs/schema/entities/로 이동
+# 4. spec 파일에는 schema 참조 링크 추가
+```
+
+**정리 후 필수 작업**:
+1. `docs/schema/README.md`에 새 엔티티 추가
+2. spec 파일 헤더에 `> 엔티티 스키마: [파일명](../../schema/entities/파일명.md)` 추가
+3. Hive TypeId 범위 충돌 확인
+
+→ [Schema 문서 구조](docs/schema/README.md)
+
 ---
 
 ## 주요 모델 {#models}
@@ -394,6 +438,9 @@ class NewModel { ... }
 | 모델 | 위치 | 용도 |
 |------|------|------|
 | Student | `students/domain/entities/` | 학생 정보, 레벨 |
+| LessonClass | `students/domain/entities/` | 🆕 클래스/소속 그룹 (학원/개인) |
+| ClassMembership | `students/domain/entities/` | 🆕 학생-클래스 관계 (레슨 정보) |
+| LessonLocation | `students/domain/entities/` | 🆕 레슨 장소 |
 | Lesson | `lessons/domain/entities/` | 레슨 기록, 노트 |
 | Payment | `lessons/domain/entities/` | 결제, 입금확인 |
 | PracticeTask | `practice/domain/entities/` | 연습 과제 |
@@ -403,6 +450,8 @@ class NewModel { ... }
 | Parent | `parent_home/domain/entities/` | 학부모 정보 |
 | Invite | `profile/domain/entities/` | 초대 시스템 |
 | Notification | `notifications/domain/entities/` | 알림 |
+
+> 📐 **학생 클래스 시스템 설계**: [docs/specs/student/student_class_system.md](docs/specs/student/student_class_system.md) 참조
 
 ---
 

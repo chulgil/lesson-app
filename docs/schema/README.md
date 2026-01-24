@@ -20,6 +20,8 @@ docs/schema/
 │   ├── lesson_schedule.md    # LessonSchedule (스케줄 설정)
 │   ├── parent.md             # Parent (학부모)
 │   ├── payment.md            # Payment, Invoice (결제)
+│   ├── practice_goal.md      # PracticeGoal (연습 목표)
+│   ├── practice_note.md      # PracticeNote (연습노트)
 │   ├── practice_space.md     # PracticeSpace (연습 공간)
 │   ├── student.md            # Student (학생)
 │   └── subscription.md       # Subscription (수강권)
@@ -47,6 +49,8 @@ docs/schema/
 | [Student](entities/student.md) | 학생 | [student_class_system.md](../specs/student/student_class_system.md) | - |
 | [ClassMembership](entities/class_membership.md) | 학생-클래스 소속 관계 | [student_class_system.md](../specs/student/student_class_system.md) | 66-67 |
 | [PracticeSpace](entities/practice_space.md) | 연습 공간, 코치 연결 | [student_centered_architecture.md](../specs/lesson/student_centered_architecture.md) | 81-89 |
+| [PracticeNote](entities/practice_note.md) | 연습노트 | [practice_note_spec.md](../specs/practice/practice_note_spec.md) | 31 |
+| [PracticeGoal](entities/practice_goal.md) | 연습 목표 | [practice_goal_spec.md](../specs/practice/practice_goal_spec.md) | 32 |
 
 ### 결제/수강권
 
@@ -67,6 +71,7 @@ docs/schema/
 
 | 범위 | 도메인 | 엔티티 |
 |------|--------|--------|
+| 31-32 | 연습 | PracticeNote (31), PracticeGoal (32) |
 | 50-59 | 수강권 | Subscription (55-57) |
 | 60-69 | 클래스 | LessonClass (60-62), LessonLocation (63-65), ClassMembership (66-67) |
 | 70-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
