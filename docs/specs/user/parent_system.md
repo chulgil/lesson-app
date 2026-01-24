@@ -1256,10 +1256,15 @@ class Child {
 | 수강권 등록 완료 | 새 수강권 등록 | ON (필수) |
 | 레슨 장소 변경 | 장소 정보 변경 시 | ON (권장) |
 
-### 12.8 데이터 모델 확장 (학부모 수강권 조회용)
+### 12.8 UI View Models (학부모 화면용)
+
+> **📌 참조**: 핵심 엔티티 정의 (LessonClass, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
+>
+> 아래 View Models는 학부모 앱 UI 표시용으로, 핵심 엔티티를 조합한 읽기 전용 모델입니다.
 
 ```dart
-/// 학부모가 조회하는 자녀 수강권 정보
+/// 학부모가 조회하는 자녀 수강권 정보 (읽기 전용 View Model)
+/// - LessonClass, Subscription 엔티티를 조합
 class ChildSubscriptionView {
   final String childId;
   final String childName;
@@ -1299,7 +1304,11 @@ class ParentPaymentRequestView {
 
 ---
 
-## 13. 데이터 모델 (기존)
+## 13. 학부모 전용 데이터 모델
+
+> **📌 참조**: 공통 엔티티 (LessonClass, ClassMembership, Subscription 등)는 [student_class_system.md](../student/student_class_system.md)를 참조하세요.
+>
+> 이 섹션에는 학부모 시스템 전용 엔티티만 정의합니다.
 
 ### 13.1 Parent (학부모)
 

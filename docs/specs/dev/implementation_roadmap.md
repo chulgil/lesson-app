@@ -4,6 +4,17 @@
 > 상태: 계획
 > 연관 스펙: [role_based_screens.md](../design/role_based_screens.md), [student_class_system.md](../student/student_class_system.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md)
 
+> **📌 엔티티 구현 상세 참조**
+>
+> | 엔티티 | 구현 상세 (Dart, JSON, Hive TypeId) |
+> |--------|-----------------------------------|
+> | LessonClass | [schema/entities/lesson_class.md](../../schema/entities/lesson_class.md) |
+> | ClassMembership | [schema/entities/class_membership.md](../../schema/entities/class_membership.md) |
+> | Subscription | [schema/entities/subscription.md](../../schema/entities/subscription.md) |
+> | LessonLocation | [schema/entities/lesson_location.md](../../schema/entities/lesson_location.md) |
+> | Student | [schema/entities/student.md](../../schema/entities/student.md) |
+> | Parent | [schema/entities/parent.md](../../schema/entities/parent.md) |
+
 ## 개요
 
 이 문서는 학원/수강권/3자 관계 시스템의 **구현 로드맵**입니다.
@@ -476,6 +487,112 @@ lib/
 2. **Mock 데이터 준비**: 테스트용 학원/개인레슨 데이터 생성
 3. **기존 코드 영향 분석**: Student, Lesson, Payment 변경 범위 확인
 4. **GitHub Issue 생성**: Phase별 작업을 이슈로 등록
+
+---
+
+## 📋 통합 구현 체크리스트
+
+### ✅ 설계 문서 (완료)
+
+| 항목 | 상태 | 문서 |
+|------|:----:|------|
+| 엔티티 설계 | ✅ | [student_class_system.md](../student/student_class_system.md) |
+| 엔티티 스키마 | ✅ | [schema/entities/](../../schema/entities/) |
+| 수강권 비즈니스 로직 | ✅ | [subscription_system_spec.md](../subscription/subscription_system_spec.md) |
+| 결제 상태 관리 | ✅ | [payment_unified_spec.md](../payment/payment_unified_spec.md) |
+| 학부모 시스템 | ✅ | [parent_system.md](../user/parent_system.md) |
+| 역할별 화면 설계 | ✅ | [role_based_screens.md](../design/role_based_screens.md) |
+
+### 🔴 Phase 1: 기반 엔티티 (필수)
+
+| 작업 | 파일 | 상태 |
+|------|------|:----:|
+| LessonClass 엔티티 | `features/students/domain/entities/lesson_class.dart` | ⬜ |
+| LessonClass Hive Adapter | `lesson_class.g.dart` | ⬜ |
+| LessonClass Repository | `data/repositories/mock_lesson_class_repository.dart` | ⬜ |
+| LessonClass Provider | `presentation/providers/lesson_class_providers.dart` | ⬜ |
+| ClassMembership 엔티티 | `features/students/domain/entities/class_membership.dart` | ⬜ |
+| ClassMembership Hive Adapter | `class_membership.g.dart` | ⬜ |
+| ClassMembership Repository | `data/repositories/mock_membership_repository.dart` | ⬜ |
+| Membership Provider | `presentation/providers/membership_providers.dart` | ⬜ |
+| LessonLocation 엔티티 | `features/students/domain/entities/lesson_location.dart` | ⬜ |
+| LessonLocation Repository | `data/repositories/mock_location_repository.dart` | ⬜ |
+| Location Provider | `presentation/providers/location_providers.dart` | ⬜ |
+| build_runner 실행 | `dart run build_runner build` | ⬜ |
+
+### 🔴 Phase 2: 수강권 시스템 (필수)
+
+| 작업 | 파일 | 상태 |
+|------|------|:----:|
+| Subscription 엔티티 | `features/subscription/domain/entities/subscription.dart` | ⬜ |
+| Subscription Hive Adapter | `subscription.g.dart` | ⬜ |
+| Subscription Repository | `data/repositories/mock_subscription_repository.dart` | ⬜ |
+| Subscription Provider | `presentation/providers/subscription_providers.dart` | ⬜ |
+| Payment 엔티티 확장 | `features/lessons/domain/entities/payment.dart` | ⬜ |
+| 레슨 완료 시 수강권 차감 | Provider 로직 | ⬜ |
+| 수강권 만료 알림 | Provider 로직 | ⬜ |
+
+### 🟠 Phase 3: 선생님 앱 UI
+
+| 작업 | 파일 | 상태 |
+|------|------|:----:|
+| 학생 목록 그룹핑 | `student_list_screen.dart` | ⬜ |
+| 학생 상세 수강권 표시 | `student_detail_screen.dart` | ⬜ |
+| 수강권 발급 화면 | `issue_subscription_screen.dart` (신규) | ⬜ |
+| 미수금 관리 화면 | `payment_management_screen.dart` | ⬜ |
+
+### 🟠 Phase 4: 학생 앱 UI
+
+| 작업 | 파일 | 상태 |
+|------|------|:----:|
+| 홈 화면 수강권 표시 | `student_home_screen.dart` | ⬜ |
+| 수강권 상세 화면 | `student_subscription_screen.dart` (신규) | ⬜ |
+| 레슨 장소 화면 | `lesson_location_screen.dart` (신규) | ⬜ |
+
+### 🟡 Phase 5: 학부모 앱 UI
+
+| 작업 | 파일 | 상태 |
+|------|------|:----:|
+| 자녀 프로필 수강권 배지 | `profile_selector_screen.dart` | ⬜ |
+| 대시보드 수강권 카드 | `parent_dashboard_screen.dart` | ⬜ |
+| 결제 관리 화면 | `parent_payment_screen.dart` (신규) | ⬜ |
+| 자녀 수강권 조회 | `child_subscription_screen.dart` (신규) | ⬜ |
+
+### 🟠 Phase 6: 통합 및 테스트
+
+| 작업 | 상태 |
+|------|:----:|
+| Student → ClassMembership 마이그레이션 스크립트 | ⬜ |
+| Payment 형식 변환 | ⬜ |
+| Hive 스키마 마이그레이션 | ⬜ |
+| subscription_routes.dart 추가 | ⬜ |
+| location_routes.dart 추가 | ⬜ |
+| 엔티티 단위 테스트 | ⬜ |
+| Provider 단위 테스트 | ⬜ |
+| E2E 시나리오 테스트 | ⬜ |
+
+### Hive TypeId 할당표
+
+구현 시 아래 TypeId를 사용하세요. (충돌 방지)
+
+| TypeId | 타입 | 문서 |
+|:------:|------|------|
+| 50 | LessonClassType | [lesson_class.md](../../schema/entities/lesson_class.md) |
+| 51 | PaymentType | [lesson_class.md](../../schema/entities/lesson_class.md) |
+| 52 | LessonClass | [lesson_class.md](../../schema/entities/lesson_class.md) |
+| 53 | MembershipStatus | [class_membership.md](../../schema/entities/class_membership.md) |
+| 54 | ClassMembership | [class_membership.md](../../schema/entities/class_membership.md) |
+| 55 | SubscriptionType | [subscription.md](../../schema/entities/subscription.md) |
+| 56 | SubscriptionStatus | [subscription.md](../../schema/entities/subscription.md) |
+| 57 | Subscription | [subscription.md](../../schema/entities/subscription.md) |
+| 58 | LocationType | [lesson_location.md](../../schema/entities/lesson_location.md) |
+| 59 | LessonLocation | [lesson_location.md](../../schema/entities/lesson_location.md) |
+| 60 | ConnectionStatus | [student.md](../../schema/entities/student.md) |
+| 61 | AgeGroup | [student.md](../../schema/entities/student.md) |
+| 62 | Student | [student.md](../../schema/entities/student.md) |
+| 63 | Parent | [parent.md](../../schema/entities/parent.md) |
+| 64 | Child | [parent.md](../../schema/entities/parent.md) |
+| 65 | ParentChildRelation | [parent.md](../../schema/entities/parent.md) |
 
 ---
 

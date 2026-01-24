@@ -3,6 +3,22 @@
 > 작성일: 2026-01-24
 > 상태: 설계 완료
 
+**⚠️ 이 문서는 비즈니스 요구사항과 설계의 Single Source of Truth입니다.**
+
+> **📌 구현 상세 참조 안내**
+>
+> 이 문서는 **설계 (What)**에 집중합니다. Dart 엔티티 전체 코드, JSON 스키마, Hive TypeId 등 **구현 상세 (How)**는 아래 문서를 참조하세요:
+>
+> | 엔티티 | 구현 상세 |
+> |--------|----------|
+> | LessonClass | [schema/entities/lesson_class.md](../../schema/entities/lesson_class.md) |
+> | ClassMembership | [schema/entities/class_membership.md](../../schema/entities/class_membership.md) |
+> | Student | [schema/entities/student.md](../../schema/entities/student.md) |
+> | LessonLocation | [schema/entities/lesson_location.md](../../schema/entities/lesson_location.md) |
+> | Subscription | [schema/entities/subscription.md](../../schema/entities/subscription.md) |
+
+---
+
 ## 개요
 
 선생님이 여러 학원과 개인레슨을 동시에 관리할 수 있도록, 학생 그룹화 및 소속 개념을 재설계합니다.
@@ -17,123 +33,84 @@
 
 ## 엔티티 설계
 
+> 💡 각 엔티티의 전체 Dart 코드, JSON 스키마, Hive TypeId는 [docs/schema/entities/](../../schema/entities/) 참조
+
 ### 1. LessonClass (클래스/소속 그룹)
 
 학원 또는 개인레슨 그룹을 나타내는 엔티티입니다.
 
-```dart
-/// 클래스 유형
-enum LessonClassType {
-  academy,   // 학원 (기관 소속)
-  private,   // 개인레슨
-}
+**클래스 유형 (LessonClassType)**
+| 값 | 설명 |
+|----|------|
+| `academy` | 학원 (기관 소속) |
+| `private` | 개인레슨 |
 
-/// 결제 유형
-enum PaymentType {
-  organization,  // 기관(학원)에서 일괄 결제 → 선생님은 급여
-  parent,        // 학부모가 선생님에게 직접 결제
-}
+**결제 유형 (PaymentType)**
+| 값 | 설명 |
+|----|------|
+| `organization` | 기관(학원)에서 일괄 결제 → 선생님은 급여 |
+| `parent` | 학부모가 선생님에게 직접 결제 |
 
-/// 클래스/소속 그룹
-class LessonClass {
-  final String id;
-  final String teacherId;        // 소유 선생님 ID
+**주요 필드**
+- `teacherId`: 소유 선생님 ID
+- `name`: 클래스명 ("○○음악학원", "개인레슨" 등)
+- `type`: LessonClassType
+- `paymentType`: PaymentType
+- `contactPerson/Phone/address`: 학원 정보 (academy 타입만)
 
-  // 기본 정보
-  final String name;             // "○○음악학원", "개인레슨" 등
-  final LessonClassType type;    // academy | private
-  final PaymentType paymentType; // organization | parent
-
-  // 학원 정보 (type == academy인 경우)
-  final String? contactPerson;   // 학원 담당자 이름
-  final String? contactPhone;    // 학원 연락처
-  final String? address;         // 학원 주소
-
-  // 설정
-  final int sortOrder;           // 표시 순서
-  final bool isArchived;         // 보관 여부
-
-  // 메타
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-}
-```
+→ [전체 엔티티 코드](../../schema/entities/lesson_class.md)
 
 ### 2. ClassMembership (클래스 소속 관계)
 
 학생이 특정 클래스에 소속된 관계와 해당 클래스에서의 레슨 정보입니다.
 
-```dart
-/// 학생의 클래스 소속 정보
-class ClassMembership {
-  final String id;
-  final String lessonClassId;    // 소속 클래스 ID
-  final String studentId;        // 학생 ID
+**소속 상태 (MembershipStatus)**
+| 값 | 설명 |
+|----|------|
+| `trial` | 체험 중 |
+| `active` | 정규 수강 중 |
+| `paused` | 휴강 |
+| `terminated` | 종료 |
 
-  // 이 클래스에서의 레슨 정보
-  final String instrument;       // 악기 (피아노, 바이올린 등)
-  final StudentStatus status;    // 체험/정규/휴강/종료
-  final StudentLevel level;      // 레벨 (입문/초급/중급/고급)
+**주요 필드**
+- `lessonClassId`, `studentId`: 클래스-학생 연결
+- `instrument`: 악기 (피아노, 바이올린 등)
+- `status`: MembershipStatus
+- `level`: 레벨 (입문/초급/중급/고급)
+- `monthlyFee`, `lessonsPerWeek`: 수강료 정보
+- `lessonDay`, `lessonTime`, `lessonDuration`: 스케줄
 
-  // 수강료 정보
-  final int monthlyFee;          // 월 수강료
-  final int lessonsPerWeek;      // 주당 레슨 횟수 (1 or 2)
+**계산 필드**
+- `monthlyLessonCount`: 주당 횟수 × 4
+- `lessonFee`: 월 수강료 ÷ 월 레슨 횟수
 
-  // 레슨 스케줄
-  final String? lessonDay;       // 레슨 요일 (월, 화, ...)
-  final String? lessonTime;      // 레슨 시간 (14:00)
-  final int lessonDuration;      // 레슨 시간(분) (기본 60)
-
-  // 메모
-  final String? notes;           // 특이사항
-
-  // 메타
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-
-  // 계산 필드
-  int get monthlyLessonCount => lessonsPerWeek * 4;
-  int get lessonFee => (monthlyFee / monthlyLessonCount).round();
-}
-```
+→ [전체 엔티티 코드](../../schema/entities/class_membership.md)
 
 ### 3. Student (학생) - 단순화
 
 학생의 **기본 정보만** 포함합니다. 레슨/수강료 정보는 ClassMembership으로 이동합니다.
 
-```dart
-/// 학생 (플랫폼 사용자)
-class Student {
-  final String id;
+**앱 연결 상태 (ConnectionStatus)**
+| 값 | 설명 |
+|----|------|
+| `offline` | 미연결 (초대 전) |
+| `inviteSent` | 초대 발송됨 |
+| `connected` | 연결됨 |
 
-  // 기본 정보
-  final String name;
-  final Color profileColor;
-  final String? profileImageUrl;
+**연령 그룹 (AgeGroup)**
+| 값 | 연령 | 설명 |
+|----|------|------|
+| `child` | 만 12세 이하 | 미취학/초등 |
+| `student` | 만 13-18세 | 중고등 |
+| `adult` | 만 19세 이상 | 성인 |
 
-  // 연락처 (개인레슨용, 학원 학생은 비워둘 수 있음)
-  final String? phone;           // 학생 본인 연락처
-  final String? parentPhone;     // 학부모 연락처
-  final String? parentName;      // 학부모 이름
-  final String? email;
+**주요 필드**
+- `name`, `profileColor`: 기본 정보
+- `phone`, `parentPhone`, `parentName`: 연락처
+- `birthDate`, `manualAgeGroup`: 연령 정보
+- `connectionStatus`, `connectedAt`: 앱 연결 상태
 
-  // 연령 정보
-  final DateTime? birthDate;     // 생년월일 (연령 그룹 계산용)
-  final AgeGroup? manualAgeGroup; // 수동 설정 연령 그룹
-
-  // 앱 연결 상태
-  final ConnectionStatus connectionStatus;
-  final DateTime? connectedAt;
-
-  // 메타
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-
-  // 계산 필드
-  AgeGroup get effectiveAgeGroup =>
-      AgeGroup.fromBirthDate(birthDate) ?? manualAgeGroup ?? AgeGroup.student;
-}
-```
+→ [전체 엔티티 코드](../../schema/entities/student.md)
 
 ---
 
@@ -330,133 +307,58 @@ class Student {
 
 기존 Student 데이터를 새 구조로 변환합니다.
 
-```dart
-Future<void> migrateToClassSystem() async {
-  // 1. 기본 "개인레슨" 클래스 생성
-  final defaultClass = LessonClass(
-    id: uuid.v4(),
-    teacherId: currentTeacherId,
-    name: '개인레슨',
-    type: LessonClassType.private,
-    paymentType: PaymentType.parent,
-    createdAt: DateTime.now(),
-  );
-  await lessonClassRepository.create(defaultClass);
+**마이그레이션 단계**
+1. 기본 "개인레슨" LessonClass 생성
+2. 기존 Student 데이터 분리:
+   - **Student**: 기본 정보만 (이름, 연락처, 연결 상태)
+   - **ClassMembership**: 레슨 정보 (악기, 수강료, 스케줄)
 
-  // 2. 기존 학생 데이터 분리
-  final oldStudents = await oldStudentRepository.getAll();
-
-  for (final oldStudent in oldStudents) {
-    // 2a. Student 엔티티 생성 (기본 정보만)
-    final newStudent = Student(
-      id: oldStudent.id,
-      name: oldStudent.name,
-      phone: oldStudent.phone,
-      parentPhone: oldStudent.parentPhone,
-      profileColor: oldStudent.profileColor,
-      birthDate: oldStudent.birthDate,
-      connectionStatus: oldStudent.connectionStatus,
-      connectedAt: oldStudent.connectedAt,
-      createdAt: oldStudent.createdAt,
-    );
-    await studentRepository.create(newStudent);
-
-    // 2b. ClassMembership 생성 (레슨 정보)
-    final membership = ClassMembership(
-      id: uuid.v4(),
-      lessonClassId: defaultClass.id,
-      studentId: newStudent.id,
-      instrument: oldStudent.instrument,
-      status: oldStudent.status,
-      level: oldStudent.level,
-      monthlyFee: oldStudent.monthlyFee,
-      lessonsPerWeek: oldStudent.lessonsPerWeek,
-      lessonDay: oldStudent.lessonDay,
-      lessonTime: oldStudent.lessonTime,
-      lessonDuration: oldStudent.lessonDuration,
-      createdAt: DateTime.now(),
-    );
-    await membershipRepository.create(membership);
-  }
-}
-```
+**필드 이동 매핑**
+| 기존 (Student) | 신규 (ClassMembership) |
+|---------------|----------------------|
+| instrument | instrument |
+| level | level |
+| monthlyFee | monthlyFee |
+| lessonsPerWeek | lessonsPerWeek |
+| lessonDay | lessonDay |
+| lessonTime | lessonTime |
+| lessonDuration | lessonDuration |
+| status | status |
 
 ### 하위 호환성
 
-기존 코드와의 호환을 위해 확장 메서드를 제공합니다.
+기존 코드와의 호환을 위해 `StudentWithMembership` 결합 클래스를 제공합니다.
 
-```dart
-/// 기존 코드 호환을 위한 확장
-extension StudentWithMembershipX on Student {
-  /// 특정 클래스에서의 멤버십 정보와 결합
-  StudentWithMembership withMembership(ClassMembership membership) {
-    return StudentWithMembership(
-      student: this,
-      membership: membership,
-    );
-  }
-}
+**StudentWithMembership 구조**
+- `student`: Student 엔티티 참조
+- `membership`: ClassMembership 엔티티 참조
+- 기존 필드 접근자 유지 (`id`, `name`, `instrument`, `monthlyFee` 등)
 
-/// 기존 Student 형태로 사용할 수 있는 결합 클래스
-class StudentWithMembership {
-  final Student student;
-  final ClassMembership membership;
-
-  // 기존 필드 접근 (하위 호환)
-  String get id => student.id;
-  String get name => student.name;
-  String get instrument => membership.instrument;
-  int get monthlyFee => membership.monthlyFee;
-  StudentStatus get status => membership.status;
-  // ... 기타 필드
-}
-```
+→ [전체 마이그레이션 코드](../../schema/entities/student.md#마이그레이션-참고)
 
 ---
 
 ## Provider 설계
 
-```dart
-// 클래스 목록
-@riverpod
-Future<List<LessonClass>> teacherClasses(Ref ref, String teacherId) async {
-  final repository = ref.watch(lessonClassRepositoryProvider);
-  return repository.getClassesByTeacher(teacherId);
-}
+### 주요 Provider 목록
 
-// 특정 클래스의 멤버십 목록 (학생 정보 포함)
-@riverpod
-Future<List<StudentWithMembership>> classMemberships(
-  Ref ref,
-  String classId,
-) async {
-  final membershipRepo = ref.watch(membershipRepositoryProvider);
-  final studentRepo = ref.watch(studentRepositoryProvider);
+| Provider | 파라미터 | 반환 타입 | 설명 |
+|----------|---------|----------|------|
+| `teacherClassesProvider` | teacherId | `List<LessonClass>` | 선생님의 클래스 목록 |
+| `classMembershipsProvider` | classId | `List<StudentWithMembership>` | 클래스의 학생 목록 |
+| `groupedStudentsProvider` | teacherId | `Map<LessonClass, List<...>>` | 클래스별 그룹화된 학생 |
 
-  final memberships = await membershipRepo.getByClassId(classId);
+### 데이터 흐름
 
-  return Future.wait(memberships.map((m) async {
-    final student = await studentRepo.getById(m.studentId);
-    return student!.withMembership(m);
-  }));
-}
-
-// 선생님의 모든 학생 (클래스별 그룹화)
-@riverpod
-Future<Map<LessonClass, List<StudentWithMembership>>> groupedStudents(
-  Ref ref,
-  String teacherId,
-) async {
-  final classes = await ref.watch(teacherClassesProvider(teacherId).future);
-
-  final result = <LessonClass, List<StudentWithMembership>>{};
-  for (final cls in classes) {
-    final members = await ref.watch(classMembershipsProvider(cls.id).future);
-    result[cls] = members;
-  }
-  return result;
-}
 ```
+teacherClassesProvider(teacherId)
+    ↓
+classMembershipsProvider(classId) × N개
+    ↓
+groupedStudentsProvider(teacherId)  → UI에서 클래스별 그룹화 표시
+```
+
+**위치**: `lib/features/students/presentation/providers/`
 
 ---
 
@@ -503,39 +405,57 @@ LessonClass와 연계하여 레슨 장소를 체계적으로 관리합니다.
 
 ### LessonLocation 엔티티
 
-```dart
-/// 레슨 장소 유형
-enum LocationType {
-  academyRoom,     // 🏫 학원 레슨실
-  teacherStudio,   // 🏠 선생님 스튜디오
-  studentHome,     // 🚗 학생 집 방문
-  externalPlace,   // 📍 외부 장소
-  online,          // 💻 온라인
-}
+**장소 유형 (LocationType)**
+| 값 | 아이콘 | 설명 |
+|----|:-----:|------|
+| `academyRoom` | 🏫 | 학원 레슨실 |
+| `teacherStudio` | 🏠 | 선생님 스튜디오 |
+| `studentHome` | 🚗 | 학생 집 방문 |
+| `externalPlace` | 📍 | 외부 장소 |
+| `online` | 💻 | 온라인 |
 
-/// 레슨 장소
-class LessonLocation {
-  final String id;
-  final String name;                    // "레슨실 1", "홈스튜디오"
-  final LocationType type;
-  final String? lessonClassId;          // 소속 클래스 (학원 레슨실인 경우)
-  final String? ownerId;                // 소유자 (선생님 ID)
+**주요 필드**
+- `name`, `type`: 장소 기본 정보
+- `lessonClassId`: 소속 클래스 (학원 레슨실인 경우)
+- `address`, `addressDetail`: 주소 정보
+- `onlinePlatform`, `onlineLink`: 온라인 정보
+- `isDefault`: 기본 장소 여부
 
-  // 주소 정보
-  final String? address;                // 전체 주소
-  final String? addressDetail;          // 상세 주소 (동/호수)
+→ [전체 엔티티 코드](../../schema/entities/lesson_location.md)
 
-  // 온라인 정보
-  final String? onlinePlatform;         // "zoom", "google_meet", "facetime"
-  final String? onlineLink;             // 미팅 링크 (선택)
+### 5. Subscription (수강권)
 
-  // 메타
-  final String? notes;                  // 찾아오는 길, 주차 정보 등
-  final bool isDefault;                 // 기본 장소 여부
-  final bool isActive;                  // 활성 상태
-  final DateTime createdAt;
-}
-```
+학생별 수강권 정보입니다. ClassMembership과 연결됩니다.
+
+**수강권 유형 (SubscriptionType)**
+| 값 | 설명 |
+|----|------|
+| `trial` | 체험 레슨 (무료/할인) |
+| `monthly` | 월정액 (기간제) |
+| `package` | 회차제 (8회, 16회 등) |
+
+**수강권 상태 (SubscriptionStatus)**
+| 값 | 설명 |
+|----|------|
+| `active` | 활성 (사용 가능) |
+| `expiringSoon` | 만료 임박 (7일 이내 또는 잔여 2회 이하) |
+| `expired` | 만료됨 |
+| `paused` | 일시정지 |
+
+**주요 필드**
+- `studentId`, `membershipId`: 학생-멤버십 연결
+- `type`: SubscriptionType
+- `totalLessons`, `usedLessons`: 회차 정보 (회차제만)
+- `startDate`, `endDate`: 기간 정보
+
+**만료 임박 규칙**
+- 기간제: 만료일 7일 이내
+- 회차제: 잔여 2회 이하
+
+→ [전체 엔티티 코드](../../schema/entities/subscription.md)
+→ [비즈니스 로직 상세](../subscription/subscription_system_spec.md)
+
+---
 
 ### LessonClass와 LessonLocation 관계
 

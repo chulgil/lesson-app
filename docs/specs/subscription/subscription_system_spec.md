@@ -1157,279 +1157,153 @@ enum TerminationStep {
 
 ## 8. 데이터 모델
 
+> **📌 엔티티 참조 안내**
+>
+> 핵심 엔티티 정의는 [student_class_system.md](../student/student_class_system.md)를 **Single Source of Truth**로 참조하세요:
+> - LessonClass, ClassMembership, Student, LessonLocation, Subscription
+>
+> 이 문서에는 학원 전용 엔티티(Organization, Membership 등)만 정의합니다.
+
 ### 8.1 Organization (학원)
 
-```dart
-/// 학원/조직
-class Organization {
-  final String id;
-  final String name;                    // "OO음악학원"
-  final String ownerId;                 // 대표 계정 ID
-  final OrganizationType type;          // academy, studio
-  final String? businessNumber;         // 사업자등록번호 (선택)
-  final String? address;
-  final String? phone;
-  final BankAccount? bankAccount;       // 학원 계좌
-  final OrganizationSettings settings;  // 학원 설정
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-}
+**조직 유형 (OrganizationType)**
+| 값 | 설명 |
+|----|------|
+| `academy` | 학원 (사업자) |
+| `studio` | 개인 스튜디오 |
 
-enum OrganizationType {
-  academy,    // 학원 (사업자)
-  studio,     // 개인 스튜디오
-}
+**주요 필드**
+- `name`, `ownerId`: 학원 기본 정보
+- `businessNumber`: 사업자등록번호 (선택)
+- `settings`: 학원 설정 (패키지 옵션, 취소 정책 등)
 
-/// 학원 설정
-class OrganizationSettings {
-  final List<PackageOption> packageOptions;  // 패키지 옵션
-  final bool requireParentConsent;           // 미성년자 학부모 동의 필수
-  final int lessonCancelHours;               // 레슨 취소 가능 시간
-  final String? termsUrl;                    // 이용약관 URL
-  final bool requireSubscription = true;     // 수강권 필수 (학원은 항상 true)
-}
-
-/// 개인 선생님 설정
-class TeacherSettings {
-  final List<PackageOption> packageOptions;  // 패키지 옵션
-  final bool requireSubscription;            // 수강권 필수 (기본값: false)
-  final int lessonCancelHours;               // 레슨 취소 가능 시간
-}
-```
+**학원 설정 (OrganizationSettings)**
+- `packageOptions`: 패키지 옵션 목록
+- `requireParentConsent`: 미성년자 학부모 동의 필수
+- `lessonCancelHours`: 레슨 취소 가능 시간
+- `requireSubscription`: 수강권 필수 (학원 = true)
 
 ### 8.2 Membership (학원-강사 관계) - 다중 소속 지원
 
 선생님은 **여러 학원에 소속**될 수 있습니다.
 
-```dart
-/// 학원 멤버십 (선생님 1명 → 여러 학원 가능)
-class Membership {
-  final String id;
-  final String organizationId;          // 학원 ID
-  final String userId;                  // 선생님 ID
-  final MemberRole role;
-  final MemberStatus status;
-  final DateTime joinedAt;
-  final DateTime? terminatedAt;
-  final String? terminatedBy;           // 퇴사 처리자
-  final TerminationReason? terminationReason;
-}
+**역할 (MemberRole)**
+| 값 | 권한 |
+|----|------|
+| `owner` | 대표: 모든 권한 |
+| `manager` | 매니저: 학생 배정, 수강권 발행 |
+| `instructor` | 강사: 배정된 학생만 |
 
-// 예시: 선생님 A가 2개 학원 소속
-// Membership { organizationId: "OO음악학원", userId: "선생님A", role: instructor }
-// Membership { organizationId: "XX피아노학원", userId: "선생님A", role: instructor }
+**상태 (MemberStatus)**
+| 값 | 설명 |
+|----|------|
+| `active` | 활성 |
+| `inactive` | 비활성 (일시 중지) |
+| `terminated` | 퇴사 |
 
-enum MemberRole {
-  owner,       // 대표: 모든 권한
-  manager,     // 매니저: 학생 배정, 수강권 발행
-  instructor,  // 강사: 배정된 학생만
-}
+**퇴사 사유 (TerminationReason)**
+- `resignation`: 자진 퇴사
+- `dismissal`: 해고
+- `contractEnd`: 계약 종료
 
-enum MemberStatus {
-  active,      // 활성
-  inactive,    // 비활성 (일시 중지)
-  terminated,  // 퇴사
-}
-
-enum TerminationReason {
-  resignation,   // 자진 퇴사
-  dismissal,     // 해고
-  contractEnd,   // 계약 종료
-  other,
-}
+**다중 소속 예시**
+```
+선생님 A:
+├── Membership { organizationId: "OO음악학원", role: instructor }
+└── Membership { organizationId: "XX피아노학원", role: instructor }
 ```
 
 ### 8.3 TeacherStudentRelation (선생님-학생 관계) - Context 포함
 
 학생은 **학원 레슨 + 개인 레슨을 병행**할 수 있습니다.
 
-```dart
-/// 선생님-학생 관계 (Context 포함)
-class TeacherStudentRelation {
-  final String id;
-  final String teacherId;
-  final String studentId;
-  final String? organizationId;         // null이면 개인 레슨
-  final String? subscriptionId;         // 연결된 수강권
-  final String? instrument;             // 악기 (바이올린, 피아노 등)
-  final RelationStatus status;
-  final DateTime createdAt;
-  final DateTime? endedAt;
-}
+**핵심 설계**: `organizationId`가 null이면 개인 레슨
 
-// 예시: 학생 B가 2개 레슨 병행
-// TeacherStudentRelation {
-//   teacherId: "선생님A", studentId: "학생B",
-//   organizationId: "OO음악학원", instrument: "바이올린"
-// }
-// TeacherStudentRelation {
-//   teacherId: "선생님C", studentId: "학생B",
-//   organizationId: null, instrument: "피아노"  // 개인 레슨
-// }
+**상태 (RelationStatus)**
+| 값 | 설명 |
+|----|------|
+| `active` | 활성 (레슨 진행 중) |
+| `paused` | 일시 중지 |
+| `ended` | 종료 |
 
-enum RelationStatus {
-  active,      // 활성 (레슨 진행 중)
-  paused,      // 일시 중지
-  ended,       // 종료
-}
+**주요 필드**
+- `teacherId`, `studentId`: 관계 연결
+- `organizationId`: 학원 ID (null = 개인 레슨)
+- `subscriptionId`: 연결된 수강권
+- `instrument`: 악기
+
+**병행 레슨 예시**
+```
+학생 B:
+├── 선생님A / OO음악학원 / 바이올린
+└── 선생님C / 개인 (null) / 피아노
 ```
 
 ### 8.4 Subscription (수강권)
 
-```dart
-/// 수강권
-class Subscription {
-  final String id;
-  final String? organizationId;         // null이면 개인
-  final String studentId;
-  final String teacherId;               // 개인 모드: 선생님, 학원: 담당 강사
-  final String issuerId;                // 발행자 (대표/매니저/선생님)
-  final String? paymentId;              // 연결된 Payment
+> **📌 참조**: 기본 Subscription 엔티티는 [subscription.md](../../schema/entities/subscription.md) 참조
 
-  // 수강권 유형
-  final SubscriptionType type;
-  final SubscriptionStatus status;
+**학원 모드 확장 필드**
+- `organizationId`: 학원 ID (null = 개인)
+- `issuerId`: 발행자 (대표/매니저/선생님)
+- 정지 관련: `isSuspended`, `suspendedAt`, `suspendedUntil`, `suspendReason`
 
-  // 패키지 (N회권)
-  final int? totalLessons;
-  final int? remainingLessons;
-  final int? usedLessons;
-  final DateTime? expirationDate;
-
-  // 월정액
-  final int? monthlyLessonCount;
-  final int? currentMonthUsed;
-
-  // 금액
-  final int amount;
-  final int? discountAmount;
-  final int finalAmount;
-
-  // 정지
-  final bool isSuspended;
-  final DateTime? suspendedAt;
-  final DateTime? suspendedUntil;
-  final String? suspendReason;
-
-  // 메타
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-}
-
-enum SubscriptionType {
-  trial,      // 체험
-  monthly,    // 월정액
-  package,    // N회권
-}
-
-enum SubscriptionStatus {
-  pending,     // 결제 대기
-  active,      // 활성
-  expired,     // 만료 (유효기간)
-  exhausted,   // 소진 (횟수)
-  suspended,   // 정지
-  cancelled,   // 취소
-}
-```
+**확장된 상태 (학원 모드)**
+| 값 | 설명 |
+|----|------|
+| `pending` | 결제 대기 |
+| `active` | 활성 |
+| `expired` | 만료 (유효기간) |
+| `exhausted` | 소진 (횟수) |
+| `suspended` | 정지 |
+| `cancelled` | 취소 |
 
 ### 8.5 SubscriptionUsage (수강권 사용 기록)
 
-```dart
-/// 수강권 사용 기록
-class SubscriptionUsage {
-  final String id;
-  final String subscriptionId;
-  final String lessonId;
-  final String instructorId;            // 레슨 진행 강사
-  final int deductedCount;              // 차감 횟수 (보통 1)
-  final int remainingAfter;             // 차감 후 잔여
-  final DateTime usedAt;
-}
-```
+**주요 필드**
+- `subscriptionId`, `lessonId`: 수강권-레슨 연결
+- `instructorId`: 레슨 진행 강사
+- `deductedCount`: 차감 횟수 (보통 1)
+- `remainingAfter`: 차감 후 잔여
 
 ### 8.6 RecordVisibility (레슨 기록 공개 설정)
 
-```dart
-/// 레슨 기록 공개 범위
-enum VisibilityLevel {
-  public,           // 🌐 전체 공개
-  currentTeacher,   // 👤 현재 선생님만
-  private,          // 🔒 비공개 (본인만)
-}
+**공개 범위 (VisibilityLevel)**
+| 값 | 아이콘 | 설명 |
+|----|:-----:|------|
+| `public` | 🌐 | 전체 공개 |
+| `currentTeacher` | 👤 | 현재 선생님만 |
+| `private` | 🔒 | 비공개 (본인만) |
 
-/// 학생별 공개 설정
-class RecordVisibilitySettings {
-  final String studentId;
+**공유 범위 (ShareScope)**
+| 값 | 설명 |
+|----|------|
+| `all` | 전체 공유 |
+| `recentSixMonths` | 최근 6개월 |
+| `none` | 공유 안 함 |
 
-  // 기본 공개 범위
-  final VisibilityLevel defaultVisibility;
+**승인 상태 (ApprovalStatus)**
+- `pending`, `approved`, `rejected`, `expired`
 
-  // 데이터 유형별 세부 설정
-  final VisibilityLevel lessonNotes;      // 레슨 노트
-  final VisibilityLevel repertoire;       // 레퍼토리 목록
-  final VisibilityLevel recordings;       // 녹음 파일
-  final VisibilityLevel practiceRecords;  // 연습 기록
-
-  // 항상 비공개 (변경 불가)
-  // - 연락처
-  // - 결제 정보
-
-  final DateTime updatedAt;
-}
-
-/// 이전 기록 공유 승인
-class RecordShareApproval {
-  final String id;
-  final String studentId;
-  final String newTeacherId;            // 새 선생님
-  final String? previousTeacherId;      // 이전 선생님
-  final ShareScope scope;               // 공유 범위
-  final ApprovalStatus status;
-  final DateTime requestedAt;
-  final DateTime? approvedAt;
-}
-
-enum ShareScope {
-  all,              // 전체 공유
-  recentSixMonths,  // 최근 6개월
-  none,             // 공유 안 함
-}
-
-enum ApprovalStatus {
-  pending,    // 승인 대기
-  approved,   // 승인됨
-  rejected,   // 거절됨
-  expired,    // 만료됨
-}
-```
+**RecordVisibilitySettings 필드**
+- `defaultVisibility`: 기본 공개 범위
+- 유형별 설정: `lessonNotes`, `repertoire`, `recordings`, `practiceRecords`
+- 항상 비공개: 연락처, 결제 정보
 
 ### 8.7 기존 모델 확장
 
-```dart
-// Student 확장
-class Student {
-  // ... 기존 필드
-  final String? organizationId;         // 학원 소속
-  final String? assignedInstructorId;   // 담당 강사
-  final RecordVisibilitySettings? visibilitySettings;  // 공개 설정
-}
+학원 모드에서 기존 엔티티에 추가되는 필드입니다.
 
-// Lesson 확장
-class Lesson {
-  // ... 기존 필드
-  final String? organizationId;
-  final String? subscriptionId;         // 연결된 수강권
-  final String? subscriptionUsageId;    // 사용 기록
-  final VisibilityLevel? visibility;    // 개별 공개 설정 (override)
-}
-
-// Payment 확장
-class Payment {
-  // ... 기존 필드
-  final String? organizationId;
-  final String? subscriptionId;         // 연결된 수강권
-}
-```
+| 엔티티 | 추가 필드 | 설명 |
+|--------|----------|------|
+| **Student** | `organizationId` | 학원 소속 |
+| | `assignedInstructorId` | 담당 강사 |
+| | `visibilitySettings` | 공개 설정 |
+| **Lesson** | `organizationId` | 학원 소속 |
+| | `subscriptionId` | 연결된 수강권 |
+| | `visibility` | 개별 공개 설정 |
+| **Payment** | `organizationId` | 학원 소속 |
+| | `subscriptionId` | 연결된 수강권 |
 
 ---
 
@@ -1454,43 +1328,20 @@ class Payment {
 
 ### 9.2 권한 체크 로직
 
-```dart
-/// 권한 체크 서비스
-class PermissionService {
+**학생 접근 권한 (canAccessStudent)**
+```
+1. 개인 모드 (organizationId == null)
+   → student.teacherId == userId
 
-  /// 학생 접근 권한 확인
-  Future<bool> canAccessStudent(String userId, String studentId) async {
-    final student = await getStudent(studentId);
+2. 학원 모드
+   → owner/manager: 전체 학생 접근 가능
+   → instructor: 담당 학생만 (assignedInstructorId == userId)
+```
 
-    // 개인 모드
-    if (student.organizationId == null) {
-      return student.teacherId == userId;
-    }
-
-    // 학원 모드
-    final membership = await getMembership(userId, student.organizationId!);
-    if (membership == null) return false;
-
-    switch (membership.role) {
-      case MemberRole.owner:
-      case MemberRole.manager:
-        return true;  // 전체 학생 접근 가능
-      case MemberRole.instructor:
-        return student.assignedInstructorId == userId;  // 담당 학생만
-    }
-  }
-
-  /// 수강권 발행 권한 확인
-  Future<bool> canIssueSubscription(String userId, String? orgId) async {
-    if (orgId == null) return true;  // 개인 모드는 항상 가능
-
-    final membership = await getMembership(userId, orgId);
-    if (membership == null) return false;
-
-    return membership.role == MemberRole.owner ||
-           membership.role == MemberRole.manager;
-  }
-}
+**수강권 발행 권한 (canIssueSubscription)**
+```
+1. 개인 모드: 항상 가능
+2. 학원 모드: owner 또는 manager만 가능
 ```
 
 ---
