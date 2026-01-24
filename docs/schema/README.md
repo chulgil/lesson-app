@@ -26,7 +26,9 @@ docs/schema/
 │   ├── practice_space.md       # PracticeSpace (연습 공간)
 │   ├── student.md              # Student (학생)
 │   ├── subscription.md         # Subscription (수강권)
-│   └── teacher_availability.md # TeacherAvailability (가용시간)
+│   ├── teacher_availability.md # TeacherAvailability (가용시간)
+│   ├── review.md               # TeacherReview, LessonFeedback (리뷰)
+│   └── teacher.md              # Teacher, Certificate (선생님)
 └── api/                        # API 스펙 (추후)
     └── ...
 ```
@@ -69,6 +71,24 @@ docs/schema/
 |--------|------|----------|:-----------:|
 | [Parent](entities/parent.md) | 학부모, 자녀, 연결, 설정 | [parent_system.md](../specs/user/parent_system.md) | 63-72 |
 
+### 리뷰
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [TeacherReview](entities/review.md) | 선생님 리뷰, 카테고리 평점 | [review_system.md](../specs/review/review_system.md) | TBD |
+| [LessonFeedback](entities/review.md#lessonfeedback-레슨-피드백---비공개) | 레슨 피드백 (비공개) | [review_system.md](../specs/review/review_system.md) | TBD |
+| [TeacherReviewSettings](entities/review.md#teacherreviewsettings-선생님-리뷰-설정) | 선생님 리뷰 공개 설정 | [review_system.md](../specs/review/review_system.md) | TBD |
+| [TeacherReviewStats](entities/review.md#teacherreviewstats-리뷰-통계) | 리뷰 통계 | [review_system.md](../specs/review/review_system.md) | TBD |
+
+### 선생님
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [Teacher](entities/teacher.md) | 선생님, 프로필, 인증 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
+| [Certificate](entities/teacher.md#certificate-자격증) | 자격증 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
+| [ProfileVisibilitySettings](entities/teacher.md#profilevisibilitysettings-공개-범위-설정) | 공개 범위 설정 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
+| [TeacherSearchFilter](entities/teacher.md#teachersearchfilter-검색-필터) | 검색 필터/결과 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
+
 ---
 
 ## Hive TypeId 할당 현황
@@ -85,6 +105,8 @@ docs/schema/
 | 94-101 | 스케줄 | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy |
 | TBD | 가용시간 | TeacherAvailability (schema), WeeklySchedule, TimeException, GoogleCalendarSync |
 | TBD | 취소정책 | CancellationPolicy, NoShowPolicy, CancellationRecord, PenaltyResult |
+| TBD | 리뷰 | TeacherReview, ReviewerType, ReviewTrigger, CategoryRatings, LessonFeedback, LessonSatisfaction, TeacherResponse, TeacherReviewSettings, ReviewVisibility, TeacherBadge, TeacherReviewStats |
+| TBD | 선생님 | Teacher, ProfileCompletionLevel, PhoneVerification, Certificate, CertificateStatus, CertificateType, TeacherVerification, VerificationBadge, ProfileVisibilitySettings, ProfileVisibility, Education, Career, FeeRange, LessonType, Video |
 
 ---
 

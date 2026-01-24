@@ -2,6 +2,7 @@
 
 > 작성일: 2025-12-27
 > 상태: 스펙 확정
+> 엔티티 스키마: [review.md](../../schema/entities/review.md)
 
 ---
 
@@ -31,32 +32,12 @@
 
 ### 리뷰 작성자 유형
 
-```dart
-/// 리뷰 작성자 유형
-enum ReviewerType {
-  student,   // 학생 본인 (만 14세 이상)
-  parent,    // 부모 대리 작성 (만 14세 미만 자녀)
-}
+> 📦 **엔티티 정의**: [review.md - ReviewerType, TeacherReview](../../schema/entities/review.md#reviewertype-작성자-유형)
 
-/// 리뷰 모델 확장
-class TeacherReview {
-  // ... 기존 필드
-
-  // 작성자 정보
-  final ReviewerType reviewerType;
-  final String? parentId;           // 부모 대리 작성 시
-  final String? childProfileId;     // 자녀 프로필 ID
-  final String? studentId;          // 학생 계정 ID
-
-  // 작성자 표시명 (공개 리뷰에서)
-  String get displayReviewer {
-    if (reviewerType == ReviewerType.parent) {
-      return '학부모';  // 또는 '보호자'
-    }
-    return '학생';
-  }
-}
-```
+| 작성자 유형 | 설명 | 표시 |
+|------------|------|------|
+| student | 학생 본인 (만 14세 이상) | "학생" |
+| parent | 부모 대리 작성 (만 14세 미만) | "학부모" |
 
 ### 리뷰 작성 권한
 
@@ -155,28 +136,14 @@ class TeacherReview {
 
 ### 2.1 레슨 피드백
 
-```dart
-/// Lesson feedback from student to teacher (private)
-class LessonFeedback {
-  final String id;
-  final String lessonId;
-  final String studentId;
-  final String teacherId;
+> 📦 **엔티티 정의**: [review.md - LessonFeedback, LessonSatisfaction](../../schema/entities/review.md#lessonfeedback-레슨-피드백---비공개)
 
-  // Quick feedback (optional)
-  final LessonSatisfaction? satisfaction;  // 만족도
-  final String? comment;                    // 한줄 코멘트
-
-  final DateTime createdAt;
-}
-
-enum LessonSatisfaction {
-  veryGood,   // 😊 매우 좋았어요
-  good,       // 🙂 좋았어요
-  okay,       // 😐 보통이에요
-  notGood,    // 😕 아쉬웠어요
-}
-```
+| 만족도 | 이모지 | 설명 |
+|--------|:------:|------|
+| veryGood | 😊 | 매우 좋았어요 |
+| good | 🙂 | 좋았어요 |
+| okay | 😐 | 보통이에요 |
+| notGood | 😕 | 아쉬웠어요 |
 
 ### 2.2 피드백 수집 UI
 
@@ -211,52 +178,15 @@ class FeedbackAnalytics {
 
 ### 3.1 리뷰 모델
 
-```dart
-enum ReviewTrigger {
-  trialLessonComplete,  // 체험레슨 종료
-  connectionEnded,      // 연결 종료
-  voluntary,            // 자발적 작성
-}
+> 📦 **엔티티 정의**: [review.md - TeacherReview, CategoryRatings, ReviewTrigger](../../schema/entities/review.md#teacherreview-선생님-리뷰)
 
-class TeacherReview {
-  final String id;
-  final String studentId;
-  final String teacherId;
-  final ReviewTrigger trigger;
+**리뷰 트리거:**
 
-  // Overall rating
-  final int overallRating;  // 1-5 stars
-
-  // Category ratings
-  final CategoryRatings categoryRatings;
-
-  // Text review
-  final String? reviewText;  // 최소 20자, 최대 500자
-
-  // Metadata
-  final int lessonCount;     // 작성 시점 레슨 횟수
-  final Duration duration;   // 연결 기간
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-
-  // Teacher response
-  final String? teacherResponse;
-  final DateTime? respondedAt;
-
-  // Visibility (teacher controls)
-  final bool isPublic;  // 선생님이 공개 여부 설정
-}
-
-class CategoryRatings {
-  final int preparation;    // 수업 준비
-  final int explanation;    // 설명력
-  final int friendliness;   // 친절도
-  final int progressMgmt;   // 진도 관리
-
-  double get average =>
-    (preparation + explanation + friendliness + progressMgmt) / 4;
-}
-```
+| 트리거 | 시점 | 설명 |
+|--------|------|------|
+| trialLessonComplete | 체험레슨 완료 직후 | 첫 인상 평가 |
+| connectionEnded | 연결 해제 시 | 최종 평가 |
+| voluntary | 언제든지 | 진행 중에도 작성 가능 |
 
 ### 3.2 리뷰 카테고리 상세
 
@@ -269,21 +199,16 @@ class CategoryRatings {
 
 ### 3.3 리뷰 작성 규칙
 
-```dart
-class ReviewPolicy {
-  // 작성 조건
-  static const int minLessonsForReview = 1;  // 최소 1회 레슨
-  static const int minTextLength = 20;       // 최소 20자
-  static const int maxTextLength = 500;      // 최대 500자
+> 📦 **정책 상수**: [review.md - 리뷰 정책 상수](../../schema/entities/review.md#리뷰-정책-상수)
 
-  // 수정 규칙
-  static const Duration editablePeriod = Duration(days: 7);  // 7일 내 수정 가능
-
-  // 삭제 규칙
-  static const bool studentCanDelete = true;   // 학생 삭제 가능
-  static const bool teacherCanDelete = false;  // 선생님 삭제 불가
-}
-```
+| 항목 | 값 | 설명 |
+|------|-----|------|
+| 최소 레슨 횟수 | 1회 | 리뷰 작성 조건 |
+| 텍스트 최소 길이 | 20자 | 공개 시 필수 |
+| 텍스트 최대 길이 | 500자 | |
+| 수정 가능 기간 | 7일 | |
+| 학생 삭제 | 가능 | |
+| 선생님 삭제 | 불가 | |
 
 ---
 
@@ -344,22 +269,14 @@ class VoluntaryReviewAccess {
 
 ### 5.1 선생님 공개 설정
 
-```dart
-class TeacherReviewSettings {
-  final ReviewVisibility defaultVisibility;
-  final bool showAverageRating;       // 평균 평점 표시
-  final bool showCategoryRatings;     // 카테고리별 평점 표시
-  final bool showReviewCount;         // 리뷰 수 표시
-  final bool allowNewReviews;         // 새 리뷰 허용
-}
+> 📦 **엔티티 정의**: [review.md - TeacherReviewSettings, ReviewVisibility](../../schema/entities/review.md#teacherreviewsettings-선생님-리뷰-설정)
 
-enum ReviewVisibility {
-  public,      // 모든 리뷰 공개
-  selective,   // 선생님이 개별 선택
-  summaryOnly, // 평균 점수만 공개
-  private,     // 완전 비공개
-}
-```
+| 공개 범위 | 설명 |
+|----------|------|
+| public | 모든 리뷰 자동 공개 |
+| selective | 선생님이 개별 선택 |
+| summaryOnly | 평균 점수만 표시 |
+| private | 완전 비공개 |
 
 ### 5.2 개별 리뷰 공개 관리
 
@@ -389,25 +306,16 @@ class PublicReviewSummary {
 
 ### 6.1 답변 모델
 
-```dart
-class TeacherResponse {
-  final String reviewId;
-  final String responseText;  // 최대 300자
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-}
-```
+> 📦 **엔티티 정의**: [review.md - TeacherResponse](../../schema/entities/review.md#teacherresponse-선생님-답변)
 
 ### 6.2 답변 규칙
 
-```dart
-class ResponsePolicy {
-  static const int maxLength = 300;           // 최대 300자
-  static const bool canEdit = true;           // 수정 가능
-  static const bool canDelete = true;         // 삭제 가능
-  static const Duration responseWindow = Duration(days: 30);  // 30일 내 답변
-}
-```
+| 규칙 | 값 |
+|------|-----|
+| 최대 길이 | 300자 |
+| 수정 가능 | ✓ |
+| 삭제 가능 | ✓ |
+| 답변 기한 | 30일 이내 |
 
 ### 6.3 답변 UI
 
@@ -429,61 +337,32 @@ class ReviewResponseSheet extends StatelessWidget {
 
 ### 7.1 검색 랭킹 반영
 
-```dart
-class TeacherSearchRanking {
-  // Ranking factors (가중치)
-  static const double ratingWeight = 0.3;       // 평균 평점
-  static const double reviewCountWeight = 0.2;  // 리뷰 수
-  static const double profileWeight = 0.2;      // 프로필 완성도
-  static const double activityWeight = 0.2;     // 최근 활동
-  static const double certificationWeight = 0.1; // 자격 인증
-
-  double calculateScore(Teacher teacher) {
-    return (teacher.averageRating / 5 * ratingWeight) +
-           (min(teacher.reviewCount / 20, 1) * reviewCountWeight) +
-           (teacher.profileCompletion * profileWeight) +
-           (teacher.activityScore * activityWeight) +
-           (teacher.hasCertification ? 1 : 0) * certificationWeight;
-  }
-}
-```
+| 요소 | 가중치 | 설명 |
+|------|:------:|------|
+| 평균 평점 | 30% | averageRating / 5 |
+| 리뷰 수 | 20% | min(reviewCount / 20, 1) |
+| 프로필 완성도 | 20% | profileCompletion |
+| 최근 활동 | 20% | activityScore |
+| 자격 인증 | 10% | hasCertification |
 
 ### 7.2 뱃지 시스템
 
-```dart
-enum TeacherBadge {
-  // Review-based badges
-  topRated,       // ⭐ 최고 평점 (4.8+ & 10+ 리뷰)
-  studentChoice,  // 👍 학생 추천 (4.5+ & 20+ 리뷰)
+> 📦 **엔티티 정의**: [review.md - TeacherBadge](../../schema/entities/review.md#teacherbadge-선생님-뱃지)
 
-  // Existing badges
-  verified,       // ✓ 자격 인증
-  premium,        // 💎 프리미엄 (프로필 100%)
-  phoneVerified,  // 📱 본인 인증
-}
-
-class BadgeRequirements {
-  static bool isTopRated(Teacher teacher) {
-    return teacher.averageRating >= 4.8 &&
-           teacher.publicReviewCount >= 10;
-  }
-
-  static bool isStudentChoice(Teacher teacher) {
-    return teacher.averageRating >= 4.5 &&
-           teacher.publicReviewCount >= 20;
-  }
-}
-```
+| 뱃지 | 조건 | 아이콘 |
+|------|------|:------:|
+| topRated | 평점 4.8+ & 리뷰 10개+ | ⭐ |
+| studentChoice | 평점 4.5+ & 리뷰 20개+ | 👍 |
+| verified | 자격증 인증 완료 | ✓ |
+| premium | 프로필 완성도 100% | 💎 |
+| phoneVerified | 휴대폰 인증 완료 | 📱 |
 
 ### 7.3 뱃지 표시
 
-```dart
-// Profile and search results
-class TeacherBadgeDisplay extends StatelessWidget {
-  final List<TeacherBadge> badges;
+프로필 및 검색 결과에 획득한 뱃지 아이콘 표시:
 
-  // ⭐ 최고평점 | ✓ 자격인증 | 📱 본인인증
-}
+```
+⭐ 최고평점 | ✓ 자격인증 | 📱 본인인증
 ```
 
 ---
@@ -535,56 +414,21 @@ class MyReviewsScreen extends StatelessWidget {
 
 ## 9. 데이터 모델 요약
 
-### Review 관련 모델
+> 📦 **전체 엔티티 정의**: [review.md](../../schema/entities/review.md)
 
-```dart
-// Main review model
-class TeacherReview {
-  final String id;
-  final String studentId;
-  final String teacherId;
-  final ReviewTrigger trigger;
-  final int overallRating;
-  final CategoryRatings categoryRatings;
-  final String? reviewText;
-  final int lessonCount;
-  final Duration connectionDuration;
-  final DateTime createdAt;
-  final DateTime? updatedAt;
-  final TeacherResponse? response;
-  final bool isPublic;
-  final bool studentWantsPublic;  // 학생 공개 동의
-}
-
-// Lesson feedback (private)
-class LessonFeedback {
-  final String id;
-  final String lessonId;
-  final String studentId;
-  final String teacherId;
-  final LessonSatisfaction? satisfaction;
-  final String? comment;
-  final DateTime createdAt;
-}
-
-// Teacher review settings
-class TeacherReviewSettings {
-  final ReviewVisibility defaultVisibility;
-  final bool showAverageRating;
-  final bool showCategoryRatings;
-  final bool showReviewCount;
-  final bool allowNewReviews;
-}
-
-// Review statistics
-class TeacherReviewStats {
-  final double averageRating;
-  final int totalReviews;
-  final int publicReviews;
-  final Map<String, double> categoryAverages;
-  final Map<int, int> ratingDistribution;  // 1: 2개, 5: 15개 등
-}
-```
+| 엔티티 | 설명 |
+|--------|------|
+| TeacherReview | 선생님 리뷰 (공개 가능) |
+| CategoryRatings | 카테고리별 평점 |
+| LessonFeedback | 레슨 피드백 (비공개) |
+| TeacherResponse | 선생님 답변 |
+| TeacherReviewSettings | 선생님 리뷰 설정 |
+| TeacherReviewStats | 리뷰 통계 |
+| ReviewerType | 작성자 유형 (student/parent) |
+| ReviewTrigger | 리뷰 트리거 |
+| LessonSatisfaction | 만족도 (이모지) |
+| ReviewVisibility | 공개 범위 |
+| TeacherBadge | 선생님 뱃지 |
 
 ---
 
