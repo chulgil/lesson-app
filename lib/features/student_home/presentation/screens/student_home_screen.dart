@@ -22,19 +22,23 @@ import 'student_practice_tab.dart';
 import 'student_profile_tab.dart';
 
 /// Student home screen with practice dashboard
-class StudentHomeScreen extends StatefulWidget {
+class StudentHomeScreen extends ConsumerStatefulWidget {
   const StudentHomeScreen({super.key});
 
   @override
-  State<StudentHomeScreen> createState() => _StudentHomeScreenState();
+  ConsumerState<StudentHomeScreen> createState() => _StudentHomeScreenState();
 }
 
-class _StudentHomeScreenState extends State<StudentHomeScreen> {
+class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    // Auto-switch to student role when entering this screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+    });
     // Show recording recovery message if any recordings were recovered at startup
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final result = getStartupRecoveryResult();
