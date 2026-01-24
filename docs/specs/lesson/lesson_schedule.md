@@ -2,6 +2,7 @@
 
 > 작성일: 2025-12-25
 > 상태: ✅ 화면 구현 완료, 라우터 연결 필요
+> 엔티티 스키마: [lesson_schedule.md](../../schema/entities/lesson_schedule.md)
 
 ---
 
@@ -58,6 +59,8 @@
 | cancelled | 취소됨 | - | - |
 | rejected | 거절됨 | - | - |
 
+→ BookingStatus 엔티티: [booking.md](../../schema/entities/booking.md#booking-레슨-예약)
+
 ---
 
 ## 정규레슨 전환 플로우
@@ -92,22 +95,16 @@
 | **선생님별 설정** | 가능 (개별 정책 선택) |
 | **결제** | 항상 4회분 고정 |
 
-### 선생님 설정 옵션
-
-```
-FifthWeekPolicy:
-├── skip (기본값)     → 5주차 자동 휴강
-├── optional          → 학생 선택 (진행/휴강)
-├── credit            → 진행 후 다음달 이월
-└── always            → 항상 진행 (5회 결제)
-```
+### FifthWeekPolicy
 
 | 정책 | 설명 | 결제 |
 |------|------|------|
-| **skip** | 5주차는 자동으로 휴강 표시 | 4회 고정 |
+| **skip** (기본값) | 5주차는 자동으로 휴강 표시 | 4회 고정 |
 | **optional** | 5주차에 학생이 선택 (진행/휴강) | 4회 + 선택시 추가 |
 | **credit** | 5주차 진행 → 다음달 크레딧 적립 | 4회 고정, 크레딧 차감 |
 | **always** | 5주차도 항상 진행 | 5회 결제 |
+
+→ 엔티티 정의: [lesson_schedule.md](../../schema/entities/lesson_schedule.md#fifthweekpolicy-5주차-정책)
 
 ### 캘린더 표시 (skip 정책 예시)
 
@@ -152,25 +149,6 @@ FifthWeekPolicy:
 │ │ 5주차는 휴강입니다.         │ │
 │ └─────────────────────────────┘ │
 └─────────────────────────────────┘
-```
-
-### 데이터 모델
-
-```dart
-enum FifthWeekPolicy {
-  skip,      // 5주차 자동 휴강 (기본값)
-  optional,  // 학생 선택
-  credit,    // 다음달 이월
-  always,    // 항상 진행
-}
-
-class RegularLessonSettings {
-  final int sessionsPerMonth;        // 기본 4
-  final FifthWeekPolicy fifthWeek;   // 기본 skip
-  final String? customNotice;        // 선택적 안내 문구
-  final DayOfWeek lessonDay;         // 레슨 요일
-  final TimeOfDay lessonTime;        // 레슨 시간
-}
 ```
 
 ### 자동 스케줄 생성 로직
@@ -237,6 +215,17 @@ class RegularLessonSettings {
 │  [변경요청] [취소]                   │
 └─────────────────────────────────────┘
 ```
+
+---
+
+## 관련 문서
+
+| 문서 | 설명 |
+|------|------|
+| [lesson_schedule.md](../../schema/entities/lesson_schedule.md) | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy 엔티티 |
+| [booking.md](../../schema/entities/booking.md) | Booking, BookingStatus 엔티티 |
+| [Unified_Lesson_Booking_Spec.md](./Unified_Lesson_Booking_Spec.md) | 통합 레슨 신청 스펙 |
+| [Lesson_Schedule_Design.md](./Lesson_Schedule_Design.md) | 레슨 스케줄 상세 설계 |
 
 ---
 
