@@ -30,33 +30,29 @@ docs/
 │   ├── icons.md          # 아이콘 토큰
 │   └── status.md         # 상태 토큰
 ├── _components/          # 🔑 공통 컴포넌트 스펙
-│   ├── form_field.md     # 폼 입력 필드
-│   ├── measure_picker.md # 마디 선택기
-│   ├── date_range_picker.md # 날짜 범위 선택기
-│   ├── repeat_toggle.md  # 반복 토글
-│   ├── submit_button.md  # 제출 버튼
-│   ├── bottom_sheet.md   # 바텀 시트
-│   ├── list_card.md      # 리스트 카드
-│   ├── confirm_dialog.md # 확인 다이얼로그
-│   └── empty_state.md    # 빈 상태
 ├── _patterns/            # 🔑 공통 패턴
-│   ├── crud_form.md      # CRUD 폼 패턴
-│   ├── list_detail.md    # 리스트-상세 패턴
-│   └── date_constraint.md # 날짜 제약 패턴
+├── schema/               # 🔑 엔티티 스키마 (구현 상세)
+│   ├── entities/         # Dart 엔티티, Hive TypeId
+│   │   ├── booking.md
+│   │   ├── lesson_schedule.md
+│   │   ├── payment.md
+│   │   ├── practice_space.md
+│   │   ├── subscription.md
+│   │   └── ...
+│   └── README.md         # 엔티티 인덱스
 ├── registry.md           # 📋 문서 의존성 레지스트리
 ├── requirement/          # 요구사항 및 현황
 ├── proposal/             # 기획 제안서
-├── specs/                # 기능 명세서
+├── specs/                # 기능 명세서 (설계/비즈니스 로직)
+│   ├── _archive/         # 통합/폐기된 문서
 │   ├── lesson/           # 레슨 시스템
 │   ├── practice/         # 연습 시스템
 │   ├── metronome/        # 메트로놈
 │   ├── payment/          # 결제 시스템
-│   ├── subscription/     # 구독/수강권 시스템 (개인/학원)
-│   ├── student/          # 학생 시스템 (클래스/소속)
-│   ├── user/             # 사용자 (선생님/학부모)
+│   ├── subscription/     # 구독/수강권 시스템
+│   ├── student/          # 학생 시스템
+│   ├── user/             # 사용자 시스템
 │   ├── notification/     # 알림 시스템
-│   ├── review/           # 리뷰 시스템
-│   ├── trial/            # 체험 레슨
 │   ├── invite/           # 초대 시스템
 │   ├── design/           # UX/UI 설계
 │   └── dev/              # 개발 가이드
@@ -152,9 +148,10 @@ docs/
 | 문서 | 상태 | 설명 |
 |------|------|------|
 | [payment_unified_spec.md](specs/payment/payment_unified_spec.md) | ✅ 확정 | **통합 결제 스펙** (3자 관계 관점, 상태 enum 통일) |
-| [payment_system.md](specs/payment/payment_system.md) | 📦 레거시 | 결제 시스템 스펙 (→ unified_spec으로 통합) |
-| [payment_flow.md](specs/payment/payment_flow.md) | 📦 레거시 | 결제 플로우 (→ unified_spec으로 통합) |
-| [payment_requirement.md](specs/payment/payment_requirement.md) | 📦 레거시 | 결제 요구사항 (→ unified_spec으로 통합) |
+
+> 📦 레거시 파일(`payment_system.md`, `payment_flow.md`, `payment_requirement.md`)은 `specs/_archive/`로 이동됨
+
+→ 엔티티: [schema/entities/payment.md](schema/entities/payment.md)
 
 ### 구독 시스템 (subscription/)
 
@@ -201,7 +198,10 @@ docs/
 | 문서 | 상태 | 설명 |
 |------|------|------|
 | [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | **양방향 초대 시스템** (맞팔, QR/URL/코드, 3자 관계) |
-| [invite_system.md](specs/invite/invite_system.md) | ⚠️ DEPRECATED | v1 레거시 (→ v2로 완전 대체됨) |
+
+> 📦 DEPRECATED `invite_system.md`는 `specs/_archive/`로 이동됨
+
+→ 엔티티: [schema/entities/practice_space.md](schema/entities/practice_space.md) (InviteCode)
 
 ### UX/UI 설계 (design/)
 

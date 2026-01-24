@@ -1,11 +1,17 @@
 # 초대 시스템 v2 - 맞팔 기반 연결
 
-> 마지막 업데이트: 2025-12-28
+> 마지막 업데이트: 2026-01-24
 
 ## 개요
 
-선생님-학생 간 **상호 팔로우(맞팔)** 기반의 연결 시스템입니다.
-수기 등록 학생을 지원하며, 앱 연결 시 자동 맞팔로 간소화된 UX를 제공합니다.
+**상호 팔로우(맞팔)** 기반의 연결 시스템입니다.
+다음 관계 유형을 지원합니다:
+
+| 관계 | 설명 |
+|------|------|
+| **선생님 ↔ 학생** | 맞팔 기반 연결, 수기 등록 지원 |
+| **학부모 ↔ 선생님** | 자녀 통해 연결, 대리 관리 |
+| **학원 ↔ 선생님** | 소속 관계, 역할 기반 권한 |
 
 ### 핵심 변경점 (v1 → v2)
 
@@ -15,6 +21,7 @@
 | 학생 등록 | 앱 연결 필수 | **수기 등록 지원** |
 | 검색 방식 | 코드 입력 | **연락처 동기화 + 코드** |
 | 상태 표시 | 없음 | **아이콘으로 연결 상태 표시** |
+| 학원 지원 | 없음 | **학원-선생님 소속 관계** |
 
 ---
 
@@ -530,6 +537,429 @@ Future<void> acceptParentInvite({
 |------|----------|------|----------|
 | **학부모 주도** | 학부모 | 학부모가 적극적으로 참여 | 학부모가 먼저 앱 설치한 경우 |
 | **선생님 주도** | 선생님 | 선생님이 간편하게 연락처로 초대 | 선생님이 학부모 연락처 보유 시 (권장) |
+
+---
+
+## 학원-선생님 초대 시스템
+
+> 📋 상세 설계: [three_party_relationship_spec.md](../lesson/three_party_relationship_spec.md)
+
+학원과 선생님 간의 연결을 관리하는 시스템입니다. 학원에서 선생님을 강사로 초대하거나, 선생님이 학원에 가입을 요청할 수 있습니다.
+
+### 핵심 컨셉
+
+| 항목 | 설명 |
+|------|------|
+| 관계 유형 | 학원 ↔ 선생님 (소속 관계) |
+| 초대 방향 | 양방향 (학원→선생님, 선생님→학원) |
+| 역할 | owner, manager, instructor |
+| 데이터 소유권 | 학원 컨텍스트에서 생성된 데이터는 학원 소유 |
+
+### 멤버십 역할
+
+```dart
+/// 학원 멤버십 역할
+enum MembershipRole {
+  owner,      // 👑 원장 - 학원 전체 관리, 멤버 관리, 정산
+  manager,    // 📋 매니저 - 스케줄 관리, 학생 배정
+  instructor, // 🎵 강사 - 본인 학생만 관리
+}
+
+/// 학원 멤버십
+class Membership {
+  final String id;
+  final String organizationId;  // 학원 ID
+  final String userId;          // 선생님 ID
+  final MembershipRole role;
+  final MembershipStatus status;
+  final DateTime joinedAt;
+  final DateTime? invitedAt;
+  final String? invitedBy;      // 초대한 사람 ID
+}
+
+enum MembershipStatus {
+  pending,    // 초대/가입 대기 중
+  active,     // 활성 멤버
+  suspended,  // 일시 정지
+  left,       // 탈퇴
+}
+```
+
+### 학원 → 선생님 초대
+
+학원 관리자(owner/manager)가 선생님을 강사로 초대합니다.
+
+#### 초대 플로우
+
+```
+[학원 관리자 앱/웹]
+        │
+        ▼
+[강사 초대] ← 선생님 검색 (전화번호/코드/연락처)
+        │
+        │ 초대 링크/코드 전송
+        ▼
+[선생님 앱]
+        │
+        ▼
+[초대 확인 화면]
+  "OO 음악학원에서 강사로 초대했습니다"
+  "역할: 강사(instructor)"
+        │
+        ├──[수락]──► Membership 생성 (active)
+        │              └── 학원 목록에 추가
+        │
+        └──[거절]──► 초대 만료 처리
+```
+
+#### 초대 API
+
+```dart
+// 학원에서 선생님 초대
+Future<void> inviteTeacherToAcademy({
+  required String organizationId,
+  required String inviterId,       // 초대하는 관리자 ID
+  required String teacherContact,  // 전화번호/이메일
+  required MembershipRole role,    // 보통 instructor
+  InviteMethod method = InviteMethod.link,
+}) async {
+  // 1. 권한 확인 (owner/manager만 가능)
+  final inviter = await getMembership(organizationId, inviterId);
+  if (inviter.role != MembershipRole.owner &&
+      inviter.role != MembershipRole.manager) {
+    throw UnauthorizedException('강사 초대 권한이 없습니다');
+  }
+
+  // 2. 초대 코드 생성
+  final inviteCode = generateAcademyInviteCode(organizationId, role);
+  final inviteLink = 'lessonapp://academy-invite/$inviteCode';
+
+  // 3. 대기 멤버십 생성
+  await createPendingMembership(
+    organizationId: organizationId,
+    contact: teacherContact,
+    role: role,
+    invitedBy: inviterId,
+    inviteCode: inviteCode,
+  );
+
+  // 4. 초대 전송
+  await sendInvite(
+    contact: teacherContact,
+    link: inviteLink,
+    method: method,
+    message: '${getAcademyName(organizationId)}에서 강사로 초대했습니다',
+  );
+}
+
+// 선생님이 초대 수락
+Future<void> acceptAcademyInvite({
+  required String teacherId,
+  required String inviteCode,
+}) async {
+  // 1. 초대 검증
+  final invite = await validateAcademyInvite(inviteCode);
+  if (invite == null || invite.isExpired) {
+    throw InvalidStateException('유효하지 않은 초대입니다');
+  }
+
+  // 2. 멤버십 활성화
+  await activateMembership(
+    organizationId: invite.organizationId,
+    userId: teacherId,
+    role: invite.role,
+  );
+
+  // 3. 선생님에게 학원 추가
+  await addOrganizationToTeacher(teacherId, invite.organizationId);
+
+  // 4. 알림 발송
+  await notifyAcademyNewMember(invite.organizationId, teacherId);
+}
+```
+
+### 선생님 → 학원 가입 요청
+
+선생님이 학원에 가입을 요청합니다.
+
+#### 가입 요청 플로우
+
+```
+[선생님 앱]
+        │
+        ▼
+[학원 검색] ← 학원 코드/이름으로 검색
+        │
+        ▼
+[가입 요청]
+  "OO 음악학원에 강사로 가입을 요청합니다"
+        │
+        ▼
+[학원 관리자 알림]
+  "김선생님이 강사 가입을 요청했습니다"
+        │
+        ├──[수락]──► Membership 생성 (active)
+        │              └── 선생님에게 알림
+        │
+        ├──[거절]──► 요청 만료 처리
+        │              └── 선생님에게 알림
+        │
+        └──[무시]──► 7일 후 자동 만료
+```
+
+#### 가입 요청 API
+
+```dart
+// 선생님이 학원 가입 요청
+Future<void> requestJoinAcademy({
+  required String teacherId,
+  required String organizationId,
+  String? message,
+}) async {
+  // 1. 중복 요청 확인
+  final existing = await getPendingRequest(teacherId, organizationId);
+  if (existing != null) {
+    throw InvalidStateException('이미 가입 요청이 진행 중입니다');
+  }
+
+  // 2. 이미 멤버인지 확인
+  final membership = await getMembership(organizationId, teacherId);
+  if (membership != null && membership.status == MembershipStatus.active) {
+    throw InvalidStateException('이미 소속된 학원입니다');
+  }
+
+  // 3. 가입 요청 생성
+  await createJoinRequest(
+    organizationId: organizationId,
+    teacherId: teacherId,
+    message: message,
+  );
+
+  // 4. 학원 관리자에게 알림
+  await notifyAcademyAdmins(
+    organizationId: organizationId,
+    title: '강사 가입 요청',
+    body: '${getTeacherName(teacherId)}님이 강사로 가입을 요청했습니다',
+    data: {'teacherId': teacherId, 'type': 'join_request'},
+  );
+}
+
+// 학원 관리자가 가입 요청 응답
+Future<void> respondToJoinRequest({
+  required String organizationId,
+  required String adminId,
+  required String teacherId,
+  required bool accept,
+  MembershipRole role = MembershipRole.instructor,
+}) async {
+  // 1. 권한 확인
+  final admin = await getMembership(organizationId, adminId);
+  if (admin.role != MembershipRole.owner &&
+      admin.role != MembershipRole.manager) {
+    throw UnauthorizedException('가입 요청 처리 권한이 없습니다');
+  }
+
+  if (accept) {
+    // 2a. 멤버십 생성
+    await createMembership(
+      organizationId: organizationId,
+      userId: teacherId,
+      role: role,
+      approvedBy: adminId,
+    );
+
+    // 3a. 선생님에게 학원 추가
+    await addOrganizationToTeacher(teacherId, organizationId);
+
+    // 4a. 수락 알림
+    await notifyTeacher(
+      teacherId: teacherId,
+      title: '가입 승인',
+      body: '${getAcademyName(organizationId)} 가입이 승인되었습니다',
+    );
+  } else {
+    // 2b. 요청 거절 처리
+    await rejectJoinRequest(organizationId, teacherId);
+
+    // 3b. 거절 알림
+    await notifyTeacher(
+      teacherId: teacherId,
+      title: '가입 거절',
+      body: '${getAcademyName(organizationId)} 가입이 거절되었습니다',
+    );
+  }
+}
+```
+
+### 학원 컨텍스트에서 학생 관리
+
+선생님이 학원 소속일 때 학생을 등록하면, 해당 학생은 학원과 선생님 모두에게 연결됩니다.
+
+#### 학생 등록 컨텍스트
+
+```dart
+// 학생 등록 시 컨텍스트 결정
+Future<Student> createStudent({
+  required String teacherId,
+  required String name,
+  String? organizationId,  // null이면 개인 레슨
+  // ... 기타 필드
+}) async {
+  // 학원 컨텍스트면 organizationId 설정
+  final student = Student(
+    id: generateId(),
+    name: name,
+    organizationId: organizationId,
+    teacherId: teacherId,
+    // ...
+  );
+
+  await saveStudent(student);
+
+  // TeacherStudentRelation 생성
+  await createTeacherStudentRelation(
+    teacherId: teacherId,
+    studentId: student.id,
+    organizationId: organizationId,
+  );
+
+  return student;
+}
+```
+
+#### 학원 학생 vs 개인 학생
+
+| 구분 | 개인 학생 | 학원 학생 |
+|------|----------|----------|
+| `organizationId` | `null` | 학원 ID |
+| 데이터 소유권 | 선생님 | 학원 |
+| 선생님 이직 시 | 선생님과 함께 이동 | 학원에 남음 |
+| 결제 정산 | 선생님에게 직접 | 학원 통해 정산 |
+| UI 표시 | 개인 탭 | 학원 탭 |
+
+### 선생님 학원 탈퇴/제명
+
+#### 탈퇴 플로우
+
+```
+[선생님 본인 탈퇴]
+        │
+        ▼
+"OO 음악학원에서 탈퇴하시겠습니까?"
+"학원 학생 데이터는 학원에 남습니다"
+        │
+        ├──[확인]──► Membership.status = left
+        │              ├── 학원 목록에서 제거
+        │              ├── 개인 학생은 유지
+        │              └── 학원 학생 접근권 해제
+        │
+        └──[취소]──► 유지
+
+[학원 관리자 제명]
+        │
+        ▼
+"김선생님을 제명하시겠습니까?"
+"학원 학생 데이터는 학원에 남습니다"
+        │
+        ├──[확인]──► Membership.status = left
+        │              ├── 선생님에게 알림
+        │              └── 학원 학생 다른 강사에게 재배정 필요
+        │
+        └──[취소]──► 유지
+```
+
+#### 탈퇴 API
+
+```dart
+// 선생님 본인 탈퇴
+Future<void> leaveAcademy({
+  required String teacherId,
+  required String organizationId,
+}) async {
+  // 1. 멤버십 상태 변경
+  await updateMembershipStatus(
+    organizationId: organizationId,
+    userId: teacherId,
+    status: MembershipStatus.left,
+    leftAt: DateTime.now(),
+  );
+
+  // 2. 선생님의 학원 목록에서 제거
+  await removeOrganizationFromTeacher(teacherId, organizationId);
+
+  // 3. 학원 학생 접근권 해제 (TeacherStudentRelation 비활성화)
+  await deactivateAcademyStudentRelations(teacherId, organizationId);
+
+  // 4. 학원 관리자에게 알림
+  await notifyAcademyAdmins(
+    organizationId: organizationId,
+    title: '강사 탈퇴',
+    body: '${getTeacherName(teacherId)}님이 탈퇴했습니다',
+  );
+}
+
+// 학원 관리자가 강사 제명
+Future<void> removeTeacherFromAcademy({
+  required String adminId,
+  required String organizationId,
+  required String teacherId,
+  String? reason,
+}) async {
+  // 1. 권한 확인
+  final admin = await getMembership(organizationId, adminId);
+  if (admin.role != MembershipRole.owner) {
+    throw UnauthorizedException('강사 제명 권한이 없습니다');
+  }
+
+  // 2. 멤버십 상태 변경
+  await updateMembershipStatus(
+    organizationId: organizationId,
+    userId: teacherId,
+    status: MembershipStatus.left,
+    leftAt: DateTime.now(),
+    removedBy: adminId,
+    removalReason: reason,
+  );
+
+  // 3. 선생님의 학원 목록에서 제거
+  await removeOrganizationFromTeacher(teacherId, organizationId);
+
+  // 4. 학원 학생 접근권 해제
+  await deactivateAcademyStudentRelations(teacherId, organizationId);
+
+  // 5. 선생님에게 알림
+  await notifyTeacher(
+    teacherId: teacherId,
+    title: '학원 제명',
+    body: '${getAcademyName(organizationId)}에서 제명되었습니다',
+  );
+}
+```
+
+### 학원 초대 알림
+
+| 이벤트 | 수신자 | 메시지 |
+|--------|--------|--------|
+| 초대 발송 | 선생님 | "OO음악학원에서 강사로 초대했습니다" |
+| 초대 수락 | 학원 관리자 | "김선생님이 강사로 합류했습니다" |
+| 초대 거절 | 학원 관리자 | "김선생님이 초대를 거절했습니다" |
+| 가입 요청 | 학원 관리자 | "김선생님이 강사 가입을 요청했습니다" |
+| 가입 승인 | 선생님 | "OO음악학원 가입이 승인되었습니다" |
+| 가입 거절 | 선생님 | "OO음악학원 가입이 거절되었습니다" |
+| 탈퇴 완료 | 학원 관리자 | "김선생님이 탈퇴했습니다" |
+| 제명 완료 | 선생님 | "OO음악학원에서 제명되었습니다" |
+
+### 학원-선생님 연결 상태 인디케이터
+
+| 상태 | 아이콘 | 설명 |
+|------|:------:|------|
+| 초대 발송됨 | 🟡 | 학원이 초대, 선생님 응답 대기 |
+| 가입 요청됨 | 🔵 | 선생님이 요청, 학원 승인 대기 |
+| 활성 멤버 | 🟢 | 정상 활동 중 |
+| 일시 정지 | 🟠 | 활동 일시 정지 |
+| 탈퇴/제명 | ⚪ | 더 이상 소속 아님 |
+
+---
 
 ### 설정 변경 시 처리
 
@@ -1652,7 +2082,16 @@ for (final req in pendingRequests) {
 - [ ] 설정 변경 시 처리 (updateAutoAcceptSetting)
 - [ ] 푸시 알림 백그라운드 액션 (FCM + Local Notification)
 
-### Phase 3
+### Phase 3 - 학원 시스템
+- [ ] Membership 모델 및 역할 (owner, manager, instructor)
+- [ ] 학원 → 선생님 초대 (inviteTeacherToAcademy)
+- [ ] 선생님 → 학원 가입 요청 (requestJoinAcademy)
+- [ ] 가입 승인/거절 처리 (respondToJoinRequest)
+- [ ] 학원 컨텍스트 학생 등록 (organizationId)
+- [ ] 학원 탈퇴/제명 (leaveAcademy, removeTeacherFromAcademy)
+- [ ] 학원-선생님 연결 상태 인디케이터
+
+### Phase 4
 - [ ] 알림 센터 통합
 - [ ] 연결 해제 기능
 - [ ] 검색 노출 설정
@@ -1922,4 +2361,6 @@ Future<void> updateAllPracticeLevels(String teacherId) async {
 ## 관련 문서
 
 - [브레인스토밍 Q&A](../../proposal/invite_ux_improvement.md)
-- [기존 초대 시스템 v1](./invite_system.md)
+- [기존 초대 시스템 v1](./invite_system.md) ⚠️ DEPRECATED
+- [3자 관계 설계](../lesson/three_party_relationship_spec.md) - 학원-선생님-학생 관계 상세
+- [구독 시스템](../subscription/subscription_system_spec.md) - 수강권/정산 시스템

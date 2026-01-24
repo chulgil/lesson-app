@@ -2,7 +2,8 @@
 
 > 작성일: 2026-01-23
 > 상태: 📋 설계 완료 (구현 대기)
-> 관련 문서: [payment_system.md](../payment/payment_system.md), [payment_flow.md](../payment/payment_flow.md)
+> 엔티티 스키마: [subscription.md](../../schema/entities/subscription.md)
+> 관련 문서: [payment_unified_spec.md](../payment/payment_unified_spec.md)
 
 ---
 

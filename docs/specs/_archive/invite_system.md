@@ -1,7 +1,15 @@
 # 양방향 초대 시스템 스펙 (v1)
 
+> ⚠️ **DEPRECATED**: 이 문서는 더 이상 사용되지 않습니다.
+>
+> 최신 버전: [invite_system_v2.md](./invite_system_v2.md)
+>
+> v2에서 추가된 주요 기능:
+> - 맞팔(mutual follow) 기반 연결 시스템
+> - 학원 ↔ 선생님 ↔ 학생 3자 관계 지원
+> - PracticeSpace/CoachConnection 아키텍처 반영
+>
 > 마지막 업데이트: 2025-12-28
-> **Note**: 개선된 버전은 [invite_system_v2.md](./invite_system_v2.md) 참조
 
 ## 개요
 
