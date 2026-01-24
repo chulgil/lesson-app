@@ -6,7 +6,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../widgets/section_form/date_range_section.dart';
 import '../widgets/section_form/range_picker_sheet.dart';
 
 /// Input data for a single section in quick add
@@ -50,7 +52,12 @@ class QuickAddScreen extends ConsumerStatefulWidget {
 class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   final _formKey = GlobalKey<FormState>();
   final _repertoireNameController = TextEditingController();
+  final _descriptionController = TextEditingController();
   bool _isLoading = false;
+
+  // Date fields
+  DateTime _startDate = DateTime.now();
+  DateTime? _endDate;
 
   // Sections list (starts with one section)
   final List<_SectionInput> _sections = [_SectionInput()];
@@ -79,10 +86,46 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
   @override
   void dispose() {
     _repertoireNameController.dispose();
+    _descriptionController.dispose();
     for (final section in _sections) {
       section.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _selectStartDate() async {
+    final picked = await AppDatePicker.show(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      helpText: '시작일 선택',
+    );
+    if (picked != null) {
+      setState(() {
+        _startDate = picked;
+        if (_endDate != null && _endDate!.isBefore(_startDate)) {
+          _endDate = null;
+        }
+      });
+    }
+  }
+
+  Future<void> _selectEndDate() async {
+    final picked = await AppDatePicker.show(
+      context: context,
+      initialDate: _endDate ?? _startDate,
+      firstDate: _startDate,
+      lastDate: DateTime(2030),
+      helpText: '종료일 선택',
+    );
+    if (picked != null) {
+      setState(() => _endDate = picked);
+    }
+  }
+
+  void _clearEndDate() {
+    setState(() => _endDate = null);
   }
 
   void _addSection() {
@@ -119,6 +162,11 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       final repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
             studentId: widget.studentId,
             name: _repertoireNameController.text.trim(),
+            description: _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
+            startDate: _startDate,
+            endDate: _endDate,
           );
 
       // 2. Create all sections
@@ -259,7 +307,50 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 }).toList(),
               ),
 
+              const SizedBox(height: AppSpacing.space4),
+
+              // Description field (optional)
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: '설명 (선택)',
+                  hintText: '예: Bach Violin Concerto in A minor',
+                  prefixIcon: Icon(Icons.description_outlined),
+                ),
+                maxLines: 1,
+                textInputAction: TextInputAction.next,
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Practice period
+              DateRangeSection(
+                startDate: _startDate,
+                endDate: _endDate,
+                onStartDateTap: _selectStartDate,
+                onEndDateTap: _selectEndDate,
+                onEndDateClear: _clearEndDate,
+                endDatePlaceholder: '설정 안함 (매일 반복)',
+                showHintMessage: true,
+              ),
+
               const SizedBox(height: AppSpacing.space6),
+
+              // Section divider
+              const Divider(),
+
+              const SizedBox(height: AppSpacing.space4),
+
+              // Section header
+              Row(
+                children: [
+                  const Icon(Icons.queue_music, size: 20, color: AppColors.primary),
+                  const SizedBox(width: AppSpacing.space2),
+                  Text('섹션 목록', style: AppTypography.headingSmall),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacing.space4),
 
               // Sections
               ...List.generate(_sections.length, (index) {

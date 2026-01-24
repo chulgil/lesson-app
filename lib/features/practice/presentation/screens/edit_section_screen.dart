@@ -37,6 +37,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   // Original section for comparison
   PracticeSection? _originalSection;
 
+  // Repertoire info for context display
+  PracticeRepertoire? _repertoire;
+
   // Range type selection
   SectionRangeType _rangeType = SectionRangeType.measure;
 
@@ -61,9 +64,13 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
   }
 
   Future<void> _loadSectionData() async {
+    // Load repertoire data for context display
+    final repertoire = await ref.read(repertoireProvider(widget.repertoireId).future);
+
     // Load section data
     final section = await ref.read(sectionProvider(widget.sectionId).future);
     if (section != null && mounted) {
+      _repertoire = repertoire;
       setState(() {
         _originalSection = section;
         _pieceNameController.text = section.pieceName;
@@ -258,14 +265,52 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ========================================
-              // 📋 기본 정보 섹션
+              // 📚 레퍼토리 정보 (읽기 전용)
               // ========================================
-              const SectionHeader(
-                icon: '📋',
-                title: '기본 정보',
-                subtitle: '곡명, 범위, 별칭 설정',
-              ),
-              const SizedBox(height: AppSpacing.space4),
+              if (_repertoire != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.space4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.library_music,
+                        color: AppColors.primary,
+                        size: 24,
+                      ),
+                      const SizedBox(width: AppSpacing.space3),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _repertoire!.name,
+                              style: AppTypography.headingSmall.copyWith(
+                                color: AppColors.primary,
+                              ),
+                            ),
+                            if (_repertoire!.description != null &&
+                                _repertoire!.description!.isNotEmpty)
+                              Text(
+                                _repertoire!.description!,
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space6),
+              ],
 
               // Piece name field
               TextFormField(

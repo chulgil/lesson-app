@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -97,13 +96,37 @@ class _RepertoireDetailScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Repertoire Name
-          Text(
-            repertoire.name,
-            style: AppTypography.headingLarge,
+          // Repertoire header (same as list item)
+          Row(
+            children: [
+              Icon(
+                Icons.menu_book,
+                color: AppColors.primary,
+                size: 28,
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      repertoire.name,
+                      style: AppTypography.headingLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      repertoire.dateRangeText,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           if (repertoire.description != null) ...[
-            const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space3),
             Text(
               repertoire.description!,
               style: AppTypography.bodyMedium.copyWith(
@@ -111,11 +134,6 @@ class _RepertoireDetailScreenState
               ),
             ),
           ],
-
-          const SizedBox(height: AppSpacing.space6),
-
-          // Period display (read-only)
-          _buildPeriodSection(repertoire),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -324,59 +342,6 @@ class _RepertoireDetailScreenState
             )).toList(),
       );
     }
-  }
-
-  Widget _buildPeriodSection(PracticeRepertoire repertoire) {
-    final dateFormat = DateFormat('yyyy.MM.dd');
-    final startStr = dateFormat.format(repertoire.startDate);
-    final endStr = repertoire.endDate != null
-        ? dateFormat.format(repertoire.endDate!)
-        : '진행중';
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.calendar_today,
-            size: 20,
-            color: AppColors.primary,
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '연습 기간',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space1),
-                Text(
-                  '$startStr ~ $endStr',
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Edit button hint
-          IconButton(
-            onPressed: _openEditScreen,
-            icon: const Icon(Icons.edit_outlined, size: 20),
-            tooltip: '기간 편집',
-            color: AppColors.textSecondaryLight,
-          ),
-        ],
-      ),
-    );
   }
 
   String _formatDateForTitle(DateTime date) {

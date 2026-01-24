@@ -182,7 +182,6 @@ class _LessonList extends StatelessWidget {
           children: [
             // Date title
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   dateFormat.format(selectedDate),
@@ -190,6 +189,28 @@ class _LessonList extends StatelessWidget {
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
+                if (_isToday(selectedDate)) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusSmall),
+                    ),
+                    child: Text(
+                      '오늘',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+                const Spacer(),
                 Text(
                   '${dayLessons.length}개 레슨',
                   style: AppTypography.bodyMedium.copyWith(
@@ -253,6 +274,13 @@ class _LessonList extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  bool _isToday(DateTime date) {
+    final now = DateTime.now();
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 
   Widget _buildAddLessonButton(BuildContext context) {

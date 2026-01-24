@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -58,42 +59,78 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               ),
             ),
 
-            // Date header with sort option
+            // Date header with count and sort option
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding,
               ),
-              child: Row(
-                children: [
-                  Text(
-                    _getDateHeaderText(),
-                    style: AppTypography.headingSmall,
-                  ),
-                  if (_isToday()) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusSmall),
-                      ),
-                      child: Text(
-                        '오늘',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
+              child: repertoiresAsync.when(
+                data: (repertoires) => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.textSecondaryLight,
                       ),
                     ),
+                    if (_isToday()) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusSmall),
+                        ),
+                        child: Text(
+                          '오늘',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                    const Spacer(),
+                    // Repertoire count
+                    Text(
+                      '${repertoires.length}개 레퍼토리',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Sort dropdown
+                    _buildSortDropdown(),
                   ],
-                  const Spacer(),
-                  // Sort dropdown
-                  _buildSortDropdown(),
-                ],
+                ),
+                loading: () => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
+                ),
+                error: (_, __) => Row(
+                  children: [
+                    Text(
+                      _formatDate(_selectedDate),
+                      style: AppTypography.headingSmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    const Spacer(),
+                    _buildSortDropdown(),
+                  ],
+                ),
               ),
             ),
 
@@ -121,37 +158,12 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push(
-            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
-  String _getDateHeaderText() {
-    final now = DateTime.now();
-    final isToday = _selectedDate.year == now.year &&
-        _selectedDate.month == now.month &&
-        _selectedDate.day == now.day;
-
-    if (isToday) {
-      return '${_selectedDate.month}월 ${_selectedDate.day}일 연습';
-    }
-
-    final yesterday = now.subtract(const Duration(days: 1));
-    final isYesterday = _selectedDate.year == yesterday.year &&
-        _selectedDate.month == yesterday.month &&
-        _selectedDate.day == yesterday.day;
-
-    if (isYesterday) {
-      return '${_selectedDate.month}월 ${_selectedDate.day}일 연습 기록';
-    }
-
-    return '${_selectedDate.month}월 ${_selectedDate.day}일 연습 기록';
+  String _formatDate(DateTime date) {
+    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
+    return dateFormat.format(date);
   }
 
   bool _isToday() {
@@ -260,33 +272,40 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
 
   Widget _buildEmptyState(String studentId) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.library_music_outlined,
-            size: 64,
-            color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            _isToday() ? '오늘 연습할 레퍼토리가 없습니다' : '이 날짜에 연습 기록이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.library_music_outlined,
+              size: 64,
+              color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
             ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          if (_isToday())
-            FilledButton.icon(
-              onPressed: () {
-                context.push(
-                  '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                );
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('레퍼토리 추가'),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              _isToday() ? '오늘 연습할 레퍼토리가 없습니다' : '이 날짜에 연습 기록이 없습니다',
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
             ),
-        ],
+            const SizedBox(height: AppSpacing.space6),
+            if (_isToday())
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.push(
+                    '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                  );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('레퍼토리 추가'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  side: BorderSide(color: AppColors.primary),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -296,8 +315,30 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
       ),
-      itemCount: repertoires.length,
+      itemCount: repertoires.length + 1, // +1 for add button
       itemBuilder: (context, index) {
+        // Last item is add button
+        if (index == repertoires.length) {
+          return Padding(
+            padding: const EdgeInsets.only(
+              top: AppSpacing.space2,
+              bottom: AppSpacing.space4,
+            ),
+            child: OutlinedButton.icon(
+              onPressed: () {
+                context.push(
+                  '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('레퍼토리 추가'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+                side: BorderSide(color: AppColors.primary),
+              ),
+            ),
+          );
+        }
         final repertoire = repertoires[index];
         return _RepertoireCard(
           repertoire: repertoire,
