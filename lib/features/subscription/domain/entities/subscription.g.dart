@@ -23,6 +23,7 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       paymentId: fields[3] as String?,
       type: fields[4] as SubscriptionType,
       totalLessons: fields[5] as int?,
+      lessonsPerMonth: fields[13] as int?,
       usedLessons: fields[6] as int,
       startDate: fields[7] as DateTime?,
       endDate: fields[8] as DateTime?,
@@ -36,7 +37,7 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,6 +60,8 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..write(obj.amount)
       ..writeByte(10)
       ..write(obj.status)
+      ..writeByte(13)
+      ..write(obj.lessonsPerMonth)
       ..writeByte(11)
       ..write(obj.createdAt)
       ..writeByte(12)
@@ -180,6 +183,7 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       paymentId: json['paymentId'] as String?,
       type: $enumDecode(_$SubscriptionTypeEnumMap, json['type']),
       totalLessons: (json['totalLessons'] as num?)?.toInt(),
+      lessonsPerMonth: (json['lessonsPerMonth'] as num?)?.toInt(),
       usedLessons: (json['usedLessons'] as num?)?.toInt() ?? 0,
       startDate: json['startDate'] == null
           ? null
@@ -208,6 +212,7 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'endDate': instance.endDate?.toIso8601String(),
       'amount': instance.amount,
       'status': _$SubscriptionStatusEnumMap[instance.status]!,
+      'lessonsPerMonth': instance.lessonsPerMonth,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

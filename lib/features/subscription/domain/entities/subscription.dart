@@ -71,6 +71,9 @@ class Subscription extends HiveObject {
   @HiveField(10)
   final SubscriptionStatus status;
 
+  @HiveField(13)
+  final int? lessonsPerMonth; // Monthly: lessons included per month (e.g., 4)
+
   @HiveField(11)
   final DateTime createdAt;
 
@@ -84,6 +87,7 @@ class Subscription extends HiveObject {
     this.paymentId,
     required this.type,
     this.totalLessons,
+    this.lessonsPerMonth,
     this.usedLessons = 0,
     this.startDate,
     this.endDate,
@@ -98,15 +102,31 @@ class Subscription extends HiveObject {
 
   Map<String, dynamic> toJson() => _$SubscriptionToJson(this);
 
-  /// Remaining lessons count (package type only).
-  int? get remainingLessons =>
-      type == SubscriptionType.package && totalLessons != null
-          ? (totalLessons! - usedLessons)
-          : null;
+  /// Total lessons for display (package: totalLessons, monthly: lessonsPerMonth).
+  int? get totalLessonsForDisplay =>
+      type == SubscriptionType.package ? totalLessons : lessonsPerMonth;
+
+  /// Remaining lessons count (hybrid: package or monthly).
+  int? get remainingLessons {
+    if (type == SubscriptionType.package && totalLessons != null) {
+      return totalLessons! - usedLessons;
+    }
+    if (type == SubscriptionType.monthly && lessonsPerMonth != null) {
+      return lessonsPerMonth! - usedLessons;
+    }
+    if (type == SubscriptionType.trial) {
+      return 1 - usedLessons;
+    }
+    return null;
+  }
+
+  /// Days until expiration.
+  int? get daysUntilExpiration =>
+      endDate?.difference(DateTime.now()).inDays;
 
   /// Check if expiring soon (7 days or 2 lessons remaining).
   bool get isExpiringSoon {
-    if (endDate != null && endDate!.difference(DateTime.now()).inDays <= 7) {
+    if (daysUntilExpiration != null && daysUntilExpiration! <= 7) {
       return true;
     }
     if (remainingLessons != null && remainingLessons! <= 2) {
@@ -123,16 +143,14 @@ class Subscription extends HiveObject {
     return false;
   }
 
-  /// Usage percentage (package type only).
-  double? get usagePercentage => type == SubscriptionType.package &&
-          totalLessons != null &&
-          totalLessons! > 0
-      ? (usedLessons / totalLessons!) * 100
-      : null;
-
-  /// Days until expiration.
-  int? get daysUntilExpiration =>
-      endDate?.difference(DateTime.now()).inDays;
+  /// Usage percentage (hybrid).
+  double? get usagePercentage {
+    final total = totalLessonsForDisplay;
+    if (total != null && total > 0) {
+      return (usedLessons / total) * 100;
+    }
+    return null;
+  }
 
   /// Type display label in Korean.
   String get typeLabel {
@@ -140,7 +158,7 @@ class Subscription extends HiveObject {
       case SubscriptionType.trial:
         return '체험';
       case SubscriptionType.monthly:
-        return '월정액';
+        return lessonsPerMonth != null ? '월정액 (${lessonsPerMonth}회)' : '월정액';
       case SubscriptionType.package:
         return '${totalLessons ?? 0}회권';
     }
@@ -160,16 +178,38 @@ class Subscription extends HiveObject {
     }
   }
 
-  /// Summary text for display.
+  /// Summary text for display (hybrid: count + days).
   String get summaryText {
-    if (type == SubscriptionType.package) {
-      return '$remainingLessons/$totalLessons회 남음';
-    } else if (type == SubscriptionType.monthly) {
-      final days = daysUntilExpiration ?? 0;
-      return days > 0 ? 'D-$days' : '만료됨';
-    } else {
-      return '체험중';
+    if (type == SubscriptionType.trial) {
+      return usedLessons > 0 ? '체험 완료' : '체험중';
     }
+
+    final remaining = remainingLessons;
+    final total = totalLessonsForDisplay;
+    final days = daysUntilExpiration;
+
+    // Build hybrid display: "2/4회 남음 (D-15)"
+    final countPart = (remaining != null && total != null)
+        ? '$remaining/${total}회 남음'
+        : '';
+
+    String daysPart = '';
+    if (status == SubscriptionStatus.paused) {
+      daysPart = '일시정지';
+    } else if (status == SubscriptionStatus.expired) {
+      daysPart = '만료됨';
+    } else if (remaining != null && remaining <= 0) {
+      daysPart = '소진됨';
+    } else if (days != null && days > 0) {
+      daysPart = 'D-$days';
+    } else if (days != null && days <= 0) {
+      daysPart = '만료됨';
+    }
+
+    if (countPart.isNotEmpty && daysPart.isNotEmpty) {
+      return '$countPart ($daysPart)';
+    }
+    return countPart.isNotEmpty ? countPart : daysPart;
   }
 
   Subscription copyWith({
@@ -179,6 +219,7 @@ class Subscription extends HiveObject {
     String? paymentId,
     SubscriptionType? type,
     int? totalLessons,
+    int? lessonsPerMonth,
     int? usedLessons,
     DateTime? startDate,
     DateTime? endDate,
@@ -194,6 +235,7 @@ class Subscription extends HiveObject {
       paymentId: paymentId ?? this.paymentId,
       type: type ?? this.type,
       totalLessons: totalLessons ?? this.totalLessons,
+      lessonsPerMonth: lessonsPerMonth ?? this.lessonsPerMonth,
       usedLessons: usedLessons ?? this.usedLessons,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
