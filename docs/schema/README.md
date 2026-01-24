@@ -1,6 +1,6 @@
 # 데이터 스키마 문서
 
-> 마지막 업데이트: 2026-01-24
+> 마지막 업데이트: 2026-01-25
 
 이 폴더는 **구현 상세** 문서를 포함합니다.
 비즈니스 요구사항과 UI 설계는 `docs/specs/`를 참조하세요.
@@ -65,7 +65,7 @@ docs/schema/
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
 | [Payment](entities/payment.md) | 결제, 청구서 | [payment_unified_spec.md](../specs/payment/payment_unified_spec.md) | 70-80 |
-| [Subscription](entities/subscription.md) | 수강권 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 50-52 |
+| [Subscription](entities/subscription.md) | 수강권, 부가 서비스, 교차 수강 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 55-62 |
 
 ### 사용자
 
@@ -116,8 +116,8 @@ docs/schema/
 
 | 범위 | 도메인 | 엔티티 |
 |------|--------|--------|
-| 31-32 | 연습 | PracticeNote (31), PracticeGoal (32) |
-| 50-59 | 수강권 | Subscription (55-57) |
+| 31-34 | 연습/수강권 | PracticeNote (31), PracticeGoal (32), BillingType (33), FifthWeekPolicy (34) |
+| 55-62 | 수강권 | Subscription (55-57), SubscriptionOption (58-60), SubscriptionScope (61), SubscriptionUsage (62) |
 | 60-62 | 클래스 | LessonClass (60-62) |
 | 63-72 | 학부모 | Parent (63), Child (64), ParentChildRelation (65), ConnectionStatus (66), ProfileType (67), ParentPermission (68), UserProfile (69), ParentTeacherConnection (70), ParentVisibilitySettings (71), ParentNotificationSettings (72) |
 | 73-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |

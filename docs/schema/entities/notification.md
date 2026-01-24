@@ -34,6 +34,19 @@ enum NotificationType {
   paymentConfirmed,
   lessonsRunningLow,
 
+  // 🆕 수강권 (2026-01-25)
+  subscriptionExpiring7d,    // 만료 임박 D-7
+  subscriptionExpiring3d,    // 만료 임박 D-3
+  subscriptionExpiring1d,    // 만료 임박 D-1
+  subscriptionExpired,       // 만료됨
+  subscriptionLow,           // 잔여 1회
+  subscriptionRenewed,       // 갱신 완료
+
+  // 🆕 회차권 레슨 예약 (2026-01-25)
+  nextLessonRequest,         // 다음 레슨 예약 요청 (선생님)
+  lessonTimeProposed,        // 레슨 시간 제안 (학생에게)
+  lessonTimeConfirmed,       // 레슨 예약 확정
+
   // 노쇼/취소
   noshowWarning,
   noshowConfirmed,
@@ -147,6 +160,63 @@ const notificationTemplates = {
     titleTemplate: '🎉 스트릭 달성!',
     bodyTemplate: '{{streakDays}}일 연속 연습! 대단해요!',
     priority: NotificationPriority.low,
+    bypassDnd: false,
+  ),
+
+  // 🆕 수강권 알림 템플릿
+  NotificationType.subscriptionExpiring7d: NotificationTemplate(
+    type: NotificationType.subscriptionExpiring7d,
+    titleTemplate: '⏰ 수강권 만료 예정',
+    bodyTemplate: '{{subscriptionName}}이 7일 후 만료됩니다. 갱신하시겠어요?',
+    priority: NotificationPriority.normal,
+    bypassDnd: false,
+  ),
+
+  NotificationType.subscriptionExpiring3d: NotificationTemplate(
+    type: NotificationType.subscriptionExpiring3d,
+    titleTemplate: '⚠️ 수강권 곧 만료',
+    bodyTemplate: '{{subscriptionName}}이 3일 후 만료됩니다. {{remainingLessons}}회가 남아있어요.',
+    priority: NotificationPriority.high,
+    bypassDnd: false,
+  ),
+
+  NotificationType.subscriptionExpiring1d: NotificationTemplate(
+    type: NotificationType.subscriptionExpiring1d,
+    titleTemplate: '🚨 수강권 내일 만료',
+    bodyTemplate: '{{subscriptionName}}이 내일 만료됩니다. 미사용 횟수가 소멸됩니다.',
+    priority: NotificationPriority.high,
+    bypassDnd: false,
+  ),
+
+  NotificationType.subscriptionLow: NotificationTemplate(
+    type: NotificationType.subscriptionLow,
+    titleTemplate: '📢 마지막 수강권',
+    bodyTemplate: '수강권이 1회 남았습니다. 갱신을 준비해주세요.',
+    priority: NotificationPriority.normal,
+    bypassDnd: false,
+  ),
+
+  NotificationType.nextLessonRequest: NotificationTemplate(
+    type: NotificationType.nextLessonRequest,
+    titleTemplate: '📅 다음 레슨 예약',
+    bodyTemplate: '{{studentName}} 학생 레슨이 완료되었습니다. 다음 레슨 시간을 제안해주세요. ({{remainingLessons}}회 남음)',
+    priority: NotificationPriority.normal,
+    bypassDnd: false,
+  ),
+
+  NotificationType.lessonTimeProposed: NotificationTemplate(
+    type: NotificationType.lessonTimeProposed,
+    titleTemplate: '🎻 레슨 시간 제안',
+    bodyTemplate: '{{teacherName}} 선생님이 다음 레슨 시간을 제안했습니다',
+    priority: NotificationPriority.normal,
+    bypassDnd: false,
+  ),
+
+  NotificationType.lessonTimeConfirmed: NotificationTemplate(
+    type: NotificationType.lessonTimeConfirmed,
+    titleTemplate: '✅ 레슨 예약 확정',
+    bodyTemplate: '{{date}} {{time}} 레슨이 확정되었습니다',
+    priority: NotificationPriority.normal,
     bypassDnd: false,
   ),
 };
