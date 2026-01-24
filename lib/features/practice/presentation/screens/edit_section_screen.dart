@@ -8,8 +8,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../../../shared/widgets/app_date_picker.dart';
 import '../../domain/entities/practice_repertoire.dart';
+import '../widgets/section_form/add_section_widgets.dart';
 import '../widgets/section_form/date_range_section.dart';
-import '../widgets/section_form/range_picker_button.dart';
 import '../widgets/section_form/range_picker_sheet.dart';
 
 /// Screen for editing an existing practice section
@@ -330,7 +330,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // ========================================
               // 📋 기본 정보 섹션
               // ========================================
-              _buildSectionHeader(
+              const SectionHeader(
                 icon: '📋',
                 title: '기본 정보',
                 subtitle: '곡명, 범위, 별칭 설정',
@@ -419,7 +419,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
-                _buildRangePickers(
+                RangePickers(
                   startValue: _startMeasure,
                   endValue: _endMeasure,
                   startLabel: '시작 마디',
@@ -442,7 +442,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
-                _buildRangePickers(
+                RangePickers(
                   startValue: _startLine,
                   endValue: _endLine,
                   startLabel: '시작 줄',
@@ -459,31 +459,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 const SizedBox(height: AppSpacing.space2),
 
                 // Auto-generated section name preview
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '섹션 이름: ${_getRangePreviewText()}',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                RangePreviewBox(rangeText: _getRangePreviewText()),
 
                 const SizedBox(height: AppSpacing.space6),
 
@@ -505,173 +481,21 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // ========================================
               // 🐾 N회 반복 설정 (선택)
               // ========================================
-              Row(
-                children: [
-                  const Text('🐾', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text('N회 반복', style: AppTypography.headingSmall),
-                  const Spacer(),
-                  Text(
-                    '선택',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
+              RepeatCountSection(
+                repeatCount: _repeatCount,
+                onChanged: (value) => setState(() => _repeatCount = value),
               ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '하루에 여러 번 연습해야 하는 경우 설정하세요',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Repeat count dropdown
-              DropdownButtonFormField<int?>(
-                value: _repeatCount,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.repeat),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space4,
-                    vertical: AppSpacing.space3,
-                  ),
-                ),
-                items: [
-                  const DropdownMenuItem(
-                    value: null,
-                    child: Text('없음'),
-                  ),
-                  ...List.generate(
-                    9,
-                    (index) => DropdownMenuItem(
-                      value: index + 2,
-                      child: Text('${index + 2}회 🐾'),
-                    ),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _repeatCount = value;
-                  });
-                },
-              ),
-
-              if (_repeatCount != null) ...[
-                const SizedBox(height: AppSpacing.space2),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.secondary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Row(
-                    children: [
-                      const Text('🐾', style: TextStyle(fontSize: 18)),
-                      const SizedBox(width: AppSpacing.space2),
-                      Expanded(
-                        child: Text(
-                          '매일 $_repeatCount회 연습을 완료하면 모든 발바닥이 채워집니다',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textPrimaryLight,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
 
               const SizedBox(height: AppSpacing.space8),
 
               // ========================================
               // ⏱️ 목표 연습시간 설정 (선택)
               // ========================================
-              Row(
-                children: [
-                  const Text('⏱️', style: TextStyle(fontSize: 20)),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text('목표 연습시간', style: AppTypography.headingSmall),
-                  const Spacer(),
-                  Text(
-                    '선택',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
+              TargetTimeSection(
+                targetMinutes: _targetPracticeMinutes,
+                onChanged: (value) =>
+                    setState(() => _targetPracticeMinutes = value),
               ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '이 섹션의 목표 연습시간을 설정하세요',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Target practice time dropdown
-              DropdownButtonFormField<int?>(
-                value: _targetPracticeMinutes,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.timer_outlined),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space4,
-                    vertical: AppSpacing.space3,
-                  ),
-                ),
-                items: [
-                  const DropdownMenuItem(
-                    value: null,
-                    child: Text('설정 안함'),
-                  ),
-                  ...[5, 10, 15, 20, 30, 45, 60, 90, 120].map(
-                    (minutes) => DropdownMenuItem(
-                      value: minutes,
-                      child: Text(minutes >= 60
-                          ? '${minutes ~/ 60}시간${minutes % 60 > 0 ? ' ${minutes % 60}분' : ''}'
-                          : '$minutes분'),
-                    ),
-                  ),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _targetPracticeMinutes = value;
-                  });
-                },
-              ),
-
-              if (_targetPracticeMinutes != null) ...[
-                const SizedBox(height: AppSpacing.space2),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.info_outline,
-                        size: 18,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Expanded(
-                        child: Text(
-                          '목표시간 달성 시 진행률이 100%로 표시됩니다',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
 
               const SizedBox(height: AppSpacing.space8),
 
@@ -701,89 +525,4 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required String icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space3,
-        vertical: AppSpacing.space2,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.headingSmall,
-                ),
-                Text(
-                  subtitle,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRangePickers({
-    required int startValue,
-    required int endValue,
-    required String startLabel,
-    required String endLabel,
-    required String unit,
-    required VoidCallback onStartTap,
-    required VoidCallback onEndTap,
-  }) {
-    return Row(
-      children: [
-        Expanded(
-          child: RangePickerButton(
-            label: startLabel,
-            value: startValue,
-            unit: unit,
-            onTap: onStartTap,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space4),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space3,
-            vertical: AppSpacing.space2,
-          ),
-          child: Text(
-            '~',
-            style: AppTypography.headingMedium.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space4),
-        Expanded(
-          child: RangePickerButton(
-            label: endLabel,
-            value: endValue,
-            unit: unit,
-            onTap: onEndTap,
-          ),
-        ),
-      ],
-    );
-  }
 }
