@@ -81,6 +81,7 @@ class AppRoutes {
   // Subscription routes
   static const subscriptions = '/subscriptions';
   static const subscriptionDetail = '/subscriptions/:id';
+  static const issueSubscription = '/subscriptions/issue';
 
   // Parent routes
   static const childProfiles = '/parent/children';

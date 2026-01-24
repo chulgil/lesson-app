@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
+import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management
 class StudentsTab extends ConsumerStatefulWidget {
@@ -19,6 +20,7 @@ class StudentsTab extends ConsumerStatefulWidget {
 class _StudentsTabState extends ConsumerState<StudentsTab> {
   final _searchController = TextEditingController();
   StudentFilter _currentFilter = StudentFilter.all;
+  ClassTypeFilter _classTypeFilter = ClassTypeFilter.all;
 
   @override
   void dispose() {
@@ -167,29 +169,70 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         vertical: AppSpacing.space3,
       ),
       child: Row(
-        children: StudentFilter.values.map((filter) {
-          final isSelected = _currentFilter == filter;
-          return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.space2),
-            child: FilterChip(
-              label: Text(filter.label),
-              selected: isSelected,
-              onSelected: (_) => setState(() => _currentFilter = filter),
-              backgroundColor: AppColors.surfaceLight,
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
-              side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
+        children: [
+          // Class type filters (학원/개인)
+          ...ClassTypeFilter.values.map((filter) {
+            final isSelected = _classTypeFilter == filter;
+            return Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.space2),
+              child: FilterChip(
+                avatar: filter == ClassTypeFilter.academy
+                    ? const Text('🏫', style: TextStyle(fontSize: 12))
+                    : filter == ClassTypeFilter.private
+                        ? const Text('👤', style: TextStyle(fontSize: 12))
+                        : null,
+                label: Text(filter.label),
+                selected: isSelected,
+                onSelected: (_) => setState(() => _classTypeFilter = filter),
+                backgroundColor: AppColors.surfaceLight,
+                selectedColor: AppColors.info.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.info,
+                side: BorderSide(
+                  color: isSelected ? AppColors.info : AppColors.borderLight,
+                ),
+                labelStyle: AppTypography.bodySmall.copyWith(
+                  color: isSelected
+                      ? AppColors.info
+                      : AppColors.textSecondaryLight,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
-              labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            );
+          }),
+
+          // Divider
+          Container(
+            width: 1,
+            height: 24,
+            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+            color: AppColors.borderLight,
+          ),
+
+          // Practice status filters
+          ...StudentFilter.values.map((filter) {
+            final isSelected = _currentFilter == filter;
+            return Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.space2),
+              child: FilterChip(
+                label: Text(filter.label),
+                selected: isSelected,
+                onSelected: (_) => setState(() => _currentFilter = filter),
+                backgroundColor: AppColors.surfaceLight,
+                selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                checkmarkColor: AppColors.primary,
+                side: BorderSide(
+                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                ),
+                labelStyle: AppTypography.bodySmall.copyWith(
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.textSecondaryLight,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
-            ),
-          );
-        }).toList(),
+            );
+          }),
+        ],
       ),
     );
   }
@@ -332,13 +375,13 @@ enum StudentFilter {
   const StudentFilter(this.label);
 }
 
-class _StudentCard extends StatelessWidget {
+class _StudentCard extends ConsumerWidget {
   final Student student;
 
   const _StudentCard({required this.student});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -397,7 +440,7 @@ class _StudentCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name, status, and instrument
+                    // Name, badges row
                     Row(
                       children: [
                         Text(
@@ -407,6 +450,38 @@ class _StudentCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),
+                        // Class type badge (학원/개인)
+                        StudentClassBadge(studentId: student.id),
+                        const SizedBox(width: AppSpacing.space1),
+                        // Subscription badge
+                        StudentSubscriptionMiniBadge(studentId: student.id),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppSpacing.space1),
+
+                    // Instrument and status
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                AppColors.secondaryLight.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            student.instrument,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.space1),
                         // Status badge (체험/정규/휴강/종료)
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -426,45 +501,12 @@ class _StudentCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.space1),
-                        // Instrument badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                AppColors.secondaryLight.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            student.instrument,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.secondary,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
 
-                    const SizedBox(height: AppSpacing.space1),
-
-                    // Lesson schedule
-                    if (student.lessonSchedule != null)
-                      Text(
-                        student.lessonSchedule!,
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-
                     const SizedBox(height: AppSpacing.space2),
 
-                    // Practice rate
+                    // Practice rate and lesson schedule
                     Row(
                       children: [
                         Icon(
@@ -482,13 +524,19 @@ class _StudentCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.space3),
-                        Text(
-                          '총 ${student.totalLessons}회 레슨',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                        if (student.lessonSchedule != null) ...[
+                          const SizedBox(width: AppSpacing.space3),
+                          Expanded(
+                            child: Text(
+                              student.lessonSchedule!,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textTertiaryLight,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ],

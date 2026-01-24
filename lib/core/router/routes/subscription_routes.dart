@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../app_routes.dart';
 import '../../../features/subscription/presentation/screens/subscription_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_detail_screen.dart';
+import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
 
 /// Subscription-related routes.
 List<RouteBase> subscriptionRoutes = [
@@ -18,6 +19,17 @@ List<RouteBase> subscriptionRoutes = [
     builder: (context, state) {
       final id = state.pathParameters['id']!;
       return SubscriptionDetailScreen(subscriptionId: id);
+    },
+  ),
+  GoRoute(
+    path: AppRoutes.issueSubscription,
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId']!;
+      final membershipId = state.uri.queryParameters['membershipId'];
+      return IssueSubscriptionScreen(
+        studentId: studentId,
+        membershipId: membershipId,
+      );
     },
   ),
 ];

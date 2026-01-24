@@ -130,6 +130,11 @@ class _StudentDetailContent extends ConsumerWidget {
 
                     const SizedBox(height: AppSpacing.space6),
 
+                    // Subscription status (수강권 현황)
+                    StudentSubscriptionSection(studentId: student.id),
+
+                    const SizedBox(height: AppSpacing.space6),
+
                     // Practice progress this week
                     StudentPracticeSection(studentId: student.id),
 
