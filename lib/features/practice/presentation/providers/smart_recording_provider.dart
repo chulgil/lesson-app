@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../models/smart_recording.dart';
@@ -27,7 +26,7 @@ class SmartRecordingSettingsNotifier extends _$SmartRecordingSettingsNotifier {
         state = SmartRecordingSettings.fromJson(Map<String, dynamic>.from(data));
       }
     } catch (e) {
-      debugPrint('Failed to load smart recording settings: $e');
+      // Failed to load settings, use defaults
     }
   }
 
@@ -36,7 +35,7 @@ class SmartRecordingSettingsNotifier extends _$SmartRecordingSettingsNotifier {
       final box = await Hive.openBox<Map>(_boxName);
       await box.put(_settingsKey, state.toJson());
     } catch (e) {
-      debugPrint('Failed to save smart recording settings: $e');
+      // Failed to save settings
     }
   }
 
@@ -105,9 +104,7 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
   /// Start monitoring amplitude for smart recording.
   void startMonitoring() {
-    debugPrint('SmartRecording: startMonitoring called, isEnabled=${state.isEnabled}');
     if (!state.isEnabled) {
-      debugPrint('SmartRecording: Skipping - smart recording is disabled');
       return;
     }
 
@@ -124,8 +121,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _amplitudeSubscription = recorder.normalizedAmplitudeStream.listen(_onAmplitude);
-
-    debugPrint('SmartRecording: Started monitoring (threshold=${state.threshold}, middleSilence=$_middleSilenceThreshold, skipEnabled=$_middleSilenceSkipEnabled)');
   }
 
   /// Stop monitoring and calculate trim durations.
@@ -138,7 +133,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
     }
 
     final now = DateTime.now();
-    final recordingDuration = now.difference(_recordingStartTime!);
 
     // Calculate trimmed durations with 3-second buffer
     const buffer = Duration(seconds: 3);
@@ -182,7 +176,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
 
     // Handle edge case: entire recording is silent
     if (state.phase == RecordingPhase.waiting) {
-      debugPrint('SmartRecording: Entire recording was silent, no trimming');
       return state.copyWith(
         trimmedStart: Duration.zero,
         trimmedEnd: Duration.zero,
@@ -195,16 +188,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
       trimmedEnd: trimmedEnd,
       silencePeriods: finalSilencePeriods,
     );
-
-    debugPrint('SmartRecording: Stopped monitoring');
-    debugPrint('  Recording duration: $recordingDuration');
-    debugPrint('  Trimmed start: $trimmedStart');
-    debugPrint('  Trimmed end: $trimmedEnd');
-    debugPrint('  Middle silence periods: ${finalSilencePeriods.length}');
-    for (int i = 0; i < finalSilencePeriods.length; i++) {
-      final p = finalSilencePeriods[i];
-      debugPrint('    [$i] ${p.startTime} ~ ${p.endTime} (skip ${p.duration})');
-    }
 
     _recordingStartTime = null;
     return result;
@@ -224,7 +207,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
           soundStartTime: now,
           soundEndTime: now,
         );
-        debugPrint('SmartRecording: Sound started at ${now.difference(_recordingStartTime!)}');
       } else if (state.phase == RecordingPhase.ending) {
         // Sound detected during ending phase - use debounce to avoid noise spikes
         if (_tentativeSoundStart == null) {
@@ -256,7 +238,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
                   clearMiddleSilenceStartTime: true,
                 );
                 _tentativeSoundStart = null;
-                debugPrint('SmartRecording: Added middle silence skip: ${newPeriod.startTime} ~ ${newPeriod.endTime}');
                 return;
               }
             }
@@ -268,7 +249,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
             clearMiddleSilenceStartTime: true,
           );
           _tentativeSoundStart = null;
-          debugPrint('SmartRecording: Sound resumed at ${now.difference(_recordingStartTime!)}');
         }
         // Keep updating soundEndTime during tentative sound
         state = state.copyWith(soundEndTime: now);
@@ -285,7 +265,6 @@ class SmartRecordingNotifier extends _$SmartRecordingNotifier {
           middleSilenceStartTime: now,
         );
         _tentativeSoundStart = null;
-        debugPrint('SmartRecording: Sound ended at ${now.difference(_recordingStartTime!)}');
       } else if (state.phase == RecordingPhase.ending) {
         // Reset tentative sound if silence detected again
         _tentativeSoundStart = null;

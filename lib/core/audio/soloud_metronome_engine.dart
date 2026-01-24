@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:isolate';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_soloud/flutter_soloud.dart';
 import '../../models/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
@@ -133,27 +132,19 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
   Future<void> init() async {
     if (_initialized) return;
 
-    final stopwatch = Stopwatch()..start();
-    debugPrint('SoLoudMetronomeEngine: init started');
-
     try {
       // Initialize SoLoud engine
       if (!_soloud.isInitialized) {
         await _soloud.init();
-        debugPrint('SoLoudMetronomeEngine: SoLoud initialized at ${stopwatch.elapsedMilliseconds}ms');
       }
 
       // Initialize timing isolate
       await _initIsolate();
-      debugPrint('SoLoudMetronomeEngine: Isolate ready at ${stopwatch.elapsedMilliseconds}ms');
 
       await _loadSounds();
-      debugPrint('SoLoudMetronomeEngine: sounds loaded at ${stopwatch.elapsedMilliseconds}ms');
 
       _initialized = true;
-      debugPrint('SoLoudMetronomeEngine: initialized in ${stopwatch.elapsedMilliseconds}ms');
     } catch (e) {
-      debugPrint('SoLoudMetronomeEngine: init failed: $e');
       rethrow;
     }
   }
@@ -197,20 +188,13 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
       final mediumPath = _settings.sound.getAssetPath(BeatType.medium);
       final weakPath = _settings.sound.getAssetPath(BeatType.weak);
 
-      debugPrint('SoLoudMetronomeEngine: Loading sounds...');
-      debugPrint('  Strong: $strongPath');
-      debugPrint('  Medium: $mediumPath');
-      debugPrint('  Weak: $weakPath');
-
       // Load sounds using SoLoud
       _strongSource = await _soloud.loadAsset(strongPath);
       _mediumSource = await _soloud.loadAsset(mediumPath);
       _weakSource = await _soloud.loadAsset(weakPath);
 
       _soundsLoaded = true;
-      debugPrint('SoLoudMetronomeEngine: Sounds loaded successfully');
-    } catch (e) {
-      debugPrint('SoLoudMetronomeEngine: Failed to load sounds: $e');
+    } catch (_) {
       _soundsLoaded = false;
     }
   }
@@ -278,8 +262,6 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
     _isolateSendPort?.send(_subdivisionIntervalMs);
     // Start timing in isolate (will handle subsequent beats)
     _isolateSendPort?.send('start');
-
-    debugPrint('SoLoudMetronomeEngine: Started at ${_settings.bpm} BPM, subdivision=${_settings.subdivision.label} (interval=${_subdivisionIntervalMs.toStringAsFixed(1)}ms)');
   }
 
   @override
@@ -289,7 +271,6 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
     _currentSubdivision = 0;
     _tickCount = 0;
     _isolateSendPort?.send('stop');
-    debugPrint('SoLoudMetronomeEngine: Stopped');
   }
 
   @override
@@ -405,8 +386,8 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
     // SoLoud.play is non-blocking and handles audio on native thread
     try {
       _soloud.play(source);
-    } catch (e) {
-      debugPrint('SoLoudMetronomeEngine: Failed to play beat: $e');
+    } catch (_) {
+      // Silently ignore playback errors
     }
   }
 
@@ -445,8 +426,8 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
       try {
         // Don't await - fire and forget for immediate playback
         _soloud.play(_strongSource!);
-      } catch (e) {
-        debugPrint('SoLoudMetronomeEngine: Failed to play sound: $e');
+      } catch (_) {
+        // Silently ignore
       }
     }
   }
@@ -467,6 +448,5 @@ class SoLoudMetronomeEngine implements MetronomeEngineInterface {
 
     await _disposeSources();
     _initialized = false;
-    debugPrint('SoLoudMetronomeEngine: Disposed');
   }
 }

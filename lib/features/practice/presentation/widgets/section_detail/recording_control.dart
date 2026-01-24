@@ -77,7 +77,6 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
   void _startMicInputCheck() {
     _micCheckSubscription?.cancel();
     _recordingStartTime = DateTime.now();
-    debugPrint('RecordingControl: Starting mic input check');
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
@@ -85,7 +84,6 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
 
       if (amplitude >= _quietThreshold) {
         if (!_hasMicInput || _isQuiet) {
-          debugPrint('RecordingControl: Strong input detected (amplitude=$amplitude)');
           setState(() {
             _hasMicInput = true;
             _isQuiet = false;
@@ -98,7 +96,6 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
         if (_recordingStartTime != null &&
             now.difference(_recordingStartTime!) >= _micCheckDuration) {
           if (!_isQuiet && widget.isRecording) {
-            debugPrint('RecordingControl: Quiet input detected (amplitude=$amplitude)');
             setState(() {
               _hasMicInput = true;
               _isQuiet = true;
@@ -111,7 +108,6 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
       if (_recordingStartTime != null &&
           now.difference(_recordingStartTime!) >= _micCheckDuration) {
         if (_hasMicInput && widget.isRecording) {
-          debugPrint('RecordingControl: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
           setState(() {
             _hasMicInput = false;
             _isQuiet = false;

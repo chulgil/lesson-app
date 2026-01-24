@@ -38,6 +38,7 @@ class AppRoutes {
   static const practice = '/practice';
   static const practiceRepertoire = '/practice/repertoire';
   static const addRepertoire = '/practice/repertoire/add';
+  static const quickAddRepertoire = '/practice/repertoire/quick-add';
   static const repertoireDetail = '/practice/repertoire/:id';
   static const editRepertoire = '/practice/repertoire/:id/edit';
   static const practiceRecording = '/practice/recording/:repertoireId';

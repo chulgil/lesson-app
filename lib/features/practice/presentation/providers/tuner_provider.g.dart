@@ -6,7 +6,7 @@ part of 'tuner_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentNoteNameHash() => r'b8464364a057b25c712d3471d88c4305314e85db';
+String _$currentNoteNameHash() => r'acda1400fbf92b98314684f5ba96d5e4d67c1e7a';
 
 /// Provider for current note display name.
 ///
@@ -25,7 +25,7 @@ final currentNoteNameProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentNoteNameRef = AutoDisposeProviderRef<String?>;
-String _$tunerInfoDisplayHash() => r'bab37f5e37919d8eb57fcebbb3c16b561ec4d425';
+String _$tunerInfoDisplayHash() => r'3d9b0ed8e1803a35868caf81f18a094c26b295a7';
 
 /// Provider for tuner info display string (e.g., "A4 · 442Hz · +5¢").
 ///
@@ -44,7 +44,7 @@ final tunerInfoDisplayProvider = AutoDisposeProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TunerInfoDisplayRef = AutoDisposeProviderRef<String>;
-String _$tunerHash() => r'30bce4b534d4bc12d6a554d9e403d0db68fe33ac';
+String _$tunerHash() => r'94718febb75087d3ae2df241842ab32e89c3d237';
 
 /// Tuner state management with Riverpod.
 ///

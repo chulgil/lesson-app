@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'audio_trimmer_service.dart';
 
@@ -112,7 +111,7 @@ class AudioPlayerService {
   }
 
   /// Callback when playback completes.
-  VoidCallback? onComplete;
+  void Function()? onComplete;
 
   /// Stream of position changes.
   Stream<Duration> get positionStream => _player.onPositionChanged;
@@ -125,7 +124,6 @@ class AudioPlayerService {
   Future<void> init() async {
     _playerStateSubscription = _player.onPlayerStateChanged.listen((playerState) {
       _state = _mapPlayerState(playerState);
-      debugPrint('AudioPlayer: State changed to $_state');
 
       if (_state == PlaybackState.completed) {
         onComplete?.call();
@@ -182,7 +180,6 @@ class AudioPlayerService {
 
       if (nextIndex >= _segments.length) {
         // No more segments, playback complete
-        debugPrint('AudioPlayer: All segments completed');
         stop();
         onComplete?.call();
         return;
@@ -200,9 +197,6 @@ class AudioPlayerService {
     _isTransitioning = true;
     _currentSegmentIndex = segmentIndex;
     final segment = _segments[segmentIndex];
-
-    debugPrint('AudioPlayer: Transitioning to segment $segmentIndex '
-        '(${segment.start} ~ ${segment.end})');
 
     await _player.seek(segment.start);
     _isTransitioning = false;
@@ -234,21 +228,9 @@ class AudioPlayerService {
 
       // Load trim metadata if exists
       _trimMetadata = await AudioTrimmerService.instance.readTrimMetadata(filePath);
-      if (_trimMetadata != null && _trimMetadata!.hasTrimming) {
-        debugPrint('AudioPlayer: Loaded with trim - start: ${_trimMetadata!.contentStart}, end: ${_trimMetadata!.contentEnd}');
-        if (_trimMetadata!.hasMiddleSilenceSkip) {
-          debugPrint('AudioPlayer: Has ${_segments.length} segments for middle silence skip');
-          for (int i = 0; i < _segments.length; i++) {
-            final seg = _segments[i];
-            debugPrint('  Segment $i: ${seg.start} ~ ${seg.end} (${seg.duration})');
-          }
-        }
-      }
 
-      debugPrint('AudioPlayer: Loading $filePath');
       return true;
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to load $filePath: $e');
       _state = PlaybackState.error;
       return false;
     }
@@ -258,7 +240,6 @@ class AudioPlayerService {
   Future<void> play() async {
     try {
       if (_currentPath == null) {
-        debugPrint('AudioPlayer: No file loaded');
         return;
       }
       // Use UrlSource with file:// protocol for iOS compatibility
@@ -270,17 +251,13 @@ class AudioPlayerService {
         _currentSegmentIndex = 0;
         final firstSegment = _segments[0];
         await _player.seek(firstSegment.start);
-        debugPrint('AudioPlayer: Seeked to first segment start: ${firstSegment.start}');
       }
       // Seek to content start if trimmed (non-segment playback)
       else if (_trimMetadata != null && _trimMetadata!.contentStart > Duration.zero) {
         await _player.seek(_trimMetadata!.contentStart);
-        debugPrint('AudioPlayer: Seeked to trim start: ${_trimMetadata!.contentStart}');
       }
-
-      debugPrint('AudioPlayer: Playing $fileUrl');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to play: $e');
+      // Error during playback
     }
   }
 
@@ -288,9 +265,8 @@ class AudioPlayerService {
   Future<void> pause() async {
     try {
       await _player.pause();
-      debugPrint('AudioPlayer: Paused');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to pause: $e');
+      // Error during pause
     }
   }
 
@@ -300,9 +276,8 @@ class AudioPlayerService {
       await _player.stop();
       _position = Duration.zero;
       _currentSegmentIndex = 0;
-      debugPrint('AudioPlayer: Stopped');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to stop: $e');
+      // Error during stop
     }
   }
 
@@ -314,9 +289,8 @@ class AudioPlayerService {
         _currentSegmentIndex = _findSegmentForPosition(position);
       }
       await _player.seek(position);
-      debugPrint('AudioPlayer: Seeked to $position');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to seek: $e');
+      // Error during seek
     }
   }
 
@@ -338,7 +312,6 @@ class AudioPlayerService {
         final actualPos = seg.start + offsetInSegment;
         _currentSegmentIndex = i;
         await _player.seek(actualPos);
-        debugPrint('AudioPlayer: Seeked to effective $effectivePos -> actual $actualPos (segment $i)');
         return;
       }
       accumulated += seg.duration;
@@ -385,9 +358,8 @@ class AudioPlayerService {
   Future<void> setSpeed(double speed) async {
     try {
       await _player.setPlaybackRate(speed.clamp(0.5, 2.0));
-      debugPrint('AudioPlayer: Speed set to $speed');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to set speed: $e');
+      // Error setting speed
     }
   }
 
@@ -395,9 +367,8 @@ class AudioPlayerService {
   Future<void> setVolume(double volume) async {
     try {
       await _player.setVolume(volume.clamp(0.0, 1.0));
-      debugPrint('AudioPlayer: Volume set to $volume');
     } catch (e) {
-      debugPrint('AudioPlayer: Failed to set volume: $e');
+      // Error setting volume
     }
   }
 
@@ -423,6 +394,5 @@ class AudioPlayerService {
     await _positionSubscription?.cancel();
     await _durationSubscription?.cancel();
     await _player.dispose();
-    debugPrint('AudioPlayer: Disposed');
   }
 }

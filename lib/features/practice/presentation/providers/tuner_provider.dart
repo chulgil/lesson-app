@@ -128,7 +128,6 @@ class Tuner extends _$Tuner {
     Future.microtask(_initAsync);
 
     ref.onDispose(() {
-      debugPrint('Tuner: disposing');
       _noteSubscription?.cancel();
       _engine?.dispose();
       _engine = null;
@@ -139,8 +138,6 @@ class Tuner extends _$Tuner {
 
   /// Create and configure the tuner engine.
   void _createEngine(TunerEngineType type, [double? referenceFrequency]) {
-    debugPrint('Tuner: Creating engine type: $type');
-
     // Use provided frequency or fall back to current state settings
     final refFreq = referenceFrequency ?? state.settings.referenceFrequency;
 
@@ -164,15 +161,12 @@ class Tuner extends _$Tuner {
     if (_initialized) return;
     _initialized = true;
 
-    debugPrint('Tuner: _initAsync started');
-
     // Load saved settings from Hive
     try {
       final savedSettings = await _storageService.loadSettings();
       state = state.copyWith(settings: savedSettings);
-      debugPrint('Tuner: Loaded settings - refFreq: ${savedSettings.referenceFrequency}');
     } catch (e) {
-      debugPrint('Tuner: Failed to load settings: $e');
+      // Failed to load settings, use defaults
     }
 
     final success = await _engine!.init();
@@ -180,10 +174,8 @@ class Tuner extends _$Tuner {
     if (success) {
       _engine!.referenceFrequency = state.settings.referenceFrequency;
       state = state.copyWith(isInitialized: true);
-      debugPrint('Tuner: _initAsync completed successfully');
     } else {
       state = state.copyWith(error: 'Failed to initialize tuner');
-      debugPrint('Tuner: _initAsync failed');
     }
   }
 
@@ -191,9 +183,8 @@ class Tuner extends _$Tuner {
   Future<void> _saveSettings() async {
     try {
       await _storageService.saveSettings(state.settings);
-      debugPrint('Tuner: Settings saved');
     } catch (e) {
-      debugPrint('Tuner: Failed to save settings: $e');
+      // Failed to save settings
     }
   }
 
@@ -232,7 +223,6 @@ class Tuner extends _$Tuner {
       // If same note but grace period expired, this is a fresh start
       // Briefly reset to trigger animation restart
       if (isSameNote && !wasWithinGrace && _lastNoteTime != null) {
-        debugPrint('Tuner: Grace period expired, starting fresh (${note.name.sharpName})');
         // Reset state to trigger animation restart
         state = state.copyWith(
           currentNote: null,
@@ -251,16 +241,10 @@ class Tuner extends _$Tuner {
         currentNote: note,
         status: status,
       );
-
-      // Log continuity for debugging
-      if (isSameNote && wasWithinGrace) {
-        debugPrint('Tuner: Same note continuity maintained (${note.name.sharpName})');
-      }
     }
   }
 
   void _onError(String message) {
-    debugPrint('Tuner error: $message');
     state = state.copyWith(error: message);
   }
 
@@ -268,7 +252,6 @@ class Tuner extends _$Tuner {
   Future<void> start() async {
     if (state.isListening) return;
 
-    debugPrint('Tuner: start called');
     state = state.copyWith(
       isListening: true,
       status: TuningStatus.listening,
@@ -282,7 +265,6 @@ class Tuner extends _$Tuner {
   Future<void> stop() async {
     if (!state.isListening) return;
 
-    debugPrint('Tuner: stop called');
     state = state.copyWith(
       isListening: false,
       status: TuningStatus.idle,
@@ -304,7 +286,6 @@ class Tuner extends _$Tuner {
   /// Update reference frequency (430-450Hz).
   void setReferenceFrequency(double frequency) {
     final clamped = TunerSettings.clampFrequency(frequency);
-    debugPrint('Tuner: setReferenceFrequency $clamped');
 
     state = state.copyWith(
       settings: state.settings.copyWith(referenceFrequency: clamped),
@@ -316,7 +297,6 @@ class Tuner extends _$Tuner {
 
   /// Update transposition setting.
   void setTransposition(Transposition transposition) {
-    debugPrint('Tuner: setTransposition $transposition');
     state = state.copyWith(
       settings: state.settings.copyWith(transposition: transposition),
     );
@@ -325,7 +305,6 @@ class Tuner extends _$Tuner {
 
   /// Update enharmonic display mode.
   void setEnharmonicMode(EnharmonicMode mode) {
-    debugPrint('Tuner: setEnharmonicMode $mode');
     state = state.copyWith(
       settings: state.settings.copyWith(enharmonicMode: mode),
     );
@@ -334,7 +313,6 @@ class Tuner extends _$Tuner {
 
   /// Update difficulty level.
   void setDifficulty(TunerDifficulty difficulty) {
-    debugPrint('Tuner: setDifficulty $difficulty');
     state = state.copyWith(
       settings: state.settings.copyWith(difficulty: difficulty),
     );
@@ -343,7 +321,6 @@ class Tuner extends _$Tuner {
 
   /// Update clef type for staff notation.
   void setClefType(ClefType clefType) {
-    debugPrint('Tuner: setClefType $clefType');
     state = state.copyWith(
       settings: state.settings.copyWith(clefType: clefType),
     );
@@ -380,7 +357,6 @@ class Tuner extends _$Tuner {
 
   /// Update all settings at once.
   void updateSettings(TunerSettings settings) {
-    debugPrint('Tuner: updateSettings');
     state = state.copyWith(settings: settings);
     _engine?.referenceFrequency = settings.referenceFrequency;
     _saveSettings();
@@ -389,8 +365,6 @@ class Tuner extends _$Tuner {
   /// Switch between tuner engines.
   Future<void> switchEngine(TunerEngineType type) async {
     if (_currentEngineType == type) return;
-
-    debugPrint('Tuner: Switching engine from $_currentEngineType to $type');
 
     // Stop current engine
     final wasListening = state.isListening;
@@ -431,15 +405,11 @@ class Tuner extends _$Tuner {
   /// so that enabling processing later (on tuner tab) is instantaneous
   /// and doesn't interfere with metronome playback.
   Future<void> warmUp() async {
-    debugPrint('Tuner: warmUp called');
-
     if (_engine == null) {
-      debugPrint('Tuner: Engine not ready, initializing first');
       await _initAsync();
     }
 
     await _engine?.warmUp();
-    debugPrint('Tuner: warmUp complete');
   }
 
   /// Enable pitch processing (instant, no audio session reconfiguration).
@@ -447,8 +417,6 @@ class Tuner extends _$Tuner {
   /// Call this when switching to the tuner tab.
   /// Requires [warmUp] to have been called first.
   void enableProcessing() {
-    debugPrint('Tuner: enableProcessing called');
-
     _engine?.enableProcessing();
 
     state = state.copyWith(
@@ -463,8 +431,6 @@ class Tuner extends _$Tuner {
   /// Call this when switching away from the tuner tab.
   /// The stream stays active so re-enabling is instant.
   void disableProcessing() {
-    debugPrint('Tuner: disableProcessing called');
-
     _engine?.disableProcessing();
 
     // Reset continuity tracking
@@ -482,7 +448,6 @@ class Tuner extends _$Tuner {
   ///
   /// Call this when the practice tools modal closes.
   Future<void> stopCompletely() async {
-    debugPrint('Tuner: stopCompletely called');
     _wasListeningBeforePause = false;
     await stop();
   }
@@ -491,7 +456,6 @@ class Tuner extends _$Tuner {
   /// Disables processing but keeps stream active for quick resume.
   Future<void> onAppPaused() async {
     if (state.isListening) {
-      debugPrint('Tuner: App paused, disabling processing');
       _wasListeningBeforePause = true;
       disableProcessing();
     } else {
@@ -503,7 +467,6 @@ class Tuner extends _$Tuner {
   /// Re-enables processing if it was active before pause.
   Future<void> onAppResumed() async {
     if (_wasListeningBeforePause) {
-      debugPrint('Tuner: App resumed, re-enabling processing');
       _wasListeningBeforePause = false;
       enableProcessing();
     }

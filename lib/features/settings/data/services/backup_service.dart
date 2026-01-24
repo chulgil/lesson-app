@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -202,7 +201,6 @@ class BackupService {
         restoredBoxEntries: restoredBoxEntries,
       );
     } catch (e) {
-      debugPrint('Restore error: $e');
       return RestoreResult.failure('복원 중 오류 발생: $e');
     }
   }
@@ -306,7 +304,7 @@ class BackupService {
           .map((r) => _practiceRecordingToJson(r))
           .toList();
     } catch (e) {
-      debugPrint('Could not export practice_recordings: $e');
+      // Could not export practice_recordings
     }
 
     // Export practice_repertoires box (NEW)
@@ -317,9 +315,8 @@ class BackupService {
         repertoireData[key.toString()] = repertoiresBox.get(key);
       }
       export['practice_repertoires'] = repertoireData;
-      debugPrint('Exported ${repertoireData.length} repertoires');
     } catch (e) {
-      debugPrint('Could not export practice_repertoires: $e');
+      // Could not export practice_repertoires
     }
 
     // Export metronome_settings box
@@ -327,7 +324,7 @@ class BackupService {
       final metronomeBox = await Hive.openBox('metronome_settings');
       export['metronome_settings'] = Map<String, dynamic>.from(metronomeBox.toMap());
     } catch (e) {
-      debugPrint('Could not export metronome_settings: $e');
+      // Could not export metronome_settings
     }
 
     // Export smart_recording_settings box
@@ -339,7 +336,7 @@ class BackupService {
       }
       export['smart_recording_settings'] = smartRecordingData;
     } catch (e) {
-      debugPrint('Could not export smart_recording_settings: $e');
+      // Could not export smart_recording_settings
     }
 
     return export;
@@ -363,12 +360,11 @@ class BackupService {
           }
         }
         await box.flush();
-        debugPrint('Restored ${repertoires.length} repertoires');
 
         // Build section ID mapping for recording restoration
         sectionIdMapping = await _buildSectionIdMapping(repertoires);
       } catch (e) {
-        debugPrint('Could not restore practice_repertoires: $e');
+        // Could not restore practice_repertoires
       }
     }
 
@@ -386,7 +382,6 @@ class BackupService {
           final updatedFilePath = _updateFilePath(recording.filePath, currentDocsPath);
           if (updatedFilePath != recording.filePath) {
             recording = recording.copyWith(filePath: updatedFilePath);
-            debugPrint('Updated file path: ${recording.filePath}');
           }
 
           // Try section matching if section doesn't exist
@@ -394,7 +389,6 @@ class BackupService {
             final newSectionId = sectionIdMapping[recording.sectionId]!;
             if (newSectionId != recording.sectionId) {
               recording = recording.copyWith(sectionId: newSectionId);
-              debugPrint('Remapped recording ${recording.id.substring(0, 8)}... to section $newSectionId');
             }
           }
 
@@ -405,7 +399,7 @@ class BackupService {
         }
         await box.flush();
       } catch (e) {
-        debugPrint('Could not restore practice_recordings: $e');
+        // Could not restore practice_recordings
       }
     }
 
@@ -424,7 +418,7 @@ class BackupService {
         }
         await box.flush();
       } catch (e) {
-        debugPrint('Could not restore metronome_settings: $e');
+        // Could not restore metronome_settings
       }
     }
 
@@ -443,7 +437,7 @@ class BackupService {
         }
         await box.flush();
       } catch (e) {
-        debugPrint('Could not restore smart_recording_settings: $e');
+        // Could not restore smart_recording_settings
       }
     }
 
@@ -566,12 +560,10 @@ class BackupService {
 
         if (newSectionId != null && newSectionId != oldSectionId) {
           mapping[oldSectionId] = newSectionId;
-          debugPrint('Section mapping: $oldSectionId -> $newSectionId ($key)');
         }
       }
     }
 
-    debugPrint('Built section ID mapping with ${mapping.length} entries');
     return mapping;
   }
 
@@ -583,7 +575,7 @@ class BackupService {
         return DateTime.parse(timestamp as String);
       }
     } catch (e) {
-      debugPrint('Could not get last backup date: $e');
+      // Could not get last backup date
     }
     return null;
   }
@@ -594,7 +586,7 @@ class BackupService {
       await box.put('last_backup_date', date.toIso8601String());
       await box.flush();
     } catch (e) {
-      debugPrint('Could not save last backup date: $e');
+      // Could not save last backup date
     }
   }
 }

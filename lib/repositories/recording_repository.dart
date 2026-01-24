@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/recording.dart';
@@ -54,17 +53,6 @@ class HiveRecordingRepository implements RecordingRepository {
       return _box!;
     }
     _box = await Hive.openBox<Recording>(_boxName);
-    debugPrint('=== RecordingRepository: Box opened ===');
-    debugPrint('RecordingRepository: Total recordings in box: ${_box!.length}');
-    debugPrint('RecordingRepository: Box path: ${_box!.path}');
-
-    // Log all recordings for debugging
-    for (final recording in _box!.values) {
-      debugPrint('  - ID: ${recording.id.substring(0, 8)}..., '
-          'repertoireId: ${recording.repertoireId}, '
-          'path: ${recording.localPath}');
-    }
-    debugPrint('=== End of box contents ===');
     return _box!;
   }
 
@@ -78,7 +66,6 @@ class HiveRecordingRepository implements RecordingRepository {
     // Sort by recorded date, newest first
     recordings.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
 
-    debugPrint('RecordingRepository: Found ${recordings.length} recordings for repertoire $repertoireId');
     return recordings;
   }
 
@@ -92,7 +79,6 @@ class HiveRecordingRepository implements RecordingRepository {
     // Sort by recorded date, newest first
     recordings.sort((a, b) => b.recordedAt.compareTo(a.recordedAt));
 
-    debugPrint('RecordingRepository: Found ${recordings.length} recordings for student $studentId');
     return recordings;
   }
 
@@ -117,18 +103,9 @@ class HiveRecordingRepository implements RecordingRepository {
   @override
   Future<void> saveRecording(Recording recording) async {
     final box = await _recordingsBox;
-    debugPrint('=== RecordingRepository: Saving recording ===');
-    debugPrint('  ID: ${recording.id}');
-    debugPrint('  repertoireId: ${recording.repertoireId}');
-    debugPrint('  localPath: ${recording.localPath}');
-    debugPrint('  Box length before: ${box.length}');
 
     await box.put(recording.id, recording);
     await box.flush(); // Ensure data is written to disk immediately
-
-    debugPrint('  Box length after: ${box.length}');
-    debugPrint('  Box path: ${box.path}');
-    debugPrint('=== Recording saved and flushed ===');
   }
 
   @override
@@ -142,16 +119,14 @@ class HiveRecordingRepository implements RecordingRepository {
         final file = File(recording.localPath);
         if (await file.exists()) {
           await file.delete();
-          debugPrint('RecordingRepository: Deleted file ${recording.localPath}');
         }
       } catch (e) {
-        debugPrint('RecordingRepository: Failed to delete file: $e');
+        // Ignore file deletion errors
       }
 
       // Remove from database
       await box.delete(id);
       await box.flush();
-      debugPrint('RecordingRepository: Deleted recording $id (flushed)');
     }
   }
 
@@ -168,7 +143,6 @@ class HiveRecordingRepository implements RecordingRepository {
       final updated = recording.copyWith(isRepresentative: true);
       await box.put(id, updated);
       await box.flush();
-      debugPrint('RecordingRepository: Set recording $id as representative (flushed)');
     }
   }
 
@@ -186,7 +160,6 @@ class HiveRecordingRepository implements RecordingRepository {
     if (recordings.isNotEmpty) {
       await box.flush();
     }
-    debugPrint('RecordingRepository: Cleared representative for repertoire $repertoireId');
   }
 
   @override
@@ -201,7 +174,6 @@ class HiveRecordingRepository implements RecordingRepository {
       );
       await box.put(id, updated);
       await box.flush();
-      debugPrint('RecordingRepository: Marked recording $id as shared (flushed)');
     }
   }
 
@@ -211,18 +183,14 @@ class HiveRecordingRepository implements RecordingRepository {
     final box = await _recordingsBox;
     final orphanedIds = <String>[];
 
-    debugPrint('=== RecordingRepository: Checking for orphaned recordings ===');
-
     for (final recording in box.values) {
       final file = File(recording.localPath);
       if (!await file.exists()) {
         orphanedIds.add(recording.id);
-        debugPrint('  Orphaned: ${recording.id.substring(0, 8)}... (file not found: ${recording.localPath})');
       }
     }
 
     if (orphanedIds.isEmpty) {
-      debugPrint('  No orphaned recordings found');
       return 0;
     }
 
@@ -231,9 +199,6 @@ class HiveRecordingRepository implements RecordingRepository {
       await box.delete(id);
     }
     await box.flush();
-
-    debugPrint('  Cleaned up ${orphanedIds.length} orphaned recordings');
-    debugPrint('=== Cleanup complete ===');
 
     return orphanedIds.length;
   }
@@ -245,9 +210,6 @@ class HiveRecordingRepository implements RecordingRepository {
     final currentBasePath = appDir.path;
     int recoveredCount = 0;
 
-    debugPrint('=== RecordingRepository: Migrating and recovering paths ===');
-    debugPrint('  Current base path: $currentBasePath');
-
     for (final recording in box.values.toList()) {
       final storedPath = recording.localPath;
       final file = File(storedPath);
@@ -256,9 +218,6 @@ class HiveRecordingRepository implements RecordingRepository {
       if (await file.exists()) {
         continue;
       }
-
-      debugPrint('  Checking: ${recording.id.substring(0, 8)}...');
-      debugPrint('    Stored path: $storedPath');
 
       // Try to recover the path
       String? newPath;
@@ -272,7 +231,6 @@ class HiveRecordingRepository implements RecordingRepository {
         final reconstructedFile = File(reconstructedPath);
         if (await reconstructedFile.exists()) {
           newPath = reconstructedPath;
-          debugPrint('    Strategy 1 (path reconstruction) succeeded');
         }
       }
 
@@ -284,7 +242,6 @@ class HiveRecordingRepository implements RecordingRepository {
           await for (final entity in recordingsDir.list(recursive: true)) {
             if (entity is File && entity.path.endsWith(fileName)) {
               newPath = entity.path;
-              debugPrint('    Strategy 2 (filename search) succeeded');
               break;
             }
           }
@@ -293,23 +250,16 @@ class HiveRecordingRepository implements RecordingRepository {
 
       // Update path if recovered
       if (newPath != null) {
-        debugPrint('    Recovered path: $newPath');
         final updated = recording.copyWith(localPath: newPath);
         await box.put(recording.id, updated);
         recoveredCount++;
-      } else {
-        debugPrint('    Could not recover - file may be deleted');
       }
     }
 
     if (recoveredCount > 0) {
       await box.flush();
-      debugPrint('  Recovered $recoveredCount recordings');
-    } else {
-      debugPrint('  No paths needed recovery');
     }
 
-    debugPrint('=== Migration complete ===');
     return recoveredCount;
   }
 }

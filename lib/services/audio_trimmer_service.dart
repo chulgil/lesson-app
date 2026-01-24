@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/smart_recording.dart';
 
@@ -31,24 +30,45 @@ class AudioTrimmerService {
 
       // Check if trimming is needed (including middle silence)
       if (trimStart == Duration.zero && trimEnd == Duration.zero && silencePeriods.isEmpty) {
-        debugPrint('AudioTrimmer: No trimming needed');
         return TrimResult.noTrim(inputPath);
       }
 
-      // Calculate actual content duration
-      final contentDuration = totalDuration - trimStart - trimEnd;
-      if (contentDuration.inSeconds < 1) {
-        debugPrint('AudioTrimmer: Content too short after trimming, skipping');
+      // Ensure minimum content duration of 3 seconds
+      const minContentDuration = Duration(seconds: 3);
+      Duration adjustedTrimStart = trimStart;
+      Duration adjustedTrimEnd = trimEnd;
+
+      final contentDuration = totalDuration - adjustedTrimStart - adjustedTrimEnd;
+      if (contentDuration < minContentDuration) {
+        // Reduce trimEnd first to preserve minimum content
+        final deficit = minContentDuration - contentDuration;
+        adjustedTrimEnd = adjustedTrimEnd - deficit;
+        if (adjustedTrimEnd < Duration.zero) {
+          // If still not enough, also reduce trimStart
+          adjustedTrimStart = adjustedTrimStart + adjustedTrimEnd; // adjustedTrimEnd is negative
+          adjustedTrimEnd = Duration.zero;
+          if (adjustedTrimStart < Duration.zero) {
+            adjustedTrimStart = Duration.zero;
+          }
+        }
+      }
+
+      // Final content duration check (minimum 1 second)
+      final finalContentDuration = totalDuration - adjustedTrimStart - adjustedTrimEnd;
+      if (finalContentDuration.inSeconds < 1) {
         return TrimResult.failed(
           inputPath,
           'Recording too short after trimming (less than 1 second)',
         );
       }
 
+      // Use adjusted values
+      trimStart = adjustedTrimStart;
+      trimEnd = adjustedTrimEnd;
+
       // Create backup of original file
       final originalBackupPath = await _createBackup(inputPath);
       if (originalBackupPath == null) {
-        debugPrint('AudioTrimmer: Failed to create backup');
         return TrimResult.failed(inputPath, 'Failed to create backup');
       }
 
@@ -68,12 +88,6 @@ class AudioTrimmerService {
         return TrimResult.failed(inputPath, 'Failed to create trimmed file');
       }
 
-      debugPrint('AudioTrimmer: Successfully trimmed');
-      debugPrint('  Original: $originalBackupPath');
-      debugPrint('  Trimmed: $trimmedPath');
-      debugPrint('  Start: ${trimStart.inMilliseconds}ms');
-      debugPrint('  End: ${trimEnd.inMilliseconds}ms');
-
       return TrimResult(
         success: true,
         trimmedFilePath: trimmedPath,
@@ -82,7 +96,6 @@ class AudioTrimmerService {
         trimmedEnd: trimEnd,
       );
     } catch (e) {
-      debugPrint('AudioTrimmer: Error trimming audio: $e');
       return TrimResult.failed(inputPath, e.toString());
     }
   }
@@ -97,7 +110,6 @@ class AudioTrimmerService {
       final trimmedFile = File(trimmedPath);
 
       if (!await originalFile.exists()) {
-        debugPrint('AudioTrimmer: Original file not found for restore');
         return false;
       }
 
@@ -109,10 +121,8 @@ class AudioTrimmerService {
       // Copy original back to trimmed location
       await originalFile.copy(trimmedPath);
 
-      debugPrint('AudioTrimmer: Restored original file');
       return true;
     } catch (e) {
-      debugPrint('AudioTrimmer: Error restoring original: $e');
       return false;
     }
   }
@@ -123,10 +133,9 @@ class AudioTrimmerService {
       final file = File(backupPath);
       if (await file.exists()) {
         await file.delete();
-        debugPrint('AudioTrimmer: Deleted backup file');
       }
     } catch (e) {
-      debugPrint('AudioTrimmer: Error deleting backup: $e');
+      // Error deleting backup
     }
   }
 
@@ -155,7 +164,6 @@ class AudioTrimmerService {
       await inputFile.copy(backupPath);
       return backupPath;
     } catch (e) {
-      debugPrint('AudioTrimmer: Error creating backup: $e');
       return null;
     }
   }
@@ -168,7 +176,7 @@ class AudioTrimmerService {
         await backupFile.delete();
       }
     } catch (e) {
-      debugPrint('AudioTrimmer: Error restoring backup: $e');
+      // Error restoring backup
     }
   }
 
@@ -200,7 +208,6 @@ class AudioTrimmerService {
         for (final silence in silencePeriods) {
           // Skip silence periods that are completely outside content range
           if (silence.endTime <= contentStart || silence.startTime >= contentEnd) {
-            debugPrint('AudioTrimmer: Skipping silence period outside content range: ${silence.startTime} ~ ${silence.endTime}');
             continue;
           }
 
@@ -224,8 +231,6 @@ class AudioTrimmerService {
           }
         }
 
-        debugPrint('AudioTrimmer: Valid silence periods: ${validSilencePeriods.length} (original: ${silencePeriods.length})');
-
         // Build segments by excluding valid silence periods
         Duration currentStart = contentStart;
         for (final silence in validSilencePeriods) {
@@ -235,7 +240,6 @@ class AudioTrimmerService {
               'start': currentStart.inMilliseconds,
               'end': silence.startTime.inMilliseconds,
             });
-            debugPrint('AudioTrimmer: Added segment ${currentStart.inMilliseconds}ms ~ ${silence.startTime.inMilliseconds}ms');
           }
           // Move past this silence period
           currentStart = silence.endTime;
@@ -246,7 +250,6 @@ class AudioTrimmerService {
             'start': currentStart.inMilliseconds,
             'end': contentEnd.inMilliseconds,
           });
-          debugPrint('AudioTrimmer: Added final segment ${currentStart.inMilliseconds}ms ~ ${contentEnd.inMilliseconds}ms');
         }
       }
 
@@ -265,17 +268,8 @@ class AudioTrimmerService {
 
       await metadataFile.writeAsString(jsonEncode(metadata));
 
-      debugPrint('AudioTrimmer: Created trim metadata file');
-      debugPrint('  contentStart: ${contentStart.inMilliseconds}ms');
-      debugPrint('  contentEnd: ${contentEnd.inMilliseconds}ms');
-      debugPrint('  Segments: ${segments.length}');
-      for (int i = 0; i < segments.length; i++) {
-        final seg = segments[i];
-        debugPrint('    [$i] ${seg['start']}ms ~ ${seg['end']}ms');
-      }
       return inputPath; // Return same path, player will use metadata
     } catch (e) {
-      debugPrint('AudioTrimmer: Error creating trimmed copy: $e');
       return null;
     }
   }
@@ -327,7 +321,6 @@ class AudioTrimmerService {
         );
       }
     } catch (e) {
-      debugPrint('AudioTrimmer: Error reading trim metadata: $e');
       return null;
     }
   }
@@ -340,7 +333,7 @@ class AudioTrimmerService {
         await metadataFile.delete();
       }
     } catch (e) {
-      debugPrint('AudioTrimmer: Error deleting trim metadata: $e');
+      // Error deleting trim metadata
     }
   }
 }

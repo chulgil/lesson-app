@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
-import 'package:flutter/foundation.dart';
 
 /// Manages audio session configuration for simultaneous playback and recording.
 ///
@@ -27,7 +26,6 @@ class AudioSessionManager {
   /// This prevents audio interruption when switching between metronome and tuner.
   static Future<void> configureForPlayAndRecord() async {
     if (_isConfigured) {
-      debugPrint('AudioSessionManager: Already configured');
       return;
     }
 
@@ -48,7 +46,6 @@ class AudioSessionManager {
               AVAudioSessionRouteSharingPolicy.defaultPolicy,
           avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
         ));
-        debugPrint('AudioSessionManager: iOS configured for playAndRecord');
       } else if (Platform.isAndroid) {
         // Android: Configure for media playback with recording capability
         await _session!.configure(const AudioSessionConfiguration(
@@ -59,13 +56,15 @@ class AudioSessionManager {
           androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
           androidWillPauseWhenDucked: false,
         ));
-        debugPrint('AudioSessionManager: Android configured');
       }
 
       // Subscribe to interruption events
       _interruptionSubscription?.cancel();
       _interruptionSubscription = _session!.interruptionEventStream.listen((event) {
-        debugPrint('AudioSessionManager: Interruption event - begin=${event.begin}, type=${event.type}');
+        // Ignore unknown type on Android (false positive at app start)
+        if (Platform.isAndroid && event.type == AudioInterruptionType.unknown) {
+          return;
+        }
 
         if (event.begin) {
           // Audio interrupted (e.g., phone call started)
@@ -84,10 +83,8 @@ class AudioSessionManager {
       // Activate the session
       await _session!.setActive(true);
       _isConfigured = true;
-
-      debugPrint('AudioSessionManager: Audio session activated successfully');
-    } catch (e) {
-      debugPrint('AudioSessionManager: Configuration failed - $e');
+    } catch (_) {
+      // Configuration failed silently
     }
   }
 

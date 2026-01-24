@@ -14,7 +14,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      // fontFamily: AppTypography.fontFamily, // TODO: Enable with Pretendard
+      fontFamily: AppTypography.fontFamily,
 
       // Colors
       colorScheme: ColorScheme.light(
@@ -170,7 +170,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      // fontFamily: AppTypography.fontFamily, // TODO: Enable with Pretendard
+      fontFamily: AppTypography.fontFamily,
 
       // Colors
       colorScheme: ColorScheme.dark(

@@ -118,10 +118,6 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
         if (durationDiff.abs() > const Duration(milliseconds: 200)) {
           // Adjust _trimEnd: actualDuration - trimEndSilence
           _trimEnd = actualDuration - _trimEndSilence;
-          debugPrint('RecordingPlayerSheet: Adjusted trimEnd for actual duration');
-          debugPrint('  Actual file duration: ${actualDuration.inMilliseconds}ms');
-          debugPrint('  Metadata totalDuration: ${_metadataTotalDuration.inMilliseconds}ms');
-          debugPrint('  Adjusted trimEnd: ${_trimEnd.inMilliseconds}ms');
         }
         _trimAdjusted = true;
       }
@@ -170,16 +166,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
         setState(() {
           _duration = metadata.contentDuration;
         });
-        debugPrint('RecordingPlayerSheet: Loaded trim metadata');
-        debugPrint('  trimOffset=${_trimOffset.inMilliseconds}ms');
-        debugPrint('  trimEnd=${_trimEnd.inMilliseconds}ms');
-        debugPrint('  metadataTotalDuration=${_metadataTotalDuration.inMilliseconds}ms');
-        debugPrint('  trimEndSilence=${_trimEndSilence.inMilliseconds}ms');
-        debugPrint('  displayDuration=${_duration.inMilliseconds}ms');
       }
     } catch (e) {
       // Fail-safe: just use full file
-      debugPrint('RecordingPlayerSheet: Could not load trim metadata: $e');
     }
   }
 

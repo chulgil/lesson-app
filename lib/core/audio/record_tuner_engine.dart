@@ -3,8 +3,8 @@
 // Uses pitch_detector_dart (YIN algorithm) for pitch detection
 
 import 'dart:async';
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:pitch_detector_dart/pitch_detector.dart';
 import 'package:record/record.dart';
 
@@ -110,12 +110,9 @@ class RecordTunerEngine implements TunerEngine {
     if (_isInitialized) return true;
 
     try {
-      debugPrint('RecordTunerEngine: Initializing...');
-
       // Check microphone permission
       final hasPermission = await _recorder.hasPermission();
       if (!hasPermission) {
-        debugPrint('RecordTunerEngine: No microphone permission');
         onError?.call('Microphone permission denied');
         return false;
       }
@@ -139,10 +136,8 @@ class RecordTunerEngine implements TunerEngine {
       );
 
       _isInitialized = true;
-      debugPrint('RecordTunerEngine: Initialized successfully');
       return true;
     } catch (e) {
-      debugPrint('RecordTunerEngine: Init failed - $e');
       onError?.call('Failed to initialize: $e');
       return false;
     }
@@ -157,8 +152,6 @@ class RecordTunerEngine implements TunerEngine {
     }
 
     try {
-      debugPrint('RecordTunerEngine: Starting audio capture...');
-
       _isListening = true;
       _isProcessingEnabled = true;
       _stabilityFilter.reset();
@@ -171,12 +164,9 @@ class RecordTunerEngine implements TunerEngine {
       if (!_isStreamActive) {
         await _startStream();
       }
-
-      debugPrint('RecordTunerEngine: Audio capture started');
     } catch (e) {
       _isListening = false;
       _isProcessingEnabled = false;
-      debugPrint('RecordTunerEngine: Start failed - $e');
       onError?.call('Failed to start audio capture: $e');
     }
   }
@@ -199,7 +189,6 @@ class RecordTunerEngine implements TunerEngine {
     );
 
     _isStreamActive = true;
-    debugPrint('RecordTunerEngine: Stream started');
   }
 
   /// Stop the recorder stream (internal helper).
@@ -211,7 +200,6 @@ class RecordTunerEngine implements TunerEngine {
     await _recorder.stop();
 
     _isStreamActive = false;
-    debugPrint('RecordTunerEngine: Stream stopped');
   }
 
   @override
@@ -219,8 +207,6 @@ class RecordTunerEngine implements TunerEngine {
     if (!_isListening) return;
 
     try {
-      debugPrint('RecordTunerEngine: Stopping audio capture...');
-
       _isListening = false;
       _isProcessingEnabled = false;
 
@@ -234,10 +220,7 @@ class RecordTunerEngine implements TunerEngine {
 
       _streamController.add(null);
       onPitchDetected?.call(null);
-
-      debugPrint('RecordTunerEngine: Audio capture stopped');
     } catch (e) {
-      debugPrint('RecordTunerEngine: Stop failed - $e');
       onError?.call('Failed to stop audio capture: $e');
     }
   }
@@ -250,7 +233,6 @@ class RecordTunerEngine implements TunerEngine {
   @override
   Future<void> warmUp() async {
     if (_isStreamActive) {
-      debugPrint('RecordTunerEngine: Already warmed up');
       return;
     }
 
@@ -260,18 +242,13 @@ class RecordTunerEngine implements TunerEngine {
     }
 
     try {
-      debugPrint('RecordTunerEngine: Warming up (starting stream without processing)...');
-
       _isProcessingEnabled = false;
       _stabilityFilter.reset();
       _amplitudeGate.reset();
       _sampleBuffer.clear();
 
       await _startStream();
-
-      debugPrint('RecordTunerEngine: Warm up complete');
     } catch (e) {
-      debugPrint('RecordTunerEngine: Warm up failed - $e');
       onError?.call('Failed to warm up: $e');
     }
   }
@@ -282,11 +259,9 @@ class RecordTunerEngine implements TunerEngine {
   @override
   void enableProcessing() {
     if (!_isStreamActive) {
-      debugPrint('RecordTunerEngine: Cannot enable processing - stream not active');
       return;
     }
 
-    debugPrint('RecordTunerEngine: Enabling processing');
     _isListening = true;
     _isProcessingEnabled = true;
     _stabilityFilter.reset();
@@ -301,7 +276,6 @@ class RecordTunerEngine implements TunerEngine {
   /// This allows instant re-enabling without audio session reconfiguration.
   @override
   void disableProcessing() {
-    debugPrint('RecordTunerEngine: Disabling processing (keeping stream active)');
     _isListening = false;
     _isProcessingEnabled = false;
     _currentNote = null;
@@ -359,8 +333,8 @@ class RecordTunerEngine implements TunerEngine {
 
         await _processBuffer(bufferToProcess);
       }
-    } catch (e) {
-      debugPrint('RecordTunerEngine: Audio processing error - $e');
+    } catch (_) {
+      // Audio processing error - silently ignore
     }
   }
 
@@ -375,11 +349,6 @@ class RecordTunerEngine implements TunerEngine {
 
     // Detect pitch using YIN algorithm
     final pitchResult = await _pitchDetector.getPitchFromFloatBuffer(samples);
-
-    // Debug log
-    if (pitchResult.pitched && pitchResult.pitch > 0) {
-      debugPrint('Pitch: ${pitchResult.pitch.toStringAsFixed(1)}Hz');
-    }
 
     // Apply stability filter
     final stabilityResult = _stabilityFilter.process(
@@ -430,7 +399,6 @@ class RecordTunerEngine implements TunerEngine {
   }
 
   void _onAudioError(Object error) {
-    debugPrint('RecordTunerEngine: Audio error - $error');
     onError?.call('Audio capture error: $error');
   }
 

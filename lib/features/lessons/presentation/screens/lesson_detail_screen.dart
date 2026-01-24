@@ -51,69 +51,80 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     return lessonAsync.when(
       data: (lesson) {
         if (lesson == null) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back),
-              ),
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.event_busy, size: 64, color: AppColors.textTertiaryLight),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '레슨을 찾을 수 없습니다',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return _buildNotFoundScaffold();
         }
-
         return _buildContent(context, lesson);
       },
-      loading: () => Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back),
-          ),
+      loading: () => _buildLoadingScaffold(),
+      error: (error, _) => _buildErrorScaffold(),
+    );
+  }
+
+  Scaffold _buildNotFoundScaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
         ),
-        body: const Center(child: CircularProgressIndicator()),
       ),
-      error: (error, _) => Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back),
-          ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event_busy, size: 64, color: AppColors.textTertiaryLight),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              '레슨을 찾을 수 없습니다',
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 64, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              Text(
-                '데이터를 불러오는데 실패했습니다',
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
+      ),
+    );
+  }
+
+  Scaffold _buildLoadingScaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Scaffold _buildErrorScaffold() {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: AppColors.error),
+            const SizedBox(height: AppSpacing.space4),
+            Text(
+              '데이터를 불러오는데 실패했습니다',
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondaryLight,
               ),
-              const SizedBox(height: AppSpacing.space6),
-              OutlinedButton.icon(
-                onPressed: () => ref.invalidate(lessonProvider(widget.lessonId)),
-                icon: const Icon(Icons.refresh),
-                label: const Text('다시 시도'),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: AppSpacing.space6),
+            OutlinedButton.icon(
+              onPressed: () => ref.invalidate(lessonProvider(widget.lessonId)),
+              icon: const Icon(Icons.refresh),
+              label: const Text('다시 시도'),
+            ),
+          ],
         ),
       ),
     );
@@ -128,13 +139,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         },
         child: Column(
           children: [
-            // Lesson info header
             LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
-
-            // Tab bar
             _buildTabBar(),
-
-            // Tab content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
@@ -161,48 +167,18 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       title: const Text('레슨 상세'),
       actions: [
         IconButton(
-          onPressed: () {
-            // Share or export
-          },
+          onPressed: () {},
           icon: const Icon(Icons.share_outlined),
         ),
         PopupMenuButton<String>(
-          onSelected: (value) async {
-            if (value == 'edit') {
-              context.push('/lessons/${widget.lessonId}/edit');
-            } else if (value == 'cancel') {
-              final confirmed = await _showCancelConfirmation();
-              if (confirmed == true) {
-                await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('레슨이 취소되었습니다')),
-                  );
-                }
-              }
-            } else if (value == 'delete') {
-              final confirmed = await _showDeleteConfirmation();
-              if (confirmed == true) {
-                await ref.read(lessonsNotifierProvider.notifier).deleteLesson(lesson.id);
-                if (mounted) {
-                  context.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('레슨이 삭제되었습니다')),
-                  );
-                }
-              }
-            }
-          },
+          onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder: (context) => [
             const PopupMenuItem(value: 'edit', child: Text('수정')),
             if (lesson.status == LessonStatus.scheduled)
               const PopupMenuItem(value: 'cancel', child: Text('취소')),
             PopupMenuItem(
               value: 'delete',
-              child: Text(
-                '삭제',
-                style: TextStyle(color: AppColors.error),
-              ),
+              child: Text('삭제', style: TextStyle(color: AppColors.error)),
             ),
           ],
         ),
@@ -210,13 +186,38 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
+  Future<void> _handleAppBarAction(String value, Lesson lesson) async {
+    if (value == 'edit') {
+      context.push('/lessons/${widget.lessonId}/edit');
+    } else if (value == 'cancel') {
+      final confirmed = await showCancelLessonConfirmation(context);
+      if (confirmed == true) {
+        await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('레슨이 취소되었습니다')),
+          );
+        }
+      }
+    } else if (value == 'delete') {
+      final confirmed = await showDeleteLessonConfirmation(context);
+      if (confirmed == true) {
+        await ref.read(lessonsNotifierProvider.notifier).deleteLesson(lesson.id);
+        if (mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('레슨이 삭제되었습니다')),
+          );
+        }
+      }
+    }
+  }
+
   Widget _buildTabBar() {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: TabBar(
         controller: _tabController,
@@ -240,268 +241,52 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         children: [
           // Teacher notes section
           if (widget.isTeacher) ...[
-            _buildSectionHeader('레슨 피드백', Icons.edit_note),
+            LessonDetailSectionHeader(
+              title: '레슨 피드백',
+              icon: Icons.edit_note,
+            ),
             const SizedBox(height: AppSpacing.space3),
-            _buildNoteEditor(lesson),
+            LessonNoteEditor(initialText: lesson.feedback),
           ] else ...[
-            _buildSectionHeader('선생님 피드백', Icons.school),
+            LessonDetailSectionHeader(
+              title: '선생님 피드백',
+              icon: Icons.school,
+            ),
             const SizedBox(height: AppSpacing.space3),
-            _buildTeacherFeedbackCard(lesson),
+            TeacherFeedbackCard(lesson: lesson),
           ],
 
           const SizedBox(height: AppSpacing.space6),
 
           // Key points
-          _buildSectionHeader(
-            '주요 포인트',
-            Icons.lightbulb_outline,
+          LessonDetailSectionHeader(
+            title: '주요 포인트',
+            icon: Icons.lightbulb_outline,
             showAddButton: widget.isTeacher,
             onAdd: () => _showAddKeyPointDialog(lesson),
           ),
           const SizedBox(height: AppSpacing.space3),
-          _buildKeyPointsList(lesson),
+          KeyPointsList(
+            lesson: lesson,
+            isTeacher: widget.isTeacher,
+            onRemove: (index) => _removeKeyPoint(lesson, index),
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Practice tips
-          _buildSectionHeader(
-            '연습 팁',
-            Icons.tips_and_updates_outlined,
+          LessonDetailSectionHeader(
+            title: '연습 팁',
+            icon: Icons.tips_and_updates_outlined,
             showAddButton: widget.isTeacher,
             onAdd: () => _showAddPracticeTipDialog(lesson),
           ),
           const SizedBox(height: AppSpacing.space3),
-          _buildPracticeTips(lesson),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(
-    String title,
-    IconData icon, {
-    bool showAddButton = false,
-    VoidCallback? onAdd,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: AppColors.primary),
-        const SizedBox(width: AppSpacing.space2),
-        Text(title, style: AppTypography.headingSmall),
-        const Spacer(),
-        if (showAddButton && onAdd != null)
-          IconButton(
-            onPressed: onAdd,
-            icon: const Icon(Icons.add_circle_outline),
-            iconSize: 22,
-            color: AppColors.primary,
-            tooltip: '추가',
-            constraints: const BoxConstraints(),
-            padding: EdgeInsets.zero,
+          PracticeTipsCard(
+            lesson: lesson,
+            isTeacher: widget.isTeacher,
+            onEdit: () => _showEditPracticeTipDialog(lesson),
           ),
-      ],
-    );
-  }
-
-  Widget _buildNoteEditor(Lesson lesson) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: TextField(
-        maxLines: 6,
-        controller: TextEditingController(text: lesson.feedback ?? ''),
-        decoration: InputDecoration(
-          hintText: '레슨 피드백을 작성하세요...',
-          hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(AppSpacing.space4),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTeacherFeedbackCard(Lesson lesson) {
-    if (lesson.feedback == null || lesson.feedback!.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.chat_bubble_outline, color: AppColors.textTertiaryLight),
-            const SizedBox(width: AppSpacing.space3),
-            Text(
-              '아직 피드백이 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            lesson.feedback!,
-            style: AppTypography.bodyMedium.copyWith(
-              height: 1.6,
-            ),
-          ),
-          if (lesson.updatedAt != null) ...[
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              '작성: ${lesson.updatedAt!.month}월 ${lesson.updatedAt!.day}일',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeyPointsList(Lesson lesson) {
-    if (lesson.keyPoints == null || lesson.keyPoints!.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.lightbulb_outline, color: AppColors.textTertiaryLight),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Text(
-                widget.isTeacher
-                    ? '+ 버튼을 눌러 주요 포인트를 추가하세요'
-                    : '주요 포인트가 없습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Column(
-      children: lesson.keyPoints!.asMap().entries.map((entry) {
-        final index = entry.key;
-        final point = entry.value;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 6),
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Text(point, style: AppTypography.bodyMedium),
-              ),
-              if (widget.isTeacher)
-                IconButton(
-                  onPressed: () => _removeKeyPoint(lesson, index),
-                  icon: const Icon(Icons.close),
-                  iconSize: 18,
-                  color: AppColors.textTertiaryLight,
-                  constraints: const BoxConstraints(),
-                  padding: EdgeInsets.zero,
-                  tooltip: '삭제',
-                ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildPracticeTips(Lesson lesson) {
-    final hasTips = lesson.practiceTips != null && lesson.practiceTips!.isNotEmpty;
-
-    if (!hasTips) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.tips_and_updates_outlined, color: AppColors.textTertiaryLight),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Text(
-                widget.isTeacher
-                    ? '+ 버튼을 눌러 연습 팁을 추가하세요'
-                    : '연습 팁이 없습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.info_outline, color: AppColors.info, size: 20),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Text(
-              lesson.practiceTips ?? '',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.info,
-              ),
-            ),
-          ),
-          if (widget.isTeacher)
-            IconButton(
-              onPressed: () => _showEditPracticeTipDialog(lesson),
-              icon: const Icon(Icons.edit_outlined),
-              iconSize: 18,
-              color: AppColors.info,
-              constraints: const BoxConstraints(),
-              padding: EdgeInsets.zero,
-              tooltip: '수정',
-            ),
         ],
       ),
     );
@@ -513,33 +298,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Recording status
-          if (_isRecording) _buildRecordingStatus(),
+          if (_isRecording)
+            RecordingStatusIndicator(recordingSeconds: _recordingSeconds),
 
-          // Past recordings
-          _buildSectionHeader('녹음 파일', Icons.mic),
+          LessonDetailSectionHeader(title: '녹음 파일', icon: Icons.mic),
           const SizedBox(height: AppSpacing.space3),
 
           if (lesson.recordings == null || lesson.recordings!.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.mic_off, color: AppColors.textTertiaryLight),
-                  const SizedBox(width: AppSpacing.space3),
-                  Text(
-                    '녹음 파일이 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            )
+            const RecordingsEmptyState()
           else
             ...lesson.recordings!.asMap().entries.map((entry) {
               final idx = entry.key;
@@ -548,7 +314,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 padding: const EdgeInsets.only(bottom: AppSpacing.space3),
                 child: LessonRecordingCard(
                   title: '레슨 녹음 ${idx + 1}',
-                  duration: _formatRecordingDuration(recording.duration),
+                  duration: formatRecordingDuration(recording.duration),
                   date:
                       '${recording.recordedAt.month}월 ${recording.recordedAt.day}일 ${recording.recordedAt.hour}:${recording.recordedAt.minute.toString().padLeft(2, '0')}',
                   hasTranscript: recording.transcription != null,
@@ -558,14 +324,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           const SizedBox(height: AppSpacing.space6),
 
-          // AI Summary (if available)
           if (lesson.recordings?.any((r) => r.aiSummary != null) == true) ...[
-            _buildSectionHeader('AI 요약', Icons.auto_awesome),
+            LessonDetailSectionHeader(title: 'AI 요약', icon: Icons.auto_awesome),
             const SizedBox(height: AppSpacing.space3),
             Builder(
               builder: (context) {
                 final aiSummary = lesson.recordings
-                    ?.firstWhere((r) => r.aiSummary != null, orElse: () => lesson.recordings!.first)
+                    ?.firstWhere(
+                      (r) => r.aiSummary != null,
+                      orElse: () => lesson.recordings!.first,
+                    )
                     .aiSummary;
                 if (aiSummary == null) return const SizedBox.shrink();
                 return AISummaryCard(summary: aiSummary);
@@ -577,58 +345,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  String _formatRecordingDuration(Duration duration) {
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-  }
-
-  Widget _buildRecordingStatus() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: AppColors.error,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Text(
-            '녹음 중',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.error,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            _formatDuration(_recordingSeconds),
-            style: AppTypography.headingMedium.copyWith(
-              color: AppColors.error,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDuration(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
-
   Widget _buildAssignmentsTab(Lesson lesson) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -636,51 +352,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         lessonId: lesson.id,
         studentId: lesson.studentId,
         isTeacher: widget.isTeacher,
-      ),
-    );
-  }
-
-  Future<bool?> _showCancelConfirmation() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레슨 취소'),
-        content: const Text('이 레슨을 취소하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('아니오'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('취소하기'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<bool?> _showDeleteConfirmation() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레슨 삭제'),
-        content: const Text(
-          '이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
       ),
     );
   }
@@ -713,7 +384,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     });
   }
 
-  // Key points and practice tips editing methods
   void _showAddKeyPointDialog(Lesson lesson) {
     showModalBottomSheet(
       context: context,
@@ -742,47 +412,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  void _showEditPracticeTipDialog(Lesson lesson) {
-    final controller = TextEditingController(text: lesson.practiceTips ?? '');
-
-    showDialog(
+  void _showEditPracticeTipDialog(Lesson lesson) async {
+    final result = await showEditPracticeTipDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('연습 팁 수정'),
-        content: TextField(
-          controller: controller,
-          maxLines: 4,
-          decoration: const InputDecoration(
-            hintText: '연습 팁을 입력하세요',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          if (lesson.practiceTips != null && lesson.practiceTips!.isNotEmpty)
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _setPracticeTip(lesson, null);
-              },
-              child: Text(
-                '삭제',
-                style: TextStyle(color: AppColors.error),
-              ),
-            ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _setPracticeTip(lesson, controller.text.trim());
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
+      currentTip: lesson.practiceTips,
+      hasTip: lesson.practiceTips != null && lesson.practiceTips!.isNotEmpty,
     );
+
+    if (result != null) {
+      _setPracticeTip(lesson, result.isEmpty ? null : result);
+    }
   }
 
   Future<void> _addKeyPoint(Lesson lesson, String content) async {

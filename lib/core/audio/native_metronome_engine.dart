@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../../models/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
@@ -43,8 +42,6 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
   Future<void> init() async {
     if (_initialized) return;
 
-    debugPrint('NativeMetronomeEngine: init started');
-
     try {
       // Initialize native engine with current settings
       final result = await _methodChannel.invokeMethod<bool>('init', {
@@ -69,12 +66,9 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
       _setupEventChannel();
 
       _initialized = true;
-      debugPrint('NativeMetronomeEngine: initialized successfully');
-    } on PlatformException catch (e) {
-      debugPrint('NativeMetronomeEngine: init failed - ${e.message}');
+    } on PlatformException {
       rethrow;
-    } on MissingPluginException catch (e) {
-      debugPrint('NativeMetronomeEngine: plugin not found - $e');
+    } on MissingPluginException {
       rethrow;
     }
   }
@@ -101,9 +95,7 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
           }
         }
       },
-      onError: (dynamic error) {
-        debugPrint('NativeMetronomeEngine: event error - $error');
-      },
+      onError: (_) {},
     );
   }
 
@@ -181,10 +173,8 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
       _isPlaying = true;
       _currentBeat = 0;
       await _methodChannel.invokeMethod('start');
-      debugPrint('NativeMetronomeEngine: Started at ${_settings.bpm} BPM');
-    } on PlatformException catch (e) {
+    } on PlatformException {
       _isPlaying = false;
-      debugPrint('NativeMetronomeEngine: start failed - ${e.message}');
       rethrow;
     }
   }
@@ -197,9 +187,7 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
       _isPlaying = false;
       _currentBeat = 0;
       await _methodChannel.invokeMethod('stop');
-      debugPrint('NativeMetronomeEngine: Stopped');
-    } on PlatformException catch (e) {
-      debugPrint('NativeMetronomeEngine: stop failed - ${e.message}');
+    } on PlatformException {
       rethrow;
     }
   }
@@ -238,8 +226,8 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
 
     try {
       await _methodChannel.invokeMethod('playTapSound');
-    } on PlatformException catch (e) {
-      debugPrint('NativeMetronomeEngine: playTapSound failed - ${e.message}');
+    } on PlatformException {
+      // Silently ignore
     }
   }
 
@@ -252,12 +240,11 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
     if (_initialized) {
       try {
         await _methodChannel.invokeMethod('dispose');
-      } on PlatformException catch (e) {
-        debugPrint('NativeMetronomeEngine: dispose failed - ${e.message}');
+      } on PlatformException {
+        // Silently ignore
       }
     }
 
     _initialized = false;
-    debugPrint('NativeMetronomeEngine: Disposed');
   }
 }

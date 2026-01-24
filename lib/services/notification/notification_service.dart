@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -63,13 +62,11 @@ class LocalNotificationService implements NotificationService {
     );
 
     _isInitialized = true;
-    debugPrint('LocalNotificationService initialized');
   }
 
   void _onNotificationTapped(NotificationResponse response) {
     if (response.payload != null) {
       // Parse payload and emit notification
-      debugPrint('Notification tapped: ${response.payload}');
       // TODO: Parse payload to AppNotification and emit
     }
   }
@@ -120,8 +117,6 @@ class LocalNotificationService implements NotificationService {
       details,
       payload: _encodePayload(notification),
     );
-
-    debugPrint('Notification shown: ${notification.title}');
   }
 
   @override
@@ -139,7 +134,6 @@ class LocalNotificationService implements NotificationService {
 
     // Don't schedule if time has passed
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
-      debugPrint('Skipping past notification: ${notification.title}');
       return;
     }
 
@@ -157,22 +151,16 @@ class LocalNotificationService implements NotificationService {
       matchDateTimeComponents: null,
       payload: _encodePayload(notification),
     );
-
-    debugPrint(
-      'Notification scheduled: ${notification.title} at ${notification.scheduledAt}',
-    );
   }
 
   @override
   Future<void> cancelNotification(String id) async {
     await _localNotifications.cancel(id.hashCode);
-    debugPrint('Notification cancelled: $id');
   }
 
   @override
   Future<void> cancelAllNotifications() async {
     await _localNotifications.cancelAll();
-    debugPrint('All notifications cancelled');
   }
 
   NotificationDetails _getNotificationDetails(AppNotification notification) {

@@ -23,18 +23,26 @@ enum class BeatType {
 typealias BeatCallback = (Int, Boolean) -> Unit
 
 /**
+ * Callback type for subdivision events.
+ */
+typealias SubdivisionCallback = (Int, Boolean) -> Unit
+
+/**
  * High-precision metronome engine using AudioTrack with LOW_LATENCY mode.
  *
  * Uses PCM frame counting for precise timing:
  * - Writes click sounds directly to AudioTrack stream
  * - Calculates exact frame positions for each beat
  * - Fills silence between beats
+ * - Supports subdivisions and sound patterns (for rest patterns)
  */
 class MetronomeAudioEngine(
     private val context: Context,
     private var bpm: Int,
     private var beatsPerMeasure: Int,
     private var accentPattern: String,
+    private var subdivision: Int = 1,
+    private var soundPattern: List<Boolean> = listOf(true),
     strongSoundPath: String,
     mediumSoundPath: String,
     weakSoundPath: String
@@ -59,9 +67,11 @@ class MetronomeAudioEngine(
     @Volatile
     private var isRunning = false
     private var currentBeat = 0
+    private var currentSubBeat = 0
 
-    // Callback
+    // Callbacks
     var onBeat: BeatCallback? = null
+    var onSubdivision: SubdivisionCallback? = null
 
     init {
         loadSounds(strongSoundPath, mediumSoundPath, weakSoundPath)
@@ -124,14 +134,15 @@ class MetronomeAudioEngine(
             AUDIO_FORMAT
         )
 
-        // Use at least 100ms buffer (SAMPLE_RATE / 10 frames * 2 bytes * 2 channels)
-        val desiredBufferSize = maxOf(minBufferSize, SAMPLE_RATE / 10 * 2 * 2)
+        // Use minimum buffer size for lowest latency
+        // Only add a small margin to prevent underruns
+        val desiredBufferSize = minBufferSize + (SAMPLE_RATE / 20 * 2 * 2)  // +50ms margin
 
         audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_GAME)  // USAGE_GAME has lower latency
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build()
             )
             .setAudioFormat(
@@ -163,8 +174,13 @@ class MetronomeAudioEngine(
 
         isRunning = true
         currentBeat = 0
+        currentSubBeat = 0
 
         audioTrack?.play()
+
+        // Prime the audio buffer with a small amount of silence to reduce initial latency
+        val primeBuffer = ShortArray(SAMPLE_RATE / 50 * 2)  // ~20ms of silence, stereo
+        audioTrack?.write(primeBuffer, 0, primeBuffer.size)
 
         // Start audio loop
         audioHandler?.post { audioLoop() }
@@ -182,6 +198,7 @@ class MetronomeAudioEngine(
         audioHandler = null
 
         currentBeat = 0
+        currentSubBeat = 0
     }
 
     // MARK: - Audio Loop
@@ -189,35 +206,63 @@ class MetronomeAudioEngine(
     private fun audioLoop() {
         val track = audioTrack ?: return
 
+        // Pre-calculate fixed interval per subdivision in frames
+        // This ensures consistent timing regardless of sound buffer size
+        val framesPerBeat = SAMPLE_RATE * 60 / bpm
+        val framesPerSubdivision = framesPerBeat / subdivision
+
         while (isRunning) {
-            // Move to next beat
-            currentBeat = (currentBeat % beatsPerMeasure) + 1
+            // Recalculate if BPM or subdivision changed
+            val currentFramesPerBeat = SAMPLE_RATE * 60 / bpm
+            val currentFramesPerSubdivision = currentFramesPerBeat / subdivision
 
-            // Get beat type and buffer
-            val beatType = getBeatType(currentBeat)
-            val clickBuffer = getBuffer(beatType)
+            // Determine if this is main beat or subdivision
+            val isMainBeat = currentSubBeat == 0
 
-            // Calculate frames per beat
-            val framesPerBeat = SAMPLE_RATE * 60 / bpm
+            // Determine which sound to play
+            val patternIndex = currentSubBeat % soundPattern.size
+            val shouldPlaySound = soundPattern.getOrElse(patternIndex) { true }
 
-            // Write click sound
-            if (clickBuffer.isNotEmpty()) {
-                track.write(clickBuffer, 0, clickBuffer.size)
+            val clickBuffer: ShortArray
+            val isAccent: Boolean
+
+            if (isMainBeat) {
+                // Move to next beat
+                currentBeat = (currentBeat % beatsPerMeasure) + 1
+
+                // Get beat type and buffer
+                val beatType = getBeatType(currentBeat)
+                clickBuffer = if (shouldPlaySound) getBuffer(beatType) else ShortArray(0)
+                isAccent = currentBeat == 1 && accentPattern != "uniform"
+
+                // Send beat event
+                onBeat?.invoke(currentBeat, isAccent)
+            } else {
+                // Subdivision tick - use weak sound
+                clickBuffer = if (shouldPlaySound) weakBuffer else ShortArray(0)
+                isAccent = false
             }
 
-            // Send beat event
-            val isAccent = currentBeat == 1 && accentPattern != "uniform"
-            onBeat?.invoke(currentBeat, isAccent)
+            // Send subdivision event
+            onSubdivision?.invoke(currentSubBeat, isMainBeat)
 
-            // Calculate silence needed to fill the beat interval
-            val clickFrames = clickBuffer.size / 2  // stereo = 2 samples per frame
-            val silenceFrames = framesPerBeat - clickFrames
+            // Write click sound
+            val clickFrames = if (clickBuffer.isNotEmpty()) {
+                track.write(clickBuffer, 0, clickBuffer.size)
+                clickBuffer.size / 2  // stereo = 2 samples per frame
+            } else {
+                0
+            }
 
+            // Fill remaining interval with silence to maintain consistent timing
+            val silenceFrames = currentFramesPerSubdivision - clickFrames
             if (silenceFrames > 0) {
-                // Write silence (zeros)
                 val silenceBuffer = ShortArray(silenceFrames * 2)  // stereo
                 track.write(silenceBuffer, 0, silenceBuffer.size)
             }
+
+            // Move to next subdivision
+            currentSubBeat = (currentSubBeat + 1) % subdivision
         }
     }
 
@@ -262,6 +307,14 @@ class MetronomeAudioEngine(
 
     fun setAccentPattern(pattern: String) {
         accentPattern = pattern
+    }
+
+    fun setSubdivision(newSubdivision: Int) {
+        subdivision = newSubdivision.coerceIn(1, 8)
+    }
+
+    fun setSoundPattern(pattern: List<Boolean>) {
+        soundPattern = if (pattern.isEmpty()) listOf(true) else pattern
     }
 
     // MARK: - Tap Sound

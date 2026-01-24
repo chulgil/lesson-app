@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
@@ -81,7 +80,6 @@ class AudioRecorderService {
   Future<void> init() async {
     _stateSubscription = _recorder.onStateChanged().listen((state) {
       _state = state;
-      debugPrint('AudioRecorder: State changed to $state');
     });
 
     _amplitudeSubscription = amplitudeStream.listen((amp) {
@@ -95,10 +93,8 @@ class AudioRecorderService {
   Future<bool> requestPermission() async {
     final status = await Permission.microphone.request();
     if (status.isGranted) {
-      debugPrint('AudioRecorder: Microphone permission granted');
       return true;
     }
-    debugPrint('AudioRecorder: Microphone permission denied');
     return false;
   }
 
@@ -129,7 +125,6 @@ class AudioRecorderService {
       if (!await hasPermission()) {
         final granted = await requestPermission();
         if (!granted) {
-          debugPrint('AudioRecorder: Permission not granted');
           return null;
         }
       }
@@ -144,7 +139,6 @@ class AudioRecorderService {
       await _amplitudeBroadcastSubscription?.cancel();
       _amplitudeBroadcastSubscription = null;
       _normalizedAmplitudeStreamCache = null;
-      debugPrint('AudioRecorder: Reset amplitude stream cache');
 
       // Configure and start recording
       await _recorder.start(
@@ -160,10 +154,8 @@ class AudioRecorderService {
       _recordingStartTime = DateTime.now();
       _pausedDuration = Duration.zero;
 
-      debugPrint('AudioRecorder: Recording started at $filePath');
       return filePath;
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to start recording: $e');
       return null;
     }
   }
@@ -172,9 +164,8 @@ class AudioRecorderService {
   Future<void> pauseRecording() async {
     try {
       await _recorder.pause();
-      debugPrint('AudioRecorder: Recording paused');
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to pause recording: $e');
+      // Error pausing recording
     }
   }
 
@@ -182,9 +173,8 @@ class AudioRecorderService {
   Future<void> resumeRecording() async {
     try {
       await _recorder.resume();
-      debugPrint('AudioRecorder: Recording resumed');
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to resume recording: $e');
+      // Error resuming recording
     }
   }
 
@@ -196,10 +186,8 @@ class AudioRecorderService {
       final path = await _recorder.stop();
       _recordingStartTime = null;
       _pausedDuration = null;
-      debugPrint('AudioRecorder: Recording stopped, saved to $path');
       return path;
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to stop recording: $e');
       return null;
     }
   }
@@ -216,11 +204,10 @@ class AudioRecorderService {
         final file = File(path);
         if (await file.exists()) {
           await file.delete();
-          debugPrint('AudioRecorder: Recording cancelled and deleted');
         }
       }
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to cancel recording: $e');
+      // Error cancelling recording
     }
   }
 
@@ -230,12 +217,10 @@ class AudioRecorderService {
       final file = File(filePath);
       if (await file.exists()) {
         await file.delete();
-        debugPrint('AudioRecorder: Deleted recording at $filePath');
         return true;
       }
       return false;
     } catch (e) {
-      debugPrint('AudioRecorder: Failed to delete recording: $e');
       return false;
     }
   }
@@ -268,6 +253,5 @@ class AudioRecorderService {
     await _amplitudeBroadcastSubscription?.cancel();
     _normalizedAmplitudeStreamCache = null;
     await _recorder.dispose();
-    debugPrint('AudioRecorder: Disposed');
   }
 }

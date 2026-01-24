@@ -3,8 +3,8 @@
 // Uses flutter_audio_capture for microphone input
 
 import 'dart:async';
+import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_audio_capture/flutter_audio_capture.dart';
 import 'package:pitch_detector_dart/pitch_detector.dart';
 
@@ -114,8 +114,6 @@ class PitchTunerEngine implements TunerEngine {
     if (_isInitialized) return true;
 
     try {
-      debugPrint('PitchTunerEngine: Initializing...');
-
       // Initialize pitch detector
       _pitchDetector = PitchDetector(
         audioSampleRate: _config.sampleRate.toDouble(),
@@ -135,10 +133,8 @@ class PitchTunerEngine implements TunerEngine {
       );
 
       _isInitialized = true;
-      debugPrint('PitchTunerEngine: Initialized successfully');
       return true;
     } catch (e) {
-      debugPrint('PitchTunerEngine: Init failed - $e');
       onError?.call('Failed to initialize pitch detector: $e');
       return false;
     }
@@ -153,8 +149,6 @@ class PitchTunerEngine implements TunerEngine {
     }
 
     try {
-      debugPrint('PitchTunerEngine: Starting audio capture...');
-
       _isListening = true;
       _stabilityFilter.reset();
       _amplitudeGate.reset();
@@ -165,11 +159,8 @@ class PitchTunerEngine implements TunerEngine {
         sampleRate: _config.sampleRate,
         bufferSize: _config.bufferSize,
       );
-
-      debugPrint('PitchTunerEngine: Audio capture started');
     } catch (e) {
       _isListening = false;
-      debugPrint('PitchTunerEngine: Start failed - $e');
       onError?.call('Failed to start audio capture: $e');
     }
   }
@@ -179,18 +170,13 @@ class PitchTunerEngine implements TunerEngine {
     if (!_isListening) return;
 
     try {
-      debugPrint('PitchTunerEngine: Stopping audio capture...');
-
       await _audioCapture.stop();
       _isListening = false;
       _currentNote = null;
 
       _streamController.add(null);
       onPitchDetected?.call(null);
-
-      debugPrint('PitchTunerEngine: Audio capture stopped');
     } catch (e) {
-      debugPrint('PitchTunerEngine: Stop failed - $e');
       onError?.call('Failed to stop audio capture: $e');
     }
   }
@@ -267,13 +253,12 @@ class PitchTunerEngine implements TunerEngine {
         // Keep showing last note briefly (hysteresis)
         // This prevents flickering
       }
-    } catch (e) {
-      debugPrint('PitchTunerEngine: Audio processing error - $e');
+    } catch (_) {
+      // Audio processing error - silently ignore
     }
   }
 
   void _onAudioError(Object error) {
-    debugPrint('PitchTunerEngine: Audio error - $error');
     onError?.call('Audio capture error: $error');
   }
 

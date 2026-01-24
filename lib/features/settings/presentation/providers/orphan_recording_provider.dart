@@ -2,7 +2,6 @@
 //
 // Part of the backup restore feature enhancement.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -109,7 +108,6 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
 
       state = const AsyncValue.data(null);
     } catch (e) {
-      debugPrint('Error refreshing from Hive: $e');
       state = AsyncValue.error(e, StackTrace.current);
     }
   }
@@ -133,7 +131,6 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
       state = const AsyncValue.data(null);
       return true;
     } catch (e) {
-      debugPrint('Error reassigning recording: $e');
       state = AsyncValue.error(e, StackTrace.current);
       return false;
     }
@@ -155,7 +152,6 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
       state = const AsyncValue.data(null);
       return true;
     } catch (e) {
-      debugPrint('Error deleting recording: $e');
       state = AsyncValue.error(e, StackTrace.current);
       return false;
     }
@@ -177,7 +173,6 @@ class OrphanRecordingManager extends _$OrphanRecordingManager {
       state = const AsyncValue.data(null);
       return true;
     } catch (e) {
-      debugPrint('Error importing recording: $e');
       state = AsyncValue.error(e, StackTrace.current);
       return false;
     }

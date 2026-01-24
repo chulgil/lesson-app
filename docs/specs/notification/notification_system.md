@@ -2,6 +2,7 @@
 
 > 작성일: 2025-12-27
 > 상태: ✅ 스펙 확정
+> 엔티티 스키마: [notification.md](../../schema/entities/notification.md)
 
 레슨 앱의 알림 시스템 상세 설계
 
@@ -14,9 +15,8 @@
 3. [알림 유형](#알림-유형)
 4. [알림 타이밍](#알림-타이밍)
 5. [사용자 설정](#사용자-설정)
-6. [데이터 모델](#데이터-모델)
-7. [UI 와이어프레임](#ui-와이어프레임)
-8. [기술 구현](#기술-구현)
+6. [UI 와이어프레임](#ui-와이어프레임)
+7. [기술 구현](#기술-구현)
 
 ---
 
@@ -48,38 +48,32 @@
 > 미성년자 정책에 따라 만 14세 미만 학생은 별도 기기가 없을 수 있습니다.
 > 자녀 프로필 관련 모든 알림은 **부모 기기**로 전송됩니다.
 
-### 알림 수신 대상 결정
+### 알림 수신 대상 결정 로직
 
 ```dart
-/// 알림 수신 대상 결정
-class NotificationRouter {
-  /// 학생/자녀 관련 알림의 실제 수신자 결정
-  String getNotificationRecipient(LessonParticipant participant) {
-    if (participant is ChildProfile) {
-      // 자녀 프로필 → 부모 계정으로 알림
-      return participant.parentId;
-    } else if (participant is Student) {
-      // 학생 계정 → 본인에게 알림
-      return participant.id;
-    }
-    throw ArgumentError('Unknown participant type');
+/// 학생/자녀 관련 알림의 실제 수신자 결정
+String getNotificationRecipient(LessonParticipant participant) {
+  if (participant is ChildProfile) {
+    // 자녀 프로필 → 부모 계정으로 알림
+    return participant.parentId;
+  } else if (participant is Student) {
+    // 학생 계정 → 본인에게 알림
+    return participant.id;
   }
-
-  /// FCM 토큰 조회 (자녀 프로필은 부모 토큰 사용)
-  Future<String?> getFcmToken(LessonParticipant participant) async {
-    final recipientId = getNotificationRecipient(participant);
-    return await _tokenRepository.getToken(recipientId);
-  }
+  throw ArgumentError('Unknown participant type');
 }
 ```
 
-### 알림 내용 커스터마이징
+### 알림 내용 커스터마이징 로직
 
 자녀 프로필일 경우 알림 내용에 자녀 이름 포함:
 
 ```dart
 /// 알림 메시지 생성
-String buildNotificationBody(NotificationType type, LessonParticipant participant) {
+String buildNotificationBody(
+  NotificationType type,
+  LessonParticipant participant,
+) {
   if (participant is ChildProfile) {
     // 부모에게: "민수의 레슨이 내일 14:00에 있습니다"
     return '${participant.name}의 ${getBaseMessage(type)}';
@@ -99,33 +93,6 @@ String buildNotificationBody(NotificationType type, LessonParticipant participan
 | 스트릭 위험 | 부모 | 학생 본인 |
 | 결제 요청 | 부모 | 학생 본인 (또는 연결된 부모) |
 | 레슨 노트 공유 | 부모 | 학생 본인 |
-
-### 학부모 알림 설정
-
-```dart
-/// 학부모 알림 설정
-class ParentNotificationSettings {
-  // 기본 설정
-  final bool lessonReminderEnabled;
-  final List<Duration> lessonReminderTimes;
-
-  // 자녀별 설정 (프로필별로 다르게 설정 가능)
-  final Map<String, ChildNotificationSettings> childSettings;
-
-  // 방해금지 시간
-  final bool dndEnabled;
-  final TimeOfDay dndStart;
-  final TimeOfDay dndEnd;
-}
-
-/// 자녀별 알림 설정
-class ChildNotificationSettings {
-  final String childProfileId;
-  final bool practiceReminderEnabled;
-  final TimeOfDay practiceReminderTime;
-  final bool streakWarningEnabled;
-}
-```
 
 ### 알림 표시 예시
 
@@ -205,6 +172,8 @@ class ChildNotificationSettings {
 
 ## 알림 유형
 
+> 엔티티 정의: [NotificationType](../../schema/entities/notification.md#notificationtype)
+
 ### 1. 레슨 관련 알림
 
 | 알림 ID | 유형 | 수신자 | 타이밍 | 푸시 | 인앱 |
@@ -256,33 +225,24 @@ class ChildNotificationSettings {
 | `STUDENT_PRACTICE_REPORT` | 학생 연습 현황 | 선생님 | 주간 | ✗ | ✓ |
 | `REVIEW_RECEIVED` | 리뷰 작성됨 | 선생님 | 작성 시 | ✓ | ✓ |
 
+### 6. 학원 관련 알림
+
+> 학원-선생님 관계 알림. 자세한 내용은 [초대 시스템 v2](../invite/invite_system_v2.md#학원-선생님-초대-시스템) 참조.
+
+| 알림 ID | 유형 | 수신자 | 타이밍 | 푸시 | 인앱 |
+|---------|------|--------|--------|------|------|
+| `ACADEMY_INVITE_RECEIVED` | 학원 강사 초대 | 선생님 | 초대 시 | ✓ | ✓ |
+| `ACADEMY_INVITE_ACCEPTED` | 초대 수락 | 학원 관리자 | 수락 시 | ✓ | ✓ |
+| `ACADEMY_INVITE_DECLINED` | 초대 거절 | 학원 관리자 | 거절 시 | ✗ | ✓ |
+| `ACADEMY_JOIN_REQUEST` | 가입 요청 | 학원 관리자 | 요청 시 | ✓ | ✓ |
+| `ACADEMY_JOIN_APPROVED` | 가입 승인 | 선생님 | 승인 시 | ✓ | ✓ |
+| `ACADEMY_JOIN_REJECTED` | 가입 거절 | 선생님 | 거절 시 | ✓ | ✓ |
+| `ACADEMY_MEMBER_LEFT` | 강사 탈퇴 | 학원 관리자 | 탈퇴 시 | ✓ | ✓ |
+| `ACADEMY_MEMBER_REMOVED` | 강사 제명 | 선생님 | 제명 시 | ✓ | ✓ |
+
 ---
 
 ## 알림 타이밍
-
-### 레슨 리마인더 타이밍
-
-```dart
-/// 레슨 리마인더 기본 설정
-class LessonReminderSettings {
-  final List<Duration> reminderTimes;  // 기본: [24시간 전]
-  final bool enabled;
-
-  static const defaultSettings = LessonReminderSettings(
-    reminderTimes: [Duration(hours: 24)],
-    enabled: true,
-  );
-}
-```
-
-**선택 가능한 옵션:**
-
-| 옵션 | 설명 |
-|------|------|
-| 24시간 전 | 기본값 |
-| 3시간 전 | 추가 선택 |
-| 1시간 전 | 추가 선택 |
-| 30분 전 | 추가 선택 |
 
 ### 연습 리마인더 전략
 
@@ -298,21 +258,24 @@ class LessonReminderSettings {
 예: 22:00 "오늘 연습하면 8일 스트릭 달성!"
 ```
 
-**연습 리마인더 로직:**
+### 연습 리마인더 스케줄링 로직
 
 ```dart
-/// 연습 리마인더 스케줄러
-class PracticeReminderScheduler {
-  void scheduleReminders(PracticeReminderSettings settings) {
-    // 1. 고정 시간 리마인더
-    if (settings.dailyReminderEnabled) {
-      scheduleAt(settings.dailyReminderTime, NotificationType.practiceReminder);
-    }
+void scheduleReminders(PracticeReminderSettings settings) {
+  // 1. 고정 시간 리마인더
+  if (settings.dailyReminderEnabled) {
+    scheduleAt(
+      settings.dailyReminderTime,
+      NotificationType.practiceReminder,
+    );
+  }
 
-    // 2. 스트릭 위험 알림 (오늘 연습 안 했을 때만)
-    if (settings.streakWarningEnabled && !todayPracticeCompleted) {
-      scheduleAt(settings.streakWarningTime, NotificationType.streakWarning);
-    }
+  // 2. 스트릭 위험 알림 (오늘 연습 안 했을 때만)
+  if (settings.streakWarningEnabled && !todayPracticeCompleted) {
+    scheduleAt(
+      settings.streakWarningTime,
+      NotificationType.streakWarning,
+    );
   }
 }
 ```
@@ -321,62 +284,15 @@ class PracticeReminderScheduler {
 
 ## 사용자 설정
 
-### 학생 알림 설정
+> 설정 엔티티 정의: [NotificationSettings](../../schema/entities/notification.md#notificationsettings)
+
+### 방해금지(DND) 처리 로직
 
 ```dart
-/// 학생 알림 설정
-class StudentNotificationSettings {
-  // 레슨 알림
-  final bool lessonReminderEnabled;
-  final List<Duration> lessonReminderTimes;  // 기본: 24시간 전
-
-  // 연습 알림
-  final bool practiceReminderEnabled;
-  final TimeOfDay practiceReminderTime;      // 기본: 19:00
-  final bool streakWarningEnabled;
-  final TimeOfDay streakWarningTime;         // 기본: 21:00
-
-  // 결제 알림
-  final bool paymentReminderEnabled;
-
-  // 방해금지 시간
-  final bool dndEnabled;
-  final TimeOfDay dndStart;                  // 기본: 22:00
-  final TimeOfDay dndEnd;                    // 기본: 08:00
-
-  // 알림 빈도
-  final int maxDailyNotifications;           // 기본: 5, 0=무제한
-}
-```
-
-### 선생님 알림 설정
-
-```dart
-/// 선생님 알림 설정
-class TeacherNotificationSettings {
-  // 레슨 알림
-  final bool lessonReminderEnabled;
-  final List<Duration> lessonReminderTimes;
-
-  // 학생 활동 알림 (선택)
-  final bool newStudentAlert;                // 새 학생 등록
-  final bool trialBookingAlert;              // 체험레슨 요청
-  final bool paymentReceivedAlert;           // 입금 확인
-  final bool studentPracticeReport;          // 학생 연습 현황 (주간)
-  final bool reviewReceivedAlert;            // 리뷰 알림
-
-  // 방해금지 시간
-  final bool dndEnabled;
-  final TimeOfDay dndStart;
-  final TimeOfDay dndEnd;
-}
-```
-
-### 방해금지(DND) 처리
-
-```dart
-/// DND 시간대 확인
-bool shouldSendNotification(DateTime now, NotificationSettings settings) {
+bool shouldSendNotification(
+  DateTime now,
+  NotificationSettings settings,
+) {
   if (!settings.dndEnabled) return true;
 
   final currentTime = TimeOfDay.fromDateTime(now);
@@ -395,7 +311,7 @@ bool shouldSendNotification(DateTime now, NotificationSettings settings) {
 }
 ```
 
-**DND 중 긴급 알림 처리:**
+### DND 중 긴급 알림 처리
 
 | 알림 유형 | DND 중 처리 |
 |----------|------------|
@@ -403,125 +319,6 @@ bool shouldSendNotification(DateTime now, NotificationSettings settings) {
 | 레슨 시작 알림 | 즉시 발송 |
 | 취소/변경 알림 | 즉시 발송 |
 | 노쇼 관련 알림 | 즉시 발송 |
-
----
-
-## 데이터 모델
-
-### 핵심 모델
-
-```dart
-/// 알림 타입
-enum NotificationType {
-  // 레슨
-  lessonBooked,
-  lessonReminder,
-  lessonCancelled,
-  lessonRescheduled,
-  lessonStarting,
-  lessonCompleted,
-  lessonNoteShared,
-
-  // 연습
-  practiceReminder,
-  streakWarning,
-  streakMilestone,
-  practiceAssigned,
-  weeklyGoalAchieved,
-
-  // 결제
-  paymentRequested,
-  paymentReminder,
-  paymentReceived,
-  paymentConfirmed,
-  lessonsRunningLow,
-
-  // 노쇼/취소
-  noshowWarning,
-  noshowConfirmed,
-  teacherNoshow,
-  compensationApplied,
-  cancellationDeadline,
-
-  // 관리
-  newStudentRegistered,
-  trialBookingRequest,
-  studentPracticeReport,
-  reviewReceived,
-}
-
-/// 알림 우선순위
-enum NotificationPriority {
-  low,      // 정보성 (성과, 리포트)
-  normal,   // 일반 (리마인더)
-  high,     // 중요 (결제, 취소)
-  urgent,   // 긴급 (노쇼, 레슨 시작)
-}
-
-/// 알림 엔티티
-class AppNotification {
-  final String id;
-  final String userId;
-  final NotificationType type;
-  final NotificationPriority priority;
-  final String title;
-  final String body;
-  final Map<String, dynamic>? data;     // 추가 데이터 (lessonId 등)
-  final DateTime createdAt;
-  final DateTime? scheduledAt;          // 예약 발송 시간
-  final DateTime? sentAt;               // 실제 발송 시간
-  final DateTime? readAt;               // 읽음 시간
-  final bool isPush;                    // 푸시 알림 여부
-  final bool isInApp;                   // 인앱 알림 여부
-}
-
-/// 알림 템플릿
-class NotificationTemplate {
-  final NotificationType type;
-  final String titleTemplate;           // "{{teacherName}} 선생님 레슨"
-  final String bodyTemplate;            // "내일 {{time}}에 레슨이 있습니다"
-  final NotificationPriority priority;
-  final bool bypassDnd;                 // DND 무시 여부
-}
-```
-
-### 알림 템플릿 예시
-
-```dart
-const notificationTemplates = {
-  NotificationType.lessonReminder: NotificationTemplate(
-    type: NotificationType.lessonReminder,
-    titleTemplate: '🎻 레슨 리마인더',
-    bodyTemplate: '{{when}} {{teacherName}} 선생님 레슨이 있습니다',
-    priority: NotificationPriority.normal,
-    bypassDnd: false,
-  ),
-
-  NotificationType.streakWarning: NotificationTemplate(
-    type: NotificationType.streakWarning,
-    titleTemplate: '🔥 스트릭 위험!',
-    bodyTemplate: '오늘 연습하면 {{streakDays}}일 스트릭 달성!',
-    priority: NotificationPriority.normal,
-    bypassDnd: false,
-  ),
-
-  NotificationType.lessonStarting: NotificationTemplate(
-    type: NotificationType.lessonStarting,
-    titleTemplate: '🎵 레슨 시작',
-    bodyTemplate: '{{teacherName}} 선생님 레슨이 곧 시작됩니다',
-    priority: NotificationPriority.urgent,
-    bypassDnd: true,  // DND 무시
-  ),
-
-  NotificationType.streakMilestone: NotificationTemplate(
-    type: NotificationType.streakMilestone,
-    titleTemplate: '🎉 스트릭 달성!',
-    bodyTemplate: '{{streakDays}}일 연속 연습! 대단해요!',
-    priority: NotificationPriority.low,
-    bypassDnd: false,
-  ),
-};
-```
 
 ---
 
@@ -637,10 +434,9 @@ dependencies:
   timezone: ^0.9.0                 # 시간대 처리
 ```
 
-### 알림 서비스 구조
+### 알림 서비스 인터페이스
 
 ```dart
-/// 알림 서비스 인터페이스
 abstract class NotificationService {
   Future<void> initialize();
   Future<void> requestPermission();
@@ -649,8 +445,11 @@ abstract class NotificationService {
   Future<void> cancelAllNotifications();
   Stream<AppNotification> get onNotificationTapped;
 }
+```
 
-/// FCM + Local Notification 구현
+### FCM + Local Notification 구현
+
+```dart
 class NotificationServiceImpl implements NotificationService {
   final FirebaseMessaging _fcm;
   final FlutterLocalNotificationsPlugin _localNotifications;
@@ -696,10 +495,9 @@ class NotificationServiceImpl implements NotificationService {
 }
 ```
 
-### 알림 스케줄러
+### 연습 리마인더 스케줄러 구현
 
 ```dart
-/// 연습 리마인더 스케줄러
 class PracticeReminderScheduler {
   final NotificationService _notificationService;
   final PracticeRepository _practiceRepository;
@@ -712,7 +510,9 @@ class PracticeReminderScheduler {
     // 1. 연습 리마인더 스케줄링
     if (settings.practiceReminderEnabled) {
       final reminderTime = DateTime(
-        today.year, today.month, today.day,
+        today.year,
+        today.month,
+        today.day,
         settings.practiceReminderTime.hour,
         settings.practiceReminderTime.minute,
       );
@@ -732,7 +532,9 @@ class PracticeReminderScheduler {
     // 2. 스트릭 위험 알림 스케줄링 (연습 미완료 시에만)
     if (settings.streakWarningEnabled) {
       final warningTime = DateTime(
-        today.year, today.month, today.day,
+        today.year,
+        today.month,
+        today.day,
         settings.streakWarningTime.hour,
         settings.streakWarningTime.minute,
       );
@@ -749,7 +551,9 @@ class PracticeReminderScheduler {
           body: '오늘 연습하면 ${currentStreak + 1}일 스트릭 달성!',
           scheduledAt: warningTime,
         ),
-        condition: () async => !await _practiceRepository.hasPracticedToday(userId),
+        condition: () async {
+          return !await _practiceRepository.hasPracticedToday(userId);
+        },
       );
     }
   }
@@ -759,7 +563,6 @@ class PracticeReminderScheduler {
 ### 백엔드 연동 (추후)
 
 ```dart
-/// 서버 푸시 알림 (FCM)
 class ServerNotificationService {
   /// 레슨 리마인더 발송 (서버에서 스케줄링)
   Future<void> sendLessonReminder(String lessonId) async {

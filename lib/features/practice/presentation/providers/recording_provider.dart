@@ -179,7 +179,6 @@ class RecordingNotifier extends _$RecordingNotifier {
           parts.add('$cleanedUp개 누락 파일 정리됨');
         }
         message = parts.join(', ');
-        debugPrint('RecordingProvider: $message');
       }
 
       final recordings = await _repository.getRecordingsForRepertoire(_repertoireId);
@@ -190,7 +189,6 @@ class RecordingNotifier extends _$RecordingNotifier {
         recoveryMessage: message,
       );
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to load recordings: $e');
       state = state.copyWith(
         isLoading: false,
         isRecovering: false,
@@ -236,7 +234,6 @@ class RecordingNotifier extends _$RecordingNotifier {
       final path = await _recorder.startRecording(repertoireId: _repertoireId);
       if (path != null) {
         state = state.copyWith(currentRecordingPath: path, hasMicInput: true);
-        debugPrint('RecordingProvider: Started recording at $path');
 
         // Start monitoring amplitude for mic input detection
         _startMicInputCheck();
@@ -248,7 +245,6 @@ class RecordingNotifier extends _$RecordingNotifier {
         return false;
       }
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to start recording: $e');
       state = state.copyWith(isRecording: false, error: 'Failed to start recording');
       return false;
     }
@@ -267,7 +263,6 @@ class RecordingNotifier extends _$RecordingNotifier {
         hasDetectedInput = true;
         _micInputCheckSubscription?.cancel();
         _micInputCheckSubscription = null;
-        debugPrint('RecordingProvider: Mic input detected (amplitude=$amplitude)');
         return;
       }
 
@@ -278,7 +273,6 @@ class RecordingNotifier extends _$RecordingNotifier {
 
         if (!hasDetectedInput && state.isRecording) {
           state = state.copyWith(hasMicInput: false);
-          debugPrint('RecordingProvider: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
         }
       }
     });
@@ -343,10 +337,8 @@ class RecordingNotifier extends _$RecordingNotifier {
         recordings: [recording, ...state.recordings],
       );
 
-      debugPrint('RecordingProvider: Saved recording ${recording.id}');
       return recording;
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to stop recording: $e');
       state = state.copyWith(
         isRecording: false,
         error: 'Failed to save recording',
@@ -369,24 +361,19 @@ class RecordingNotifier extends _$RecordingNotifier {
       currentRecordingPath: null,
       currentRecordingDuration: Duration.zero,
     );
-    debugPrint('RecordingProvider: Cancelled recording');
   }
 
   /// Play a recording.
   Future<void> playRecording(String recordingId) async {
     try {
       final recording = state.recordings.firstWhere((r) => r.id == recordingId);
-      debugPrint('RecordingProvider: Playing recording ${recording.id}');
-      debugPrint('RecordingProvider: File path: ${recording.localPath}');
 
       // Check if file exists
       final file = File(recording.localPath);
       if (!await file.exists()) {
-        debugPrint('RecordingProvider: File does not exist!');
         state = state.copyWith(error: 'Recording file not found');
         return;
       }
-      debugPrint('RecordingProvider: File exists, size: ${await file.length()} bytes');
 
       // Stop current playback if any
       if (state.isPlaying) {
@@ -395,7 +382,6 @@ class RecordingNotifier extends _$RecordingNotifier {
 
       // Load and play
       final loaded = await _player.load(recording.localPath);
-      debugPrint('RecordingProvider: Load result: $loaded');
       if (loaded) {
         await _player.play();
         state = state.copyWith(
@@ -403,14 +389,10 @@ class RecordingNotifier extends _$RecordingNotifier {
           playingRecordingId: recordingId,
           playbackDuration: Duration(seconds: recording.durationSeconds),
         );
-        debugPrint('RecordingProvider: Playback started');
       } else {
         state = state.copyWith(error: 'Failed to load recording');
-        debugPrint('RecordingProvider: Failed to load recording');
       }
-    } catch (e, stack) {
-      debugPrint('RecordingProvider: Error playing recording: $e');
-      debugPrint('RecordingProvider: Stack trace: $stack');
+    } catch (e) {
       state = state.copyWith(error: 'Failed to play recording: $e');
     }
   }
@@ -465,9 +447,7 @@ class RecordingNotifier extends _$RecordingNotifier {
           .toList();
 
       state = state.copyWith(recordings: updatedRecordings);
-      debugPrint('RecordingProvider: Deleted recording $recordingId');
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to delete recording: $e');
       state = state.copyWith(error: 'Failed to delete recording');
     }
   }
@@ -485,9 +465,7 @@ class RecordingNotifier extends _$RecordingNotifier {
       }).toList();
 
       state = state.copyWith(recordings: updatedRecordings);
-      debugPrint('RecordingProvider: Set $recordingId as representative');
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to set representative: $e');
       state = state.copyWith(error: 'Failed to set representative');
     }
   }
@@ -514,9 +492,7 @@ class RecordingNotifier extends _$RecordingNotifier {
       }).toList();
 
       state = state.copyWith(recordings: updatedRecordings);
-      debugPrint('RecordingProvider: Shared with teacher');
     } catch (e) {
-      debugPrint('RecordingProvider: Failed to share: $e');
       state = state.copyWith(error: 'Failed to share recording');
     }
   }

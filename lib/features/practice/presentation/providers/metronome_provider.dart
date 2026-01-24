@@ -78,12 +78,10 @@ class Metronome extends _$Metronome {
     // iOS: AVAudioEngine, Android: Oboe
     // Use SoLoud on desktop platforms (macOS, Windows, Linux)
     if (Platform.isIOS || Platform.isAndroid) {
-      debugPrint('Metronome: Using NativeMetronomeEngine (${Platform.isIOS ? "iOS AVAudioEngine" : "Android Oboe"})');
       final engine = NativeMetronomeEngine();
       engine.onSubdivision = _onSubdivision;
       _engine = engine;
     } else {
-      debugPrint('Metronome: Using SoLoud engine (desktop)');
       final engine = SoLoudMetronomeEngine();
       engine.onSubdivision = _onSubdivision;
       _engine = engine;
@@ -110,21 +108,14 @@ class Metronome extends _$Metronome {
     if (_initialized) return;
     _initialized = true;
 
-    final stopwatch = Stopwatch()..start();
-    debugPrint('Metronome: _initAsync started');
-
     // Load saved settings (in parallel with engine init for speed)
     final settingsFuture = _storage.loadSettings();
 
-    debugPrint('Metronome: Starting engine.init() at ${stopwatch.elapsedMilliseconds}ms');
     await _engine!.init();
-    debugPrint('Metronome: engine.init() done at ${stopwatch.elapsedMilliseconds}ms');
 
     final savedSettings = await settingsFuture;
-    debugPrint('Metronome: settings loaded at ${stopwatch.elapsedMilliseconds}ms');
 
     await _engine!.updateSettings(savedSettings);
-    debugPrint('Metronome: updateSettings done at ${stopwatch.elapsedMilliseconds}ms');
 
     _engineReady = true;
 
@@ -138,7 +129,6 @@ class Metronome extends _$Metronome {
       isReady: true,
       audioError: initialError,
     );
-    debugPrint('Metronome: _initAsync completed in ${stopwatch.elapsedMilliseconds}ms');
   }
 
   /// Wait for engine to be ready before starting
@@ -154,7 +144,6 @@ class Metronome extends _$Metronome {
   /// Pre-warm the engine to reduce first-play latency.
   /// Call this when metronome screen opens.
   Future<void> warmUp() async {
-    debugPrint('Metronome: warmUp called');
     await _ensureReady();
   }
 
@@ -176,8 +165,6 @@ class Metronome extends _$Metronome {
   }
 
   void _onAudioInterruption(bool isInterrupted) {
-    debugPrint('Metronome: Audio interruption - isInterrupted=$isInterrupted');
-
     if (isInterrupted) {
       // Stop playback and show error
       if (state.isPlaying) {
@@ -193,8 +180,6 @@ class Metronome extends _$Metronome {
   /// Start the metronome - immediate response, no waiting.
   void start() {
     if (state.isPlaying) return; // Already playing
-
-    debugPrint('Metronome: start called');
 
     // Update UI state and play first beat immediately for instant feedback
     // isAccent depends on user's accentPattern setting (not uniform = first beat accented)
@@ -215,7 +200,6 @@ class Metronome extends _$Metronome {
   void stop() {
     if (!state.isPlaying) return; // Already stopped
 
-    debugPrint('Metronome: stop called');
     state = state.copyWith(
       isPlaying: false,
       currentBeat: 0,
@@ -228,7 +212,6 @@ class Metronome extends _$Metronome {
 
   /// Toggle play/stop - immediate response.
   void toggle() {
-    debugPrint('Metronome: toggle called, isPlaying: ${state.isPlaying}');
     if (state.isPlaying) {
       stop();
     } else {
@@ -239,7 +222,6 @@ class Metronome extends _$Metronome {
   /// Set BPM (40-208 range).
   Future<void> setBpm(int bpm) async {
     final clampedBpm = MetronomeSettings.clampBpm(bpm);
-    debugPrint('Metronome: setBpm called with $bpm -> $clampedBpm');
 
     // Update state first to ensure UI responds immediately
     state = state.copyWith(
@@ -250,7 +232,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.setBpm(clampedBpm);
     } catch (e) {
-      debugPrint('Metronome: setBpm engine error: $e');
+      // Engine error, ignore
     }
 
     _saveSettings();
@@ -258,7 +240,6 @@ class Metronome extends _$Metronome {
 
   /// Increment BPM by given amount.
   Future<void> incrementBpm(int delta) async {
-    debugPrint('Metronome: incrementBpm called with delta $delta');
     await setBpm(state.settings.bpm + delta);
   }
 
@@ -269,7 +250,6 @@ class Metronome extends _$Metronome {
 
   /// Set time signature.
   Future<void> setTimeSignature(TimeSignature timeSignature) async {
-    debugPrint('Metronome: setTimeSignature called: $timeSignature');
     final newSettings = state.settings.copyWith(timeSignature: timeSignature);
 
     // Update state first for immediate UI response
@@ -279,7 +259,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.updateSettings(newSettings);
     } catch (e) {
-      debugPrint('Metronome: setTimeSignature engine error: $e');
+      // Engine error, ignore
     }
 
     _saveSettings();
@@ -287,7 +267,6 @@ class Metronome extends _$Metronome {
 
   /// Set metronome sound.
   Future<void> setSound(MetronomeSound sound) async {
-    debugPrint('Metronome: setSound called: $sound');
     final newSettings = state.settings.copyWith(sound: sound);
 
     // Update state first for immediate UI response
@@ -297,7 +276,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.updateSettings(newSettings);
     } catch (e) {
-      debugPrint('Metronome: setSound engine error: $e');
+      // Engine error, ignore
     }
 
     _saveSettings();
@@ -329,7 +308,6 @@ class Metronome extends _$Metronome {
   /// - uniform: all beats = main (no accent)
   /// - strongMediumWeak: same as firstBeatOnly (3-level not supported by package)
   Future<void> setAccentPattern(AccentPattern pattern) async {
-    debugPrint('Metronome: setAccentPattern called: $pattern');
     final newSettings = state.settings.copyWith(accentPattern: pattern);
 
     // Update state first for immediate UI response
@@ -339,7 +317,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.updateSettings(newSettings);
     } catch (e) {
-      debugPrint('Metronome: setAccentPattern engine error: $e');
+      // Engine error, ignore
     }
 
     _saveSettings();
@@ -347,7 +325,6 @@ class Metronome extends _$Metronome {
 
   /// Set subdivision pattern.
   Future<void> setSubdivision(Subdivision subdivision) async {
-    debugPrint('Metronome: setSubdivision called: $subdivision');
     final newSettings = state.settings.copyWith(subdivision: subdivision);
 
     // Update state first for immediate UI response
@@ -357,7 +334,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.updateSettings(newSettings);
     } catch (e) {
-      debugPrint('Metronome: setSubdivision engine error: $e');
+      // Engine error, ignore
     }
 
     _saveSettings();
@@ -365,8 +342,6 @@ class Metronome extends _$Metronome {
 
   /// Update all settings at once.
   Future<void> updateSettings(MetronomeSettings settings) async {
-    debugPrint('Metronome: updateSettings called');
-
     // Update state first for immediate UI response
     state = state.copyWith(settings: settings);
 
@@ -374,7 +349,7 @@ class Metronome extends _$Metronome {
     try {
       await _engine?.updateSettings(settings);
     } catch (e) {
-      debugPrint('Metronome: updateSettings engine error: $e');
+      // Engine error, ignore
     }
 
     await _saveSettings();

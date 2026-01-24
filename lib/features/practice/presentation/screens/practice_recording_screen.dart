@@ -58,8 +58,6 @@ class _PracticeRecordingScreenState
       recordingNotifierProvider(widget.repertoireId, widget.studentId),
     );
 
-    debugPrint('PracticeRecordingScreen: build - isRecording=${state.isRecording}, isPaused=${state.isPaused}');
-
     // Show recovery message as snackbar
     if (state.recoveryMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -300,7 +298,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
   void _startMicInputCheck() {
     _micCheckSubscription?.cancel();
     _recordingStartTime = DateTime.now();
-    debugPrint('_RecordingSectionState: Starting mic input check');
 
     final recorder = ref.read(audioRecorderServiceProvider);
     _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
@@ -309,7 +306,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
       // Strong input detected (amplitude >= quiet threshold)
       if (amplitude >= _quietThreshold) {
         if (!_hasMicInput || _isQuiet) {
-          debugPrint('_RecordingSectionState: Strong input detected (amplitude=$amplitude)');
           setState(() {
             _hasMicInput = true;
             _isQuiet = false;
@@ -323,7 +319,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
         if (_recordingStartTime != null &&
             now.difference(_recordingStartTime!) >= _micCheckDuration) {
           if (!_isQuiet && widget.isRecording) {
-            debugPrint('_RecordingSectionState: Quiet input detected (amplitude=$amplitude)');
             setState(() {
               _hasMicInput = true;
               _isQuiet = true;
@@ -337,7 +332,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
       if (_recordingStartTime != null &&
           now.difference(_recordingStartTime!) >= _micCheckDuration) {
         if (_hasMicInput && widget.isRecording) {
-          debugPrint('_RecordingSectionState: No mic input detected after ${_micCheckDuration.inMilliseconds}ms');
           setState(() {
             _hasMicInput = false;
             _isQuiet = false;
@@ -378,8 +372,6 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
     // Check microphone permission
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
     final hasMicPermission = micPermissionAsync.valueOrNull ?? false;
-
-    debugPrint('_RecordingSection: isRecording=${widget.isRecording}, style=$waveformStyle, hasStream=${amplitudeStream != null}');
 
     return Container(
       padding: EdgeInsets.all(AppSpacing.space6),

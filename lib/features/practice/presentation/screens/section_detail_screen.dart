@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -487,6 +488,20 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     });
   }
 
+  /// Get actual audio file duration using just_audio
+  /// Returns null if file cannot be read
+  Future<Duration?> _getActualFileDuration(String filePath) async {
+    try {
+      final player = AudioPlayer();
+      await player.setFilePath(filePath);
+      final duration = player.duration;
+      await player.dispose();
+      return duration;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> _stopRecording(PracticeSection section) async {
     final recorder = ref.read(audioRecorderServiceProvider);
 
@@ -542,7 +557,10 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
     final metronomeBpm = _usedMetronome
         ? ref.read(metronomeProvider).settings.bpm
         : null;
-    final totalDuration = Duration(seconds: _recordingSeconds);
+
+    // Get actual file duration (Android UI timer can be inaccurate)
+    final audioDuration = await _getActualFileDuration(filePath);
+    final totalDuration = audioDuration ?? Duration(seconds: _recordingSeconds);
 
     // Apply smart recording trimming if enabled (including middle silence)
     TrimResult? trimResult;
@@ -558,19 +576,20 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       );
     }
 
-    // Calculate actual duration after trimming (start/end + middle silence)
-    int actualDuration = _recordingSeconds;
+    // Calculate actual duration after trimming using milliseconds for accuracy
+    int actualDurationMs = totalDuration.inMilliseconds;
     if (trimResult?.hasTrimming == true) {
-      actualDuration -= trimResult!.trimmedStart.inSeconds;
-      actualDuration -= trimResult.trimmedEnd.inSeconds;
+      actualDurationMs -= trimResult!.trimmedStart.inMilliseconds;
+      actualDurationMs -= trimResult.trimmedEnd.inMilliseconds;
     }
     // Also subtract middle silence periods
     if (smartRecordingState.silencePeriods.isNotEmpty) {
-      final middleSilenceSeconds = smartRecordingState.silencePeriods
-          .fold<int>(0, (sum, period) => sum + period.duration.inSeconds);
-      actualDuration -= middleSilenceSeconds;
+      final middleSilenceMs = smartRecordingState.silencePeriods
+          .fold<int>(0, (sum, period) => sum + period.duration.inMilliseconds);
+      actualDurationMs -= middleSilenceMs;
     }
-    // Ensure duration is at least 1 second
+    // Convert to seconds with rounding, ensure at least 1 second
+    int actualDuration = (actualDurationMs / 1000).round();
     if (actualDuration < 1) actualDuration = 1;
 
     try {

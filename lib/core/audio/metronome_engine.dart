@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import '../../models/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
 
@@ -51,17 +50,10 @@ class MetronomeEngine implements MetronomeEngineInterface {
   Future<void> init() async {
     if (_initialized) return;
 
-    final stopwatch = Stopwatch()..start();
-    debugPrint('MetronomeEngine: init started');
-
     await _initAudioPlayers();
-    debugPrint('MetronomeEngine: audio players created at ${stopwatch.elapsedMilliseconds}ms');
-
     await _loadSoundPaths();
-    debugPrint('MetronomeEngine: sounds loaded at ${stopwatch.elapsedMilliseconds}ms');
 
     _initialized = true;
-    debugPrint('MetronomeEngine: initialized in ${stopwatch.elapsedMilliseconds}ms');
   }
 
   Future<void> _initAudioPlayers() async {
@@ -70,7 +62,6 @@ class MetronomeEngine implements MetronomeEngineInterface {
     final mode = Platform.isAndroid
         ? PlayerMode.mediaPlayer
         : PlayerMode.lowLatency;
-    debugPrint('MetronomeEngine: Using PlayerMode.$mode');
 
     // Create 2 players per beat type for alternating playback
     for (var i = 0; i < 2; i++) {
@@ -103,9 +94,8 @@ class MetronomeEngine implements MetronomeEngineInterface {
       for (final player in _weakPlayers) {
         await player.setSource(AssetSource(_weakAsset));
       }
-      debugPrint('MetronomeEngine: Audio warmed up');
-    } catch (e) {
-      debugPrint('MetronomeEngine: Warm-up failed: $e');
+    } catch (_) {
+      // Warm-up failed silently
     }
   }
 
@@ -145,11 +135,6 @@ class MetronomeEngine implements MetronomeEngineInterface {
     _mediumAsset = mediumPath.replaceFirst('assets/', '');
     _weakAsset = weakPath.replaceFirst('assets/', '');
 
-    debugPrint('MetronomeEngine: Sound paths set...');
-    debugPrint('  Strong: $_strongAsset');
-    debugPrint('  Medium: $_mediumAsset');
-    debugPrint('  Weak: $_weakAsset');
-
     _soundsLoaded = true;
 
     // Pre-load sounds to reduce first-play latency
@@ -184,8 +169,6 @@ class MetronomeEngine implements MetronomeEngineInterface {
       const Duration(milliseconds: 5),
       (_) => _checkAndTick(),
     );
-
-    debugPrint('MetronomeEngine: Started at ${_settings.bpm} BPM');
   }
 
   /// Check if it's time to tick based on elapsed time (drift-corrected).
@@ -213,7 +196,6 @@ class MetronomeEngine implements MetronomeEngineInterface {
     _stopwatch = null;
     _currentBeat = 0;
     _expectedTicks = 0;
-    debugPrint('MetronomeEngine: Stopped');
   }
 
   @override
@@ -294,14 +276,10 @@ class MetronomeEngine implements MetronomeEngineInterface {
     if (Platform.isAndroid) {
       player.stop().then((_) {
         return player.play(AssetSource(asset));
-      }).catchError((e) {
-        debugPrint('MetronomeEngine: Failed to play beat: $e');
-      });
+      }).catchError((_) {});
     } else {
       // On iOS, just play directly (more efficient)
-      player.play(AssetSource(asset)).catchError((e) {
-        debugPrint('MetronomeEngine: Failed to play beat: $e');
-      });
+      player.play(AssetSource(asset)).catchError((_) {});
     }
   }
 
@@ -349,6 +327,5 @@ class MetronomeEngine implements MetronomeEngineInterface {
     _strongPlayers.clear();
     _mediumPlayers.clear();
     _weakPlayers.clear();
-    debugPrint('MetronomeEngine: Disposed');
   }
 }

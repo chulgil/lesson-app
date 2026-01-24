@@ -29,7 +29,8 @@ docs/schema/
 │   ├── teacher_availability.md # TeacherAvailability (가용시간)
 │   ├── review.md               # TeacherReview, LessonFeedback (리뷰)
 │   ├── teacher.md              # Teacher, Certificate (선생님)
-│   └── invite.md               # Follow, Membership (초대/연결)
+│   ├── invite.md               # Follow, Membership (초대/연결)
+│   └── notification.md         # AppNotification, NotificationSettings (알림)
 └── api/                        # API 스펙 (추후)
     └── ...
 ```
@@ -98,6 +99,16 @@ docs/schema/
 | [Membership](entities/invite.md#membership-학원-멤버십) | 학원-사용자 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
 | [TeacherSettings](entities/invite.md#teachersettings-선생님-설정) | 선생님 초대 설정 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
 | [PracticeLevel](entities/invite.md#practicelevel-연습-레벨) | 연습 레벨 (성과) | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+
+### 알림
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
+| [NotificationType](entities/notification.md#notificationtype) | 알림 유형 enum | [notification_system.md](../specs/notification/notification_system.md) | TBD |
+| [NotificationPriority](entities/notification.md#notificationpriority) | 알림 우선순위 | [notification_system.md](../specs/notification/notification_system.md) | TBD |
+| [AppNotification](entities/notification.md#appnotification) | 알림 엔티티 | [notification_system.md](../specs/notification/notification_system.md) | TBD |
+| [NotificationTemplate](entities/notification.md#notificationtemplate) | 알림 템플릿 | [notification_system.md](../specs/notification/notification_system.md) | TBD |
+| [NotificationSettings](entities/notification.md#notificationsettings) | 사용자별 알림 설정 | [notification_system.md](../specs/notification/notification_system.md) | TBD |
 
 ---
 

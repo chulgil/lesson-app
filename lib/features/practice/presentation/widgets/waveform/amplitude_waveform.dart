@@ -43,31 +43,25 @@ class _AmplitudeWaveformState extends State<AmplitudeWaveform> {
   final Queue<double> _amplitudes = Queue<double>();
   StreamSubscription<double>? _subscription;
   int _maxBars = 50;
-  int _dataCount = 0; // Debug counter
 
   @override
   void initState() {
     super.initState();
-    debugPrint('AmplitudeWaveform: initState called, isActive=${widget.isActive}');
     _subscribeToStream();
   }
 
   @override
   void didUpdateWidget(AmplitudeWaveform oldWidget) {
     super.didUpdateWidget(oldWidget);
-    debugPrint('AmplitudeWaveform: didUpdateWidget - isActive: ${oldWidget.isActive} -> ${widget.isActive}');
 
     if (widget.amplitudeStream != oldWidget.amplitudeStream) {
-      debugPrint('AmplitudeWaveform: Stream changed, resubscribing');
       _unsubscribe();
       _subscribeToStream();
     }
     if (widget.isActive != oldWidget.isActive) {
       if (!widget.isActive) {
-        debugPrint('AmplitudeWaveform: Became inactive, unsubscribing');
         _unsubscribe();
       } else {
-        debugPrint('AmplitudeWaveform: Became active, subscribing');
         _subscribeToStream();
       }
     }
@@ -75,17 +69,11 @@ class _AmplitudeWaveformState extends State<AmplitudeWaveform> {
 
   void _subscribeToStream() {
     if (!widget.isActive) {
-      debugPrint('AmplitudeWaveform: _subscribeToStream called but isActive=false, skipping');
       return;
     }
 
-    debugPrint('AmplitudeWaveform: Subscribing to stream');
     _subscription = widget.amplitudeStream.listen(
       (amplitude) {
-        _dataCount++;
-        if (_dataCount == 1 || _dataCount % 10 == 0) {
-          debugPrint('AmplitudeWaveform: Received data #$_dataCount, amplitude=$amplitude');
-        }
         if (mounted) {
           setState(() {
             _amplitudes.addLast(amplitude);
@@ -96,10 +84,10 @@ class _AmplitudeWaveformState extends State<AmplitudeWaveform> {
         }
       },
       onError: (error) {
-        debugPrint('AmplitudeWaveform: Stream error: $error');
+        // Stream error, ignore
       },
       onDone: () {
-        debugPrint('AmplitudeWaveform: Stream done');
+        // Stream done
       },
     );
   }

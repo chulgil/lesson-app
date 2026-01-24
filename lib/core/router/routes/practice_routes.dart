@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../features/practice/presentation/screens/practice_repertoire_screen.dart';
 import '../../../features/practice/presentation/screens/add_repertoire_screen.dart';
+import '../../../features/practice/presentation/screens/quick_add_screen.dart';
 import '../../../features/practice/presentation/screens/repertoire_detail_screen.dart';
 import '../../../features/practice/presentation/screens/edit_repertoire_screen.dart';
 import '../../../features/practice/presentation/screens/practice_recording_screen.dart';
@@ -36,6 +37,16 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return AddRepertoireScreen(studentId: studentId);
+    },
+  ),
+
+  // Quick Add Repertoire (simplified single-screen registration)
+  GoRoute(
+    path: AppRoutes.quickAddRepertoire,
+    name: 'quickAddRepertoire',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return QuickAddScreen(studentId: studentId);
     },
   ),
 

@@ -75,7 +75,6 @@ class DateRow extends StatelessWidget {
               height: 32,
               child: TextButton(
                 onPressed: () {
-                  debugPrint('DateRow: X button pressed, calling onClear');
                   onClear!();
                 },
                 style: TextButton.styleFrom(

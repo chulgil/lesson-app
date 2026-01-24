@@ -269,7 +269,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
         }
       });
     } catch (e) {
-      debugPrint('Failed to init audio player: $e');
+      // Audio player init failed, ignore
     }
   }
 

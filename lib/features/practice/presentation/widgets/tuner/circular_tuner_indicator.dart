@@ -79,7 +79,6 @@ class CircularTunerIndicator extends ConsumerWidget {
               enharmonicMode: settings.enharmonicMode,
               onTap: () {
                 // TODO: Play note sound when tapped
-                debugPrint('Note tapped: ${NoteName.values[i].sharpName}');
               },
             ),
 

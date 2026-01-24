@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:metronome/metronome.dart' as pkg;
 import '../../models/metronome_settings.dart';
@@ -64,15 +63,8 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
   Future<void> init() async {
     if (_initialized) return;
 
-    debugPrint('MetronomePackageEngine: init started');
-
     try {
       final (mainPath, accentedPath) = _getSoundPaths(_settings);
-
-      debugPrint('MetronomePackageEngine: mainPath=$mainPath');
-      debugPrint('MetronomePackageEngine: accentedPath=$accentedPath');
-      debugPrint('MetronomePackageEngine: actualBpm=$_actualBpm');
-      debugPrint('MetronomePackageEngine: actualTimeSignature=$_actualTimeSignature');
 
       await _metronome.init(
         mainPath,
@@ -88,9 +80,7 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
       _tickSubscription = _metronome.tickStream.listen(_onTick);
 
       _initialized = true;
-      debugPrint('MetronomePackageEngine: init completed');
-    } catch (e) {
-      debugPrint('MetronomePackageEngine: init failed - $e');
+    } catch (_) {
       rethrow;
     }
   }
@@ -189,29 +179,22 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
     final actualBpm =
         newSettings.bpm * newSettings.subdivision.divisionsPerBeat;
 
-    debugPrint('MetronomePackageEngine: updateSettings - subdivision=${newSettings.subdivision.label}, '
-        'timeSignature=$actualTimeSignature, bpm=$actualBpm');
-
     // Update all settings without awaiting each one (native calls may block)
     // Order matters: sounds first, then timeSignature, then BPM
     if (subdivisionChanged || accentPatternChanged || soundChanged) {
-      debugPrint('MetronomePackageEngine: mainPath=$mainPath, accentedPath=$accentedPath');
       _metronome.setAudioFile(mainPath: mainPath, accentedPath: accentedPath);
     }
 
     if (subdivisionChanged || timeSignatureChanged) {
-      debugPrint('MetronomePackageEngine: setTimeSignature($actualTimeSignature)');
       _metronome.setTimeSignature(actualTimeSignature);
     }
 
     if (subdivisionChanged || bpmChanged) {
-      debugPrint('MetronomePackageEngine: setBPM($actualBpm)');
       _metronome.setBPM(actualBpm);
     }
 
     // Give native side time to process
     await Future.delayed(const Duration(milliseconds: 50));
-    debugPrint('MetronomePackageEngine: updateSettings completed');
   }
 
   @override
@@ -222,8 +205,6 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
       await init();
     }
 
-    debugPrint(
-        'MetronomePackageEngine: start at ${_settings.bpm} BPM (actual: $_actualBpm)');
     _isPlaying = true;
     _currentBeat = 0;
     _currentSubdivision = 0;
@@ -234,7 +215,6 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
   Future<void> stop() async {
     if (!_isPlaying) return;
 
-    debugPrint('MetronomePackageEngine: stop');
     _isPlaying = false;
     _currentBeat = 0;
     _currentSubdivision = 0;
@@ -278,7 +258,6 @@ class MetronomePackageEngine implements MetronomeEngineInterface {
 
   @override
   Future<void> dispose() async {
-    debugPrint('MetronomePackageEngine: dispose');
     await stop();
     _tickSubscription?.cancel();
     _tickSubscription = null;

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 class AppTypography {
   AppTypography._();
 
-  // TODO: Add Pretendard font and uncomment
-  // static const String fontFamily = 'Pretendard';
+  static const String fontFamily = 'Pretendard';
 
   // Display
   static const displayLarge = TextStyle(

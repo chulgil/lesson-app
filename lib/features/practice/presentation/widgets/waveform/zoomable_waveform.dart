@@ -191,11 +191,8 @@ class _ZoomableWaveformProgressBarState
         !_isDraggingMarkerA &&
         !_isDraggingMarkerB;
 
-    debugPrint('ZoomableWaveform: scaleEnd - maxMove: $_maxMoveDistance, isTap: $isTap, zooming: $_isZooming');
-
     if (isTap && _scaleStartPoint != null) {
       final newProgress = _localXToProgress(_scaleStartPoint!.dx, width);
-      debugPrint('ZoomableWaveform: TAP SEEK to progress: $newProgress');
       widget.onSeek(newProgress);
     }
 
@@ -223,7 +220,6 @@ class _ZoomableWaveformProgressBarState
     // On desktop, use tap down for immediate response
     // This is especially important for macOS where onScaleStart might fire before onTapUp
     final newProgress = _localXToProgress(details.localPosition.dx, width);
-    debugPrint('ZoomableWaveform: Desktop TAP at progress: $newProgress');
     widget.onSeek(newProgress);
   }
 
