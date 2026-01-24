@@ -484,6 +484,10 @@ grep -r "@JsonSerializable" docs/specs/
 - 연습 기록 편집 UI (재사용 가능한 PracticeStatsEditor 위젯)
 - 연습/레슨 화면 달력 통일 (WeekCalendarWidget)
 - 섹션/레퍼토리 상세 UI 개선 (레이아웃 간소화, 날짜 표시)
+- 학생 레슨/연습 탭 UI 통일 (상단 헤더 + 추가 버튼)
+- 학생 레슨 탭 통합 데이터 (lessonsProvider 사용)
+- 레슨 장소 정보 표시 (학생 앱, 스튜디오/방문/온라인)
+- 위젯 분리 (StudentLessonCard, TrialBookingCard)
 
 ### 진행중
 - 스마트 녹음 트림 후 실제 재생 시간 표시 (Issue #7)

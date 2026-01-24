@@ -82,6 +82,17 @@ class LessonRecording {
   });
 }
 
+/// Lesson location info (simplified for display)
+class LessonLocationInfo {
+  final String name; // "스튜디오 메이트", "학생 집"
+  final String? address; // Optional address
+
+  const LessonLocationInfo({
+    required this.name,
+    this.address,
+  });
+}
+
 /// Lesson model
 class Lesson {
   final String id;
@@ -100,6 +111,7 @@ class Lesson {
   final String? practiceTips;
   final List<LessonRecording>? recordings;
   final List<String>? assignments;
+  final LessonLocationInfo? location; // Lesson location
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -120,6 +132,7 @@ class Lesson {
     this.practiceTips,
     this.recordings,
     this.assignments,
+    this.location,
     required this.createdAt,
     this.updatedAt,
   });
@@ -168,6 +181,7 @@ class Lesson {
     String? practiceTips,
     List<LessonRecording>? recordings,
     List<String>? assignments,
+    LessonLocationInfo? location,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -188,6 +202,7 @@ class Lesson {
       practiceTips: practiceTips ?? this.practiceTips,
       recordings: recordings ?? this.recordings,
       assignments: assignments ?? this.assignments,
+      location: location ?? this.location,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

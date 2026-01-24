@@ -36,6 +36,10 @@ class MockLessonRepository implements LessonRepository {
             composer: 'Mozart',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '스튜디오 메이트',
+          address: '서울시 강남구 테헤란로 123',
+        ),
         feedback: '활 잡는 자세가 많이 좋아졌어요. 다음 시간에는 3번 곡 연습해오세요.',
         keyPoints: ['보잉 연습', '음정 정확도'],
         createdAt: today.subtract(const Duration(days: 7)),
@@ -60,6 +64,9 @@ class MockLessonRepository implements LessonRepository {
             movement: '1악장',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '학생 집 방문',
+        ),
         createdAt: today.subtract(const Duration(days: 5)),
       ),
       Lesson(
@@ -82,6 +89,10 @@ class MockLessonRepository implements LessonRepository {
             notes: '봄 - 1악장',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '뮤직홀 연습실',
+          address: '서울시 서초구 방배동 456',
+        ),
         createdAt: today.subtract(const Duration(days: 3)),
       ),
 
@@ -105,6 +116,7 @@ class MockLessonRepository implements LessonRepository {
             movement: 'Prelude',
           ),
         ],
+        location: const LessonLocationInfo(name: '온라인 (Zoom)'),
         createdAt: today.subtract(const Duration(days: 2)),
       ),
       Lesson(
@@ -125,6 +137,10 @@ class MockLessonRepository implements LessonRepository {
             composer: 'Gossec',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '스튜디오 메이트',
+          address: '서울시 강남구 테헤란로 123',
+        ),
         createdAt: today.subtract(const Duration(days: 1)),
       ),
 
@@ -147,6 +163,9 @@ class MockLessonRepository implements LessonRepository {
             composer: 'Mozart',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '학생 집 방문',
+        ),
         createdAt: today,
       ),
 
@@ -169,6 +188,10 @@ class MockLessonRepository implements LessonRepository {
             composer: 'Boccherini',
           ),
         ],
+        location: const LessonLocationInfo(
+          name: '스튜디오 메이트',
+          address: '서울시 강남구 테헤란로 123',
+        ),
         feedback: '비브라토 연습을 더 해오세요. 손목 힘을 빼고 자연스럽게.',
         keyPoints: ['비브라토', '운지법'],
         practiceTips: '메트로놈 60 템포로 천천히 연습하기',

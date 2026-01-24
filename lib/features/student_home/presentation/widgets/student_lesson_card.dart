@@ -127,6 +127,29 @@ class StudentLessonCard extends StatelessWidget {
                             ),
                           ],
                         ),
+                        if (lesson.location != null) ...[
+                          const SizedBox(height: AppSpacing.space1),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
+                                color: AppColors.textTertiaryLight,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  lesson.location!.name,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                         if (lesson.pieces.isNotEmpty) ...[
                           const SizedBox(height: AppSpacing.space1),
                           Text(
