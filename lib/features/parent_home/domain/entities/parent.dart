@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 /// V2: Parent permission level enum
 enum ParentPermission {
   viewOnly,       // 열람만 가능
@@ -54,11 +56,11 @@ enum ParentStatus {
   Color get color {
     switch (this) {
       case ParentStatus.pending:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case ParentStatus.active:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case ParentStatus.inactive:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
     }
   }
 }

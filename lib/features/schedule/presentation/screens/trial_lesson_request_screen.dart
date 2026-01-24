@@ -11,6 +11,7 @@ import '../../../../models/student.dart';
 import '../../../../models/teacher_student_relation.dart';
 import '../../../../providers/booking/booking_providers.dart';
 import '../../../../providers/student/student_providers.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../widgets/schedule_option_card.dart';
 import '../widgets/schedule_option_picker.dart';
 
@@ -84,7 +85,7 @@ class _TrialLessonRequestScreenState
 
   Future<void> _loadCurrentUserDefaults() async {
     try {
-      final studentId = widget.studentId ?? 'student_1';
+      final String studentId = widget.studentId ?? ref.read(currentUserIdProvider);
       final student = await ref.read(studentProvider(studentId).future);
 
       if (student != null && mounted) {

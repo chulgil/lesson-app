@@ -3,6 +3,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
+
 /// Child profile status enum
 enum ChildProfileStatus {
   active,
@@ -43,11 +45,11 @@ enum ChildConnectionStatus {
   Color get color {
     switch (this) {
       case ChildConnectionStatus.connected:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case ChildConnectionStatus.pending:
-        return const Color(0xFFFFA726); // Orange
+        return AppColors.warning;
       case ChildConnectionStatus.unconnected:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
     }
   }
 

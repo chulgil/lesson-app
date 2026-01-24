@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import 'child_profile.dart';
 
 /// Profile type for dual-role support
@@ -41,11 +42,11 @@ enum ProfileType {
   Color get color {
     switch (this) {
       case ProfileType.parent:
-        return const Color(0xFF6B5B95); // Primary purple
+        return AppColors.primary;
       case ProfileType.student:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case ProfileType.child:
-        return const Color(0xFFF4A460); // Secondary orange
+        return AppColors.secondary;
     }
   }
 }

@@ -228,15 +228,15 @@ enum ConnectionRequestStatus {
   Color get color {
     switch (this) {
       case ConnectionRequestStatus.pending:
-        return const Color(0xFFFF9800); // Orange
+        return AppColors.warning;
       case ConnectionRequestStatus.accepted:
-        return const Color(0xFF4CAF50); // Green
+        return AppColors.success;
       case ConnectionRequestStatus.rejected:
-        return const Color(0xFFE57373); // Red
+        return AppColors.error;
       case ConnectionRequestStatus.cancelled:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
       case ConnectionRequestStatus.expired:
-        return const Color(0xFF9E9E9E); // Grey
+        return AppColors.textTertiaryLight;
     }
   }
 

@@ -12,6 +12,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/parent.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 
 /// Student profile tab with settings and account info
 class StudentProfileTab extends ConsumerWidget {
@@ -497,9 +498,7 @@ class StudentProfileTab extends ConsumerWidget {
     final random = Random();
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final inviteCode = List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
-    // Hardcoded student info for now (will be from provider in production)
-    const studentName = '홍길동';
-    const studentId = 'student_1';
+    final studentId = ref.read(currentUserIdProvider);
 
     // Create and save the invitation to the repository
     final invitation = ParentInvitation(
@@ -589,7 +588,7 @@ class StudentProfileTab extends ConsumerWidget {
               SharePlus.instance.share(
                 ShareParams(
                   text: '[레슨앱] 학부모 초대\n\n'
-                      '$studentName 학생의 학부모님을 초대합니다.\n\n'
+                      '학생의 학부모님을 초대합니다.\n\n'
                       '초대 코드: $inviteCode\n\n'
                       '앱을 설치하고 위 코드를 입력해주세요.',
                 ),

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/child_profile.dart';
 import '../../../../models/parent_notification_settings.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/child_profile_provider.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import '../widgets/notification_settings_sheet.dart';
@@ -17,14 +18,12 @@ import 'child_profile_form_screen.dart';
 class ParentProfileTab extends ConsumerWidget {
   const ParentProfileTab({super.key});
 
-  // TODO: Get from auth provider
-  static const _parentId = 'parent_1';
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final childProfilesAsync = ref.watch(childProfilesProvider(_parentId));
+    final parentId = ref.watch(currentUserIdProvider);
+    final childProfilesAsync = ref.watch(childProfilesProvider(parentId));
     final notificationSettingsAsync =
-        ref.watch(notificationSettingsNotifierProvider(_parentId));
+        ref.watch(notificationSettingsNotifierProvider(parentId));
 
     return Scaffold(
       appBar: AppBar(
@@ -42,12 +41,13 @@ class ParentProfileTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
 
             // Connected children section
-            _buildChildrenSection(context, ref, childProfilesAsync),
+            _buildChildrenSection(context, ref, childProfilesAsync, parentId),
 
             const SizedBox(height: AppSpacing.space4),
 
             // Notification settings
-            _buildNotificationSection(context, ref, notificationSettingsAsync),
+            _buildNotificationSection(
+                context, ref, notificationSettingsAsync, parentId),
 
             const SizedBox(height: AppSpacing.space4),
 
@@ -355,6 +355,7 @@ class ParentProfileTab extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AsyncValue<ParentNotificationSettings?> settingsAsync,
+    String parentId,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -372,7 +373,8 @@ class ParentProfileTab extends ConsumerWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => _showNotificationSettingsSheet(context, ref),
+                onPressed: () =>
+                    _showNotificationSettingsSheet(context, ref, parentId),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
@@ -409,7 +411,7 @@ class ParentProfileTab extends ConsumerWidget {
                 final s = settings ??
                     ParentNotificationSettings.defaultSettings(
                       id: 'default',
-                      parentId: _parentId,
+                      parentId: parentId,
                     );
 
                 return Column(
@@ -422,6 +424,7 @@ class ParentProfileTab extends ConsumerWidget {
                       onChanged: (value) => _toggleNotificationGroup(
                         ref,
                         s,
+                        parentId,
                         assignmentEnabled: value,
                       ),
                     ),
@@ -434,6 +437,7 @@ class ParentProfileTab extends ConsumerWidget {
                       onChanged: (value) => _toggleNotificationGroup(
                         ref,
                         s,
+                        parentId,
                         lessonEnabled: value,
                       ),
                     ),
@@ -446,6 +450,7 @@ class ParentProfileTab extends ConsumerWidget {
                       onChanged: (value) => _toggleNotificationGroup(
                         ref,
                         s,
+                        parentId,
                         practiceEnabled: value,
                       ),
                     ),
@@ -547,7 +552,8 @@ class ParentProfileTab extends ConsumerWidget {
 
   void _toggleNotificationGroup(
     WidgetRef ref,
-    ParentNotificationSettings settings, {
+    ParentNotificationSettings settings,
+    String parentId, {
     bool? assignmentEnabled,
     bool? lessonEnabled,
     bool? practiceEnabled,
@@ -574,11 +580,12 @@ class ParentProfileTab extends ConsumerWidget {
     }
 
     ref
-        .read(notificationSettingsNotifierProvider(_parentId).notifier)
+        .read(notificationSettingsNotifierProvider(parentId).notifier)
         .saveSettings(updated);
   }
 
-  void _showNotificationSettingsSheet(BuildContext context, WidgetRef ref) {
+  void _showNotificationSettingsSheet(
+      BuildContext context, WidgetRef ref, String parentId) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -592,17 +599,16 @@ class ParentProfileTab extends ConsumerWidget {
         expand: false,
         builder: (context, scrollController) {
           final settingsAsync =
-              ref.watch(notificationSettingsNotifierProvider(_parentId));
+              ref.watch(notificationSettingsNotifierProvider(parentId));
 
           return settingsAsync.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('오류: $e')),
             data: (settings) {
               final s = settings ??
                   ParentNotificationSettings.defaultSettings(
                     id: 'default',
-                    parentId: _parentId,
+                    parentId: parentId,
                   );
 
               return NotificationSettingsSheet(
@@ -610,8 +616,8 @@ class ParentProfileTab extends ConsumerWidget {
                 scrollController: scrollController,
                 onSettingsChanged: (newSettings) {
                   ref
-                      .read(notificationSettingsNotifierProvider(_parentId)
-                          .notifier)
+                      .read(
+                          notificationSettingsNotifierProvider(parentId).notifier)
                       .saveSettings(newSettings);
                 },
               );
@@ -626,6 +632,7 @@ class ParentProfileTab extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     AsyncValue<List<ChildProfile>> childProfilesAsync,
+    String parentId,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
@@ -644,7 +651,7 @@ class ParentProfileTab extends ConsumerWidget {
               ),
               TextButton.icon(
                 onPressed: () =>
-                    context.push('${AppRoutes.childProfiles}?parentId=$_parentId'),
+                    context.push('${AppRoutes.childProfiles}?parentId=$parentId'),
                 icon: const Icon(Icons.settings, size: 16),
                 label: const Text('관리'),
                 style: TextButton.styleFrom(
@@ -679,7 +686,8 @@ class ParentProfileTab extends ConsumerWidget {
               ),
               data: (profiles) => Column(
                 children: [
-                  ...profiles.map((profile) => _buildChildItem(context, profile)),
+                  ...profiles
+                      .map((profile) => _buildChildItem(context, profile, parentId)),
                   if (profiles.isNotEmpty)
                     Divider(
                       height: 1,
@@ -690,7 +698,7 @@ class ParentProfileTab extends ConsumerWidget {
                     icon: Icons.add_circle_outline,
                     label: '자녀 추가하기',
                     labelColor: AppColors.primary,
-                    onTap: () => _showAddChildDialog(context),
+                    onTap: () => _showAddChildDialog(context, parentId),
                   )),
                 ],
               ),
@@ -701,14 +709,16 @@ class ParentProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildChildItem(BuildContext context, ChildProfile profile) {
+  Widget _buildChildItem(
+      BuildContext context, ChildProfile profile, String parentId) {
     return InkWell(
       onTap: () {
         // Navigate to child profile edit
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => _buildChildProfileFormScreen(profile),
+            builder: (context) =>
+                _buildChildProfileFormScreen(profile, parentId),
           ),
         );
       },
@@ -765,8 +775,9 @@ class ParentProfileTab extends ConsumerWidget {
               child: Text(
                 profile.status.label,
                 style: AppTypography.caption.copyWith(
-                  color:
-                      profile.isActive ? AppColors.success : AppColors.textTertiaryLight,
+                  color: profile.isActive
+                      ? AppColors.success
+                      : AppColors.textTertiaryLight,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -778,14 +789,14 @@ class ParentProfileTab extends ConsumerWidget {
   }
 
   // Helper to build child profile form screen with existing profile
-  Widget _buildChildProfileFormScreen(ChildProfile profile) {
+  Widget _buildChildProfileFormScreen(ChildProfile profile, String parentId) {
     return ChildProfileFormScreen(
-      parentId: _parentId,
+      parentId: parentId,
       existingProfile: profile,
     );
   }
 
-  void _showAddChildDialog(BuildContext context) {
+  void _showAddChildDialog(BuildContext context, String parentId) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -816,7 +827,7 @@ class ParentProfileTab extends ConsumerWidget {
                 description: '별도 계정 없이 학부모 계정에서 관리',
                 onTap: () {
                   Navigator.pop(context);
-                  context.push('${AppRoutes.addChildProfile}?parentId=$_parentId');
+                  context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
                 },
               ),
 

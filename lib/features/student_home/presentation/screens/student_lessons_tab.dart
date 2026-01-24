@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../providers/booking/booking_providers.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../widgets/week_calendar_widget.dart';
 
 /// State provider for student selected date
@@ -26,9 +27,6 @@ class StudentLessonsTab extends ConsumerStatefulWidget {
 }
 
 class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
-  // TODO: Replace with actual student ID from auth
-  static const _currentStudentId = 'student_1';
-
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -39,8 +37,9 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
 
   @override
   Widget build(BuildContext context) {
+    final currentStudentId = ref.watch(currentUserIdProvider);
     final selectedDate = ref.watch(studentSelectedDateProvider);
-    final studentBookings = ref.watch(studentBookingsProvider(_currentStudentId));
+    final studentBookings = ref.watch(studentBookingsProvider(currentStudentId));
 
     // Get trial bookings for display
     final trialBookings = studentBookings.whenOrNull(
