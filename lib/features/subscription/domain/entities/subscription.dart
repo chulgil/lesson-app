@@ -191,40 +191,22 @@ class Subscription extends HiveObject {
     return false;
   }
 
-  /// Check if renewal reminder needed (D-7~D-4 or 1 lesson remaining).
-  /// Gentle reminder with info color (blue), not warning.
-  bool get isRenewalReminder {
-    // Already expired or depleted - no reminder needed
-    if (status == SubscriptionStatus.expired) return false;
-    if (isDepleted) return false;
-    if (endDate != null && endDate!.isBefore(DateTime.now())) return false;
-
-    // D-7 ~ D-4: gentle reminder
-    if (daysUntilExpiration != null &&
-        daysUntilExpiration! >= 4 &&
-        daysUntilExpiration! <= 7) {
-      return true;
-    }
-    // 1 lesson remaining: gentle reminder
-    if (remainingLessons != null &&
-        remainingLessons! == 1) {
-      return true;
-    }
-    return false;
-  }
-
-  /// Check if expiring soon (D-3 or less) - urgent.
-  /// Returns false for already expired or depleted subscriptions.
+  /// Check if renewal needed (D-7 or less, or 1 lesson remaining).
+  /// Simplified: single warning state (orange) instead of two-stage.
   bool get isExpiringSoon {
     // Already expired or depleted - not "expiring soon"
     if (status == SubscriptionStatus.expired) return false;
     if (isDepleted) return false;
     if (endDate != null && endDate!.isBefore(DateTime.now())) return false;
 
-    // D-3 or less: urgent warning
+    // D-7 or less: needs renewal
     if (daysUntilExpiration != null &&
         daysUntilExpiration! >= 0 &&
-        daysUntilExpiration! <= 3) {
+        daysUntilExpiration! <= 7) {
+      return true;
+    }
+    // 1 lesson remaining: needs renewal
+    if (remainingLessons != null && remainingLessons! == 1) {
       return true;
     }
     return false;

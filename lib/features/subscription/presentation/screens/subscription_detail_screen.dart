@@ -11,6 +11,7 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
+import '../utils/subscription_status_colors.dart';
 
 /// Screen showing subscription detail information.
 class SubscriptionDetailScreen extends ConsumerWidget {
@@ -174,49 +175,11 @@ class _SubscriptionDetailContent extends ConsumerWidget {
   }
 
   Widget _buildStatusCard() {
-    Color statusColor;
-    IconData statusIcon;
-    String statusLabel;
-    String statusMessage;
-
-    // Priority: Depleted > Expired > ExpiringSoon > RenewalReminder > Paused > Active
-    if (subscription.isDepleted) {
-      // 사용 완료: Primary (보라) - 긍정적 성취
-      statusColor = AppColors.primary;
-      statusIcon = Icons.celebration;
-      statusLabel = '사용 완료';
-      statusMessage = '수강권을 모두 사용했습니다';
-    } else if (subscription.isExpired) {
-      // 기간 만료: Gray - 중립적 (빨강 X)
-      statusColor = AppColors.textTertiaryLight;
-      statusIcon = Icons.event_busy;
-      statusLabel = '만료됨';
-      statusMessage = '수강권 유효기간이 지났습니다';
-    } else if (subscription.isExpiringSoon) {
-      // 긴급 (D-3 이하): Warning (주황)
-      statusColor = AppColors.warning;
-      statusIcon = Icons.schedule;
-      statusLabel = '갱신 필요';
-      statusMessage = '수강권이 곧 만료됩니다. 지금 갱신하세요.';
-    } else if (subscription.isRenewalReminder) {
-      // 부드러운 알림 (D-7~D-4 또는 1회): Info (파랑)
-      statusColor = AppColors.info;
-      statusIcon = Icons.info_outline;
-      statusLabel = '갱신 안내';
-      statusMessage = '수강권 만료가 다가오고 있습니다';
-    } else if (subscription.status == SubscriptionStatus.paused) {
-      // 일시정지: Gray
-      statusColor = AppColors.textTertiaryLight;
-      statusIcon = Icons.pause_circle;
-      statusLabel = '일시정지';
-      statusMessage = '수강권이 일시정지 상태입니다';
-    } else {
-      // 이용중: Success (녹색)
-      statusColor = AppColors.success;
-      statusIcon = Icons.check_circle;
-      statusLabel = '이용중';
-      statusMessage = '수강권이 활성화되어 있습니다';
-    }
+    // Use common utility for consistent colors across all screens
+    final statusColor = SubscriptionStatusColors.getColor(subscription);
+    final statusIcon = SubscriptionStatusColors.getIcon(subscription);
+    final statusLabel = SubscriptionStatusColors.getLabel(subscription);
+    final statusMessage = SubscriptionStatusColors.getMessage(subscription);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -382,7 +345,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     final percentage = subscription.usagePercentage ?? 0;
 
     // Get status-based color
-    final statusColor = _getStatusColor();
+    final statusColor = SubscriptionStatusColors.getColor(subscription);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -484,53 +447,29 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     );
   }
 
-  /// Get color based on subscription status (same as subscription_card.dart)
-  Color _getStatusColor() {
-    if (subscription.isDepleted) {
-      return AppColors.primary;
-    }
-    if (subscription.isExpiringSoon) {
-      return AppColors.warning;
-    }
-    if (subscription.isRenewalReminder) {
-      return AppColors.info;
-    }
-    if (subscription.isExpired) {
-      return AppColors.textTertiaryLight;
-    }
-    return AppColors.primary;
-  }
-
   Widget _buildPeriodCard() {
     final days = subscription.daysUntilExpiration ?? 0;
+    final displayColor = SubscriptionStatusColors.getColor(subscription);
 
-    // Get display text and color based on status
+    // Get display text based on status (simplified 3+1 color system)
     String displayText;
     String subtitleText;
-    Color displayColor;
 
     if (subscription.isDepleted) {
       displayText = '완료';
       subtitleText = '수강권을 모두 사용했습니다';
-      displayColor = AppColors.primary;
     } else if (subscription.isExpired) {
       displayText = '만료됨';
       subtitleText = '수강권 유효기간이 지났습니다';
-      displayColor = AppColors.textTertiaryLight;
     } else if (subscription.isExpiringSoon) {
-      // 긴급 (D-3 이하)
       displayText = 'D-$days';
-      subtitleText = '지금 갱신하세요';
-      displayColor = AppColors.warning;
-    } else if (subscription.isRenewalReminder) {
-      // 부드러운 알림 (D-7~D-4)
-      displayText = 'D-$days';
-      subtitleText = '갱신을 준비해주세요';
-      displayColor = AppColors.info;
+      subtitleText = '갱신이 필요합니다';
+    } else if (subscription.status == SubscriptionStatus.paused) {
+      displayText = '일시정지';
+      subtitleText = '수강권이 일시정지 상태입니다';
     } else {
       displayText = 'D-$days';
       subtitleText = '남은 일수';
-      displayColor = AppColors.primary;
     }
 
     return Container(

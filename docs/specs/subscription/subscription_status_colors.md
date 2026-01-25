@@ -10,32 +10,30 @@
 
 수강권의 상태별 시각적 표현 가이드. 브랜드 색상과 UX 원칙에 기반한 설계.
 
-**핵심 원칙**: 단계별 색상 전환으로 부드러운 알림 → 긴급 경고
+**핵심 원칙**: 3+1 색상 시스템으로 단순하고 명확한 상태 전달
 
 ---
 
-## 브랜드 팔레트
+## 3+1 색상 시스템
 
-| 색상 | 코드 | 용도 |
-|------|------|------|
-| **Primary (보라)** | #6B5B95 | 브랜드 핵심, 성취 |
-| **Success (녹색)** | #2E8B57 | 성공, 활성 |
-| **Info (파랑)** | #4A90D9 | 정보, 부드러운 알림 |
-| **Warning (주황)** | #F4A460 | 긴급, 행동 유도 |
-| **Tertiary (회색)** | #999999 | 비활성, 만료 |
-
----
-
-## 상태 정의 (6단계)
-
-| 상태 | 조건 | 의미 | 색상 |
+| 상태 | 색상 | 코드 | 의미 |
 |------|------|------|------|
-| **이용중** | 잔여 ≥ 2회, D-8 이상 | 정상 사용 중 | 녹색 |
-| **갱신 안내** | 잔여 = 1회 또는 D-7~D-4 | 곧 만료 예정 (부드러운 알림) | 파랑 |
-| **갱신 필요** | D-3 이하 | 긴급 (행동 유도) | 주황 |
-| **사용 완료** | 잔여 = 0 | 모든 레슨 사용 완료 | 보라 |
-| **일시정지** | 수동 정지 | 임시 중단 | 회색 |
-| **만료됨** | 유효기간 경과 | 기간 만료 | 회색 |
+| **이용중** | 녹색 | #2E8B57 | 정상 사용 중 |
+| **갱신 필요** | 주황 | #F4A460 | 행동 유도 (D-7 이하 OR 1회 남음) |
+| **비활성** | 회색 | #999999 | 만료됨, 일시정지 |
+| **사용 완료** | 보라 | #9A8BC4 | 성취 (브랜드 강조) |
+
+---
+
+## 상태 정의 (5단계)
+
+| 상태 | 조건 | 색상 |
+|------|------|------|
+| **이용중** | 정상 사용 중 | 녹색 |
+| **갱신 필요** | D-7 이하 OR 잔여 1회 | 주황 |
+| **사용 완료** | 잔여 = 0 | 보라 |
+| **일시정지** | 수동 정지 | 회색 |
+| **만료됨** | 유효기간 경과 | 회색 |
 
 ---
 
@@ -43,50 +41,40 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  상태별 시각 디자인 가이드                                        │
+│  3+1 Color System 시각 디자인                                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ✅ 이용중 (Active)                                             │
 │  ┌─────────────────────────────────────────┐                   │
-│  │ 배지: [이용중] 초록 배경                  │                   │
+│  │ 배지: [이용중] 녹색 배경                  │                   │
 │  │ 텍스트: "3/4회 남음 (D-25)"               │                   │
 │  │ 본문 색상: 기본 (검정)                    │                   │
 │  │ 테두리: 기본 1px                         │                   │
 │  └─────────────────────────────────────────┘                   │
 │                                                                 │
-│  💡 갱신 안내 (Renewal Reminder) ← 부드러운 알림                 │
-│  ┌─────────────────────────────────────────┐                   │
-│  │ 배지: [갱신 안내] 파랑 배경               │                   │
-│  │ 텍스트: "1/4회 남음 (D-5)"                │                   │
-│  │ 본문 색상: 파랑 (info)                    │                   │
-│  │ 테두리: 연한 파랑 1px                    │                   │
-│  │ 메시지: "갱신을 준비해주세요"             │                   │
-│  └─────────────────────────────────────────┘                   │
-│                                                                 │
-│  ⚠️ 갱신 필요 (Expiring Soon) ← 긴급                            │
+│  ⚠️ 갱신 필요 (Expiring Soon)                                   │
 │  ┌─────────────────────────────────────────┐                   │
 │  │ 배지: [갱신 필요] 주황 배경               │                   │
-│  │ 텍스트: "1/4회 남음 (D-2)"                │                   │
+│  │ 텍스트: "1/4회 남음 (D-5)"                │                   │
 │  │ 본문 색상: 주황 (warning)                 │                   │
 │  │ 테두리: 주황 2px                         │                   │
-│  │ 하단: 경고 배너 표시                      │                   │
-│  │ 메시지: "지금 갱신하세요"                 │                   │
+│  │ 메시지: "갱신이 필요합니다"               │                   │
 │  └─────────────────────────────────────────┘                   │
 │                                                                 │
 │  🎉 사용 완료 (Depleted)                                        │
 │  ┌─────────────────────────────────────────┐                   │
-│  │ 배지: [사용 완료] 보라(primary) 배경      │                   │
+│  │ 배지: [사용 완료] 연보라 배경             │                   │
 │  │ 텍스트: "4회 모두 사용"                   │                   │
-│  │ 본문 색상: 보라 (primary)                 │                   │
-│  │ 테두리: 보라 2px (연한)                   │                   │
+│  │ 본문 색상: 연보라 (primaryLight)          │                   │
+│  │ 테두리: 연보라 2px                        │                   │
 │  └─────────────────────────────────────────┘                   │
 │                                                                 │
 │  ⏸️ 일시정지 (Paused)                                           │
 │  ┌─────────────────────────────────────────┐                   │
 │  │ 배지: [일시정지] 회색 배경                │                   │
-│  │ 텍스트: 현재 상태                        │                   │
 │  │ 본문 색상: 회색                          │                   │
 │  │ 테두리: 기본 1px                         │                   │
+│  │ Opacity: 80%                            │                   │
 │  └─────────────────────────────────────────┘                   │
 │                                                                 │
 │  ❌ 만료됨 (Expired)                                            │
@@ -95,7 +83,7 @@
 │  │ 텍스트: "2회 미사용 (만료됨)"             │                   │
 │  │ 본문 색상: 회색 (tertiary)                │                   │
 │  │ 테두리: 연한 회색 1px                    │                   │
-│  │ Opacity: 70% (전체 카드)                 │                   │
+│  │ Opacity: 70%                            │                   │
 │  └─────────────────────────────────────────┘                   │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -105,16 +93,18 @@
 
 ## UX 설계 원칙
 
-### 1. 단계별 색상 전환
+### 1. 색상 최소화
 
-경고를 갑자기 주지 않고, 부드러운 알림 → 긴급 경고로 단계적 전환
+> "Too many colors greatly reduces the user's ability to learn and properly use the application." - Carbon Design System
 
 ```
-D-8 이상: 녹색 (안심)
-    ↓
-D-7~D-4: 파랑 (부드러운 알림) ← "갱신을 준비해주세요"
-    ↓
-D-3 이하: 주황 (긴급) ← "지금 갱신하세요"
+❌ 기존 (6개 상태, 4가지 색상):
+   이용중(녹색), 갱신안내(파랑), 갱신필요(주황),
+   사용완료(보라), 일시정지(회색), 만료됨(회색)
+
+✅ 개선 (5개 상태, 3+1색):
+   이용중(녹색), 갱신필요(주황),
+   비활성(회색), 사용완료(보라)
 ```
 
 ### 2. 성취 = 브랜드 컬러
@@ -128,10 +118,11 @@ D-3 이하: 주황 (긴급) ← "지금 갱신하세요"
 
 ### 3. 비활성 = 페이드아웃
 
-만료된 카드는 opacity 낮춰 시각적 우선순위 ↓
+만료/일시정지 카드는 opacity 낮춰 시각적 우선순위 ↓
 
 ```
 활성 수강권: 100% opacity
+일시정지: 80% opacity
 만료 수강권: 70% opacity
 → 현재 사용 가능한 것에 집중 유도
 ```
@@ -154,18 +145,34 @@ D-3 이하: 주황 (긴급) ← "지금 갱신하세요"
 
 ## 구현 세부사항
 
+### 공통 유틸리티 클래스
+
+```dart
+// lib/features/subscription/presentation/utils/subscription_status_colors.dart
+class SubscriptionStatusColors {
+  static Color getColor(Subscription subscription);
+  static Color getProgressColor(Subscription subscription);
+  static Color getBadgeBackground(Subscription subscription);
+  static Color getBorderColor(Subscription subscription);
+  static Color getSummaryTextColor(Subscription subscription);
+  static String getLabel(Subscription subscription);
+  static IconData getIcon(Subscription subscription);
+  static String getMessage(Subscription subscription);
+  static double getBorderWidth(Subscription subscription);
+  static double getCardOpacity(Subscription subscription);
+}
+```
+
 ### 판정 우선순위
 
 ```dart
-// 상태 판정 순서 (subscription_card.dart)
+// 상태 판정 순서
 if (subscription.isDepleted) {
   // 사용 완료 (보라)
 } else if (subscription.isExpired) {
   // 기간 만료 (회색)
 } else if (subscription.isExpiringSoon) {
-  // 긴급 - D-3 이하 (주황)
-} else if (subscription.isRenewalReminder) {
-  // 부드러운 알림 - D-7~D-4 또는 1회 (파랑)
+  // 갱신 필요 - D-7 이하 OR 1회 (주황)
 } else if (subscription.status == SubscriptionStatus.paused) {
   // 일시정지 (회색)
 } else {
@@ -179,18 +186,7 @@ if (subscription.isDepleted) {
 |------|------|------|
 | `isDepleted` | bool | 잔여 횟수 ≤ 0 |
 | `isExpired` | bool | 유효기간 경과 |
-| `isRenewalReminder` | bool | D-7~D-4 또는 잔여 1회 |
-| `isExpiringSoon` | bool | D-3 이하 |
-
-### 요약 텍스트 (summaryText)
-
-| 상태 | 텍스트 예시 |
-|------|------------|
-| 이용중 | "3/4회 남음 (D-25)" |
-| 갱신 안내 | "1/4회 남음 (D-5)" |
-| 갱신 필요 | "1/4회 남음 (D-2)" |
-| 사용 완료 | "4회 모두 사용" |
-| 만료됨 (미사용분) | "2회 미사용 (만료됨)" |
+| `isExpiringSoon` | bool | D-7 이하 OR 잔여 1회 |
 
 ---
 
@@ -198,9 +194,10 @@ if (subscription.isDepleted) {
 
 | 파일 | 역할 |
 |------|------|
-| `subscription.dart` | isDepleted, isRenewalReminder, isExpiringSoon 등 computed properties |
-| `subscription_card.dart` | 상태별 색상, 스타일 적용 |
-| `subscription_detail_screen.dart` | 상세 화면 상태별 UI |
+| `subscription.dart` | isDepleted, isExpiringSoon 등 computed properties |
+| `subscription_status_colors.dart` | 공통 색상/라벨/아이콘 유틸리티 |
+| `subscription_card.dart` | 카드 UI (유틸리티 사용) |
+| `subscription_detail_screen.dart` | 상세 화면 UI (유틸리티 사용) |
 
 ---
 
@@ -208,5 +205,6 @@ if (subscription.isDepleted) {
 
 | 날짜 | 변경 내용 |
 |------|----------|
-| 2026-01-25 | 초안 작성, 구현 완료 |
-| 2026-01-25 | 단계별 색상 도입: 갱신 안내(파랑) + 갱신 필요(주황) |
+| 2026-01-25 | 초안 작성, 6단계 색상 시스템 |
+| 2026-01-25 | 3+1 색상 시스템으로 단순화 (파랑 제거) |
+| 2026-01-25 | 공통 유틸리티 클래스 추출 |

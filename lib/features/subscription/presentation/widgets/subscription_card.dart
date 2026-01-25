@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/subscription.dart';
+import '../utils/subscription_status_colors.dart';
 
 /// Card widget displaying subscription information.
 class SubscriptionCard extends StatelessWidget {
@@ -38,21 +39,18 @@ class SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Expired cards have lower opacity to de-emphasize
-    final cardOpacity = subscription.isExpired ? 0.7 : 1.0;
-
     return GestureDetector(
       onTap: onTap,
       child: Opacity(
-        opacity: cardOpacity,
+        opacity: SubscriptionStatusColors.getCardOpacity(subscription),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: _getBorderColor(),
-              width: _getBorderWidth(),
+              color: SubscriptionStatusColors.getBorderColor(subscription),
+              width: SubscriptionStatusColors.getBorderWidth(subscription),
             ),
           ),
           child: Column(
@@ -112,7 +110,8 @@ class SubscriptionCard extends StatelessWidget {
                         subscription.summaryText,
                         style: AppTypography.bodyLarge.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: _getSummaryTextColor(),
+                          color: SubscriptionStatusColors.getSummaryTextColor(
+                              subscription),
                         ),
                       ),
                       // Bonus badge (보너스 있을 때)
@@ -155,12 +154,6 @@ class SubscriptionCard extends StatelessWidget {
     );
   }
 
-  double _getBorderWidth() {
-    if (subscription.isDepleted || subscription.isExpiringSoon) {
-      return 2;
-    }
-    return 1;
-  }
 
   Widget _buildTypeIcon() {
     IconData icon;
@@ -192,56 +185,19 @@ class SubscriptionCard extends StatelessWidget {
   }
 
   Widget _buildStatusBadge() {
-    Color backgroundColor;
-    Color textColor;
-    String label;
-
-    // Priority: Depleted > Expired > ExpiringSoon > RenewalReminder > Paused > Active
-    if (subscription.isDepleted) {
-      // 사용 완료: Primary (보라) - 긍정적 성취
-      backgroundColor = AppColors.primary.withValues(alpha: 0.1);
-      textColor = AppColors.primary;
-      label = '사용 완료';
-    } else if (subscription.isExpired) {
-      // 기간 만료: Gray - 중립적 (빨강 X)
-      backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.1);
-      textColor = AppColors.textTertiaryLight;
-      label = '만료됨';
-    } else if (subscription.isExpiringSoon) {
-      // 긴급 (D-3 이하): Warning (주황)
-      backgroundColor = AppColors.warning.withValues(alpha: 0.1);
-      textColor = AppColors.warning;
-      label = '갱신 필요';
-    } else if (subscription.isRenewalReminder) {
-      // 부드러운 알림 (D-7~D-4 또는 1회): Info (파랑)
-      backgroundColor = AppColors.info.withValues(alpha: 0.1);
-      textColor = AppColors.info;
-      label = '갱신 안내';
-    } else if (subscription.status == SubscriptionStatus.paused) {
-      // 일시정지: Gray
-      backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.1);
-      textColor = AppColors.textTertiaryLight;
-      label = '일시정지';
-    } else {
-      // 이용중: Success (녹색)
-      backgroundColor = AppColors.success.withValues(alpha: 0.1);
-      textColor = AppColors.success;
-      label = '이용중';
-    }
-
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: SubscriptionStatusColors.getBadgeBackground(subscription),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
-        label,
+        SubscriptionStatusColors.getLabel(subscription),
         style: AppTypography.caption.copyWith(
-          color: textColor,
+          color: SubscriptionStatusColors.getColor(subscription),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -273,6 +229,8 @@ class SubscriptionCard extends StatelessWidget {
 
   Widget _buildProgressIndicator() {
     final percentage = subscription.usagePercentage ?? 0;
+    final progressColor =
+        SubscriptionStatusColors.getProgressColor(subscription);
     return SizedBox(
       width: 48,
       height: 48,
@@ -283,36 +241,18 @@ class SubscriptionCard extends StatelessWidget {
             value: percentage / 100,
             strokeWidth: 4,
             backgroundColor: AppColors.borderLight,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              _getProgressColor(),
-            ),
+            valueColor: AlwaysStoppedAnimation<Color>(progressColor),
           ),
           Text(
             '${percentage.toInt()}%',
             style: AppTypography.caption.copyWith(
               fontWeight: FontWeight.w600,
-              color: _getProgressColor(),
+              color: progressColor,
             ),
           ),
         ],
       ),
     );
-  }
-
-  Color _getProgressColor() {
-    if (subscription.isDepleted) {
-      return AppColors.primary;
-    }
-    if (subscription.isExpiringSoon) {
-      return AppColors.warning;
-    }
-    if (subscription.isRenewalReminder) {
-      return AppColors.info;
-    }
-    if (subscription.isExpired) {
-      return AppColors.textTertiaryLight;
-    }
-    return AppColors.primary;
   }
 
   Widget _buildProgressBar() {
@@ -330,7 +270,7 @@ class SubscriptionCard extends StatelessWidget {
             minHeight: 6,
             backgroundColor: AppColors.borderLight,
             valueColor: AlwaysStoppedAnimation<Color>(
-              _getProgressColor(),
+              SubscriptionStatusColors.getProgressColor(subscription),
             ),
           ),
         ),
@@ -516,35 +456,4 @@ class SubscriptionCard extends StatelessWidget {
     );
   }
 
-  Color _getBorderColor() {
-    if (subscription.isDepleted) {
-      return AppColors.primary.withValues(alpha: 0.3);
-    }
-    if (subscription.isExpiringSoon) {
-      return AppColors.warning;
-    }
-    if (subscription.isRenewalReminder) {
-      return AppColors.info.withValues(alpha: 0.3);
-    }
-    if (subscription.isExpired) {
-      return AppColors.textTertiaryLight.withValues(alpha: 0.3);
-    }
-    return AppColors.borderLight;
-  }
-
-  Color _getSummaryTextColor() {
-    if (subscription.isDepleted) {
-      return AppColors.primary;
-    }
-    if (subscription.isExpiringSoon) {
-      return AppColors.warning;
-    }
-    if (subscription.isRenewalReminder) {
-      return AppColors.info;
-    }
-    if (subscription.isExpired) {
-      return AppColors.textTertiaryLight;
-    }
-    return AppColors.textPrimaryLight;
-  }
 }
