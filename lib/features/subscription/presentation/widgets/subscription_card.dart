@@ -381,11 +381,21 @@ class SubscriptionCard extends StatelessWidget {
           if (subscription.type == SubscriptionType.package &&
               subscription.status != SubscriptionStatus.expired) ...[
             const SizedBox(height: AppSpacing.space2),
-            Text(
-              '✅ 유효기간 내 자유롭게 사용',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.primary,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.verified_outlined,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '유효기간 내 자유롭게 사용',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
             ),
           ],
         ],
