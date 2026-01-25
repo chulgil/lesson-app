@@ -9,6 +9,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/child_profile.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/child_profile_provider.dart';
+import '../widgets/assignment_item.dart';
+import '../widgets/section_card.dart';
+import '../widgets/stat_card.dart';
 
 /// Selected child provider for parent dashboard
 final selectedChildIdProvider = StateProvider<String?>((ref) => null);
@@ -412,7 +415,7 @@ class ParentDashboardTab extends ConsumerWidget {
     return Row(
       children: [
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.calendar_today,
             label: '이번주 레슨',
             value: '1회',
@@ -421,7 +424,7 @@ class ParentDashboardTab extends ConsumerWidget {
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.assignment_turned_in,
             label: '과제 완료',
             value: '4/5',
@@ -430,7 +433,7 @@ class ParentDashboardTab extends ConsumerWidget {
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
-          child: _StatCard(
+          child: StatCard(
             icon: Icons.local_fire_department,
             label: '연습 스트릭',
             value: '12일',
@@ -442,7 +445,7 @@ class ParentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildUpcomingLesson() {
-    return _SectionCard(
+    return SectionCard(
       title: '다음 레슨',
       icon: Icons.event,
       child: ListTile(
@@ -503,7 +506,7 @@ class ParentDashboardTab extends ConsumerWidget {
     final monday = today.subtract(Duration(days: today.weekday - 1));
     final practiceStatus = [true, true, true, true, true, false, false]; // Demo
 
-    return _SectionCard(
+    return SectionCard(
       title: '이번 주 연습',
       icon: Icons.local_fire_department,
       trailing: Text(
@@ -568,7 +571,7 @@ class ParentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildRecentAssignments() {
-    return _SectionCard(
+    return SectionCard(
       title: '과제 현황',
       icon: Icons.assignment,
       trailing: TextButton(
@@ -576,22 +579,22 @@ class ParentDashboardTab extends ConsumerWidget {
         child: const Text('전체보기'),
       ),
       child: Column(
-        children: [
-          _AssignmentItem(
+        children: const [
+          AssignmentItem(
             title: '스케일 연습',
             dueDate: '내일 마감',
             isCompleted: false,
             priority: 'must',
           ),
-          const Divider(height: 1),
-          _AssignmentItem(
+          Divider(height: 1),
+          AssignmentItem(
             title: '비브라토 연습',
             dueDate: '완료됨',
             isCompleted: true,
             priority: 'should',
           ),
-          const Divider(height: 1),
-          _AssignmentItem(
+          Divider(height: 1),
+          AssignmentItem(
             title: '모차르트 소나타 1악장',
             dueDate: '2일 남음',
             isCompleted: false,
@@ -603,7 +606,7 @@ class ParentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildPaymentStatus() {
-    return _SectionCard(
+    return SectionCard(
       title: '결제 현황',
       icon: Icons.payment,
       child: Column(
@@ -664,178 +667,6 @@ class ParentDashboardTab extends ConsumerWidget {
               child: const Text('결제하기'),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color color;
-
-  const _StatCard({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            value,
-            style: AppTypography.headingSmall.copyWith(color: color),
-          ),
-          Text(
-            label,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Widget? trailing;
-  final Widget child;
-
-  const _SectionCard({
-    required this.title,
-    required this.icon,
-    this.trailing,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 20, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.space2),
-              Text(title, style: AppTypography.headingSmall),
-              const Spacer(),
-              if (trailing != null) trailing!,
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space3),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
-class _AssignmentItem extends StatelessWidget {
-  final String title;
-  final String dueDate;
-  final bool isCompleted;
-  final String priority;
-
-  const _AssignmentItem({
-    required this.title,
-    required this.dueDate,
-    required this.isCompleted,
-    required this.priority,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: isCompleted ? AppColors.success : AppColors.surfaceSecondaryLight,
-              shape: BoxShape.circle,
-              border: isCompleted
-                  ? null
-                  : Border.all(color: AppColors.borderLight),
-            ),
-            child: isCompleted
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
-                : null,
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.bodyMedium.copyWith(
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color: isCompleted
-                        ? AppColors.textTertiaryLight
-                        : AppColors.textPrimaryLight,
-                  ),
-                ),
-                Text(
-                  dueDate,
-                  style: AppTypography.caption.copyWith(
-                    color: isCompleted
-                        ? AppColors.success
-                        : dueDate.contains('내일')
-                            ? AppColors.warning
-                            : AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (!isCompleted && priority == 'must')
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: AppColors.errorLight,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '필수',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.error,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                ),
-              ),
-            ),
         ],
       ),
     );
