@@ -6,6 +6,8 @@ import '../../../features/subscription/presentation/screens/subscription_detail_
 import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
 
 /// Subscription-related routes.
+/// NOTE: More specific routes (like /issue) must come BEFORE parameterized routes (like /:id)
+/// to prevent GoRouter from matching "issue" as an ID parameter.
 List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.subscriptions,
@@ -14,13 +16,7 @@ List<RouteBase> subscriptionRoutes = [
       return SubscriptionListScreen(studentId: studentId);
     },
   ),
-  GoRoute(
-    path: AppRoutes.subscriptionDetail,
-    builder: (context, state) {
-      final id = state.pathParameters['id']!;
-      return SubscriptionDetailScreen(subscriptionId: id);
-    },
-  ),
+  // Issue route must come before detail route to avoid matching "issue" as :id
   GoRoute(
     path: AppRoutes.issueSubscription,
     builder: (context, state) {
@@ -30,6 +26,13 @@ List<RouteBase> subscriptionRoutes = [
         studentId: studentId,
         membershipId: membershipId,
       );
+    },
+  ),
+  GoRoute(
+    path: AppRoutes.subscriptionDetail,
+    builder: (context, state) {
+      final id = state.pathParameters['id']!;
+      return SubscriptionDetailScreen(subscriptionId: id);
     },
   ),
 ];
