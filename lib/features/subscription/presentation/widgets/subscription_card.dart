@@ -211,16 +211,16 @@ class SubscriptionCard extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.3),
+          color: AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Text(
         subscription.bonusText ?? '',
         style: AppTypography.caption.copyWith(
-          color: AppColors.info,
+          color: AppColors.primary,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -326,7 +326,7 @@ class SubscriptionCard extends StatelessWidget {
             _buildDetailRow(
               '• 보너스',
               '+${subscription.bonusCount}회 (${subscription.bonusReason ?? "보너스"})',
-              valueColor: AppColors.info,
+              valueColor: AppColors.primary,
             ),
           ],
           // 사용 횟수
