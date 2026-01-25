@@ -2415,6 +2415,410 @@ class SubscriptionAlertScheduler {
 
 → 알림 시스템 상세: [notification_system.md](../notification/notification_system.md)
 
+### 5.10 🆕 수강권 환불 시스템
+
+> 결정일: 2026-01-25
+> 법적 근거: 학원법 시행령 제18조, 별표4
+
+#### 📚 법적 근거 (대한민국)
+
+**1. 「학원의 설립·운영 및 과외교습에 관한 법률 시행령」 제18조**
+
+> 교습비등의 반환 등에 관한 기준은 별표 4와 같다.
+
+**2. 별표 4 - 교습비등의 반환기준**
+
+| 구분 | 반환사유 발생일 | 반환금액 |
+|------|----------------|----------|
+| **교습기간 기준** | 교습시작 전 | 이미 납부한 교습비등의 전액 |
+| | 1개월 이내 (1/3 경과 전) | 교습비등의 2/3 해당액 |
+| | 1개월 이내 (1/2 경과 전) | 교습비등의 1/2 해당액 |
+| | 1개월 이내 (1/2 경과 후) | 반환하지 않음 |
+| | 1개월 초과 | 반환사유 발생일까지의 교습비 + 나머지 월의 교습비 전액 |
+| **총 교습시간 기준** | 교습시작 전 | 이미 납부한 교습비등의 전액 |
+| | 1/3 경과 전 | 교습비등의 2/3 해당액 |
+| | 1/2 경과 전 | 교습비등의 1/2 해당액 |
+| | 1/2 경과 후 | 반환하지 않음 |
+
+**3. 환불 의무 기한**
+
+```
+⚠️ 학원법 시행령 제18조제3항:
+   "반환사유가 발생한 날부터 5일 이내에 반환해야 한다"
+
+→ 환불 요청일로부터 5영업일 이내 환불 처리 필수
+```
+
+**4. 위약금 관련 (공정거래위원회 표준약관)**
+
+```
+- 소비자 단순 변심: 최대 10% 위약금 부과 가능
+- 사업자 귀책 (선생님 사정, 폐업 등): 위약금 부과 불가, 전액 환불
+- 10% 초과 위약금은 불공정약관으로 무효 처리 가능
+```
+
+**5. 개인과외 교습 적용**
+
+```
+개인과외교습자(개인 선생님)도 학원법 적용 대상:
+- 법 제2조제1호: "과외교습"도 정의에 포함
+- 별표4 반환기준 동일 적용
+- 미등록 개인과외도 소비자보호법 적용
+```
+
+#### 환불 정책 원칙
+
+```
+1. "법정 환불 기준 준수" ⚖️
+   - 학원법 시행령 별표4 (교습비 반환기준) 적용
+   - 공정거래위원회 표준약관 참고 (위약금 최대 10%)
+
+2. "5일 이내 환불 처리" ⏰
+   - 학원법 시행령 제18조제3항에 따라 법정 의무
+   - 환불 요청일 기준 5영업일 이내 입금 완료
+
+3. "실제 결제금액 기준"
+   - 정가가 아닌 할인 적용된 실제 결제금액 기준
+   - 보너스 횟수는 환불 계산에서 제외
+
+4. "기록 보존"
+   - 환불 이력은 영구 보존
+   - 원본 수강권 정보 유지 (soft delete)
+```
+
+#### 환불 계산 공식
+
+**1. 회차권 (Package)**
+
+```
+환불금액 = 결제금액 × (잔여횟수 / 기본횟수) - 위약금
+
+- 잔여횟수: remainingLessons - bonusCount (보너스 제외)
+- 기본횟수: totalLessons (보너스 미포함)
+- 위약금: 환불금액의 최대 10% (단순 변심 시)
+```
+
+| 사용률 | 환불액 | 위약금 |
+|--------|--------|--------|
+| 미사용 | 100% | 10% |
+| 1/3 미만 | 2/3 | 10% |
+| 1/2 미만 | 1/2 | 10% |
+| 1/2 이상 | 환불 불가 | - |
+
+**2. 월정액 (Monthly)**
+
+```
+환불금액 = 결제금액 × (잔여일수 / 총일수) - 위약금
+
+- 잔여일수: endDate - 환불요청일
+- 총일수: endDate - startDate
+- 사용한 레슨 횟수도 차감 가능 (선택적)
+```
+
+| 경과 | 환불액 |
+|------|--------|
+| 1/3 경과 전 | 2/3 환불 |
+| 1/2 경과 전 | 1/2 환불 |
+| 1/2 경과 후 | 환불 불가 |
+
+**3. 체험 (Trial)**
+
+```
+- 미사용: 전액 환불
+- 사용 후: 환불 불가
+```
+
+#### 위약금 면제 사유
+
+| 사유 | 위약금 | 비고 |
+|------|--------|------|
+| 선생님 사정 (퇴사, 부상 등) | 면제 | 전액 환불 |
+| 학원 폐업 | 면제 | 전액 환불 |
+| 이사/전학 (증빙 필요) | 면제 | 잔여분 환불 |
+| 질병 (진단서 필요) | 면제 | 잔여분 환불 |
+| 단순 변심 | 10% | 법정 최대치 |
+
+#### 환불 상태 추가
+
+```dart
+/// SubscriptionStatus에 추가
+enum SubscriptionStatus {
+  active,
+  expiringSoon,
+  expired,
+  paused,
+  refunded,      // 🆕 환불 완료
+  refundPending, // 🆕 환불 진행중 (선택적)
+}
+```
+
+#### 환불 기록 엔티티
+
+```dart
+@HiveType(typeId: 63)
+@JsonSerializable()
+class SubscriptionRefund extends HiveObject {
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
+  final String subscriptionId;  // 원본 수강권 ID
+
+  @HiveField(2)
+  final String requestedBy;     // 요청자 ID (학생/선생님)
+
+  @HiveField(3)
+  final RefundReason reason;    // 환불 사유
+
+  @HiveField(4)
+  final String? reasonDetail;   // 상세 사유
+
+  @HiveField(5)
+  final int originalAmount;     // 원래 결제금액
+
+  @HiveField(6)
+  final int usedLessons;        // 사용한 횟수
+
+  @HiveField(7)
+  final int remainingLessons;   // 남은 횟수 (보너스 제외)
+
+  @HiveField(8)
+  final int refundAmount;       // 환불금액
+
+  @HiveField(9)
+  final int penaltyAmount;      // 위약금
+
+  @HiveField(10)
+  final RefundStatus status;    // 환불 상태
+
+  @HiveField(11)
+  final DateTime requestedAt;   // 요청일
+
+  @HiveField(12)
+  final DateTime? processedAt;  // 처리일
+
+  @HiveField(13)
+  final String? processedBy;    // 처리자 ID
+
+  @HiveField(14)
+  final String? note;           // 관리자 메모
+}
+
+@HiveType(typeId: 64)
+enum RefundReason {
+  @HiveField(0)
+  customerRequest,    // 단순 변심
+
+  @HiveField(1)
+  teacherUnavailable, // 선생님 사정
+
+  @HiveField(2)
+  academyClosed,      // 학원 폐업
+
+  @HiveField(3)
+  relocation,         // 이사/전학
+
+  @HiveField(4)
+  illness,            // 질병
+
+  @HiveField(5)
+  other,              // 기타
+}
+
+@HiveType(typeId: 65)
+enum RefundStatus {
+  @HiveField(0)
+  pending,    // 대기중
+
+  @HiveField(1)
+  approved,   // 승인됨
+
+  @HiveField(2)
+  rejected,   // 거절됨
+
+  @HiveField(3)
+  completed,  // 완료 (입금 완료)
+}
+```
+
+#### 환불 계산 서비스
+
+```dart
+class RefundCalculator {
+  /// 환불금액 계산
+  RefundCalculation calculate({
+    required Subscription subscription,
+    required RefundReason reason,
+    required DateTime requestDate,
+  }) {
+    final isPackage = subscription.type == SubscriptionType.package;
+
+    // 보너스 제외한 잔여 횟수
+    final baseRemaining = isPackage
+        ? (subscription.totalLessons! - subscription.usedLessons)
+        : (subscription.lessonsPerMonth! - subscription.usedLessons);
+    final remainingWithoutBonus = baseRemaining.clamp(0, baseRemaining);
+
+    // 기본 횟수
+    final baseTotal = isPackage
+        ? subscription.totalLessons!
+        : subscription.lessonsPerMonth!;
+
+    // 사용률 계산
+    final usageRate = subscription.usedLessons / baseTotal;
+
+    // 환불 가능 여부
+    if (usageRate >= 0.5) {
+      return RefundCalculation(
+        isRefundable: false,
+        reason: '1/2 이상 사용하여 환불이 불가합니다.',
+      );
+    }
+
+    // 환불금액 계산
+    final refundRate = remainingWithoutBonus / baseTotal;
+    var refundAmount = (subscription.amount * refundRate).round();
+
+    // 위약금 계산 (단순 변심만)
+    var penaltyAmount = 0;
+    if (reason == RefundReason.customerRequest) {
+      penaltyAmount = (refundAmount * 0.1).round(); // 10%
+      refundAmount -= penaltyAmount;
+    }
+
+    return RefundCalculation(
+      isRefundable: true,
+      originalAmount: subscription.amount,
+      usedLessons: subscription.usedLessons,
+      remainingLessons: remainingWithoutBonus,
+      refundAmount: refundAmount,
+      penaltyAmount: penaltyAmount,
+      penaltyWaived: reason != RefundReason.customerRequest,
+    );
+  }
+}
+
+class RefundCalculation {
+  final bool isRefundable;
+  final String? reason;
+  final int originalAmount;
+  final int usedLessons;
+  final int remainingLessons;
+  final int refundAmount;
+  final int penaltyAmount;
+  final bool penaltyWaived;
+
+  // ...
+}
+```
+
+#### 환불 UI 플로우
+
+```
+[학생 앱 - 환불 요청]
+┌─────────────────────────────────────┐
+│  📋 환불 요청                        │
+├─────────────────────────────────────┤
+│                                      │
+│  수강권 정보                          │
+│  ┌─────────────────────────────────┐│
+│  │ 8회권 (바이올린)                  ││
+│  │ 결제금액: 380,000원               ││
+│  │ 사용: 3회 / 남음: 5회             ││
+│  └─────────────────────────────────┘│
+│                                      │
+│  환불 사유 선택                       │
+│  ○ 단순 변심                         │
+│  ○ 선생님 사정                       │
+│  ○ 이사/전학                         │
+│  ○ 질병                             │
+│  ○ 기타: [_______________]          │
+│                                      │
+│  예상 환불금액                        │
+│  ┌─────────────────────────────────┐│
+│  │ 잔여분: 237,500원                 ││
+│  │ 위약금: -23,750원 (10%)           ││
+│  │ ─────────────────────           ││
+│  │ 환불금액: 213,750원               ││
+│  └─────────────────────────────────┘│
+│                                      │
+│  ⚠️ 환불 요청 후 선생님 승인이 필요합니다 │
+│                                      │
+│  [취소]              [환불 요청하기]  │
+└─────────────────────────────────────┘
+
+[선생님/학원 앱 - 환불 승인]
+┌─────────────────────────────────────┐
+│  📋 환불 요청 승인                    │
+├─────────────────────────────────────┤
+│                                      │
+│  학생: 김서연                         │
+│  수강권: 8회권                        │
+│  요청일: 2026-01-25                  │
+│  사유: 단순 변심                      │
+│                                      │
+│  환불 내역                            │
+│  ┌─────────────────────────────────┐│
+│  │ 결제금액: 380,000원               ││
+│  │ 사용: 3회 / 남음: 5회             ││
+│  │ 환불금액: 213,750원               ││
+│  │ 위약금: 23,750원                  ││
+│  └─────────────────────────────────┘│
+│                                      │
+│  관리자 메모 (선택)                    │
+│  [_______________________________]  │
+│                                      │
+│  [거절]              [승인하기]       │
+└─────────────────────────────────────┘
+```
+
+#### 환불 처리 워크플로우
+
+```
+1. 학생 환불 요청
+   └→ RefundStatus.pending
+
+2. 선생님/관리자 검토
+   ├→ 승인: RefundStatus.approved
+   │   └→ Subscription.status = refunded
+   └→ 거절: RefundStatus.rejected
+       └→ 사유 기록
+
+3. 환불 완료 (입금 확인)
+   └→ RefundStatus.completed
+       └→ 알림 발송
+```
+
+#### 개인 vs 학원 환불 권한
+
+| 권한 | 개인 선생님 | 학원 강사 | 학원 매니저 | 학원 대표 |
+|------|------------|----------|------------|----------|
+| 환불 요청 조회 | ✅ | ❌ | ✅ | ✅ |
+| 환불 승인 | ✅ | ❌ | ✅ | ✅ |
+| 환불 거절 | ✅ | ❌ | ✅ | ✅ |
+| 환불 이력 조회 | ✅ | 본인 학생만 | ✅ | ✅ |
+
+#### 환불 기록 표시 (수강권 이력)
+
+```
+[수강권 상세 - 환불됨]
+┌─────────────────────────────────────┐
+│  8회권 (바이올린)           [환불됨]  │
+├─────────────────────────────────────┤
+│                                      │
+│  📅 기간: 2025-12-01 ~ 2026-01-31   │
+│  💰 결제: 380,000원                  │
+│  📊 사용: 3/8회                      │
+│                                      │
+│  ───────── 환불 정보 ─────────       │
+│  환불일: 2026-01-25                  │
+│  사유: 단순 변심                      │
+│  환불금액: 213,750원                 │
+│  위약금: 23,750원                    │
+│                                      │
+└─────────────────────────────────────┘
+```
+
 ---
 
 ## 6. 정산 구조
