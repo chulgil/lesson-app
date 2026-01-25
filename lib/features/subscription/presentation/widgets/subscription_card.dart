@@ -170,7 +170,7 @@ class SubscriptionCard extends StatelessWidget {
         break;
       case SubscriptionType.package:
         icon = Icons.confirmation_number_outlined;
-        color = AppColors.secondary;
+        color = AppColors.primary;
         break;
     }
 
