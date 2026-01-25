@@ -36,10 +36,22 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   String? _selectedMembershipId;
   int _totalLessons = 8;
   int _monthsCount = 1;
-  int _amount = 0;
+  int _originalAmount = 0;  // 정가
+  int _discountPercent = 0; // 할인율 (0~100)
+  int _bonusLessons = 0;    // 보너스 횟수
+  String? _bonusReason;     // 보너스 사유
   DateTime? _startDate;
 
   final _amountController = TextEditingController();
+
+  /// 할인 적용된 최종 금액
+  int get _finalAmount {
+    if (_discountPercent <= 0) return _originalAmount;
+    return (_originalAmount * (100 - _discountPercent) / 100).round();
+  }
+
+  /// 총 횟수 (기본 + 보너스)
+  int get _totalLessonsWithBonus => _totalLessons + _bonusLessons;
 
   @override
   void initState() {
@@ -124,6 +136,18 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           _buildAmountInput(),
 
           const SizedBox(height: AppSpacing.space6),
+
+          // Discount section (체험권 제외)
+          if (_selectedType != SubscriptionType.trial) ...[
+            _buildDiscountSection(),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+
+          // Bonus section (체험권 제외)
+          if (_selectedType != SubscriptionType.trial) ...[
+            _buildBonusSection(),
+            const SizedBox(height: AppSpacing.space6),
+          ],
 
           // Start date
           _buildStartDatePicker(),
@@ -437,7 +461,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('금액', style: AppTypography.headingSmall),
+        Text('정가', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space3),
         TextFormField(
           controller: _amountController,
@@ -462,7 +486,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           ),
           onChanged: (value) {
             final cleanValue = value.replaceAll(',', '');
-            _amount = int.tryParse(cleanValue) ?? 0;
+            setState(() {
+              _originalAmount = int.tryParse(cleanValue) ?? 0;
+            });
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -471,16 +497,232 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             return null;
           },
         ),
-        if (_selectedType == SubscriptionType.package && _amount > 0) ...[
+        if (_selectedType == SubscriptionType.package && _originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '회당 ${NumberFormat('#,###').format((_amount / _totalLessons).round())}원',
+            '회당 ${NumberFormat('#,###').format((_originalAmount / _totalLessons).round())}원',
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondaryLight,
             ),
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildDiscountSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('할인 혜택', style: AppTypography.headingSmall),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '(선택)',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // 할인율 선택
+        Text(
+          '할인율',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: [0, 5, 10, 15, 20].map((percent) {
+            final isSelected = _discountPercent == percent;
+            return ChoiceChip(
+              label: Text(percent == 0 ? '없음' : '$percent%'),
+              selected: isSelected,
+              onSelected: (_) => setState(() => _discountPercent = percent),
+              selectedColor: AppColors.secondary.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.secondary,
+              backgroundColor: AppColors.surfaceLight,
+              side: BorderSide(
+                color: isSelected ? AppColors.secondary : AppColors.borderLight,
+              ),
+              labelStyle: AppTypography.bodyMedium.copyWith(
+                color: isSelected ? AppColors.secondary : AppColors.textSecondaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+
+        // 할인 적용 시 금액 표시
+        if (_discountPercent > 0 && _originalAmount > 0) ...[
+          const SizedBox(height: AppSpacing.space3),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.local_offer, size: 18, color: AppColors.secondary),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  '${NumberFormat('#,###').format(_originalAmount - _finalAmount)}원 할인',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${NumberFormat('#,###').format(_finalAmount)}원',
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBonusSection() {
+    // 체험권은 보너스 없음
+    if (_selectedType == SubscriptionType.trial) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('보너스 횟수', style: AppTypography.headingSmall),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '(선택)',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // 보너스 횟수 선택
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: [0, 1, 2, 3].map((count) {
+            final isSelected = _bonusLessons == count;
+            return ChoiceChip(
+              label: Text(count == 0 ? '없음' : '+$count회'),
+              selected: isSelected,
+              onSelected: (_) => setState(() {
+                _bonusLessons = count;
+                if (count == 0) _bonusReason = null;
+              }),
+              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.primary,
+              backgroundColor: AppColors.surfaceLight,
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.borderLight,
+              ),
+              labelStyle: AppTypography.bodyMedium.copyWith(
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+
+        // 보너스 사유 선택 (보너스가 있을 때만)
+        if (_bonusLessons > 0) ...[
+          const SizedBox(height: AppSpacing.space4),
+          Text(
+            '보너스 사유',
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Wrap(
+            spacing: AppSpacing.space2,
+            runSpacing: AppSpacing.space2,
+            children: [
+              _buildBonusReasonChip('대량 구매'),
+              _buildBonusReasonChip('5주차 보너스'),
+              _buildBonusReasonChip('추천 이벤트'),
+              _buildBonusReasonChip('재등록 혜택'),
+              _buildBonusReasonChip('기타'),
+            ],
+          ),
+
+          // 보너스 정보 박스
+          const SizedBox(height: AppSpacing.space3),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.card_giftcard, size: 18, color: AppColors.primary),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  '보너스 +$_bonusLessons회',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (_bonusReason != null) ...[
+                  const SizedBox(width: AppSpacing.space2),
+                  Text(
+                    '($_bonusReason)',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                Text(
+                  '총 $_totalLessonsWithBonus회',
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBonusReasonChip(String reason) {
+    final isSelected = _bonusReason == reason;
+    return ChoiceChip(
+      label: Text(reason),
+      selected: isSelected,
+      onSelected: (_) => setState(() => _bonusReason = reason),
+      selectedColor: AppColors.primary.withValues(alpha: 0.15),
+      checkmarkColor: AppColors.primary,
+      backgroundColor: AppColors.surfaceLight,
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : AppColors.borderLight,
+      ),
+      labelStyle: AppTypography.bodySmall.copyWith(
+        color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      ),
     );
   }
 
@@ -543,6 +785,18 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       }
     }
 
+    // 횟수 표시 (보너스 포함)
+    String lessonsDisplay;
+    if (_selectedType == SubscriptionType.trial) {
+      lessonsDisplay = '체험 (1회)';
+    } else if (_selectedType == SubscriptionType.package) {
+      lessonsDisplay = _bonusLessons > 0
+          ? '회차제 ($_totalLessons + $_bonusLessons회)'
+          : '회차제 ($_totalLessons회)';
+    } else {
+      lessonsDisplay = '월정액 ($_monthsCount개월)';
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -560,18 +814,41 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          _buildSummaryRow(
-            '유형',
-            _selectedType == SubscriptionType.trial
-                ? '체험 (1회)'
-                : _selectedType == SubscriptionType.package
-                    ? '회차제 ($_totalLessons회)'
-                    : '월정액 ($_monthsCount개월)',
-          ),
-          _buildSummaryRow(
-            '금액',
-            '${NumberFormat('#,###').format(_amount)}원',
-          ),
+          _buildSummaryRow('유형', lessonsDisplay),
+
+          // 금액 (할인 적용 시 정가/할인가 표시)
+          if (_discountPercent > 0 && _originalAmount > 0) ...[
+            _buildSummaryRow(
+              '정가',
+              '${NumberFormat('#,###').format(_originalAmount)}원',
+              strikethrough: true,
+            ),
+            _buildSummaryRow(
+              '할인',
+              '-${NumberFormat('#,###').format(_originalAmount - _finalAmount)}원 ($_discountPercent%)',
+              valueColor: AppColors.secondary,
+            ),
+            _buildSummaryRow(
+              '결제금액',
+              '${NumberFormat('#,###').format(_finalAmount)}원',
+              isBold: true,
+            ),
+          ] else ...[
+            _buildSummaryRow(
+              '금액',
+              '${NumberFormat('#,###').format(_originalAmount)}원',
+            ),
+          ],
+
+          // 보너스 횟수
+          if (_bonusLessons > 0) ...[
+            _buildSummaryRow(
+              '보너스',
+              '+$_bonusLessons회${_bonusReason != null ? ' ($_bonusReason)' : ''}',
+              valueColor: AppColors.primary,
+            ),
+          ],
+
           if (_startDate != null)
             _buildSummaryRow('시작일', dateFormat.format(_startDate!)),
           if (endDate != null)
@@ -581,7 +858,13 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     );
   }
 
-  Widget _buildSummaryRow(String label, String value) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    bool strikethrough = false,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Row(
@@ -596,7 +879,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           Text(
             value,
             style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: valueColor ?? (strikethrough ? AppColors.textTertiaryLight : null),
+              decoration: strikethrough ? TextDecoration.lineThrough : null,
             ),
           ),
         ],
@@ -634,6 +919,14 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       return;
     }
 
+    // Validate bonus reason if bonus is set
+    if (_bonusLessons > 0 && _bonusReason == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('보너스 사유를 선택해주세요')),
+      );
+      return;
+    }
+
     // Calculate end date
     DateTime? endDate;
     int? totalLessons;
@@ -654,9 +947,11 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       type: _selectedType,
       totalLessons: totalLessons,
       usedLessons: 0,
+      bonusCount: _bonusLessons,
+      bonusReason: _bonusReason,
       startDate: _startDate,
       endDate: endDate,
-      amount: _amount,
+      amount: _finalAmount,  // 할인 적용된 금액
       status: SubscriptionStatus.active,
       createdAt: DateTime.now(),
     );
