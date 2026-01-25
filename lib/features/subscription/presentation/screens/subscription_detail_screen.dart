@@ -176,29 +176,40 @@ class _SubscriptionDetailContent extends ConsumerWidget {
   Widget _buildStatusCard() {
     Color statusColor;
     IconData statusIcon;
+    String statusLabel;
     String statusMessage;
 
-    switch (subscription.status) {
-      case SubscriptionStatus.active:
-        statusColor = AppColors.success;
-        statusIcon = Icons.check_circle;
-        statusMessage = '수강권이 활성화되어 있습니다';
-        break;
-      case SubscriptionStatus.expiringSoon:
-        statusColor = AppColors.warning;
-        statusIcon = Icons.warning_amber;
-        statusMessage = '수강권이 곧 만료됩니다. 갱신을 권장합니다.';
-        break;
-      case SubscriptionStatus.expired:
-        statusColor = AppColors.error;
-        statusIcon = Icons.cancel;
-        statusMessage = '수강권이 만료되었습니다';
-        break;
-      case SubscriptionStatus.paused:
-        statusColor = AppColors.textTertiaryLight;
-        statusIcon = Icons.pause_circle;
-        statusMessage = '수강권이 일시정지 상태입니다';
-        break;
+    // Priority: Depleted > Expired > ExpiringSoon > Paused > Active
+    if (subscription.isDepleted) {
+      // 사용 완료: Primary (보라) - 긍정적 성취
+      statusColor = AppColors.primary;
+      statusIcon = Icons.celebration;
+      statusLabel = '사용 완료';
+      statusMessage = '수강권을 모두 사용했습니다';
+    } else if (subscription.isExpired) {
+      // 기간 만료: Gray - 중립적 (빨강 X)
+      statusColor = AppColors.textTertiaryLight;
+      statusIcon = Icons.event_busy;
+      statusLabel = '만료됨';
+      statusMessage = '수강권 유효기간이 지났습니다';
+    } else if (subscription.isExpiringSoon) {
+      // 만료 임박: Warning (주황) - 행동 유도
+      statusColor = AppColors.warning;
+      statusIcon = Icons.schedule;
+      statusLabel = '갱신 필요';
+      statusMessage = '수강권이 곧 만료됩니다. 갱신을 권장합니다.';
+    } else if (subscription.status == SubscriptionStatus.paused) {
+      // 일시정지: Gray
+      statusColor = AppColors.textTertiaryLight;
+      statusIcon = Icons.pause_circle;
+      statusLabel = '일시정지';
+      statusMessage = '수강권이 일시정지 상태입니다';
+    } else {
+      // 이용중: Success (녹색)
+      statusColor = AppColors.success;
+      statusIcon = Icons.check_circle;
+      statusLabel = '이용중';
+      statusMessage = '수강권이 활성화되어 있습니다';
     }
 
     return Container(
@@ -217,7 +228,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  subscription.statusLabel,
+                  statusLabel,
                   style: AppTypography.headingSmall.copyWith(
                     color: statusColor,
                   ),
@@ -364,6 +375,9 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     final used = subscription.usedLessons;
     final percentage = subscription.usagePercentage ?? 0;
 
+    // Get status-based color
+    final statusColor = _getStatusColor();
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -384,16 +398,14 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               Column(
                 children: [
                   Text(
-                    '$remaining',
+                    subscription.isDepleted ? '완료' : '$remaining',
                     style: AppTypography.displayLarge.copyWith(
-                      color: subscription.isExpiringSoon
-                          ? AppColors.warning
-                          : AppColors.primary,
+                      color: statusColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    '남은 횟수',
+                    subscription.isDepleted ? '모두 사용' : '남은 횟수',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
@@ -437,9 +449,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               value: percentage / 100,
               minHeight: 12,
               backgroundColor: AppColors.borderLight,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                subscription.isExpiringSoon ? AppColors.warning : AppColors.primary,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(statusColor),
             ),
           ),
 
@@ -468,9 +478,45 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     );
   }
 
+  /// Get color based on subscription status (same as subscription_card.dart)
+  Color _getStatusColor() {
+    if (subscription.isDepleted) {
+      return AppColors.primary;
+    }
+    if (subscription.isExpiringSoon) {
+      return AppColors.warning;
+    }
+    if (subscription.isExpired) {
+      return AppColors.textTertiaryLight;
+    }
+    return AppColors.primary;
+  }
+
   Widget _buildPeriodCard() {
     final days = subscription.daysUntilExpiration ?? 0;
-    final isExpired = days <= 0;
+
+    // Get display text and color based on status
+    String displayText;
+    String subtitleText;
+    Color displayColor;
+
+    if (subscription.isDepleted) {
+      displayText = '완료';
+      subtitleText = '수강권을 모두 사용했습니다';
+      displayColor = AppColors.primary;
+    } else if (subscription.isExpired) {
+      displayText = '만료됨';
+      subtitleText = '수강권 유효기간이 지났습니다';
+      displayColor = AppColors.textTertiaryLight;
+    } else if (subscription.isExpiringSoon) {
+      displayText = 'D-$days';
+      subtitleText = '갱신을 권장합니다';
+      displayColor = AppColors.warning;
+    } else {
+      displayText = 'D-$days';
+      subtitleText = '남은 일수';
+      displayColor = AppColors.primary;
+    }
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -490,18 +536,14 @@ class _SubscriptionDetailContent extends ConsumerWidget {
             child: Column(
               children: [
                 Text(
-                  isExpired ? '만료됨' : 'D-$days',
+                  displayText,
                   style: AppTypography.displayLarge.copyWith(
-                    color: isExpired
-                        ? AppColors.error
-                        : subscription.isExpiringSoon
-                            ? AppColors.warning
-                            : AppColors.primary,
+                    color: displayColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  isExpired ? '수강권이 만료되었습니다' : '남은 일수',
+                  subtitleText,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -510,16 +552,18 @@ class _SubscriptionDetailContent extends ConsumerWidget {
             ),
           ),
 
-          if (!isExpired && subscription.endDate != null) ...[
+          if (!subscription.isExpired && !subscription.isDepleted && subscription.endDate != null) ...[
             const SizedBox(height: AppSpacing.space4),
             const Divider(),
             const SizedBox(height: AppSpacing.space3),
-            Text(
-              '${DateFormat('yyyy년 M월 d일').format(subscription.endDate!)}에 만료됩니다',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+            Center(
+              child: Text(
+                '${DateFormat('yyyy년 M월 d일').format(subscription.endDate!)}에 만료됩니다',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ],
         ],
