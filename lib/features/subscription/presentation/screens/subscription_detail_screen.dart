@@ -358,7 +358,8 @@ class _SubscriptionDetailContent extends ConsumerWidget {
 
   Widget _buildUsageCard() {
     final remaining = subscription.remainingLessons ?? 0;
-    final total = subscription.totalLessons ?? 0;
+    // Use totalLessonsForDisplay to include bonus lessons
+    final total = subscription.totalLessonsForDisplay ?? 0;
     final used = subscription.usedLessons;
     final percentage = subscription.usagePercentage ?? 0;
 

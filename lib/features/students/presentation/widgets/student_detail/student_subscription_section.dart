@@ -406,11 +406,11 @@ class _SubscriptionMembershipCard extends ConsumerWidget {
         ),
         const SizedBox(width: AppSpacing.space4),
 
-        // Status/remaining
+        // Status/remaining (use totalLessonsForDisplay to include bonus)
         if (subscription.type == SubscriptionType.package)
           _buildDetailItem(
             icon: Icons.check_circle_outline,
-            label: '${subscription.remainingLessons}/${subscription.totalLessons}회 남음',
+            label: '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회 남음',
             color: subscription.isExpiringSoon
                 ? AppColors.warning
                 : AppColors.success,

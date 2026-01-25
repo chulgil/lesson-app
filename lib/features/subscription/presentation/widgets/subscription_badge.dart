@@ -53,7 +53,8 @@ class SubscriptionBadge extends StatelessWidget {
 
   String _getLabel() {
     if (subscription.type == SubscriptionType.package) {
-      return '${subscription.remainingLessons}/${subscription.totalLessons}회';
+      // Use totalLessonsForDisplay to include bonus lessons
+      return '${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회';
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
       return days > 0 ? 'D-$days' : '만료';
@@ -163,7 +164,8 @@ class SubscriptionSummaryText extends StatelessWidget {
 
     String text;
     if (subscription.type == SubscriptionType.package) {
-      text = '🎟️ ${subscription.remainingLessons}/${subscription.totalLessons}회 남음';
+      // Use totalLessonsForDisplay to include bonus lessons
+      text = '🎟️ ${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회 남음';
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
       text = days > 0 ? '📅 D-$days 남음' : '📅 만료됨';
