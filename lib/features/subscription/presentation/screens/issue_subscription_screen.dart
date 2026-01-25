@@ -35,6 +35,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   SubscriptionType _selectedType = SubscriptionType.package;
   String? _selectedMembershipId;
   int _totalLessons = 8;
+  int _validityDays = 90;   // 회차권 유효기간 (일)
   int _monthsCount = 1;
   int _originalAmount = 0;  // 정가
   int _discountPercent = 0; // 할인율 (0~100)
@@ -373,6 +374,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 회차 선택
         Text('회차 선택', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space3),
         Wrap(
@@ -383,7 +385,19 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             return ChoiceChip(
               label: Text('$count회'),
               selected: isSelected,
-              onSelected: (_) => setState(() => _totalLessons = count),
+              onSelected: (_) => setState(() {
+                _totalLessons = count;
+                // 회차에 따른 기본 유효기간 자동 설정
+                if (count <= 4) {
+                  _validityDays = 60;
+                } else if (count <= 8) {
+                  _validityDays = 90;
+                } else if (count <= 12) {
+                  _validityDays = 120;
+                } else {
+                  _validityDays = 180;
+                }
+              }),
               selectedColor: AppColors.primary.withValues(alpha: 0.15),
               checkmarkColor: AppColors.primary,
               backgroundColor: AppColors.surfaceLight,
@@ -396,6 +410,59 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
               ),
             );
           }).toList(),
+        ),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // 유효기간 선택
+        Text('유효기간', style: AppTypography.headingSmall),
+        const SizedBox(height: AppSpacing.space3),
+        Wrap(
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
+          children: [30, 60, 90, 120, 180, 365].map((days) {
+            final isSelected = _validityDays == days;
+            final label = days < 365 ? '$days일' : '1년';
+            return ChoiceChip(
+              label: Text(label),
+              selected: isSelected,
+              onSelected: (_) => setState(() => _validityDays = days),
+              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              checkmarkColor: AppColors.primary,
+              backgroundColor: AppColors.surfaceLight,
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.borderLight,
+              ),
+              labelStyle: AppTypography.bodyMedium.copyWith(
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            );
+          }).toList(),
+        ),
+
+        // 유효기간 안내
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 16, color: AppColors.textSecondaryLight),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: Text(
+                  '유효기간 내 자유롭게 사용 가능합니다.',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -782,6 +849,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         endDate = DateTime(_startDate!.year, _startDate!.month + _monthsCount, _startDate!.day);
       } else if (_selectedType == SubscriptionType.trial) {
         endDate = _startDate!.add(const Duration(days: 7));
+      } else if (_selectedType == SubscriptionType.package) {
+        endDate = _startDate!.add(Duration(days: _validityDays));
       }
     }
 
@@ -791,8 +860,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       lessonsDisplay = '체험 (1회)';
     } else if (_selectedType == SubscriptionType.package) {
       lessonsDisplay = _bonusLessons > 0
-          ? '회차제 ($_totalLessons + $_bonusLessons회)'
-          : '회차제 ($_totalLessons회)';
+          ? '회차제 ($_totalLessons + $_bonusLessons회, $_validityDays일)'
+          : '회차제 ($_totalLessons회, $_validityDays일)';
     } else {
       lessonsDisplay = '월정액 ($_monthsCount개월)';
     }
@@ -937,7 +1006,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       totalLessons = 1;
       endDate = _startDate!.add(const Duration(days: 7));
     } else {
+      // Package subscription
       totalLessons = _totalLessons;
+      endDate = _startDate!.add(Duration(days: _validityDays));
     }
 
     final subscription = Subscription(
