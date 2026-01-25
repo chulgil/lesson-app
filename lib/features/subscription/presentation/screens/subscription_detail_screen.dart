@@ -9,6 +9,7 @@ import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
+import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
 
 /// Screen showing subscription detail information.
@@ -151,7 +152,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               ],
 
               // History section
-              _buildHistorySection(),
+              _buildHistorySection(ref),
             ],
           ),
         );
@@ -526,8 +527,11 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     );
   }
 
-  Widget _buildHistorySection() {
-    // Placeholder for usage history
+  Widget _buildHistorySection(WidgetRef ref) {
+    final usageHistoryAsync = ref.watch(
+      subscriptionUsageHistoryProvider(subscription.id),
+    );
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -544,36 +548,137 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               Text('이용 내역', style: AppTypography.headingSmall),
               TextButton(
                 onPressed: () {
-                  // TODO: Show full history
+                  // TODO: Navigate to full history screen
                 },
                 child: const Text('전체 보기'),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
-          // Placeholder message
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.history,
-                    size: 40,
-                    color: AppColors.textTertiaryLight,
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  Text(
-                    '이용 내역이 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textTertiaryLight,
-                    ),
-                  ),
-                ],
+          usageHistoryAsync.when(
+            data: (usages) => _buildUsageList(usages),
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(AppSpacing.space4),
+                child: CircularProgressIndicator(),
               ),
             ),
+            error: (_, __) => _buildEmptyHistory(),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildUsageList(List<SubscriptionUsage> usages) {
+    if (usages.isEmpty) {
+      return _buildEmptyHistory();
+    }
+
+    // Show max 5 recent usages
+    final recentUsages = usages.take(5).toList();
+    final dateFormat = DateFormat('M.d(E)', 'ko_KR');
+    final timeFormat = DateFormat('HH:mm');
+
+    return Column(
+      children: recentUsages.map((usage) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space3,
+            vertical: AppSpacing.space2,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          child: Row(
+            children: [
+              // Date column
+              SizedBox(
+                width: 60,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      dateFormat.format(usage.usedAt),
+                      style: AppTypography.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      timeFormat.format(usage.usedAt),
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              // Divider
+              Container(
+                width: 1,
+                height: 30,
+                color: AppColors.borderLight,
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              // Details column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (usage.teacherName != null || usage.instrument != null)
+                      Text(
+                        [
+                          if (usage.teacherName != null) usage.teacherName,
+                          if (usage.instrument != null) usage.instrument,
+                        ].join(' · '),
+                        style: AppTypography.bodyMedium,
+                      ),
+                    if (usage.note != null)
+                      Text(
+                        usage.note!,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              // Check icon
+              Icon(
+                Icons.check_circle_outline,
+                size: 18,
+                color: AppColors.success,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildEmptyHistory() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        child: Column(
+          children: [
+            Icon(
+              Icons.history,
+              size: 40,
+              color: AppColors.textTertiaryLight,
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '이용 내역이 없습니다',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -383,8 +383,9 @@ class SubscriptionCard extends StatelessWidget {
               subscription.fifthWeekPolicyLabel!,
             ),
           ],
-          // 월정액 이월 경고
-          if (subscription.type == SubscriptionType.monthly) ...[
+          // 월정액 이월 경고 (만료되지 않은 경우만)
+          if (subscription.type == SubscriptionType.monthly &&
+              subscription.status != SubscriptionStatus.expired) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
               '⚠️ 미사용분 소멸 (이월 불가)',
@@ -393,11 +394,12 @@ class SubscriptionCard extends StatelessWidget {
               ),
             ),
           ],
-          // 회차권 이월 안내
-          if (subscription.type == SubscriptionType.package) ...[
+          // 회차권 안내 (만료되지 않은 경우만)
+          if (subscription.type == SubscriptionType.package &&
+              subscription.status != SubscriptionStatus.expired) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '✅ 유효기간 내 이월 가능',
+              '✅ 유효기간 내 자유롭게 사용',
               style: AppTypography.caption.copyWith(
                 color: AppColors.success,
               ),

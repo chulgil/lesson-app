@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
+import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
 
 part 'subscription_providers.g.dart';
@@ -61,6 +62,16 @@ Future<List<Subscription>> expiringSoonSubscriptions(
 ) async {
   final repository = ref.watch(subscriptionRepositoryProvider);
   return repository.getExpiringSoon();
+}
+
+/// Get usage history for a subscription.
+@riverpod
+Future<List<SubscriptionUsage>> subscriptionUsageHistory(
+  SubscriptionUsageHistoryRef ref,
+  String subscriptionId,
+) async {
+  final repository = ref.watch(subscriptionRepositoryProvider);
+  return repository.getUsageHistory(subscriptionId);
 }
 
 /// Get all subscriptions for a teacher's students.

@@ -1,4 +1,5 @@
 import '../entities/subscription.dart';
+import '../entities/subscription_usage.dart';
 
 /// Repository interface for Subscription operations.
 abstract class SubscriptionRepository {
@@ -18,7 +19,13 @@ abstract class SubscriptionRepository {
   Future<Subscription> update(Subscription subscription);
 
   /// Use one lesson (increment usedLessons by 1).
-  Future<Subscription> useLesson(String id);
+  /// Optionally provide lesson details for usage history.
+  Future<Subscription> useLesson(
+    String id, {
+    String? lessonId,
+    String? teacherName,
+    String? instrument,
+  });
 
   /// Update subscription status.
   Future<void> updateStatus(String id, SubscriptionStatus status);
@@ -34,4 +41,14 @@ abstract class SubscriptionRepository {
 
   /// Watch active subscription for a membership (stream).
   Stream<Subscription?> watchActiveByMembershipId(String membershipId);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // Usage History
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// Get usage history for a subscription.
+  Future<List<SubscriptionUsage>> getUsageHistory(String subscriptionId);
+
+  /// Add a usage record.
+  Future<SubscriptionUsage> addUsage(SubscriptionUsage usage);
 }

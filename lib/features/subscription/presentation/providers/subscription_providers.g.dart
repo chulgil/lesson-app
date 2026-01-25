@@ -661,6 +661,157 @@ final expiringSoonSubscriptionsProvider =
 // ignore: unused_element
 typedef ExpiringSoonSubscriptionsRef
     = AutoDisposeFutureProviderRef<List<Subscription>>;
+String _$subscriptionUsageHistoryHash() =>
+    r'6a391a951c5487c9d05abe777cfdbb49a456a07c';
+
+/// Get usage history for a subscription.
+///
+/// Copied from [subscriptionUsageHistory].
+@ProviderFor(subscriptionUsageHistory)
+const subscriptionUsageHistoryProvider = SubscriptionUsageHistoryFamily();
+
+/// Get usage history for a subscription.
+///
+/// Copied from [subscriptionUsageHistory].
+class SubscriptionUsageHistoryFamily
+    extends Family<AsyncValue<List<SubscriptionUsage>>> {
+  /// Get usage history for a subscription.
+  ///
+  /// Copied from [subscriptionUsageHistory].
+  const SubscriptionUsageHistoryFamily();
+
+  /// Get usage history for a subscription.
+  ///
+  /// Copied from [subscriptionUsageHistory].
+  SubscriptionUsageHistoryProvider call(
+    String subscriptionId,
+  ) {
+    return SubscriptionUsageHistoryProvider(
+      subscriptionId,
+    );
+  }
+
+  @override
+  SubscriptionUsageHistoryProvider getProviderOverride(
+    covariant SubscriptionUsageHistoryProvider provider,
+  ) {
+    return call(
+      provider.subscriptionId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'subscriptionUsageHistoryProvider';
+}
+
+/// Get usage history for a subscription.
+///
+/// Copied from [subscriptionUsageHistory].
+class SubscriptionUsageHistoryProvider
+    extends AutoDisposeFutureProvider<List<SubscriptionUsage>> {
+  /// Get usage history for a subscription.
+  ///
+  /// Copied from [subscriptionUsageHistory].
+  SubscriptionUsageHistoryProvider(
+    String subscriptionId,
+  ) : this._internal(
+          (ref) => subscriptionUsageHistory(
+            ref as SubscriptionUsageHistoryRef,
+            subscriptionId,
+          ),
+          from: subscriptionUsageHistoryProvider,
+          name: r'subscriptionUsageHistoryProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionUsageHistoryHash,
+          dependencies: SubscriptionUsageHistoryFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionUsageHistoryFamily._allTransitiveDependencies,
+          subscriptionId: subscriptionId,
+        );
+
+  SubscriptionUsageHistoryProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.subscriptionId,
+  }) : super.internal();
+
+  final String subscriptionId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<SubscriptionUsage>> Function(
+            SubscriptionUsageHistoryRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SubscriptionUsageHistoryProvider._internal(
+        (ref) => create(ref as SubscriptionUsageHistoryRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        subscriptionId: subscriptionId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<SubscriptionUsage>> createElement() {
+    return _SubscriptionUsageHistoryProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SubscriptionUsageHistoryProvider &&
+        other.subscriptionId == subscriptionId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, subscriptionId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin SubscriptionUsageHistoryRef
+    on AutoDisposeFutureProviderRef<List<SubscriptionUsage>> {
+  /// The parameter `subscriptionId` of this provider.
+  String get subscriptionId;
+}
+
+class _SubscriptionUsageHistoryProviderElement
+    extends AutoDisposeFutureProviderElement<List<SubscriptionUsage>>
+    with SubscriptionUsageHistoryRef {
+  _SubscriptionUsageHistoryProviderElement(super.provider);
+
+  @override
+  String get subscriptionId =>
+      (origin as SubscriptionUsageHistoryProvider).subscriptionId;
+}
+
 String _$teacherStudentSubscriptionsHash() =>
     r'57e0db746b9ac021da6817be4207b318ca8b6ee9';
 
