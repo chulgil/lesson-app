@@ -32,6 +32,32 @@ enum SubscriptionStatus {
   paused, // Paused
 }
 
+/// Billing type (for teacher/academy settings).
+@HiveType(typeId: 58)
+enum BillingType {
+  @HiveField(0)
+  perPackage, // Package billing (pay before N lessons)
+
+  @HiveField(1)
+  monthly, // Monthly billing (fixed day each month)
+}
+
+/// Fifth week policy (for monthly subscriptions).
+@HiveType(typeId: 59)
+enum FifthWeekPolicy {
+  @HiveField(0)
+  skip, // Skip (no lesson on 5th week)
+
+  @HiveField(1)
+  bonus, // Give bonus lesson (+1)
+
+  @HiveField(2)
+  deduct, // Deduct from existing subscription
+
+  @HiveField(3)
+  optional, // Student choice
+}
+
 /// Student subscription entity.
 @HiveType(typeId: 57)
 @JsonSerializable()
@@ -80,6 +106,22 @@ class Subscription extends HiveObject {
   @HiveField(12)
   final DateTime? updatedAt;
 
+  // Bonus and billing settings (new fields)
+  @HiveField(14)
+  final int bonusCount; // Bonus lessons (5th week, events, etc.)
+
+  @HiveField(15)
+  final BillingType? billingType; // Billing type (perPackage, monthly)
+
+  @HiveField(16)
+  final int? billingDay; // Billing day for monthly (1-31)
+
+  @HiveField(17)
+  final FifthWeekPolicy? fifthWeekPolicy; // 5th week policy (monthly only)
+
+  @HiveField(18)
+  final String? bonusReason; // Reason for bonus (e.g., "5주차", "이벤트")
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -95,6 +137,11 @@ class Subscription extends HiveObject {
     required this.status,
     required this.createdAt,
     this.updatedAt,
+    this.bonusCount = 0,
+    this.billingType,
+    this.billingDay,
+    this.fifthWeekPolicy,
+    this.bonusReason,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
@@ -102,23 +149,34 @@ class Subscription extends HiveObject {
 
   Map<String, dynamic> toJson() => _$SubscriptionToJson(this);
 
-  /// Total lessons for display (package: totalLessons, monthly: lessonsPerMonth).
-  int? get totalLessonsForDisplay =>
+  /// Total lessons for display (package: totalLessons, monthly: lessonsPerMonth + bonus).
+  int? get totalLessonsForDisplay {
+    final base =
+        type == SubscriptionType.package ? totalLessons : lessonsPerMonth;
+    if (base == null) return null;
+    return base + bonusCount;
+  }
+
+  /// Base lessons without bonus (for display breakdown).
+  int? get baseLessons =>
       type == SubscriptionType.package ? totalLessons : lessonsPerMonth;
 
-  /// Remaining lessons count (hybrid: package or monthly).
+  /// Remaining lessons count (hybrid: package or monthly + bonus).
   int? get remainingLessons {
     if (type == SubscriptionType.package && totalLessons != null) {
-      return totalLessons! - usedLessons;
+      return totalLessons! + bonusCount - usedLessons;
     }
     if (type == SubscriptionType.monthly && lessonsPerMonth != null) {
-      return lessonsPerMonth! - usedLessons;
+      return lessonsPerMonth! + bonusCount - usedLessons;
     }
     if (type == SubscriptionType.trial) {
       return 1 - usedLessons;
     }
     return null;
   }
+
+  /// Check if has bonus lessons.
+  bool get hasBonus => bonusCount > 0;
 
   /// Days until expiration.
   int? get daysUntilExpiration =>
@@ -158,7 +216,7 @@ class Subscription extends HiveObject {
       case SubscriptionType.trial:
         return '체험';
       case SubscriptionType.monthly:
-        return lessonsPerMonth != null ? '월정액 (${lessonsPerMonth}회)' : '월정액';
+        return lessonsPerMonth != null ? '월정액 ($lessonsPerMonth회)' : '월정액';
       case SubscriptionType.package:
         return '${totalLessons ?? 0}회권';
     }
@@ -190,7 +248,7 @@ class Subscription extends HiveObject {
 
     // Build hybrid display: "2/4회 남음 (D-15)"
     final countPart = (remaining != null && total != null)
-        ? '$remaining/${total}회 남음'
+        ? '$remaining/$total회 남음'
         : '';
 
     String daysPart = '';
@@ -212,6 +270,72 @@ class Subscription extends HiveObject {
     return countPart.isNotEmpty ? countPart : daysPart;
   }
 
+  /// Bonus display text (e.g., "🎁 보너스 +1회 (5주차)").
+  String? get bonusText {
+    if (bonusCount <= 0) return null;
+    final reason = bonusReason ?? '보너스';
+    return '🎁 +$bonusCount회 ($reason)';
+  }
+
+  /// Detailed breakdown text for display.
+  String get detailText {
+    if (type == SubscriptionType.trial) {
+      return amount > 0 ? '체험 레슨 (${_formatAmount(amount)})' : '무료 체험 레슨';
+    }
+
+    final base = baseLessons;
+    final buffer = StringBuffer();
+
+    if (type == SubscriptionType.monthly) {
+      buffer.write('기본: ${base ?? 0}회');
+    } else {
+      buffer.write('${base ?? 0}회권 중 $usedLessons회 사용');
+    }
+
+    if (bonusCount > 0) {
+      buffer.write('\n보너스: +$bonusCount회');
+      if (bonusReason != null) {
+        buffer.write(' ($bonusReason)');
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  /// Format amount in Korean won.
+  String _formatAmount(int amount) {
+    if (amount >= 10000) {
+      return '${(amount / 10000).toStringAsFixed(0)}만원';
+    }
+    return '$amount원';
+  }
+
+  /// Billing type display label in Korean.
+  String? get billingTypeLabel {
+    if (billingType == null) return null;
+    switch (billingType!) {
+      case BillingType.perPackage:
+        return '회차 결제';
+      case BillingType.monthly:
+        return billingDay != null ? '월정액 (매월 $billingDay일)' : '월정액';
+    }
+  }
+
+  /// Fifth week policy display label in Korean.
+  String? get fifthWeekPolicyLabel {
+    if (fifthWeekPolicy == null) return null;
+    switch (fifthWeekPolicy!) {
+      case FifthWeekPolicy.skip:
+        return '휴강';
+      case FifthWeekPolicy.bonus:
+        return '보너스 지급';
+      case FifthWeekPolicy.deduct:
+        return '기존에서 차감';
+      case FifthWeekPolicy.optional:
+        return '학생 선택';
+    }
+  }
+
   Subscription copyWith({
     String? id,
     String? studentId,
@@ -227,6 +351,11 @@ class Subscription extends HiveObject {
     SubscriptionStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? bonusCount,
+    BillingType? billingType,
+    int? billingDay,
+    FifthWeekPolicy? fifthWeekPolicy,
+    String? bonusReason,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -243,6 +372,11 @@ class Subscription extends HiveObject {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      bonusCount: bonusCount ?? this.bonusCount,
+      billingType: billingType ?? this.billingType,
+      billingDay: billingDay ?? this.billingDay,
+      fifthWeekPolicy: fifthWeekPolicy ?? this.fifthWeekPolicy,
+      bonusReason: bonusReason ?? this.bonusReason,
     );
   }
 

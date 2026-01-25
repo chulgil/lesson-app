@@ -31,13 +31,18 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       status: fields[10] as SubscriptionStatus,
       createdAt: fields[11] as DateTime,
       updatedAt: fields[12] as DateTime?,
+      bonusCount: fields[14] as int,
+      billingType: fields[15] as BillingType?,
+      billingDay: fields[16] as int?,
+      fifthWeekPolicy: fields[17] as FifthWeekPolicy?,
+      bonusReason: fields[18] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -65,7 +70,17 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..writeByte(11)
       ..write(obj.createdAt)
       ..writeByte(12)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(14)
+      ..write(obj.bonusCount)
+      ..writeByte(15)
+      ..write(obj.billingType)
+      ..writeByte(16)
+      ..write(obj.billingDay)
+      ..writeByte(17)
+      ..write(obj.fifthWeekPolicy)
+      ..writeByte(18)
+      ..write(obj.bonusReason);
   }
 
   @override
@@ -172,6 +187,94 @@ class SubscriptionStatusAdapter extends TypeAdapter<SubscriptionStatus> {
           typeId == other.typeId;
 }
 
+class BillingTypeAdapter extends TypeAdapter<BillingType> {
+  @override
+  final int typeId = 58;
+
+  @override
+  BillingType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return BillingType.perPackage;
+      case 1:
+        return BillingType.monthly;
+      default:
+        return BillingType.perPackage;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, BillingType obj) {
+    switch (obj) {
+      case BillingType.perPackage:
+        writer.writeByte(0);
+        break;
+      case BillingType.monthly:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BillingTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class FifthWeekPolicyAdapter extends TypeAdapter<FifthWeekPolicy> {
+  @override
+  final int typeId = 59;
+
+  @override
+  FifthWeekPolicy read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return FifthWeekPolicy.skip;
+      case 1:
+        return FifthWeekPolicy.bonus;
+      case 2:
+        return FifthWeekPolicy.deduct;
+      case 3:
+        return FifthWeekPolicy.optional;
+      default:
+        return FifthWeekPolicy.skip;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, FifthWeekPolicy obj) {
+    switch (obj) {
+      case FifthWeekPolicy.skip:
+        writer.writeByte(0);
+        break;
+      case FifthWeekPolicy.bonus:
+        writer.writeByte(1);
+        break;
+      case FifthWeekPolicy.deduct:
+        writer.writeByte(2);
+        break;
+      case FifthWeekPolicy.optional:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FifthWeekPolicyAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
@@ -197,6 +300,13 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      bonusCount: (json['bonusCount'] as num?)?.toInt() ?? 0,
+      billingType:
+          $enumDecodeNullable(_$BillingTypeEnumMap, json['billingType']),
+      billingDay: (json['billingDay'] as num?)?.toInt(),
+      fifthWeekPolicy: $enumDecodeNullable(
+          _$FifthWeekPolicyEnumMap, json['fifthWeekPolicy']),
+      bonusReason: json['bonusReason'] as String?,
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
@@ -215,6 +325,11 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'lessonsPerMonth': instance.lessonsPerMonth,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'bonusCount': instance.bonusCount,
+      'billingType': _$BillingTypeEnumMap[instance.billingType],
+      'billingDay': instance.billingDay,
+      'fifthWeekPolicy': _$FifthWeekPolicyEnumMap[instance.fifthWeekPolicy],
+      'bonusReason': instance.bonusReason,
     };
 
 const _$SubscriptionTypeEnumMap = {
@@ -228,4 +343,16 @@ const _$SubscriptionStatusEnumMap = {
   SubscriptionStatus.expiringSoon: 'expiringSoon',
   SubscriptionStatus.expired: 'expired',
   SubscriptionStatus.paused: 'paused',
+};
+
+const _$BillingTypeEnumMap = {
+  BillingType.perPackage: 'perPackage',
+  BillingType.monthly: 'monthly',
+};
+
+const _$FifthWeekPolicyEnumMap = {
+  FifthWeekPolicy.skip: 'skip',
+  FifthWeekPolicy.bonus: 'bonus',
+  FifthWeekPolicy.deduct: 'deduct',
+  FifthWeekPolicy.optional: 'optional',
 };

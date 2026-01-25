@@ -21,30 +21,67 @@ class MockSubscriptionRepository implements SubscriptionRepository {
     final monthEnd = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
     _subscriptions.addAll([
-      // === Student 1 (김서연) - 활성 수강권들 ===
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 1. 체험 (Trial)
+      // ═══════════════════════════════════════════════════════════════════
 
-      // 1. 회차권 8회 - 이용중 (3/8회 사용, 5회 남음)
+      // [1-1] 체험 대기
       Subscription(
-        id: 'sub_001',
-        studentId: 'student_1',
-        membershipId: 'cm_001', // 행복음악학원 바이올린
-        paymentId: 'pay_001',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 3,
-        startDate: now.subtract(const Duration(days: 21)),
-        endDate: now.add(const Duration(days: 41)), // ~2 months validity
-        amount: 380000,
+        id: 'sub_trial_01',
+        studentId: 'student_4',
+        membershipId: 'cm_004',
+        type: SubscriptionType.trial,
+        totalLessons: 1,
+        usedLessons: 0,
+        startDate: now,
+        endDate: now.add(const Duration(days: 7)),
+        amount: 50000,
         status: SubscriptionStatus.active,
-        createdAt: now.subtract(const Duration(days: 21)),
+        createdAt: now,
       ),
-      // 표시: "5/8회 남음 (D-41)"
+      // 표시: "체험중" / ~1/31까지
 
-      // 2. 월정액 (4회) - 이용중 (2/4회 사용, 2회 남음)
+      // [1-2] 체험 완료
       Subscription(
-        id: 'sub_002',
+        id: 'sub_trial_02',
+        studentId: 'student_5',
+        membershipId: 'cm_010',
+        type: SubscriptionType.trial,
+        totalLessons: 1,
+        usedLessons: 1,
+        startDate: now.subtract(const Duration(days: 3)),
+        endDate: now.add(const Duration(days: 4)),
+        amount: 30000, // Discounted
+        status: SubscriptionStatus.expired,
+        createdAt: now.subtract(const Duration(days: 3)),
+      ),
+      // 표시: "체험 완료"
+
+      // [1-3] 무료 체험
+      Subscription(
+        id: 'sub_trial_03',
+        studentId: 'student_6',
+        membershipId: 'cm_011',
+        type: SubscriptionType.trial,
+        totalLessons: 1,
+        usedLessons: 0,
+        startDate: now,
+        endDate: now.add(const Duration(days: 7)),
+        amount: 0, // Free
+        status: SubscriptionStatus.active,
+        createdAt: now,
+      ),
+      // 표시: "체험중" (무료)
+
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 2. 월정액 (Monthly) - 미사용분 소멸
+      // ═══════════════════════════════════════════════════════════════════
+
+      // [2-1] 월정액 4회 - 이용중 (여유)
+      Subscription(
+        id: 'sub_monthly_01',
         studentId: 'student_1',
-        membershipId: 'cm_005', // 개인레슨 피아노
+        membershipId: 'cm_005',
         paymentId: 'pay_002',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 4,
@@ -53,53 +90,18 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         endDate: monthEnd,
         amount: 200000,
         status: SubscriptionStatus.active,
+        billingType: BillingType.monthly,
+        billingDay: 27,
+        fifthWeekPolicy: FifthWeekPolicy.bonus,
         createdAt: monthStart,
       ),
-      // 표시: "2/4회 남음 (D-6)"
+      // 표시: "2/4회 남음 (D-15)" ⚠️ 미사용분 소멸
 
-      // === Student 2 (이도현) - 만료 임박 + 만료됨 ===
-
-      // 3. 회차권 8회 - 만료 임박 (6/8회 사용, 2회 남음)
+      // [2-2] 월정액 4회 - 만료 임박 (1회 남음, D-3)
       Subscription(
-        id: 'sub_003',
-        studentId: 'student_2',
-        membershipId: 'cm_002', // 행복음악학원 피아노
-        paymentId: 'pay_003',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 6,
-        startDate: now.subtract(const Duration(days: 45)),
-        endDate: now.add(const Duration(days: 15)),
-        amount: 380000,
-        status: SubscriptionStatus.expiringSoon,
-        createdAt: now.subtract(const Duration(days: 45)),
-      ),
-      // 표시: "2/8회 남음 (D-15)" ⚠️
-
-      // 4. 회차권 4회 - 소진됨 (만료)
-      Subscription(
-        id: 'sub_006',
-        studentId: 'student_2',
-        membershipId: 'cm_002',
-        paymentId: 'pay_old',
-        type: SubscriptionType.package,
-        totalLessons: 4,
-        usedLessons: 4,
-        startDate: now.subtract(const Duration(days: 90)),
-        endDate: now.subtract(const Duration(days: 30)),
-        amount: 200000,
-        status: SubscriptionStatus.expired,
-        createdAt: now.subtract(const Duration(days: 90)),
-      ),
-      // 표시: "0/4회 남음 (소진됨)"
-
-      // === Student 3 (박지민) - 월정액 만료 임박 ===
-
-      // 5. 월정액 (4회) - 만료 임박 (3/4회 사용, 1회 남음, D-3)
-      Subscription(
-        id: 'sub_004',
+        id: 'sub_monthly_02',
         studentId: 'student_3',
-        membershipId: 'cm_003', // 개인레슨 바이올린
+        membershipId: 'cm_003',
         paymentId: 'pay_004',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 4,
@@ -108,13 +110,35 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         endDate: now.add(const Duration(days: 3)),
         amount: 250000,
         status: SubscriptionStatus.expiringSoon,
+        billingType: BillingType.monthly,
+        billingDay: 1,
+        fifthWeekPolicy: FifthWeekPolicy.skip,
         createdAt: monthStart,
       ),
-      // 표시: "1/4회 남음 (D-3)" ⚠️
+      // 표시: "⚠️ 1/4회 남음 (D-3)"
 
-      // 6. 지난달 월정액 - 만료됨
+      // [2-3] 월정액 4회 - 전체 사용 (횟수 소진, 기간 남음)
       Subscription(
-        id: 'sub_007',
+        id: 'sub_monthly_03',
+        studentId: 'student_7',
+        membershipId: 'cm_012',
+        paymentId: 'pay_007',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        usedLessons: 4,
+        startDate: monthStart,
+        endDate: now.add(const Duration(days: 10)),
+        amount: 200000,
+        status: SubscriptionStatus.expiringSoon,
+        billingType: BillingType.monthly,
+        billingDay: 27,
+        createdAt: monthStart,
+      ),
+      // 표시: "0/4회 남음 (D-10)" ✅ 이번 달 모두 사용
+
+      // [2-4] 월정액 4회 - 만료됨 (기간 종료)
+      Subscription(
+        id: 'sub_monthly_04',
         studentId: 'student_3',
         membershipId: 'cm_003',
         paymentId: 'pay_005',
@@ -125,31 +149,227 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         endDate: DateTime(now.year, now.month, 0, 23, 59, 59),
         amount: 250000,
         status: SubscriptionStatus.expired,
+        billingType: BillingType.monthly,
+        billingDay: 1,
         createdAt: DateTime(now.year, now.month - 1, 1),
       ),
-      // 표시: "0/4회 남음 (만료됨)"
+      // 표시: "0/4회 남음 (만료됨)" - 2024년 12월분
 
-      // === Student 4 (최예은) - 체험 + 일시정지 ===
-
-      // 7. 체험 레슨
+      // [2-5] 월정액 4회 - 미사용 소멸 (2회 남기고 만료)
       Subscription(
-        id: 'sub_005',
-        studentId: 'student_4',
-        membershipId: 'cm_004', // 개인레슨 첼로 체험
-        type: SubscriptionType.trial,
-        totalLessons: 1,
-        usedLessons: 0,
-        startDate: now,
-        endDate: now.add(const Duration(days: 7)),
-        amount: 50000,
-        status: SubscriptionStatus.active,
-        createdAt: now,
+        id: 'sub_monthly_05',
+        studentId: 'student_8',
+        membershipId: 'cm_013',
+        paymentId: 'pay_008',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        usedLessons: 2,
+        startDate: DateTime(now.year, now.month - 1, 1),
+        endDate: DateTime(now.year, now.month, 0, 23, 59, 59),
+        amount: 180000,
+        status: SubscriptionStatus.expired,
+        billingType: BillingType.monthly,
+        billingDay: 15,
+        createdAt: DateTime(now.year, now.month - 1, 1),
       ),
-      // 표시: "체험중"
+      // 표시: "❌ 2/4회 미사용 소멸"
 
-      // 8. 회차권 8회 - 일시정지
+      // [2-6] 월정액 8회 - 이용중 (주 2회)
       Subscription(
-        id: 'sub_008',
+        id: 'sub_monthly_06',
+        studentId: 'student_9',
+        membershipId: 'cm_014',
+        paymentId: 'pay_009',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 8,
+        usedLessons: 3,
+        startDate: monthStart,
+        endDate: now.add(const Duration(days: 20)),
+        amount: 350000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.monthly,
+        billingDay: 27,
+        fifthWeekPolicy: FifthWeekPolicy.bonus,
+        createdAt: monthStart,
+      ),
+      // 표시: "5/8회 남음 (D-20)"
+
+      // [2-7] 🆕 월정액 5주차 보너스 (+1회)
+      Subscription(
+        id: 'sub_monthly_07',
+        studentId: 'student_1',
+        membershipId: 'cm_015',
+        paymentId: 'pay_010',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        usedLessons: 1,
+        bonusCount: 1,
+        bonusReason: '5주차',
+        startDate: monthStart,
+        endDate: now.add(const Duration(days: 25)),
+        amount: 200000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.monthly,
+        billingDay: 27,
+        fifthWeekPolicy: FifthWeekPolicy.bonus,
+        createdAt: monthStart,
+      ),
+      // 표시: "4/5회 남음 (D-25)" + "🎁 +1회 (5주차)"
+
+      // [2-8] 🆕 월정액 이벤트 보너스 (+2회)
+      Subscription(
+        id: 'sub_monthly_08',
+        studentId: 'student_10',
+        membershipId: 'cm_016',
+        paymentId: 'pay_011',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        usedLessons: 0,
+        bonusCount: 2,
+        bonusReason: '신규 가입 이벤트',
+        startDate: monthStart,
+        endDate: monthEnd,
+        amount: 200000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.monthly,
+        billingDay: 1,
+        createdAt: monthStart,
+      ),
+      // 표시: "6/6회 남음" + "🎁 +2회 (신규 가입 이벤트)"
+
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 3. 회차권 (Package) - 유효기간 내 이월 가능
+      // ═══════════════════════════════════════════════════════════════════
+
+      // [3-1] 4회권 - 이용중
+      Subscription(
+        id: 'sub_package_01',
+        studentId: 'student_11',
+        membershipId: 'cm_017',
+        paymentId: 'pay_012',
+        type: SubscriptionType.package,
+        totalLessons: 4,
+        usedLessons: 3,
+        startDate: now.subtract(const Duration(days: 20)),
+        endDate: now.add(const Duration(days: 30)),
+        amount: 200000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 20)),
+      ),
+      // 표시: "1/4회 남음 (D-30)" ✅ 유효기간 내 이월 가능
+
+      // [3-2] 8회권 - 이용중 (여유)
+      Subscription(
+        id: 'sub_package_02',
+        studentId: 'student_1',
+        membershipId: 'cm_001',
+        paymentId: 'pay_001',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 3,
+        startDate: now.subtract(const Duration(days: 21)),
+        endDate: now.add(const Duration(days: 41)),
+        amount: 380000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 21)),
+      ),
+      // 표시: "5/8회 남음 (D-41)"
+
+      // [3-3] 8회권 - 만료 임박 (2회 남음)
+      Subscription(
+        id: 'sub_package_03',
+        studentId: 'student_2',
+        membershipId: 'cm_002',
+        paymentId: 'pay_003',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 6,
+        startDate: now.subtract(const Duration(days: 45)),
+        endDate: now.add(const Duration(days: 15)),
+        amount: 380000,
+        status: SubscriptionStatus.expiringSoon,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 45)),
+      ),
+      // 표시: "⚠️ 2/8회 남음 (D-15)"
+
+      // [3-4] 8회권 - 만료 임박 (기간 D-5)
+      Subscription(
+        id: 'sub_package_04',
+        studentId: 'student_12',
+        membershipId: 'cm_018',
+        paymentId: 'pay_013',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 4,
+        startDate: now.subtract(const Duration(days: 55)),
+        endDate: now.add(const Duration(days: 5)),
+        amount: 340000,
+        status: SubscriptionStatus.expiringSoon,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 55)),
+      ),
+      // 표시: "⚠️ 4/8회 남음 (D-5)" 유효기간 만료 임박!
+
+      // [3-5] 4회권 - 소진됨
+      Subscription(
+        id: 'sub_package_05',
+        studentId: 'student_2',
+        membershipId: 'cm_002',
+        paymentId: 'pay_old',
+        type: SubscriptionType.package,
+        totalLessons: 4,
+        usedLessons: 4,
+        startDate: now.subtract(const Duration(days: 90)),
+        endDate: now.subtract(const Duration(days: 30)),
+        amount: 200000,
+        status: SubscriptionStatus.expired,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 90)),
+      ),
+      // 표시: "0/4회 남음 (소진됨)"
+
+      // [3-6] 8회권 - 기간 만료 (미사용분 있음)
+      Subscription(
+        id: 'sub_package_06',
+        studentId: 'student_13',
+        membershipId: 'cm_019',
+        paymentId: 'pay_014',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 4,
+        startDate: now.subtract(const Duration(days: 120)),
+        endDate: now.subtract(const Duration(days: 60)),
+        amount: 380000,
+        status: SubscriptionStatus.expired,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 120)),
+      ),
+      // 표시: "⏱️ 4/8회 미사용 만료"
+
+      // [3-7] 16회권 - 이용중 (대량)
+      Subscription(
+        id: 'sub_package_07',
+        studentId: 'student_14',
+        membershipId: 'cm_020',
+        paymentId: 'pay_015',
+        type: SubscriptionType.package,
+        totalLessons: 16,
+        usedLessons: 5,
+        startDate: now.subtract(const Duration(days: 15)),
+        endDate: now.add(const Duration(days: 75)),
+        amount: 700000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 15)),
+      ),
+      // 표시: "11/16회 남음 (D-75)"
+
+      // [3-8] 8회권 - 일시정지
+      Subscription(
+        id: 'sub_package_08',
         studentId: 'student_4',
         membershipId: 'cm_006',
         paymentId: 'pay_006',
@@ -160,9 +380,30 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         endDate: now.add(const Duration(days: 30)),
         amount: 380000,
         status: SubscriptionStatus.paused,
+        billingType: BillingType.perPackage,
         createdAt: now.subtract(const Duration(days: 30)),
       ),
-      // 표시: "6/8회 남음 (일시정지)"
+      // 표시: "⏸️ 6/8회 남음 (일시정지)"
+
+      // [3-9] 🆕 8회권 + 보너스 (추천 이벤트)
+      Subscription(
+        id: 'sub_package_09',
+        studentId: 'student_15',
+        membershipId: 'cm_021',
+        paymentId: 'pay_016',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 2,
+        bonusCount: 1,
+        bonusReason: '친구 추천',
+        startDate: now.subtract(const Duration(days: 10)),
+        endDate: now.add(const Duration(days: 50)),
+        amount: 380000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 10)),
+      ),
+      // 표시: "7/9회 남음 (D-50)" + "🎁 +1회 (친구 추천)"
     ]);
   }
 
@@ -245,8 +486,9 @@ class MockSubscriptionRepository implements SubscriptionRepository {
 
     if (subscription.type == SubscriptionType.package &&
         subscription.totalLessons != null) {
-      // Package: check total lessons
-      final remaining = subscription.totalLessons! - newUsedLessons;
+      // Package: check total lessons + bonus
+      final remaining =
+          subscription.totalLessons! + subscription.bonusCount - newUsedLessons;
       if (remaining <= 0) {
         newStatus = SubscriptionStatus.expired;
       } else if (remaining <= 2) {
@@ -254,8 +496,10 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       }
     } else if (subscription.type == SubscriptionType.monthly &&
         subscription.lessonsPerMonth != null) {
-      // Monthly: check lessons per month
-      final remaining = subscription.lessonsPerMonth! - newUsedLessons;
+      // Monthly: check lessons per month + bonus
+      final remaining = subscription.lessonsPerMonth! +
+          subscription.bonusCount -
+          newUsedLessons;
       if (remaining <= 0) {
         // All monthly lessons used - can still be active if days remain
         newStatus = SubscriptionStatus.expiringSoon;
@@ -307,9 +551,8 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         return true;
       }
       // Check lesson count (2 or less remaining)
-      if (s.type == SubscriptionType.package &&
-          s.totalLessons != null &&
-          (s.totalLessons! - s.usedLessons) <= 2) {
+      final remaining = s.remainingLessons;
+      if (remaining != null && remaining <= 2) {
         return true;
       }
       return false;
@@ -327,11 +570,32 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       'cm_002',
       'cm_003',
       'cm_004',
-      'cm_005'
+      'cm_005',
+      'cm_006',
+      'cm_015',
     ];
     return _subscriptions
         .where((s) => teacherMembershipIds.contains(s.membershipId))
         .toList();
+  }
+
+  /// Add bonus to a subscription.
+  Future<Subscription> addBonus(
+      String id, int bonusCount, String reason) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final index = _subscriptions.indexWhere((s) => s.id == id);
+    if (index == -1) {
+      throw Exception('Subscription not found: $id');
+    }
+    final subscription = _subscriptions[index];
+    final updated = subscription.copyWith(
+      bonusCount: subscription.bonusCount + bonusCount,
+      bonusReason: reason,
+      updatedAt: DateTime.now(),
+    );
+    _subscriptions[index] = updated;
+    _notifyListeners();
+    return updated;
   }
 
   @override
