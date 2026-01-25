@@ -1,3 +1,5 @@
+import 'dart:ui' show Color;
+
 import 'package:uuid/uuid.dart';
 
 import '../../domain/entities/entities.dart';
@@ -13,7 +15,70 @@ class MockStudentRepository implements StudentRepository {
   }
 
   void _initMockData() {
-    // No dummy data - users create their own students
+    final now = DateTime.now();
+
+    _students.addAll([
+      // 수강권 테스트용 학생
+      Student(
+        id: 'student_1',
+        name: '김민준',
+        instrument: '바이올린',
+        level: StudentLevel.intermediate,
+        status: StudentStatus.active,
+        isActive: true,
+        profileColor: const Color(0xFF6B5B95),
+        createdAt: now.subtract(const Duration(days: 90)),
+        phone: '010-1234-5678',
+        email: 'minjun@example.com',
+        notes: '수강권 테스트 학생 - 14개 수강권 케이스',
+      ),
+      Student(
+        id: 'student_2',
+        name: '이서연',
+        instrument: '피아노',
+        level: StudentLevel.beginner,
+        status: StudentStatus.active,
+        isActive: true,
+        profileColor: const Color(0xFFF4A460),
+        createdAt: now.subtract(const Duration(days: 60)),
+        phone: '010-2345-6789',
+      ),
+      Student(
+        id: 'student_3',
+        name: '박지호',
+        instrument: '첼로',
+        level: StudentLevel.advanced,
+        status: StudentStatus.active,
+        isActive: true,
+        profileColor: const Color(0xFF2E8B57),
+        createdAt: now.subtract(const Duration(days: 30)),
+        phone: '010-3456-7890',
+      ),
+      Student(
+        id: 'student_4',
+        name: '최유진',
+        instrument: '플루트',
+        level: StudentLevel.beginner,
+        status: StudentStatus.trial,
+        isActive: true,
+        profileColor: const Color(0xFF4A90D9),
+        createdAt: now.subtract(const Duration(days: 7)),
+        phone: '010-4567-8901',
+        notes: '체험 레슨 예정',
+      ),
+      Student(
+        id: 'student_5',
+        name: '정하은',
+        instrument: '클라리넷',
+        level: StudentLevel.intermediate,
+        status: StudentStatus.inactive,
+        isActive: false,
+        profileColor: const Color(0xFF999999),
+        createdAt: now.subtract(const Duration(days: 120)),
+        phone: '010-5678-9012',
+        notes: '휴강 중',
+      ),
+    ]);
   }
 
   @override
