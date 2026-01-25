@@ -440,8 +440,8 @@ class SubscriptionCard extends StatelessWidget {
   Widget _buildExpirationWarning() {
     String message;
     if (subscription.remainingLessons != null &&
-        subscription.remainingLessons! <= renewalAlertThreshold + 1) {
-      message = '⚠️ 잔여 ${subscription.remainingLessons}회 - 수강권 갱신을 권장합니다';
+        subscription.remainingLessons! <= renewalAlertThreshold) {
+      message = '⚠️ 잔여 ${subscription.remainingLessons}회 - 갱신 권장';
     } else if (subscription.daysUntilExpiration != null &&
         subscription.daysUntilExpiration! <= renewalAlertDays) {
       message = '⚠️ D-${subscription.daysUntilExpiration} - 유효기간 만료 임박';

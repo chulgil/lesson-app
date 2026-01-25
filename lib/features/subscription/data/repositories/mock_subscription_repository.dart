@@ -405,11 +405,11 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       ),
       // 표시: "7/9회 남음 (D-50)" + "🎁 +1회 (친구 추천)"
 
-      // [3-10] 🆕 10회권 + 1회 보너스 (대량 구매 정책)
+      // [3-10] 🆕 10회권 + 1회 보너스 (대량 구매 정책) - student_1용
       Subscription(
         id: 'sub_package_10',
-        studentId: 'student_16',
-        membershipId: 'cm_022',
+        studentId: 'student_1',
+        membershipId: 'cm_001',
         paymentId: 'pay_017',
         type: SubscriptionType.package,
         totalLessons: 10,
@@ -425,11 +425,11 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       ),
       // 표시: "8/11회 남음 (D-56)" + "🎁 +1회 (대량 구매 보너스)"
 
-      // [3-11] 🆕 16회권 + 2회 보너스 (대량 구매 정책)
+      // [3-11] 🆕 16회권 + 2회 보너스 (대량 구매 정책) - student_1용
       Subscription(
         id: 'sub_package_11',
-        studentId: 'student_17',
-        membershipId: 'cm_023',
+        studentId: 'student_1',
+        membershipId: 'cm_001',
         paymentId: 'pay_018',
         type: SubscriptionType.package,
         totalLessons: 16,
@@ -445,46 +445,24 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       ),
       // 표시: "14/18회 남음 (D-69)" + "🎁 +2회 (대량 구매 보너스)"
 
-      // [3-12] 🆕 20회권 + 3회 보너스 (학원 대량 구매)
+      // [3-12] 🆕 갱신 권장 테스트 - 잔여 1회 (student_1용)
       Subscription(
         id: 'sub_package_12',
-        studentId: 'student_18',
-        membershipId: 'cm_024',
+        studentId: 'student_1',
+        membershipId: 'cm_001',
         paymentId: 'pay_019',
         type: SubscriptionType.package,
-        totalLessons: 20,
-        usedLessons: 5,
-        bonusCount: 3,
-        bonusReason: '학원 대량 구매',
-        startDate: now.subtract(const Duration(days: 28)),
-        endDate: now.add(const Duration(days: 62)),
-        amount: 880000,
-        status: SubscriptionStatus.active,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 28)),
-      ),
-      // 표시: "18/23회 남음 (D-62)" + "🎁 +3회 (학원 대량 구매)"
-
-      // [3-13] 🆕 10회권 + 1회 보너스 - 갱신 알림 (잔여 1회)
-      Subscription(
-        id: 'sub_package_13',
-        studentId: 'student_19',
-        membershipId: 'cm_025',
-        paymentId: 'pay_020',
-        type: SubscriptionType.package,
-        totalLessons: 10,
-        usedLessons: 10,
-        bonusCount: 1,
-        bonusReason: '대량 구매 보너스',
-        startDate: now.subtract(const Duration(days: 60)),
+        totalLessons: 8,
+        usedLessons: 7,
+        bonusCount: 0,
+        startDate: now.subtract(const Duration(days: 50)),
         endDate: now.add(const Duration(days: 10)),
-        amount: 450000,
+        amount: 380000,
         status: SubscriptionStatus.expiringSoon,
         billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 60)),
+        createdAt: now.subtract(const Duration(days: 50)),
       ),
-      // 표시: "⚠️ 1/11회 남음 (D-10)" + "🎁 +1회 (대량 구매 보너스)"
-      // 갱신 권장 알림 표시
+      // 표시: "⚠️ 1/8회 남음 (D-10)" - 갱신 권장
     ]);
   }
 
@@ -654,10 +632,6 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       'cm_005',
       'cm_006',
       'cm_015',
-      'cm_022', // 10회권 + 1회 보너스
-      'cm_023', // 16회권 + 2회 보너스
-      'cm_024', // 20회권 + 3회 보너스
-      'cm_025', // 10회권 갱신 알림
     ];
     return _subscriptions
         .where((s) => teacherMembershipIds.contains(s.membershipId))
