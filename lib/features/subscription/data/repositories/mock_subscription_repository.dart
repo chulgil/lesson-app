@@ -28,7 +28,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [1-1] 체험 대기
       Subscription(
         id: 'sub_trial_01',
-        studentId: 'student_4',
+        studentId: 'student_1',
         membershipId: 'cm_004',
         type: SubscriptionType.trial,
         totalLessons: 1,
@@ -44,7 +44,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [1-2] 체험 완료
       Subscription(
         id: 'sub_trial_02',
-        studentId: 'student_5',
+        studentId: 'student_1',
         membershipId: 'cm_010',
         type: SubscriptionType.trial,
         totalLessons: 1,
@@ -60,7 +60,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [1-3] 무료 체험
       Subscription(
         id: 'sub_trial_03',
-        studentId: 'student_6',
+        studentId: 'student_1',
         membershipId: 'cm_011',
         type: SubscriptionType.trial,
         totalLessons: 1,
@@ -100,7 +100,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-2] 월정액 4회 - 만료 임박 (1회 남음, D-3)
       Subscription(
         id: 'sub_monthly_02',
-        studentId: 'student_3',
+        studentId: 'student_1',
         membershipId: 'cm_003',
         paymentId: 'pay_004',
         type: SubscriptionType.monthly,
@@ -120,7 +120,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-3] 월정액 4회 - 전체 사용 (횟수 소진, 기간 남음)
       Subscription(
         id: 'sub_monthly_03',
-        studentId: 'student_7',
+        studentId: 'student_1',
         membershipId: 'cm_012',
         paymentId: 'pay_007',
         type: SubscriptionType.monthly,
@@ -139,7 +139,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-4] 월정액 4회 - 만료됨 (기간 종료)
       Subscription(
         id: 'sub_monthly_04',
-        studentId: 'student_3',
+        studentId: 'student_1',
         membershipId: 'cm_003',
         paymentId: 'pay_005',
         type: SubscriptionType.monthly,
@@ -158,7 +158,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-5] 월정액 4회 - 미사용 소멸 (2회 남기고 만료)
       Subscription(
         id: 'sub_monthly_05',
-        studentId: 'student_8',
+        studentId: 'student_1',
         membershipId: 'cm_013',
         paymentId: 'pay_008',
         type: SubscriptionType.monthly,
@@ -177,7 +177,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-6] 월정액 8회 - 이용중 (주 2회)
       Subscription(
         id: 'sub_monthly_06',
-        studentId: 'student_9',
+        studentId: 'student_1',
         membershipId: 'cm_014',
         paymentId: 'pay_009',
         type: SubscriptionType.monthly,
@@ -219,7 +219,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [2-8] 🆕 월정액 이벤트 보너스 (+2회)
       Subscription(
         id: 'sub_monthly_08',
-        studentId: 'student_10',
+        studentId: 'student_1',
         membershipId: 'cm_016',
         paymentId: 'pay_011',
         type: SubscriptionType.monthly,
@@ -244,7 +244,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-1] 4회권 - 이용중
       Subscription(
         id: 'sub_package_01',
-        studentId: 'student_11',
+        studentId: 'student_1',
         membershipId: 'cm_017',
         paymentId: 'pay_012',
         type: SubscriptionType.package,
@@ -280,7 +280,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-3] 8회권 - 만료 임박 (2회 남음)
       Subscription(
         id: 'sub_package_03',
-        studentId: 'student_2',
+        studentId: 'student_1',
         membershipId: 'cm_002',
         paymentId: 'pay_003',
         type: SubscriptionType.package,
@@ -298,7 +298,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-4] 8회권 - 만료 임박 (기간 D-5)
       Subscription(
         id: 'sub_package_04',
-        studentId: 'student_12',
+        studentId: 'student_1',
         membershipId: 'cm_018',
         paymentId: 'pay_013',
         type: SubscriptionType.package,
@@ -316,7 +316,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-5] 4회권 - 소진됨
       Subscription(
         id: 'sub_package_05',
-        studentId: 'student_2',
+        studentId: 'student_1',
         membershipId: 'cm_002',
         paymentId: 'pay_old',
         type: SubscriptionType.package,
@@ -334,7 +334,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-6] 8회권 - 기간 만료 (미사용분 있음)
       Subscription(
         id: 'sub_package_06',
-        studentId: 'student_13',
+        studentId: 'student_1',
         membershipId: 'cm_019',
         paymentId: 'pay_014',
         type: SubscriptionType.package,
@@ -352,7 +352,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-7] 16회권 - 이용중 (대량)
       Subscription(
         id: 'sub_package_07',
-        studentId: 'student_14',
+        studentId: 'student_1',
         membershipId: 'cm_020',
         paymentId: 'pay_015',
         type: SubscriptionType.package,
@@ -370,7 +370,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-8] 8회권 - 일시정지
       Subscription(
         id: 'sub_package_08',
-        studentId: 'student_4',
+        studentId: 'student_1',
         membershipId: 'cm_006',
         paymentId: 'pay_006',
         type: SubscriptionType.package,
@@ -388,7 +388,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       // [3-9] 🆕 8회권 + 보너스 (추천 이벤트)
       Subscription(
         id: 'sub_package_09',
-        studentId: 'student_15',
+        studentId: 'student_1',
         membershipId: 'cm_021',
         paymentId: 'pay_016',
         type: SubscriptionType.package,
