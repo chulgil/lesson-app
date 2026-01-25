@@ -340,7 +340,7 @@ class SubscriptionCard extends StatelessWidget {
             '${subscription.remainingLessons ?? 0}회',
             valueColor: subscription.isExpiringSoon
                 ? AppColors.warning
-                : AppColors.success,
+                : AppColors.primary,
             isBold: true,
           ),
           // 유효기간
@@ -384,7 +384,7 @@ class SubscriptionCard extends StatelessWidget {
             Text(
               '✅ 유효기간 내 자유롭게 사용',
               style: AppTypography.caption.copyWith(
-                color: AppColors.success,
+                color: AppColors.primary,
               ),
             ),
           ],

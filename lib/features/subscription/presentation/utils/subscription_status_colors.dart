@@ -28,7 +28,7 @@ class SubscriptionStatusColors {
     if (subscription.status == SubscriptionStatus.paused) {
       return AppColors.textTertiaryLight; // 일시정지 (회색)
     }
-    return AppColors.success; // 이용중 (녹색)
+    return AppColors.primary; // 이용중 (보라)
   }
 
   /// Get the progress/accent color (for progress bars, indicators).
