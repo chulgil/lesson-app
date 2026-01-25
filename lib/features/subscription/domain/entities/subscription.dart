@@ -182,12 +182,22 @@ class Subscription extends HiveObject {
   int? get daysUntilExpiration =>
       endDate?.difference(DateTime.now()).inDays;
 
+  /// Check if all lessons are used (depleted).
+  /// Different from expired - depleted is a positive outcome (goal achieved).
+  bool get isDepleted {
+    if (remainingLessons != null && remainingLessons! <= 0) {
+      return true;
+    }
+    return false;
+  }
+
   /// Check if expiring soon (7 days or 1 lesson remaining).
-  /// Returns false for already expired subscriptions.
+  /// Returns false for already expired or depleted subscriptions.
   /// Note: Threshold is configurable per teacher/academy (default: 1).
   bool get isExpiringSoon {
-    // Already expired - not "expiring soon"
+    // Already expired or depleted - not "expiring soon"
     if (status == SubscriptionStatus.expired) return false;
+    if (isDepleted) return false;
     if (endDate != null && endDate!.isBefore(DateTime.now())) return false;
 
     if (daysUntilExpiration != null &&
@@ -203,11 +213,11 @@ class Subscription extends HiveObject {
     return false;
   }
 
-  /// Check if expired.
+  /// Check if expired by date (time ran out).
+  /// Note: This is different from isDepleted (lessons used up).
   bool get isExpired {
     if (status == SubscriptionStatus.expired) return true;
     if (endDate != null && endDate!.isBefore(DateTime.now())) return true;
-    if (remainingLessons != null && remainingLessons! <= 0) return true;
     return false;
   }
 
@@ -256,6 +266,16 @@ class Subscription extends HiveObject {
     final total = totalLessonsForDisplay;
     final days = daysUntilExpiration;
 
+    // Depleted: show "N회 모두 사용" (positive framing)
+    if (isDepleted && total != null) {
+      return '$total회 모두 사용';
+    }
+
+    // Expired by date with unused lessons: show remaining with "만료됨"
+    if (isExpired && remaining != null && remaining > 0) {
+      return '$remaining회 미사용 (만료됨)';
+    }
+
     // Build hybrid display: "2/4회 남음 (D-15)"
     final countPart = (remaining != null && total != null)
         ? '$remaining/$total회 남음'
@@ -264,10 +284,8 @@ class Subscription extends HiveObject {
     String daysPart = '';
     if (status == SubscriptionStatus.paused) {
       daysPart = '일시정지';
-    } else if (status == SubscriptionStatus.expired) {
+    } else if (isExpired) {
       daysPart = '만료됨';
-    } else if (remaining != null && remaining <= 0) {
-      daysPart = '소진됨';
     } else if (days != null && days > 0) {
       daysPart = 'D-$days';
     } else if (days != null && days <= 0) {
