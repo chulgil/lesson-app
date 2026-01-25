@@ -182,8 +182,9 @@ class Subscription extends HiveObject {
   int? get daysUntilExpiration =>
       endDate?.difference(DateTime.now()).inDays;
 
-  /// Check if expiring soon (7 days or 2 lessons remaining).
+  /// Check if expiring soon (7 days or 1 lesson remaining).
   /// Returns false for already expired subscriptions.
+  /// Note: Threshold is configurable per teacher/academy (default: 1).
   bool get isExpiringSoon {
     // Already expired - not "expiring soon"
     if (status == SubscriptionStatus.expired) return false;
@@ -196,7 +197,7 @@ class Subscription extends HiveObject {
     }
     if (remainingLessons != null &&
         remainingLessons! > 0 &&
-        remainingLessons! <= 2) {
+        remainingLessons! <= 1) {
       return true;
     }
     return false;
