@@ -191,23 +191,40 @@ class Subscription extends HiveObject {
     return false;
   }
 
-  /// Check if expiring soon (7 days or 1 lesson remaining).
+  /// Check if renewal reminder needed (D-7~D-4 or 1 lesson remaining).
+  /// Gentle reminder with info color (blue), not warning.
+  bool get isRenewalReminder {
+    // Already expired or depleted - no reminder needed
+    if (status == SubscriptionStatus.expired) return false;
+    if (isDepleted) return false;
+    if (endDate != null && endDate!.isBefore(DateTime.now())) return false;
+
+    // D-7 ~ D-4: gentle reminder
+    if (daysUntilExpiration != null &&
+        daysUntilExpiration! >= 4 &&
+        daysUntilExpiration! <= 7) {
+      return true;
+    }
+    // 1 lesson remaining: gentle reminder
+    if (remainingLessons != null &&
+        remainingLessons! == 1) {
+      return true;
+    }
+    return false;
+  }
+
+  /// Check if expiring soon (D-3 or less) - urgent.
   /// Returns false for already expired or depleted subscriptions.
-  /// Note: Threshold is configurable per teacher/academy (default: 1).
   bool get isExpiringSoon {
     // Already expired or depleted - not "expiring soon"
     if (status == SubscriptionStatus.expired) return false;
     if (isDepleted) return false;
     if (endDate != null && endDate!.isBefore(DateTime.now())) return false;
 
+    // D-3 or less: urgent warning
     if (daysUntilExpiration != null &&
         daysUntilExpiration! >= 0 &&
-        daysUntilExpiration! <= 7) {
-      return true;
-    }
-    if (remainingLessons != null &&
-        remainingLessons! > 0 &&
-        remainingLessons! <= 1) {
+        daysUntilExpiration! <= 3) {
       return true;
     }
     return false;

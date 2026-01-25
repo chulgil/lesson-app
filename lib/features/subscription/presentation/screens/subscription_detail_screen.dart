@@ -179,7 +179,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     String statusLabel;
     String statusMessage;
 
-    // Priority: Depleted > Expired > ExpiringSoon > Paused > Active
+    // Priority: Depleted > Expired > ExpiringSoon > RenewalReminder > Paused > Active
     if (subscription.isDepleted) {
       // 사용 완료: Primary (보라) - 긍정적 성취
       statusColor = AppColors.primary;
@@ -193,11 +193,17 @@ class _SubscriptionDetailContent extends ConsumerWidget {
       statusLabel = '만료됨';
       statusMessage = '수강권 유효기간이 지났습니다';
     } else if (subscription.isExpiringSoon) {
-      // 만료 임박: Warning (주황) - 행동 유도
+      // 긴급 (D-3 이하): Warning (주황)
       statusColor = AppColors.warning;
       statusIcon = Icons.schedule;
       statusLabel = '갱신 필요';
-      statusMessage = '수강권이 곧 만료됩니다. 갱신을 권장합니다.';
+      statusMessage = '수강권이 곧 만료됩니다. 지금 갱신하세요.';
+    } else if (subscription.isRenewalReminder) {
+      // 부드러운 알림 (D-7~D-4 또는 1회): Info (파랑)
+      statusColor = AppColors.info;
+      statusIcon = Icons.info_outline;
+      statusLabel = '갱신 안내';
+      statusMessage = '수강권 만료가 다가오고 있습니다';
     } else if (subscription.status == SubscriptionStatus.paused) {
       // 일시정지: Gray
       statusColor = AppColors.textTertiaryLight;
@@ -486,6 +492,9 @@ class _SubscriptionDetailContent extends ConsumerWidget {
     if (subscription.isExpiringSoon) {
       return AppColors.warning;
     }
+    if (subscription.isRenewalReminder) {
+      return AppColors.info;
+    }
     if (subscription.isExpired) {
       return AppColors.textTertiaryLight;
     }
@@ -509,9 +518,15 @@ class _SubscriptionDetailContent extends ConsumerWidget {
       subtitleText = '수강권 유효기간이 지났습니다';
       displayColor = AppColors.textTertiaryLight;
     } else if (subscription.isExpiringSoon) {
+      // 긴급 (D-3 이하)
       displayText = 'D-$days';
-      subtitleText = '갱신을 권장합니다';
+      subtitleText = '지금 갱신하세요';
       displayColor = AppColors.warning;
+    } else if (subscription.isRenewalReminder) {
+      // 부드러운 알림 (D-7~D-4)
+      displayText = 'D-$days';
+      subtitleText = '갱신을 준비해주세요';
+      displayColor = AppColors.info;
     } else {
       displayText = 'D-$days';
       subtitleText = '남은 일수';

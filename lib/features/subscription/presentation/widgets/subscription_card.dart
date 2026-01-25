@@ -196,7 +196,7 @@ class SubscriptionCard extends StatelessWidget {
     Color textColor;
     String label;
 
-    // Priority: Depleted > Expired > ExpiringSoon > Paused > Active
+    // Priority: Depleted > Expired > ExpiringSoon > RenewalReminder > Paused > Active
     if (subscription.isDepleted) {
       // 사용 완료: Primary (보라) - 긍정적 성취
       backgroundColor = AppColors.primary.withValues(alpha: 0.1);
@@ -208,10 +208,15 @@ class SubscriptionCard extends StatelessWidget {
       textColor = AppColors.textTertiaryLight;
       label = '만료됨';
     } else if (subscription.isExpiringSoon) {
-      // 만료 임박: Warning (주황) - 행동 유도
+      // 긴급 (D-3 이하): Warning (주황)
       backgroundColor = AppColors.warning.withValues(alpha: 0.1);
       textColor = AppColors.warning;
       label = '갱신 필요';
+    } else if (subscription.isRenewalReminder) {
+      // 부드러운 알림 (D-7~D-4 또는 1회): Info (파랑)
+      backgroundColor = AppColors.info.withValues(alpha: 0.1);
+      textColor = AppColors.info;
+      label = '갱신 안내';
     } else if (subscription.status == SubscriptionStatus.paused) {
       // 일시정지: Gray
       backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.1);
@@ -300,6 +305,9 @@ class SubscriptionCard extends StatelessWidget {
     }
     if (subscription.isExpiringSoon) {
       return AppColors.warning;
+    }
+    if (subscription.isRenewalReminder) {
+      return AppColors.info;
     }
     if (subscription.isExpired) {
       return AppColors.textTertiaryLight;
@@ -515,6 +523,9 @@ class SubscriptionCard extends StatelessWidget {
     if (subscription.isExpiringSoon) {
       return AppColors.warning;
     }
+    if (subscription.isRenewalReminder) {
+      return AppColors.info.withValues(alpha: 0.3);
+    }
     if (subscription.isExpired) {
       return AppColors.textTertiaryLight.withValues(alpha: 0.3);
     }
@@ -527,6 +538,9 @@ class SubscriptionCard extends StatelessWidget {
     }
     if (subscription.isExpiringSoon) {
       return AppColors.warning;
+    }
+    if (subscription.isRenewalReminder) {
+      return AppColors.info;
     }
     if (subscription.isExpired) {
       return AppColors.textTertiaryLight;
