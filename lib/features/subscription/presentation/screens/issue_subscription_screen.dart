@@ -228,8 +228,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: (isAcademy ? AppColors.info : AppColors.primary)
-                      .withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Center(
@@ -414,18 +413,18 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: AppColors.info),
+          Icon(Icons.info_outline, color: AppColors.primary),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.info,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -670,7 +669,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('수강권이 발급되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.primary,
           ),
         );
         context.pop();

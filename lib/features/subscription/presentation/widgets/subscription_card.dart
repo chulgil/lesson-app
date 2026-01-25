@@ -162,7 +162,7 @@ class SubscriptionCard extends StatelessWidget {
     switch (subscription.type) {
       case SubscriptionType.trial:
         icon = Icons.star_outline;
-        color = AppColors.info;
+        color = AppColors.primary;
         break;
       case SubscriptionType.monthly:
         icon = Icons.calendar_month;
