@@ -233,8 +233,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: (isAcademy ? AppColors.info : AppColors.primary)
-                  .withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Center(
@@ -648,7 +647,7 @@ class _SubscriptionDetailContent extends ConsumerWidget {
               Icon(
                 Icons.check_circle_outline,
                 size: 18,
-                color: AppColors.success,
+                color: AppColors.primary,
               ),
             ],
           ),
