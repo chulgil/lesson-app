@@ -212,7 +212,8 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
-| [role_based_screens.md](specs/design/role_based_screens.md) | 📋 설계 완료 | **역할별 화면 통합 설계** (선생님/학생/학부모 앱) |
+| [role_based_screens.md](specs/design/role_based_screens.md) | 📋 설계 완료 | **역할별 화면 개요** (3앱 네비게이션 구조) |
+| [teacher_app_screens.md](specs/design/teacher_app_screens.md) | ✅ 확정 | **선생님 앱 화면 상세** (홈/캘린더/학생/프로필) |
 | [ux_guidelines.md](specs/design/ux_guidelines.md) | ✅ 확정 | UX 가이드라인 |
 | [figma_templates.md](specs/design/figma_templates.md) | ✅ 확정 | Figma 템플릿 |
 | [competitive_analysis.md](specs/design/competitive_analysis.md) | ✅ 확정 | 경쟁사 분석 |
