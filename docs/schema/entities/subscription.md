@@ -157,6 +157,19 @@ class Subscription {
   @HiveField(20)
   final FifthWeekPolicy? fifthWeekPolicy; // 5주차 정책 (월정액만)
 
+  // 🆕 수강권 이름 및 예약 정책 필드 (2026-01-26)
+  @HiveField(21)
+  final String? name;                     // 수강권 이름 (예: "그룹레슨수강권", "바이올린수강권")
+
+  @HiveField(22)
+  final int? maxRescheduleCount;          // 변경/취소 가능 횟수 (null = 무제한)
+
+  @HiveField(23)
+  final int usedRescheduleCount;          // 사용한 변경/취소 횟수
+
+  @HiveField(24)
+  final bool autoConfirm;                 // 학생 예약 시 자동 확정 (선생님 컨펌 불필요)
+
   // 상태
   @HiveField(10)
   final SubscriptionStatus status;
@@ -186,6 +199,10 @@ class Subscription {
     this.fifthWeekPolicy,                        // 🆕
     this.organizationId,                         // 🆕
     this.allowedClassIds,                        // 🆕
+    this.name,                                   // 🆕 수강권 이름
+    this.maxRescheduleCount,                     // 🆕 변경/취소 가능 횟수
+    this.usedRescheduleCount = 0,                // 🆕 사용한 변경/취소 횟수
+    this.autoConfirm = false,                    // 🆕 자동 확정 (기본: 컨펌 필요)
     required this.status,
     required this.createdAt,
     this.updatedAt,
@@ -253,6 +270,31 @@ class Subscription {
     return countPart.isNotEmpty ? countPart : daysPart;
   }
 
+  /// 변경/취소 가능 여부
+  bool get canReschedule {
+    if (maxRescheduleCount == null) return true; // 무제한
+    return usedRescheduleCount < maxRescheduleCount!;
+  }
+
+  /// 남은 변경/취소 횟수
+  int? get remainingRescheduleCount {
+    if (maxRescheduleCount == null) return null; // 무제한
+    return maxRescheduleCount! - usedRescheduleCount;
+  }
+
+  /// 수강권 표시 이름 (name이 없으면 기본 이름 생성)
+  String get displayName {
+    if (name != null && name!.isNotEmpty) return name!;
+    switch (type) {
+      case SubscriptionType.trial:
+        return '체험 레슨';
+      case SubscriptionType.monthly:
+        return '월정액 ${lessonsPerMonth ?? 4}회';
+      case SubscriptionType.package:
+        return '${totalLessons ?? 8}회권';
+    }
+  }
+
   Subscription copyWith({
     String? id,
     String? studentId,
@@ -272,6 +314,10 @@ class Subscription {
     int? billingDay,
     int? bonusCount,
     FifthWeekPolicy? fifthWeekPolicy,
+    String? name,
+    int? maxRescheduleCount,
+    int? usedRescheduleCount,
+    bool? autoConfirm,
     SubscriptionStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -295,6 +341,10 @@ class Subscription {
       billingDay: billingDay ?? this.billingDay,
       bonusCount: bonusCount ?? this.bonusCount,
       fifthWeekPolicy: fifthWeekPolicy ?? this.fifthWeekPolicy,
+      name: name ?? this.name,
+      maxRescheduleCount: maxRescheduleCount ?? this.maxRescheduleCount,
+      usedRescheduleCount: usedRescheduleCount ?? this.usedRescheduleCount,
+      autoConfirm: autoConfirm ?? this.autoConfirm,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -323,10 +373,14 @@ class Subscription {
 | `scope` | SubscriptionScope | ✅ | 사용 범위 (기본: singleClass) |
 | `organizationId` | String? | - | 학원 ID (scope=organization) |
 | `allowedClassIds` | List\<String\>? | - | 허용 클래스 목록 (scope=multiClass) |
-| `billingType` | BillingType | ✅ | 🆕 결제 방식 (기본: perPackage) |
-| `billingDay` | int? | - | 🆕 결제일 (월정액: 1~31) |
-| `bonusCount` | int | ✅ | 🆕 보너스 횟수 (기본값: 0) |
-| `fifthWeekPolicy` | FifthWeekPolicy? | - | 🆕 5주차 정책 (월정액만) |
+| `billingType` | BillingType | ✅ | 결제 방식 (기본: perPackage) |
+| `billingDay` | int? | - | 결제일 (월정액: 1~31) |
+| `bonusCount` | int | ✅ | 보너스 횟수 (기본값: 0) |
+| `fifthWeekPolicy` | FifthWeekPolicy? | - | 5주차 정책 (월정액만) |
+| `name` | String? | - | 🆕 수강권 이름 (예: "바이올린수강권") |
+| `maxRescheduleCount` | int? | - | 🆕 변경/취소 가능 횟수 (null = 무제한) |
+| `usedRescheduleCount` | int | ✅ | 🆕 사용한 변경/취소 횟수 (기본값: 0) |
+| `autoConfirm` | bool | ✅ | 🆕 학생 예약 시 자동 확정 (기본: false) |
 | `status` | SubscriptionStatus | ✅ | active, expiringSoon, expired, paused |
 | `createdAt` | DateTime | ✅ | 생성일 |
 | `updatedAt` | DateTime? | - | 수정일 |
@@ -1045,6 +1099,260 @@ Map<String, int> getUsageByClass(List<SubscriptionUsage> usages) {
 |------|--------|
 | SubscriptionScope | 61 |
 | SubscriptionUsage | 62 |
+
+---
+
+## 수강권 템플릿 (SubscriptionTemplate) 🆕
+
+> 추가일: 2026-01-26
+> 선생님이 자주 사용하는 수강권을 템플릿으로 미리 저장하여 빠르게 발급
+
+### 엔티티 정의
+
+```dart
+/// 수강권 템플릿 (선생님별)
+@HiveType(typeId: 63)
+@JsonSerializable()
+class SubscriptionTemplate {
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
+  final String teacherId;             // 선생님 ID (FK → Teacher)
+
+  @HiveField(2)
+  final String? organizationId;       // 학원 ID (null = 개인 선생님)
+
+  @HiveField(3)
+  final String name;                  // 템플릿 이름 (예: "바이올린수강권", "그룹레슨수강권")
+
+  @HiveField(4)
+  final SubscriptionType type;        // trial, monthly, package
+
+  @HiveField(5)
+  final int? totalLessons;            // 패키지: 총 횟수 (예: 8)
+
+  @HiveField(6)
+  final int? lessonsPerMonth;         // 월정액: 월 포함 횟수 (예: 4)
+
+  @HiveField(7)
+  final int amount;                   // 금액
+
+  @HiveField(8)
+  final int? validityDays;            // 유효기간 (일 단위, 예: 60일)
+
+  @HiveField(9)
+  final BillingType billingType;      // 결제 방식
+
+  @HiveField(10)
+  final int? billingDay;              // 결제일 (월정액: 1~31)
+
+  @HiveField(11)
+  final FifthWeekPolicy? fifthWeekPolicy; // 5주차 정책 (월정액만)
+
+  // 🆕 예약 정책
+  @HiveField(12)
+  final int? maxRescheduleCount;      // 변경/취소 가능 횟수 (null = 무제한)
+
+  @HiveField(13)
+  final bool autoConfirm;             // 학생 예약 시 자동 확정
+
+  @HiveField(14)
+  final String? description;          // 템플릿 설명 (선택)
+
+  @HiveField(15)
+  final bool isActive;                // 활성 여부 (비활성화 시 목록에서 숨김)
+
+  @HiveField(16)
+  final DateTime createdAt;
+
+  @HiveField(17)
+  final DateTime? updatedAt;
+
+  const SubscriptionTemplate({
+    required this.id,
+    required this.teacherId,
+    this.organizationId,
+    required this.name,
+    required this.type,
+    this.totalLessons,
+    this.lessonsPerMonth,
+    required this.amount,
+    this.validityDays,
+    this.billingType = BillingType.perPackage,
+    this.billingDay,
+    this.fifthWeekPolicy,
+    this.maxRescheduleCount,
+    this.autoConfirm = false,
+    this.description,
+    this.isActive = true,
+    required this.createdAt,
+    this.updatedAt,
+  });
+
+  factory SubscriptionTemplate.fromJson(Map<String, dynamic> json) =>
+      _$SubscriptionTemplateFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SubscriptionTemplateToJson(this);
+
+  /// 템플릿에서 수강권 생성
+  Subscription createSubscription({
+    required String studentId,
+    required String membershipId,
+    String? paymentId,
+  }) {
+    final now = DateTime.now();
+    final endDate = validityDays != null
+        ? now.add(Duration(days: validityDays!))
+        : (type == SubscriptionType.monthly
+            ? DateTime(now.year, now.month + 1, 0) // 월말
+            : null);
+
+    return Subscription(
+      id: 'sub_${DateTime.now().millisecondsSinceEpoch}',
+      studentId: studentId,
+      membershipId: membershipId,
+      paymentId: paymentId,
+      type: type,
+      totalLessons: totalLessons,
+      lessonsPerMonth: lessonsPerMonth,
+      startDate: now,
+      endDate: endDate,
+      amount: amount,
+      billingType: billingType,
+      billingDay: billingDay,
+      fifthWeekPolicy: fifthWeekPolicy,
+      name: name,
+      maxRescheduleCount: maxRescheduleCount,
+      autoConfirm: autoConfirm,
+      status: SubscriptionStatus.active,
+      createdAt: now,
+    );
+  }
+}
+```
+
+### 필드 설명
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|:----:|------|
+| `id` | String | ✅ | UUID |
+| `teacherId` | String | ✅ | 선생님 ID (FK → Teacher) |
+| `organizationId` | String? | - | 학원 ID (null = 개인 선생님) |
+| `name` | String | ✅ | 템플릿/수강권 이름 |
+| `type` | SubscriptionType | ✅ | trial, monthly, package |
+| `totalLessons` | int? | - | 패키지: 총 횟수 |
+| `lessonsPerMonth` | int? | - | 월정액: 월 포함 횟수 |
+| `amount` | int | ✅ | 금액 (원) |
+| `validityDays` | int? | - | 유효기간 (일 단위) |
+| `billingType` | BillingType | ✅ | 결제 방식 |
+| `billingDay` | int? | - | 결제일 (월정액: 1~31) |
+| `fifthWeekPolicy` | FifthWeekPolicy? | - | 5주차 정책 (월정액만) |
+| `maxRescheduleCount` | int? | - | 변경/취소 가능 횟수 |
+| `autoConfirm` | bool | ✅ | 자동 확정 여부 (기본: false) |
+| `description` | String? | - | 템플릿 설명 |
+| `isActive` | bool | ✅ | 활성 여부 (기본: true) |
+| `createdAt` | DateTime | ✅ | 생성일 |
+| `updatedAt` | DateTime? | - | 수정일 |
+
+### JSON 예시
+
+```json
+// 바이올린 8회권 템플릿
+{
+  "id": "tpl_violin_8",
+  "teacherId": "teacher_001",
+  "organizationId": null,
+  "name": "바이올린수강권",
+  "type": "package",
+  "totalLessons": 8,
+  "lessonsPerMonth": null,
+  "amount": 380000,
+  "validityDays": 60,
+  "billingType": "perPackage",
+  "billingDay": null,
+  "fifthWeekPolicy": null,
+  "maxRescheduleCount": 2,
+  "autoConfirm": true,
+  "description": "1:1 개인 레슨 8회권 (2개월 유효)",
+  "isActive": true,
+  "createdAt": "2026-01-26T00:00:00.000Z"
+}
+
+// 그룹레슨 월정액 템플릿
+{
+  "id": "tpl_group_monthly",
+  "teacherId": "teacher_001",
+  "organizationId": "org_001",
+  "name": "그룹레슨수강권",
+  "type": "monthly",
+  "totalLessons": null,
+  "lessonsPerMonth": 4,
+  "amount": 150000,
+  "validityDays": null,
+  "billingType": "monthly",
+  "billingDay": 25,
+  "fifthWeekPolicy": "bonus",
+  "maxRescheduleCount": 1,
+  "autoConfirm": true,
+  "description": "그룹 레슨 월 4회 (5주차 보너스)",
+  "isActive": true,
+  "createdAt": "2026-01-26T00:00:00.000Z"
+}
+
+// 체험 레슨 템플릿
+{
+  "id": "tpl_trial",
+  "teacherId": "teacher_001",
+  "organizationId": null,
+  "name": "체험레슨",
+  "type": "trial",
+  "totalLessons": 1,
+  "lessonsPerMonth": null,
+  "amount": 30000,
+  "validityDays": 14,
+  "billingType": "perPackage",
+  "billingDay": null,
+  "fifthWeekPolicy": null,
+  "maxRescheduleCount": 1,
+  "autoConfirm": true,
+  "description": "30분 체험 레슨",
+  "isActive": true,
+  "createdAt": "2026-01-26T00:00:00.000Z"
+}
+```
+
+### Repository 인터페이스
+
+```dart
+// lib/features/subscription/domain/repositories/subscription_template_repository.dart
+
+abstract class SubscriptionTemplateRepository {
+  /// 선생님의 템플릿 목록 조회
+  Future<List<SubscriptionTemplate>> getByTeacherId(String teacherId);
+
+  /// 활성 템플릿 목록 조회
+  Future<List<SubscriptionTemplate>> getActiveByTeacherId(String teacherId);
+
+  /// 템플릿 생성
+  Future<SubscriptionTemplate> create(SubscriptionTemplate template);
+
+  /// 템플릿 수정
+  Future<SubscriptionTemplate> update(SubscriptionTemplate template);
+
+  /// 템플릿 비활성화
+  Future<void> deactivate(String id);
+
+  /// 템플릿 삭제
+  Future<void> delete(String id);
+}
+```
+
+### Hive TypeId (템플릿)
+
+| 타입 | TypeId |
+|------|--------|
+| SubscriptionTemplate | 63 |
 
 ---
 
