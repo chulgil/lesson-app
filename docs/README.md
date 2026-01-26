@@ -113,13 +113,15 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [flow_without_app.md](specs/lesson/flow_without_app.md) | ✅ 확정 | **📊 앱 미사용 시 플로우** (Pain Points 분석, 미팅용) |
+| [flow_with_app.md](specs/lesson/flow_with_app.md) | ✅ 확정 | **📊 앱 사용 시 플로우** (개선 효과, 미팅용) |
 | [three_party_relationship_spec.md](specs/lesson/three_party_relationship_spec.md) | 📋 설계 중 | **3자 관계 UI/UX 설계** (→ 엔티티는 student_class_system.md 참조) |
 | [lesson_schedule.md](specs/lesson/lesson_schedule.md) | ✅ 확정 | 레슨 스케줄 시스템 |
 | [Lesson_Types_Analysis.md](specs/lesson/Lesson_Types_Analysis.md) | ✅ 확정 | 레슨 유형 분석 |
 | [Lesson_Schedule_Design.md](specs/lesson/Lesson_Schedule_Design.md) | ✅ 확정 | 레슨 스케줄 설계 |
 | [student_centered_architecture.md](specs/lesson/student_centered_architecture.md) | ✅ 확정 | 학생 중심 아키텍처 |
 | [Unified_Lesson_Booking_Spec.md](specs/lesson/Unified_Lesson_Booking_Spec.md) | ✅ 확정 | 통합 레슨 예약 스펙 |
-| [Multi_Option_Schedule_Spec.md](specs/lesson/Multi_Option_Schedule_Spec.md) | ✅ 확정 | 다중 옵션 스케줄 제안 |
+| [Multi_Option_Schedule_Spec.md](specs/lesson/Multi_Option_Schedule_Spec.md) | ✅ 확정 | **양방향 다중 옵션 스케줄 제안** (학생→선생님 + 선생님→학생) |
 
 ### 연습 시스템 (practice/)
 
