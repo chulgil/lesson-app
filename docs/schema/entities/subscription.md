@@ -1356,6 +1356,217 @@ abstract class SubscriptionTemplateRepository {
 
 ---
 
+## 수강권 수정 이력 (SubscriptionHistory) 🆕
+
+> 추가일: 2026-01-26
+> 목적: 선생님이 수강권을 수정할 때 이력 기록 (삭제 대신 재작성 방식)
+
+### 배경: 재작성 vs 삭제 방식
+
+| 방식 | 설명 | 적합 환경 |
+|------|------|----------|
+| **재작성** (lesson-app) | 수강권 수정 + 이력 기록, 사용분 유지 | 개인 선생님, 외부 결제 |
+| **삭제+재발급** (스튜디오메이트) | 기존 삭제 → 환불 → 새 발급 | 학원, 앱 내 결제/PG 연동 |
+
+**lesson-app이 재작성 방식을 선택한 이유:**
+1. 앱 내 결제 없음 → 환불/재결제 개념 불필요
+2. 학생 경험 우선 → "내 수강권 그대로" 연속성
+3. 이력 추적 용이 → 같은 ID로 변경 이력 관리
+
+### 엔티티 정의
+
+```dart
+/// 수강권 수정 이력
+@HiveType(typeId: 78)
+@JsonSerializable()
+class SubscriptionHistory {
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
+  final String subscriptionId;     // FK → Subscription
+
+  @HiveField(2)
+  final String modifiedBy;         // 수정자 ID (선생님)
+
+  @HiveField(3)
+  final DateTime modifiedAt;
+
+  @HiveField(4)
+  final String changeType;         // 변경 유형
+
+  @HiveField(5)
+  final String? fieldName;         // 변경된 필드명
+
+  @HiveField(6)
+  final String? oldValue;          // 이전 값
+
+  @HiveField(7)
+  final String? newValue;          // 새 값
+
+  @HiveField(8)
+  final String? reason;            // 수정 사유
+
+  const SubscriptionHistory({
+    required this.id,
+    required this.subscriptionId,
+    required this.modifiedBy,
+    required this.modifiedAt,
+    required this.changeType,
+    this.fieldName,
+    this.oldValue,
+    this.newValue,
+    this.reason,
+  });
+
+  factory SubscriptionHistory.fromJson(Map<String, dynamic> json) =>
+      _$SubscriptionHistoryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SubscriptionHistoryToJson(this);
+}
+```
+
+### 변경 유형 (changeType)
+
+| changeType | 설명 | 예시 |
+|------------|------|------|
+| `created` | 최초 발급 | - |
+| `amount_changed` | 금액 변경 | 380,000 → 450,000 |
+| `lessons_added` | 횟수 추가 | 8회 → 10회 |
+| `lessons_reduced` | 횟수 감소 (환불 등) | 8회 → 6회 |
+| `extended` | 유효기간 연장 | 2/28 → 3/31 |
+| `paused` | 일시정지 | - |
+| `resumed` | 재개 | - |
+| `cancelled` | 취소 (전체) | - |
+
+### 필드 설명
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|:----:|------|
+| `id` | String | ✅ | UUID |
+| `subscriptionId` | String | ✅ | 수강권 ID (FK → Subscription) |
+| `modifiedBy` | String | ✅ | 수정자 ID (선생님) |
+| `modifiedAt` | DateTime | ✅ | 수정 일시 |
+| `changeType` | String | ✅ | 변경 유형 |
+| `fieldName` | String? | - | 변경된 필드명 |
+| `oldValue` | String? | - | 이전 값 (JSON string) |
+| `newValue` | String? | - | 새 값 (JSON string) |
+| `reason` | String? | - | 수정 사유 |
+
+### JSON 예시
+
+```json
+// 횟수 추가
+{
+  "id": "hist_001",
+  "subscriptionId": "sub_001",
+  "modifiedBy": "teacher_001",
+  "modifiedAt": "2026-01-26T10:00:00.000Z",
+  "changeType": "lessons_added",
+  "fieldName": "totalLessons",
+  "oldValue": "8",
+  "newValue": "10",
+  "reason": "추가 레슨 요청"
+}
+
+// 금액 변경
+{
+  "id": "hist_002",
+  "subscriptionId": "sub_001",
+  "modifiedBy": "teacher_001",
+  "modifiedAt": "2026-01-26T10:00:00.000Z",
+  "changeType": "amount_changed",
+  "fieldName": "amount",
+  "oldValue": "380000",
+  "newValue": "450000",
+  "reason": "추가 레슨 요청으로 금액 조정"
+}
+
+// 유효기간 연장
+{
+  "id": "hist_003",
+  "subscriptionId": "sub_002",
+  "modifiedBy": "teacher_001",
+  "modifiedAt": "2026-01-26T11:00:00.000Z",
+  "changeType": "extended",
+  "fieldName": "endDate",
+  "oldValue": "2026-02-28",
+  "newValue": "2026-03-31",
+  "reason": "학생 요청으로 1개월 연장"
+}
+```
+
+### Repository 인터페이스
+
+```dart
+// lib/features/subscription/domain/repositories/subscription_history_repository.dart
+
+abstract class SubscriptionHistoryRepository {
+  /// 수강권의 수정 이력 조회
+  Future<List<SubscriptionHistory>> getBySubscriptionId(String subscriptionId);
+
+  /// 이력 기록
+  Future<SubscriptionHistory> create(SubscriptionHistory history);
+
+  /// 선생님의 최근 수정 이력 조회
+  Future<List<SubscriptionHistory>> getRecentByTeacherId(
+    String teacherId, {
+    int limit = 50,
+  });
+}
+```
+
+### 수강권 수정 시 자동 이력 기록
+
+```dart
+/// 수강권 수정 + 이력 자동 기록
+Future<Subscription> updateSubscription({
+  required String subscriptionId,
+  required String modifiedBy,
+  int? totalLessons,
+  int? amount,
+  DateTime? endDate,
+  String? reason,
+}) async {
+  final current = await subscriptionRepo.getById(subscriptionId);
+
+  // 변경 사항 감지 및 이력 기록
+  if (totalLessons != null && totalLessons != current.totalLessons) {
+    await historyRepo.create(SubscriptionHistory(
+      id: generateId(),
+      subscriptionId: subscriptionId,
+      modifiedBy: modifiedBy,
+      modifiedAt: DateTime.now(),
+      changeType: totalLessons > (current.totalLessons ?? 0)
+          ? 'lessons_added'
+          : 'lessons_reduced',
+      fieldName: 'totalLessons',
+      oldValue: current.totalLessons?.toString(),
+      newValue: totalLessons.toString(),
+      reason: reason,
+    ));
+  }
+
+  // ... 다른 필드 변경 감지
+
+  // 수강권 업데이트 (usedLessons 유지!)
+  return subscriptionRepo.update(current.copyWith(
+    totalLessons: totalLessons ?? current.totalLessons,
+    amount: amount ?? current.amount,
+    endDate: endDate ?? current.endDate,
+    updatedAt: DateTime.now(),
+  ));
+}
+```
+
+### Hive TypeId (이력)
+
+| 타입 | TypeId |
+|------|--------|
+| SubscriptionHistory | 78 |
+
+---
+
 ## 관련 엔티티
 
 - [ClassMembership](class_membership.md) - 소속 관계
