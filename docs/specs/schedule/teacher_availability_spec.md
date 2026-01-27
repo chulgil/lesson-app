@@ -2,7 +2,7 @@
 
 > 작성일: 2026-01-26
 > 최종 수정: 2026-01-27
-> 상태: 📋 설계 완료 (구현 대기)
+> 상태: ✅ 구현 완료 (Phase 1~4)
 > 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md)
 > UX 가이드: [ux_guidelines.md](../design/ux_guidelines.md) - 섹션 11~12 참고
 
@@ -947,6 +947,108 @@ bool isRecommended(TimeSlot slot, List<Lesson> recentLessons) {
 | 탭 | 가용 ↔ 불가 토글 |
 | 드래그 | 연속 블록 선택 |
 | 길게 누르기 | 반복 패턴 설정 메뉴 |
+
+---
+
+## 10. 구현 현황
+
+> 최종 업데이트: 2026-01-27
+
+### 10.1 구현 완료 항목
+
+| 기능 | 파일 | 상태 |
+|------|------|:----:|
+| **Phase 1: 엔티티** | | ✅ |
+| TeacherAvailability 엔티티 | `domain/entities/teacher_availability.dart` | ✅ |
+| WeeklySchedule 엔티티 | `domain/entities/teacher_availability.dart` | ✅ |
+| TimeException 엔티티 | `domain/entities/teacher_availability.dart` | ✅ |
+| AvailabilitySlot 엔티티 | `domain/entities/availability_slot.dart` | ✅ |
+| Repository 인터페이스 | `domain/repositories/teacher_availability_repository.dart` | ✅ |
+| Mock Repository | `data/repositories/mock_teacher_availability_repository.dart` | ✅ |
+| Riverpod Providers | `presentation/providers/teacher_availability_providers.dart` | ✅ |
+| **Phase 2: 선생님 블록 그리드 UI** | | ✅ |
+| AvailabilityBlockGrid | `widgets/availability/availability_block_grid.dart` | ✅ |
+| AvailabilityBlock | `widgets/availability/availability_block.dart` | ✅ |
+| AvailabilityLegend | `widgets/availability/availability_legend.dart` | ✅ |
+| TeacherAvailabilityScreen | `screens/teacher_availability_screen.dart` | ✅ |
+| WeeklyScheduleScreen | `screens/weekly_schedule_screen.dart` | ✅ |
+| TimeExceptionScreen | `screens/time_exception_screen.dart` | ✅ |
+| **Phase 3: 학생 칩 선택 UI** | | ✅ |
+| AvailabilityChipSelector | `widgets/availability/availability_chip_selector.dart` | ✅ |
+| AvailabilityDateNavigator | `widgets/availability/availability_date_navigator.dart` | ✅ |
+| AvailabilityBookingPreview | `widgets/availability/availability_booking_preview.dart` | ✅ |
+| EmptySlotsSuggestion | `widgets/availability/empty_slots_suggestion.dart` | ✅ |
+| **Phase 4: 기존 화면 통합** | | ✅ |
+| LessonBookingScreen | `screens/lesson_booking_screen.dart` | ✅ |
+| GuestStudentInputDialog | `widgets/availability/guest_student_input_dialog.dart` | ✅ |
+| BookingConfirmationScreen | `screens/booking_confirmation_screen.dart` | ✅ |
+| 수강권 연동 | `providers/teacher_availability_providers.dart` | ✅ |
+
+### 10.2 Hive TypeId 할당
+
+| TypeId | 엔티티 |
+|:------:|--------|
+| 70 | AvailabilityType |
+| 71 | SlotStatus (AvailabilitySlotStatus) |
+| 72 | TeacherAvailability |
+| 73 | WeeklySchedule |
+| 74 | ExceptionType |
+| 75 | TimeException |
+| 76 | AvailabilitySlot |
+
+### 10.3 파일 구조
+
+```
+lib/features/schedule/
+├── domain/
+│   ├── entities/
+│   │   ├── teacher_availability.dart      # ✅ TeacherAvailability, WeeklySchedule, TimeException
+│   │   └── availability_slot.dart         # ✅ AvailabilitySlot
+│   └── repositories/
+│       └── teacher_availability_repository.dart  # ✅ Repository 인터페이스
+├── data/
+│   └── repositories/
+│       └── mock_teacher_availability_repository.dart  # ✅ Mock 구현체
+└── presentation/
+    ├── providers/
+    │   └── teacher_availability_providers.dart  # ✅ Riverpod Providers
+    ├── screens/
+    │   ├── teacher_availability_screen.dart     # ✅ 선생님 가용 시간 관리
+    │   ├── weekly_schedule_screen.dart          # ✅ 주간 스케줄 설정
+    │   ├── time_exception_screen.dart           # ✅ 휴무/예외 설정
+    │   ├── lesson_booking_screen.dart           # ✅ 학생 예약 화면
+    │   └── booking_confirmation_screen.dart     # ✅ 예약 확인 화면
+    └── widgets/
+        └── availability/
+            ├── availability_block_grid.dart     # ✅ 선생님용 블록 그리드
+            ├── availability_block.dart          # ✅ 개별 블록
+            ├── availability_legend.dart         # ✅ 범례
+            ├── availability_chip_selector.dart  # ✅ 학생용 칩 선택기
+            ├── availability_date_navigator.dart # ✅ 날짜 네비게이션
+            ├── availability_booking_preview.dart # ✅ 예약 미리보기
+            ├── empty_slots_suggestion.dart      # ✅ 빈 슬롯 대안 제안
+            └── guest_student_input_dialog.dart  # ✅ 게스트 학생 입력
+```
+
+### 10.4 추가 구현 완료 (2026-01-27)
+
+| 기능 | 파일 | 상태 |
+|------|------|:----:|
+| **예약 변경/취소 플로우** | | ✅ |
+| BookingRescheduleScreen | `screens/booking_reschedule_screen.dart` | ✅ |
+| BookingCancelScreen | `screens/booking_cancel_screen.dart` | ✅ |
+| MyBookingsScreen | `screens/my_bookings_screen.dart` | ✅ |
+| **알림 연동** | | ✅ |
+| BookingNotificationService | `services/booking_notification_service.dart` | ✅ |
+| Provider 알림 통합 | `providers/teacher_availability_providers.dart` | ✅ |
+
+### 10.5 남은 작업 (미래 개선)
+
+| 항목 | 우선순위 | 상태 |
+|------|:--------:|:----:|
+| 추천 슬롯 로직 개선 (3개월 이력 기반) | 중간 | 📋 |
+| 드래그 선택 (블록 그리드) | 낮음 | 📋 |
+| 레거시 화면 제거 | 낮음 | 📋 |
 
 ---
 

@@ -1,6 +1,6 @@
 # 데이터 스키마 문서
 
-> 마지막 업데이트: 2026-01-25
+> 마지막 업데이트: 2026-01-27
 
 이 폴더는 **구현 상세** 문서를 포함합니다.
 비즈니스 요구사항과 UI 설계는 `docs/specs/`를 참조하세요.
@@ -26,7 +26,8 @@ docs/schema/
 │   ├── practice_space.md       # PracticeSpace (연습 공간)
 │   ├── student.md              # Student (학생)
 │   ├── subscription.md         # Subscription (수강권)
-│   ├── teacher_availability.md # TeacherAvailability (가용시간)
+│   ├── teacher_availability.md # TeacherAvailability (가용시간) ✅
+│   ├── availability_slot.md    # AvailabilitySlot (계산된 슬롯) ✅
 │   ├── review.md               # TeacherReview, LessonFeedback (리뷰)
 │   ├── teacher.md              # Teacher, Certificate (선생님)
 │   ├── invite.md               # Follow, Membership (초대/연결)
@@ -47,7 +48,8 @@ docs/schema/
 | [LessonSchedule](entities/lesson_schedule.md) | 스케줄 설정, 5주차 정책 | [lesson_schedule.md](../specs/lesson/lesson_schedule.md) | 94-101 |
 | [LessonClass](entities/lesson_class.md) | 학원/개인레슨 클래스 | [student_class_system.md](../specs/student/student_class_system.md) | 60-62 |
 | [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) | - |
-| [TeacherAvailability](entities/teacher_availability.md) | 선생님 가용시간 (3계층) | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
+| [TeacherAvailability](entities/teacher_availability.md) | 선생님 가용시간 | [teacher_availability_spec.md](../specs/schedule/teacher_availability_spec.md) | 70-76 |
+| [AvailabilitySlot](entities/availability_slot.md) | 계산된 가용 슬롯 | [teacher_availability_spec.md](../specs/schedule/teacher_availability_spec.md) | - |
 | [CancellationPolicy](entities/cancellation_policy.md) | 취소/노쇼 정책 | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
 
 ### 학생/연습
@@ -124,7 +126,7 @@ docs/schema/
 | 81-89 | 연습공간 | PracticeSpace, CoachConnection, Assignment, InviteCode |
 | 90-93 | 예약 | Booking, LessonType, BookingStatus, TeacherStudentRelation |
 | 94-101 | 스케줄 | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy |
-| TBD | 가용시간 | TeacherAvailability (schema), WeeklySchedule, TimeException, GoogleCalendarSync |
+| 70-76 | 가용시간 | AvailabilityType (70), SlotStatus (71), TeacherAvailability (72), WeeklySchedule (73), ExceptionType (74), TimeException (75), AvailabilitySlot (76) |
 | TBD | 취소정책 | CancellationPolicy, NoShowPolicy, CancellationRecord, PenaltyResult |
 | TBD | 리뷰 | TeacherReview, ReviewerType, ReviewTrigger, CategoryRatings, LessonFeedback, LessonSatisfaction, TeacherResponse, TeacherReviewSettings, ReviewVisibility, TeacherBadge, TeacherReviewStats |
 | TBD | 선생님 | Teacher, ProfileCompletionLevel, PhoneVerification, Certificate, CertificateStatus, CertificateType, TeacherVerification, VerificationBadge, ProfileVisibilitySettings, ProfileVisibility, Education, Career, FeeRange, LessonType, Video |

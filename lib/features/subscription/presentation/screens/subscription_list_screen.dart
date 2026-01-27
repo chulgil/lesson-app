@@ -231,7 +231,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space6),
             FilledButton.icon(
-              onPressed: () => context.push(AppRoutes.selectTeacher),
+              onPressed: () => context.push(AppRoutes.teacherSearch),
               icon: const Icon(Icons.search),
               label: const Text('선생님 찾기'),
             ),

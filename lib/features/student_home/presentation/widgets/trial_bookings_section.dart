@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,7 +42,7 @@ class TrialBookingsSection extends ConsumerWidget {
               children: [
                 Text('내 체험레슨', style: AppTypography.headingMedium),
                 TextButton.icon(
-                  onPressed: () => context.push(AppRoutes.selectTeacher),
+                  onPressed: () => context.push(AppRoutes.teacherSearch),
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('신청'),
                 ),
@@ -105,7 +105,7 @@ class TrialBookingsSection extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           FilledButton.icon(
-            onPressed: () => context.push(AppRoutes.selectTeacher),
+            onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.add, size: 18),
             label: const Text('체험레슨 신청'),
           ),

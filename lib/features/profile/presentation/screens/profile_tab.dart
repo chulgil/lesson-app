@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -52,9 +52,9 @@ class ProfileTab extends StatelessWidget {
                 onTap: () => context.push(AppRoutes.lessonTimeSettings),
               ),
               _MenuItem(
-                icon: Icons.event_note,
-                label: '예약 관리',
-                onTap: () => context.push(AppRoutes.bookingList),
+                icon: Icons.calendar_month,
+                label: '가용 시간 관리',
+                onTap: () => context.push(AppRoutes.teacherAvailability),
               ),
               _MenuItem(
                 icon: Icons.pending_actions,

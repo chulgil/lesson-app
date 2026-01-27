@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -24,7 +24,19 @@ class CompactTrialBookingCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push(AppRoutes.bookingDetail.replaceFirst(':id', booking.id));
+          // Navigate to my bookings for this teacher
+          context.push(
+            AppRoutes.myBookings,
+            extra: {
+              'studentId': booking.studentId,
+              'studentName': booking.studentName,
+              'teacherId': booking.teacherId,
+              'teacherName': booking.teacherName,
+              'instrument': booking.instrument ?? '바이올린',
+              'remainingReschedules': 3,
+              'totalReschedules': 3,
+            },
+          );
         },
         child: Row(
           children: [

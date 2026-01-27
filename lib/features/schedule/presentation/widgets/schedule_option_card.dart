@@ -6,6 +6,10 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson_booking.dart';
 
 /// Display mode for schedule option card
+///
+/// **DEPRECATED**: Part of the old multi-option scheduling system.
+/// Use [AvailabilityChipSelector] for the new single-selection UI.
+@Deprecated('Use AvailabilityChipSelector. Will be removed in v2.0.')
 enum ScheduleOptionCardMode {
   /// Student view - editable with change/delete buttons
   student,
@@ -18,6 +22,10 @@ enum ScheduleOptionCardMode {
 }
 
 /// A card widget displaying a schedule option with priority
+///
+/// **DEPRECATED**: Part of the old multi-option scheduling system.
+/// Use [AvailabilityChipSelector] for the new single-selection UI.
+@Deprecated('Use AvailabilityChipSelector. Will be removed in v2.0.')
 class ScheduleOptionCard extends StatelessWidget {
   final ScheduleOption option;
   final ScheduleOptionCardMode mode;

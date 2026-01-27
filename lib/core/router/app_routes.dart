@@ -68,15 +68,14 @@ class AppRoutes {
   static const backupSettings = '/settings/backup';
   static const allRecordings = '/settings/recordings';
 
-  // Schedule routes
-  static const selectTeacher = '/schedule/teachers';
-  static const lessonTypeSelect = '/schedule/lesson/type';
+  // Schedule routes - Student
+  static const lessonBooking = '/schedule/booking';
+  static const myBookings = '/schedule/my-bookings';
+
+  // Schedule routes - Teacher
+  static const teacherAvailability = '/schedule/availability';
   static const pendingBookings = '/schedule/pending';
-  static const trialLessonRequest = '/schedule/trial/request';
-  static const regularLessonRequest = '/schedule/regular/request';
   static const registerRegularLesson = '/schedule/regular/register';
-  static const bookingList = '/schedule/bookings';
-  static const bookingDetail = '/schedule/booking/:id';
 
   // Subscription routes
   static const subscriptions = '/subscriptions';

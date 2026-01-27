@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -292,7 +292,12 @@ class TrialBookingCard extends ConsumerWidget {
 
   void _onModify(BuildContext context) {
     context.push(
-      '${AppRoutes.trialLessonRequest}?teacherId=${booking.teacherId}&teacherName=${booking.teacherName}&bookingId=${booking.id}',
+      AppRoutes.lessonBooking,
+      extra: {
+        'teacherId': booking.teacherId,
+        'teacherName': booking.teacherName,
+        'instrument': booking.instrument ?? '바이올린',
+      },
     );
   }
 
@@ -354,7 +359,12 @@ class TrialBookingCard extends ConsumerWidget {
 
   void _onRetry(BuildContext context) {
     context.push(
-      '/schedule/trial/request?teacherId=${booking.teacherId}&teacherName=${Uri.encodeComponent(booking.teacherName)}',
+      AppRoutes.lessonBooking,
+      extra: {
+        'teacherId': booking.teacherId,
+        'teacherName': booking.teacherName,
+        'instrument': booking.instrument ?? '바이올린',
+      },
     );
   }
 }

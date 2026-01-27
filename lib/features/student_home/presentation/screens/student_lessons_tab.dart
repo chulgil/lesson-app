@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -97,7 +97,7 @@ class _StudentLessonsTabState extends ConsumerState<StudentLessonsTab> {
               Text('내 레슨', style: AppTypography.headingLarge),
               FilledButton.icon(
                 onPressed: () {
-                  context.push(AppRoutes.selectTeacher);
+                  context.push(AppRoutes.teacherSearch);
                 },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('레슨 신청'),

@@ -269,6 +269,11 @@ enum ExperienceLevel {
 
 /// Schedule option for multi-option booking system
 /// Students can propose 1-3 options with priority ranking
+///
+/// **DEPRECATED**: Part of the old multi-option scheduling system.
+/// The new system uses [AvailabilitySlot] for single time slot selection.
+/// Kept for backward compatibility with existing bookings.
+@Deprecated('Use AvailabilitySlot for new bookings. Will be removed in v2.0.')
 class ScheduleOption {
   final String id;
   final int priority; // 1 = highest priority, 2, 3
