@@ -50,7 +50,10 @@ docs/schema/
 | [LessonLocation](entities/lesson_location.md) | 레슨 장소 | [student_class_system.md](../specs/student/student_class_system.md) | - |
 | [TeacherAvailability](entities/teacher_availability.md) | 선생님 가용시간 | [teacher_availability_spec.md](../specs/schedule/teacher_availability_spec.md) | 70-76 |
 | [AvailabilitySlot](entities/availability_slot.md) | 계산된 가용 슬롯 | [teacher_availability_spec.md](../specs/schedule/teacher_availability_spec.md) | - |
-| [CancellationPolicy](entities/cancellation_policy.md) | 취소/노쇼 정책 | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
+| [MakeupLesson](entities/makeup_lesson.md) | 보강 레슨 추적 | [lesson_schedule.md](../specs/lesson/lesson_schedule.md) | 85-87 |
+| [NoShowPolicy](entities/no_show_policy.md) | 노쇼 정책 | [lesson_schedule.md](../specs/lesson/lesson_schedule.md) | 88-89 |
+| [LessonScheduleChange](entities/lesson_schedule_change.md) | 스케줄 변경 이력 | [lesson_schedule.md](../specs/lesson/lesson_schedule.md) | 90-92 |
+| [CancellationPolicy](entities/cancellation_policy.md) | 취소 정책 | [trial_lesson_system.md](../specs/trial/trial_lesson_system.md) | TBD |
 
 ### 학생/연습
 
@@ -68,6 +71,8 @@ docs/schema/
 |--------|------|----------|:-----------:|
 | [Payment](entities/payment.md) | 결제, 청구서 | [payment_unified_spec.md](../specs/payment/payment_unified_spec.md) | 70-80 |
 | [Subscription](entities/subscription.md) | 수강권, 부가 서비스, 교차 수강 | [subscription_system_spec.md](../specs/subscription/subscription_system_spec.md) | 55-62 |
+| SubscriptionTemplate | 수강권 템플릿 (선생님 재사용) | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 80 |
+| SubscriptionProposal | 수강권 제안 | [subscription_proposal_spec.md](../specs/subscription/subscription_proposal_spec.md) | 81-82 |
 
 ### 사용자
 
@@ -127,7 +132,12 @@ docs/schema/
 | 90-93 | 예약 | Booking, LessonType, BookingStatus, TeacherStudentRelation |
 | 94-101 | 스케줄 | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy |
 | 70-76 | 가용시간 | AvailabilityType (70), SlotStatus (71), TeacherAvailability (72), WeeklySchedule (73), ExceptionType (74), TimeException (75), AvailabilitySlot (76) |
-| TBD | 취소정책 | CancellationPolicy, NoShowPolicy, CancellationRecord, PenaltyResult |
+| 77 | 수강권사용 | UsageType (77) - 레슨/늦은취소/노쇼/변경 구분 |
+| 80-84 | 수강권제안 | SubscriptionTemplate (80), ProposalStatus (81), SubscriptionProposal (82), LeadStatus (83), StudentLead (84) |
+| 85-87 | 보강 | MakeupStatus (85), MakeupReason (86), MakeupLesson (87) |
+| 88-89 | 노쇼정책 | NoShowPolicy (88), NoShowRecord (89) |
+| 90-92 | 스케줄변경 | ScheduleChangeType (90), ScheduleChangeStatus (91), LessonScheduleChange (92) |
+| TBD | 취소정책 | CancellationPolicy, CancellationRecord, PenaltyResult |
 | TBD | 리뷰 | TeacherReview, ReviewerType, ReviewTrigger, CategoryRatings, LessonFeedback, LessonSatisfaction, TeacherResponse, TeacherReviewSettings, ReviewVisibility, TeacherBadge, TeacherReviewStats |
 | TBD | 선생님 | Teacher, ProfileCompletionLevel, PhoneVerification, Certificate, CertificateStatus, CertificateType, TeacherVerification, VerificationBadge, ProfileVisibilitySettings, ProfileVisibility, Education, Career, FeeRange, LessonType, Video |
 | TBD | 초대 | Follow, FollowUserRole, InviteMethod, TeacherSettings, Membership, MembershipRole, MembershipStatus, PracticeLevel |
