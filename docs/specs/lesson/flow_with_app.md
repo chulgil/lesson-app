@@ -375,8 +375,8 @@ sequenceDiagram
     App->>Push: 학생에게 제안 알림
     Push->>S: "🎻 정기 레슨 제안\n3개 시간대 옵션 / 월 20만원"
 
-    S->>App: 제안 확인 → 옵션 중 선택
-    Note over S: 토요일 15:00 선택 (1순위)
+    S->>App: 제안 확인 → 시간 선택
+    Note over S: 토요일 15:00 탭 (원클릭)
 
     S->>App: 수락
 
