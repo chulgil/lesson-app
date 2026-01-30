@@ -1,6 +1,6 @@
 # CLAUDE.md - Lesson App {#overview}
 
-> 마지막 업데이트: 2026-01-12
+> 마지막 업데이트: 2026-01-29
 
 음악 레슨/연습 관리 앱 (Flutter)
 
@@ -331,6 +331,132 @@ class NewModel { ... }
 ```
 
 → [상세 UX 가이드라인](docs/specs/design/ux_guidelines.md#24-⚠️-claude-작업-시-ui-일관성-필수-준수)
+
+### 🎯 원샷 UX 설계 원칙
+
+> ⚠️ **중요**: 사용자의 **한 번 액션**에 최대한 많은 처리를 완료
+
+**원칙**: 각 액터(선생님, 학생, 학원)의 하나의 버튼 클릭/액션으로 관련된 모든 작업이 백그라운드에서 자동 처리되도록 설계
+
+| 설계 원칙 | 설명 | 예시 |
+|----------|------|------|
+| **원샷 완료** | 한 번 탭으로 모든 연관 작업 완료 | "수강권 발급" 1번 → 알림+스케줄+상태 모두 처리 |
+| **자동 연쇄 처리** | 사용자가 추가 액션 불필요 | 체험 수락 → 관계 생성, 캘린더 등록, 알림 발송 자동 |
+| **백그라운드 처리** | 로딩 없이 즉시 다음 화면 | 알림/이메일은 백그라운드에서 |
+| **양방향 즉시 반영** | 상대방 화면에도 즉시 표시 | 선생님이 수락 → 학생 화면 실시간 갱신 |
+
+**액터별 원샷 UX 예시**:
+
+| 액터 | 액션 (1회) | 자동 처리되는 것들 |
+|------|-----------|-------------------|
+| 선생님 | [수강권 발급] 탭 | 수강권 생성 + 학생 알림 + 관계 active + 스케줄 등록 |
+| 학생 | [레슨 요청] 탭 | 요청 생성 + 선생님 알림 + 이전 스케줄 첨부 |
+| 학원 | [선생님 초대] 탭 | 초대 생성 + 선생님 알림 + 임시 관계 생성 |
+
+**설계 체크리스트**:
+```markdown
+- [ ] 이 버튼 하나로 사용자가 원하는 결과가 완성되는가?
+- [ ] 사용자가 추가로 해야 할 단계가 남아있지 않은가?
+- [ ] 연관된 다른 데이터(알림, 상태, 스케줄)도 함께 처리되는가?
+- [ ] 상대방(다른 액터)의 화면에도 바로 반영되는가?
+```
+
+**예시: 체험 신청 플로우**
+```
+❌ 나쁜 설계 (여러 단계 필요):
+  학생: 체험 신청 → 대기
+  선생님: 신청 확인 → 수락 버튼 → 시간 선택 → 확정 버튼
+  학생: 알림 확인 → 캘린더 확인
+
+✅ 좋은 설계 (원샷 완료):
+  학생: 시간 선택 + 체험 신청 (1회)
+  선생님: [수락] 탭 (1회)
+    → 자동: 관계 생성, 캘린더 등록, 학생 알림, 리마인더 예약
+  학생: 푸시 알림으로 즉시 확인 (추가 액션 불필요)
+```
+
+### 🧩 공통 위젯 우선 사용 필수
+
+> ⚠️ **중요**: 새 위젯 작성 전 반드시 기존 공통 위젯 확인
+
+**원칙**: `lib/core/widgets/`에 공통 위젯이 있으면 반드시 해당 위젯을 사용
+
+| 상황 | Claude 행동 |
+|------|------------|
+| 공통 위젯 존재 | **공통 위젯 사용** (직접 구현 금지) |
+| 공통 위젯 없음 | 구현 후 **공통화 가능 여부 검토** |
+| 공통 위젯 수정 필요 | 사용자 동의 후 **공통 위젯 확장** |
+
+**주요 공통 위젯** (`lib/core/widgets/`):
+
+| 위젯 | 경로 | 용도 |
+|------|------|------|
+| `LessonCountSelector` | `selectors/` | 레슨 횟수 선택 (프리셋 + 직접 입력) |
+| `LessonDurationSelector` | `selectors/` | 수업 시간 선택 (프리셋 + 직접 입력) |
+| `ValidityPeriodSelector` | `selectors/` | 유효기간 선택 (프리셋 + 직접 입력) |
+| `DiscountPercentSelector` | `selectors/` | 할인율 선택 (프리셋 + 직접 입력) |
+| `BonusCountSelector` | `selectors/` | 보너스 횟수 선택 (프리셋 + 직접 입력) |
+| `WeekCalendarWidget` | `.` | 주간 캘린더 |
+| `QuickToolButton` | `.` | 빠른 도구 버튼 |
+| `StatCard` | `.` | 통계 카드 |
+
+**위젯 구현 전 체크리스트**:
+```markdown
+- [ ] `lib/core/widgets/`에 유사한 위젯이 있는가?
+- [ ] 있다면 해당 위젯을 사용했는가?
+- [ ] 새로 만든 위젯은 다른 곳에서도 재사용 가능한가? → 공통화 검토
+```
+
+**예시: 횟수/시간/기간 선택**
+```dart
+// ✅ 올바른 방법: 공통 위젯 사용
+LessonCountSelector(
+  selectedCount: _totalLessons,
+  isCustom: _isCustomLessons,
+  customController: _customLessonsController,
+  onCountChanged: (count, isCustom) { ... },
+)
+
+// ❌ 잘못된 방법: 직접 Wrap + ChoiceChip 구현
+Wrap(
+  children: [4, 8, 12, 16].map((count) {
+    return ChoiceChip(label: Text('$count회'), ...);
+  }).toList(),
+)
+```
+
+### 🔍 사전 검증 필수 (Pre-validation Required)
+
+> ⚠️ **중요**: 화면/기능 구현 후 사용자에게 테스트 요청하기 전 반드시 사전 검증
+
+**원칙**: 코드 작성 후 사용자 테스트 전에 Claude가 먼저 잠재적 문제를 검증
+
+| 검증 항목 | 확인 내용 |
+|----------|----------|
+| **Provider 의존성** | Mock 데이터 존재 확인, `keepAlive` 필요 여부 확인 |
+| **Dropdown 위젯** | 초기값이 items 목록에 포함되는지, `isExpanded` 설정 필요 여부 |
+| **AsyncValue 처리** | loading, error, data 상태 모두 처리되었는지 |
+| **레이아웃 검증** | Row 안 Expanded 사용 시 overflow 가능성, Flexible 대체 검토 |
+| **null 안전성** | nullable 변수 사용 시 null 체크 존재 여부 |
+
+**사전 검증 체크리스트**:
+```markdown
+- [ ] `flutter analyze` 통과 (error 없음)
+- [ ] Provider 코드 생성 완료 (`dart run build_runner build`)
+- [ ] Mock Repository에 테스트 데이터 존재 확인
+- [ ] Dropdown value가 items 리스트에 포함되는지 검증
+- [ ] Row 내부 Expanded → Flexible + isExpanded 조합 검토
+- [ ] Repository Provider에 keepAlive 필요 여부 확인
+```
+
+**자주 발생하는 오류 패턴**:
+
+| 오류 | 원인 | 해결 |
+|------|------|------|
+| 빈 화면 | Repository가 AutoDispose로 매번 새 인스턴스 생성 | `@Riverpod(keepAlive: true)` 추가 |
+| mouse_tracker 에러 | Dropdown 내부 Row + Expanded 조합 | `Flexible` + `isExpanded: true` 사용 |
+| Dropdown assertion | value가 items에 없음 | 유효성 검증 후 null 처리 |
+| Provider not found | 코드 생성 미완료 | `build_runner build` 실행 |
 
 ---
 
