@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../models/time_slot.dart';
 import '../../../../repositories/booking_repository.dart';
+import '../../../subscription/domain/services/auto_proposal_service.dart';
 import 'booking_repository_provider.dart';
 
 // Export repository provider
@@ -246,16 +247,42 @@ class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
   }
 
   /// Complete a lesson
+  /// For trial lessons, triggers auto-proposal if enabled
   Future<LessonBooking> completeLesson(String bookingId) async {
     state = const AsyncValue.loading();
     try {
       final booking = await _repository.completeLesson(bookingId);
+
+      // Trigger auto-proposal for completed trial lessons
+      if (booking.isTrial && booking.status == BookingStatus.completed) {
+        await _triggerAutoProposalForTrialLesson(booking);
+      }
+
       final bookings = await _repository.getAllBookings();
       state = AsyncValue.data(bookings);
       return booking;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
+    }
+  }
+
+  /// Trigger auto-proposal after trial lesson completion
+  Future<void> _triggerAutoProposalForTrialLesson(LessonBooking booking) async {
+    // Skip if no student ID (shouldn't happen for trial lessons)
+    if (booking.studentId == null) return;
+
+    try {
+      final autoProposalService = ref.read(autoProposalServiceProvider);
+      await autoProposalService.triggerAfterTrialCompletion(
+        teacherId: booking.teacherId,
+        studentId: booking.studentId!,
+        trialCompletedAt: DateTime.now(),
+      );
+    } catch (e) {
+      // Log error but don't fail the main operation
+      // Auto-proposal failure should not block lesson completion
+      debugPrint('Auto-proposal trigger failed: $e');
     }
   }
 

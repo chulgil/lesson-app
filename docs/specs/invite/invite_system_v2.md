@@ -1,26 +1,53 @@
-# 초대 시스템 v2 - 맞팔 기반 연결
+# 초대 시스템 v2
 
-> 마지막 업데이트: 2026-01-24
+> 마지막 업데이트: 2026-01-30
 
 > 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md)
 > 📦 **관련 엔티티**: [student.md](../../schema/entities/student.md), [parent.md](../../schema/entities/parent.md), [payment.md](../../schema/entities/payment.md)
+> 📖 **용어 정의**: [glossary.md](../glossary.md)
+
+---
+
+> ⚠️ **중요: 선생님-학생 관계 모델 업데이트**
+>
+> 선생님-학생 관계는 **수강권 중심 모델**로 변경되었습니다.
+> 본 문서의 선생님-학생 연결 관련 내용은 아래 문서를 참조하세요:
+>
+> **👉 [수강권 중심 관계 모델](./subscription_based_relationship.md)**
+>
+> | 개념 | 기존 (본 문서) | 변경 (새 문서) |
+> |------|--------------|---------------|
+> | 관계 정의 | ~~맞팔~~ | **수강권 상태** |
+> | 팔로우 용도 | ~~레슨 관계~~ | **소식 구독** (공연/행사) |
+> | 상태 전환 | 수동 | **자동** (수강권 기반) |
+>
+> **👉 연결 플로우 상세**:
+> - [앱 사용 플로우](../lesson/flow_with_app.md) - 신규/재등록/앱 전환 전체 플로우
+> - [기존 정기레슨 → 앱 전환](../lesson/flow_with_app.md#25-기존-정기레슨--앱-전환-플로우) - 오프라인 학생 앱 전환
+>
+> 본 문서에서 유효한 부분:
+> - ✅ 학부모 연결 시스템
+> - ✅ 학원-선생님 소속 시스템
+> - ✅ QR/URL/코드 기반 초대
+
+---
 
 ## 개요
 
-**상호 팔로우(맞팔)** 기반의 연결 시스템입니다.
+초대 및 연결 시스템입니다.
 다음 관계 유형을 지원합니다:
 
-| 관계 | 설명 |
-|------|------|
-| **선생님 ↔ 학생** | 맞팔 기반 연결, 수기 등록 지원 |
-| **학부모 ↔ 선생님** | 자녀 통해 연결, 대리 관리 |
-| **학원 ↔ 선생님** | 소속 관계, 역할 기반 권한 |
+| 관계 | 설명 | 참조 |
+|------|------|------|
+| **선생님 ↔ 학생** | 수강권 기반 관계 | 👉 [subscription_based_relationship.md](./subscription_based_relationship.md) |
+| **학부모 ↔ 선생님** | 자녀 통해 연결, 대리 관리 | 본 문서 |
+| **학원 ↔ 선생님** | 소속 관계, 역할 기반 권한 | 본 문서 |
 
 ### 핵심 변경점 (v1 → v2)
 
 | 항목 | v1 | v2 |
 |------|----|----|
-| 연결 방식 | 요청 → 수락 2단계 | **자동 맞팔** (즉시 연결) |
+| 연결 방식 | 요청 → 수락 2단계 | **QR 스캔 = 자동 연결** (제로 탭) |
 | 학생 등록 | 앱 연결 필수 | **수기 등록 지원** |
 | 검색 방식 | 코드 입력 | **연락처 동기화 + 코드** |
 | 상태 표시 | 없음 | **아이콘으로 연결 상태 표시** |
@@ -217,6 +244,9 @@
    - **자동 수락 (기본)**: 즉시 맞팔 처리
    - **수동 수락**: 선생님이 알림에서 수락/거절
 3. **수기 학생 매칭**: 전화번호 일치 시 자동 연결
+4. **기존 정기레슨 → 앱 전환**: QR 스캔 후 선생님이 수강권 직접 등록
+   - 체험/결제 대기 없이 즉시 active 전환
+   - 👉 상세: [flow_with_app.md 섹션 2.5](../lesson/flow_with_app.md#25-기존-정기레슨--앱-전환-플로우)
 
 ### 선생님 설정
 
@@ -809,6 +839,12 @@ Future<Student> createStudent({
 | 결제 정산 | 선생님에게 직접 | 학원 통해 정산 |
 | UI 표시 | 개인 탭 | 학원 탭 |
 
+> ✅ **구현 완료**: 선생님 검색 화면에서 학원/개인 탭 분리 구현됨
+> - `TeacherSearchType.academy` / `TeacherSearchType.individual` enum
+> - `TeacherProfile.organizationId/organizationName` 필드
+> - TabBar UI로 탭 전환 시 자동 필터 적용
+> - 학원 소속 선생님 카드에 학원 이름 뱃지 표시
+
 ### 선생님 학원 탈퇴/제명
 
 #### 탈퇴 플로우
@@ -1146,9 +1182,13 @@ Student에 추가되는 필드:
 | poor | 🔴 | 주 1-2일 |
 | onBreak | ⚪ | 휴강 |
 
-### Follow 모델 (신규)
+### Follow 모델 (소식 구독)
 
-> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md#follow-맞팔-관계)
+> 📦 **엔티티 정의**: [invite.md](../../schema/entities/invite.md#follow-소식-구독)
+> 📖 **용어 정의**: [glossary.md](../glossary.md#12-팔로우-follow--소식-구독)
+>
+> ⚠️ **참고**: Follow는 **소식 구독** 용도입니다.
+> 레슨 관계는 [TeacherStudentRelation](./subscription_based_relationship.md)을 사용합니다.
 
 | 필드 | 설명 |
 |------|------|
@@ -1170,8 +1210,11 @@ Student에 추가되는 필드:
 
 ### 연결 판정 로직
 
+> ⚠️ **레거시 코드**: 아래 코드의 "맞팔"은 **소식 구독**의 상호 팔로우를 의미합니다.
+> 레슨 관계 판정은 `TeacherStudentRelation.status`를 사용하세요.
+
 ```dart
-// 맞팔 여부 확인
+// 상호 팔로우 여부 확인 (소식 구독용)
 bool isMutualFollow(String userId1, String userId2) {
   final follow1 = follows.any((f) =>
     f.followerId == userId1 && f.followeeId == userId2);

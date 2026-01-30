@@ -5,6 +5,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../models/notification_settings.dart';
 import '../../../../services/notification/notification_service.dart';
 import '../../../../services/notification/practice_reminder_scheduler.dart';
+import '../../domain/entities/notification.dart';
+import '../../domain/services/connection_notification_service.dart';
+import '../../domain/services/proposal_notification_service.dart';
 
 part 'notification_providers.g.dart';
 
@@ -21,6 +24,20 @@ LocalNotificationService notificationService(Ref ref) {
 PracticeReminderScheduler practiceReminderScheduler(Ref ref) {
   final notificationService = ref.watch(notificationServiceProvider);
   return PracticeReminderScheduler(notificationService);
+}
+
+/// Provider for connection notification service
+@riverpod
+ConnectionNotificationService connectionNotificationService(Ref ref) {
+  final notificationService = ref.watch(notificationServiceProvider);
+  return ConnectionNotificationService(notificationService);
+}
+
+/// Provider for proposal notification service
+@riverpod
+ProposalNotificationService proposalNotificationService(Ref ref) {
+  final notificationService = ref.watch(notificationServiceProvider);
+  return ProposalNotificationService(notificationService);
 }
 
 /// Provider for student notification settings
@@ -123,5 +140,132 @@ class TeacherNotificationSettingsNotifier extends _$TeacherNotificationSettingsN
 
   void toggleDnd(bool enabled) {
     state = state.copyWith(dndEnabled: enabled);
+  }
+}
+
+// ============================================================
+// Notification List & Actions Providers (for UI)
+// ============================================================
+
+/// Provider for user's notifications list
+/// TODO: Replace with actual API/Hive data source
+@riverpod
+Future<List<AppNotification>> userNotifications(Ref ref) async {
+  // Mock data for now - replace with actual repository
+  await Future.delayed(const Duration(milliseconds: 300));
+
+  final now = DateTime.now();
+  return [
+    // ============================================================
+    // 🎁 수강권 제안 알림
+    // 학생별로 1개의 제안만 존재 (시스템 자동 또는 선생님 수동)
+    // ============================================================
+
+    // student_1: 체험레슨 후 시스템 자동 제안
+    AppNotification(
+      id: 'n_proposal_1',
+      userId: 'current_user',
+      type: NotificationType.proposalReceived,
+      priority: NotificationPriority.high,
+      title: '수강권 제안이 도착했어요!',
+      body: '체험레슨 후 72시간 골든타임 할인 혜택을 확인해보세요',
+      createdAt: now.subtract(const Duration(hours: 1)),
+      sentAt: now.subtract(const Duration(hours: 1)),
+      actionUrl: '/proposals/proposal_auto_1',
+      actionLabel: '제안 확인하기',
+      data: {
+        'proposalId': 'proposal_auto_1',
+        'teacherId': 'teacher_1',
+        'isAutoProposal': true,
+      },
+    ),
+
+    // ============================================================
+    // 기존 알림
+    // ============================================================
+
+    AppNotification(
+      id: 'n1',
+      userId: 'current_user',
+      type: NotificationType.connectionRequestAccepted,
+      priority: NotificationPriority.high,
+      title: '연결 완료',
+      body: '김선생님과 연결되었습니다! 지금 체험레슨을 예약해보세요.',
+      createdAt: now.subtract(const Duration(minutes: 5)),
+      sentAt: now.subtract(const Duration(minutes: 5)),
+      actionUrl: '/teachers/teacher_1?name=${Uri.encodeComponent('김선생님')}',
+      actionLabel: '선생님 보기',
+    ),
+    AppNotification(
+      id: 'n2',
+      userId: 'current_user',
+      type: NotificationType.lessonReminder,
+      priority: NotificationPriority.normal,
+      title: '레슨 알림',
+      body: '내일 오후 3시 김선생님과 레슨이 있습니다',
+      createdAt: now.subtract(const Duration(hours: 2)),
+      sentAt: now.subtract(const Duration(hours: 2)),
+      readAt: now.subtract(const Duration(hours: 1)),
+    ),
+    AppNotification(
+      id: 'n3',
+      userId: 'current_user',
+      type: NotificationType.practiceReminder,
+      priority: NotificationPriority.normal,
+      title: '연습 시간이에요!',
+      body: '오늘의 연습 목표를 달성해보세요',
+      createdAt: now.subtract(const Duration(days: 1)),
+      sentAt: now.subtract(const Duration(days: 1)),
+    ),
+    AppNotification(
+      id: 'n4',
+      userId: 'current_user',
+      type: NotificationType.streakMilestone,
+      priority: NotificationPriority.low,
+      title: '🔥 연속 연습 달성!',
+      body: '7일 연속 연습을 달성했어요!',
+      createdAt: now.subtract(const Duration(days: 2)),
+      sentAt: now.subtract(const Duration(days: 2)),
+      readAt: now.subtract(const Duration(days: 2)),
+    ),
+  ];
+}
+
+/// Provider for unread notification count (for badge)
+@riverpod
+int unreadNotificationCount(Ref ref) {
+  final notificationsAsync = ref.watch(userNotificationsProvider);
+  return notificationsAsync.when(
+    data: (notifications) => notifications.where((n) => !n.isRead).length,
+    loading: () => 0,
+    error: (_, __) => 0,
+  );
+}
+
+/// Notifier for notification actions (mark as read, delete, etc.)
+@riverpod
+class NotificationActions extends _$NotificationActions {
+  @override
+  void build() {
+    // No state needed, just actions
+  }
+
+  /// Mark a single notification as read
+  Future<void> markAsRead(String notificationId) async {
+    // TODO: Implement with actual repository
+    // For now, just invalidate the provider to refresh
+    ref.invalidate(userNotificationsProvider);
+  }
+
+  /// Mark all notifications as read
+  Future<void> markAllAsRead() async {
+    // TODO: Implement with actual repository
+    ref.invalidate(userNotificationsProvider);
+  }
+
+  /// Delete a notification
+  Future<void> deleteNotification(String notificationId) async {
+    // TODO: Implement with actual repository
+    ref.invalidate(userNotificationsProvider);
   }
 }

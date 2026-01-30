@@ -9,6 +9,17 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/invite.dart';
 import '../../../../providers/invite/invite_provider.dart';
 
+/// QR code type
+enum _QrType { invite, academy }
+
+/// Parsed QR result
+class _ParsedQr {
+  final _QrType type;
+  final String value;
+
+  const _ParsedQr(this.type, this.value);
+}
+
 /// Screen for scanning QR codes to connect with teachers/students
 class ScanInviteScreen extends ConsumerStatefulWidget {
   const ScanInviteScreen({super.key});
@@ -237,21 +248,27 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
 
     try {
       // Parse the QR code data
-      // Expected format: lessonapp://invite/CODE
-      final inviteCode = _parseInviteCode(rawValue);
+      final parsed = _parseQrCode(rawValue);
 
-      if (inviteCode != null) {
-        // Look up the invite
-        final invite =
-            await ref.read(inviteByCodeProvider(inviteCode).future);
-
-        if (invite != null && invite.isValid) {
+      if (parsed != null) {
+        if (parsed.type == _QrType.academy) {
+          // Navigate to academy detail screen
           if (mounted) {
-            // Navigate to confirmation screen
-            context.push('/invite/confirm', extra: invite);
+            context.push('/academy/${parsed.value}');
           }
-        } else {
-          _showError('유효하지 않은 초대 코드입니다');
+        } else if (parsed.type == _QrType.invite) {
+          // Look up the invite
+          final invite =
+              await ref.read(inviteByCodeProvider(parsed.value).future);
+
+          if (invite != null && invite.isValid) {
+            if (mounted) {
+              // Navigate to confirmation screen
+              context.push('/invite/confirm', extra: invite);
+            }
+          } else {
+            _showError('유효하지 않은 초대 코드입니다');
+          }
         }
       } else {
         _showError('올바른 QR 코드가 아닙니다');
@@ -265,19 +282,22 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
     }
   }
 
-  String? _parseInviteCode(String rawValue) {
-    // Try to parse as URL: lessonapp://invite/CODE
+  _ParsedQr? _parseQrCode(String rawValue) {
     final uri = Uri.tryParse(rawValue);
-    if (uri != null &&
-        uri.scheme == 'lessonapp' &&
-        uri.host == 'invite' &&
-        uri.pathSegments.isNotEmpty) {
-      return uri.pathSegments.first;
+    if (uri != null && uri.scheme == 'lessonapp') {
+      // lessonapp://academy/{academyId}
+      if (uri.host == 'academy' && uri.pathSegments.isNotEmpty) {
+        return _ParsedQr(_QrType.academy, uri.pathSegments.first);
+      }
+      // lessonapp://invite/{code}
+      if (uri.host == 'invite' && uri.pathSegments.isNotEmpty) {
+        return _ParsedQr(_QrType.invite, uri.pathSegments.first);
+      }
     }
 
-    // If it's just a 6-digit code
+    // If it's just a 6-digit code (invite code)
     if (RegExp(r'^\d{6}$').hasMatch(rawValue)) {
-      return rawValue;
+      return _ParsedQr(_QrType.invite, rawValue);
     }
 
     return null;

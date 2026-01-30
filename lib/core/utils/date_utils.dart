@@ -2,6 +2,44 @@
 class LessonDateUtils {
   LessonDateUtils._();
 
+  /// Korean weekday names (1=월 to 7=일)
+  static const List<String> weekdayNamesKorean = [
+    '월', '화', '수', '목', '금', '토', '일',
+  ];
+
+  /// Full Korean weekday names (1=월요일 to 7=일요일)
+  static const List<String> weekdayFullNamesKorean = [
+    '월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일',
+  ];
+
+  /// Get short Korean weekday name (1=월, 2=화, ...)
+  /// [weekday] should be 1-7 (1=Monday, 7=Sunday)
+  static String getWeekdayNameKorean(int weekday) {
+    if (weekday < 1 || weekday > 7) {
+      throw ArgumentError('Weekday must be between 1 and 7, got: $weekday');
+    }
+    return weekdayNamesKorean[weekday - 1];
+  }
+
+  /// Get full Korean weekday name (1=월요일, 2=화요일, ...)
+  /// [weekday] should be 1-7 (1=Monday, 7=Sunday)
+  static String getWeekdayFullNameKorean(int weekday) {
+    if (weekday < 1 || weekday > 7) {
+      throw ArgumentError('Weekday must be between 1 and 7, got: $weekday');
+    }
+    return weekdayFullNamesKorean[weekday - 1];
+  }
+
+  /// Format schedule display (e.g., "화요일 15:00" or "매주 화요일 15:00")
+  static String formatScheduleDisplay({
+    required int weekday,
+    required String time,
+    bool includeWeekly = false,
+  }) {
+    final dayName = getWeekdayFullNameKorean(weekday);
+    return includeWeekly ? '매주 $dayName $time' : '$dayName $time';
+  }
+
   /// Get the week number of the month for a given date (ISO week, Monday start)
   /// Week 1: Days 1-7 that include Monday
   /// Example: Dec 15, 2024 (Sunday) -> Week 3

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../notifications/domain/entities/notification.dart';
+import '../../../notifications/presentation/providers/notification_providers.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_date_navigator.dart';
@@ -24,6 +28,7 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
   final int remainingReschedules;
   final int totalReschedules;
   final String? instrument;
+  final String? subscriptionId; // 🆕 For reschedule count deduction
 
   const BookingRescheduleScreen({
     super.key,
@@ -37,6 +42,7 @@ class BookingRescheduleScreen extends ConsumerStatefulWidget {
     required this.remainingReschedules,
     required this.totalReschedules,
     this.instrument,
+    this.subscriptionId,
   });
 
   @override
@@ -522,6 +528,18 @@ class _BookingRescheduleScreenState
             widget.studentName,
           );
 
+      // 3. 🆕 Deduct reschedule allowance from subscription
+      int newRemainingReschedules = widget.remainingReschedules - 1;
+      if (widget.subscriptionId != null) {
+        final updated = await ref
+            .read(subscriptionNotifierProvider(widget.studentId).notifier)
+            .useReschedule(widget.subscriptionId!);
+        newRemainingReschedules = updated.remainingReschedule;
+      }
+
+      // 4. 🆕 Send notification about reschedule allowance usage
+      await _sendRescheduleNotification(newRemainingReschedules);
+
       if (mounted) {
         // Show success and pop
         ScaffoldMessenger.of(context).showSnackBar(
@@ -556,5 +574,44 @@ class _BookingRescheduleScreenState
     final hour = widget.currentStartTime.hour.toString().padLeft(2, '0');
     final minute = widget.currentStartTime.minute.toString().padLeft(2, '0');
     return '${widget.currentDate.month}/${widget.currentDate.day}($weekday) $hour:$minute';
+  }
+
+  /// 🆕 Send notification about reschedule allowance usage
+  Future<void> _sendRescheduleNotification(int remainingCount) async {
+    final notificationService = ref.read(notificationServiceProvider);
+
+    if (remainingCount <= 0) {
+      // All reschedules used - send depletion warning
+      final notification = AppNotification(
+        id: const Uuid().v4(),
+        userId: widget.studentId,
+        type: NotificationType.rescheduleAllowanceDepleted,
+        priority: NotificationPriority.high,
+        title: '변경권을 모두 사용했습니다',
+        body: '더 이상 레슨 일정을 직접 변경할 수 없습니다. 변경이 필요한 경우 선생님에게 문의해주세요.',
+        createdAt: DateTime.now(),
+        data: {
+          'subscriptionId': widget.subscriptionId,
+          'teacherId': widget.teacherId,
+        },
+      );
+      await notificationService.showNotification(notification);
+    } else if (remainingCount == 1) {
+      // Last reschedule remaining - send warning
+      final notification = AppNotification(
+        id: const Uuid().v4(),
+        userId: widget.studentId,
+        type: NotificationType.rescheduleAllowanceUsed,
+        priority: NotificationPriority.normal,
+        title: '변경권 1회 남음',
+        body: '변경권이 1회 남았습니다. 신중하게 사용해주세요.',
+        createdAt: DateTime.now(),
+        data: {
+          'subscriptionId': widget.subscriptionId,
+          'remainingCount': remainingCount,
+        },
+      );
+      await notificationService.showNotification(notification);
+    }
   }
 }

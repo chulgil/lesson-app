@@ -430,6 +430,50 @@ final pendingRequestCountProvider = AutoDisposeFutureProvider<int>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PendingRequestCountRef = AutoDisposeFutureProviderRef<int>;
+String _$myDisconnectedConnectionsHash() =>
+    r'0581ae9bb5cd67574ec793ca2ea6b3df576ffedd';
+
+/// Get inactive/disconnected connections for current user
+/// Used in teacher search to show "이전에 레슨했어요" teachers
+///
+/// Copied from [myDisconnectedConnections].
+@ProviderFor(myDisconnectedConnections)
+final myDisconnectedConnectionsProvider =
+    AutoDisposeFutureProvider<List<Connection>>.internal(
+  myDisconnectedConnections,
+  name: r'myDisconnectedConnectionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$myDisconnectedConnectionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef MyDisconnectedConnectionsRef
+    = AutoDisposeFutureProviderRef<List<Connection>>;
+String _$previousTeacherIdsHash() =>
+    r'5e52adaa777b08a589860f95074e9c94d62d5109';
+
+/// Get teacher IDs that the current student previously had lessons with
+///
+/// Copied from [previousTeacherIds].
+@ProviderFor(previousTeacherIds)
+final previousTeacherIdsProvider =
+    AutoDisposeFutureProvider<Set<String>>.internal(
+  previousTeacherIds,
+  name: r'previousTeacherIdsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$previousTeacherIdsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef PreviousTeacherIdsRef = AutoDisposeFutureProviderRef<Set<String>>;
 String _$currentInviteUserRoleHash() =>
     r'588b216dacf821ea8d22a0a20f104b36a1e0303c';
 
@@ -525,7 +569,7 @@ final connectionRequesterProvider = AutoDisposeNotifierProvider<
 typedef _$ConnectionRequester
     = AutoDisposeNotifier<AsyncValue<ConnectionRequest?>>;
 String _$connectionRequestResponderHash() =>
-    r'8b6fa4c19a2472f655bf6c0351cb3b7fd33f873a';
+    r'6d9963280f4d32775013747bea37a0b28312c6af';
 
 /// Accept/Reject connection request
 ///

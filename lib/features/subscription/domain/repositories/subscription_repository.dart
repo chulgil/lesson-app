@@ -27,6 +27,11 @@ abstract class SubscriptionRepository {
     String? instrument,
   });
 
+  /// Use one reschedule allowance (increment usedRescheduleCount by 1).
+  /// Returns the updated subscription.
+  /// Throws if no reschedule allowance remaining.
+  Future<Subscription> useReschedule(String id);
+
   /// Update subscription status.
   Future<void> updateStatus(String id, SubscriptionStatus status);
 

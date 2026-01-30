@@ -8,6 +8,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../models/teacher_search.dart';
 import '../../../../providers/search/teacher_search_provider.dart';
+import '../../../parent_home/presentation/providers/user_profile_provider.dart';
+import '../../../profile/domain/entities/invite.dart';
+import '../../../profile/presentation/providers/invite_provider.dart';
 
 /// Teacher public profile detail screen
 class TeacherDetailScreen extends ConsumerWidget {
@@ -72,13 +75,21 @@ class TeacherDetailScreen extends ConsumerWidget {
   }
 }
 
-class _TeacherDetailContent extends StatelessWidget {
+class _TeacherDetailContent extends ConsumerWidget {
   final TeacherPublicProfile profile;
 
   const _TeacherDetailContent({required this.profile});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Check if this is a previous teacher (disconnected)
+    final disconnectedConnectionsAsync = ref.watch(myDisconnectedConnectionsProvider);
+    final isPreviousTeacher = disconnectedConnectionsAsync.valueOrNull
+            ?.any((c) => c.teacherId == profile.id) ??
+        false;
+    final disconnectedConnection = disconnectedConnectionsAsync.valueOrNull
+        ?.where((c) => c.teacherId == profile.id)
+        .firstOrNull;
     return CustomScrollView(
       slivers: [
         // App bar with profile image
@@ -238,19 +249,8 @@ class _TeacherDetailContent extends StatelessWidget {
                   const SizedBox(height: AppSpacing.space4),
                 ],
 
-                // Fee range
-                if (profile.feeRange != null) ...[
-                  _buildSection(
-                    icon: Icons.payments_outlined,
-                    title: '수강료',
-                    child: Text(
-                      '${_formatCurrency(profile.feeRange!.minFee)} ~ ${_formatCurrency(profile.feeRange!.maxFee)}원 / ${profile.feeRange!.duration}분',
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textSecondaryLight),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                ],
+                // 수강료는 선생님이 제안 시 직접 안내하므로 공개 프로필에서 제외
+                // (수강권 시스템으로 가격 협상 가능)
 
                 // Education
                 if (profile.education != null &&
@@ -368,55 +368,88 @@ class _TeacherDetailContent extends StatelessWidget {
                   const SizedBox(height: AppSpacing.space4),
                 ],
 
-                // Lesson request buttons
+                // Lesson request buttons or Reconnect button
                 const SizedBox(height: AppSpacing.space6),
-                Row(
-                  children: [
-                    // Trial lesson button
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          context.push(
-                            '/schedule/trial/request?teacherId=${profile.id}&teacherName=${Uri.encodeComponent(profile.name ?? '')}',
-                          );
-                        },
-                        icon: const Icon(Icons.school_outlined),
-                        label: const Text('체험레슨'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.secondary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.space3),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                if (isPreviousTeacher) ...[
+                  // Previous teacher - show reconnect button
+                  _buildReconnectSection(context, ref, disconnectedConnection),
+                ] else ...[
+                  // New teacher - show trial/regular lesson buttons
+                  Builder(
+                    builder: (context) {
+                      final userProfile = ref.watch(currentUserProfileProvider);
+                      return Row(
+                        children: [
+                          // Trial lesson button
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // Navigate to new chip-based booking screen for trial lesson
+                                context.push(
+                                  '/schedule/booking',
+                                  extra: {
+                                    'teacherId': profile.id,
+                                    'teacherName': profile.name ?? '',
+                                    'instrument': profile.instruments.isNotEmpty
+                                        ? profile.instruments.first
+                                        : '악기',
+                                    'studentId': userProfile.userId,
+                                    'studentName': userProfile.userName,
+                                    'isTrialLesson': true,
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.school_outlined),
+                              label: const Text('체험레슨'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.secondary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.space3),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space3),
-                    // Regular lesson button
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          context.push(
-                            '/schedule/regular/request?teacherId=${profile.id}&teacherName=${Uri.encodeComponent(profile.name ?? '')}',
-                          );
-                        },
-                        icon: const Icon(Icons.calendar_today),
-                        label: const Text('정규레슨'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.space3),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: AppSpacing.space3),
+                          // Regular lesson button
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                // Navigate to new chip-based booking screen for regular lesson
+                                context.push(
+                                  '/schedule/booking',
+                                  extra: {
+                                    'teacherId': profile.id,
+                                    'teacherName': profile.name ?? '',
+                                    'instrument': profile.instruments.isNotEmpty
+                                        ? profile.instruments.first
+                                        : '악기',
+                                    'studentId': userProfile.userId,
+                                    'studentName': userProfile.userName,
+                                    'isTrialLesson': false,
+                                  },
+                                );
+                              },
+                              icon: const Icon(Icons.calendar_today),
+                              label: const Text('정규레슨'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: AppSpacing.space3),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.space6),
               ],
             ),
@@ -424,6 +457,111 @@ class _TeacherDetailContent extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildReconnectSection(
+    BuildContext context,
+    WidgetRef ref,
+    Connection? disconnectedConnection,
+  ) {
+    // Format previous lesson period
+    String? previousLessonPeriod;
+    if (disconnectedConnection?.connectedAt != null) {
+      final start = _formatDate(disconnectedConnection!.connectedAt);
+      final end = disconnectedConnection.deactivatedAt != null
+          ? _formatDate(disconnectedConnection.deactivatedAt!)
+          : '';
+      previousLessonPeriod = '$start ~ $end';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Previous lesson info banner
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.info.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(
+              color: AppColors.info.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.history, color: AppColors.info, size: 24),
+              const SizedBox(width: AppSpacing.space2),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '이전에 레슨을 받았던 선생님입니다',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.info,
+                      ),
+                    ),
+                    if (previousLessonPeriod != null)
+                      Text(
+                        previousLessonPeriod,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        // Lesson request button (not direct booking - teacher needs to propose subscription)
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              final userProfile = ref.read(currentUserProfileProvider);
+              // Navigate to lesson request screen (not booking screen)
+              // Teacher will review and send subscription proposal
+              context.push(
+                '/schedule/lesson-request',
+                extra: {
+                  'teacherId': profile.id,
+                  'teacherName': profile.name ?? '',
+                  'studentId': userProfile.userId,
+                  'studentName': userProfile.userName,
+                  'previousLessonPeriod': previousLessonPeriod,
+                },
+              );
+            },
+            icon: const Icon(Icons.send),
+            label: const Text('레슨 요청'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        // Info text
+        Text(
+          '선생님이 스케줄 확인 후 수강권을 제안합니다',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}.${date.month}.${date.day}';
   }
 
   Widget _buildBadgesSection() {
@@ -535,12 +673,5 @@ class _TeacherDetailContent extends StatelessWidget {
       case LessonType.visit:
         return '방문 수업';
     }
-  }
-
-  String _formatCurrency(int amount) {
-    if (amount >= 10000) {
-      return '${(amount / 10000).toStringAsFixed(amount % 10000 == 0 ? 0 : 1)}만';
-    }
-    return amount.toString();
   }
 }

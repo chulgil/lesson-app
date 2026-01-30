@@ -3,6 +3,15 @@
 
 import 'teacher_profile.dart';
 
+/// Type of teacher/academy to search for
+enum TeacherSearchType {
+  /// Search for academies (organizationId != null)
+  academy,
+
+  /// Search for individual teachers (organizationId == null)
+  individual,
+}
+
 /// Search filter for finding teachers
 class TeacherSearchFilter {
   final String? keyword;
@@ -14,6 +23,7 @@ class TeacherSearchFilter {
   final int? minExperience;
   final bool? hasVerifiedCertificate;
   final ProfileCompletionLevel? minCompletionLevel;
+  final TeacherSearchType? teacherType;
 
   const TeacherSearchFilter({
     this.keyword,
@@ -25,6 +35,7 @@ class TeacherSearchFilter {
     this.minExperience,
     this.hasVerifiedCertificate,
     this.minCompletionLevel,
+    this.teacherType,
   });
 
   static const empty = TeacherSearchFilter();
@@ -39,6 +50,8 @@ class TeacherSearchFilter {
       minExperience == null &&
       hasVerifiedCertificate == null &&
       minCompletionLevel == null;
+  // Note: teacherType is not included in isEmpty check
+  // because it's controlled by tab, not by filter sheet
 
   TeacherSearchFilter copyWith({
     String? keyword,
@@ -50,6 +63,7 @@ class TeacherSearchFilter {
     int? minExperience,
     bool? hasVerifiedCertificate,
     ProfileCompletionLevel? minCompletionLevel,
+    TeacherSearchType? teacherType,
   }) {
     return TeacherSearchFilter(
       keyword: keyword ?? this.keyword,
@@ -62,6 +76,7 @@ class TeacherSearchFilter {
       hasVerifiedCertificate:
           hasVerifiedCertificate ?? this.hasVerifiedCertificate,
       minCompletionLevel: minCompletionLevel ?? this.minCompletionLevel,
+      teacherType: teacherType ?? this.teacherType,
     );
   }
 
@@ -74,6 +89,7 @@ class TeacherSearchFilter {
         minExperience: minExperience,
         hasVerifiedCertificate: hasVerifiedCertificate,
         minCompletionLevel: minCompletionLevel,
+        teacherType: teacherType,
       );
 }
 
@@ -118,6 +134,8 @@ class TeacherPublicProfile {
   final String id;
   final String? name;
   final String? profileImage;
+  final String? organizationId;
+  final String? organizationName;
   final List<String> instruments;
   final String introduction;
   final int? experienceYears;
@@ -130,10 +148,18 @@ class TeacherPublicProfile {
   final List<VerificationBadge> badges;
   final ProfileCompletionLevel completionLevel;
 
+  /// Check if this is an academy teacher
+  bool get isAcademy => organizationId != null;
+
+  /// Check if this is an individual teacher
+  bool get isIndividual => organizationId == null;
+
   const TeacherPublicProfile({
     required this.id,
     this.name,
     this.profileImage,
+    this.organizationId,
+    this.organizationName,
     required this.instruments,
     required this.introduction,
     this.experienceYears,
@@ -159,6 +185,8 @@ class TeacherPublicProfile {
       profileImage: settings.photoVisibility == ProfileVisibility.public
           ? profile.profileImage
           : null,
+      organizationId: profile.organizationId,
+      organizationName: profile.organizationName,
       instruments: profile.instruments,
       introduction: profile.introduction,
       experienceYears: profile.experienceYears,

@@ -122,6 +122,14 @@ class Subscription extends HiveObject {
   @HiveField(18)
   final String? bonusReason; // Reason for bonus (e.g., "5주차", "이벤트")
 
+  /// 🆕 Total reschedule allowance (from template)
+  @HiveField(19)
+  final int totalRescheduleAllowance;
+
+  /// 🆕 Used reschedule count
+  @HiveField(20)
+  final int usedRescheduleCount;
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -142,6 +150,8 @@ class Subscription extends HiveObject {
     this.billingDay,
     this.fifthWeekPolicy,
     this.bonusReason,
+    this.totalRescheduleAllowance = 2, // 기본값: 2회
+    this.usedRescheduleCount = 0,
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
@@ -177,6 +187,13 @@ class Subscription extends HiveObject {
 
   /// Check if has bonus lessons.
   bool get hasBonus => bonusCount > 0;
+
+  /// 🆕 Remaining reschedule count.
+  int get remainingReschedule =>
+      totalRescheduleAllowance - usedRescheduleCount;
+
+  /// 🆕 Check if student can reschedule (has remaining allowance).
+  bool get canReschedule => remainingReschedule > 0;
 
   /// Days until expiration.
   int? get daysUntilExpiration =>
@@ -383,6 +400,8 @@ class Subscription extends HiveObject {
     int? billingDay,
     FifthWeekPolicy? fifthWeekPolicy,
     String? bonusReason,
+    int? totalRescheduleAllowance,
+    int? usedRescheduleCount,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -404,6 +423,9 @@ class Subscription extends HiveObject {
       billingDay: billingDay ?? this.billingDay,
       fifthWeekPolicy: fifthWeekPolicy ?? this.fifthWeekPolicy,
       bonusReason: bonusReason ?? this.bonusReason,
+      totalRescheduleAllowance:
+          totalRescheduleAllowance ?? this.totalRescheduleAllowance,
+      usedRescheduleCount: usedRescheduleCount ?? this.usedRescheduleCount,
     );
   }
 

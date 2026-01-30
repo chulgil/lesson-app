@@ -202,6 +202,21 @@ class LocalNotificationService implements NotificationService {
       case NotificationType.paymentRequested:
       case NotificationType.paymentReminder:
         return 'payment_channel';
+      case NotificationType.connectionRequestReceived:
+      case NotificationType.connectionRequestAccepted:
+      case NotificationType.connectionEstablished:
+      case NotificationType.connectionRequestRejected:
+      case NotificationType.connectionDisconnected:
+        return 'connection_channel';
+      case NotificationType.makeupLessonCreated:
+      case NotificationType.makeupLessonExpiring:
+      case NotificationType.makeupLessonExpired:
+        return 'makeup_channel';
+      case NotificationType.scheduleChangeRequested:
+      case NotificationType.scheduleChangeApproved:
+      case NotificationType.scheduleChangeRejected:
+      case NotificationType.scheduleChangeAlternative:
+        return 'schedule_channel';
       default:
         return 'default_channel';
     }
@@ -220,6 +235,21 @@ class LocalNotificationService implements NotificationService {
       case NotificationType.paymentRequested:
       case NotificationType.paymentReminder:
         return 'Payment Notifications';
+      case NotificationType.connectionRequestReceived:
+      case NotificationType.connectionRequestAccepted:
+      case NotificationType.connectionEstablished:
+      case NotificationType.connectionRequestRejected:
+      case NotificationType.connectionDisconnected:
+        return 'Connection Notifications';
+      case NotificationType.makeupLessonCreated:
+      case NotificationType.makeupLessonExpiring:
+      case NotificationType.makeupLessonExpired:
+        return 'Makeup Lesson Notifications';
+      case NotificationType.scheduleChangeRequested:
+      case NotificationType.scheduleChangeApproved:
+      case NotificationType.scheduleChangeRejected:
+      case NotificationType.scheduleChangeAlternative:
+        return 'Schedule Change Notifications';
       default:
         return 'General Notifications';
     }
@@ -270,8 +300,25 @@ class LocalNotificationService implements NotificationService {
   }
 
   String _encodePayload(AppNotification notification) {
-    // Simple payload encoding - just notification ID and type
-    return '${notification.id}|${notification.type.name}';
+    // Payload encoding: id|type|actionUrl|actionLabel
+    final parts = [
+      notification.id,
+      notification.type.name,
+      notification.actionUrl ?? '',
+      notification.actionLabel ?? '',
+    ];
+    return parts.join('|');
+  }
+
+  /// Parse payload back to notification action info
+  static Map<String, String?> parsePayload(String payload) {
+    final parts = payload.split('|');
+    return {
+      'id': parts.isNotEmpty ? parts[0] : null,
+      'type': parts.length > 1 ? parts[1] : null,
+      'actionUrl': parts.length > 2 && parts[2].isNotEmpty ? parts[2] : null,
+      'actionLabel': parts.length > 3 && parts[3].isNotEmpty ? parts[3] : null,
+    };
   }
 
   void dispose() {

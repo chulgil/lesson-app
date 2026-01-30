@@ -81,6 +81,21 @@ class AvailabilitySlot {
     return '$hour:$minute';
   }
 
+  /// Get formatted time range string (e.g., "14:00~14:50")
+  String get formattedTimeRange => '$formattedStartTime~$formattedEndTime';
+
+  /// Get short formatted time range (e.g., "14:00~50")
+  /// Shows full start time but abbreviated end time (minutes only if same hour)
+  String get formattedTimeRangeShort {
+    if (startTime.hour == endTime.hour) {
+      // Same hour: "14:00~30"
+      final endMinute = endTime.minute.toString().padLeft(2, '0');
+      return '$formattedStartTime~:$endMinute';
+    }
+    // Different hour: "14:30~15:20"
+    return formattedTimeRange;
+  }
+
   /// Get formatted date string (e.g., "2/18(화)")
   String get formattedDate {
     const weekdays = ['월', '화', '수', '목', '금', '토', '일'];

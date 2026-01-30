@@ -20,6 +20,7 @@ class MyBookingsScreen extends ConsumerWidget {
   final int remainingReschedules;
   final int totalReschedules;
   final String? instrument;
+  final String? subscriptionId; // 🆕 For reschedule count deduction
 
   const MyBookingsScreen({
     super.key,
@@ -30,6 +31,7 @@ class MyBookingsScreen extends ConsumerWidget {
     required this.remainingReschedules,
     required this.totalReschedules,
     this.instrument,
+    this.subscriptionId,
   });
 
   @override
@@ -381,6 +383,7 @@ class MyBookingsScreen extends ConsumerWidget {
           remainingReschedules: remainingReschedules,
           totalReschedules: totalReschedules,
           instrument: instrument,
+          subscriptionId: subscriptionId, // 🆕 For reschedule count deduction
         ),
       ),
     );

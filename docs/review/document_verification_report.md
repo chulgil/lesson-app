@@ -17,7 +17,7 @@
 | subscription_system_spec.md | docs/specs/subscription/ | 학원 모드, 다중 소속, 3자 데이터 소유권 |
 | student_centered_architecture.md | docs/specs/lesson/ | PracticeSpace, CoachConnection |
 | parent_system.md | docs/specs/user/ | 학부모 시스템, 자녀 프로필 |
-| invite_system_v2.md | docs/specs/invite/ | 맞팔 기반 연결 시스템 |
+| invite_system_v2.md | docs/specs/invite/ | 수강권 기반 연결 시스템 |
 | payment_flow.md | docs/specs/payment/ | 결제 플로우 상세 |
 | payment_system.md | docs/specs/payment/ | 2단계 입금확인 |
 | teacher_registration.md | docs/specs/user/ | 외부 선생님 등록 |
@@ -47,7 +47,7 @@
 | 선생님 등록/온보딩 | ✅ 완료 | teacher_registration.md |
 | 프로필 완성도 시스템 | ✅ 완료 | 4단계(minimum~complete), 기능 제한 |
 | 자격증 인증 | ✅ 완료 | 업로드 → 검토 → 뱃지 |
-| 학생 초대/연결 | ✅ 완료 | invite_system_v2.md (맞팔 기반) |
+| 학생 초대/연결 | ✅ 완료 | invite_system_v2.md (수강권 기반) |
 | 결제 설정 | ✅ 완료 | payment_flow.md (선결제/후결제, 환불정책) |
 | 취소/노쇼 정책 | ✅ 완료 | trial_lesson_system.md |
 | 가용시간 관리 | ✅ 완료 | 3계층 구조, 구글 캘린더 연동 |

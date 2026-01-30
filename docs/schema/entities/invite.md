@@ -2,18 +2,39 @@
 
 > 작성일: 2026-01-24
 > 상태: 📋 설계 완료 (미구현)
-> 관련 스펙: [invite_system_v2.md](../../specs/invite/invite_system_v2.md)
+> 관련 스펙: [invite_system_v2.md](../../specs/invite/invite_system_v2.md), [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md)
+
+---
+
+> ⚠️ **중요: 선생님-학생 관계 모델 변경**
+>
+> 선생님-학생 관계는 **수강권 중심 모델**로 변경되었습니다.
+> 새 엔티티는 아래 문서를 참조하세요:
+>
+> **👉 [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md)**
+>
+> 새 엔티티:
+> - `TeacherStudentRelation` (TypeId: 90) - 레슨 관계
+> - `RelationshipStatus` (TypeId: 91) - 관계 상태
+> - `NotificationSetting` (TypeId: 92) - 레슨 알림 설정
+> - `Follow` (TypeId: 93) - **소식 구독용** (레슨 관계와 분리)
+> - `FollowTargetType` (TypeId: 94) - 팔로우 대상 타입
 
 ---
 
 ## 개요
 
-초대 시스템과 맞팔(Mutual Follow) 시스템의 핵심 엔티티입니다.
+초대 시스템 및 관계 관리 엔티티입니다.
 
 ```
-초대 시스템
-├── Follow (맞팔 관계)
-│   └── FollowUserRole
+선생님-학생 관계 (subscription_based_relationship.md)
+├── TeacherStudentRelation (수강권 기반 관계)
+│   └── RelationshipStatus
+├── NotificationSetting (레슨 알림 설정)
+└── Follow (소식 구독 - 공연/행사)
+    └── FollowTargetType
+
+초대 방식
 ├── InviteMethod (초대 방법)
 └── TeacherSettings (선생님 설정)
 
@@ -45,14 +66,18 @@
 
 ---
 
-## Follow (맞팔 관계)
+## Follow (소식 구독)
+
+> 📖 **용어 정의**: [glossary.md](../../specs/glossary.md#12-팔로우-follow--소식-구독)
+>
+> ⚠️ **참고**: Follow는 **소식 구독** 용도입니다. 레슨 관계는 `TeacherStudentRelation`을 사용합니다.
 
 ```dart
 class Follow {
   final String id;
   final String followerId;       // 팔로우 하는 사람
   final FollowUserRole followerRole;
-  final String followeeId;       // 팔로우 받는 사람
+  final String followeeId;       // 팔로우 받는 사람 (선생님/학원)
   final FollowUserRole followeeRole;
   final DateTime createdAt;
 }
@@ -69,21 +94,16 @@ class Follow {
 | followeeRole | FollowUserRole | 팔로우 받는 사람 역할 |
 | createdAt | DateTime | 생성일 |
 
-### 맞팔 판단 로직
+### 용도
 
-```dart
-// A가 B를 팔로우하는 레코드
-Follow(followerId: A, followeeId: B)
+| 용도 | 설명 |
+|------|------|
+| 공연 소식 | 선생님 공연/연주회 알림 |
+| 학원 이벤트 | 학원 행사, 모집 소식 |
+| 과거 관계 유지 | 이전 선생님 소식 계속 받기 |
 
-// B가 A를 팔로우하는 레코드
-Follow(followerId: B, followeeId: A)
-
-// 두 레코드 모두 존재 → 맞팔(연결) 상태
-bool isMutualFollow(String userA, String userB) {
-  return exists(followerId: userA, followeeId: userB) &&
-         exists(followerId: userB, followeeId: userA);
-}
-```
+> **Note**: 레슨 관계 판단은 `TeacherStudentRelation.status`를 사용하세요.
+> Follow는 수강권과 무관하게 **누구나** 할 수 있습니다.
 
 ---
 
@@ -292,8 +312,8 @@ enum MembershipStatus {
         ├──[학생이 수락]──► Follow 생성 (student → teacher)
         │                         │
         │                         ▼
-        │                   맞팔 완성! 🎉
-        │                   ConnectionStatus = connected
+        │                   소식 구독 완성! 🎉
+        │                   (레슨 관계는 TeacherStudentRelation 사용)
         │
         └──[학생이 거절]──► 초대 삭제
 ```
@@ -316,7 +336,9 @@ lib/features/students/domain/entities/practice_level.dart
 
 | 문서 | 설명 |
 |------|------|
-| [invite_system_v2.md](../../specs/invite/invite_system_v2.md) | 초대 시스템 스펙 (맞팔 시스템) |
+| [invite_system_v2.md](../../specs/invite/invite_system_v2.md) | 초대 시스템 스펙 (수강권 기반) |
+| [subscription_based_relationship.md](../../specs/invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
+| [glossary.md](../../specs/glossary.md) | 용어 정의 |
 | [student.md](student.md) | 학생 엔티티 (ConnectionStatus) |
 | [parent.md](parent.md) | 학부모 엔티티 (ParentTeacherConnection) |
 | [payment.md](payment.md) | 결제 엔티티 |

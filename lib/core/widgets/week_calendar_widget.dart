@@ -16,12 +16,23 @@ class WeekCalendarWidget extends StatefulWidget {
   /// Dates with lessons (for teacher app)
   final Set<DateTime>? lessonDates;
 
+  /// Dates with available slots (for booking screen)
+  /// - Shows green dot indicator on available dates
+  /// - Fades out dates without available slots
+  final Set<DateTime>? availableDates;
+
+  /// Whether to restrict selection to dates with markers only
+  /// Used in booking flow to prevent selecting unavailable dates
+  final bool restrictToMarkedDates;
+
   const WeekCalendarWidget({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
     this.practicedDates,
     this.lessonDates,
+    this.availableDates,
+    this.restrictToMarkedDates = false,
   });
 
   @override
@@ -111,7 +122,18 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
         widget.lessonDates!.any((d) => _isSameDay(d, date))) {
       return true;
     }
+    // Check available dates (for booking)
+    if (widget.availableDates != null &&
+        widget.availableDates!.any((d) => _isSameDay(d, date))) {
+      return true;
+    }
     return false;
+  }
+
+  /// Check if date has available slots (for booking UX)
+  bool _isAvailableDate(DateTime date) {
+    if (widget.availableDates == null) return true; // No restriction
+    return widget.availableDates!.any((d) => _isSameDay(d, date));
   }
 
   String _getHeaderText() {
@@ -347,11 +369,37 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     final isToday = _isSameDay(date, today);
     final hasMarker = _hasMarker(date);
     final isFuture = date.isAfter(today);
+    final isPast = date.isBefore(today) && !isToday;
+
+    // For booking UX: check if date is available
+    final isAvailable = _isAvailableDate(date);
+    final isBookingMode = widget.availableDates != null;
+
+    // Determine if cell should be interactive
+    // In booking mode: only future dates with availability can be tapped
+    final canSelect = isBookingMode
+        ? (!isPast && (isAvailable || isToday))
+        : true;
+
+    // Determine visual appearance
+    // UX: Available dates are bright, unavailable dates are faded
+    Color getTextColor() {
+      if (isSelected) return AppColors.primary;
+
+      if (isBookingMode) {
+        // Booking mode: emphasize available dates
+        if (isPast) return Colors.white.withValues(alpha: 0.3);
+        if (isAvailable) return Colors.white;
+        return Colors.white.withValues(alpha: 0.35); // Unavailable future
+      }
+
+      // Default behavior
+      if (isFuture) return Colors.white.withValues(alpha: 0.4);
+      return Colors.white;
+    }
 
     return GestureDetector(
-      onTap: () {
-        widget.onDateSelected(date);
-      },
+      onTap: canSelect ? () => widget.onDateSelected(date) : null,
       child: Container(
         height: 52,
         margin: const EdgeInsets.symmetric(horizontal: 2),
@@ -369,11 +417,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
             Text(
               '${date.day}',
               style: AppTypography.headingSmall.copyWith(
-                color: isSelected
-                    ? AppColors.primary
-                    : isFuture
-                        ? Colors.white.withValues(alpha: 0.4)
-                        : Colors.white,
+                color: getTextColor(),
                 fontWeight:
                     isToday || isSelected ? FontWeight.bold : FontWeight.w500,
               ),
@@ -384,7 +428,12 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                 height: 6,
                 margin: const EdgeInsets.only(top: 4),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.success : Colors.white,
+                  // UX: Green dot for available, white for others
+                  color: isSelected
+                      ? AppColors.success
+                      : isBookingMode
+                          ? AppColors.success.withValues(alpha: 0.9)
+                          : Colors.white,
                   shape: BoxShape.circle,
                 ),
               ),

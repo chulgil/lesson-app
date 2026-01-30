@@ -36,13 +36,15 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       billingDay: fields[16] as int?,
       fifthWeekPolicy: fields[17] as FifthWeekPolicy?,
       bonusReason: fields[18] as String?,
+      totalRescheduleAllowance: fields[19] as int,
+      usedRescheduleCount: fields[20] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -80,7 +82,11 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..writeByte(17)
       ..write(obj.fifthWeekPolicy)
       ..writeByte(18)
-      ..write(obj.bonusReason);
+      ..write(obj.bonusReason)
+      ..writeByte(19)
+      ..write(obj.totalRescheduleAllowance)
+      ..writeByte(20)
+      ..write(obj.usedRescheduleCount);
   }
 
   @override
@@ -307,6 +313,9 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       fifthWeekPolicy: $enumDecodeNullable(
           _$FifthWeekPolicyEnumMap, json['fifthWeekPolicy']),
       bonusReason: json['bonusReason'] as String?,
+      totalRescheduleAllowance:
+          (json['totalRescheduleAllowance'] as num?)?.toInt() ?? 2,
+      usedRescheduleCount: (json['usedRescheduleCount'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
@@ -330,6 +339,8 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'billingDay': instance.billingDay,
       'fifthWeekPolicy': _$FifthWeekPolicyEnumMap[instance.fifthWeekPolicy],
       'bonusReason': instance.bonusReason,
+      'totalRescheduleAllowance': instance.totalRescheduleAllowance,
+      'usedRescheduleCount': instance.usedRescheduleCount,
     };
 
 const _$SubscriptionTypeEnumMap = {

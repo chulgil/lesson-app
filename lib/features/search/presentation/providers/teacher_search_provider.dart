@@ -13,12 +13,27 @@ TeacherSearchRepository teacherSearchRepository(Ref ref) {
   return MockTeacherSearchRepository();
 }
 
+/// Current search tab state (academy vs individual)
+@riverpod
+class TeacherSearchTabState extends _$TeacherSearchTabState {
+  @override
+  TeacherSearchType build() {
+    return TeacherSearchType.academy; // Default to academy tab
+  }
+
+  void setTab(TeacherSearchType type) {
+    state = type;
+  }
+}
+
 /// Current search filter state
 @riverpod
 class TeacherSearchFilterState extends _$TeacherSearchFilterState {
   @override
   TeacherSearchFilter build() {
-    return TeacherSearchFilter.empty;
+    // Watch tab state and apply teacherType to filter
+    final tabType = ref.watch(teacherSearchTabStateProvider);
+    return TeacherSearchFilter(teacherType: tabType);
   }
 
   void updateKeyword(String? keyword) {
@@ -50,7 +65,9 @@ class TeacherSearchFilterState extends _$TeacherSearchFilterState {
   }
 
   void clearFilter() {
-    state = TeacherSearchFilter.empty;
+    // Preserve teacherType when clearing filter
+    final tabType = ref.read(teacherSearchTabStateProvider);
+    state = TeacherSearchFilter(teacherType: tabType);
   }
 
   void clearKeyword() {
@@ -145,4 +162,26 @@ Future<List<String>> availableInstruments(Ref ref) async {
 Future<List<String>> availableAreas(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getAvailableAreas();
+}
+
+/// Academy info provider - get academy details by organization ID
+@riverpod
+Future<AcademyInfo?> academyInfo(Ref ref, String organizationId) async {
+  final repo = ref.watch(teacherSearchRepositoryProvider);
+  return repo.getAcademyInfo(organizationId);
+}
+
+/// Academy teachers provider - get all teachers in an academy
+@riverpod
+Future<List<TeacherPublicProfile>> academyTeachers(
+    Ref ref, String organizationId) async {
+  final repo = ref.watch(teacherSearchRepositoryProvider);
+  return repo.getTeachersByOrganization(organizationId);
+}
+
+/// All academies provider - get list of all academies
+@riverpod
+Future<List<AcademyInfo>> allAcademies(Ref ref) async {
+  final repo = ref.watch(teacherSearchRepositoryProvider);
+  return repo.getAllAcademies();
 }

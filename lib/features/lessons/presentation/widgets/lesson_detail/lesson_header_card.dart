@@ -136,12 +136,18 @@ class _StatusBadge extends StatelessWidget {
     Color color;
     switch (status) {
       case LessonStatus.scheduled:
+      case LessonStatus.reschedulePending:
         color = AppColors.primary;
       case LessonStatus.completed:
         color = AppColors.practiceGood;
       case LessonStatus.cancelled:
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
         color = AppColors.textTertiaryLight;
       case LessonStatus.noShow:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.studentAbsent:
         color = AppColors.error;
     }
 

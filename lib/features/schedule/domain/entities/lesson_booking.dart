@@ -755,6 +755,7 @@ class LessonBooking {
 /// Trial lesson request model (before becoming a booking)
 /// Now supports multi-option scheduling (1-3 options with priority)
 class TrialLessonRequest {
+  final String? studentId;
   final String studentName;
   final String? studentPhone;
   final String? studentEmail;
@@ -769,6 +770,7 @@ class TrialLessonRequest {
   final TimeOfDay? preferredEndTime;
 
   const TrialLessonRequest({
+    this.studentId,
     required this.studentName,
     this.studentPhone,
     this.studentEmail,
@@ -829,6 +831,7 @@ class TrialLessonRequest {
       id: id,
       teacherId: teacherId,
       teacherName: teacherName,
+      studentId: studentId,
       studentName: studentName,
       lessonType: LessonType.trial,
       status: BookingStatus.pending,

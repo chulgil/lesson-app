@@ -963,8 +963,374 @@ class _TeacherStudentSubscriptionsProviderElement
       (origin as TeacherStudentSubscriptionsProvider).teacherId;
 }
 
+String _$activeSubscriptionBetweenHash() =>
+    r'2a378dcd8f74f700997e85e662357c06e5ac38ed';
+
+/// Check if a student has an active subscription with a teacher.
+/// Returns the active subscription if found, null otherwise.
+///
+/// Copied from [activeSubscriptionBetween].
+@ProviderFor(activeSubscriptionBetween)
+const activeSubscriptionBetweenProvider = ActiveSubscriptionBetweenFamily();
+
+/// Check if a student has an active subscription with a teacher.
+/// Returns the active subscription if found, null otherwise.
+///
+/// Copied from [activeSubscriptionBetween].
+class ActiveSubscriptionBetweenFamily
+    extends Family<AsyncValue<Subscription?>> {
+  /// Check if a student has an active subscription with a teacher.
+  /// Returns the active subscription if found, null otherwise.
+  ///
+  /// Copied from [activeSubscriptionBetween].
+  const ActiveSubscriptionBetweenFamily();
+
+  /// Check if a student has an active subscription with a teacher.
+  /// Returns the active subscription if found, null otherwise.
+  ///
+  /// Copied from [activeSubscriptionBetween].
+  ActiveSubscriptionBetweenProvider call({
+    required String studentId,
+    required String teacherId,
+  }) {
+    return ActiveSubscriptionBetweenProvider(
+      studentId: studentId,
+      teacherId: teacherId,
+    );
+  }
+
+  @override
+  ActiveSubscriptionBetweenProvider getProviderOverride(
+    covariant ActiveSubscriptionBetweenProvider provider,
+  ) {
+    return call(
+      studentId: provider.studentId,
+      teacherId: provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'activeSubscriptionBetweenProvider';
+}
+
+/// Check if a student has an active subscription with a teacher.
+/// Returns the active subscription if found, null otherwise.
+///
+/// Copied from [activeSubscriptionBetween].
+class ActiveSubscriptionBetweenProvider
+    extends AutoDisposeFutureProvider<Subscription?> {
+  /// Check if a student has an active subscription with a teacher.
+  /// Returns the active subscription if found, null otherwise.
+  ///
+  /// Copied from [activeSubscriptionBetween].
+  ActiveSubscriptionBetweenProvider({
+    required String studentId,
+    required String teacherId,
+  }) : this._internal(
+          (ref) => activeSubscriptionBetween(
+            ref as ActiveSubscriptionBetweenRef,
+            studentId: studentId,
+            teacherId: teacherId,
+          ),
+          from: activeSubscriptionBetweenProvider,
+          name: r'activeSubscriptionBetweenProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$activeSubscriptionBetweenHash,
+          dependencies: ActiveSubscriptionBetweenFamily._dependencies,
+          allTransitiveDependencies:
+              ActiveSubscriptionBetweenFamily._allTransitiveDependencies,
+          studentId: studentId,
+          teacherId: teacherId,
+        );
+
+  ActiveSubscriptionBetweenProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String studentId;
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<Subscription?> Function(ActiveSubscriptionBetweenRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: ActiveSubscriptionBetweenProvider._internal(
+        (ref) => create(ref as ActiveSubscriptionBetweenRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<Subscription?> createElement() {
+    return _ActiveSubscriptionBetweenProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ActiveSubscriptionBetweenProvider &&
+        other.studentId == studentId &&
+        other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin ActiveSubscriptionBetweenRef
+    on AutoDisposeFutureProviderRef<Subscription?> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _ActiveSubscriptionBetweenProviderElement
+    extends AutoDisposeFutureProviderElement<Subscription?>
+    with ActiveSubscriptionBetweenRef {
+  _ActiveSubscriptionBetweenProviderElement(super.provider);
+
+  @override
+  String get studentId =>
+      (origin as ActiveSubscriptionBetweenProvider).studentId;
+  @override
+  String get teacherId =>
+      (origin as ActiveSubscriptionBetweenProvider).teacherId;
+}
+
+String _$canBookLessonHash() => r'1cef46eb828bdd44b759fb973593c0186b120aca';
+
+/// Check if a student can book a lesson with a teacher.
+/// Returns true if:
+/// - It's a trial lesson (no subscription needed)
+/// - Student has an active subscription with remaining lessons
+///
+/// Copied from [canBookLesson].
+@ProviderFor(canBookLesson)
+const canBookLessonProvider = CanBookLessonFamily();
+
+/// Check if a student can book a lesson with a teacher.
+/// Returns true if:
+/// - It's a trial lesson (no subscription needed)
+/// - Student has an active subscription with remaining lessons
+///
+/// Copied from [canBookLesson].
+class CanBookLessonFamily extends Family<AsyncValue<bool>> {
+  /// Check if a student can book a lesson with a teacher.
+  /// Returns true if:
+  /// - It's a trial lesson (no subscription needed)
+  /// - Student has an active subscription with remaining lessons
+  ///
+  /// Copied from [canBookLesson].
+  const CanBookLessonFamily();
+
+  /// Check if a student can book a lesson with a teacher.
+  /// Returns true if:
+  /// - It's a trial lesson (no subscription needed)
+  /// - Student has an active subscription with remaining lessons
+  ///
+  /// Copied from [canBookLesson].
+  CanBookLessonProvider call({
+    required String studentId,
+    required String teacherId,
+    required bool isTrialLesson,
+  }) {
+    return CanBookLessonProvider(
+      studentId: studentId,
+      teacherId: teacherId,
+      isTrialLesson: isTrialLesson,
+    );
+  }
+
+  @override
+  CanBookLessonProvider getProviderOverride(
+    covariant CanBookLessonProvider provider,
+  ) {
+    return call(
+      studentId: provider.studentId,
+      teacherId: provider.teacherId,
+      isTrialLesson: provider.isTrialLesson,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'canBookLessonProvider';
+}
+
+/// Check if a student can book a lesson with a teacher.
+/// Returns true if:
+/// - It's a trial lesson (no subscription needed)
+/// - Student has an active subscription with remaining lessons
+///
+/// Copied from [canBookLesson].
+class CanBookLessonProvider extends AutoDisposeFutureProvider<bool> {
+  /// Check if a student can book a lesson with a teacher.
+  /// Returns true if:
+  /// - It's a trial lesson (no subscription needed)
+  /// - Student has an active subscription with remaining lessons
+  ///
+  /// Copied from [canBookLesson].
+  CanBookLessonProvider({
+    required String studentId,
+    required String teacherId,
+    required bool isTrialLesson,
+  }) : this._internal(
+          (ref) => canBookLesson(
+            ref as CanBookLessonRef,
+            studentId: studentId,
+            teacherId: teacherId,
+            isTrialLesson: isTrialLesson,
+          ),
+          from: canBookLessonProvider,
+          name: r'canBookLessonProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$canBookLessonHash,
+          dependencies: CanBookLessonFamily._dependencies,
+          allTransitiveDependencies:
+              CanBookLessonFamily._allTransitiveDependencies,
+          studentId: studentId,
+          teacherId: teacherId,
+          isTrialLesson: isTrialLesson,
+        );
+
+  CanBookLessonProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+    required this.teacherId,
+    required this.isTrialLesson,
+  }) : super.internal();
+
+  final String studentId;
+  final String teacherId;
+  final bool isTrialLesson;
+
+  @override
+  Override overrideWith(
+    FutureOr<bool> Function(CanBookLessonRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CanBookLessonProvider._internal(
+        (ref) => create(ref as CanBookLessonRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+        teacherId: teacherId,
+        isTrialLesson: isTrialLesson,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<bool> createElement() {
+    return _CanBookLessonProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CanBookLessonProvider &&
+        other.studentId == studentId &&
+        other.teacherId == teacherId &&
+        other.isTrialLesson == isTrialLesson;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+    hash = _SystemHash.combine(hash, isTrialLesson.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CanBookLessonRef on AutoDisposeFutureProviderRef<bool> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+
+  /// The parameter `isTrialLesson` of this provider.
+  bool get isTrialLesson;
+}
+
+class _CanBookLessonProviderElement
+    extends AutoDisposeFutureProviderElement<bool> with CanBookLessonRef {
+  _CanBookLessonProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as CanBookLessonProvider).studentId;
+  @override
+  String get teacherId => (origin as CanBookLessonProvider).teacherId;
+  @override
+  bool get isTrialLesson => (origin as CanBookLessonProvider).isTrialLesson;
+}
+
 String _$subscriptionNotifierHash() =>
-    r'485fe1a7522e6d4de318dcc9055a18235ef56772';
+    r'5712e64b8cc3297c8b3f069b9ac6998bdca6fbe2';
 
 abstract class _$SubscriptionNotifier
     extends BuildlessAutoDisposeAsyncNotifier<List<Subscription>> {
@@ -1126,7 +1492,7 @@ class _SubscriptionNotifierProviderElement
 }
 
 String _$membershipSubscriptionNotifierHash() =>
-    r'1e75d0a27f3a6c2f169f939c7efff904c4227fb5';
+    r'0472ba42b286ca3bee1228e9e9ef0389b4401883';
 
 abstract class _$MembershipSubscriptionNotifier
     extends BuildlessAutoDisposeAsyncNotifier<Subscription?> {

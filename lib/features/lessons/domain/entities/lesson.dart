@@ -1,9 +1,22 @@
 /// Lesson status enum
 enum LessonStatus {
+  // Basic states
   scheduled,
   completed,
-  cancelled,
-  noShow;
+
+  // Cancellation states (detailed)
+  cancelled, // Generic cancelled (legacy compatibility)
+  cancelledByStudentAdvance, // Student cancelled 24h+ in advance (no deduction)
+  cancelledByStudentLate, // Student cancelled within 24h (deducted)
+  cancelledByTeacher, // Teacher cancelled (reschedule, no deduction)
+  cancelledMutual, // Mutual agreement (reschedule, no deduction)
+
+  // Absence
+  noShow, // Legacy no-show
+  studentAbsent, // Student absent (deducted)
+
+  // Reschedule pending
+  reschedulePending; // Reschedule requested, waiting for confirmation
 
   String get label {
     switch (this) {
@@ -13,8 +26,46 @@ enum LessonStatus {
         return '완료';
       case LessonStatus.cancelled:
         return '취소';
+      case LessonStatus.cancelledByStudentAdvance:
+        return '사전 취소';
+      case LessonStatus.cancelledByStudentLate:
+        return '당일 취소';
+      case LessonStatus.cancelledByTeacher:
+        return '선생님 취소';
+      case LessonStatus.cancelledMutual:
+        return '합의 취소';
       case LessonStatus.noShow:
         return '결석';
+      case LessonStatus.studentAbsent:
+        return '학생 불참';
+      case LessonStatus.reschedulePending:
+        return '변경 대기';
+    }
+  }
+
+  /// Whether this status results in subscription deduction
+  bool get isDeducted {
+    switch (this) {
+      case LessonStatus.completed:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.noShow:
+      case LessonStatus.studentAbsent:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /// Whether this status allows rescheduling
+  bool get allowsReschedule {
+    switch (this) {
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
+      case LessonStatus.reschedulePending:
+        return true;
+      default:
+        return false;
     }
   }
 }

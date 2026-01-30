@@ -292,10 +292,14 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
     LessonType lessonType = LessonType.oneTime,
     int fee = 50000,
   }) async {
+    debugPrint('[SlotBookingNotifier] bookSlot called');
+    debugPrint('[SlotBookingNotifier] slotId: $slotId');
+    debugPrint('[SlotBookingNotifier] studentId: $studentId, studentName: $studentName');
     state = const AsyncValue.loading();
 
     try {
       // 1. Update availability slot status
+      debugPrint('[SlotBookingNotifier] Step 1: Updating availability slot...');
       final availabilityRepository =
           ref.read(teacherAvailabilityRepositoryProvider);
       final bookedSlot = await availabilityRepository.bookSlot(
@@ -303,11 +307,14 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         studentId,
         studentName,
       );
+      debugPrint('[SlotBookingNotifier] Step 1 completed');
 
       // 2. Create actual lesson booking
+      debugPrint('[SlotBookingNotifier] Step 2: Creating lesson booking...');
       final bookingsNotifier = ref.read(bookingsNotifierProvider.notifier);
 
       final request = TrialLessonRequest(
+        studentId: studentId,
         studentName: studentName,
         goal: LessonGoal.hobby,
         experience: ExperienceLevel.none,
@@ -322,6 +329,7 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         request: request,
         fee: fee,
       );
+      debugPrint('[SlotBookingNotifier] Step 2 completed, booking id: ${booking.id}');
 
       state = AsyncValue.data(bookedSlot);
 
@@ -330,6 +338,8 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
 
       return booking;
     } catch (e, st) {
+      debugPrint('[SlotBookingNotifier] ERROR: $e');
+      debugPrint('[SlotBookingNotifier] StackTrace: $st');
       state = AsyncValue.error(e, st);
       rethrow;
     }
@@ -540,6 +550,50 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
       // Reload availability
       final updated = await repository.getAvailability(teacherId);
       state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Update lesson time settings
+  Future<void> updateLessonSettings({
+    required int slotDurationMinutes,
+    required int slotStartInterval,
+    required int breakTimeBetweenLessons,
+  }) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final repository = ref.read(teacherAvailabilityRepositoryProvider);
+
+      // Get current availability
+      var availability = await repository.getAvailability(teacherId);
+
+      if (availability == null) {
+        // Create new availability if not exists
+        availability = TeacherAvailability(
+          id: teacherId,
+          teacherId: teacherId,
+          slotDurationMinutes: slotDurationMinutes,
+          slotStartInterval: slotStartInterval,
+          breakTimeBetweenLessons: breakTimeBetweenLessons,
+          createdAt: DateTime.now(),
+        );
+      } else {
+        // Update existing
+        availability = availability.copyWith(
+          slotDurationMinutes: slotDurationMinutes,
+          slotStartInterval: slotStartInterval,
+          breakTimeBetweenLessons: breakTimeBetweenLessons,
+          updatedAt: DateTime.now(),
+        );
+      }
+
+      final updated = await repository.saveAvailability(availability);
+      state = AsyncValue.data(updated);
+
+      // Invalidate slot providers to reflect new settings
+      ref.invalidate(teacherAvailabilityProvider(teacherId));
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }

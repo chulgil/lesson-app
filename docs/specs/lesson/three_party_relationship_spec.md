@@ -2,7 +2,7 @@
 
 > 작성일: 2026-01-24
 > 상태: 📋 설계 중
-> 관련 문서: [student_class_system.md](../student/student_class_system.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [student_centered_architecture.md](student_centered_architecture.md)
+> 관련 문서: [student_class_system.md](../student/student_class_system.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [student_centered_architecture.md](student_centered_architecture.md), [subscription_based_relationship.md](../invite/subscription_based_relationship.md)
 
 ---
 

@@ -81,6 +81,10 @@ abstract class InviteRepository {
 
   /// Check if two users are connected
   Future<bool> areConnected(String userId1, String userId2);
+
+  /// Get inactive (disconnected) connections for a user
+  /// Returns teachers that the student previously had lessons with but is now disconnected
+  Future<List<Connection>> getInactiveConnectionsByUser(String userId);
 }
 
 /// Mock implementation of InviteRepository
@@ -104,6 +108,7 @@ class MockInviteRepository implements InviteRepository {
     _invites['invite_1'] = Invite(
       id: 'invite_1',
       creatorId: 'teacher_1',
+      creatorName: '김선생님',
       creatorRole: InviteUserRole.teacher,
       inviteCode: '123456',
       inviteUrl: '$_appScheme://$_inviteHost/123456',
@@ -116,6 +121,7 @@ class MockInviteRepository implements InviteRepository {
     _invites['invite_2'] = Invite(
       id: 'invite_2',
       creatorId: 'student_1',
+      creatorName: '박학생',
       creatorRole: InviteUserRole.student,
       inviteCode: '654321',
       inviteUrl: '$_appScheme://$_inviteHost/654321',
@@ -128,6 +134,7 @@ class MockInviteRepository implements InviteRepository {
     _invites['invite_3'] = Invite(
       id: 'invite_3',
       creatorId: 'teacher_2',
+      creatorName: '이선생님',
       creatorRole: InviteUserRole.teacher,
       inviteCode: 'TEACH2',
       inviteUrl: '$_appScheme://$_inviteHost/TEACH2',
@@ -140,6 +147,7 @@ class MockInviteRepository implements InviteRepository {
     _invites['invite_4'] = Invite(
       id: 'invite_4',
       creatorId: 'student_2',
+      creatorName: '이학생',
       creatorRole: InviteUserRole.student,
       inviteCode: 'STUD02',
       inviteUrl: '$_appScheme://$_inviteHost/STUD02',
@@ -172,6 +180,30 @@ class MockInviteRepository implements InviteRepository {
       studentId: 'student_1',
       studentName: '박학생',
       connectedAt: now.subtract(const Duration(days: 30)),
+    );
+
+    // Inactive connection (previous teacher for student_1)
+    _connections['connection_2'] = Connection(
+      id: 'connection_2',
+      teacherId: 'teacher_3',
+      teacherName: '박선생님',
+      studentId: 'student_1',
+      studentName: '박학생',
+      connectedAt: now.subtract(const Duration(days: 180)),
+      isActive: false,
+      deactivatedAt: now.subtract(const Duration(days: 60)),
+    );
+
+    // Another inactive connection for student_1
+    _connections['connection_3'] = Connection(
+      id: 'connection_3',
+      teacherId: 'teacher_4',
+      teacherName: '최선생님',
+      studentId: 'student_1',
+      studentName: '박학생',
+      connectedAt: now.subtract(const Duration(days: 365)),
+      isActive: false,
+      deactivatedAt: now.subtract(const Duration(days: 120)),
     );
   }
 
@@ -513,5 +545,17 @@ class MockInviteRepository implements InviteRepository {
         c.isActive &&
         ((c.teacherId == userId1 && c.studentId == userId2) ||
             (c.teacherId == userId2 && c.studentId == userId1)));
+  }
+
+  @override
+  Future<List<Connection>> getInactiveConnectionsByUser(String userId) async {
+    await Future.delayed(const Duration(milliseconds: 150));
+    return _connections.values
+        .where((c) =>
+            (c.teacherId == userId || c.studentId == userId) && !c.isActive)
+        .toList()
+      ..sort((a, b) =>
+          (b.deactivatedAt ?? b.connectedAt)
+              .compareTo(a.deactivatedAt ?? a.connectedAt));
   }
 }

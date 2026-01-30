@@ -70,6 +70,9 @@ class AppRoutes {
 
   // Schedule routes - Student
   static const lessonBooking = '/schedule/booking';
+  static const lessonRequest = '/schedule/lesson-request';
+  static const lessonRequests = '/schedule/lesson-requests'; // Teacher view
+  static const myLessonRequests = '/schedule/my-requests'; // Student view
   static const myBookings = '/schedule/my-bookings';
 
   // Schedule routes - Teacher
@@ -77,10 +80,22 @@ class AppRoutes {
   static const pendingBookings = '/schedule/pending';
   static const registerRegularLesson = '/schedule/regular/register';
 
+  // Group class routes
+  static const groupClasses = '/group-classes';
+  static const groupClassDetail = '/group-classes/:id';
+  static const groupClassAttendance = '/group-classes/:id/attendance';
+
   // Subscription routes
   static const subscriptions = '/subscriptions';
   static const subscriptionDetail = '/subscriptions/:id';
   static const issueSubscription = '/subscriptions/issue';
+  static const subscriptionTemplates = '/subscriptions/templates';
+
+  // Proposal routes
+  static const proposalCreate = '/proposals/create';
+  static const proposalDetail = '/proposals/:id';
+  static const proposalConfirm = '/proposals/confirm';
+  static const proposalSettings = '/proposals/settings';
 
   // Parent routes
   static const childProfiles = '/parent/children';
@@ -90,6 +105,7 @@ class AppRoutes {
   // Search routes
   static const teacherSearch = '/search/teachers';
   static const teacherDetail = '/teachers/:id';
+  static const academyDetail = '/academy/:id';
 
   // Invite routes
   static const invite = '/invite';
@@ -99,4 +115,7 @@ class AppRoutes {
   static const inviteHistory = '/invite/history';
   static const pendingRequests = '/invite/requests';
   static const myConnections = '/connections';
+
+  // Notification routes
+  static const notifications = '/notifications';
 }

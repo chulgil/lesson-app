@@ -1,6 +1,25 @@
 import '../models/teacher_profile.dart';
 import '../models/teacher_search.dart';
 
+/// Academy info for student app display
+class AcademyInfo {
+  final String id;
+  final String name;
+  final String? address;
+  final String? phone;
+  final List<String> instruments;
+  final int teacherCount;
+
+  const AcademyInfo({
+    required this.id,
+    required this.name,
+    this.address,
+    this.phone,
+    this.instruments = const [],
+    this.teacherCount = 0,
+  });
+}
+
 /// Repository for searching teachers
 abstract class TeacherSearchRepository {
   /// Search teachers with filter
@@ -22,15 +41,29 @@ abstract class TeacherSearchRepository {
 
   /// Get available areas for filtering
   Future<List<String>> getAvailableAreas();
+
+  /// Get academy info by organization ID
+  Future<AcademyInfo?> getAcademyInfo(String organizationId);
+
+  /// Get all teachers belonging to an organization/academy
+  Future<List<TeacherPublicProfile>> getTeachersByOrganization(
+      String organizationId);
+
+  /// Get all academies (unique organizations)
+  Future<List<AcademyInfo>> getAllAcademies();
 }
 
 /// Mock implementation for development
 class MockTeacherSearchRepository implements TeacherSearchRepository {
   // Mock teacher profiles for search
+  // Some are academies (organizationId != null), some are individuals (organizationId == null)
   final List<TeacherProfile> _mockTeachers = [
+    // === 학원 소속 선생님들 ===
     TeacherProfile(
       id: 'teacher_1',
       userId: 'user_teacher_1',
+      organizationId: 'academy_1',
+      organizationName: '김지수 음악학원',
       name: '김지수',
       profileImage: 'https://i.pravatar.cc/150?u=teacher1',
       instruments: ['피아노', '작곡'],
@@ -38,7 +71,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           '서울대학교 음악대학 피아노과 졸업 후 15년간 학생들을 가르치고 있습니다. 클래식부터 재즈까지 다양한 장르를 지도합니다.',
       experienceYears: 15,
       lessonAreas: ['서울 강남', '서울 서초', '온라인'],
-      lessonTypes: [LessonType.inPerson, LessonType.online],
+      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.online],
       feeRange: const FeeRange(minFee: 60000, maxFee: 80000, duration: 60),
       education: [
         const Education(
@@ -97,58 +130,10 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
       createdAt: DateTime(2024, 1, 1),
     ),
     TeacherProfile(
-      id: 'teacher_2',
-      userId: 'user_teacher_2',
-      name: '박현우',
-      profileImage: 'https://i.pravatar.cc/150?u=teacher2',
-      instruments: ['바이올린', '비올라'],
-      introduction:
-          '음대 재학 시절부터 꾸준히 학생들을 지도해왔습니다. 초보자도 쉽게 따라할 수 있는 맞춤형 레슨을 제공합니다.',
-      experienceYears: 8,
-      lessonAreas: ['서울 마포', '서울 용산', '경기 고양'],
-      lessonTypes: [LessonType.inPerson, LessonType.visit],
-      feeRange: const FeeRange(minFee: 50000, maxFee: 70000, duration: 60),
-      education: [
-        const Education(
-          school: '한국예술종합학교',
-          major: '바이올린',
-          degree: 'bachelor',
-          graduationYear: 2016,
-        ),
-      ],
-      career: [
-        const Career(
-          organization: '서울시립교향악단',
-          position: '객원 연주자',
-          startYear: 2016,
-          endYear: 2020,
-        ),
-        const Career(
-          organization: '프리랜서',
-          position: '바이올린 강사',
-          startYear: 2020,
-        ),
-      ],
-      verification: TeacherVerification(
-        isPhoneVerified: true,
-        phoneNumber: '010-2345-6789',
-        phoneVerifiedAt: DateTime(2024, 2, 10),
-        certificates: [],
-      ),
-      visibilitySettings: const ProfileVisibilitySettings(
-        isSearchable: true,
-        nameVisibility: ProfileVisibility.public,
-        photoVisibility: ProfileVisibility.public,
-        contactVisibility: ProfileVisibility.students,
-        feeVisibility: ProfileVisibility.public,
-        careerVisibility: ProfileVisibility.public,
-        certificateVisibility: ProfileVisibility.public,
-      ),
-      createdAt: DateTime(2024, 2, 1),
-    ),
-    TeacherProfile(
       id: 'teacher_3',
       userId: 'user_teacher_3',
+      organizationId: 'academy_2',
+      organizationName: '하모니 음악학원',
       name: '이서연',
       profileImage: 'https://i.pravatar.cc/150?u=teacher3',
       instruments: ['첼로'],
@@ -156,7 +141,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           '첼로의 따뜻한 음색을 사랑하며, 학생들에게 음악의 즐거움을 전하고 있습니다. 취미반부터 입시반까지 모두 환영합니다.',
       experienceYears: 10,
       lessonAreas: ['서울 송파', '서울 강동', '온라인'],
-      lessonTypes: [LessonType.inPerson, LessonType.online],
+      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.online],
       feeRange: const FeeRange(minFee: 55000, maxFee: 75000, duration: 60),
       education: [
         const Education(
@@ -211,6 +196,8 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
     TeacherProfile(
       id: 'teacher_4',
       userId: 'user_teacher_4',
+      organizationId: 'academy_3',
+      organizationName: '정민호 기타 스튜디오',
       name: '정민호',
       profileImage: 'https://i.pravatar.cc/150?u=teacher4',
       instruments: ['기타', '우쿨렐레', '베이스'],
@@ -218,7 +205,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           '기타 하나로 세상의 모든 음악을 연주해보세요! 팝, 록, 재즈, 핑거스타일까지 다양하게 배울 수 있습니다.',
       experienceYears: 12,
       lessonAreas: ['서울 홍대', '서울 신촌', '온라인'],
-      lessonTypes: [LessonType.inPerson, LessonType.online],
+      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.online],
       feeRange: const FeeRange(minFee: 40000, maxFee: 60000, duration: 60),
       education: [
         const Education(
@@ -258,9 +245,62 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
       ),
       createdAt: DateTime(2024, 4, 1),
     ),
+    // === 개인 선생님들 ===
+    TeacherProfile(
+      id: 'teacher_2',
+      userId: 'user_teacher_2',
+      // organizationId: null (개인 선생님)
+      name: '박현우',
+      profileImage: 'https://i.pravatar.cc/150?u=teacher2',
+      instruments: ['바이올린', '비올라'],
+      introduction:
+          '음대 재학 시절부터 꾸준히 학생들을 지도해왔습니다. 초보자도 쉽게 따라할 수 있는 맞춤형 레슨을 제공합니다.',
+      experienceYears: 8,
+      lessonAreas: ['서울 마포', '서울 용산', '경기 고양'],
+      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.visit],
+      feeRange: const FeeRange(minFee: 50000, maxFee: 70000, duration: 60),
+      education: [
+        const Education(
+          school: '한국예술종합학교',
+          major: '바이올린',
+          degree: 'bachelor',
+          graduationYear: 2016,
+        ),
+      ],
+      career: [
+        const Career(
+          organization: '서울시립교향악단',
+          position: '객원 연주자',
+          startYear: 2016,
+          endYear: 2020,
+        ),
+        const Career(
+          organization: '프리랜서',
+          position: '바이올린 강사',
+          startYear: 2020,
+        ),
+      ],
+      verification: TeacherVerification(
+        isPhoneVerified: true,
+        phoneNumber: '010-2345-6789',
+        phoneVerifiedAt: DateTime(2024, 2, 10),
+        certificates: [],
+      ),
+      visibilitySettings: const ProfileVisibilitySettings(
+        isSearchable: true,
+        nameVisibility: ProfileVisibility.public,
+        photoVisibility: ProfileVisibility.public,
+        contactVisibility: ProfileVisibility.students,
+        feeVisibility: ProfileVisibility.public,
+        careerVisibility: ProfileVisibility.public,
+        certificateVisibility: ProfileVisibility.public,
+      ),
+      createdAt: DateTime(2024, 2, 1),
+    ),
     TeacherProfile(
       id: 'teacher_5',
       userId: 'user_teacher_5',
+      // organizationId: null (개인 선생님)
       name: '최유진',
       profileImage: 'https://i.pravatar.cc/150?u=teacher5',
       instruments: ['플룻', '리코더'],
@@ -268,7 +308,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           '관악기의 맑고 청아한 소리를 함께 배워보세요. 호흡부터 테크닉까지 체계적으로 지도합니다.',
       experienceYears: 6,
       lessonAreas: ['경기 분당', '경기 수원', '온라인'],
-      lessonTypes: [LessonType.inPerson, LessonType.online, LessonType.visit],
+      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.online, LessonTypeOption.visit],
       feeRange: const FeeRange(minFee: 45000, maxFee: 65000, duration: 60),
       education: [
         const Education(
@@ -329,6 +369,15 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         .where((t) => t.visibilitySettings.isSearchable)
         .where((t) => t.canBeSearched)
         .toList();
+
+    // Apply teacher type filter (academy vs individual)
+    if (filter.teacherType != null) {
+      filtered = filtered.where((t) {
+        return filter.teacherType == TeacherSearchType.academy
+            ? t.isAcademy
+            : t.isIndividual;
+      }).toList();
+    }
 
     // Apply filters
     if (filter.keyword != null && filter.keyword!.isNotEmpty) {
@@ -467,5 +516,85 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
       }
     }
     return areas.toList()..sort();
+  }
+
+  @override
+  Future<AcademyInfo?> getAcademyInfo(String organizationId) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    // Find teachers belonging to this organization
+    final orgTeachers = _mockTeachers
+        .where((t) => t.organizationId == organizationId)
+        .toList();
+
+    if (orgTeachers.isEmpty) return null;
+
+    // Get academy info from first teacher
+    final firstTeacher = orgTeachers.first;
+
+    // Collect all instruments from org teachers
+    final instruments = <String>{};
+    for (final teacher in orgTeachers) {
+      instruments.addAll(teacher.instruments);
+    }
+
+    return AcademyInfo(
+      id: organizationId,
+      name: firstTeacher.organizationName ?? '학원',
+      address: firstTeacher.lessonAreas?.firstOrNull,
+      phone: firstTeacher.verification.phoneNumber,
+      instruments: instruments.toList()..sort(),
+      teacherCount: orgTeachers.length,
+    );
+  }
+
+  @override
+  Future<List<TeacherPublicProfile>> getTeachersByOrganization(
+      String organizationId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    return _mockTeachers
+        .where((t) =>
+            t.organizationId == organizationId &&
+            t.visibilitySettings.isSearchable &&
+            t.canBeSearched)
+        .map((t) => TeacherPublicProfile.fromProfile(t))
+        .toList();
+  }
+
+  @override
+  Future<List<AcademyInfo>> getAllAcademies() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Group teachers by organizationId
+    final orgMap = <String, List<TeacherProfile>>{};
+    for (final teacher in _mockTeachers) {
+      if (teacher.organizationId != null &&
+          teacher.visibilitySettings.isSearchable &&
+          teacher.canBeSearched) {
+        orgMap.putIfAbsent(teacher.organizationId!, () => []).add(teacher);
+      }
+    }
+
+    // Create AcademyInfo for each organization
+    return orgMap.entries.map((entry) {
+      final orgId = entry.key;
+      final teachers = entry.value;
+      final firstTeacher = teachers.first;
+
+      final instruments = <String>{};
+      for (final teacher in teachers) {
+        instruments.addAll(teacher.instruments);
+      }
+
+      return AcademyInfo(
+        id: orgId,
+        name: firstTeacher.organizationName ?? '학원',
+        address: firstTeacher.lessonAreas?.firstOrNull,
+        phone: firstTeacher.verification.phoneNumber,
+        instruments: instruments.toList()..sort(),
+        teacherCount: teachers.length,
+      );
+    }).toList();
   }
 }

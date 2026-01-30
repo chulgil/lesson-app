@@ -316,6 +316,10 @@ class TeacherProfile {
   final String id;
   final String userId;
 
+  // Organization info (null for individual teachers)
+  final String? organizationId;
+  final String? organizationName;
+
   // Basic info (required for minimum)
   final String name;
   final String? profileImage;
@@ -345,9 +349,17 @@ class TeacherProfile {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  /// Check if this is an academy teacher
+  bool get isAcademy => organizationId != null;
+
+  /// Check if this is an individual teacher
+  bool get isIndividual => organizationId == null;
+
   const TeacherProfile({
     required this.id,
     required this.userId,
+    this.organizationId,
+    this.organizationName,
     required this.name,
     this.profileImage,
     required this.instruments,
@@ -476,6 +488,8 @@ class TeacherProfile {
   TeacherProfile copyWith({
     String? id,
     String? userId,
+    String? organizationId,
+    String? organizationName,
     String? name,
     String? profileImage,
     List<String>? instruments,
@@ -497,6 +511,8 @@ class TeacherProfile {
     return TeacherProfile(
       id: id ?? this.id,
       userId: userId ?? this.userId,
+      organizationId: organizationId ?? this.organizationId,
+      organizationName: organizationName ?? this.organizationName,
       name: name ?? this.name,
       profileImage: profileImage ?? this.profileImage,
       instruments: instruments ?? this.instruments,

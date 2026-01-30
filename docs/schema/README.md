@@ -98,11 +98,20 @@ docs/schema/
 | [ProfileVisibilitySettings](entities/teacher.md#profilevisibilitysettings-공개-범위-설정) | 공개 범위 설정 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
 | [TeacherSearchFilter](entities/teacher.md#teachersearchfilter-검색-필터) | 검색 필터/결과 | [teacher_registration.md](../specs/user/teacher_registration.md) | TBD |
 
-### 초대/연결
+### 선생님-학생 관계 (수강권 기반)
 
 | 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
 |--------|------|----------|:-----------:|
-| [Follow](entities/invite.md#follow-맞팔-관계) | 맞팔 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
+| TeacherStudentRelation | 수강권 기반 레슨 관계 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 90 |
+| RelationshipStatus | 관계 상태 enum | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 91 |
+| NotificationSetting | 레슨 알림/공유 설정 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 92 |
+| Follow | 소식 구독 (팔로우) | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 93 |
+| FollowTargetType | 팔로우 대상 타입 | [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md) | 94 |
+
+### 초대/학원
+
+| 엔티티 | 설명 | 관련 스펙 | Hive TypeId |
+|--------|------|----------|:-----------:|
 | [Membership](entities/invite.md#membership-학원-멤버십) | 학원-사용자 관계 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
 | [TeacherSettings](entities/invite.md#teachersettings-선생님-설정) | 선생님 초대 설정 | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
 | [PracticeLevel](entities/invite.md#practicelevel-연습-레벨) | 연습 레벨 (성과) | [invite_system_v2.md](../specs/invite/invite_system_v2.md) | TBD |
@@ -127,6 +136,8 @@ docs/schema/
 | 55-62 | 수강권 | Subscription (55-57), SubscriptionOption (58-60), SubscriptionScope (61), SubscriptionUsage (62) |
 | 60-62 | 클래스 | LessonClass (60-62) |
 | 63-72 | 학부모 | Parent (63), Child (64), ParentChildRelation (65), ConnectionStatus (66), ProfileType (67), ParentPermission (68), UserProfile (69), ParentTeacherConnection (70), ParentVisibilitySettings (71), ParentNotificationSettings (72) |
+| 85-88 | 레슨 요청 | LessonRequest (85), LessonRequestType (86), LessonRequestStatus (87), RequestedStartTiming (88) |
+| 90-94 | 관계/팔로우 | TeacherStudentRelation (90), RelationshipStatus (91), NotificationSetting (92), Follow (93), FollowTargetType (94) |
 | 73-80 | 결제 | Payment, Invoice, TeacherPaymentConfig |
 | 81-89 | 연습공간 | PracticeSpace, CoachConnection, Assignment, InviteCode |
 | 90-93 | 예약 | Booking, LessonType, BookingStatus, TeacherStudentRelation |

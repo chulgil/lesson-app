@@ -64,7 +64,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                '${selectedSlot.formattedStartTime} (${selectedSlot.durationMinutes}분)',
+                '${selectedSlot.formattedTimeRange} (${selectedSlot.durationMinutes}분)',
                 style: AppTypography.headingSmall.copyWith(
                   color: AppColors.textPrimaryLight,
                 ),

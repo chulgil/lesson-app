@@ -31,7 +31,9 @@ class MockTeacherAvailabilityRepository
     final availability = TeacherAvailability(
       id: _uuid.v4(),
       teacherId: teacherId,
-      slotDurationMinutes: 60,
+      slotDurationMinutes: 50, // 50분 레슨
+      slotStartInterval: 30, // 30분 단위 시작 (10:00, 10:30, 11:00...)
+      breakTimeBetweenLessons: 10, // 10분 쉬는 시간
       weeklySchedules: [
         // Tuesday 14:00-18:00
         WeeklySchedule(
@@ -428,7 +430,8 @@ class MockTeacherAvailabilityRepository
     if (schedules.isEmpty) return [];
 
     final slots = <AvailabilitySlot>[];
-    final duration = availability.slotDurationMinutes;
+    final lessonDuration = availability.slotDurationMinutes;
+    final startInterval = availability.slotStartInterval;
 
     for (final schedule in schedules) {
       final startParts = schedule.startTime.split(':');
@@ -441,14 +444,15 @@ class MockTeacherAvailabilityRepository
       var currentMinutes = startHour * 60 + startMinute;
       final endMinutes = endHour * 60 + endMinute;
 
-      while (currentMinutes + duration <= endMinutes) {
+      // Generate slots at startInterval intervals (e.g., 30min: 10:00, 10:30, 11:00...)
+      while (currentMinutes + lessonDuration <= endMinutes) {
         final slotHour = currentMinutes ~/ 60;
         final slotMinute = currentMinutes % 60;
 
         final startTime = TimeOfDay(hour: slotHour, minute: slotMinute);
         final endTime = TimeOfDay(
-          hour: (currentMinutes + duration) ~/ 60,
-          minute: (currentMinutes + duration) % 60,
+          hour: (currentMinutes + lessonDuration) ~/ 60,
+          minute: (currentMinutes + lessonDuration) % 60,
         );
 
         // Skip if slot is in the past for today
@@ -461,16 +465,17 @@ class MockTeacherAvailabilityRepository
             slotMinute,
           );
           if (slotDateTime.isBefore(now)) {
-            currentMinutes += duration;
+            currentMinutes += startInterval;
             continue;
           }
         }
 
-        // Check if slot is booked
-        final bookedSlot = _findBookedSlot(
+        // Check if this slot conflicts with any booked slot
+        final conflictingSlot = _findConflictingSlot(
           availability.teacherId,
           date,
-          startTime,
+          currentMinutes,
+          currentMinutes + lessonDuration,
         );
 
         AvailabilitySlotStatus status;
@@ -478,15 +483,16 @@ class MockTeacherAvailabilityRepository
         String? bookedByName;
         String? lessonId;
 
-        if (bookedSlot != null) {
-          if (bookedSlot.bookedByStudentId == currentStudentId) {
+        if (conflictingSlot != null) {
+          // Check if this is the student's own booking
+          if (conflictingSlot.bookedByStudentId == currentStudentId) {
             status = AvailabilitySlotStatus.myBooking;
           } else {
             status = AvailabilitySlotStatus.booked;
           }
-          bookedById = bookedSlot.bookedByStudentId;
-          bookedByName = bookedSlot.bookedByStudentName;
-          lessonId = bookedSlot.lessonId;
+          bookedById = conflictingSlot.bookedByStudentId;
+          bookedByName = conflictingSlot.bookedByStudentName;
+          lessonId = conflictingSlot.lessonId;
         } else {
           status = AvailabilitySlotStatus.available;
         }
@@ -496,13 +502,15 @@ class MockTeacherAvailabilityRepository
             currentStudentId != null &&
             _isRecommendedSlot(currentStudentId, date, startTime);
 
+        // Use simple date format (yyyy-MM-dd) to avoid parsing issues with ISO 8601
+        final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
         slots.add(AvailabilitySlot(
-          id: '${availability.teacherId}_${date.toIso8601String()}_$slotHour:$slotMinute',
+          id: '${availability.teacherId}_${dateStr}_$slotHour:$slotMinute',
           teacherId: availability.teacherId,
           date: date,
           startTime: startTime,
           endTime: endTime,
-          durationMinutes: duration,
+          durationMinutes: lessonDuration,
           status: status,
           bookedByStudentId: bookedById,
           bookedByStudentName: bookedByName,
@@ -510,25 +518,38 @@ class MockTeacherAvailabilityRepository
           isRecommended: isRecommended,
         ));
 
-        currentMinutes += duration;
+        // Move to next slot start time (30min or 60min interval)
+        currentMinutes += startInterval;
       }
     }
 
     return slots;
   }
 
-  AvailabilitySlot? _findBookedSlot(
+  /// Find any booked slot that conflicts with the given time range
+  AvailabilitySlot? _findConflictingSlot(
     String teacherId,
     DateTime date,
-    TimeOfDay startTime,
+    int startMinutes,
+    int endMinutes,
   ) {
     for (final slot in _bookedSlots.values) {
-      if (slot.teacherId == teacherId &&
-          slot.date.year == date.year &&
-          slot.date.month == date.month &&
-          slot.date.day == date.day &&
-          slot.startTime.hour == startTime.hour &&
-          slot.startTime.minute == startTime.minute) {
+      if (slot.teacherId != teacherId) {
+        continue;
+      }
+      if (slot.date.year != date.year ||
+          slot.date.month != date.month ||
+          slot.date.day != date.day) {
+        continue;
+      }
+
+      // Calculate booked slot's time range in minutes
+      final bookedStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
+      final bookedEndMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
+
+      // Check for overlap: two ranges overlap if one starts before the other ends
+      // [startMinutes, endMinutes) overlaps with [bookedStartMinutes, bookedEndMinutes)
+      if (startMinutes < bookedEndMinutes && endMinutes > bookedStartMinutes) {
         return slot;
       }
     }
@@ -559,34 +580,56 @@ class MockTeacherAvailabilityRepository
     await Future.delayed(const Duration(milliseconds: 100));
 
     // Parse slot ID to get details
-    final parts = slotId.split('_');
-    if (parts.length < 3) {
-      throw Exception('Invalid slot ID format');
+    // Format: teacherId_date_time (e.g., "teacher_1_2026-01-28_14:00")
+    // teacherId may contain underscores, so we parse from the end
+    final lastUnderscoreIdx = slotId.lastIndexOf('_');
+    if (lastUnderscoreIdx == -1) {
+      throw Exception('Invalid slot ID format: missing time');
+    }
+    final timeStr = slotId.substring(lastUnderscoreIdx + 1);
+
+    final beforeTime = slotId.substring(0, lastUnderscoreIdx);
+    final secondLastUnderscoreIdx = beforeTime.lastIndexOf('_');
+    if (secondLastUnderscoreIdx == -1) {
+      throw Exception('Invalid slot ID format: missing date');
     }
 
-    final teacherId = parts[0];
-    final dateStr = parts[1];
-    final timeStr = parts[2];
+    final teacherId = beforeTime.substring(0, secondLastUnderscoreIdx);
+    final dateStr = beforeTime.substring(secondLastUnderscoreIdx + 1);
     final timeParts = timeStr.split(':');
 
-    final date = DateTime.parse(dateStr);
-    final hour = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1]);
-
-    // Check if slot is still available
-    final existing = _findBookedSlot(
-      teacherId,
-      date,
-      TimeOfDay(hour: hour, minute: minute),
-    );
-
-    if (existing != null) {
-      throw Exception('이미 예약된 시간입니다');
+    if (timeParts.length < 2) {
+      throw Exception('Invalid slot ID format: invalid time "$timeStr"');
     }
+
+    DateTime date;
+    try {
+      date = DateTime.parse(dateStr);
+    } catch (e) {
+      throw Exception('Invalid slot ID format: invalid date "$dateStr"');
+    }
+
+    final hour = int.tryParse(timeParts[0]) ?? 0;
+    final minute = int.tryParse(timeParts[1]) ?? 0;
 
     final availability = _availabilities[teacherId];
     if (availability == null) {
       throw Exception('Teacher availability not found');
+    }
+
+    final startMinutes = hour * 60 + minute;
+    final endMinutes = startMinutes + availability.slotDurationMinutes;
+
+    // Check if slot conflicts with any existing booking
+    final conflicting = _findConflictingSlot(
+      teacherId,
+      date,
+      startMinutes,
+      endMinutes,
+    );
+
+    if (conflicting != null) {
+      throw Exception('이미 예약된 시간대와 겹칩니다');
     }
 
     final bookedSlot = AvailabilitySlot(
@@ -595,8 +638,8 @@ class MockTeacherAvailabilityRepository
       date: date,
       startTime: TimeOfDay(hour: hour, minute: minute),
       endTime: TimeOfDay(
-        hour: (hour * 60 + minute + availability.slotDurationMinutes) ~/ 60,
-        minute: (hour * 60 + minute + availability.slotDurationMinutes) % 60,
+        hour: endMinutes ~/ 60,
+        minute: endMinutes % 60,
       ),
       durationMinutes: availability.slotDurationMinutes,
       status: AvailabilitySlotStatus.booked,

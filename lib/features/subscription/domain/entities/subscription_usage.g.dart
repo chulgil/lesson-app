@@ -25,13 +25,15 @@ class SubscriptionUsageAdapter extends TypeAdapter<SubscriptionUsage> {
       instrument: fields[5] as String?,
       note: fields[6] as String?,
       createdAt: fields[7] as DateTime,
+      usageType: fields[8] as UsageType,
+      deducted: fields[9] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, SubscriptionUsage obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +49,11 @@ class SubscriptionUsageAdapter extends TypeAdapter<SubscriptionUsage> {
       ..writeByte(6)
       ..write(obj.note)
       ..writeByte(7)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(8)
+      ..write(obj.usageType)
+      ..writeByte(9)
+      ..write(obj.deducted);
   }
 
   @override
@@ -57,6 +63,55 @@ class SubscriptionUsageAdapter extends TypeAdapter<SubscriptionUsage> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SubscriptionUsageAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class UsageTypeAdapter extends TypeAdapter<UsageType> {
+  @override
+  final int typeId = 77;
+
+  @override
+  UsageType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return UsageType.normal;
+      case 1:
+        return UsageType.lateCancellation;
+      case 2:
+        return UsageType.studentAbsent;
+      case 3:
+        return UsageType.rescheduled;
+      default:
+        return UsageType.normal;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, UsageType obj) {
+    switch (obj) {
+      case UsageType.normal:
+        writer.writeByte(0);
+        break;
+      case UsageType.lateCancellation:
+        writer.writeByte(1);
+        break;
+      case UsageType.studentAbsent:
+        writer.writeByte(2);
+        break;
+      case UsageType.rescheduled:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UsageTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -75,6 +130,9 @@ SubscriptionUsage _$SubscriptionUsageFromJson(Map<String, dynamic> json) =>
       instrument: json['instrument'] as String?,
       note: json['note'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      usageType: $enumDecodeNullable(_$UsageTypeEnumMap, json['usageType']) ??
+          UsageType.normal,
+      deducted: json['deducted'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$SubscriptionUsageToJson(SubscriptionUsage instance) =>
@@ -87,4 +145,13 @@ Map<String, dynamic> _$SubscriptionUsageToJson(SubscriptionUsage instance) =>
       'instrument': instance.instrument,
       'note': instance.note,
       'createdAt': instance.createdAt.toIso8601String(),
+      'usageType': _$UsageTypeEnumMap[instance.usageType]!,
+      'deducted': instance.deducted,
     };
+
+const _$UsageTypeEnumMap = {
+  UsageType.normal: 'normal',
+  UsageType.lateCancellation: 'lateCancellation',
+  UsageType.studentAbsent: 'studentAbsent',
+  UsageType.rescheduled: 'rescheduled',
+};

@@ -415,6 +415,30 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
+  Future<Subscription> useReschedule(String id) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final index = _subscriptions.indexWhere((s) => s.id == id);
+    if (index == -1) {
+      throw Exception('Subscription not found: $id');
+    }
+
+    final subscription = _subscriptions[index];
+
+    // Check if reschedule is available
+    if (!subscription.canReschedule) {
+      throw Exception('No reschedule allowance remaining');
+    }
+
+    final updated = subscription.copyWith(
+      usedRescheduleCount: subscription.usedRescheduleCount + 1,
+      updatedAt: DateTime.now(),
+    );
+    _subscriptions[index] = updated;
+    _notifyListeners();
+    return updated;
+  }
+
+  @override
   Future<void> updateStatus(String id, SubscriptionStatus status) async {
     await Future.delayed(const Duration(milliseconds: 100));
     final index = _subscriptions.indexWhere((s) => s.id == id);

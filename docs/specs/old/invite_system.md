@@ -2,14 +2,14 @@
 
 > ⚠️ **DEPRECATED**: 이 문서는 더 이상 사용되지 않습니다.
 >
-> 최신 버전: [invite_system_v2.md](./invite_system_v2.md)
+> 최신 버전: [invite_system_v2.md](../invite/invite_system_v2.md)
 >
-> v2에서 추가된 주요 기능:
-> - 맞팔(mutual follow) 기반 연결 시스템
+> v2에서 변경된 주요 사항:
+> - ~~맞팔(mutual follow)~~ → **수강권 기반 관계** ([glossary.md](../glossary.md))
+> - 팔로우 → **소식 구독** (공연/이벤트용)
 > - 학원 ↔ 선생님 ↔ 학생 3자 관계 지원
-> - PracticeSpace/CoachConnection 아키텍처 반영
 >
-> 마지막 업데이트: 2025-12-28
+> 마지막 업데이트: 2026-01-30
 
 ## 개요
 

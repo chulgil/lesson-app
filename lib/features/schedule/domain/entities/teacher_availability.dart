@@ -39,7 +39,8 @@ class TeacherAvailability extends HiveObject {
   @HiveField(1)
   final String teacherId;
 
-  /// Default lesson duration in minutes (30, 45, 60)
+  /// Default lesson duration in minutes (30, 45, 50, 60)
+  /// This is how long each lesson lasts.
   @HiveField(2)
   final int slotDurationMinutes;
 
@@ -61,6 +62,16 @@ class TeacherAvailability extends HiveObject {
   @HiveField(7)
   final DateTime? updatedAt;
 
+  /// Slot start time interval in minutes (30 or 60)
+  /// This determines available start times: 30 = 10:00, 10:30, 11:00...
+  /// 60 = 10:00, 11:00, 12:00...
+  @HiveField(8)
+  final int slotStartInterval;
+
+  /// Break time between lessons in minutes (0, 5, 10, 15)
+  @HiveField(9)
+  final int breakTimeBetweenLessons;
+
   TeacherAvailability({
     required this.id,
     required this.teacherId,
@@ -70,12 +81,18 @@ class TeacherAvailability extends HiveObject {
     this.autoGenerateWeeks = 4,
     required this.createdAt,
     this.updatedAt,
+    this.slotStartInterval = 30,
+    this.breakTimeBetweenLessons = 0,
   });
 
   factory TeacherAvailability.fromJson(Map<String, dynamic> json) =>
       _$TeacherAvailabilityFromJson(json);
 
   Map<String, dynamic> toJson() => _$TeacherAvailabilityToJson(this);
+
+  /// Effective slot duration including break time
+  /// Used for determining next available slot start time
+  int get effectiveSlotDuration => slotDurationMinutes + breakTimeBetweenLessons;
 
   TeacherAvailability copyWith({
     String? id,
@@ -86,6 +103,8 @@ class TeacherAvailability extends HiveObject {
     int? autoGenerateWeeks,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? slotStartInterval,
+    int? breakTimeBetweenLessons,
   }) {
     return TeacherAvailability(
       id: id ?? this.id,
@@ -96,6 +115,8 @@ class TeacherAvailability extends HiveObject {
       autoGenerateWeeks: autoGenerateWeeks ?? this.autoGenerateWeeks,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      slotStartInterval: slotStartInterval ?? this.slotStartInterval,
+      breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
     );
   }
 }

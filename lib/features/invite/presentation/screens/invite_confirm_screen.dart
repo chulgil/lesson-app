@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/invite.dart';
 import '../../../../providers/auth/user_role_provider.dart';
 import '../../../../providers/invite/invite_provider.dart';
+import '../../../parent_home/presentation/providers/user_profile_provider.dart';
 
 /// Screen for confirming connection request from an invite
 class InviteConfirmScreen extends ConsumerStatefulWidget {
@@ -429,6 +431,11 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     // Get home route based on current user role
     final userRole = ref.read(currentUserRoleProvider);
     final homeRoute = userRole.homeRoute;
+    final invite = widget.invite;
+
+    // Check if student connected to teacher - offer booking option
+    final isStudentConnectingToTeacher =
+        userRole == UserRole.student && invite.creatorRole == InviteUserRole.teacher;
 
     showDialog(
       context: context,
@@ -468,24 +475,96 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
               ),
               textAlign: TextAlign.center,
             ),
+            if (isStudentConnectingToTeacher) ...[
+              const SizedBox(height: AppSpacing.space3),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.lightbulb_outline,
+                         size: 20, color: AppColors.info),
+                    const SizedBox(width: AppSpacing.space2),
+                    Expanded(
+                      child: Text(
+                        '지금 바로 체험레슨을 예약할 수 있어요!',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.info,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.space4),
           ],
         ),
         actions: [
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(); // Close dialog
-                context.go(homeRoute); // Go to role-specific home
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('확인'),
+          if (isStudentConnectingToTeacher) ...[
+            // Two buttons: Go home or Book lesson
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      context.go(homeRoute);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textSecondaryLight,
+                    ),
+                    child: const Text('홈으로'),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      // Navigate to booking screen with teacher info
+                      final userProfile = ref.read(currentUserProfileProvider);
+                      context.push(
+                        AppRoutes.lessonBooking,
+                        extra: {
+                          'teacherId': invite.creatorId,
+                          'teacherName': invite.creatorName ?? '선생님',
+                          'instrument': '악기', // Will be selected in booking screen
+                          'studentId': userProfile.userId,
+                          'studentName': userProfile.userName,
+                          'isTrialLesson': true,
+                        },
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('레슨 예약'),
+                  ),
+                ),
+              ],
             ),
-          ),
+          ] else ...[
+            // Single button: Go home
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  context.go(homeRoute);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('확인'),
+              ),
+            ),
+          ],
         ],
       ),
     );

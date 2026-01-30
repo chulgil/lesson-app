@@ -1,8 +1,13 @@
 # 통합 레슨 신청 시스템 스펙
 
 > 작성일: 2025-01-24
-> 상태: 스펙 확정
+> 최종 수정: 2026-01-27
+> 상태: 스펙 확정 (수강권 제안 플로우 추가)
 > 엔티티 스키마: [booking.md](../../schema/entities/booking.md)
+> 관련 문서: [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
+
+> ⚠️ **핵심 원칙**: 레슨 예약은 **유효한 수강권이 있어야만** 가능합니다.
+> 수강권이 없는 학생은 [수강권 제안 플로우](../subscription/subscription_proposal_spec.md)를 통해 먼저 수강권을 발급받아야 합니다.
 
 ---
 
@@ -304,6 +309,56 @@
 
 ---
 
+## 수강권 상태별 예약 플로우
+
+> 2026-01-27 추가
+
+### 예약 전 수강권 확인
+
+```
+[학생이 레슨 예약 요청]
+         │
+         ▼
+   ┌─────────────┐
+   │ 수강권 상태? │
+   └──────┬──────┘
+          │
+    ┌─────┴─────┬─────────────┐
+    │           │             │
+    ▼           ▼             ▼
+ [없음]      [만료됨]       [유효함]
+    │           │             │
+    ▼           ▼             ▼
+┌──────────────────┐    ┌──────────────┐
+│ 수강권 제안 플로우 │    │ 바로 예약 가능 │
+│ (결제 → 발급)     │    │ (시간 선택)   │
+└──────────────────┘    └──────────────┘
+```
+
+### 수강권 제안 플로우 (수강권 없음/만료 시)
+
+| 단계 | 주체 | 액션 | 설명 |
+|:----:|------|------|------|
+| 1 | 선생님 | 템플릿 선택 → 제안 | 미리 설정한 템플릿 사용 |
+| 2 | 학생 | 제안 확인 → 입금 | 외부 뱅킹 앱으로 입금 |
+| 3 | 학생 | [입금 완료했어요] 클릭 | 선생님에게 알림 |
+| 4 | 선생님 | 입금 확인 → [확인 완료] | 수강권 자동 발급 |
+| 5 | 학생 | 레슨 예약 | LessonBookingScreen |
+
+→ 상세: [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
+
+### 단일 예약 화면 원칙
+
+모든 레슨 예약은 **LessonBookingScreen** 하나로 통일됩니다.
+
+| 시나리오 | 진입점 | 결과 |
+|----------|--------|------|
+| 수강권 보유 학생 | 직접 예약 화면 접근 | 시간 선택 → 즉시 확정 |
+| 수강권 제안 수락 후 | 푸시 알림 → 예약 화면 | 시간 선택 → 즉시 확정 |
+| 체험레슨 | 선생님 검색 → 예약 | 시간 선택 → 즉시 확정 |
+
+---
+
 ## 관련 문서
 
 | 문서 | 설명 |
@@ -311,3 +366,5 @@
 | [booking.md](../../schema/entities/booking.md) | Booking, LessonType, BookingStatus 엔티티 |
 | [practice_space.md](../../schema/entities/practice_space.md) | InviteCode 엔티티 |
 | [Lesson_Schedule_Design.md](./Lesson_Schedule_Design.md) | 레슨 스케줄 설계 |
+| [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 시스템 |
+| [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 시간 선택 UI |

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../models/teacher_search.dart';
 import '../../../../providers/search/teacher_search_provider.dart';
+import '../../../profile/presentation/providers/invite_provider.dart';
 
 /// Screen for searching teachers
 class TeacherSearchScreen extends ConsumerStatefulWidget {
@@ -18,21 +19,36 @@ class TeacherSearchScreen extends ConsumerStatefulWidget {
       _TeacherSearchScreenState();
 }
 
-class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
+class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
+    with SingleTickerProviderStateMixin {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) {
+      final type = _tabController.index == 0
+          ? TeacherSearchType.academy
+          : TeacherSearchType.individual;
+      ref.read(teacherSearchTabStateProvider.notifier).setTab(type);
+    }
   }
 
   void _onScroll() {
@@ -52,6 +68,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
   Widget build(BuildContext context) {
     final searchResult = ref.watch(teacherSearchResultsProvider);
     final filter = ref.watch(teacherSearchFilterStateProvider);
+    final currentTab = ref.watch(teacherSearchTabStateProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,6 +82,23 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
             onPressed: () => _showFilterSheet(context),
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.primary,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: AppColors.textSecondaryLight,
+          indicatorWeight: 3,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.school_outlined),
+              text: '학원',
+            ),
+            Tab(
+              icon: Icon(Icons.person_outline),
+              text: '개인 선생님',
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
@@ -74,7 +108,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: '악기, 지역, 선생님 이름으로 검색',
+                hintText: currentTab == TeacherSearchType.academy
+                    ? '학원 이름, 악기, 지역으로 검색'
+                    : '선생님 이름, 악기, 지역으로 검색',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -196,8 +232,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
 
     if (filter.lessonTypes != null && filter.lessonTypes!.isNotEmpty) {
       for (final type in filter.lessonTypes!) {
-        chips.add(_buildFilterChip(_getLessonTypeLabel(type), () {
-          final newList = List<LessonType>.from(filter.lessonTypes!)..remove(type);
+        chips.add(_buildFilterChip(_getLessonTypeOptionLabel(type), () {
+          final newList = List<LessonTypeOption>.from(filter.lessonTypes!)..remove(type);
           ref
               .read(teacherSearchFilterStateProvider.notifier)
               .updateLessonTypes(newList.isEmpty ? null : newList);
@@ -258,15 +294,23 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
   }
 
   Widget _buildResults(TeacherSearchResult result) {
+    final currentTab = ref.watch(teacherSearchTabStateProvider);
+    final isAcademyTab = currentTab == TeacherSearchType.academy;
+    final previousTeacherIdsAsync = ref.watch(previousTeacherIdsProvider);
+
     if (result.teachers.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: AppColors.textTertiaryLight),
+            Icon(
+              isAcademyTab ? Icons.school_outlined : Icons.person_search_outlined,
+              size: 64,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '검색 결과가 없습니다',
+              isAcademyTab ? '검색된 학원이 없습니다' : '검색된 선생님이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
@@ -283,6 +327,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
       );
     }
 
+    // Get previous teacher IDs for marking
+    final previousTeacherIds = previousTeacherIdsAsync.valueOrNull ?? {};
+
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -296,18 +343,24 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
             ),
           );
         }
-        return _buildTeacherCard(result.teachers[index]);
+        final teacher = result.teachers[index];
+        final isPreviousTeacher = previousTeacherIds.contains(teacher.id);
+        return _buildTeacherCard(teacher, isPreviousTeacher: isPreviousTeacher);
       },
     );
   }
 
-  Widget _buildTeacherCard(TeacherProfile teacher) {
+  Widget _buildTeacherCard(TeacherProfile teacher, {bool isPreviousTeacher = false}) {
     final publicProfile = TeacherPublicProfile.fromProfile(teacher);
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        // Highlight previous teacher with a subtle border
+        side: isPreviousTeacher
+            ? BorderSide(color: AppColors.info.withValues(alpha: 0.5), width: 1.5)
+            : BorderSide.none,
       ),
       child: InkWell(
         onTap: () => context.push('/teachers/${teacher.id}'),
@@ -336,6 +389,73 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Previous teacher badge
+                    if (isPreviousTeacher) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.info.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.history,
+                              size: 12,
+                              color: AppColors.info,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '이전에 레슨했어요',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.info,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+
+                    // Academy badge (if applicable)
+                    if (publicProfile.isAcademy &&
+                        publicProfile.organizationName != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.school,
+                              size: 12,
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              publicProfile.organizationName!,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+
                     // Name and badges
                     Row(
                       children: [
@@ -477,13 +597,13 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen> {
     }
   }
 
-  String _getLessonTypeLabel(LessonType type) {
+  String _getLessonTypeOptionLabel(LessonTypeOption type) {
     switch (type) {
-      case LessonType.inPerson:
+      case LessonTypeOption.inPerson:
         return '대면';
-      case LessonType.online:
+      case LessonTypeOption.online:
         return '온라인';
-      case LessonType.visit:
+      case LessonTypeOption.visit:
         return '방문';
     }
   }
@@ -614,7 +734,7 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
                   // Lesson types
                   _buildSectionTitle('레슨 방식'),
                   const SizedBox(height: 8),
-                  _buildLessonTypeSelection(),
+                  _buildLessonTypeOptionSelection(),
 
                   const SizedBox(height: 24),
 
@@ -728,12 +848,12 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
     );
   }
 
-  Widget _buildLessonTypeSelection() {
+  Widget _buildLessonTypeOptionSelection() {
     final selected = _filter.lessonTypes ?? [];
     final types = [
-      (LessonType.inPerson, '대면 레슨'),
-      (LessonType.online, '온라인 레슨'),
-      (LessonType.visit, '방문 레슨'),
+      (LessonTypeOption.inPerson, '대면 레슨'),
+      (LessonTypeOption.online, '온라인 레슨'),
+      (LessonTypeOption.visit, '방문 레슨'),
     ];
 
     return Wrap(
@@ -746,7 +866,7 @@ class _FilterSheetState extends ConsumerState<_FilterSheet> {
           label: Text(label),
           selected: isSelected,
           onSelected: (value) {
-            final newList = List<LessonType>.from(selected);
+            final newList = List<LessonTypeOption>.from(selected);
             if (value) {
               newList.add(type);
             } else {

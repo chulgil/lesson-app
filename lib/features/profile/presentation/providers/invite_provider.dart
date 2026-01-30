@@ -4,6 +4,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/invite.dart';
 import '../../../../repositories/invite_repository.dart';
 import '../../../../providers/auth/user_role_provider.dart';
+import '../../../notifications/domain/services/connection_notification_service.dart';
+import '../../../notifications/presentation/providers/notification_providers.dart';
 
 part 'invite_provider.g.dart';
 
@@ -231,11 +233,50 @@ class ConnectionRequestResponder extends _$ConnectionRequestResponder {
       ref.invalidate(pendingRequestsProvider);
       ref.invalidate(myConnectionsProvider);
 
+      // Send notification using the connection notification service
+      await _sendConnectionAcceptedNotification(connection);
+
       return connection;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       return null;
     }
+  }
+
+  /// Send notification to the requester when their connection request is accepted
+  Future<void> _sendConnectionAcceptedNotification(Connection connection) async {
+    final connectionNotificationService = ref.read(connectionNotificationServiceProvider);
+    final currentRole = ref.read(currentInviteUserRoleProvider);
+
+    // Determine who is the requester (the one who should receive the notification)
+    final String requesterId;
+    final String accepterName;
+    final bool requesterIsStudent;
+
+    if (currentRole == InviteUserRole.teacher) {
+      // Teacher accepted → Student was the requester
+      requesterId = connection.studentId;
+      accepterName = connection.teacherName;
+      requesterIsStudent = true;
+    } else {
+      // Student accepted → Teacher was the requester
+      requesterId = connection.teacherId;
+      accepterName = connection.studentName;
+      requesterIsStudent = false;
+    }
+
+    await connectionNotificationService.sendConnectionAcceptedNotification(
+      requesterId: requesterId,
+      accepterName: accepterName,
+      connection: ConnectionInfo(
+        id: connection.id,
+        teacherId: connection.teacherId,
+        teacherName: connection.teacherName,
+        studentId: connection.studentId,
+        studentName: connection.studentName,
+      ),
+      requesterIsStudent: requesterIsStudent,
+    );
   }
 
   Future<bool> rejectRequest(String requestId, {String? reason}) async {
@@ -341,4 +382,22 @@ class ConnectionManager extends _$ConnectionManager {
 Future<int> pendingRequestCount(Ref ref) async {
   final requests = await ref.watch(pendingRequestsProvider.future);
   return requests.length;
+}
+
+// ===== Disconnected (Previous) Teachers =====
+
+/// Get inactive/disconnected connections for current user
+/// Used in teacher search to show "이전에 레슨했어요" teachers
+@riverpod
+Future<List<Connection>> myDisconnectedConnections(Ref ref) async {
+  final repo = ref.watch(inviteRepositoryProvider);
+  final userId = ref.watch(currentInviteUserIdProvider);
+  return repo.getInactiveConnectionsByUser(userId);
+}
+
+/// Get teacher IDs that the current student previously had lessons with
+@riverpod
+Future<Set<String>> previousTeacherIds(Ref ref) async {
+  final connections = await ref.watch(myDisconnectedConnectionsProvider.future);
+  return connections.map((c) => c.teacherId).toSet();
 }

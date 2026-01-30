@@ -297,6 +297,9 @@ class TrialBookingCard extends ConsumerWidget {
         'teacherId': booking.teacherId,
         'teacherName': booking.teacherName,
         'instrument': booking.instrument ?? '바이올린',
+        'studentId': booking.studentId,
+        'studentName': booking.studentName,
+        'isTrialLesson': true,
       },
     );
   }
@@ -364,6 +367,9 @@ class TrialBookingCard extends ConsumerWidget {
         'teacherId': booking.teacherId,
         'teacherName': booking.teacherName,
         'instrument': booking.instrument ?? '바이올린',
+        'studentId': booking.studentId,
+        'studentName': booking.studentName,
+        'isTrialLesson': true,
       },
     );
   }

@@ -3,6 +3,47 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'subscription_usage.g.dart';
 
+/// Usage type for subscription deduction
+@HiveType(typeId: 77)
+enum UsageType {
+  @HiveField(0)
+  normal, // 정상 레슨 완료
+
+  @HiveField(1)
+  lateCancellation, // 당일 취소 (24시간 이내)
+
+  @HiveField(2)
+  studentAbsent, // 학생 결석/노쇼
+
+  @HiveField(3)
+  rescheduled; // 변경/보충 레슨
+
+  String get label {
+    switch (this) {
+      case UsageType.normal:
+        return '정상 수업';
+      case UsageType.lateCancellation:
+        return '당일 취소';
+      case UsageType.studentAbsent:
+        return '학생 결석';
+      case UsageType.rescheduled:
+        return '변경 수업';
+    }
+  }
+
+  /// Whether this usage type results in subscription deduction
+  bool get isDeducted {
+    switch (this) {
+      case UsageType.normal:
+      case UsageType.lateCancellation:
+      case UsageType.studentAbsent:
+        return true;
+      case UsageType.rescheduled:
+        return false; // 변경 수업은 별도 차감 없음 (원래 레슨에서 차감됨)
+    }
+  }
+}
+
 /// Subscription usage record entity.
 /// Tracks each lesson usage from a subscription.
 @HiveType(typeId: 63)
@@ -32,6 +73,12 @@ class SubscriptionUsage extends HiveObject {
   @HiveField(7)
   final DateTime createdAt;
 
+  @HiveField(8)
+  final UsageType usageType; // Usage type (normal, lateCancellation, etc.)
+
+  @HiveField(9)
+  final bool deducted; // Whether this usage was deducted from subscription
+
   SubscriptionUsage({
     required this.id,
     required this.subscriptionId,
@@ -41,6 +88,8 @@ class SubscriptionUsage extends HiveObject {
     this.instrument,
     this.note,
     required this.createdAt,
+    this.usageType = UsageType.normal,
+    this.deducted = true,
   });
 
   factory SubscriptionUsage.fromJson(Map<String, dynamic> json) =>
@@ -57,6 +106,8 @@ class SubscriptionUsage extends HiveObject {
     String? instrument,
     String? note,
     DateTime? createdAt,
+    UsageType? usageType,
+    bool? deducted,
   }) {
     return SubscriptionUsage(
       id: id ?? this.id,
@@ -67,11 +118,85 @@ class SubscriptionUsage extends HiveObject {
       instrument: instrument ?? this.instrument,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
+      usageType: usageType ?? this.usageType,
+      deducted: deducted ?? this.deducted,
     );
   }
 
   @override
   String toString() {
-    return 'SubscriptionUsage(id: $id, subscriptionId: $subscriptionId, usedAt: $usedAt)';
+    return 'SubscriptionUsage(id: $id, subscriptionId: $subscriptionId, usedAt: $usedAt, usageType: $usageType, deducted: $deducted)';
+  }
+
+  /// Create usage for normal lesson completion
+  factory SubscriptionUsage.forLesson({
+    required String id,
+    required String subscriptionId,
+    required String lessonId,
+    required DateTime usedAt,
+    String? teacherName,
+    String? instrument,
+    String? note,
+  }) {
+    return SubscriptionUsage(
+      id: id,
+      subscriptionId: subscriptionId,
+      lessonId: lessonId,
+      usedAt: usedAt,
+      teacherName: teacherName,
+      instrument: instrument,
+      note: note,
+      createdAt: DateTime.now(),
+      usageType: UsageType.normal,
+      deducted: true,
+    );
+  }
+
+  /// Create usage for late cancellation (within 24 hours)
+  factory SubscriptionUsage.forLateCancellation({
+    required String id,
+    required String subscriptionId,
+    required String lessonId,
+    required DateTime usedAt,
+    String? teacherName,
+    String? instrument,
+    String? note,
+  }) {
+    return SubscriptionUsage(
+      id: id,
+      subscriptionId: subscriptionId,
+      lessonId: lessonId,
+      usedAt: usedAt,
+      teacherName: teacherName,
+      instrument: instrument,
+      note: note ?? '당일 취소 (24시간 이내)',
+      createdAt: DateTime.now(),
+      usageType: UsageType.lateCancellation,
+      deducted: true,
+    );
+  }
+
+  /// Create usage for student absence/no-show
+  factory SubscriptionUsage.forAbsence({
+    required String id,
+    required String subscriptionId,
+    required String lessonId,
+    required DateTime usedAt,
+    String? teacherName,
+    String? instrument,
+    String? note,
+  }) {
+    return SubscriptionUsage(
+      id: id,
+      subscriptionId: subscriptionId,
+      lessonId: lessonId,
+      usedAt: usedAt,
+      teacherName: teacherName,
+      instrument: instrument,
+      note: note ?? '학생 결석',
+      createdAt: DateTime.now(),
+      usageType: UsageType.studentAbsent,
+      deducted: true,
+    );
   }
 }

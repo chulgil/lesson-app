@@ -489,12 +489,18 @@ class _LessonTimeCard extends StatelessWidget {
   Color _getStatusColor() {
     switch (lesson.status) {
       case LessonStatus.scheduled:
+      case LessonStatus.reschedulePending:
         return AppColors.primary;
       case LessonStatus.completed:
         return AppColors.practiceGood;
       case LessonStatus.cancelled:
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
         return AppColors.textTertiaryLight;
       case LessonStatus.noShow:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.studentAbsent:
         return AppColors.error;
     }
   }

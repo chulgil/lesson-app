@@ -96,6 +96,78 @@ class MockMembershipRepository implements MembershipRepository {
         notes: '바이올린 외 피아노 추가 수업',
         createdAt: now.subtract(const Duration(days: 20)),
       ),
+
+      // ============================================================
+      // 휴식/과거 학생들 (레슨 요청 Mock 데이터용)
+      // ============================================================
+
+      // Student 5 - 과거 학생 (past status - 6개월 전 종료)
+      ClassMembership(
+        id: 'cm_006',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_5',
+        instrument: '바이올린',
+        status: MembershipStatus.terminated,
+        level: '중급',
+        monthlyFee: 220000,
+        lessonsPerWeek: 1,
+        lessonDay: '토',
+        lessonTime: '14:00',
+        lessonDuration: 50,
+        notes: '6개월 전 개인 사정으로 휴식',
+        createdAt: now.subtract(const Duration(days: 300)),
+      ),
+
+      // Student 6 - 과거 학생 (수강권 제안 받은 상태)
+      ClassMembership(
+        id: 'cm_007',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_6',
+        instrument: '바이올린',
+        status: MembershipStatus.terminated,
+        level: '고급',
+        monthlyFee: 280000,
+        lessonsPerWeek: 1,
+        lessonDay: '목',
+        lessonTime: '17:00',
+        lessonDuration: 60,
+        notes: '3개월 전 휴식',
+        createdAt: now.subtract(const Duration(days: 180)),
+      ),
+
+      // Student 7 - 과거 학생 (거절된 요청)
+      ClassMembership(
+        id: 'cm_008',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_7',
+        instrument: '피아노',
+        status: MembershipStatus.terminated,
+        level: '초급',
+        monthlyFee: 180000,
+        lessonsPerWeek: 1,
+        lessonDay: '토',
+        lessonTime: '10:00',
+        lessonDuration: 60,
+        notes: '토요일 오전만 가능한 학생',
+        createdAt: now.subtract(const Duration(days: 240)),
+      ),
+
+      // Student 8 - 과거 학생 (만료된 요청)
+      ClassMembership(
+        id: 'cm_009',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_8',
+        instrument: '첼로',
+        status: MembershipStatus.terminated,
+        level: '중급',
+        monthlyFee: 200000,
+        lessonsPerWeek: 1,
+        lessonDay: '수',
+        lessonTime: '16:00',
+        lessonDuration: 45,
+        notes: '요청 만료됨',
+        createdAt: now.subtract(const Duration(days: 200)),
+      ),
     ]);
   }
 

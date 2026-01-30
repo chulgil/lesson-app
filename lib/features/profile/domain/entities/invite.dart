@@ -107,6 +107,7 @@ enum InviteUserRole {
 class Invite {
   final String id;
   final String creatorId;
+  final String? creatorName;     // Creator's display name (for UI)
   final InviteUserRole creatorRole;
   final String inviteCode;       // 6-digit code
   final String inviteUrl;        // Deep link URL
@@ -122,6 +123,7 @@ class Invite {
   const Invite({
     required this.id,
     required this.creatorId,
+    this.creatorName,
     required this.creatorRole,
     required this.inviteCode,
     required this.inviteUrl,
@@ -164,6 +166,7 @@ class Invite {
   Invite copyWith({
     String? id,
     String? creatorId,
+    String? creatorName,
     InviteUserRole? creatorRole,
     String? inviteCode,
     String? inviteUrl,
@@ -179,6 +182,7 @@ class Invite {
     return Invite(
       id: id ?? this.id,
       creatorId: creatorId ?? this.creatorId,
+      creatorName: creatorName ?? this.creatorName,
       creatorRole: creatorRole ?? this.creatorRole,
       inviteCode: inviteCode ?? this.inviteCode,
       inviteUrl: inviteUrl ?? this.inviteUrl,

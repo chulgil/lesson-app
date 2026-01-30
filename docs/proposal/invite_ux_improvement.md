@@ -2,6 +2,14 @@
 
 > 작성일: 2025-12-28
 
+> ⚠️ **용어 업데이트 (2026-01-30)**
+>
+> 본 문서의 "맞팔" 용어는 **폐기**되었습니다.
+> - **선생님-학생 관계** → 수강권 기반 관계 ([glossary.md](../specs/glossary.md))
+> - **팔로우** → 소식 구독 (공연/이벤트 알림)
+>
+> 최신 설계: [subscription_based_relationship.md](../specs/invite/subscription_based_relationship.md)
+
 ## 배경
 
 기존 초대 시스템(v1)의 복잡한 프로세스를 개선하기 위한 브레인스토밍 세션입니다.

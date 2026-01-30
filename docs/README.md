@@ -12,6 +12,7 @@
 |------|------|------|
 | [architecture.md](architecture.md) | **앱 아키텍처 가이드** | 폴더 구조, Provider 패턴, 코드 위치 |
 | [../CLAUDE.md](../CLAUDE.md) | **프로젝트 가이드** | 명령어, 규칙, 작업 우선순위 |
+| [specs/glossary.md](specs/glossary.md) | **용어 정의** | 연결, 팔로우, 수강권 등 핵심 용어 |
 | [registry.md](registry.md) | **문서 레지스트리** | 토큰/컴포넌트/패턴 의존성 추적 |
 | [refactoring_tasks.md](refactoring_tasks.md) | 리팩토링 진행 현황 | Clean Architecture 마이그레이션 |
 
@@ -198,12 +199,14 @@ docs/
 |------|------|------|
 | [trial_lesson_system.md](specs/trial/trial_lesson_system.md) | ✅ 확정 | 체험 레슨 시스템 |
 
-### 초대 시스템 (invite/)
+### 초대/관계 시스템 (invite/)
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
-| [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | **양방향 초대 시스템** (맞팔, QR/URL/코드, 3자 관계) |
+| [subscription_based_relationship.md](specs/invite/subscription_based_relationship.md) | ✅ 확정 | **수강권 중심 관계 모델** (선생님-학생 관계, 팔로우 분리) |
+| [invite_system_v2.md](specs/invite/invite_system_v2.md) | ✅ 확정 | 양방향 초대 시스템 (학부모/학원 부분) |
 
+> ⚠️ **선생님-학생 관계**는 `subscription_based_relationship.md` 참조
 > 📦 DEPRECATED `invite_system.md`는 `specs/_archive/`로 이동됨
 
 → 엔티티: [schema/entities/practice_space.md](schema/entities/practice_space.md) (InviteCode)

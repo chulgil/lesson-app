@@ -38,6 +38,36 @@ enum NotificationType {
   trialBookingRequest,
   studentPracticeReport,
   reviewReceived,
+
+  // Connection/Invite notifications
+  connectionRequestReceived,
+  connectionRequestAccepted,
+  connectionRequestRejected,
+  connectionEstablished,
+  connectionDisconnected,
+
+  // Makeup lesson notifications
+  makeupLessonCreated,
+  makeupLessonExpiring,
+  makeupLessonExpired,
+
+  // Schedule change notifications
+  scheduleChangeRequested,
+  scheduleChangeApproved,
+  scheduleChangeRejected,
+  scheduleChangeAlternative,
+
+  // Subscription proposal notifications
+  proposalReceived, // New proposal from teacher
+  proposalReminder24h, // 24h reminder
+  proposalReminder48h, // 48h reminder
+  proposalReminder72h, // 72h final reminder (golden time ending)
+  proposalAccepted, // Student accepted proposal
+  proposalExpired, // Proposal expired without action
+
+  // 🆕 Reschedule allowance notifications
+  rescheduleAllowanceUsed, // Student used reschedule allowance
+  rescheduleAllowanceDepleted, // All reschedule allowances used
 }
 
 /// Notification priority levels
@@ -63,12 +93,21 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.paymentRequested:
       case NotificationType.paymentReminder:
       case NotificationType.cancellationDeadline:
+      case NotificationType.connectionRequestReceived:
+      case NotificationType.connectionRequestAccepted:
+      case NotificationType.connectionEstablished:
+      case NotificationType.scheduleChangeRequested:
+      case NotificationType.proposalReceived:
+      case NotificationType.proposalReminder72h: // Golden time ending
         return NotificationPriority.high;
 
       case NotificationType.streakMilestone:
       case NotificationType.weeklyGoalAchieved:
       case NotificationType.lessonCompleted:
       case NotificationType.studentPracticeReport:
+      case NotificationType.connectionRequestRejected:
+      case NotificationType.connectionDisconnected:
+      case NotificationType.makeupLessonExpired:
         return NotificationPriority.low;
 
       default:
@@ -121,6 +160,12 @@ class AppNotification {
   final bool isPush;
   final bool isInApp;
 
+  /// 알림 탭 시 이동할 딥링크 URL (예: /lesson-booking?teacherId=xxx)
+  final String? actionUrl;
+
+  /// 액션 버튼 텍스트 (예: "레슨 예약하기")
+  final String? actionLabel;
+
   const AppNotification({
     required this.id,
     required this.userId,
@@ -135,6 +180,8 @@ class AppNotification {
     this.readAt,
     this.isPush = true,
     this.isInApp = true,
+    this.actionUrl,
+    this.actionLabel,
   });
 
   bool get isRead => readAt != null;
@@ -155,6 +202,8 @@ class AppNotification {
     DateTime? readAt,
     bool? isPush,
     bool? isInApp,
+    String? actionUrl,
+    String? actionLabel,
   }) {
     return AppNotification(
       id: id ?? this.id,
@@ -170,6 +219,8 @@ class AppNotification {
       readAt: readAt ?? this.readAt,
       isPush: isPush ?? this.isPush,
       isInApp: isInApp ?? this.isInApp,
+      actionUrl: actionUrl ?? this.actionUrl,
+      actionLabel: actionLabel ?? this.actionLabel,
     );
   }
 }
@@ -246,6 +297,57 @@ const Map<NotificationType, NotificationTemplate> notificationTemplates = {
     type: NotificationType.practiceAssigned,
     titleTemplate: 'New Practice Assignment',
     bodyTemplate: '{{teacherName}} assigned new practice items',
+    priority: NotificationPriority.normal,
+  ),
+  // Connection notifications
+  NotificationType.connectionRequestReceived: NotificationTemplate(
+    type: NotificationType.connectionRequestReceived,
+    titleTemplate: '🔗 새 연결 요청',
+    bodyTemplate: '{{userName}}님이 연결을 요청했습니다',
+    priority: NotificationPriority.high,
+  ),
+  NotificationType.connectionRequestAccepted: NotificationTemplate(
+    type: NotificationType.connectionRequestAccepted,
+    titleTemplate: '✅ 연결 완료',
+    bodyTemplate: '{{userName}}님과 연결되었습니다! 지금 체험레슨을 예약해보세요.',
+    priority: NotificationPriority.high,
+  ),
+  NotificationType.connectionEstablished: NotificationTemplate(
+    type: NotificationType.connectionEstablished,
+    titleTemplate: '🎉 새 학생 연결',
+    bodyTemplate: '{{userName}}님과 연결되었습니다',
+    priority: NotificationPriority.high,
+  ),
+  // Makeup lesson notifications
+  NotificationType.makeupLessonCreated: NotificationTemplate(
+    type: NotificationType.makeupLessonCreated,
+    titleTemplate: '🔄 보강 적립',
+    bodyTemplate: '보강 1회가 적립되었습니다 ({{reason}})',
+    priority: NotificationPriority.normal,
+  ),
+  NotificationType.makeupLessonExpiring: NotificationTemplate(
+    type: NotificationType.makeupLessonExpiring,
+    titleTemplate: '⏰ 보강 만료 임박',
+    bodyTemplate: '보강 {{count}}회가 {{days}}일 후 만료됩니다',
+    priority: NotificationPriority.high,
+  ),
+  // Schedule change notifications
+  NotificationType.scheduleChangeRequested: NotificationTemplate(
+    type: NotificationType.scheduleChangeRequested,
+    titleTemplate: '🔄 레슨 시간 변경 요청',
+    bodyTemplate: '{{userName}}님이 {{change}} 변경을 요청했습니다',
+    priority: NotificationPriority.high,
+  ),
+  NotificationType.scheduleChangeApproved: NotificationTemplate(
+    type: NotificationType.scheduleChangeApproved,
+    titleTemplate: '✅ 시간 변경 승인',
+    bodyTemplate: '레슨 시간이 {{newTime}}으로 변경되었습니다',
+    priority: NotificationPriority.high,
+  ),
+  NotificationType.scheduleChangeAlternative: NotificationTemplate(
+    type: NotificationType.scheduleChangeAlternative,
+    titleTemplate: '📅 다른 시간 제안',
+    bodyTemplate: '{{userName}}님이 다른 시간을 제안했습니다',
     priority: NotificationPriority.normal,
   ),
 };

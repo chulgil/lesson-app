@@ -61,6 +61,10 @@ class Teacher {
   final String id;
   final String userId;
 
+  // Organization info (학원 소속 여부) - ✅ 구현 완료
+  final String? organizationId;    // null = 개인 선생님
+  final String? organizationName;  // 학원 이름
+
   // Basic info
   final String name;
   final String? profileImage;
@@ -88,6 +92,8 @@ class Teacher {
   ProfileCompletionLevel get completionLevel;
   int get completionPercentage;
   List<String> get incompleteFields;
+  bool get isAcademy => organizationId != null;
+  bool get isIndividual => organizationId == null;
 }
 ```
 
@@ -97,6 +103,8 @@ class Teacher {
 |------|------|------|
 | id | String | 고유 식별자 |
 | userId | String | Auth 사용자 ID |
+| organizationId | String? | 학원 ID (null = 개인 선생님) ✅ |
+| organizationName | String? | 학원 이름 ✅ |
 | name | String | 이름 (필수) |
 | profileImage | String? | 프로필 사진 (필수) |
 | instruments | List<Instrument> | 가르치는 악기 (필수, 최소 1개) |
@@ -347,15 +355,32 @@ class Video {
 
 ---
 
+## TeacherSearchType (검색 유형) ✅ 구현 완료
+
+```dart
+enum TeacherSearchType {
+  academy,      // 학원 소속 선생님 (organizationId != null)
+  individual,   // 개인 선생님 (organizationId == null)
+}
+```
+
+> 검색 화면 TabBar에서 학원/개인 탭 전환 시 자동 적용
+
+---
+
 ## TeacherSearchFilter (검색 필터)
 
 ```dart
 class TeacherSearchFilter {
+  final TeacherSearchType? teacherType; // 학원/개인 (탭으로 제어) ✅
   final List<Instrument>? instruments;  // 악기
-  final String? area;                   // 지역
-  final LessonType? lessonType;         // 대면/비대면
-  final FeeRange? feeRange;             // 레슨료 범위
+  final List<String>? areas;            // 지역 (복수)
+  final List<LessonType>? lessonTypes;  // 대면/비대면 (복수)
+  final int? minFee;                    // 최소 레슨료
+  final int? maxFee;                    // 최대 레슨료
+  final int? minExperience;             // 최소 경력
   final bool? hasVerifiedCertificate;   // 자격인증 여부
+  final ProfileCompletionLevel? minCompletionLevel; // 최소 프로필 완성도
 }
 ```
 

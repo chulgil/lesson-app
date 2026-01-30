@@ -146,10 +146,18 @@ mixin PracticeDailyCompletionMixin on PracticeRepositoryBase
                   (updatedPracticeCount - currentCount).clamp(0, updatedPracticeCount);
             }
 
+            // 🆕 Fix #8: Sync isCompleted if toggling today's date
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            final isToday = dateOnly == today;
+
             updatedSection = section.copyWith(
               dailyRepeatCounts: updatedCounts,
               dailyStatuses: updatedStatuses,
               practiceCount: updatedPracticeCount,
+              // 🆕 Sync isCompleted with today's completion status
+              isCompleted: isToday ? isNowCompleted : section.isCompleted,
+              completedAt: isToday && isNowCompleted ? now : (isToday ? null : section.completedAt),
               updatedAt: DateTime.now(),
             );
           } else {
@@ -178,8 +186,31 @@ mixin PracticeDailyCompletionMixin on PracticeRepositoryBase
               ];
             }
 
+            // 🆕 Fix #8: Sync isCompleted if toggling today's date (Standard mode)
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            final isToday = dateOnly == today;
+
+            // Determine if today is now completed
+            bool? todayCompleted;
+            if (isToday) {
+              final todayStatus = updatedStatuses.firstWhere(
+                (s) => s.dateOnly == today,
+                orElse: () => DailyPracticeStatus(
+                  id: '',
+                  sectionId: sectionId,
+                  date: today,
+                  isCompleted: false,
+                ),
+              );
+              todayCompleted = todayStatus.isCompleted;
+            }
+
             updatedSection = section.copyWith(
               dailyStatuses: updatedStatuses,
+              // 🆕 Sync isCompleted with today's completion status
+              isCompleted: isToday ? todayCompleted : section.isCompleted,
+              completedAt: isToday && (todayCompleted ?? false) ? now : (isToday ? null : section.completedAt),
               updatedAt: DateTime.now(),
             );
           }

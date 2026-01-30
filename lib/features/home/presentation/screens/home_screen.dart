@@ -12,6 +12,9 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
+import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../../../calendar/presentation/screens/calendar_tab.dart';
 import '../../../practice/presentation/widgets/metronome/metronome_full_screen_modal.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
@@ -278,6 +281,46 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
               ],
             ),
 
+            const SizedBox(height: AppSpacing.space6),
+
+            // Subscription Management (TEST)
+            Text('수강권 관리', style: AppTypography.headingMedium),
+            const SizedBox(height: AppSpacing.space3),
+
+            Row(
+              children: [
+                Expanded(
+                  child: QuickToolButton(
+                    icon: Icons.inventory_2_outlined,
+                    label: '템플릿 관리',
+                    onTap: () => context.push(
+                      '${AppRoutes.subscriptionTemplates}?teacherId=teacher_1',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: QuickToolButton(
+                    icon: Icons.send_outlined,
+                    label: '제안 보내기',
+                    onTap: () => context.push(
+                      '${AppRoutes.proposalCreate}?teacherId=teacher_1',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: QuickToolButton(
+                    icon: Icons.check_circle_outline,
+                    label: '입금 확인',
+                    onTap: () => context.push(
+                      '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
             const SizedBox(height: AppSpacing.space8),
           ],
         ),
@@ -298,13 +341,10 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
         ),
         Row(
           children: [
+            _buildLessonRequestsButton(context),
             _buildPendingBookingsButton(context),
             IconButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('알림 기능은 준비 중입니다')),
-                );
-              },
+              onPressed: () => context.push(AppRoutes.notifications),
               icon: const Icon(Icons.notifications_outlined),
               tooltip: '알림',
             ),
@@ -337,6 +377,63 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
           label: const Text('추가'),
         ),
       ],
+    );
+  }
+
+  Widget _buildLessonRequestsButton(BuildContext context) {
+    final teacherId = ref.watch(currentUserIdProvider);
+    final pendingCountAsync =
+        ref.watch(pendingLessonRequestCountProvider(teacherId));
+
+    return pendingCountAsync.when(
+      data: (count) {
+        return Stack(
+          children: [
+            IconButton(
+              onPressed: () => context.push(
+                AppRoutes.lessonRequests,
+                extra: {'teacherId': teacherId},
+              ),
+              icon: const Icon(Icons.person_add_outlined),
+              tooltip: '레슨 요청',
+            ),
+            if (count > 0)
+              Positioned(
+                right: 4,
+                top: 4,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: AppColors.warning,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
+                  child: Text(
+                    count > 9 ? '9+' : '$count',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+      loading: () => IconButton(
+        onPressed: () => context.push(
+          AppRoutes.lessonRequests,
+          extra: {'teacherId': teacherId},
+        ),
+        icon: const Icon(Icons.person_add_outlined),
+        tooltip: '레슨 요청',
+      ),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 
@@ -448,7 +545,7 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
 
 // ---- Widgets ----
 
-class _LessonCard extends StatelessWidget {
+class _LessonCard extends ConsumerWidget {
   final Lesson lesson;
   final VoidCallback onTap;
 
@@ -458,7 +555,11 @@ class _LessonCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Get student's active subscription for badge
+    final subscriptionsAsync =
+        ref.watch(activeStudentSubscriptionsProvider(lesson.studentId));
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -504,11 +605,33 @@ class _LessonCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${lesson.studentName} | ${lesson.instrument}',
-                      style: AppTypography.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                    // Name, instrument, and subscription badge
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${lesson.studentName} | ${lesson.instrument}',
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        // Subscription badge
+                        subscriptionsAsync.when(
+                          data: (subscriptions) {
+                            if (subscriptions.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            // Show first active subscription badge
+                            return SubscriptionBadge(
+                              subscription: subscriptions.first,
+                              showIcon: false,
+                            );
+                          },
+                          loading: () => const SizedBox.shrink(),
+                          error: (_, __) => const SizedBox.shrink(),
+                        ),
+                      ],
                     ),
                     if (lesson.pieces.isNotEmpty)
                       Text(

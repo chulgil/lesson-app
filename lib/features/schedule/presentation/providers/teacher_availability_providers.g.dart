@@ -1588,7 +1588,7 @@ final selectedDateProvider =
 
 typedef _$SelectedDate = AutoDisposeNotifier<DateTime>;
 String _$slotBookingNotifierHash() =>
-    r'da0c95a93c466e3fbf3fe0c7921114cbbcdb07fb';
+    r'7fa2e0d23450cab483bda46c68e102d09272cf4e';
 
 /// See also [SlotBookingNotifier].
 @ProviderFor(SlotBookingNotifier)
@@ -1606,7 +1606,7 @@ final slotBookingNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SlotBookingNotifier
     = AutoDisposeNotifier<AsyncValue<AvailabilitySlot?>>;
 String _$teacherAvailabilityNotifierHash() =>
-    r'd6530867c4bc041eb9840b0bab6e7b68d0368638';
+    r'7fe8b3c811b4d31cae8695b03cac74162a7893a1';
 
 abstract class _$TeacherAvailabilityNotifier
     extends BuildlessAutoDisposeNotifier<AsyncValue<TeacherAvailability?>> {

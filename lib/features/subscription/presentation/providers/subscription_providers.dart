@@ -114,6 +114,15 @@ class SubscriptionNotifier extends _$SubscriptionNotifier {
     return updated;
   }
 
+  /// Use one reschedule allowance.
+  /// Call this when student changes their booking.
+  Future<Subscription> useReschedule(String id) async {
+    final repository = ref.read(subscriptionRepositoryProvider);
+    final updated = await repository.useReschedule(id);
+    ref.invalidateSelf();
+    return updated;
+  }
+
   Future<void> updateStatus(String id, SubscriptionStatus status) async {
     final repository = ref.read(subscriptionRepositoryProvider);
     await repository.updateStatus(id, status);
@@ -156,6 +165,21 @@ class MembershipSubscriptionNotifier extends _$MembershipSubscriptionNotifier {
     return updated;
   }
 
+  /// Use one reschedule allowance from the active subscription.
+  Future<Subscription> useReschedule() async {
+    final subscription = await future;
+    if (subscription == null) {
+      throw Exception('No active subscription found');
+    }
+    if (!subscription.canReschedule) {
+      throw Exception('No reschedule allowance remaining');
+    }
+    final repository = ref.read(subscriptionRepositoryProvider);
+    final updated = await repository.useReschedule(subscription.id);
+    ref.invalidateSelf();
+    return updated;
+  }
+
   Future<void> pause() async {
     final subscription = await future;
     if (subscription == null) return;
@@ -171,4 +195,62 @@ class MembershipSubscriptionNotifier extends _$MembershipSubscriptionNotifier {
     await repository.updateStatus(subscription.id, SubscriptionStatus.active);
     ref.invalidateSelf();
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Subscription Validation Providers
+// ═══════════════════════════════════════════════════════════════════
+
+/// Check if a student has an active subscription with a teacher.
+/// Returns the active subscription if found, null otherwise.
+@riverpod
+Future<Subscription?> activeSubscriptionBetween(
+  ActiveSubscriptionBetweenRef ref, {
+  required String studentId,
+  required String teacherId,
+}) async {
+  final repository = ref.watch(subscriptionRepositoryProvider);
+  final teacherSubscriptions = await repository.getByTeacherId(teacherId);
+
+  // Find active subscription for this student
+  final studentSubscriptions = teacherSubscriptions
+      .where((s) =>
+          s.studentId == studentId &&
+          (s.status == SubscriptionStatus.active ||
+              s.status == SubscriptionStatus.expiringSoon) &&
+          (s.remainingLessons ?? 0) > 0)
+      .toList();
+
+  if (studentSubscriptions.isEmpty) {
+    return null;
+  }
+
+  // Return the first active subscription (could prioritize by expiry date later)
+  return studentSubscriptions.first;
+}
+
+/// Check if a student can book a lesson with a teacher.
+/// Returns true if:
+/// - It's a trial lesson (no subscription needed)
+/// - Student has an active subscription with remaining lessons
+@riverpod
+Future<bool> canBookLesson(
+  CanBookLessonRef ref, {
+  required String studentId,
+  required String teacherId,
+  required bool isTrialLesson,
+}) async {
+  // Trial lessons don't require subscription
+  if (isTrialLesson) {
+    return true;
+  }
+
+  final subscription = await ref.watch(
+    activeSubscriptionBetweenProvider(
+      studentId: studentId,
+      teacherId: teacherId,
+    ).future,
+  );
+
+  return subscription != null && (subscription.remainingLessons ?? 0) > 0;
 }

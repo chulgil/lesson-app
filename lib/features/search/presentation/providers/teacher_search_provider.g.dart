@@ -258,8 +258,338 @@ final availableAreasProvider = AutoDisposeFutureProvider<List<String>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef AvailableAreasRef = AutoDisposeFutureProviderRef<List<String>>;
+String _$academyInfoHash() => r'a09a3a34bbc39263614524564df355b3ca227947';
+
+/// Academy info provider - get academy details by organization ID
+///
+/// Copied from [academyInfo].
+@ProviderFor(academyInfo)
+const academyInfoProvider = AcademyInfoFamily();
+
+/// Academy info provider - get academy details by organization ID
+///
+/// Copied from [academyInfo].
+class AcademyInfoFamily extends Family<AsyncValue<AcademyInfo?>> {
+  /// Academy info provider - get academy details by organization ID
+  ///
+  /// Copied from [academyInfo].
+  const AcademyInfoFamily();
+
+  /// Academy info provider - get academy details by organization ID
+  ///
+  /// Copied from [academyInfo].
+  AcademyInfoProvider call(
+    String organizationId,
+  ) {
+    return AcademyInfoProvider(
+      organizationId,
+    );
+  }
+
+  @override
+  AcademyInfoProvider getProviderOverride(
+    covariant AcademyInfoProvider provider,
+  ) {
+    return call(
+      provider.organizationId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'academyInfoProvider';
+}
+
+/// Academy info provider - get academy details by organization ID
+///
+/// Copied from [academyInfo].
+class AcademyInfoProvider extends AutoDisposeFutureProvider<AcademyInfo?> {
+  /// Academy info provider - get academy details by organization ID
+  ///
+  /// Copied from [academyInfo].
+  AcademyInfoProvider(
+    String organizationId,
+  ) : this._internal(
+          (ref) => academyInfo(
+            ref as AcademyInfoRef,
+            organizationId,
+          ),
+          from: academyInfoProvider,
+          name: r'academyInfoProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$academyInfoHash,
+          dependencies: AcademyInfoFamily._dependencies,
+          allTransitiveDependencies:
+              AcademyInfoFamily._allTransitiveDependencies,
+          organizationId: organizationId,
+        );
+
+  AcademyInfoProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.organizationId,
+  }) : super.internal();
+
+  final String organizationId;
+
+  @override
+  Override overrideWith(
+    FutureOr<AcademyInfo?> Function(AcademyInfoRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AcademyInfoProvider._internal(
+        (ref) => create(ref as AcademyInfoRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        organizationId: organizationId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<AcademyInfo?> createElement() {
+    return _AcademyInfoProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AcademyInfoProvider &&
+        other.organizationId == organizationId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, organizationId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AcademyInfoRef on AutoDisposeFutureProviderRef<AcademyInfo?> {
+  /// The parameter `organizationId` of this provider.
+  String get organizationId;
+}
+
+class _AcademyInfoProviderElement
+    extends AutoDisposeFutureProviderElement<AcademyInfo?> with AcademyInfoRef {
+  _AcademyInfoProviderElement(super.provider);
+
+  @override
+  String get organizationId => (origin as AcademyInfoProvider).organizationId;
+}
+
+String _$academyTeachersHash() => r'410afda8649528d8ac58c4c534b5e9c19bdcff02';
+
+/// Academy teachers provider - get all teachers in an academy
+///
+/// Copied from [academyTeachers].
+@ProviderFor(academyTeachers)
+const academyTeachersProvider = AcademyTeachersFamily();
+
+/// Academy teachers provider - get all teachers in an academy
+///
+/// Copied from [academyTeachers].
+class AcademyTeachersFamily
+    extends Family<AsyncValue<List<TeacherPublicProfile>>> {
+  /// Academy teachers provider - get all teachers in an academy
+  ///
+  /// Copied from [academyTeachers].
+  const AcademyTeachersFamily();
+
+  /// Academy teachers provider - get all teachers in an academy
+  ///
+  /// Copied from [academyTeachers].
+  AcademyTeachersProvider call(
+    String organizationId,
+  ) {
+    return AcademyTeachersProvider(
+      organizationId,
+    );
+  }
+
+  @override
+  AcademyTeachersProvider getProviderOverride(
+    covariant AcademyTeachersProvider provider,
+  ) {
+    return call(
+      provider.organizationId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'academyTeachersProvider';
+}
+
+/// Academy teachers provider - get all teachers in an academy
+///
+/// Copied from [academyTeachers].
+class AcademyTeachersProvider
+    extends AutoDisposeFutureProvider<List<TeacherPublicProfile>> {
+  /// Academy teachers provider - get all teachers in an academy
+  ///
+  /// Copied from [academyTeachers].
+  AcademyTeachersProvider(
+    String organizationId,
+  ) : this._internal(
+          (ref) => academyTeachers(
+            ref as AcademyTeachersRef,
+            organizationId,
+          ),
+          from: academyTeachersProvider,
+          name: r'academyTeachersProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$academyTeachersHash,
+          dependencies: AcademyTeachersFamily._dependencies,
+          allTransitiveDependencies:
+              AcademyTeachersFamily._allTransitiveDependencies,
+          organizationId: organizationId,
+        );
+
+  AcademyTeachersProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.organizationId,
+  }) : super.internal();
+
+  final String organizationId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<TeacherPublicProfile>> Function(AcademyTeachersRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AcademyTeachersProvider._internal(
+        (ref) => create(ref as AcademyTeachersRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        organizationId: organizationId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<TeacherPublicProfile>> createElement() {
+    return _AcademyTeachersProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AcademyTeachersProvider &&
+        other.organizationId == organizationId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, organizationId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin AcademyTeachersRef
+    on AutoDisposeFutureProviderRef<List<TeacherPublicProfile>> {
+  /// The parameter `organizationId` of this provider.
+  String get organizationId;
+}
+
+class _AcademyTeachersProviderElement
+    extends AutoDisposeFutureProviderElement<List<TeacherPublicProfile>>
+    with AcademyTeachersRef {
+  _AcademyTeachersProviderElement(super.provider);
+
+  @override
+  String get organizationId =>
+      (origin as AcademyTeachersProvider).organizationId;
+}
+
+String _$allAcademiesHash() => r'8c72abba34ea7873c4293830abec50234dd06eb9';
+
+/// All academies provider - get list of all academies
+///
+/// Copied from [allAcademies].
+@ProviderFor(allAcademies)
+final allAcademiesProvider =
+    AutoDisposeFutureProvider<List<AcademyInfo>>.internal(
+  allAcademies,
+  name: r'allAcademiesProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$allAcademiesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef AllAcademiesRef = AutoDisposeFutureProviderRef<List<AcademyInfo>>;
+String _$teacherSearchTabStateHash() =>
+    r'4db4fb24b8517e3bc40659d0265822bbf9b8346d';
+
+/// Current search tab state (academy vs individual)
+///
+/// Copied from [TeacherSearchTabState].
+@ProviderFor(TeacherSearchTabState)
+final teacherSearchTabStateProvider = AutoDisposeNotifierProvider<
+    TeacherSearchTabState, TeacherSearchType>.internal(
+  TeacherSearchTabState.new,
+  name: r'teacherSearchTabStateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherSearchTabStateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$TeacherSearchTabState = AutoDisposeNotifier<TeacherSearchType>;
 String _$teacherSearchFilterStateHash() =>
-    r'149c4eac6f1c6b278185e3b1c52647884a5f92db';
+    r'ead91ff78703c92b9cc7ba99999644e2fe573cd3';
 
 /// Current search filter state
 ///

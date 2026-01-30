@@ -4,12 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
+import '../../../schedule/domain/entities/lesson_request.dart';
+import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
 import '../widgets/weekly_practice_widget.dart';
@@ -60,7 +64,7 @@ class StudentDashboardTab extends ConsumerWidget {
                     tooltip: '선생님 초대',
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () => context.push(AppRoutes.notifications),
                     icon: const Icon(Icons.notifications_outlined),
                   ),
                 ],
@@ -86,6 +90,16 @@ class StudentDashboardTab extends ConsumerWidget {
           ),
 
           const SizedBox(height: AppSpacing.space6),
+
+          // Pending Proposals
+          _buildPendingProposalsBanner(context, ref, currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // My Lesson Requests
+          _buildLessonRequestsBanner(context, ref, currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
 
           // My Subscriptions (수강권 요약)
           StudentSubscriptionSummary(
@@ -497,6 +511,207 @@ class StudentDashboardTab extends ConsumerWidget {
           fontWeight: FontWeight.w500,
         ),
       ),
+    );
+  }
+
+  /// Lesson requests banner - shows active lesson requests status
+  Widget _buildLessonRequestsBanner(
+    BuildContext context,
+    WidgetRef ref,
+    String studentId,
+  ) {
+    final requestsAsync = ref.watch(studentLessonRequestsProvider(studentId));
+
+    return requestsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (requests) {
+        // Filter active requests (pending or proposal received)
+        final activeRequests = requests.where((r) =>
+            (r.status == LessonRequestStatus.pending && !r.isExpired) ||
+            r.status == LessonRequestStatus.proposalSent).toList();
+
+        if (activeRequests.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        // Count by status
+        final proposalCount = activeRequests
+            .where((r) => r.status == LessonRequestStatus.proposalSent)
+            .length;
+        final pendingCount = activeRequests
+            .where((r) => r.status == LessonRequestStatus.pending && !r.isExpired)
+            .length;
+
+        // Determine display based on status
+        Color bannerColor;
+        IconData bannerIcon;
+        String title;
+        String subtitle;
+
+        if (proposalCount > 0) {
+          bannerColor = AppColors.success;
+          bannerIcon = Icons.card_giftcard;
+          title = '수강권 제안 도착!';
+          subtitle = proposalCount == 1
+              ? '선생님이 수강권을 제안했습니다'
+              : '$proposalCount건의 수강권 제안이 있습니다';
+        } else {
+          bannerColor = AppColors.info;
+          bannerIcon = Icons.hourglass_empty;
+          title = '레슨 요청 대기 중';
+          subtitle = pendingCount == 1
+              ? '선생님 응답을 기다리고 있습니다'
+              : '$pendingCount건의 요청이 대기 중입니다';
+        }
+
+        return GestureDetector(
+          onTap: () {
+            context.push(
+              '${AppRoutes.myLessonRequests}?studentId=$studentId',
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: bannerColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              border: Border.all(color: bannerColor.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: bannerColor.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    bannerIcon,
+                    color: bannerColor,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondaryLight,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Pending proposals banner - shows if there are pending proposals
+  Widget _buildPendingProposalsBanner(
+    BuildContext context,
+    WidgetRef ref,
+    String studentId,
+  ) {
+    final pendingProposalsAsync =
+        ref.watch(pendingStudentProposalsProvider(studentId));
+
+    return pendingProposalsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (proposals) {
+        if (proposals.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        final proposal = proposals.first;
+        final count = proposals.length;
+
+        return GestureDetector(
+          onTap: () {
+            if (count == 1) {
+              // 1개: 해당 제안 상세로 바로 이동
+              context.push(
+                  AppRoutes.proposalDetail.replaceFirst(':id', proposal.id));
+            } else {
+              // 2개 이상: 알림 화면으로 이동 (모든 제안 알림 표시)
+              context.push(AppRoutes.notifications);
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+              border:
+                  Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.card_giftcard,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '수강권 제안이 도착했어요!',
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        // 시스템 자동 제안: 할인 혜택 강조
+                        // 선생님 수동 제안: 선생님 메시지 표시
+                        proposal.isAutoProposal
+                            ? (proposal.discountReason ?? '지금 확인하고 혜택 받으세요')
+                            : (proposal.message ?? '선생님이 수강권을 제안했습니다'),
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondaryLight,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

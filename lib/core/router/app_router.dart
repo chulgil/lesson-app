@@ -17,6 +17,7 @@ import 'routes/practice_routes.dart';
 import 'routes/parent_routes.dart';
 import 'routes/search_routes.dart';
 import 'routes/invite_routes.dart';
+import 'routes/notification_routes.dart';
 import 'routes/settings_routes.dart';
 import 'routes/subscription_routes.dart';
 
@@ -45,6 +46,7 @@ class AppRouter {
       ...parentRoutes,
       ...searchRoutes,
       ...inviteRoutes,
+      ...notificationRoutes,
       ...settingsRoutes,
       ...subscriptionRoutes,
     ],

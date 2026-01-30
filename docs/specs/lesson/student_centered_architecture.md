@@ -287,4 +287,4 @@ Phase 3: 레거시 모델 지원 종료
 | [practice_space.md](../../schema/entities/practice_space.md) | PracticeSpace, CoachConnection, Assignment 엔티티 |
 | [three_party_relationship_spec.md](three_party_relationship_spec.md) | 학원-선생님-학생 3자 관계 확장 |
 | [practice_streak_spec.md](../practice/practice_streak_spec.md) | 스트릭 기능 상세 명세 |
-| [invite_system_v2.md](../invite/invite_system_v2.md) | 초대 시스템 (맞팔 기반) |
+| [invite_system_v2.md](../invite/invite_system_v2.md) | 초대 시스템 (수강권 기반) |
