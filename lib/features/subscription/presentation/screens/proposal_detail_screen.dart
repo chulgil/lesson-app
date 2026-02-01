@@ -198,75 +198,87 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   Widget _buildMultiChoiceHeader(SubscriptionProposal proposal) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.borderLight),
       ),
-      child: Column(
+      child: Row(
         children: [
-          // Icon
+          // Icon (smaller, rounded square)
           Container(
-            width: 64,
-            height: 64,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.card_giftcard,
-              size: 32,
+              size: 24,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: AppSpacing.space4),
+          const SizedBox(width: AppSpacing.space3),
 
-          // Title
-          Text(
-            '수강권 ${proposal.allTemplateIds.length}개 중 선택',
-            style: AppTypography.headingMedium.copyWith(
-              fontWeight: FontWeight.w700,
+          // Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title row with badge
+                Row(
+                  children: [
+                    Text(
+                      '수강권 제안',
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (proposal.isAutoProposal) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.info.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '자동 발송',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.info,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.space1),
+
+                // Subtitle: 선생님 제안 or 만료 정보
+                if (proposal.status == ProposalStatus.pending)
+                  Text(
+                    proposal.formattedExpiration,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: proposal.timeUntilExpiration.inDays < 2
+                          ? AppColors.warning
+                          : AppColors.textSecondaryLight,
+                    ),
+                  )
+                else if (!proposal.isAutoProposal)
+                  Text(
+                    '선생님이 보낸 제안',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+              ],
             ),
           ),
-          const SizedBox(height: AppSpacing.space1),
-
-          // 시스템 자동 제안 vs 선생님 수동 제안 구분
-          if (proposal.isAutoProposal) ...[
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '체험레슨 후 자동 발송',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.info,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ] else ...[
-            Text(
-              '선생님이 보낸 제안',
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondaryLight),
-            ),
-          ],
-
-          // Expiration info
-          if (proposal.status == ProposalStatus.pending) ...[
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              proposal.formattedExpiration,
-              style: AppTypography.caption.copyWith(
-                color: proposal.timeUntilExpiration.inDays < 2
-                    ? AppColors.warning
-                    : AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
         ],
       ),
     );

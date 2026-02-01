@@ -64,7 +64,7 @@ class MockLessonRequestRepository implements LessonRequestRepository {
       status: LessonRequestStatus.proposalSent,
       createdAt: now.subtract(const Duration(days: 3)),
       expiresAt: now.add(const Duration(days: 4)),
-      proposalId: 'proposal_10', // 연결된 수강권 제안
+      proposalId: 'proposal_confirmed_1', // 연결된 수강권 제안 (student_6)
       statusUpdatedAt: now.subtract(const Duration(days: 2)),
     );
     _requests[request3.id] = request3;
@@ -161,7 +161,7 @@ class MockLessonRequestRepository implements LessonRequestRepository {
       status: LessonRequestStatus.proposalSent,
       createdAt: now.subtract(const Duration(days: 2)),
       expiresAt: now.add(const Duration(days: 5)),
-      proposalId: 'proposal_20', // 연결된 수강권 제안
+      proposalId: 'proposal_auto_1', // 연결된 수강권 제안 (student_1)
       statusUpdatedAt: now.subtract(const Duration(days: 1)),
     );
     _requests[request8.id] = request8;

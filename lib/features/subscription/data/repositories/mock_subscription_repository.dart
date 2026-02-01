@@ -25,49 +25,53 @@ class MockSubscriptionRepository implements SubscriptionRepository {
 
     _subscriptions.addAll([
       // ═══════════════════════════════════════════════════════════════════
-      // 📌 1. 체험 (Trial) - 2 cases
+      // 📌 student_1: 현실적인 시나리오 (활성 1개 + 만료 1개)
       // ═══════════════════════════════════════════════════════════════════
 
-      // [1] 체험 대기 (active)
+      // [1] 바이올린 회차권 - 이용중 (active)
       Subscription(
-        id: 'sub_trial_01',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        type: SubscriptionType.trial,
-        totalLessons: 1,
-        usedLessons: 0,
-        startDate: now,
-        endDate: now.add(const Duration(days: 7)),
-        amount: 50000,
-        status: SubscriptionStatus.active,
-        createdAt: now,
-      ),
-
-      // [2] 체험 완료 (expired)
-      Subscription(
-        id: 'sub_trial_02',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        type: SubscriptionType.trial,
-        totalLessons: 1,
-        usedLessons: 1,
-        startDate: now.subtract(const Duration(days: 3)),
-        endDate: now.subtract(const Duration(days: 1)),
-        amount: 30000,
-        status: SubscriptionStatus.expired,
-        createdAt: now.subtract(const Duration(days: 3)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // 📌 2. 월정액 (Monthly) - 5 cases
-      // ═══════════════════════════════════════════════════════════════════
-
-      // [3] 월정액 - 이용중 (active)
-      Subscription(
-        id: 'sub_monthly_01',
+        id: 'sub_package_01',
         studentId: 'student_1',
         membershipId: 'cm_001',
         paymentId: 'pay_001',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 3,
+        startDate: now.subtract(const Duration(days: 21)),
+        endDate: now.add(const Duration(days: 41)),
+        amount: 380000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 21)),
+      ),
+
+      // [2] 바이올린 회차권 - 이전 수강권 (expired)
+      Subscription(
+        id: 'sub_package_02',
+        studentId: 'student_1',
+        membershipId: 'cm_001',
+        paymentId: 'pay_002',
+        type: SubscriptionType.package,
+        totalLessons: 4,
+        usedLessons: 4,
+        startDate: now.subtract(const Duration(days: 90)),
+        endDate: now.subtract(const Duration(days: 22)),
+        amount: 200000,
+        status: SubscriptionStatus.expired,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 90)),
+      ),
+
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 student_1: 피아노 수강권 (cm_005용)
+      // ═══════════════════════════════════════════════════════════════════
+
+      // [3] 피아노 월정액 - 이용중 (active)
+      Subscription(
+        id: 'sub_monthly_01',
+        studentId: 'student_1',
+        membershipId: 'cm_005',
+        paymentId: 'pay_003',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 4,
         usedLessons: 2,
@@ -81,196 +85,35 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         createdAt: monthStart,
       ),
 
-      // [4] 월정액 - 만료 임박 (expiringSoon, 횟수 부족)
-      Subscription(
-        id: 'sub_monthly_02',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_002',
-        type: SubscriptionType.monthly,
-        lessonsPerMonth: 4,
-        usedLessons: 3,
-        startDate: monthStart,
-        endDate: now.add(const Duration(days: 3)),
-        amount: 250000,
-        status: SubscriptionStatus.expiringSoon,
-        billingType: BillingType.monthly,
-        billingDay: 1,
-        fifthWeekPolicy: FifthWeekPolicy.skip,
-        createdAt: monthStart,
-      ),
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 student_2: 체험 완료 후 제안 대기
+      // ═══════════════════════════════════════════════════════════════════
 
-      // [5] 월정액 - 횟수 소진, 기간 남음 (expiringSoon, 0회)
+      // [4] 피아노 체험 완료 (expired)
       Subscription(
-        id: 'sub_monthly_03',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_003',
-        type: SubscriptionType.monthly,
-        lessonsPerMonth: 4,
-        usedLessons: 4,
-        startDate: monthStart,
-        endDate: now.add(const Duration(days: 10)),
-        amount: 200000,
-        status: SubscriptionStatus.expiringSoon,
-        billingType: BillingType.monthly,
-        billingDay: 27,
-        createdAt: monthStart,
-      ),
-
-      // [6] 월정액 - 만료됨 (expired)
-      Subscription(
-        id: 'sub_monthly_04',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_004',
-        type: SubscriptionType.monthly,
-        lessonsPerMonth: 4,
-        usedLessons: 4,
-        startDate: DateTime(now.year, now.month - 1, 1),
-        endDate: DateTime(now.year, now.month, 0, 23, 59, 59),
-        amount: 250000,
-        status: SubscriptionStatus.expired,
-        billingType: BillingType.monthly,
-        billingDay: 1,
-        createdAt: DateTime(now.year, now.month - 1, 1),
-      ),
-
-      // [7] 월정액 - 보너스 (+1회)
-      Subscription(
-        id: 'sub_monthly_05',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_005',
-        type: SubscriptionType.monthly,
-        lessonsPerMonth: 4,
+        id: 'sub_trial_01',
+        studentId: 'student_2',
+        membershipId: 'cm_002',
+        type: SubscriptionType.trial,
+        totalLessons: 1,
         usedLessons: 1,
-        bonusCount: 1,
-        bonusReason: '5주차',
-        startDate: monthStart,
-        endDate: now.add(const Duration(days: 25)),
-        amount: 200000,
-        status: SubscriptionStatus.active,
-        billingType: BillingType.monthly,
-        billingDay: 27,
-        fifthWeekPolicy: FifthWeekPolicy.bonus,
-        createdAt: monthStart,
+        startDate: now.subtract(const Duration(days: 3)),
+        endDate: now.subtract(const Duration(days: 2)),
+        amount: 30000,
+        status: SubscriptionStatus.expired,
+        createdAt: now.subtract(const Duration(days: 3)),
       ),
 
       // ═══════════════════════════════════════════════════════════════════
-      // 📌 3. 회차권 (Package) - 7 cases
+      // 📌 student_3: 수강권 만료 임박
       // ═══════════════════════════════════════════════════════════════════
 
-      // [8] 회차권 - 이용중 (active)
-      Subscription(
-        id: 'sub_package_01',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_006',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 3,
-        startDate: now.subtract(const Duration(days: 21)),
-        endDate: now.add(const Duration(days: 41)),
-        amount: 380000,
-        status: SubscriptionStatus.active,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 21)),
-      ),
-
-      // [9] 회차권 - 만료 임박 (expiringSoon, 2회 남음)
-      Subscription(
-        id: 'sub_package_02',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_007',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 6,
-        startDate: now.subtract(const Duration(days: 45)),
-        endDate: now.add(const Duration(days: 15)),
-        amount: 380000,
-        status: SubscriptionStatus.expiringSoon,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 45)),
-      ),
-
-      // [10] 회차권 - 소진됨 (expired, all used)
+      // [5] 바이올린 회차권 - 1회 남음 (expiringSoon)
       Subscription(
         id: 'sub_package_03',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_008',
-        type: SubscriptionType.package,
-        totalLessons: 4,
-        usedLessons: 4,
-        startDate: now.subtract(const Duration(days: 90)),
-        endDate: now.subtract(const Duration(days: 30)),
-        amount: 200000,
-        status: SubscriptionStatus.expired,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 90)),
-      ),
-
-      // [11] 회차권 - 기간 만료 미사용분 있음 (expired with remaining)
-      Subscription(
-        id: 'sub_package_04',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_009',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 4,
-        startDate: now.subtract(const Duration(days: 120)),
-        endDate: now.subtract(const Duration(days: 60)),
-        amount: 380000,
-        status: SubscriptionStatus.expired,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 120)),
-      ),
-
-      // [12] 회차권 - 일시정지 (paused)
-      Subscription(
-        id: 'sub_package_05',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_010',
-        type: SubscriptionType.package,
-        totalLessons: 8,
-        usedLessons: 2,
-        startDate: now.subtract(const Duration(days: 30)),
-        endDate: now.add(const Duration(days: 30)),
-        amount: 380000,
-        status: SubscriptionStatus.paused,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 30)),
-      ),
-
-      // [13] 회차권 - 대량 구매 보너스 (+1회)
-      Subscription(
-        id: 'sub_package_06',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_011',
-        type: SubscriptionType.package,
-        totalLessons: 10,
-        usedLessons: 3,
-        bonusCount: 1,
-        bonusReason: '대량 구매 보너스',
-        startDate: now.subtract(const Duration(days: 14)),
-        endDate: now.add(const Duration(days: 56)),
-        amount: 450000,
-        status: SubscriptionStatus.active,
-        billingType: BillingType.perPackage,
-        createdAt: now.subtract(const Duration(days: 14)),
-      ),
-
-      // [14] 회차권 - 갱신 권장 (expiringSoon, 잔여 1회)
-      Subscription(
-        id: 'sub_package_07',
-        studentId: 'student_1',
-        membershipId: 'cm_001',
-        paymentId: 'pay_012',
+        studentId: 'student_3',
+        membershipId: 'cm_003',
+        paymentId: 'pay_004',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 7,
@@ -280,6 +123,46 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         status: SubscriptionStatus.expiringSoon,
         billingType: BillingType.perPackage,
         createdAt: now.subtract(const Duration(days: 50)),
+      ),
+
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 student_4: 체험 예정
+      // ═══════════════════════════════════════════════════════════════════
+
+      // [6] 첼로 체험 대기 (active)
+      Subscription(
+        id: 'sub_trial_02',
+        studentId: 'student_4',
+        membershipId: 'cm_004',
+        type: SubscriptionType.trial,
+        totalLessons: 1,
+        usedLessons: 0,
+        startDate: now,
+        endDate: now.add(const Duration(days: 7)),
+        amount: 50000,
+        status: SubscriptionStatus.active,
+        createdAt: now,
+      ),
+
+      // ═══════════════════════════════════════════════════════════════════
+      // 📌 student_6: 수강권 확정됨 (proposal_confirmed_1 연결)
+      // ═══════════════════════════════════════════════════════════════════
+
+      // [7] 바이올린 회차권 - 확정됨 (active)
+      Subscription(
+        id: 'sub_1',
+        studentId: 'student_6',
+        membershipId: 'cm_007',
+        paymentId: 'pay_005',
+        type: SubscriptionType.package,
+        totalLessons: 8,
+        usedLessons: 0,
+        startDate: now.subtract(const Duration(days: 4)),
+        endDate: now.add(const Duration(days: 56)),
+        amount: 380000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.perPackage,
+        createdAt: now.subtract(const Duration(days: 4)),
       ),
     ]);
   }
@@ -548,176 +431,17 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   void _initMockUsageData() {
     final now = DateTime.now();
 
-    // Generate usage history for all subscriptions with usedLessons > 0
+    // Generate usage history matching new subscription data
     _usages.addAll([
       // ═══════════════════════════════════════════════════════════════════
-      // sub_trial_02: 1 lesson used (체험 완료)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_trial_02_1',
-        subscriptionId: 'sub_trial_02',
-        usedAt: now.subtract(const Duration(days: 2)),
-        teacherName: '김선생',
-        instrument: '바이올린',
-        note: '체험 레슨',
-        createdAt: now.subtract(const Duration(days: 2)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_monthly_01: 2 lessons used (월정액 이용중)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_m01_1',
-        subscriptionId: 'sub_monthly_01',
-        usedAt: now.subtract(const Duration(days: 14)),
-        teacherName: '김선생',
-        instrument: '바이올린',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 14)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m01_2',
-        subscriptionId: 'sub_monthly_01',
-        usedAt: now.subtract(const Duration(days: 7)),
-        teacherName: '김선생',
-        instrument: '바이올린',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 7)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_monthly_02: 3 lessons used (월정액 만료 임박)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_m02_1',
-        subscriptionId: 'sub_monthly_02',
-        usedAt: now.subtract(const Duration(days: 21)),
-        teacherName: '이선생',
-        instrument: '피아노',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 21)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m02_2',
-        subscriptionId: 'sub_monthly_02',
-        usedAt: now.subtract(const Duration(days: 14)),
-        teacherName: '이선생',
-        instrument: '피아노',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 14)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m02_3',
-        subscriptionId: 'sub_monthly_02',
-        usedAt: now.subtract(const Duration(days: 7)),
-        teacherName: '이선생',
-        instrument: '피아노',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 7)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_monthly_03: 4 lessons used (월정액 횟수 소진)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_m03_1',
-        subscriptionId: 'sub_monthly_03',
-        usedAt: now.subtract(const Duration(days: 28)),
-        teacherName: '박선생',
-        instrument: '첼로',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 28)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m03_2',
-        subscriptionId: 'sub_monthly_03',
-        usedAt: now.subtract(const Duration(days: 21)),
-        teacherName: '박선생',
-        instrument: '첼로',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 21)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m03_3',
-        subscriptionId: 'sub_monthly_03',
-        usedAt: now.subtract(const Duration(days: 14)),
-        teacherName: '박선생',
-        instrument: '첼로',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 14)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m03_4',
-        subscriptionId: 'sub_monthly_03',
-        usedAt: now.subtract(const Duration(days: 7)),
-        teacherName: '박선생',
-        instrument: '첼로',
-        note: '4회차 레슨',
-        createdAt: now.subtract(const Duration(days: 7)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_monthly_04: 4 lessons used (월정액 만료됨 - 지난달)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_m04_1',
-        subscriptionId: 'sub_monthly_04',
-        usedAt: now.subtract(const Duration(days: 58)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 58)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m04_2',
-        subscriptionId: 'sub_monthly_04',
-        usedAt: now.subtract(const Duration(days: 51)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 51)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m04_3',
-        subscriptionId: 'sub_monthly_04',
-        usedAt: now.subtract(const Duration(days: 44)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 44)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_m04_4',
-        subscriptionId: 'sub_monthly_04',
-        usedAt: now.subtract(const Duration(days: 37)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '4회차 레슨',
-        createdAt: now.subtract(const Duration(days: 37)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_monthly_05: 1 lesson used (월정액 보너스 +1)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_m05_1',
-        subscriptionId: 'sub_monthly_05',
-        usedAt: now.subtract(const Duration(days: 5)),
-        teacherName: '김선생',
-        instrument: '바이올린',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 5)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_package_01: 3 lessons used (회차권 이용중)
+      // sub_package_01: 3 lessons used (student_1, 바이올린 회차권 이용중)
       // ═══════════════════════════════════════════════════════════════════
       SubscriptionUsage(
         id: 'usage_p01_1',
         subscriptionId: 'sub_package_01',
         usedAt: now.subtract(const Duration(days: 18)),
-        teacherName: '박선생',
-        instrument: '첼로',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '1회차 레슨',
         createdAt: now.subtract(const Duration(days: 18)),
       ),
@@ -725,8 +449,8 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         id: 'usage_p01_2',
         subscriptionId: 'sub_package_01',
         usedAt: now.subtract(const Duration(days: 11)),
-        teacherName: '박선생',
-        instrument: '첼로',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '2회차 레슨',
         createdAt: now.subtract(const Duration(days: 11)),
       ),
@@ -734,268 +458,150 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         id: 'usage_p01_3',
         subscriptionId: 'sub_package_01',
         usedAt: now.subtract(const Duration(days: 4)),
-        teacherName: '박선생',
-        instrument: '첼로',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '3회차 레슨',
         createdAt: now.subtract(const Duration(days: 4)),
       ),
 
       // ═══════════════════════════════════════════════════════════════════
-      // sub_package_02: 6 lessons used (회차권 만료 임박)
+      // sub_package_02: 4 lessons used (student_1, 바이올린 이전 수강권)
       // ═══════════════════════════════════════════════════════════════════
       SubscriptionUsage(
         id: 'usage_p02_1',
         subscriptionId: 'sub_package_02',
-        usedAt: now.subtract(const Duration(days: 42)),
-        teacherName: '이선생',
-        instrument: '피아노',
+        usedAt: now.subtract(const Duration(days: 80)),
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 42)),
+        createdAt: now.subtract(const Duration(days: 80)),
       ),
       SubscriptionUsage(
         id: 'usage_p02_2',
         subscriptionId: 'sub_package_02',
-        usedAt: now.subtract(const Duration(days: 35)),
-        teacherName: '이선생',
-        instrument: '피아노',
+        usedAt: now.subtract(const Duration(days: 66)),
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 35)),
+        createdAt: now.subtract(const Duration(days: 66)),
       ),
       SubscriptionUsage(
         id: 'usage_p02_3',
         subscriptionId: 'sub_package_02',
-        usedAt: now.subtract(const Duration(days: 28)),
-        teacherName: '이선생',
-        instrument: '피아노',
+        usedAt: now.subtract(const Duration(days: 52)),
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 28)),
+        createdAt: now.subtract(const Duration(days: 52)),
       ),
       SubscriptionUsage(
         id: 'usage_p02_4',
         subscriptionId: 'sub_package_02',
-        usedAt: now.subtract(const Duration(days: 21)),
-        teacherName: '이선생',
-        instrument: '피아노',
+        usedAt: now.subtract(const Duration(days: 38)),
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '4회차 레슨',
-        createdAt: now.subtract(const Duration(days: 21)),
+        createdAt: now.subtract(const Duration(days: 38)),
       ),
+
+      // ═══════════════════════════════════════════════════════════════════
+      // sub_monthly_01: 2 lessons used (student_1, 피아노 월정액)
+      // ═══════════════════════════════════════════════════════════════════
       SubscriptionUsage(
-        id: 'usage_p02_5',
-        subscriptionId: 'sub_package_02',
+        id: 'usage_m01_1',
+        subscriptionId: 'sub_monthly_01',
         usedAt: now.subtract(const Duration(days: 14)),
         teacherName: '이선생',
         instrument: '피아노',
-        note: '5회차 레슨',
+        note: '1회차 레슨',
         createdAt: now.subtract(const Duration(days: 14)),
       ),
       SubscriptionUsage(
-        id: 'usage_p02_6',
-        subscriptionId: 'sub_package_02',
+        id: 'usage_m01_2',
+        subscriptionId: 'sub_monthly_01',
         usedAt: now.subtract(const Duration(days: 7)),
         teacherName: '이선생',
         instrument: '피아노',
-        note: '6회차 레슨',
+        note: '2회차 레슨',
         createdAt: now.subtract(const Duration(days: 7)),
       ),
 
       // ═══════════════════════════════════════════════════════════════════
-      // sub_package_03: 4 lessons used (회차권 소진됨)
-      // startDate: now-90일, endDate: now-30일
+      // sub_trial_01: 1 lesson used (student_2, 피아노 체험 완료)
+      // ═══════════════════════════════════════════════════════════════════
+      SubscriptionUsage(
+        id: 'usage_trial_01',
+        subscriptionId: 'sub_trial_01',
+        usedAt: now.subtract(const Duration(days: 2)),
+        teacherName: '이선생',
+        instrument: '피아노',
+        note: '체험 레슨',
+        createdAt: now.subtract(const Duration(days: 2)),
+      ),
+
+      // ═══════════════════════════════════════════════════════════════════
+      // sub_package_03: 7 lessons used (student_3, 바이올린 만료 임박)
       // ═══════════════════════════════════════════════════════════════════
       SubscriptionUsage(
         id: 'usage_p03_1',
         subscriptionId: 'sub_package_03',
-        usedAt: now.subtract(const Duration(days: 85)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 85)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p03_2',
-        subscriptionId: 'sub_package_03',
-        usedAt: now.subtract(const Duration(days: 70)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 70)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p03_3',
-        subscriptionId: 'sub_package_03',
-        usedAt: now.subtract(const Duration(days: 55)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 55)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p03_4',
-        subscriptionId: 'sub_package_03',
-        usedAt: now.subtract(const Duration(days: 40)),
-        teacherName: '최선생',
-        instrument: '플루트',
-        note: '4회차 레슨',
-        createdAt: now.subtract(const Duration(days: 40)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_package_04: 4 lessons used (회차권 기간 만료, 미사용분 있음)
-      // startDate: now-120일, endDate: now-60일
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_p04_1',
-        subscriptionId: 'sub_package_04',
-        usedAt: now.subtract(const Duration(days: 115)),
-        teacherName: '정선생',
-        instrument: '클라리넷',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 115)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p04_2',
-        subscriptionId: 'sub_package_04',
-        usedAt: now.subtract(const Duration(days: 100)),
-        teacherName: '정선생',
-        instrument: '클라리넷',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 100)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p04_3',
-        subscriptionId: 'sub_package_04',
-        usedAt: now.subtract(const Duration(days: 85)),
-        teacherName: '정선생',
-        instrument: '클라리넷',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 85)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p04_4',
-        subscriptionId: 'sub_package_04',
-        usedAt: now.subtract(const Duration(days: 70)),
-        teacherName: '정선생',
-        instrument: '클라리넷',
-        note: '4회차 레슨',
-        createdAt: now.subtract(const Duration(days: 70)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_package_05: 2 lessons used (회차권 일시정지)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_p05_1',
-        subscriptionId: 'sub_package_05',
-        usedAt: now.subtract(const Duration(days: 25)),
-        teacherName: '한선생',
-        instrument: '오보에',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 25)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p05_2',
-        subscriptionId: 'sub_package_05',
-        usedAt: now.subtract(const Duration(days: 18)),
-        teacherName: '한선생',
-        instrument: '오보에',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 18)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_package_06: 3 lessons used (회차권 대량 구매 보너스)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_p06_1',
-        subscriptionId: 'sub_package_06',
-        usedAt: now.subtract(const Duration(days: 12)),
-        teacherName: '윤선생',
-        instrument: '비올라',
-        note: '1회차 레슨',
-        createdAt: now.subtract(const Duration(days: 12)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p06_2',
-        subscriptionId: 'sub_package_06',
-        usedAt: now.subtract(const Duration(days: 8)),
-        teacherName: '윤선생',
-        instrument: '비올라',
-        note: '2회차 레슨',
-        createdAt: now.subtract(const Duration(days: 8)),
-      ),
-      SubscriptionUsage(
-        id: 'usage_p06_3',
-        subscriptionId: 'sub_package_06',
-        usedAt: now.subtract(const Duration(days: 4)),
-        teacherName: '윤선생',
-        instrument: '비올라',
-        note: '3회차 레슨',
-        createdAt: now.subtract(const Duration(days: 4)),
-      ),
-
-      // ═══════════════════════════════════════════════════════════════════
-      // sub_package_07: 7 lessons used (회차권 갱신 권장)
-      // ═══════════════════════════════════════════════════════════════════
-      SubscriptionUsage(
-        id: 'usage_p07_1',
-        subscriptionId: 'sub_package_07',
         usedAt: now.subtract(const Duration(days: 49)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '1회차 레슨',
         createdAt: now.subtract(const Duration(days: 49)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_2',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_2',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 42)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '2회차 레슨',
         createdAt: now.subtract(const Duration(days: 42)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_3',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_3',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 35)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '3회차 레슨',
         createdAt: now.subtract(const Duration(days: 35)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_4',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_4',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 28)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '4회차 레슨',
         createdAt: now.subtract(const Duration(days: 28)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_5',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_5',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 21)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '5회차 레슨',
         createdAt: now.subtract(const Duration(days: 21)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_6',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_6',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 14)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '6회차 레슨',
         createdAt: now.subtract(const Duration(days: 14)),
       ),
       SubscriptionUsage(
-        id: 'usage_p07_7',
-        subscriptionId: 'sub_package_07',
+        id: 'usage_p03_7',
+        subscriptionId: 'sub_package_03',
         usedAt: now.subtract(const Duration(days: 7)),
-        teacherName: '조선생',
-        instrument: '트럼펫',
+        teacherName: '김선생',
+        instrument: '바이올린',
         note: '7회차 레슨',
         createdAt: now.subtract(const Duration(days: 7)),
       ),

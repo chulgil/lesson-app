@@ -58,35 +58,19 @@ class MyLessonRequestsScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
             children: [
-              // Proposal received (need action)
+              // Proposal received (need action) - no header, card shows status
               if (proposalReceived.isNotEmpty) ...[
-                _buildSectionHeader(
-                  context,
-                  '수강권 제안 도착',
-                  proposalReceived.length,
-                  AppColors.success,
-                  Icons.card_giftcard,
-                ),
-                const SizedBox(height: AppSpacing.space2),
                 ...proposalReceived.map((r) => _buildRequestCard(context, ref, r)),
-                const SizedBox(height: AppSpacing.space4),
-              ],
-
-              // Active requests (waiting for response)
-              if (active.isNotEmpty) ...[
-                _buildSectionHeader(
-                  context,
-                  '응답 대기 중',
-                  active.length,
-                  AppColors.info,
-                  Icons.hourglass_empty,
-                ),
                 const SizedBox(height: AppSpacing.space2),
-                ...active.map((r) => _buildRequestCard(context, ref, r)),
-                const SizedBox(height: AppSpacing.space4),
               ],
 
-              // Others (declined, expired, etc.)
+              // Active requests (waiting for response) - no header, card shows status
+              if (active.isNotEmpty) ...[
+                ...active.map((r) => _buildRequestCard(context, ref, r)),
+                const SizedBox(height: AppSpacing.space2),
+              ],
+
+              // Others (declined, expired, etc.) - keep header for distinction
               if (others.isNotEmpty) ...[
                 _buildSectionHeader(
                   context,
@@ -132,7 +116,7 @@ class MyLessonRequestsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space6),
           OutlinedButton.icon(
-            onPressed: () => context.push('/search'),
+            onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.search),
             label: const Text('선생님 찾기'),
           ),
@@ -201,21 +185,39 @@ class MyLessonRequestsScreen extends ConsumerWidget {
     final isProposalReceived = request.status == LessonRequestStatus.proposalSent;
     final isPending =
         request.status == LessonRequestStatus.pending && !request.isExpired;
+    final isDeclined = request.status == LessonRequestStatus.declined;
+    final isInactive = !isProposalReceived && !isPending;
+
+    // Build schedule text
+    String? scheduleText;
+    if (request.hasPreviousSchedule) {
+      scheduleText = LessonDateUtils.formatScheduleDisplay(
+        weekday: request.previousLessonDay!,
+        time: request.previousLessonTime!,
+        includeWeekly: true,
+      );
+      if (request.previousLessonDuration != null) {
+        scheduleText += ' (${request.previousLessonDuration}분)';
+      }
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: isProposalReceived
-            ? BorderSide(color: AppColors.success.withValues(alpha: 0.5))
+            ? BorderSide(color: AppColors.success, width: 2)
             : BorderSide.none,
       ),
+      color: isProposalReceived
+          ? AppColors.success.withValues(alpha: 0.05)
+          : isInactive
+              ? AppColors.surfaceSecondaryLight
+              : null,
       child: InkWell(
         onTap: isProposalReceived && request.proposalId != null
-            ? () {
-                // Navigate to proposal detail
-                context.push(AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!));
-              }
+            ? () => context.push(
+                AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!))
             : null,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
@@ -223,255 +225,149 @@ class MyLessonRequestsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: Teacher name + status
+              // Header: Teacher name + status chip
               Row(
                 children: [
                   CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    radius: 18,
+                    backgroundColor: isInactive
+                        ? AppColors.textTertiaryLight.withValues(alpha: 0.2)
+                        : AppColors.primary.withValues(alpha: 0.1),
                     child: Icon(
                       Icons.person,
-                      color: AppColors.primary,
-                      size: 20,
+                      color: isInactive
+                          ? AppColors.textTertiaryLight
+                          : AppColors.primary,
+                      size: 18,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '선생님 ${request.teacherId.replaceAll('teacher_', '#')}',
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          _formatTimeSince(request.createdAt),
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      '선생님 ${request.teacherId.replaceAll('teacher_', '#')}',
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isInactive
+                            ? AppColors.textSecondaryLight
+                            : AppColors.textPrimaryLight,
+                      ),
                     ),
                   ),
                   _buildStatusChip(request),
                 ],
               ),
 
-              const SizedBox(height: AppSpacing.space3),
-              const Divider(height: 1),
-              const SizedBox(height: AppSpacing.space3),
-
-              // Previous schedule info
-              if (request.hasPreviousSchedule) ...[
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        size: 18,
-                        color: AppColors.info,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '요청한 스케줄',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.textSecondaryLight,
-                              ),
-                            ),
-                            Text(
-                              LessonDateUtils.formatScheduleDisplay(
-                                weekday: request.previousLessonDay!,
-                                time: request.previousLessonTime!,
-                                includeWeekly: true,
-                              ),
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (request.keepPreviousSchedule)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.space2,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '유지 요청',
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.success,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space3),
-              ],
-
-              // My message
-              if (request.message != null && request.message!.isNotEmpty) ...[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.space3),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '보낸 메시지',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '"${request.message}"',
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space3),
-              ],
-
-              // Preferred timing + expiration
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  const SizedBox(width: AppSpacing.space1),
-                  Text(
-                    '희망 시작: ${request.preferredTiming.label}',
-                    style: AppTypography.bodySmall.copyWith(
+              // Schedule info (simple one line)
+              if (scheduleText != null) ...[
+                const SizedBox(height: AppSpacing.space2),
+                Row(
+                  children: [
+                    const SizedBox(width: 36 + AppSpacing.space3), // Align with name
+                    Icon(
+                      Icons.schedule,
+                      size: 14,
                       color: AppColors.textSecondaryLight,
                     ),
-                  ),
-                  const Spacer(),
-                  if (isPending)
+                    const SizedBox(width: 4),
+                    Text(
+                      scheduleText,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // Expiration info for pending
+              if (isPending) ...[
+                const SizedBox(height: AppSpacing.space1),
+                Row(
+                  children: [
+                    const SizedBox(width: 36 + AppSpacing.space3),
                     Text(
                       request.formattedExpiration,
                       style: AppTypography.caption.copyWith(
                         color: AppColors.warning,
                       ),
                     ),
-                ],
-              ),
+                  ],
+                ),
+              ],
 
-              // Decline reason (shown as guidance message)
-              if (request.status == LessonRequestStatus.declined &&
-                  request.declineReason != null) ...[
+              // Decline reason
+              if (isDeclined && request.declineReason != null) ...[
                 const SizedBox(height: AppSpacing.space3),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.05),
+                    color: AppColors.info.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                    border: Border.all(
-                      color: AppColors.info.withValues(alpha: 0.2),
-                    ),
                   ),
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.message_outlined,
-                            size: 16,
-                            color: AppColors.info,
-                          ),
-                          const SizedBox(width: AppSpacing.space1),
-                          Text(
-                            '선생님 안내',
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.info,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: AppColors.info,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        request.declineReason!,
-                        style: AppTypography.bodySmall,
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          request.declineReason!,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
 
-              // Action buttons
+              // CTA for proposal received
               if (isProposalReceived) ...[
-                const SizedBox(height: AppSpacing.space4),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (request.proposalId != null) {
-                        context.push(AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!));
-                      }
-                    },
-                    icon: const Icon(Icons.card_giftcard),
-                    label: const Text('수강권 제안 확인하기'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.success,
-                      foregroundColor: Colors.white,
+                const SizedBox(height: AppSpacing.space3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      '수강권 확인하기',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                      color: AppColors.success,
+                    ),
+                  ],
                 ),
               ],
 
-              // Declined - show alternative action
-              if (request.status == LessonRequestStatus.declined) ...[
-                const SizedBox(height: AppSpacing.space4),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => context.push('/search'),
-                    icon: const Icon(Icons.search),
-                    label: const Text('다른 선생님 찾아보기'),
-                  ),
-                ),
-              ],
-
-              // Cancel button for pending requests
+              // Cancel for pending (small text button)
               if (isPending) ...[
-                const SizedBox(height: AppSpacing.space4),
-                SizedBox(
-                  width: double.infinity,
+                const SizedBox(height: AppSpacing.space2),
+                Align(
+                  alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () => _showCancelDialog(context, ref, request),
                     style: TextButton.styleFrom(
-                      foregroundColor: AppColors.textSecondaryLight,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('요청 취소'),
+                    child: Text(
+                      '요청 취소',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -548,18 +444,6 @@ class MyLessonRequestsScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  String _formatTimeSince(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inDays > 0) {
-      return '${diff.inDays}일 전 요청';
-    } else if (diff.inHours > 0) {
-      return '${diff.inHours}시간 전 요청';
-    } else if (diff.inMinutes > 0) {
-      return '${diff.inMinutes}분 전 요청';
-    }
-    return '방금 요청';
   }
 
   Future<void> _showCancelDialog(
