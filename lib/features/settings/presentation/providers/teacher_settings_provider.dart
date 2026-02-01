@@ -176,6 +176,28 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() => _repository.getTeacherSettings());
   }
+
+  /// Update break time between lessons
+  Future<void> updateBreakTime(int minutes) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateBreakTime(minutes);
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Update minimum booking hours
+  Future<void> updateMinBookingHours(int hours) async {
+    state = const AsyncValue.loading();
+    try {
+      final updated = await _repository.updateMinBookingHours(hours);
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 final teacherSettingsNotifierProvider =

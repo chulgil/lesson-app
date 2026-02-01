@@ -72,6 +72,10 @@ class TeacherAvailability extends HiveObject {
   @HiveField(9)
   final int breakTimeBetweenLessons;
 
+  /// Minimum hours before booking (e.g., 24 = must book at least 24 hours ahead)
+  @HiveField(10)
+  final int minBookingHours;
+
   TeacherAvailability({
     required this.id,
     required this.teacherId,
@@ -83,6 +87,7 @@ class TeacherAvailability extends HiveObject {
     this.updatedAt,
     this.slotStartInterval = 30,
     this.breakTimeBetweenLessons = 0,
+    this.minBookingHours = 24,
   });
 
   factory TeacherAvailability.fromJson(Map<String, dynamic> json) =>
@@ -105,6 +110,7 @@ class TeacherAvailability extends HiveObject {
     DateTime? updatedAt,
     int? slotStartInterval,
     int? breakTimeBetweenLessons,
+    int? minBookingHours,
   }) {
     return TeacherAvailability(
       id: id ?? this.id,
@@ -117,6 +123,7 @@ class TeacherAvailability extends HiveObject {
       updatedAt: updatedAt ?? this.updatedAt,
       slotStartInterval: slotStartInterval ?? this.slotStartInterval,
       breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
+      minBookingHours: minBookingHours ?? this.minBookingHours,
     );
   }
 }

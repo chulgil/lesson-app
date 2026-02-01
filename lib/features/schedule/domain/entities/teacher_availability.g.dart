@@ -27,13 +27,14 @@ class TeacherAvailabilityAdapter extends TypeAdapter<TeacherAvailability> {
       updatedAt: fields[7] as DateTime?,
       slotStartInterval: fields[8] as int,
       breakTimeBetweenLessons: fields[9] as int,
+      minBookingHours: fields[10] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, TeacherAvailability obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class TeacherAvailabilityAdapter extends TypeAdapter<TeacherAvailability> {
       ..writeByte(8)
       ..write(obj.slotStartInterval)
       ..writeByte(9)
-      ..write(obj.breakTimeBetweenLessons);
+      ..write(obj.breakTimeBetweenLessons)
+      ..writeByte(10)
+      ..write(obj.minBookingHours);
   }
 
   @override
@@ -323,6 +326,7 @@ TeacherAvailability _$TeacherAvailabilityFromJson(Map<String, dynamic> json) =>
       slotStartInterval: (json['slotStartInterval'] as num?)?.toInt() ?? 30,
       breakTimeBetweenLessons:
           (json['breakTimeBetweenLessons'] as num?)?.toInt() ?? 0,
+      minBookingHours: (json['minBookingHours'] as num?)?.toInt() ?? 24,
     );
 
 Map<String, dynamic> _$TeacherAvailabilityToJson(
@@ -338,6 +342,7 @@ Map<String, dynamic> _$TeacherAvailabilityToJson(
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'slotStartInterval': instance.slotStartInterval,
       'breakTimeBetweenLessons': instance.breakTimeBetweenLessons,
+      'minBookingHours': instance.minBookingHours,
     };
 
 WeeklySchedule _$WeeklyScheduleFromJson(Map<String, dynamic> json) =>

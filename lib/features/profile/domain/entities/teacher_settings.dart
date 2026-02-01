@@ -14,6 +14,12 @@ class TeacherSettings {
   final DateTime createdAt;
   final DateTime? updatedAt;
 
+  /// Break time between lessons in minutes (0, 5, 10, 15, 20, 30)
+  final int breakTimeBetweenLessons;
+
+  /// Minimum hours before booking (e.g., 24 = must book at least 24 hours ahead)
+  final int minBookingHours;
+
   const TeacherSettings({
     required this.id,
     required this.instruments,
@@ -23,6 +29,8 @@ class TeacherSettings {
     required this.availableSlots,
     required this.createdAt,
     this.updatedAt,
+    this.breakTimeBetweenLessons = 0,
+    this.minBookingHours = 24,
   });
 
   /// Get all configured durations (default + custom, sorted) - includes disabled
@@ -72,6 +80,8 @@ class TeacherSettings {
     List<TimeSlot>? availableSlots,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? breakTimeBetweenLessons,
+    int? minBookingHours,
   }) {
     return TeacherSettings(
       id: id ?? this.id,
@@ -82,6 +92,8 @@ class TeacherSettings {
       availableSlots: availableSlots ?? this.availableSlots,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
+      minBookingHours: minBookingHours ?? this.minBookingHours,
     );
   }
 }

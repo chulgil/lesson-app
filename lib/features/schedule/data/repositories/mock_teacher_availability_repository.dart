@@ -94,8 +94,39 @@ class MockTeacherAvailabilityRepository
       ),
     ];
 
-    // Add a pre-booked slot
+    // Add pre-booked slots
     final nextTuesday = _getNextWeekday(now, DateTime.tuesday);
+
+    // student_1 booking (김선생님 바이올린 - 화요일 16:00)
+    final student1Slot = AvailabilitySlot(
+      id: 'booking_student1_tue16',
+      teacherId: teacherId,
+      date: nextTuesday,
+      startTime: const TimeOfDay(hour: 16, minute: 0),
+      endTime: const TimeOfDay(hour: 17, minute: 0),
+      durationMinutes: 60,
+      status: AvailabilitySlotStatus.booked,
+      bookedByStudentId: 'student_1',
+      bookedByStudentName: '홍길동',
+    );
+    _bookedSlots[student1Slot.id] = student1Slot;
+
+    // student_1 booking 2 (다음주 화요일)
+    final nextNextTuesday = nextTuesday.add(const Duration(days: 7));
+    final student1Slot2 = AvailabilitySlot(
+      id: 'booking_student1_tue16_next',
+      teacherId: teacherId,
+      date: nextNextTuesday,
+      startTime: const TimeOfDay(hour: 16, minute: 0),
+      endTime: const TimeOfDay(hour: 17, minute: 0),
+      durationMinutes: 60,
+      status: AvailabilitySlotStatus.booked,
+      bookedByStudentId: 'student_1',
+      bookedByStudentName: '홍길동',
+    );
+    _bookedSlots[student1Slot2.id] = student1Slot2;
+
+    // student_3 booking (박민지 - 화요일 14:00)
     final bookedSlot = AvailabilitySlot(
       id: _uuid.v4(),
       teacherId: teacherId,

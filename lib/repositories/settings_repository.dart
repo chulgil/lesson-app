@@ -15,6 +15,8 @@ abstract class SettingsRepository {
   Future<TeacherSettings> updateAvailableSlots(List<TimeSlot> slots);
   Future<TeacherSettings> updateTimeSlot(TimeSlot slot);
   Future<TeacherSettings> toggleTimeSlot(String slotId, bool isActive);
+  Future<TeacherSettings> updateBreakTime(int minutes);
+  Future<TeacherSettings> updateMinBookingHours(int hours);
 }
 
 /// Mock implementation of SettingsRepository
@@ -257,6 +259,26 @@ class MockSettingsRepository implements SettingsRepository {
 
     _settings = _settings.copyWith(
       availableSlots: updatedSlots,
+      updatedAt: DateTime.now(),
+    );
+    return _settings;
+  }
+
+  @override
+  Future<TeacherSettings> updateBreakTime(int minutes) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _settings = _settings.copyWith(
+      breakTimeBetweenLessons: minutes,
+      updatedAt: DateTime.now(),
+    );
+    return _settings;
+  }
+
+  @override
+  Future<TeacherSettings> updateMinBookingHours(int hours) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _settings = _settings.copyWith(
+      minBookingHours: hours,
       updatedAt: DateTime.now(),
     );
     return _settings;

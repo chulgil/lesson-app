@@ -67,6 +67,11 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Booking settings section
+          _buildBookingSettingsSection(context, ref),
+
+          const SizedBox(height: AppSpacing.space6),
+
           // Available time slots section
           _buildTimeSlotsSection(context, ref),
         ],
@@ -171,6 +176,146 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
         .toggleDuration(duration, isActive);
   }
 
+  Widget _buildBookingSettingsSection(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '예약 설정',
+          style: AppTypography.headingSmall,
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          '레슨 예약 관련 설정을 지정하세요',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          child: Column(
+            children: [
+              // Break time setting
+              _BookingSettingItem(
+                icon: Icons.coffee_outlined,
+                title: '레슨 간 휴식 시간',
+                subtitle: '${settings.breakTimeBetweenLessons}분',
+                onTap: () => _showBreakTimeDialog(context, ref),
+              ),
+              const Divider(height: 1, indent: 56, endIndent: 16),
+              // Minimum booking hours setting
+              _BookingSettingItem(
+                icon: Icons.schedule_outlined,
+                title: '최소 예약 가능 시간',
+                subtitle: '${settings.minBookingHours}시간 전',
+                onTap: () => _showMinBookingHoursDialog(context, ref),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showBreakTimeDialog(BuildContext context, WidgetRef ref) {
+    final options = [0, 5, 10, 15, 20, 30];
+    final current = settings.breakTimeBetweenLessons;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space4),
+            Text('레슨 간 휴식 시간', style: AppTypography.headingSmall),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '레슨과 레슨 사이의 휴식 시간을 설정합니다',
+              style: AppTypography.bodySmall
+                  .copyWith(color: AppColors.textSecondaryLight),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            ...options.map((minutes) => ListTile(
+                  leading: Icon(
+                    current == minutes
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    color:
+                        current == minutes ? AppColors.primary : AppColors.textTertiaryLight,
+                  ),
+                  title: Text(minutes == 0 ? '없음' : '$minutes분'),
+                  onTap: () {
+                    ref
+                        .read(teacherSettingsNotifierProvider.notifier)
+                        .updateBreakTime(minutes);
+                    Navigator.pop(context);
+                  },
+                )),
+            const SizedBox(height: AppSpacing.space4),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showMinBookingHoursDialog(BuildContext context, WidgetRef ref) {
+    final options = [1, 2, 3, 6, 12, 24, 48, 72];
+    final current = settings.minBookingHours;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: AppSpacing.space4),
+            Text('최소 예약 가능 시간', style: AppTypography.headingSmall),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
+              style: AppTypography.bodySmall
+                  .copyWith(color: AppColors.textSecondaryLight),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            ...options.map((hours) => ListTile(
+                  leading: Icon(
+                    current == hours
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    color: current == hours
+                        ? AppColors.primary
+                        : AppColors.textTertiaryLight,
+                  ),
+                  title: Text(_formatHours(hours)),
+                  onTap: () {
+                    ref
+                        .read(teacherSettingsNotifierProvider.notifier)
+                        .updateMinBookingHours(hours);
+                    Navigator.pop(context);
+                  },
+                )),
+            const SizedBox(height: AppSpacing.space4),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatHours(int hours) {
+    if (hours < 24) {
+      return '$hours시간 전';
+    } else {
+      final days = hours ~/ 24;
+      return '$days일 전';
+    }
+  }
+
   Widget _buildTimeSlotsSection(BuildContext context, WidgetRef ref) {
     final slotsByDay = <int, List<TimeSlot>>{};
     for (final slot in settings.availableSlots) {
@@ -253,5 +398,65 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     ref
         .read(teacherSettingsNotifierProvider.notifier)
         .toggleTimeSlot(slotId, isActive);
+  }
+}
+
+/// A single setting item in the booking settings section
+class _BookingSettingItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _BookingSettingItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Icon(icon, color: AppColors.primary, size: 20),
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTypography.bodyMedium),
+                  Text(
+                    subtitle,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textTertiaryLight,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
