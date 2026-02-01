@@ -67,6 +67,11 @@ class ProfileTab extends StatelessWidget {
                 onTap: () => context.push(AppRoutes.paymentManagement),
               ),
               _MenuItem(
+                icon: Icons.policy_outlined,
+                label: '레슨 정책 설정',
+                onTap: () => context.push('${AppRoutes.lessonPolicy}?teacherId=teacher_1'),
+              ),
+              _MenuItem(
                 icon: Icons.library_books_outlined,
                 label: '템플릿 관리',
                 onTap: () => context.push(AppRoutes.tipTemplateManagement),

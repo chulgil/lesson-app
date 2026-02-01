@@ -8,42 +8,24 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/date_utils.dart';
-import '../../../../core/widgets/selectors/selectors.dart';
-import '../../../relationship/presentation/providers/relationship_providers.dart';
-import '../../../schedule/presentation/providers/lesson_request_providers.dart';
-import '../../../schedule/presentation/widgets/previous_schedule_card.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
+import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
+import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../domain/entities/subscription.dart';
-import '../../domain/entities/subscription_proposal.dart';
 import '../providers/subscription_providers.dart';
+import '../widgets/chip_input_field.dart';
 
 /// Screen for teachers to issue subscriptions to students.
 class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   final String studentId;
   final String? membershipId;
-  /// Teacher ID for looking up previous schedule on re-enrollment.
-  final String? teacherId;
-  /// If true, this is an app transition from existing offline lessons.
-  /// Shows payment status selector and navigates to schedule setup after issue.
-  final bool isAppTransition;
-  /// If true, shows previous schedule restoration option.
-  /// Set to true when re-enrolling an expired/past student.
-  final bool showScheduleRestoration;
-  /// Linked lesson request ID (for re-enrollment flow).
-  /// When set, the request status will be updated to proposalSent after issue.
-  final String? lessonRequestId;
 
   const IssueSubscriptionScreen({
     super.key,
     required this.studentId,
     this.membershipId,
-    this.teacherId,
-    this.isAppTransition = false,
-    this.showScheduleRestoration = false,
-    this.lessonRequestId,
   });
 
   @override
@@ -55,32 +37,20 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
   SubscriptionType _selectedType = SubscriptionType.package;
   String? _selectedMembershipId;
-  int _totalLessons = 4;
-  bool _isCustomLessons = false;  // 커스텀 회차 입력 모드
-  int _validityDays = 30;   // 회차권 유효기간 (일)
-  bool _isCustomValidity = false;  // 커스텀 유효기간 입력 모드
+  int _totalLessons = 8;
+  int _validityDays = 90;   // 회차권 유효기간 (일)
   int _monthsCount = 1;
   int _originalAmount = 0;  // 정가
   int _discountPercent = 0; // 할인율 (0~100)
-  bool _isCustomDiscount = false;  // 커스텀 할인율 입력 모드
   int _bonusLessons = 0;    // 보너스 횟수
-  bool _isCustomBonus = false;  // 커스텀 보너스 입력 모드
   String? _bonusReason;     // 보너스 사유
-  int _rescheduleAllowance = 2;  // 🆕 변경권 횟수 (기본값: 2)
   DateTime? _startDate;
 
-  // 🆕 결제 상태 (앱 전환용)
-  ProposalPaymentStatus _paymentStatus = ProposalPaymentStatus.pending;
-
-  // 🆕 이전 스케줄 복원 관련
-  PreviousSchedule? _restoredSchedule;
-  bool _showScheduleCard = true;
-
   final _amountController = TextEditingController();
-  final _customLessonsController = TextEditingController();
-  final _customValidityController = TextEditingController();
-  final _customDiscountController = TextEditingController();
-  final _customBonusController = TextEditingController();
+  final _lessonsController = TextEditingController();
+  final _validityController = TextEditingController();
+  final _discountController = TextEditingController();
+  final _bonusController = TextEditingController();
 
   /// 할인 적용된 최종 금액
   int get _finalAmount {
@@ -88,27 +58,23 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return (_originalAmount * (100 - _discountPercent) / 100).round();
   }
 
-  /// 총 횟수 (기본 + 보너스)
-  int get _totalLessonsWithBonus => _totalLessons + _bonusLessons;
-
   @override
   void initState() {
     super.initState();
     _selectedMembershipId = widget.membershipId;
     _startDate = DateTime.now();
-    // 앱 전환 시 기본값: 결제 완료
-    if (widget.isAppTransition) {
-      _paymentStatus = ProposalPaymentStatus.completed;
-    }
+    // 기본값 설정
+    _lessonsController.text = _totalLessons.toString();
+    _validityController.text = _validityDays.toString();
   }
 
   @override
   void dispose() {
     _amountController.dispose();
-    _customLessonsController.dispose();
-    _customValidityController.dispose();
-    _customDiscountController.dispose();
-    _customBonusController.dispose();
+    _lessonsController.dispose();
+    _validityController.dispose();
+    _discountController.dispose();
+    _bonusController.dispose();
     super.dispose();
   }
 
@@ -118,7 +84,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isAppTransition ? '수강권 등록' : '수강권 발급'),
+        title: const Text('수강권 발급'),
         centerTitle: true,
       ),
       body: membershipsAsync.when(
@@ -161,14 +127,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           if (_selectedMembershipId != null)
             _buildMembershipInfo(memberships),
 
-          // 🆕 Previous schedule restoration card (for re-enrollment)
-          if (widget.showScheduleRestoration &&
-              widget.teacherId != null &&
-              _showScheduleCard) ...[
-            const SizedBox(height: AppSpacing.space4),
-            _buildPreviousScheduleSection(),
-          ],
-
           const SizedBox(height: AppSpacing.space6),
 
           // Subscription type selector
@@ -191,12 +149,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
           const SizedBox(height: AppSpacing.space6),
 
-          // 🆕 Payment status section (앱 전환 시 또는 명시적 표시)
-          if (widget.isAppTransition || _selectedType != SubscriptionType.trial) ...[
-            _buildPaymentStatusSection(),
-            const SizedBox(height: AppSpacing.space6),
-          ],
-
           // Discount section (체험권 제외)
           if (_selectedType != SubscriptionType.trial) ...[
             _buildDiscountSection(),
@@ -206,12 +158,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           // Bonus section (체험권 제외)
           if (_selectedType != SubscriptionType.trial) ...[
             _buildBonusSection(),
-            const SizedBox(height: AppSpacing.space6),
-          ],
-
-          // 🆕 Reschedule allowance section (체험권 제외)
-          if (_selectedType != SubscriptionType.trial) ...[
-            _buildRescheduleAllowanceSection(),
             const SizedBox(height: AppSpacing.space6),
           ],
 
@@ -376,93 +322,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     );
   }
 
-  /// 🆕 이전 스케줄 복원 섹션
-  Widget _buildPreviousScheduleSection() {
-    if (widget.teacherId == null) return const SizedBox.shrink();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 복원된 스케줄이 있는 경우 표시
-        if (_restoredSchedule != null) ...[
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(
-                color: AppColors.success.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.check_circle, color: AppColors.success, size: 24),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '이전 스케줄 복원됨',
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.success,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _formatSchedule(_restoredSchedule!),
-                        style: AppTypography.bodySmall,
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _restoredSchedule = null;
-                      _showScheduleCard = true;
-                    });
-                  },
-                  child: const Text('취소'),
-                ),
-              ],
-            ),
-          ),
-        ] else ...[
-          // 이전 스케줄 카드 표시
-          PreviousScheduleCard(
-            teacherId: widget.teacherId!,
-            studentId: widget.studentId,
-            onRestore: (schedule) {
-              setState(() {
-                _restoredSchedule = schedule;
-                _showScheduleCard = false;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('이전 스케줄(${_formatSchedule(schedule)})이 복원됩니다.'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-            onDismiss: () {
-              setState(() => _showScheduleCard = false);
-            },
-          ),
-        ],
-      ],
-    );
-  }
-
-  String _formatSchedule(PreviousSchedule schedule) {
-    return LessonDateUtils.formatScheduleDisplay(
-      weekday: schedule.lessonDay,
-      time: schedule.lessonTime,
-      includeWeekly: true,
-    );
-  }
-
   Widget _buildTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,258 +382,52 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   }
 
   Widget _buildPackageOptions() {
-    // 회차 프리셋: 4, 12, 24, 48
-    const lessonPresets = [4, 12, 24, 48];
-    // 유효기간 프리셋: 1개월(30), 3개월(90), 6개월(180), 1년(365)
-    const validityPresets = [
-      (days: 30, label: '1개월'),
-      (days: 90, label: '3개월'),
-      (days: 180, label: '6개월'),
-      (days: 365, label: '1년'),
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 회차 선택
-        Text('회차 선택', style: AppTypography.headingSmall),
-        const SizedBox(height: AppSpacing.space3),
-        Wrap(
-          spacing: AppSpacing.space2,
-          runSpacing: AppSpacing.space2,
-          children: [
-            // 프리셋 칩들
-            ...lessonPresets.map((count) {
-              final isSelected = !_isCustomLessons && _totalLessons == count;
-              return ChoiceChip(
-                label: Text('$count회'),
-                selected: isSelected,
-                onSelected: (_) => setState(() {
-                  _totalLessons = count;
-                  _isCustomLessons = false;
-                  _customLessonsController.clear();
-                  // 회차에 따른 기본 유효기간 자동 설정
-                  _autoSetValidityByLessons(count);
-                }),
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
-                backgroundColor: AppColors.surfaceLight,
-                side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
-                ),
-                labelStyle: AppTypography.bodyMedium.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-              );
-            }),
-            // 직접 입력 칩
-            ChoiceChip(
-              label: const Text('직접 입력'),
-              selected: _isCustomLessons,
-              onSelected: (_) => setState(() {
-                _isCustomLessons = true;
-              }),
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
-              side: BorderSide(
-                color: _isCustomLessons ? AppColors.primary : AppColors.borderLight,
-              ),
-              labelStyle: AppTypography.bodyMedium.copyWith(
-                color: _isCustomLessons ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: _isCustomLessons ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
+        // 회차 선택 (3개 + 입력)
+        ChipInputField(
+          title: '회차',
+          options: const [4, 8, 12],
+          currentValue: _totalLessons,
+          onChanged: (value) {
+            setState(() {
+              _totalLessons = value;
+              if (value > 0) _setDefaultValidity(value);
+            });
+          },
+          controller: _lessonsController,
+          suffix: '회',
         ),
 
-        // 커스텀 회차 입력 필드
-        if (_isCustomLessons) ...[
-          const SizedBox(height: AppSpacing.space3),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _customLessonsController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    hintText: '회차 입력',
-                    suffixText: '회',
-                    filled: true,
-                    fillColor: AppColors.surfaceLight,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                      vertical: AppSpacing.space3,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.borderLight),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.borderLight),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.primary),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    final count = int.tryParse(value) ?? 0;
-                    if (count > 0) {
-                      setState(() {
-                        _totalLessons = count;
-                        _autoSetValidityByLessons(count);
-                      });
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
+        const SizedBox(height: AppSpacing.space4),
 
-        const SizedBox(height: AppSpacing.space5),
-
-        // 유효기간 선택
-        Text('유효기간', style: AppTypography.headingSmall),
-        const SizedBox(height: AppSpacing.space3),
-        Wrap(
-          spacing: AppSpacing.space2,
-          runSpacing: AppSpacing.space2,
-          children: [
-            // 프리셋 칩들
-            ...validityPresets.map((preset) {
-              final isSelected = !_isCustomValidity && _validityDays == preset.days;
-              return ChoiceChip(
-                label: Text(preset.label),
-                selected: isSelected,
-                onSelected: (_) => setState(() {
-                  _validityDays = preset.days;
-                  _isCustomValidity = false;
-                  _customValidityController.clear();
-                }),
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
-                backgroundColor: AppColors.surfaceLight,
-                side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
-                ),
-                labelStyle: AppTypography.bodyMedium.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-              );
-            }),
-            // 직접 입력 칩
-            ChoiceChip(
-              label: const Text('직접 입력'),
-              selected: _isCustomValidity,
-              onSelected: (_) => setState(() {
-                _isCustomValidity = true;
-              }),
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
-              side: BorderSide(
-                color: _isCustomValidity ? AppColors.primary : AppColors.borderLight,
-              ),
-              labelStyle: AppTypography.bodyMedium.copyWith(
-                color: _isCustomValidity ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: _isCustomValidity ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-
-        // 커스텀 유효기간 입력 필드
-        if (_isCustomValidity) ...[
-          const SizedBox(height: AppSpacing.space3),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _customValidityController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: InputDecoration(
-                    hintText: '유효기간 입력',
-                    suffixText: '일',
-                    filled: true,
-                    fillColor: AppColors.surfaceLight,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                      vertical: AppSpacing.space3,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.borderLight),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.borderLight),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      borderSide: BorderSide(color: AppColors.primary),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    final days = int.tryParse(value) ?? 0;
-                    if (days > 0) {
-                      setState(() {
-                        _validityDays = days;
-                      });
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-
-        // 유효기간 안내
-        const SizedBox(height: AppSpacing.space3),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.info_outline, size: 16, color: AppColors.textSecondaryLight),
-              const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: Text(
-                  '유효기간 내 자유롭게 사용 가능합니다.',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        // 유효기간 선택 (3개 + 입력)
+        ChipInputField(
+          title: '유효기간',
+          options: const [60, 90, 180],
+          currentValue: _validityDays,
+          onChanged: (value) => setState(() => _validityDays = value),
+          controller: _validityController,
+          suffix: '일',
         ),
       ],
     );
   }
 
-  /// 회차에 따른 기본 유효기간 자동 설정
-  void _autoSetValidityByLessons(int count) {
-    if (_isCustomValidity) return;  // 커스텀 입력 중이면 자동 설정 안함
-
-    if (count <= 4) {
-      _validityDays = 30;  // 1개월
-    } else if (count <= 12) {
-      _validityDays = 90;  // 3개월
-    } else if (count <= 24) {
-      _validityDays = 180; // 6개월
+  void _setDefaultValidity(int lessonCount) {
+    int defaultDays;
+    if (lessonCount <= 4) {
+      defaultDays = 60;
+    } else if (lessonCount <= 8) {
+      defaultDays = 90;
+    } else if (lessonCount <= 12) {
+      defaultDays = 120;
     } else {
-      _validityDays = 365; // 1년
+      defaultDays = 180;
     }
+    _validityDays = defaultDays;
+    _validityController.text = defaultDays.toString();
   }
 
   Widget _buildMonthlyOptions() {
@@ -886,232 +539,31 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     );
   }
 
-  /// 🆕 결제 상태 선택 섹션 (앱 전환용)
-  Widget _buildPaymentStatusSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text('결제 상태', style: AppTypography.headingSmall),
-            const SizedBox(width: AppSpacing.space2),
-            if (widget.isAppTransition)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space2,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '앱 전환',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // 결제 대기 옵션
-        _buildPaymentStatusOption(
-          status: ProposalPaymentStatus.pending,
-          icon: Icons.hourglass_empty,
-        ),
-
-        const SizedBox(height: AppSpacing.space2),
-
-        // 결제 완료 옵션
-        _buildPaymentStatusOption(
-          status: ProposalPaymentStatus.completed,
-          icon: Icons.check_circle_outline,
-        ),
-
-        // 안내 메시지
-        const SizedBox(height: AppSpacing.space3),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: _paymentStatus == ProposalPaymentStatus.completed
-                ? AppColors.success.withValues(alpha: 0.1)
-                : AppColors.info.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                _paymentStatus == ProposalPaymentStatus.completed
-                    ? Icons.flash_on
-                    : Icons.info_outline,
-                size: 18,
-                color: _paymentStatus == ProposalPaymentStatus.completed
-                    ? AppColors.success
-                    : AppColors.info,
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: Text(
-                  _paymentStatus == ProposalPaymentStatus.completed
-                      ? '이미 결제가 완료된 경우 선택하세요.\n입금 확인 단계 없이 즉시 발급됩니다.'
-                      : '학생이 결제 후 입금 완료 알림을 보내면\n선생님이 확인 후 수강권이 발급됩니다.',
-                  style: AppTypography.caption.copyWith(
-                    color: _paymentStatus == ProposalPaymentStatus.completed
-                        ? AppColors.success
-                        : AppColors.info,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentStatusOption({
-    required ProposalPaymentStatus status,
-    required IconData icon,
-  }) {
-    final isSelected = _paymentStatus == status;
-    final color = status == ProposalPaymentStatus.completed
-        ? AppColors.success
-        : AppColors.textSecondaryLight;
-
-    return GestureDetector(
-      onTap: () => setState(() => _paymentStatus = status),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space3),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (status == ProposalPaymentStatus.completed
-                  ? AppColors.success.withValues(alpha: 0.1)
-                  : AppColors.primary.withValues(alpha: 0.1))
-              : AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(
-            color: isSelected
-                ? (status == ProposalPaymentStatus.completed
-                    ? AppColors.success
-                    : AppColors.primary)
-                : AppColors.borderLight,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Radio<ProposalPaymentStatus>(
-              value: status,
-              groupValue: _paymentStatus,
-              onChanged: (value) {
-                if (value != null) setState(() => _paymentStatus = value);
-              },
-              activeColor: status == ProposalPaymentStatus.completed
-                  ? AppColors.success
-                  : AppColors.primary,
-            ),
-            Icon(
-              icon,
-              color: isSelected ? color : AppColors.textTertiaryLight,
-              size: 20,
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    status.label,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected ? color : null,
-                    ),
-                  ),
-                  Text(
-                    status.description,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected && status == ProposalPaymentStatus.completed)
-              Icon(
-                Icons.check,
-                color: AppColors.success,
-                size: 20,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildDiscountSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text('할인 혜택', style: AppTypography.headingSmall),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              '(선택)',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // 할인율 선택 (공통 위젯 사용)
-        DiscountPercentSelector(
-          selectedPercent: _discountPercent,
-          isCustom: _isCustomDiscount,
-          customController: _customDiscountController,
-          onPercentChanged: (percent, isCustom) {
-            setState(() {
-              _discountPercent = percent;
-              _isCustomDiscount = isCustom;
-            });
-          },
-          label: '할인율',
-          accentColor: AppColors.secondary,
+        ChipInputField(
+          title: '할인',
+          isOptional: true,
+          options: const [0, 5, 10, 20],
+          currentValue: _discountPercent,
+          onChanged: (value) => setState(() => _discountPercent = value),
+          controller: _discountController,
+          suffix: '%',
+          maxValue: 100,
+          selectedColor: AppColors.secondary,
+          zeroLabel: '없음',
         ),
 
         // 할인 적용 시 금액 표시
         if (_discountPercent > 0 && _originalAmount > 0) ...[
-          const SizedBox(height: AppSpacing.space3),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.secondary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.local_offer, size: 18, color: AppColors.secondary),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  '${NumberFormat('#,###').format(_originalAmount - _finalAmount)}원 할인',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.secondary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  '${NumberFormat('#,###').format(_finalAmount)}원',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '${NumberFormat('#,###').format(_originalAmount)}원 → ${NumberFormat('#,###').format(_finalAmount)}원 (-${NumberFormat('#,###').format(_originalAmount - _finalAmount)}원)',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.secondary,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -1126,93 +578,36 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text('보너스 횟수', style: AppTypography.headingSmall),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              '(선택)',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // 보너스 횟수 선택 (공통 위젯 사용)
-        BonusCountSelector(
-          selectedCount: _bonusLessons,
-          isCustom: _isCustomBonus,
-          customController: _customBonusController,
-          onCountChanged: (count, isCustom) {
+        ChipInputField(
+          title: '보너스',
+          isOptional: true,
+          options: const [0, 1, 2, 3],
+          currentValue: _bonusLessons,
+          onChanged: (value) {
             setState(() {
-              _bonusLessons = count;
-              _isCustomBonus = isCustom;
-              if (count == 0) _bonusReason = null;
+              _bonusLessons = value;
+              if (value == 0) _bonusReason = null;
             });
           },
+          controller: _bonusController,
+          suffix: '회',
+          zeroLabel: '없음',
+          labelFormatter: (value) => value == 0 ? '없음' : '+$value회',
         ),
 
         // 보너스 사유 선택 (보너스가 있을 때만)
         if (_bonusLessons > 0) ...[
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '보너스 사유',
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
+          const SizedBox(height: AppSpacing.space3),
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
             children: [
               _buildBonusReasonChip('대량 구매'),
-              _buildBonusReasonChip('5주차 보너스'),
-              _buildBonusReasonChip('추천 이벤트'),
-              _buildBonusReasonChip('재등록 혜택'),
+              _buildBonusReasonChip('5주차'),
+              _buildBonusReasonChip('추천'),
+              _buildBonusReasonChip('재등록'),
               _buildBonusReasonChip('기타'),
             ],
-          ),
-
-          // 보너스 정보 박스
-          const SizedBox(height: AppSpacing.space3),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.card_giftcard, size: 18, color: AppColors.primary),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  '보너스 +$_bonusLessons회',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (_bonusReason != null) ...[
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    '($_bonusReason)',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-                const Spacer(),
-                Text(
-                  '총 $_totalLessonsWithBonus회',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ],
@@ -1235,103 +630,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
-    );
-  }
-
-  /// 🆕 변경권 설정 섹션
-  Widget _buildRescheduleAllowanceSection() {
-    // 체험권은 변경권 없음
-    if (_selectedType == SubscriptionType.trial) return const SizedBox.shrink();
-
-    const allowancePresets = [0, 1, 2, 3, 5];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text('변경권', style: AppTypography.headingSmall),
-            const SizedBox(width: AppSpacing.space2),
-            Tooltip(
-              message: '학생이 레슨 일정을 변경할 수 있는 횟수입니다.\n0회면 학생이 직접 변경할 수 없습니다.',
-              child: Icon(
-                Icons.info_outline,
-                size: 18,
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // 변경권 횟수 선택
-        Wrap(
-          spacing: AppSpacing.space2,
-          runSpacing: AppSpacing.space2,
-          children: allowancePresets.map((count) {
-            final isSelected = _rescheduleAllowance == count;
-            return ChoiceChip(
-              label: Text(count == 0 ? '변경불가' : '$count회'),
-              selected: isSelected,
-              onSelected: (_) => setState(() => _rescheduleAllowance = count),
-              selectedColor: count == 0
-                  ? AppColors.error.withValues(alpha: 0.15)
-                  : AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: count == 0 ? AppColors.error : AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
-              side: BorderSide(
-                color: isSelected
-                    ? (count == 0 ? AppColors.error : AppColors.primary)
-                    : AppColors.borderLight,
-              ),
-              labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected
-                    ? (count == 0 ? AppColors.error : AppColors.primary)
-                    : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            );
-          }).toList(),
-        ),
-
-        // 안내 메시지
-        const SizedBox(height: AppSpacing.space3),
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            color: _rescheduleAllowance == 0
-                ? AppColors.error.withValues(alpha: 0.1)
-                : AppColors.info.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                _rescheduleAllowance == 0
-                    ? Icons.block
-                    : Icons.swap_horiz,
-                size: 18,
-                color: _rescheduleAllowance == 0
-                    ? AppColors.error
-                    : AppColors.info,
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              Expanded(
-                child: Text(
-                  _rescheduleAllowance == 0
-                      ? '학생이 직접 레슨 일정을 변경할 수 없습니다.\n선생님에게 요청해야 합니다.'
-                      : '학생이 $_rescheduleAllowance회까지 레슨 일정을 변경할 수 있습니다.\n선생님이 변경하는 경우 차감되지 않습니다.',
-                  style: AppTypography.caption.copyWith(
-                    color: _rescheduleAllowance == 0
-                        ? AppColors.error
-                        : AppColors.info,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -1501,14 +799,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   }
 
   Widget _buildBottomBar() {
-    final buttonText = widget.isAppTransition
-        ? (_paymentStatus == ProposalPaymentStatus.completed
-            ? '수강권 등록'
-            : '수강권 제안')
-        : (_paymentStatus == ProposalPaymentStatus.completed
-            ? '수강권 발급'
-            : '수강권 제안');
-
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -1517,7 +807,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(48),
           ),
-          child: Text(buttonText),
+          child: const Text('수강권 발급'),
         ),
       ),
     );
@@ -1561,9 +851,6 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       endDate = _startDate!.add(Duration(days: _validityDays));
     }
 
-    // 🆕 결제 완료 선택 시 즉시 active, 결제 대기 시 결제 흐름 필요
-    final isImmediateIssue = _paymentStatus == ProposalPaymentStatus.completed;
-
     final subscription = Subscription(
       id: const Uuid().v4(),
       studentId: widget.studentId,
@@ -1576,76 +863,25 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       startDate: _startDate,
       endDate: endDate,
       amount: _finalAmount,  // 할인 적용된 금액
-      status: isImmediateIssue ? SubscriptionStatus.active : SubscriptionStatus.active,
+      status: SubscriptionStatus.active,
       createdAt: DateTime.now(),
-      // 🆕 변경권 설정 (체험권은 기본값 0)
-      totalRescheduleAllowance: _selectedType == SubscriptionType.trial
-          ? 0
-          : _rescheduleAllowance,
-      usedRescheduleCount: 0,
     );
 
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       await repository.create(subscription);
 
-      // 🆕 이전 스케줄 복원이 선택된 경우, 스케줄 기록
-      if (_restoredSchedule != null && widget.teacherId != null) {
-        try {
-          await ref.read(scheduleRecorderProvider.notifier).recordSchedule(
-                teacherId: widget.teacherId!,
-                studentId: widget.studentId,
-                lessonDay: _restoredSchedule!.lessonDay,
-                lessonTime: _restoredSchedule!.lessonTime,
-                lessonDuration: _restoredSchedule!.lessonDuration,
-              );
-        } catch (e) {
-          // Schedule recording failure is non-critical, log but don't block
-          debugPrint('Failed to record restored schedule: $e');
-        }
-      }
-
-      // 🆕 레슨 요청이 연결된 경우, 상태를 proposalSent로 업데이트
-      if (widget.lessonRequestId != null) {
-        try {
-          await ref.read(lessonRequestActionsProvider.notifier).sendProposal(
-                requestId: widget.lessonRequestId!,
-                proposalId: subscription.id, // 수강권 ID를 제안 ID로 사용
-              );
-        } catch (e) {
-          // Lesson request update failure is non-critical
-          debugPrint('Failed to update lesson request status: $e');
-        }
-      }
+      // Create schedule confirmation card for student (Issue #62)
+      await _createScheduleConfirmationCard(subscription);
 
       if (mounted) {
-        // 🆕 앱 전환 + 즉시 발급 시 스케줄 설정 화면으로 이동
-        if (widget.isAppTransition && isImmediateIssue) {
-          final message = _restoredSchedule != null
-              ? '수강권이 발급되었습니다. 이전 스케줄(${_formatSchedule(_restoredSchedule!)})이 복원됩니다.'
-              : '수강권이 발급되었습니다. 정기 스케줄을 설정해주세요.';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: AppColors.primary,
-            ),
-          );
-          // TODO: 스케줄 설정 화면으로 이동
-          // context.pushReplacement('/schedule/setup/${widget.studentId}');
-          context.pop(true);  // true = 수강권 발급 완료
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                isImmediateIssue
-                    ? '수강권이 발급되었습니다'
-                    : '수강권 제안이 발송되었습니다. 학생의 결제를 기다려주세요.',
-              ),
-              backgroundColor: AppColors.primary,
-            ),
-          );
-          context.pop();
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('수강권이 발급되었습니다'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+        context.pop();
       }
     } catch (e) {
       if (mounted) {
@@ -1656,6 +892,61 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           ),
         );
       }
+    }
+  }
+
+  /// Create a schedule confirmation card for the student after subscription issuance.
+  Future<void> _createScheduleConfirmationCard(Subscription subscription) async {
+    // Get membership info for instrument and lesson class
+    final memberships = ref.read(studentMembershipsProvider(widget.studentId));
+    final membership = memberships.valueOrNull?.firstWhere(
+      (m) => m.id == subscription.membershipId,
+      orElse: () => throw Exception('Membership not found'),
+    );
+
+    if (membership == null) return;
+
+    // Get lesson class to find teacher info
+    final lessonClassAsync = await ref.read(lessonClassProvider(membership.lessonClassId).future);
+
+    // Determine card type based on context
+    // For now, assume afterTrial since we're issuing from this screen
+    // TODO: Detect re-enrollment vs additional instrument scenarios
+    final cardType = ScheduleCardType.afterTrial;
+
+    // Convert lessonDay string to int (1=Mon, 7=Sun)
+    int? parseLessonDay(String? day) {
+      if (day == null) return null;
+      const dayMap = {
+        'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6, 'Sun': 7,
+        '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 7,
+      };
+      return dayMap[day];
+    }
+
+    // Use membership's existing schedule as suggested time if available
+    final suggestedDay = parseLessonDay(membership.lessonDay);
+    final suggestedTime = membership.lessonTime;
+    final lessonDuration = membership.lessonDuration;
+
+    try {
+      await ref
+          .read(scheduleConfirmationCardNotifierProvider.notifier)
+          .createCard(
+            studentId: widget.studentId,
+            teacherId: lessonClassAsync?.teacherId ?? '',
+            teacherName: lessonClassAsync?.name ?? '선생님', // Use class name as fallback
+            instrument: membership.instrument,
+            subscriptionId: subscription.id,
+            cardType: cardType,
+            totalLessons: subscription.totalLessons,
+            suggestedDay: suggestedDay,
+            suggestedTime: suggestedTime,
+            lessonDuration: lessonDuration,
+          );
+    } catch (e) {
+      // Log error but don't fail the subscription issuance
+      debugPrint('Failed to create schedule confirmation card: $e');
     }
   }
 

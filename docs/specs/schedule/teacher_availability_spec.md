@@ -1,7 +1,7 @@
 # 선생님 가용 스케줄 시스템 설계서
 
 > 작성일: 2026-01-26
-> 최종 수정: 2026-01-27
+> 최종 수정: 2026-02-01
 > 상태: ✅ 구현 완료 (Phase 1~4)
 > 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md)
 > UX 가이드: [ux_guidelines.md](../design/ux_guidelines.md) - 섹션 11~12 참고
@@ -740,10 +740,11 @@ class SubscriptionHistory {
 | 원칙 | 설명 |
 |------|------|
 | **단일 뷰** | 칩 버튼만 사용 (토글 뷰 제거) |
-| **가용 시간만** | 예약 불가 시간은 표시하지 않음 |
+| **가용 시간만** | ⚠️ **다른 학생의 예약된 시간은 절대 표시하지 않음** - 예약 가능한 시간만 표시 |
 | **스마트 추천** | 평소 레슨 시간 ⭐ 표시 |
 | **빈 상태 대응** | 가용 시간 없으면 대안 날짜 제안 |
 | **수강권 정보** | 예약 전 잔여 횟수 확인 |
+| **회원 자동 인식** | studentId가 있으면 게스트 입력 다이얼로그 생략 → 확인 다이얼로그만 표시 |
 
 ### 8.2 메인 UI: 주간 캘린더 + 칩 버튼 뷰 (✅ 2026-01-27 개선)
 
@@ -1092,7 +1093,14 @@ lib/features/schedule/
 | BookingNotificationService | `services/booking_notification_service.dart` | ✅ |
 | Provider 알림 통합 | `providers/teacher_availability_providers.dart` | ✅ |
 
-### 10.5 남은 작업 (미래 개선)
+### 10.5 추가 구현 완료 (2026-02-01)
+
+| 기능 | 설명 | 상태 |
+|------|------|:----:|
+| **예약 가능 시간만 표시** | 다른 학생의 예약된 시간(blocked slots)은 표시하지 않음 | ✅ |
+| **회원 자동 인식** | studentId가 있으면 게스트 입력 다이얼로그 생략, 확인 다이얼로그만 표시 | ✅ |
+
+### 10.6 남은 작업 (미래 개선)
 
 | 항목 | 우선순위 | 상태 |
 |------|:--------:|:----:|

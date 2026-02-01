@@ -309,23 +309,15 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     dynamic subscription,
     dynamic teacher,
   ) {
-    // Separate selectable and blocked slots
+    // Only show available slots (not blocked/booked slots)
     final selectableSlots = slots.where(
       (s) =>
           s.status == AvailabilitySlotStatus.available ||
           s.status == AvailabilitySlotStatus.myBooking,
     ).toList();
 
-    final blockedSlots = slots.where(
-      (s) =>
-          s.status == AvailabilitySlotStatus.booked ||
-          s.status == AvailabilitySlotStatus.past,
-    ).toList();
-
-    // Combine all slots for display (available first, then blocked)
-    final allDisplaySlots = [...selectableSlots, ...blockedSlots];
     // Sort by start time
-    allDisplaySlots.sort((a, b) {
+    selectableSlots.sort((a, b) {
       final aMinutes = a.startTime.hour * 60 + a.startTime.minute;
       final bMinutes = b.startTime.hour * 60 + b.startTime.minute;
       return aMinutes.compareTo(bMinutes);
@@ -356,7 +348,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     // Get fee from teacher profile if available
     final int lessonFee = teacher?.regularLessonFee ?? 50000;
 
-    if (selectableSlots.isEmpty && blockedSlots.isEmpty) {
+    if (selectableSlots.isEmpty) {
       return SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: EmptySlotsSuggestion(
@@ -369,9 +361,9 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
 
     return Column(
       children: [
-        // Time slots (show all including blocked)
+        // Time slots (only available slots)
         Expanded(
-          child: _buildSlotChips(allDisplaySlots),
+          child: _buildSlotChips(selectableSlots),
         ),
 
         // Booking preview (when slot selected)
@@ -530,12 +522,12 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
     if (_selectedSlot == null) return;
 
     String effectiveStudentId = widget.studentId ?? '';
-    String effectiveStudentName = widget.studentName ?? '';
+    String effectiveStudentName = widget.studentName ?? '학생';
 
     debugPrint('[BookingScreen] studentId: $effectiveStudentId, studentName: $effectiveStudentName');
 
-    // Case 1: Logged-in student booking - show confirmation dialog
-    if (widget.studentId != null && widget.studentName != null) {
+    // Case 1: Logged-in student booking (has studentId) - show confirmation dialog only
+    if (widget.studentId != null) {
       debugPrint('[BookingScreen] Showing confirmation dialog...');
       final confirmed = await BookingConfirmDialog.show(
         context,

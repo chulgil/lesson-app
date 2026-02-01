@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2026-01-24
+> 마지막 업데이트: 2026-01-25
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -46,6 +46,7 @@ docs/
 ├── proposal/             # 기획 제안서
 ├── specs/                # 기능 명세서 (설계/비즈니스 로직)
 │   ├── _archive/         # 통합/폐기된 문서
+│   ├── schedule/         # 🆕 스케줄/가용시간 시스템
 │   ├── lesson/           # 레슨 시스템
 │   ├── practice/         # 연습 시스템
 │   ├── metronome/        # 메트로놈
@@ -110,6 +111,12 @@ docs/
 
 ## 기능 명세 (specs/)
 
+### 스케줄 시스템 (schedule/)
+
+| 문서 | 상태 | 설명 |
+|------|------|------|
+| [teacher_availability_system.md](specs/schedule/teacher_availability_system.md) | 📋 설계 중 | **🆕 선생님 가용시간 설정 시스템** (학원/선생님/학생 관점, 중계 UX) |
+
 ### 레슨 시스템 (lesson/)
 
 | 문서 | 상태 | 설명 |
@@ -117,7 +124,7 @@ docs/
 | [flow_without_app.md](specs/lesson/flow_without_app.md) | ✅ 확정 | **📊 앱 미사용 시 플로우** (Pain Points 분석, 미팅용) |
 | [flow_with_app.md](specs/lesson/flow_with_app.md) | ✅ 확정 | **📊 앱 사용 시 플로우** (개선 효과, 미팅용) |
 | [three_party_relationship_spec.md](specs/lesson/three_party_relationship_spec.md) | 📋 설계 중 | **3자 관계 UI/UX 설계** (→ 엔티티는 student_class_system.md 참조) |
-| [lesson_schedule.md](specs/lesson/lesson_schedule.md) | ✅ 확정 | 레슨 스케줄 시스템 |
+| [lesson_schedule.md](specs/lesson/lesson_schedule.md) | ✅ 확정 | 레슨 스케줄 시스템 (→ 가용시간은 schedule/ 참조) |
 | [Lesson_Types_Analysis.md](specs/lesson/Lesson_Types_Analysis.md) | ✅ 확정 | 레슨 유형 분석 |
 | [Lesson_Schedule_Design.md](specs/lesson/Lesson_Schedule_Design.md) | ✅ 확정 | 레슨 스케줄 설계 |
 | [student_centered_architecture.md](specs/lesson/student_centered_architecture.md) | ✅ 확정 | 학생 중심 아키텍처 |

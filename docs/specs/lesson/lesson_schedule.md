@@ -679,6 +679,7 @@ enum ScheduleChangeType {
 
 | 문서 | 설명 |
 |------|------|
+| [teacher_availability_system.md](../schedule/teacher_availability_system.md) | 🆕 선생님 가용시간 설정 시스템 (학원/선생님/학생 관점) |
 | [lesson_schedule.md](../../schema/entities/lesson_schedule.md) | FifthWeekPolicy, RegularLessonSettings, TeacherAvailability, TeacherPolicy 엔티티 |
 | [booking.md](../../schema/entities/booking.md) | Booking, BookingStatus 엔티티 |
 | [Unified_Lesson_Booking_Spec.md](./Unified_Lesson_Booking_Spec.md) | 통합 레슨 신청 스펙 |

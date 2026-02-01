@@ -1,0 +1,422 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../domain/entities/schedule_confirmation_card.dart';
+import '../providers/schedule_confirmation_card_providers.dart';
+
+/// Widget to display a schedule confirmation card to the student.
+///
+/// Shows after a subscription has been issued, prompting the student
+/// to confirm their lesson schedule. Based on the scenario, it may
+/// suggest a previous schedule or trial lesson time.
+class ScheduleConfirmationCardWidget extends ConsumerWidget {
+  final ScheduleConfirmationCard card;
+  final VoidCallback? onConfirmed;
+  final VoidCallback? onSelectDifferentTime;
+
+  const ScheduleConfirmationCardWidget({
+    super.key,
+    required this.card,
+    this.onConfirmed,
+    this.onSelectDifferentTime,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifierState = ref.watch(scheduleConfirmationCardNotifierProvider);
+    final isLoading = notifierState.isLoading;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        side: BorderSide(
+          color: AppColors.success.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.success.withValues(alpha: 0.05),
+              AppColors.success.withValues(alpha: 0.1),
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with celebration icon
+              _buildHeader(context),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Teacher and subscription info
+              _buildSubscriptionInfo(context),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Schedule suggestion section
+              _buildScheduleSection(context),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Action buttons
+              _buildActionButtons(context, ref, isLoading),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space2),
+          decoration: BoxDecoration(
+            color: AppColors.success.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          ),
+          child: const Icon(
+            Icons.celebration,
+            color: AppColors.success,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '수강권이 발급되었습니다!',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.success,
+                    ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '레슨 시간을 확정해주세요',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSubscriptionInfo(BuildContext context) {
+    final instrumentText =
+        card.instrument != null ? ' · ${card.instrument}' : '';
+    final lessonsText =
+        card.totalLessons != null ? ' ${card.totalLessons}회권' : '';
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+            child: Text(
+              card.teacherName.isNotEmpty ? card.teacherName[0] : '?',
+              style: TextStyle(
+                color: AppColors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  card.teacherName,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                Text(
+                  '$instrumentText$lessonsText',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduleSection(BuildContext context) {
+    // Different UI based on card type
+    if (!card.hasSuggestedSchedule) {
+      return _buildNoSuggestionSection(context);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.schedule,
+              size: 18,
+              color: AppColors.textSecondaryLight,
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              card.cardType.suggestionText,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.space2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                ),
+                child: Icon(
+                  Icons.star,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _getScheduleTypeLabel(),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      card.formattedSuggestedSchedule ?? '',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNoSuggestionSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: AppColors.info.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.calendar_today,
+            color: AppColors.info,
+            size: 32,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '레슨 시간을 선택해주세요',
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.info,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '선생님의 가용 시간 중에서 원하는 시간을 선택할 수 있습니다',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getScheduleTypeLabel() {
+    switch (card.cardType) {
+      case ScheduleCardType.afterTrial:
+        return '체험 레슨 시간';
+      case ScheduleCardType.reEnrollment:
+        return '이전 스케줄';
+      case ScheduleCardType.additionalInstrument:
+        return '';
+    }
+  }
+
+  Widget _buildActionButtons(
+      BuildContext context, WidgetRef ref, bool isLoading) {
+    if (!card.hasSuggestedSchedule) {
+      // Only "Select Time" button for additionalInstrument
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: isLoading ? null : () => _onSelectDifferentTime(context, ref),
+          icon: const Icon(Icons.access_time, size: 18),
+          label: const Text('시간 선택하기'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.info,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Two buttons: Confirm and Select Different Time
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: isLoading ? null : () => _onSelectDifferentTime(context, ref),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.textSecondaryLight,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              side: BorderSide(color: AppColors.borderLight),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+            ),
+            child: const Text('다른 시간'),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          flex: 2,
+          child: ElevatedButton.icon(
+            onPressed: isLoading ? null : () => _onConfirm(context, ref),
+            icon: isLoading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.check, size: 18),
+            label: const Text('이 시간으로 예약'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.success,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onConfirm(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref
+          .read(scheduleConfirmationCardNotifierProvider.notifier)
+          .confirmSchedule(card.id, card.studentId);
+
+      // TODO: Actually book the lesson with the suggested schedule
+      // This should call the booking service to create the regular lesson schedule
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${card.formattedSuggestedSchedule} 스케줄이 확정되었습니다!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+
+      onConfirmed?.call();
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('스케줄 확정 중 오류가 발생했습니다: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  void _onSelectDifferentTime(BuildContext context, WidgetRef ref) {
+    // Navigate to booking screen to select a different time
+    context.push(
+      '/schedule/book-lesson'
+      '?teacherId=${card.teacherId}'
+      '&teacherName=${Uri.encodeComponent(card.teacherName)}'
+      '&studentId=${card.studentId}'
+      '&instrument=${Uri.encodeComponent(card.instrument ?? '')}'
+      '&subscriptionId=${card.subscriptionId}',
+    );
+
+    // Mark card as "changed time" after navigation
+    ref
+        .read(scheduleConfirmationCardNotifierProvider.notifier)
+        .selectDifferentTime(card.id, card.studentId);
+
+    onSelectDifferentTime?.call();
+  }
+}

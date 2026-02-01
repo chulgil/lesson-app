@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -213,7 +214,7 @@ class MyLessonRequestsScreen extends ConsumerWidget {
         onTap: isProposalReceived && request.proposalId != null
             ? () {
                 // Navigate to proposal detail
-                context.push('/subscription/proposal/${request.proposalId}');
+                context.push(AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!));
               }
             : null,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -434,7 +435,7 @@ class MyLessonRequestsScreen extends ConsumerWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (request.proposalId != null) {
-                        context.push('/subscription/proposal/${request.proposalId}');
+                        context.push(AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!));
                       }
                     },
                     icon: const Icon(Icons.card_giftcard),

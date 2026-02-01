@@ -13,6 +13,8 @@ import '../../../practice/presentation/widgets/goal/goal_progress_widget.dart';
 import '../../../practice/presentation/widgets/practice_streak_card.dart';
 import '../../../schedule/domain/entities/lesson_request.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
+import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
 import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
@@ -90,6 +92,9 @@ class StudentDashboardTab extends ConsumerWidget {
           ),
 
           const SizedBox(height: AppSpacing.space6),
+
+          // Schedule Confirmation Cards (NEW - Issue #62)
+          _buildScheduleConfirmationCards(context, ref, currentStudentId),
 
           // Pending Proposals
           _buildPendingProposalsBanner(context, ref, currentStudentId),
@@ -619,6 +624,48 @@ class StudentDashboardTab extends ConsumerWidget {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  /// Schedule confirmation cards - shows pending schedule confirmations (Issue #62)
+  Widget _buildScheduleConfirmationCards(
+    BuildContext context,
+    WidgetRef ref,
+    String studentId,
+  ) {
+    final cardsAsync =
+        ref.watch(pendingScheduleConfirmationCardsProvider(studentId));
+
+    return cardsAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (cards) {
+        if (cards.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        // Display all pending cards
+        return Column(
+          children: cards.map((card) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+              child: ScheduleConfirmationCardWidget(
+                card: card,
+                onConfirmed: () {
+                  // Refresh the cards list
+                  ref.invalidate(
+                      pendingScheduleConfirmationCardsProvider(studentId));
+                },
+                onSelectDifferentTime: () {
+                  // Refresh the cards list
+                  ref.invalidate(
+                      pendingScheduleConfirmationCardsProvider(studentId));
+                },
+              ),
+            );
+          }).toList(),
         );
       },
     );
