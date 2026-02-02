@@ -13,8 +13,6 @@ import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
-import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../../../calendar/presentation/screens/calendar_tab.dart';
 import '../../../practice/presentation/widgets/metronome/metronome_full_screen_modal.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
@@ -556,17 +554,13 @@ class _LessonCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get student's active subscription for badge
-    final subscriptionsAsync =
-        ref.watch(activeStudentSubscriptionsProvider(lesson.studentId));
-
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border(
           left: BorderSide(
-            color: AppColors.primary,
+            color: _getStatusColor(),
             width: 4,
           ),
         ),
@@ -582,36 +576,31 @@ class _LessonCard extends ConsumerWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+            vertical: AppSpacing.space3,
+          ),
           child: Row(
             children: [
-              // Time column (fixed width for alignment)
+              // Time column (fixed width)
               SizedBox(
-                width: 48,
-                child: Column(
-                  children: [
-                    const Icon(Icons.music_note, color: AppColors.primary, size: 20),
-                    const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      lesson.startTime,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                width: 52,
+                child: Text(
+                  lesson.startTime,
+                  style: AppTypography.headingSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.space3),
 
               // Info section (flexible)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name and instrument
                     Text(
                       '${lesson.studentName} · ${lesson.instrument}',
-                      style: AppTypography.bodyLarge.copyWith(
+                      style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -630,47 +619,16 @@ class _LessonCard extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(width: AppSpacing.space2),
-
-              // Trailing section (fixed width for alignment)
+              // Status (fixed width)
               SizedBox(
-                width: 72,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Row 1: Subscription badge (always show, even if empty for spacing)
-                    subscriptionsAsync.when(
-                      data: (subscriptions) {
-                        if (subscriptions.isEmpty) {
-                          return const SizedBox(height: 20);
-                        }
-                        return SubscriptionBadge(
-                          subscription: subscriptions.first,
-                          showIcon: false,
-                        );
-                      },
-                      loading: () => const SizedBox(height: 20),
-                      error: (_, __) => const SizedBox(height: 20),
-                    ),
-                    const SizedBox(height: 4),
-                    // Row 2: Status badge
-                    if (lesson.status == LessonStatus.completed)
-                      Text(
-                        '완료',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.success,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    else
-                      Text(
-                        '예정',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
-                        ),
-                      ),
-                  ],
+                width: 36,
+                child: Text(
+                  _getStatusLabel(),
+                  style: AppTypography.caption.copyWith(
+                    color: _getStatusColor(),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.end,
                 ),
               ),
 
@@ -687,6 +645,44 @@ class _LessonCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  String _getStatusLabel() {
+    switch (lesson.status) {
+      case LessonStatus.scheduled:
+      case LessonStatus.reschedulePending:
+        return '예정';
+      case LessonStatus.completed:
+        return '완료';
+      case LessonStatus.cancelled:
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
+        return '취소';
+      case LessonStatus.noShow:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.studentAbsent:
+        return '결석';
+    }
+  }
+
+  Color _getStatusColor() {
+    switch (lesson.status) {
+      case LessonStatus.scheduled:
+      case LessonStatus.reschedulePending:
+        return AppColors.primary;
+      case LessonStatus.completed:
+        return AppColors.success;
+      case LessonStatus.cancelled:
+      case LessonStatus.cancelledByStudentAdvance:
+      case LessonStatus.cancelledByTeacher:
+      case LessonStatus.cancelledMutual:
+        return AppColors.textTertiaryLight;
+      case LessonStatus.noShow:
+      case LessonStatus.cancelledByStudentLate:
+      case LessonStatus.studentAbsent:
+        return AppColors.error;
+    }
   }
 }
 

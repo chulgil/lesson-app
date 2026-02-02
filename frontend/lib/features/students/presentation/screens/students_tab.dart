@@ -400,146 +400,73 @@ class _StudentCard extends ConsumerWidget {
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+            vertical: AppSpacing.space3,
+          ),
           child: Row(
             children: [
-              // Profile avatar - clean, no status dot
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                child: Text(
-                  student.initial,
-                  style: AppTypography.headingSmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
+              // Avatar (fixed width, 같은 위치에 정렬)
+              SizedBox(
+                width: 52,
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    student.initial,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
 
-              const SizedBox(width: AppSpacing.space3),
-
-              // Info - simplified hierarchy
+              // Info section (flexible)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1: Name + Class type (학원/개인)
-                    Row(
-                      children: [
-                        Text(
-                          student.name,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        StudentClassBadge(studentId: student.id),
-                      ],
+                    // Row 1: Name · Instrument (레슨 카드와 동일 패턴)
+                    Text(
+                      '${student.name} · ${student.instrument}',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-
-                    const SizedBox(height: AppSpacing.space1),
-
-                    // Row 2: Instrument (neutral) + Subscription badge (only colored badge)
-                    Row(
-                      children: [
-                        Text(
-                          student.instrument,
-                          style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        Container(
-                          width: 4,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: AppColors.textTertiaryLight,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.space2),
-                        StudentSubscriptionMiniBadge(studentId: student.id),
-                      ],
-                    ),
-
-                    const SizedBox(height: AppSpacing.space2),
-
-                    // Row 3: Practice rate + Schedule (neutral colors)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 12,
-                          color: AppColors.textTertiaryLight,
-                        ),
-                        const SizedBox(width: 4),
-                        if (student.lessonSchedule != null)
-                          Expanded(
-                            child: Text(
-                              student.lessonSchedule!,
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          )
-                        else
-                          Text(
-                            '스케줄 미등록',
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.textTertiaryLight,
-                            ),
-                          ),
-                        const SizedBox(width: AppSpacing.space3),
-                        _buildPracticeIndicator(),
-                      ],
+                    // Row 2: Schedule (레슨 카드의 곡명 위치와 동일)
+                    Text(
+                      student.lessonSchedule ?? '스케줄 미등록',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
 
+              // Status section (fixed width, 레슨 카드와 동일)
+              SizedBox(
+                width: 56,
+                child: StudentSubscriptionMiniBadge(studentId: student.id),
+              ),
+
+              const SizedBox(width: AppSpacing.space1),
+
               // Arrow
               const Icon(
                 Icons.chevron_right,
                 color: AppColors.textTertiaryLight,
+                size: 20,
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  /// Compact practice indicator - shows dots instead of colored text
-  Widget _buildPracticeIndicator() {
-    if (student.practiceStatus == PracticeStatus.paused) {
-      return Text(
-        '휴강',
-        style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
-      );
-    }
-
-    // Show practice as simple dot indicators (7 dots for 7 days)
-    final practiceRate = student.practiceRate;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(7, (index) {
-        final isPracticed = index < practiceRate;
-        return Container(
-          width: 6,
-          height: 6,
-          margin: EdgeInsets.only(left: index > 0 ? 2 : 0),
-          decoration: BoxDecoration(
-            color: isPracticed
-                ? AppColors.primary.withValues(alpha: 0.7)
-                : AppColors.borderLight,
-            shape: BoxShape.circle,
-          ),
-        );
-      }),
     );
   }
 }

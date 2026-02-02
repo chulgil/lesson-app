@@ -337,42 +337,31 @@ class _LessonTimeCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+            vertical: AppSpacing.space3,
+          ),
           child: Row(
             children: [
-              // Time column (fixed width for alignment)
+              // Time column (fixed width) - 홈 레슨 카드와 동일
               SizedBox(
-                width: 48,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      lesson.startTime,
-                      style: AppTypography.bodyLarge.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '${lesson.duration}분',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
-                      ),
-                    ),
-                  ],
+                width: 52,
+                child: Text(
+                  lesson.startTime,
+                  style: AppTypography.headingSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-
-              const SizedBox(width: AppSpacing.space3),
 
               // Info column (flexible)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Name · Instrument (plain text, no colored badge)
                     Text(
                       '${lesson.studentName} · ${lesson.instrument}',
-                      style: AppTypography.bodyLarge.copyWith(
+                      style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -391,23 +380,16 @@ class _LessonTimeCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(width: AppSpacing.space2),
-
-              // Status section (fixed width for alignment)
+              // Status (fixed width) - 홈 레슨 카드와 동일
               SizedBox(
-                width: 48,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _getStatusLabel(),
-                      style: AppTypography.caption.copyWith(
-                        color: _getStatusColor(),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                width: 36,
+                child: Text(
+                  _getStatusLabel(),
+                  style: AppTypography.caption.copyWith(
+                    color: _getStatusColor(),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.end,
                 ),
               ),
 
