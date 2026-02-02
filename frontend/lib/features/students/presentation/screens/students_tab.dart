@@ -406,21 +406,20 @@ class _StudentCard extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              // Avatar (fixed width, 같은 위치에 정렬)
-              SizedBox(
-                width: 52,
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    student.initial,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
+              // Avatar
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                child: Text(
+                  student.initial,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
+
+              const SizedBox(width: AppSpacing.space3),
 
               // Info section (flexible)
               Expanded(

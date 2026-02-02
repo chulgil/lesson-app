@@ -343,9 +343,9 @@ class _LessonTimeCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Time column (fixed width) - 홈 레슨 카드와 동일
+              // Time column (fixed width)
               SizedBox(
-                width: 52,
+                width: 48,
                 child: Text(
                   lesson.startTime,
                   style: AppTypography.headingSmall.copyWith(
@@ -353,6 +353,8 @@ class _LessonTimeCard extends StatelessWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(width: AppSpacing.space3),
 
               // Info column (flexible)
               Expanded(

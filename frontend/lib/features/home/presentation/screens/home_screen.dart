@@ -584,7 +584,7 @@ class _LessonCard extends ConsumerWidget {
             children: [
               // Time column (fixed width)
               SizedBox(
-                width: 52,
+                width: 48,
                 child: Text(
                   lesson.startTime,
                   style: AppTypography.headingSmall.copyWith(
@@ -592,6 +592,8 @@ class _LessonCard extends ConsumerWidget {
                   ),
                 ),
               ),
+
+              const SizedBox(width: AppSpacing.space3),
 
               // Info section (flexible)
               Expanded(
