@@ -345,7 +345,7 @@ class _LessonTimeCard extends StatelessWidget {
             children: [
               // Time column (fixed width)
               SizedBox(
-                width: 48,
+                width: 56,
                 child: Text(
                   lesson.startTime,
                   style: AppTypography.headingSmall.copyWith(
