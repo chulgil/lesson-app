@@ -6,20 +6,11 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
-import '../../../../shared/widgets/collapsible_calendar.dart';
 
-/// State provider for calendar expansion
-final calendarExpandedProvider = StateProvider<bool>((ref) => true);
-
-/// State provider for selected date
-final selectedDateProvider = StateProvider<DateTime>((ref) {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day);
-});
-
-/// Calendar tab showing lesson schedule with collapsible month/week calendar
+/// Calendar tab showing lesson schedule (홈 화면과 동일한 WeekCalendarWidget 사용)
 class CalendarTab extends ConsumerStatefulWidget {
   const CalendarTab({super.key});
 
@@ -28,85 +19,66 @@ class CalendarTab extends ConsumerStatefulWidget {
 }
 
 class _CalendarTabState extends ConsumerState<CalendarTab> {
-  final ScrollController _scrollController = ScrollController();
-  double _lastScrollOffset = 0;
+  late DateTime _selectedDate;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_handleScroll);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_handleScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _handleScroll() {
-    final offset = _scrollController.offset;
-    final delta = offset - _lastScrollOffset;
-    final isExpanded = ref.read(calendarExpandedProvider);
-
-    // Only react to significant scroll movements
-    if (delta.abs() > 15) {
-      if (delta > 0 && isExpanded) {
-        // Scrolling down - collapse calendar
-        ref.read(calendarExpandedProvider.notifier).state = false;
-      } else if (delta < 0 && !isExpanded && offset < 100) {
-        // Scrolling up near top - expand calendar
-        ref.read(calendarExpandedProvider.notifier).state = true;
-      }
-      _lastScrollOffset = offset;
-    }
+    final now = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isExpanded = ref.watch(calendarExpandedProvider);
-    final selectedDate = ref.watch(selectedDateProvider);
     final lessonsAsync = ref.watch(lessonsProvider);
 
-    // Get marked dates (dates with lessons)
-    final markedDates = lessonsAsync.whenOrNull(
-      data: (lessons) => lessons
+    // Get lesson dates for calendar markers
+    final lessonDates = lessonsAsync.whenData((lessons) {
+      return lessons
           .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
-          .toSet(),
-    );
+          .toSet();
+    });
 
     return Column(
       children: [
-        // Collapsible Calendar
+        // Week Calendar (홈 화면과 동일)
         Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space2,
-            AppSpacing.screenPadding,
-            0,
-          ),
-          child: CollapsibleCalendar(
-            selectedDate: selectedDate,
-            onDateSelected: (date) {
-              ref.read(selectedDateProvider.notifier).state = date;
-            },
-            isExpanded: isExpanded,
-            markedDates: markedDates,
-            onToggleExpand: () {
-              ref.read(calendarExpandedProvider.notifier).state = !isExpanded;
-            },
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: lessonDates.when(
+            data: (dates) => WeekCalendarWidget(
+              selectedDate: _selectedDate,
+              onDateSelected: (date) {
+                setState(() {
+                  _selectedDate = date;
+                });
+              },
+              lessonDates: dates,
+            ),
+            loading: () => WeekCalendarWidget(
+              selectedDate: _selectedDate,
+              onDateSelected: (date) {
+                setState(() {
+                  _selectedDate = date;
+                });
+              },
+            ),
+            error: (_, __) => WeekCalendarWidget(
+              selectedDate: _selectedDate,
+              onDateSelected: (date) {
+                setState(() {
+                  _selectedDate = date;
+                });
+              },
+            ),
           ),
         ),
-
-        const SizedBox(height: AppSpacing.space3),
 
         // Lesson list
         Expanded(
           child: lessonsAsync.when(
             data: (lessons) => _LessonList(
-              selectedDate: selectedDate,
+              selectedDate: _selectedDate,
               lessons: lessons,
-              scrollController: _scrollController,
             ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => _buildErrorState(ref, error),
@@ -150,12 +122,10 @@ class _CalendarTabState extends ConsumerState<CalendarTab> {
 class _LessonList extends StatelessWidget {
   final DateTime selectedDate;
   final List<Lesson> lessons;
-  final ScrollController scrollController;
 
   const _LessonList({
     required this.selectedDate,
     required this.lessons,
-    required this.scrollController,
   });
 
   @override
@@ -226,7 +196,6 @@ class _LessonList extends StatelessWidget {
               child: dayLessons.isEmpty
                   ? _buildEmptyState(context)
                   : ListView.separated(
-                      controller: scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       itemCount: dayLessons.length + 1, // +1 for add button
                       separatorBuilder: (_, __) =>
@@ -247,7 +216,6 @@ class _LessonList extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return ListView(
-      controller: scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         const SizedBox(height: 60),
