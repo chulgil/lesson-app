@@ -7,14 +7,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
-import '../../../../core/widgets/quick_tool_button.dart';
 import '../../../../core/widgets/stat_card.dart';
-import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
+import '../../../lessons/domain/entities/payment.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../calendar/presentation/screens/calendar_tab.dart';
-import '../../../practice/presentation/widgets/metronome/metronome_full_screen_modal.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 import '../../../students/presentation/screens/students_tab.dart';
 
@@ -72,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today_outlined),
             activeIcon: Icon(Icons.calendar_today),
-            label: '캘린더',
+            label: '스케줄',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
@@ -90,46 +88,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-/// Dashboard Tab with Riverpod
-class _DashboardTab extends ConsumerStatefulWidget {
+/// Dashboard Tab - 핵심 숫자 + 즉시 확인 필요 + 오늘의 레슨
+class _DashboardTab extends ConsumerWidget {
   const _DashboardTab();
 
   @override
-  ConsumerState<_DashboardTab> createState() => _DashboardTabState();
-}
-
-class _DashboardTabState extends ConsumerState<_DashboardTab> {
-  late DateTime _selectedDate;
-
-  @override
-  void initState() {
-    super.initState();
-    final now = DateTime.now();
-    _selectedDate = DateTime(now.year, now.month, now.day);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final lessonsAsync = ref.watch(lessonsProvider);
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final paymentSummaryAsync = ref.watch(paymentSummaryProvider);
+    final teacherId = ref.watch(currentUserIdProvider);
+    final pendingRequestsAsync =
+        ref.watch(pendingLessonRequestCountProvider(teacherId));
+    final pendingBookingsAsync =
+        ref.watch(pendingBookingsCountProvider(teacherId));
 
-    // Get lessons for selected date
-    final selectedDateLessons = lessonsAsync.whenData((lessons) {
+    // Get today's lessons
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final todayLessons = lessonsAsync.whenData((lessons) {
       return lessons.where((lesson) {
         final lessonDate = lesson.date;
-        return lessonDate.year == _selectedDate.year &&
-            lessonDate.month == _selectedDate.month &&
-            lessonDate.day == _selectedDate.day;
+        return lessonDate.year == today.year &&
+            lessonDate.month == today.month &&
+            lessonDate.day == today.day;
       }).toList()
         ..sort((a, b) => a.startTime.compareTo(b.startTime));
-    });
-
-    // Get all lesson dates for calendar markers
-    final lessonDates = lessonsAsync.whenData((lessons) {
-      return lessons
-          .map((l) => DateTime(l.date.year, l.date.month, l.date.day))
-          .toSet();
     });
 
     return RefreshIndicator(
@@ -137,6 +121,8 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
         ref.invalidate(lessonsProvider);
         ref.invalidate(lessonStatsProvider);
         ref.invalidate(paymentSummaryProvider);
+        ref.invalidate(pendingLessonRequestCountProvider(teacherId));
+        ref.invalidate(pendingBookingsCountProvider(teacherId));
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -145,46 +131,35 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            _buildHeader(context),
+            _buildHeader(context, ref),
 
-            const SizedBox(height: AppSpacing.space4),
+            const SizedBox(height: AppSpacing.space5),
 
-            // Week Calendar
-            lessonDates.when(
-              data: (dates) => WeekCalendarWidget(
-                selectedDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
-                lessonDates: dates,
-              ),
-              loading: () => WeekCalendarWidget(
-                selectedDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
-              ),
-              error: (_, __) => WeekCalendarWidget(
-                selectedDate: _selectedDate,
-                onDateSelected: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
-                },
-              ),
+            // Stats Row (핵심 숫자 3개)
+            _buildStatsRow(
+              context,
+              todayLessons,
+              paymentSummaryAsync,
+              lessonStatsAsync,
             ),
 
             const SizedBox(height: AppSpacing.space6),
 
-            // Selected Date Lessons
-            _buildSelectedDateHeader(),
+            // Urgent Actions Section (즉시 확인 필요)
+            _buildUrgentActionsSection(
+              context,
+              pendingRequestsAsync,
+              pendingBookingsAsync,
+              paymentSummaryAsync,
+            ),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Today's Lessons Section (오늘의 레슨)
+            _buildTodayLessonsHeader(context, todayLessons),
             const SizedBox(height: AppSpacing.space3),
 
-            selectedDateLessons.when(
+            todayLessons.when(
               data: (lessons) => _buildLessonsList(context, lessons),
               loading: () => const Center(
                 child: Padding(
@@ -195,130 +170,6 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
               error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
             ),
 
-            const SizedBox(height: AppSpacing.space6),
-
-            // Stats Row
-            StatCardRow(
-              cards: [
-                lessonStatsAsync.when(
-                  data: (stats) => StatCard(
-                    title: '이번 달',
-                    value: '${stats['completed'] ?? 0}회',
-                    subtitle: '${stats['thisWeek'] ?? 0}회 예정',
-                    color: AppColors.primary,
-                    icon: Icons.calendar_today,
-                  ),
-                  loading: () => StatCard(
-                    title: '이번 달',
-                    value: '-',
-                    color: AppColors.primary,
-                    icon: Icons.calendar_today,
-                  ),
-                  error: (_, __) => StatCard(
-                    title: '이번 달',
-                    value: '-',
-                    color: AppColors.primary,
-                  ),
-                ),
-                paymentSummaryAsync.when(
-                  data: (summary) => StatCard(
-                    title: '미수금',
-                    value: summary.formattedTotalPending,
-                    subtitle: '${summary.unpaidStudents}명',
-                    color: summary.unpaidStudents > 0
-                        ? AppColors.warning
-                        : AppColors.success,
-                    icon: Icons.account_balance_wallet_outlined,
-                    onTap: () => context.push(AppRoutes.paymentManagement),
-                  ),
-                  loading: () => StatCard(
-                    title: '미수금',
-                    value: '-',
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  error: (_, __) => StatCard(
-                    title: '미수금',
-                    value: '-',
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Quick Tools
-            Text('빠른 도구', style: AppTypography.headingMedium),
-            const SizedBox(height: AppSpacing.space3),
-
-            Row(
-              children: [
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.speed,
-                    label: '메트로놈',
-                    onTap: () => MetronomeFullScreenModal.show(context),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.music_note,
-                    label: '튜너',
-                    onTap: () => context.push(AppRoutes.tuner),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.folder_outlined,
-                    label: '녹음 관리',
-                    onTap: () => context.push(AppRoutes.allRecordings),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Subscription Management (TEST)
-            Text('수강권 관리', style: AppTypography.headingMedium),
-            const SizedBox(height: AppSpacing.space3),
-
-            Row(
-              children: [
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.inventory_2_outlined,
-                    label: '템플릿 관리',
-                    onTap: () => context.push(
-                      '${AppRoutes.subscriptionTemplates}?teacherId=teacher_1',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.send_outlined,
-                    label: '제안 보내기',
-                    onTap: () => context.push(
-                      '${AppRoutes.proposalCreate}?teacherId=teacher_1',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: QuickToolButton(
-                    icon: Icons.check_circle_outline,
-                    label: '입금 확인',
-                    onTap: () => context.push(
-                      '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
             const SizedBox(height: AppSpacing.space8),
           ],
         ),
@@ -326,7 +177,7 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -339,8 +190,8 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
         ),
         Row(
           children: [
-            _buildLessonRequestsButton(context),
-            _buildPendingBookingsButton(context),
+            _buildLessonRequestsButton(context, ref),
+            _buildPendingBookingsButton(context, ref),
             IconButton(
               onPressed: () => context.push(AppRoutes.notifications),
               icon: const Icon(Icons.notifications_outlined),
@@ -352,33 +203,276 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
     );
   }
 
-  Widget _buildSelectedDateHeader() {
-    final isToday = _selectedDate.year == DateTime.now().year &&
-        _selectedDate.month == DateTime.now().month &&
-        _selectedDate.day == DateTime.now().day;
-
-    final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final weekday = weekdays[_selectedDate.weekday - 1];
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          isToday
-              ? '오늘의 레슨'
-              : '${_selectedDate.month}/${_selectedDate.day} ($weekday) 레슨',
-          style: AppTypography.headingMedium,
+  Widget _buildStatsRow(
+    BuildContext context,
+    AsyncValue<List<Lesson>> todayLessons,
+    AsyncValue<PaymentSummary> paymentSummaryAsync,
+    AsyncValue<Map<String, int>> lessonStatsAsync,
+  ) {
+    return StatCardRow(
+      cards: [
+        // Today's lesson count
+        todayLessons.when(
+          data: (lessons) => StatCard(
+            title: '오늘 레슨',
+            value: '${lessons.length}회',
+            color: AppColors.primary,
+            icon: Icons.today,
+          ),
+          loading: () => StatCard(
+            title: '오늘 레슨',
+            value: '-',
+            color: AppColors.primary,
+            icon: Icons.today,
+          ),
+          error: (_, __) => StatCard(
+            title: '오늘 레슨',
+            value: '-',
+            color: AppColors.primary,
+          ),
         ),
-        TextButton.icon(
-          onPressed: () => context.push('/lessons/add'),
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('추가'),
+        // Unpaid amount
+        paymentSummaryAsync.when(
+          data: (summary) => StatCard(
+            title: '미수금',
+            value: summary.formattedTotalPending,
+            subtitle: summary.unpaidStudents > 0 ? '${summary.unpaidStudents}명' : null,
+            color: summary.unpaidStudents > 0
+                ? AppColors.warning
+                : AppColors.success,
+            icon: Icons.account_balance_wallet_outlined,
+            onTap: () => context.push(AppRoutes.paymentManagement),
+          ),
+          loading: () => StatCard(
+            title: '미수금',
+            value: '-',
+            color: AppColors.textSecondaryLight,
+          ),
+          error: (_, __) => StatCard(
+            title: '미수금',
+            value: '-',
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        // This month completed
+        lessonStatsAsync.when(
+          data: (stats) => StatCard(
+            title: '이번 달',
+            value: '${stats['completed'] ?? 0}회',
+            subtitle: '완료',
+            color: AppColors.success,
+            icon: Icons.check_circle_outline,
+          ),
+          loading: () => StatCard(
+            title: '이번 달',
+            value: '-',
+            color: AppColors.success,
+            icon: Icons.check_circle_outline,
+          ),
+          error: (_, __) => StatCard(
+            title: '이번 달',
+            value: '-',
+            color: AppColors.success,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildLessonRequestsButton(BuildContext context) {
+  Widget _buildUrgentActionsSection(
+    BuildContext context,
+    AsyncValue<int> pendingRequestsAsync,
+    AsyncValue<int> pendingBookingsAsync,
+    AsyncValue<PaymentSummary> paymentSummaryAsync,
+  ) {
+    final pendingRequests = pendingRequestsAsync.valueOrNull ?? 0;
+    final pendingBookings = pendingBookingsAsync.valueOrNull ?? 0;
+    final unpaidStudents = paymentSummaryAsync.valueOrNull?.unpaidStudents ?? 0;
+
+    final totalUrgent = pendingRequests + pendingBookings + (unpaidStudents > 0 ? 1 : 0);
+
+    if (totalUrgent == 0) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '즉시 확인 필요',
+              style: AppTypography.headingSmall.copyWith(
+                color: AppColors.warning,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '$totalUrgent',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.warning,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.warning.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            border: Border.all(
+              color: AppColors.warning.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Column(
+            children: [
+              if (pendingRequests > 0)
+                _buildUrgentItem(
+                  context,
+                  icon: Icons.person_add,
+                  iconColor: AppColors.error,
+                  title: '레슨 요청 $pendingRequests건 대기',
+                  onTap: () => context.push(
+                    AppRoutes.lessonRequests,
+                    extra: {'teacherId': 'teacher_1'},
+                  ),
+                ),
+              if (pendingBookings > 0)
+                _buildUrgentItem(
+                  context,
+                  icon: Icons.event_note,
+                  iconColor: AppColors.warning,
+                  title: '예약 승인 $pendingBookings건 대기',
+                  onTap: () => context.push(AppRoutes.pendingBookings),
+                  showDivider: pendingRequests > 0,
+                ),
+              if (unpaidStudents > 0)
+                _buildUrgentItem(
+                  context,
+                  icon: Icons.payments,
+                  iconColor: AppColors.warning,
+                  title: '입금 확인 $unpaidStudents건 대기',
+                  onTap: () => context.push(
+                    '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
+                  ),
+                  showDivider: pendingRequests > 0 || pendingBookings > 0,
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUrgentItem(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required VoidCallback onTap,
+    bool showDivider = false,
+  }) {
+    return Column(
+      children: [
+        if (showDivider)
+          Divider(
+            height: 1,
+            color: AppColors.warning.withValues(alpha: 0.2),
+          ),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space3,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 18),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Text(
+                  '확인하기',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTodayLessonsHeader(
+    BuildContext context,
+    AsyncValue<List<Lesson>> todayLessons,
+  ) {
+    final lessonCount = todayLessons.valueOrNull?.length ?? 0;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.schedule, size: 20, color: AppColors.textSecondaryLight),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '오늘의 레슨',
+              style: AppTypography.headingMedium,
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '($lessonCount)',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+        TextButton.icon(
+          onPressed: () => context.push('/lessons/add'),
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('레슨 추가'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLessonRequestsButton(BuildContext context, WidgetRef ref) {
     final teacherId = ref.watch(currentUserIdProvider);
     final pendingCountAsync =
         ref.watch(pendingLessonRequestCountProvider(teacherId));
@@ -435,7 +529,7 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
     );
   }
 
-  Widget _buildPendingBookingsButton(BuildContext context) {
+  Widget _buildPendingBookingsButton(BuildContext context, WidgetRef ref) {
     final teacherId = ref.watch(currentUserIdProvider);
     final pendingCountAsync = ref.watch(pendingBookingsCountProvider(teacherId));
 
@@ -495,7 +589,7 @@ class _DashboardTabState extends ConsumerState<_DashboardTab> {
             Icon(Icons.event_available, color: AppColors.textTertiaryLight),
             const SizedBox(width: AppSpacing.space3),
             Text(
-              '예정된 레슨이 없습니다',
+              '오늘 예정된 레슨이 없습니다',
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
