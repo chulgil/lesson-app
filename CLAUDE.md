@@ -1,25 +1,92 @@
 # CLAUDE.md - Lesson App {#overview}
 
-> 마지막 업데이트: 2026-01-29
+> 마지막 업데이트: 2026-02-05
 
-음악 레슨/연습 관리 앱 (Flutter)
+음악 레슨/연습 관리 앱 (Monorepo: docs + backend + frontend)
 
 ## 빠른 참조 {#quick-reference}
 
 | 항목 | 값 |
 |------|-----|
-| 기술 스택 | Flutter, Riverpod (@riverpod 코드생성), Go Router, Hive |
+| 구조 | Monorepo (docs / backend / frontend) |
+| Frontend | Flutter, Riverpod, Go Router, Hive |
+| Backend | FastAPI (개발 예정) |
 | 플랫폼 | iOS, Android |
 | 아키텍처 | Clean Architecture + Feature-based |
-| 상태 | Phase 1 완료 (100%) |
+
+## 프로젝트 구조 {#project-structure}
+
+```
+lesson-app/
+├── docs/                # 📚 프로젝트 문서
+│   ├── architecture.md  # 아키텍처 가이드
+│   ├── requirement/     # 요구사항
+│   ├── proposal/        # 기획 제안서
+│   ├── specs/           # 기능 명세
+│   └── schema/          # 엔티티 스키마
+│
+├── backend/             # 🐍 백엔드 (FastAPI)
+│   ├── app/             # API 소스
+│   ├── tests/           # 테스트
+│   └── README.md
+│
+├── frontend/            # 📱 프론트엔드 (Flutter)
+│   ├── lib/
+│   │   ├── core/        # 공통 (라우터, 테마, 유틸)
+│   │   ├── features/    # 기능별 모듈 (Clean Architecture)
+│   │   ├── models/      # ⚠️ 레거시 (re-export only)
+│   │   ├── providers/   # ⚠️ 레거시 (re-export only)
+│   │   └── repositories/# ⚠️ 레거시 (re-export only)
+│   ├── assets/          # 리소스
+│   ├── android/         # Android 네이티브
+│   ├── ios/             # iOS 네이티브
+│   ├── macos/           # macOS 네이티브
+│   ├── test/            # 테스트
+│   └── pubspec.yaml
+│
+├── .claude/             # Claude 설정
+├── .github/             # GitHub Actions
+├── .serena/             # Serena 설정
+├── CLAUDE.md            # 🔑 이 파일
+└── README.md
+```
 
 ## 명령어 {#commands}
 
+### Frontend (Flutter)
+
 ```bash
-flutter pub get                    # 의존성
-flutter run                        # 실행
-dart run build_runner build --delete-conflicting-outputs  # 코드 생성
-flutter analyze                    # 분석
+cd frontend
+
+# 의존성 설치
+flutter pub get
+
+# 앱 실행
+flutter run
+
+# 코드 생성 (Provider, JSON)
+dart run build_runner build --delete-conflicting-outputs
+
+# 분석
+flutter analyze
+
+# 테스트
+flutter test
+```
+
+### Backend (Python/FastAPI)
+
+```bash
+cd backend
+
+# 가상환경 및 의존성
+uv sync
+
+# 개발 서버 실행
+uv run uvicorn app.main:app --reload
+
+# 테스트
+uv run pytest
 ```
 
 ### 기기 배포 {#device-deploy}
@@ -34,6 +101,8 @@ adb devices                        # Android 기기만 확인
 #### iPhone 배포
 
 ```bash
+cd frontend
+
 # 데이터 유지하며 배포 (권장)
 flutter run -d <device_id> --release
 
@@ -53,6 +122,8 @@ flutter install -d <device_id>
 #### Android 배포
 
 ```bash
+cd frontend
+
 # 데이터 유지하며 배포 (권장)
 flutter run -d <device_id> --release
 
@@ -82,14 +153,15 @@ flutter install -d <device_id>
 
 ---
 
-## 프로젝트 구조 (Clean Architecture) {#project-structure}
+## Frontend 구조 (Clean Architecture) {#frontend-structure}
 
 ```
-lib/
+frontend/lib/
 ├── core/                    # 공통 유틸리티
 │   ├── audio/               # 오디오 엔진 (메트로놈, 녹음)
 │   ├── models/              # 공유 enum
 │   ├── router/              # GoRouter (도메인별 분할)
+│   ├── widgets/             # 공통 위젯
 │   └── theme/               # AppColors, AppTypography
 │
 ├── features/                # 🔑 기능별 모듈 (Clean Architecture)
@@ -115,17 +187,10 @@ lib/
 ├── models/                  # ⚠️ 레거시 (re-export only)
 ├── providers/               # ⚠️ 레거시 (re-export only)
 └── repositories/            # ⚠️ 레거시 (re-export only)
-
-docs/                        # 모든 프로젝트 문서
-├── architecture.md          # 🔑 상세 아키텍처 가이드
-├── refactoring_tasks.md     # 리팩토링 현황
-├── requirement/             # 요구사항
-├── proposal/                # 기획 제안서
-└── specs/                   # 기능 명세 (도메인별)
 ```
 
-> **⚠️ 중요**: `lib/models/`, `lib/providers/`, `lib/repositories/`는 레거시 위치입니다.
-> 새 코드는 반드시 `features/[domain]/` 아래에 작성하세요.
+> **⚠️ 중요**: `frontend/lib/models/`, `frontend/lib/providers/`, `frontend/lib/repositories/`는 레거시 위치입니다.
+> 새 코드는 반드시 `frontend/lib/features/[domain]/` 아래에 작성하세요.
 
 → [상세 아키텍처 가이드](docs/architecture.md)
 
@@ -150,7 +215,7 @@ docs/                        # 모든 프로젝트 문서
 사용자: "메트로놈 타이밍 버그 이슈 만들어줘"
 
 Claude 행동:
-1. lib/core/audio/metronome_engine.dart 등 관련 파일 검색
+1. frontend/lib/core/audio/metronome_engine.dart 등 관련 파일 검색
 2. 기존 메트로놈 관련 이슈/스펙 확인
 3. 상세 이슈 생성:
 
@@ -161,8 +226,8 @@ gh issue create \
 메트로놈 타이밍 관련 문제 발생
 
 ## 관련 파일
-- lib/core/audio/metronome_engine.dart
-- lib/features/practice/presentation/providers/metronome_provider.dart
+- frontend/lib/core/audio/metronome_engine.dart
+- frontend/lib/features/practice/presentation/providers/metronome_provider.dart
 
 ## 관련 스펙
 - docs/specs/metronome/
@@ -255,18 +320,18 @@ Refs #42"
 
 | 항목 | 위치 | 예시 |
 |------|------|------|
-| 모델/엔티티 | `features/[domain]/domain/entities/` | `student.dart` |
-| Provider | `features/[domain]/presentation/providers/` | `student_providers.dart` |
-| 화면 | `features/[domain]/presentation/screens/` | `student_detail_screen.dart` |
-| 위젯 | `features/[domain]/presentation/widgets/` | `student_card.dart` |
-| 라우트 | `core/router/routes/` | `student_routes.dart` |
-| 공유 타입 | `core/models/` | `shared_enums.dart` |
+| 모델/엔티티 | `frontend/lib/features/[domain]/domain/entities/` | `student.dart` |
+| Provider | `frontend/lib/features/[domain]/presentation/providers/` | `student_providers.dart` |
+| 화면 | `frontend/lib/features/[domain]/presentation/screens/` | `student_detail_screen.dart` |
+| 위젯 | `frontend/lib/features/[domain]/presentation/widgets/` | `student_card.dart` |
+| 라우트 | `frontend/lib/core/router/routes/` | `student_routes.dart` |
+| 공유 타입 | `frontend/lib/core/models/` | `shared_enums.dart` |
 
 ### 🔧 작업 유형별 가이드
 
 #### Provider 추가
 ```dart
-// 1. 파일 위치: features/[domain]/presentation/providers/
+// 1. 파일 위치: frontend/lib/features/[domain]/presentation/providers/
 // 2. @riverpod 어노테이션 사용
 @riverpod
 Future<List<Lesson>> allLessons(Ref ref) async {
@@ -275,31 +340,31 @@ Future<List<Lesson>> allLessons(Ref ref) async {
 }
 
 // 3. build_runner 실행
-// dart run build_runner build --delete-conflicting-outputs
+// cd frontend && dart run build_runner build --delete-conflicting-outputs
 ```
 
 #### 모델 추가
 ```dart
-// 1. 파일 위치: features/[domain]/domain/entities/
+// 1. 파일 위치: frontend/lib/features/[domain]/domain/entities/
 // 2. JSON 직렬화 필요시
 @JsonSerializable()
 class NewModel { ... }
 
-// 3. 하위 호환성 필요시 lib/models/에 re-export 추가
+// 3. 하위 호환성 필요시 frontend/lib/models/에 re-export 추가
 // export '../features/[domain]/domain/entities/new_model.dart';
 ```
 
 #### 화면 추가
 ```dart
-// 1. 파일 위치: features/[domain]/presentation/screens/
-// 2. 라우트 추가: core/router/routes/[domain]_routes.dart
-// 3. 라우트 상수 추가: core/router/app_routes.dart
+// 1. 파일 위치: frontend/lib/features/[domain]/presentation/screens/
+// 2. 라우트 추가: frontend/lib/core/router/routes/[domain]_routes.dart
+// 3. 라우트 상수 추가: frontend/lib/core/router/app_routes.dart
 ```
 
 ### ✅ 작업 완료 체크리스트
 
-1. [ ] `flutter analyze` - 경고 없음 확인
-2. [ ] `dart run build_runner build` - 코드 생성 (Provider, JSON)
+1. [ ] `cd frontend && flutter analyze` - 경고 없음 확인
+2. [ ] `cd frontend && dart run build_runner build` - 코드 생성 (Provider, JSON)
 3. [ ] 관련 docs/specs/ 문서 업데이트
 4. [ ] 커밋 메시지 한글로 작성 (Conventional Commits)
 
@@ -379,7 +444,7 @@ class NewModel { ... }
 
 > ⚠️ **중요**: 새 위젯 작성 전 반드시 기존 공통 위젯 확인
 
-**원칙**: `lib/core/widgets/`에 공통 위젯이 있으면 반드시 해당 위젯을 사용
+**원칙**: `frontend/lib/core/widgets/`에 공통 위젯이 있으면 반드시 해당 위젯을 사용
 
 | 상황 | Claude 행동 |
 |------|------------|
@@ -387,7 +452,7 @@ class NewModel { ... }
 | 공통 위젯 없음 | 구현 후 **공통화 가능 여부 검토** |
 | 공통 위젯 수정 필요 | 사용자 동의 후 **공통 위젯 확장** |
 
-**주요 공통 위젯** (`lib/core/widgets/`):
+**주요 공통 위젯** (`frontend/lib/core/widgets/`):
 
 | 위젯 | 경로 | 용도 |
 |------|------|------|
@@ -402,7 +467,7 @@ class NewModel { ... }
 
 **위젯 구현 전 체크리스트**:
 ```markdown
-- [ ] `lib/core/widgets/`에 유사한 위젯이 있는가?
+- [ ] `frontend/lib/core/widgets/`에 유사한 위젯이 있는가?
 - [ ] 있다면 해당 위젯을 사용했는가?
 - [ ] 새로 만든 위젯은 다른 곳에서도 재사용 가능한가? → 공통화 검토
 ```
@@ -478,7 +543,7 @@ Wrap(
 - 대형 위젯: 별도 파일로 분리 (500줄 이상 지양)
 
 ### 아키텍처
-- **새 코드는 features/ 아래에 작성** (레거시 위치 X)
+- **새 코드는 frontend/lib/features/ 아래에 작성** (레거시 위치 X)
 - Repository 패턴: 인터페이스 + Mock 분리
 - Provider: @riverpod 어노테이션 사용
 - Re-export 패턴으로 하위 호환성 유지
@@ -563,19 +628,19 @@ grep -r "@JsonSerializable" docs/specs/
 
 | 모델 | 위치 | 용도 |
 |------|------|------|
-| Student | `students/domain/entities/` | 학생 정보, 레벨 |
-| LessonClass | `students/domain/entities/` | 🆕 클래스/소속 그룹 (학원/개인) |
-| ClassMembership | `students/domain/entities/` | 🆕 학생-클래스 관계 (레슨 정보) |
-| LessonLocation | `students/domain/entities/` | 🆕 레슨 장소 |
-| Lesson | `lessons/domain/entities/` | 레슨 기록, 노트 |
-| Payment | `lessons/domain/entities/` | 결제, 입금확인 |
-| PracticeTask | `practice/domain/entities/` | 연습 과제 |
-| Recording | `practice/domain/entities/` | 녹음 파일 |
-| TunerSettings | `practice/domain/entities/` | 튜너 설정 |
-| TunerNote | `practice/domain/entities/` | 튜너 음표 감지 |
-| Parent | `parent_home/domain/entities/` | 학부모 정보 |
-| Invite | `profile/domain/entities/` | 초대 시스템 |
-| Notification | `notifications/domain/entities/` | 알림 |
+| Student | `frontend/lib/features/students/domain/entities/` | 학생 정보, 레벨 |
+| LessonClass | `frontend/lib/features/students/domain/entities/` | 🆕 클래스/소속 그룹 (학원/개인) |
+| ClassMembership | `frontend/lib/features/students/domain/entities/` | 🆕 학생-클래스 관계 (레슨 정보) |
+| LessonLocation | `frontend/lib/features/students/domain/entities/` | 🆕 레슨 장소 |
+| Lesson | `frontend/lib/features/lessons/domain/entities/` | 레슨 기록, 노트 |
+| Payment | `frontend/lib/features/lessons/domain/entities/` | 결제, 입금확인 |
+| PracticeTask | `frontend/lib/features/practice/domain/entities/` | 연습 과제 |
+| Recording | `frontend/lib/features/practice/domain/entities/` | 녹음 파일 |
+| TunerSettings | `frontend/lib/features/practice/domain/entities/` | 튜너 설정 |
+| TunerNote | `frontend/lib/features/practice/domain/entities/` | 튜너 음표 감지 |
+| Parent | `frontend/lib/features/parent_home/domain/entities/` | 학부모 정보 |
+| Invite | `frontend/lib/features/profile/domain/entities/` | 초대 시스템 |
+| Notification | `frontend/lib/features/notifications/domain/entities/` | 알림 |
 
 > 📐 **학생 클래스 시스템 설계**: [docs/specs/student/student_class_system.md](docs/specs/student/student_class_system.md) 참조
 
@@ -614,6 +679,7 @@ grep -r "@JsonSerializable" docs/specs/
 - 학생 레슨 탭 통합 데이터 (lessonsProvider 사용)
 - 레슨 장소 정보 표시 (학생 앱, 스튜디오/방문/온라인)
 - 위젯 분리 (StudentLessonCard, TrialBookingCard)
+- 홈/스케줄 탭 UX 재설계 (홈 대시보드화, 스케줄 뷰 선택 기능)
 
 ### 진행중
 - 스마트 녹음 트림 후 실제 재생 시간 표시 (Issue #7)
@@ -649,7 +715,7 @@ grep -r "@JsonSerializable" docs/specs/
 ### 관련 파일 위치
 
 ```
-lib/
+frontend/lib/
 ├── core/audio/
 │   ├── native_metronome_engine.dart     # Dart ↔ Native 통신
 │   ├── metronome_engine_interface.dart  # 엔진 인터페이스
@@ -660,7 +726,7 @@ lib/
 │       ├── providers/metronome_provider.dart    # 상태 관리
 │       └── widgets/metronome/                   # UI 위젯
 
-ios/Runner/
+frontend/ios/Runner/
 ├── AppDelegate.swift                    # 플러그인 등록
 ├── MetronomePlugin.swift                # Flutter 플러그인
 └── Audio/MetronomeAudioEngine.swift     # 네이티브 오디오 엔진
@@ -825,11 +891,11 @@ gh issue comment 55 --body "Phase 2 완료: BookingCreator, BookingNotifier 분�
 
 ```bash
 # iOS 빌드 에러
-cd ios && pod install && cd .. && flutter clean && flutter pub get
+cd frontend/ios && pod install && cd .. && flutter clean && flutter pub get
 
 # Android 빌드 에러
-cd android && ./gradlew clean && cd .. && flutter clean && flutter pub get
+cd frontend/android && ./gradlew clean && cd .. && flutter clean && flutter pub get
 
 # Provider 코드 생성 에러
-dart run build_runner build --delete-conflicting-outputs
+cd frontend && dart run build_runner build --delete-conflicting-outputs
 ```

@@ -1,10 +1,14 @@
 # 레슨 앱 아키텍처
 
-> 마지막 업데이트: 2026-01-24
+> 마지막 업데이트: 2026-02-05
 
 ## 개요
 
 레슨 앱은 **Clean Architecture** 원칙과 **Feature-based 구조**를 결합한 Flutter 앱입니다.
+
+> ⚠️ **프로젝트 구조 변경 (2026-02-02)**
+> Flutter 코드는 `frontend/` 폴더 아래에 위치합니다.
+> 문서의 `lib/` 경로는 `frontend/lib/`를 의미합니다.
 
 ---
 
@@ -35,7 +39,7 @@ feature/
 ## 폴더 구조
 
 ```
-lib/
+frontend/lib/
 ├── core/                    # 공통 유틸리티
 │   ├── audio/               # 오디오 엔진 (메트로놈, 녹음)
 │   ├── models/              # 공유 enum (AgeGroup, ConnectionStatus)
@@ -201,7 +205,7 @@ features/notifications/
 |------|------|------|
 | Feature UI 상태 | `features/[domain]/presentation/providers/` | lesson_providers.dart |
 | 공유 상태 | `features/auth/presentation/providers/` | user_role_provider.dart |
-| 레거시 (re-export) | `lib/providers/[domain]/` | → feature로 연결 |
+| 레거시 (re-export) | `frontend/lib/providers/[domain]/` | → feature로 연결 |
 
 ### Provider 네이밍 규칙
 ```
@@ -241,12 +245,12 @@ features/[domain]/domain/entities/[model].dart
 
 ### 공유 타입
 ```
-lib/core/models/shared_enums.dart  # AgeGroup, ConnectionStatus 등
+frontend/lib/core/models/shared_enums.dart  # AgeGroup, ConnectionStatus 등
 ```
 
 ### 레거시 모델 (re-export)
 ```dart
-// lib/models/lesson.dart
+// frontend/lib/models/lesson.dart
 export '../features/lessons/domain/entities/lesson.dart';
 ```
 
@@ -285,7 +289,7 @@ class MockLessonRepository implements LessonRepository {
 
 ### 중앙 라우터
 ```
-lib/core/router/
+frontend/lib/core/router/
 ├── app_router.dart      # ShellRoute + import 조합
 ├── app_routes.dart      # 라우트 경로 상수
 └── routes/
@@ -347,10 +351,10 @@ widgets/lesson_detail/
 기존 import를 유지하면서 새 위치로 이동:
 
 ```dart
-// lib/models/student.dart (기존 위치)
+// frontend/lib/models/student.dart (기존 위치)
 export '../features/students/domain/entities/student.dart';
 
-// lib/providers/lesson/lesson_providers.dart (기존 위치)
+// frontend/lib/providers/lesson/lesson_providers.dart (기존 위치)
 export '../../features/lessons/presentation/providers/lesson_providers.dart';
 ```
 
@@ -372,14 +376,14 @@ export '../../features/lessons/presentation/providers/lesson_providers.dart';
 5. core/router/routes에 라우트 추가
 
 ### Provider 추가 시
-1. `features/[domain]/presentation/providers/` 에 생성
+1. `frontend/lib/features/[domain]/presentation/providers/` 에 생성
 2. `@riverpod` 어노테이션 사용
-3. `dart run build_runner build` 실행
-4. 기존 호환성 필요시 `lib/providers/`에 re-export
+3. `cd frontend && dart run build_runner build` 실행
+4. 기존 호환성 필요시 `frontend/lib/providers/`에 re-export
 
 ### 모델 추가 시
-1. `features/[domain]/domain/entities/` 에 생성
-2. 공유 타입은 `lib/core/models/`
+1. `frontend/lib/features/[domain]/domain/entities/` 에 생성
+2. 공유 타입은 `frontend/lib/core/models/`
 3. JSON 직렬화 필요시 `@JsonSerializable()` 추가
 4. `dart run build_runner build` 실행
 
