@@ -10,8 +10,8 @@ import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
-import '../../../lessons/domain/entities/payment.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../../calendar/presentation/screens/calendar_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 import '../../../students/presentation/screens/students_tab.dart';
@@ -96,8 +96,8 @@ class _DashboardTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final lessonsAsync = ref.watch(lessonsProvider);
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
-    final paymentSummaryAsync = ref.watch(paymentSummaryProvider);
     final teacherId = ref.watch(currentUserIdProvider);
+    final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
     final pendingRequestsAsync =
         ref.watch(pendingLessonRequestCountProvider(teacherId));
     final pendingBookingsAsync =
@@ -120,7 +120,7 @@ class _DashboardTab extends ConsumerWidget {
       onRefresh: () async {
         ref.invalidate(lessonsProvider);
         ref.invalidate(lessonStatsProvider);
-        ref.invalidate(paymentSummaryProvider);
+        ref.invalidate(unpaidSummaryProvider(teacherId));
         ref.invalidate(pendingLessonRequestCountProvider(teacherId));
         ref.invalidate(pendingBookingsCountProvider(teacherId));
       },
@@ -139,7 +139,7 @@ class _DashboardTab extends ConsumerWidget {
             _buildStatsRow(
               context,
               todayLessons,
-              paymentSummaryAsync,
+              unpaidSummaryAsync,
               lessonStatsAsync,
             ),
 
@@ -150,7 +150,7 @@ class _DashboardTab extends ConsumerWidget {
               context,
               pendingRequestsAsync,
               pendingBookingsAsync,
-              paymentSummaryAsync,
+              unpaidSummaryAsync,
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -206,7 +206,7 @@ class _DashboardTab extends ConsumerWidget {
   Widget _buildStatsRow(
     BuildContext context,
     AsyncValue<List<Lesson>> todayLessons,
-    AsyncValue<PaymentSummary> paymentSummaryAsync,
+    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
     return StatCardRow(
@@ -231,18 +231,23 @@ class _DashboardTab extends ConsumerWidget {
             color: AppColors.primary,
           ),
         ),
-        // Unpaid amount
-        paymentSummaryAsync.when(
-          data: (summary) => StatCard(
-            title: '미수금',
-            value: summary.formattedTotalPending,
-            subtitle: summary.unpaidStudents > 0 ? '${summary.unpaidStudents}명' : null,
-            color: summary.unpaidStudents > 0
-                ? AppColors.warning
-                : AppColors.success,
-            icon: Icons.account_balance_wallet_outlined,
-            onTap: () => context.push(AppRoutes.paymentManagement),
-          ),
+        // Unpaid amount (from Subscription)
+        unpaidSummaryAsync.when(
+          data: (summary) {
+            final formattedAmount = summary.totalAmount >= 10000
+                ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
+                : '${summary.totalAmount}원';
+            return StatCard(
+              title: '미수금',
+              value: summary.totalAmount > 0 ? formattedAmount : '0원',
+              subtitle: summary.studentCount > 0 ? '${summary.studentCount}명' : null,
+              color: summary.studentCount > 0
+                  ? AppColors.warning
+                  : AppColors.success,
+              icon: Icons.account_balance_wallet_outlined,
+              onTap: () => context.push(AppRoutes.paymentManagement),
+            );
+          },
           loading: () => StatCard(
             title: '미수금',
             value: '-',
@@ -283,11 +288,11 @@ class _DashboardTab extends ConsumerWidget {
     BuildContext context,
     AsyncValue<int> pendingRequestsAsync,
     AsyncValue<int> pendingBookingsAsync,
-    AsyncValue<PaymentSummary> paymentSummaryAsync,
+    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
   ) {
     final pendingRequests = pendingRequestsAsync.valueOrNull ?? 0;
     final pendingBookings = pendingBookingsAsync.valueOrNull ?? 0;
-    final unpaidStudents = paymentSummaryAsync.valueOrNull?.unpaidStudents ?? 0;
+    final unpaidStudents = unpaidSummaryAsync.valueOrNull?.studentCount ?? 0;
 
     final totalUrgent = pendingRequests + pendingBookings + (unpaidStudents > 0 ? 1 : 0);
 

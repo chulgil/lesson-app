@@ -255,32 +255,40 @@
 
 ## 미결제 처리
 
-### UnpaidPolicy
+> **2026-02-06 변경**: UnpaidPolicy 삭제, Subscription.paymentConfirmed 기반 단순 모델로 변경.
+> 상세: [세션 로그](../../session/2026-02-06_payment_redesign.md)
 
-| 값 | 설명 |
-|----|------|
-| `allowLesson` | 레슨 허용 (알림만) |
-| `blockLesson` | 레슨 차단 |
-| `reminderOnly` | 알림만 |
+### 미수금 모델 (통합 후)
 
-### 처리 플로우
+미수금 = 활성 수강권(`active`) 중 `paymentConfirmed == false`인 것.
+
+| 경로 | paymentConfirmed | 미수금 |
+|------|:----------------:|:------:|
+| 선불 (Proposal) | 항상 true | X |
+| 후불 (직접 발급, "입금 확인됨") | true | X |
+| 후불 (직접 발급, "나중에 결제") | false | **O** |
+
+### ~~UnpaidPolicy~~ (삭제됨)
+
+~~allowLesson, blockLesson, reminderOnly~~ — 미구현 상태로 삭제.
+D+3/5/7 자동 리마인더도 삭제 (푸시 알림 인프라 미구현).
+
+### 처리 플로우 (단순화)
 
 ```
-청구서 발행 (D-Day)
+선생님이 "나중에 결제"로 수강권 발급
       │
-리마인더 발송 (D+3, D+5, D+7)
+   paymentConfirmed: false
       │
-납부 기한 도래
+   홈 대시보드 미수금 StatCard에 표시
       │
-┌─────────────────────────────┐
-│ 정책별 처리                  │
-├─────────────────────────────┤
-│ allowLesson: 알림만          │
-│ blockLesson: 즉시 차단       │
-│ reminderOnly: 알림만         │
-└─────────────────────────────┘
+   선생님이 오프라인에서 입금 확인
       │
-(차단 시) 결제 완료 → 차단 해제
+   미수금 목록 → [입금확인] 탭
+      │
+   paymentConfirmed: true
+      │
+   미수금 해소
 ```
 
 ---

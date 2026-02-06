@@ -1,11 +1,36 @@
 # Payment 엔티티
 
-> 마지막 업데이트: 2026-01-24
+> 마지막 업데이트: 2026-02-06
 > 관련 스펙: [payment_unified_spec.md](../../specs/payment/payment_unified_spec.md)
+>
+> **⚠️ DEPRECATED**: Payment 엔티티는 레거시입니다.
+> 결제 정보는 `Subscription` 엔티티에 통합되었습니다.
+> 상세: [Payment→Subscription 통합 세션 로그](../../session/2026-02-06_payment_redesign.md)
 
 ## 개요
 
 결제 및 청구서 관련 엔티티입니다. 2단계 입금확인 시스템을 지원합니다.
+
+### Subscription 결제 필드 (신규, HiveField 21-27)
+
+| Field | Type | 설명 |
+|-------|------|------|
+| `paymentConfirmed` | `bool` | false = 미수금 |
+| `paymentMethod` | `SubscriptionPaymentMethod?` | 현금/계좌이체/카드/기타 |
+| `paidAt` | `DateTime?` | 학생 입금완료 시점 |
+| `paymentConfirmedAt` | `DateTime?` | 선생님 확인 시점 |
+| `discountAmount` | `int?` | 할인 금액 |
+| `discountReason` | `String?` | 할인 사유 |
+| `originalAmount` | `int?` | 할인 전 원가 |
+
+### 삭제된 설계
+
+| 대상 | 이유 |
+|------|------|
+| `UnpaidPolicy` enum | 미구현, 불필요한 복잡도 |
+| `PaymentStatus.overdue` 자동 전환 | 백엔드 없이 구현 불가 |
+| D+3/5/7 리마인더 설계 | 푸시 알림 미구현 |
+| `TeacherPaymentConfig.unpaidPolicy/graceDays/reminderDays` | 위 삭제에 따라 불필요 |
 
 ---
 
