@@ -7,6 +7,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
+import '../../domain/entities/grouped_students.dart';
+import '../../domain/entities/student_with_membership.dart';
+import '../providers/grouped_students_provider.dart';
 import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management
@@ -20,7 +23,6 @@ class StudentsTab extends ConsumerStatefulWidget {
 class _StudentsTabState extends ConsumerState<StudentsTab> {
   final _searchController = TextEditingController();
   StudentFilter _currentFilter = StudentFilter.all;
-  ClassTypeFilter _classTypeFilter = ClassTypeFilter.all;
 
   @override
   void dispose() {
@@ -30,7 +32,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final studentsAsync = ref.watch(studentsNotifierProvider);
+    final groupedAsync =
+        ref.watch(filteredGroupedStudentsProvider('teacher_1'));
 
     return Column(
       children: [
@@ -46,14 +49,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         const SizedBox(height: AppSpacing.space2),
 
         // Student count and sort
-        _buildCountAndSort(studentsAsync),
+        _buildCountAndSort(groupedAsync),
 
         const SizedBox(height: AppSpacing.space2),
 
-        // Student list
+        // Grouped student list
         Expanded(
-          child: studentsAsync.when(
-            data: (students) => _buildStudentList(students),
+          child: groupedAsync.when(
+            data: (groups) => _buildGroupedStudentList(groups),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, stack) => _buildErrorState(error),
           ),
@@ -62,38 +65,32 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
-  List<Student> _filterStudents(List<Student> students) {
-    final query = ref.watch(studentSearchQueryProvider).toLowerCase();
-    var filtered = students;
+  List<StudentGroup> _applyPracticeFilter(List<StudentGroup> groups) {
+    if (_currentFilter == StudentFilter.all) return groups;
 
-    // Apply search filter
-    if (query.isNotEmpty) {
-      filtered = filtered
-          .where((s) =>
-              s.name.toLowerCase().contains(query) ||
-              s.instrument.toLowerCase().contains(query))
-          .toList();
-    }
-
-    // Apply status filter
-    if (_currentFilter != StudentFilter.all) {
-      filtered = filtered.where((s) {
-        switch (_currentFilter) {
-          case StudentFilter.all:
-            return true;
-          case StudentFilter.good:
-            return s.practiceStatus == PracticeStatus.good;
-          case StudentFilter.normal:
-            return s.practiceStatus == PracticeStatus.normal;
-          case StudentFilter.poor:
-            return s.practiceStatus == PracticeStatus.poor;
-          case StudentFilter.paused:
-            return s.practiceStatus == PracticeStatus.paused;
-        }
-      }).toList();
-    }
-
-    return filtered;
+    return groups
+        .map((group) {
+          final filtered = group.students.where((swm) {
+            switch (_currentFilter) {
+              case StudentFilter.all:
+                return true;
+              case StudentFilter.good:
+                return swm.practiceStatus == PracticeStatus.good;
+              case StudentFilter.normal:
+                return swm.practiceStatus == PracticeStatus.normal;
+              case StudentFilter.poor:
+                return swm.practiceStatus == PracticeStatus.poor;
+              case StudentFilter.paused:
+                return swm.practiceStatus == PracticeStatus.paused;
+            }
+          }).toList();
+          return StudentGroup(
+            lessonClass: group.lessonClass,
+            students: filtered,
+          );
+        })
+        .where((group) => group.students.isNotEmpty)
+        .toList();
   }
 
   Widget _buildHeader() {
@@ -162,6 +159,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   }
 
   Widget _buildFilterChips() {
+    final classTypeFilter = ref.watch(classTypeFilterNotifierProvider);
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
@@ -170,9 +169,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       ),
       child: Row(
         children: [
-          // Class type filters (학원/개인)
+          // Class type filters
           ...ClassTypeFilter.values.map((filter) {
-            final isSelected = _classTypeFilter == filter;
+            final isSelected = classTypeFilter == filter;
             return Padding(
               padding: const EdgeInsets.only(right: AppSpacing.space2),
               child: FilterChip(
@@ -183,7 +182,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                         : null,
                 label: Text(filter.label),
                 selected: isSelected,
-                onSelected: (_) => setState(() => _classTypeFilter = filter),
+                onSelected: (_) => ref
+                    .read(classTypeFilterNotifierProvider.notifier)
+                    .set(filter),
                 backgroundColor: AppColors.surfaceLight,
                 selectedColor: AppColors.info.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.info,
@@ -237,9 +238,12 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
-  Widget _buildCountAndSort(AsyncValue<List<Student>> studentsAsync) {
-    final count = studentsAsync.when(
-      data: (students) => _filterStudents(students).length,
+  Widget _buildCountAndSort(AsyncValue<List<StudentGroup>> groupedAsync) {
+    final count = groupedAsync.when(
+      data: (groups) {
+        final filtered = _applyPracticeFilter(groups);
+        return filtered.fold<int>(0, (sum, g) => sum + g.count);
+      },
       loading: () => 0,
       error: (_, __) => 0,
     );
@@ -273,8 +277,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
-  Widget _buildStudentList(List<Student> students) {
-    final filtered = _filterStudents(students);
+  Widget _buildGroupedStudentList(List<StudentGroup> groups) {
+    final filtered = _applyPracticeFilter(groups);
 
     if (filtered.isEmpty) {
       return _buildEmptyState();
@@ -282,14 +286,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(studentsNotifierProvider);
+        ref.invalidate(groupedStudentsProvider('teacher_1'));
       },
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: ListView.builder(
+        padding:
+            const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
         itemCount: filtered.length,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
         itemBuilder: (context, index) {
-          return _StudentCard(student: filtered[index]);
+          return _ClassGroupSection(group: filtered[index]);
         },
       ),
     );
@@ -353,7 +357,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           const SizedBox(height: AppSpacing.space6),
           OutlinedButton.icon(
             onPressed: () {
-              ref.invalidate(studentsNotifierProvider);
+              ref.invalidate(groupedStudentsProvider('teacher_1'));
             },
             icon: const Icon(Icons.refresh),
             label: const Text('다시 시도'),
@@ -375,13 +379,50 @@ enum StudentFilter {
   const StudentFilter(this.label);
 }
 
-class _StudentCard extends ConsumerWidget {
-  final Student student;
+/// Section header + student cards for a single class group.
+class _ClassGroupSection extends StatelessWidget {
+  final StudentGroup group;
 
-  const _StudentCard({required this.student});
+  const _ClassGroupSection({required this.group});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header
+        Padding(
+          padding: const EdgeInsets.only(
+            top: AppSpacing.space4,
+            bottom: AppSpacing.space2,
+          ),
+          child: Text(
+            '${group.icon} ${group.title} (${group.count})',
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
+        ),
+        // Student cards
+        ...group.students.map((swm) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: _StudentCard(studentWithMembership: swm),
+            )),
+      ],
+    );
+  }
+}
+
+class _StudentCard extends ConsumerWidget {
+  final StudentWithMembership studentWithMembership;
+
+  const _StudentCard({required this.studentWithMembership});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final swm = studentWithMembership;
+
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -396,7 +437,7 @@ class _StudentCard extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push('/students/${student.id}');
+          context.push('/students/${swm.studentId}');
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
@@ -411,7 +452,7 @@ class _StudentCard extends ConsumerWidget {
                 radius: 20,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 child: Text(
-                  student.initial,
+                  swm.initial,
                   style: AppTypography.bodyLarge.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,
@@ -426,18 +467,18 @@ class _StudentCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1: Name · Instrument (레슨 카드와 동일 패턴)
+                    // Row 1: Name · Instrument
                     Text(
-                      '${student.name} · ${student.instrument}',
+                      '${swm.name} · ${swm.instrument}',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    // Row 2: Schedule (레슨 카드의 곡명 위치와 동일)
+                    // Row 2: Schedule
                     Text(
-                      student.lessonSchedule ?? '스케줄 미등록',
+                      swm.lessonSchedule ?? '스케줄 미등록',
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),
@@ -448,10 +489,11 @@ class _StudentCard extends ConsumerWidget {
                 ),
               ),
 
-              // Status section (fixed width, 레슨 카드와 동일)
+              // Status section (fixed width)
               SizedBox(
                 width: 56,
-                child: StudentSubscriptionMiniBadge(studentId: student.id),
+                child:
+                    StudentSubscriptionMiniBadge(studentId: swm.studentId),
               ),
 
               const SizedBox(width: AppSpacing.space1),

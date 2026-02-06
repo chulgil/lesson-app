@@ -1,0 +1,73 @@
+import 'package:go_router/go_router.dart';
+
+import '../app_routes.dart';
+import '../../../features/subscription/presentation/screens/subscription_list_screen.dart';
+import '../../../features/subscription/presentation/screens/subscription_detail_screen.dart';
+import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
+import '../../../features/subscription/presentation/screens/lesson_policy_screen.dart';
+import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
+
+/// Subscription-related routes.
+/// NOTE: More specific routes (like /issue, /policy) must come BEFORE parameterized routes (like /:id)
+/// to prevent GoRouter from matching them as an ID parameter.
+List<RouteBase> subscriptionRoutes = [
+  GoRoute(
+    path: AppRoutes.subscriptions,
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'];
+      return SubscriptionListScreen(studentId: studentId);
+    },
+  ),
+  // Issue route must come before detail route
+  GoRoute(
+    path: AppRoutes.issueSubscription,
+    builder: (context, state) {
+      // Support both single studentId and multiple studentIds
+      final studentIdsParam = state.uri.queryParameters['studentIds'];
+      final studentIdParam = state.uri.queryParameters['studentId'];
+      final membershipId = state.uri.queryParameters['membershipId'];
+
+      // Parse studentIds from comma-separated string or single studentId
+      final List<String> studentIds;
+      if (studentIdsParam != null && studentIdsParam.isNotEmpty) {
+        studentIds = studentIdsParam.split(',').where((s) => s.isNotEmpty).toList();
+      } else if (studentIdParam != null && studentIdParam.isNotEmpty) {
+        studentIds = [studentIdParam];
+      } else {
+        studentIds = [];
+      }
+
+      return IssueSubscriptionScreen(
+        studentIds: studentIds,
+        membershipId: membershipId,
+      );
+    },
+  ),
+  // Policy route must come before detail route
+  GoRoute(
+    path: AppRoutes.lessonPolicy,
+    builder: (context, state) {
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final lessonClassId = state.uri.queryParameters['lessonClassId'];
+      return LessonPolicyScreen(
+        teacherId: teacherId,
+        lessonClassId: lessonClassId,
+      );
+    },
+  ),
+  GoRoute(
+    path: AppRoutes.subscriptionDetail,
+    builder: (context, state) {
+      final id = state.pathParameters['id']!;
+      return SubscriptionDetailScreen(subscriptionId: id);
+    },
+  ),
+  // Proposal detail route
+  GoRoute(
+    path: AppRoutes.proposalDetail,
+    builder: (context, state) {
+      final id = state.pathParameters['id']!;
+      return ProposalDetailScreen(proposalId: id);
+    },
+  ),
+];

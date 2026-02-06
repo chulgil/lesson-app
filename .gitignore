@@ -1,4 +1,10 @@
+# =============================================================================
+# .gitignore - lesson-app (Monorepo: docs + backend + frontend)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
 # macOS
+# -----------------------------------------------------------------------------
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -6,75 +12,114 @@
 .Spotlight-V100
 .Trashes
 
-# Flutter/Dart
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-build/
-*.dart_tool
-*.flutter-plugins
-*.flutter-plugins-dependencies
+# -----------------------------------------------------------------------------
+# Frontend (Flutter/Dart)
+# -----------------------------------------------------------------------------
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/.metadata
 
 # Android
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.*
-**/android/key.properties
+frontend/android/**/gradle-wrapper.jar
+frontend/android/.gradle
+frontend/android/captures/
+frontend/android/gradlew
+frontend/android/gradlew.bat
+frontend/android/local.properties
+frontend/android/**/GeneratedPluginRegistrant.*
+frontend/android/key.properties
 *.jks
 
 # iOS/XCode
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/.last_build_id
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Flutter.podspec
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/ephemeral
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
+frontend/ios/**/*.mode1v3
+frontend/ios/**/*.mode2v3
+frontend/ios/**/*.moved-aside
+frontend/ios/**/*.pbxuser
+frontend/ios/**/*.perspectivev3
+frontend/ios/**/*sync/
+frontend/ios/**/.sconsign.dblite
+frontend/ios/**/.tags*
+frontend/ios/**/.vagrant/
+frontend/ios/**/DerivedData/
+frontend/ios/**/Icon?
+frontend/ios/**/Pods/
+frontend/ios/**/.symlinks/
+frontend/ios/**/profile
+frontend/ios/**/xcuserdata
+frontend/ios/.generated/
+frontend/ios/Flutter/.last_build_id
+frontend/ios/Flutter/App.framework
+frontend/ios/Flutter/Flutter.framework
+frontend/ios/Flutter/Flutter.podspec
+frontend/ios/Flutter/Generated.xcconfig
+frontend/ios/Flutter/ephemeral
+frontend/ios/Flutter/app.flx
+frontend/ios/Flutter/app.zip
+frontend/ios/Flutter/flutter_assets/
+frontend/ios/ServiceDefinitions.json
+frontend/ios/Runner/GeneratedPluginRegistrant.*
 
+# macOS
+frontend/macos/Flutter/GeneratedPluginRegistrant.swift
+frontend/macos/Flutter/ephemeral
+
+# -----------------------------------------------------------------------------
+# Backend (Python/FastAPI)
+# -----------------------------------------------------------------------------
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/**/*.pyc
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+backend/.coverage
+backend/htmlcov/
+backend/*.egg-info/
+backend/dist/
+backend/build/
+
+# Environment files
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# -----------------------------------------------------------------------------
 # IDE
+# -----------------------------------------------------------------------------
 .idea/
 .vscode/
 *.iml
-*.log
 
-# Test
+# -----------------------------------------------------------------------------
+# Test & Coverage
+# -----------------------------------------------------------------------------
 coverage/
+htmlcov/
+*.lcov
 
-# Miscellaneous
-*.class
-*.lock
+# -----------------------------------------------------------------------------
+# Logs
+# -----------------------------------------------------------------------------
 *.log
-*.pyc
+frontend/logs/
+
+# -----------------------------------------------------------------------------
+# Miscellaneous
+# -----------------------------------------------------------------------------
+*.class
 *.swp
 .atom/
 .buildlog/
 .history
 .svn/
+
+# Claude local settings
 .claude/settings.local.json
