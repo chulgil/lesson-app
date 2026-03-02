@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
@@ -123,10 +124,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                 color: AppColors.error.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.error_outline,
-                color: AppColors.error,
-              ),
+              child: const Icon(Icons.error_outline, color: AppColors.error),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -150,9 +148,12 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.textSecondaryLight.withValues(alpha: 0.2),
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSmall),
+                            color: AppColors.textSecondaryLight.withValues(
+                              alpha: 0.2,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             '${widget.recording.bpm} BPM',
@@ -197,29 +198,28 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
   void _showDeleteConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('녹음 기록 삭제'),
-        content: const Text(
-          '이 녹음 기록을 삭제하시겠습니까?\n'
-          '(파일이 이미 없으므로 기록만 삭제됩니다)',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              widget.onDelete();
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('녹음 기록 삭제'),
+            content: const Text(
+              '이 녹음 기록을 삭제하시겠습니까?\n'
+              '(파일이 이미 없으므로 기록만 삭제됩니다)',
             ),
-            child: const Text('삭제'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  widget.onDelete();
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -239,10 +239,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.play_arrow,
-                  color: AppColors.primary,
-                ),
+                child: const Icon(Icons.play_arrow, color: AppColors.primary),
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -266,8 +263,9 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius:
-                                  BorderRadius.circular(AppSpacing.radiusSmall),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
+                              ),
                             ),
                             child: Text(
                               '${widget.recording.bpm} BPM',
@@ -287,8 +285,9 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.success,
-                              borderRadius:
-                                  BorderRadius.circular(AppSpacing.radiusSmall),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
+                              ),
                             ),
                             child: Text(
                               '대표',
@@ -315,39 +314,72 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                 onSelected: (value) {
                   if (value == 'representative') {
                     widget.onSetRepresentative();
+                  } else if (value == 'share_external') {
+                    _shareToExternal(context, widget.recording.filePath);
                   } else if (value == 'delete') {
                     widget.onDelete();
                   }
                 },
-                itemBuilder: (context) => [
-                  if (!widget.recording.isRepresentative)
-                    const PopupMenuItem(
-                      value: 'representative',
-                      child: Row(
-                        children: [
-                          Icon(Icons.star_outline, size: 20),
-                          SizedBox(width: 8),
-                          Text('대표 녹음으로 설정'),
-                        ],
+                itemBuilder:
+                    (context) => [
+                      if (!widget.recording.isRepresentative)
+                        const PopupMenuItem(
+                          value: 'representative',
+                          child: Row(
+                            children: [
+                              Icon(Icons.star_outline, size: 20),
+                              SizedBox(width: 8),
+                              Text('대표 녹음으로 설정'),
+                            ],
+                          ),
+                        ),
+                      const PopupMenuItem(
+                        value: 'share_external',
+                        child: Row(
+                          children: [
+                            Icon(Icons.share, size: 20),
+                            SizedBox(width: 8),
+                            Text('외부 앱 공유'),
+                          ],
+                        ),
                       ),
-                    ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, size: 20, color: AppColors.error),
-                        SizedBox(width: 8),
-                        Text('삭제', style: TextStyle(color: AppColors.error)),
-                      ],
-                    ),
-                  ),
-                ],
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete,
+                              size: 20,
+                              color: AppColors.error,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              '삭제',
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _shareToExternal(BuildContext context, String filePath) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+      }
+      return;
+    }
+    await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
   }
 
   String _formatDate(DateTime date) {

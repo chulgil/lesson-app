@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -50,16 +52,18 @@ class RecordingPlayerSheet extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => RecordingPlayerSheet(
-        recording: recording,
-        repertoireId: repertoireId,
-        studentId: studentId,
-      ),
+      builder:
+          (context) => RecordingPlayerSheet(
+            recording: recording,
+            repertoireId: repertoireId,
+            studentId: studentId,
+          ),
     );
   }
 
   @override
-  ConsumerState<RecordingPlayerSheet> createState() => _RecordingPlayerSheetState();
+  ConsumerState<RecordingPlayerSheet> createState() =>
+      _RecordingPlayerSheetState();
 }
 
 class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
@@ -112,7 +116,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
     _positionSub = _player.positionStream.listen((rawPos) {
       // Adjust _trimEnd based on actual file duration (Issue #16 fix)
       // This is needed because metadata's totalDuration may differ from actual file duration
-      if (!_trimAdjusted && _metadataTotalDuration > Duration.zero && _player.duration > Duration.zero) {
+      if (!_trimAdjusted &&
+          _metadataTotalDuration > Duration.zero &&
+          _player.duration > Duration.zero) {
         final actualDuration = _player.duration;
         final durationDiff = actualDuration - _metadataTotalDuration;
         if (durationDiff.abs() > const Duration(milliseconds: 200)) {
@@ -154,8 +160,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
   /// Load trim metadata from companion .trim file.
   Future<void> _loadTrimMetadata() async {
     try {
-      final metadata = await AudioTrimmerService.instance
-          .readTrimMetadata(widget.recording.localPath);
+      final metadata = await AudioTrimmerService.instance.readTrimMetadata(
+        widget.recording.localPath,
+      );
       if (metadata != null && metadata.hasTrimming) {
         _trimOffset = metadata.contentStart;
         _trimEnd = metadata.contentEnd;
@@ -291,9 +298,13 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
   @override
   Widget build(BuildContext context) {
     // Clamp progress to 0.0-1.0 range to prevent overflow
-    final progress = _duration.inMilliseconds > 0
-        ? (_position.inMilliseconds / _duration.inMilliseconds).clamp(0.0, 1.0)
-        : 0.0;
+    final progress =
+        _duration.inMilliseconds > 0
+            ? (_position.inMilliseconds / _duration.inMilliseconds).clamp(
+              0.0,
+              1.0,
+            )
+            : 0.0;
 
     return Container(
       decoration: const BoxDecoration(
@@ -319,7 +330,8 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
 
               // Title
               Text(
-                widget.recording.title ?? _formatDate(widget.recording.recordedAt),
+                widget.recording.title ??
+                    _formatDate(widget.recording.recordedAt),
                 style: AppTypography.bodyLarge.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -343,11 +355,15 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                 children: [
                   Text(
                     _formatDuration(_position),
-                    style: AppTypography.bodySmall.copyWith(color: Colors.grey[400]),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: Colors.grey[400],
+                    ),
                   ),
                   Text(
                     _formatDuration(_duration),
-                    style: AppTypography.bodySmall.copyWith(color: Colors.grey[400]),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: Colors.grey[400],
+                    ),
                   ),
                 ],
               ),
@@ -373,9 +389,10 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                         width: _abLoop.isActive ? 16 : 8,
                         height: 2,
                         decoration: BoxDecoration(
-                          color: _abLoop.isActive
-                              ? AppColors.primary
-                              : Colors.grey[700],
+                          color:
+                              _abLoop.isActive
+                                  ? AppColors.primary
+                                  : Colors.grey[700],
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
@@ -393,17 +410,24 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                   // Speed control
                   PopupMenuButton<PlaybackSpeed>(
                     onSelected: _changeSpeed,
-                    itemBuilder: (context) => PlaybackSpeed.values
-                        .map((s) => PopupMenuItem(
-                              value: s,
-                              child: Text(
-                                s.label,
-                                style: TextStyle(
-                                  fontWeight: s == _speed ? FontWeight.bold : FontWeight.normal,
-                                ),
-                              ),
-                            ))
-                        .toList(),
+                    itemBuilder:
+                        (context) =>
+                            PlaybackSpeed.values
+                                .map(
+                                  (s) => PopupMenuItem(
+                                    value: s,
+                                    child: Text(
+                                      s.label,
+                                      style: TextStyle(
+                                        fontWeight:
+                                            s == _speed
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
                     child: Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
@@ -419,6 +443,27 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.space2),
+
+                  // Share button
+                  GestureDetector(
+                    onTap: () => _shareToExternal(context),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                        vertical: AppSpacing.space2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.ios_share,
+                        size: 20,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -449,6 +494,21 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _shareToExternal(BuildContext context) async {
+    final file = File(widget.recording.localPath);
+    if (!await file.exists()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+      }
+      return;
+    }
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(widget.recording.localPath)]),
     );
   }
 
@@ -500,12 +560,13 @@ class _ABButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(8),
-          border: isSet
-              ? null
-              : Border.all(
-                  color: isEnabled ? Colors.grey[600]! : Colors.grey[800]!,
-                  width: 1,
-                ),
+          border:
+              isSet
+                  ? null
+                  : Border.all(
+                    color: isEnabled ? Colors.grey[600]! : Colors.grey[800]!,
+                    width: 1,
+                  ),
         ),
         alignment: Alignment.center,
         child: Text(

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -69,8 +71,12 @@ class _PracticeRecordingScreenState
           ),
         );
         ref
-            .read(recordingNotifierProvider(widget.repertoireId, widget.studentId)
-                .notifier)
+            .read(
+              recordingNotifierProvider(
+                widget.repertoireId,
+                widget.studentId,
+              ).notifier,
+            )
             .clearRecoveryMessage();
       });
     }
@@ -88,53 +94,57 @@ class _PracticeRecordingScreenState
             ),
         ],
       ),
-      body: state.isLoading
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  if (state.isRecovering) ...[
-                    SizedBox(height: AppSpacing.space3),
-                    Text(
-                      '녹음 파일 복구 중...',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+      body:
+          state.isLoading
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    if (state.isRecovering) ...[
+                      SizedBox(height: AppSpacing.space3),
+                      Text(
+                        '녹음 파일 복구 중...',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
+                ),
+              )
+              : Column(
+                children: [
+                  // Recording section
+                  _RecordingSection(
+                    isRecording: state.isRecording,
+                    isPaused: state.isPaused,
+                    duration: _recordingDuration,
+                    onStart: () => _startRecording(),
+                    onStop: () => _stopRecording(),
+                    onCancel: () => _cancelRecording(),
+                  ),
+
+                  const Divider(),
+
+                  // Recordings list
+                  Expanded(
+                    child:
+                        state.recordings.isEmpty
+                            ? _EmptyRecordingsView()
+                            : _RecordingsList(
+                              recordings: state.recordings,
+                              onPlay:
+                                  (recording) => _openPlayerSheet(recording),
+                              onDelete: (id) => _deleteRecording(context, id),
+                              onSetRepresentative:
+                                  (id) => _setRepresentative(id),
+                              repertoireId: widget.repertoireId,
+                              studentId: widget.studentId,
+                            ),
+                  ),
                 ],
               ),
-            )
-          : Column(
-              children: [
-                // Recording section
-                _RecordingSection(
-                  isRecording: state.isRecording,
-                  isPaused: state.isPaused,
-                  duration: _recordingDuration,
-                  onStart: () => _startRecording(),
-                  onStop: () => _stopRecording(),
-                  onCancel: () => _cancelRecording(),
-                ),
-
-                const Divider(),
-
-                // Recordings list
-                Expanded(
-                  child: state.recordings.isEmpty
-                      ? _EmptyRecordingsView()
-                      : _RecordingsList(
-                          recordings: state.recordings,
-                          onPlay: (recording) => _openPlayerSheet(recording),
-                          onDelete: (id) => _deleteRecording(context, id),
-                          onSetRepresentative: (id) => _setRepresentative(id),
-                          repertoireId: widget.repertoireId,
-                          studentId: widget.studentId,
-                        ),
-                ),
-              ],
-            ),
     );
   }
 
@@ -179,29 +189,36 @@ class _PracticeRecordingScreenState
     );
   }
 
-  Future<void> _deleteRecording(BuildContext context, String recordingId) async {
+  Future<void> _deleteRecording(
+    BuildContext context,
+    String recordingId,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('녹음 삭제'),
-        content: const Text('이 녹음을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('녹음 삭제'),
+            content: const Text('이 녹음을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
       final notifier = ref.read(
-        recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+        recordingNotifierProvider(
+          widget.repertoireId,
+          widget.studentId,
+        ).notifier,
       );
       await notifier.deleteRecording(recordingId);
     }
@@ -217,31 +234,35 @@ class _PracticeRecordingScreenState
   Future<void> _shareWithTeacher() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('선생님께 공유'),
-        content: const Text('대표 녹음을 선생님께 공유하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('취소'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('선생님께 공유'),
+            content: const Text('대표 녹음을 선생님께 공유하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('공유'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('공유'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
       final notifier = ref.read(
-        recordingNotifierProvider(widget.repertoireId, widget.studentId).notifier,
+        recordingNotifierProvider(
+          widget.repertoireId,
+          widget.studentId,
+        ).notifier,
       );
       await notifier.shareWithTeacher();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('선생님께 공유되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('선생님께 공유되었습니다')));
     }
   }
 }
@@ -300,7 +321,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
     _recordingStartTime = DateTime.now();
 
     final recorder = ref.read(audioRecorderServiceProvider);
-    _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((amplitude) {
+    _micCheckSubscription = recorder.normalizedAmplitudeStream.listen((
+      amplitude,
+    ) {
       final now = DateTime.now();
 
       // Strong input detected (amplitude >= quiet threshold)
@@ -361,13 +384,15 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
 
   @override
   Widget build(BuildContext context) {
-    final waveformStyle = widget.isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
+    final waveformStyle =
+        widget.isRecording ? WaveformStyle.amplitude : WaveformStyle.wave;
     final waveformIsActive = widget.isRecording && !widget.isPaused;
 
     // Get amplitude stream only when recording - this ensures fresh stream each time
-    final amplitudeStream = widget.isRecording
-        ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
-        : null;
+    final amplitudeStream =
+        widget.isRecording
+            ? ref.read(audioRecorderServiceProvider).normalizedAmplitudeStream
+            : null;
 
     // Check microphone permission
     final micPermissionAsync = ref.watch(microphonePermissionProvider);
@@ -414,7 +439,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
           Container(
             height: 100,
             decoration: BoxDecoration(
-              color: widget.isRecording ? AppColors.primary : AppColors.surfaceLight,
+              color:
+                  widget.isRecording
+                      ? AppColors.primary
+                      : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(16),
             ),
             child: ClipRRect(
@@ -423,7 +451,8 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                 style: waveformStyle,
                 isActive: waveformIsActive,
                 height: 100,
-                waveColor: widget.isRecording ? Colors.white : AppColors.primary,
+                waveColor:
+                    widget.isRecording ? Colors.white : AppColors.primary,
                 amplitudeStream: amplitudeStream,
               ),
             ),
@@ -435,7 +464,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
             _formatDuration(widget.duration),
             style: AppTypography.displayMedium.copyWith(
               fontWeight: FontWeight.bold,
-              color: widget.isRecording ? AppColors.primary : AppColors.textSecondaryLight,
+              color:
+                  widget.isRecording
+                      ? AppColors.primary
+                      : AppColors.textSecondaryLight,
             ),
           ),
           SizedBox(height: AppSpacing.space2),
@@ -473,9 +505,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   child: IconButton.filled(
                     onPressed: widget.onStop,
                     icon: const Icon(Icons.stop, size: 36),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.red,
-                    ),
+                    style: IconButton.styleFrom(backgroundColor: Colors.red),
                     tooltip: '녹음 완료',
                   ),
                 ),
@@ -485,25 +515,38 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   width: 72,
                   height: 72,
                   child: IconButton.filled(
-                    onPressed: hasMicPermission ? widget.onStart : () async {
-                      // Request permission when mic is not available
-                      final granted = await ref.read(audioRecorderServiceProvider).requestPermission();
-                      if (granted) {
-                        ref.invalidate(microphonePermissionProvider);
-                      } else {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.')),
-                          );
-                        }
-                      }
-                    },
+                    onPressed:
+                        hasMicPermission
+                            ? widget.onStart
+                            : () async {
+                              // Request permission when mic is not available
+                              final granted =
+                                  await ref
+                                      .read(audioRecorderServiceProvider)
+                                      .requestPermission();
+                              if (granted) {
+                                ref.invalidate(microphonePermissionProvider);
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        '마이크 권한이 필요합니다. 설정에서 권한을 허용해주세요.',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
                     icon: Icon(
                       hasMicPermission ? Icons.mic : Icons.mic_off,
                       size: 36,
                     ),
                     style: IconButton.styleFrom(
-                      backgroundColor: hasMicPermission ? AppColors.primary : AppColors.textSecondaryLight,
+                      backgroundColor:
+                          hasMicPermission
+                              ? AppColors.primary
+                              : AppColors.textSecondaryLight,
                     ),
                     tooltip: hasMicPermission ? '녹음 시작' : '마이크 권한 필요',
                   ),
@@ -524,11 +567,7 @@ class _EmptyRecordingsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.mic_none,
-            size: 64,
-            color: AppColors.textSecondaryLight,
-          ),
+          Icon(Icons.mic_none, size: 64, color: AppColors.textSecondaryLight),
           SizedBox(height: AppSpacing.space4),
           Text(
             '녹음이 없습니다',
@@ -599,6 +638,19 @@ class _RecordingItem extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onSetRepresentative;
 
+  Future<void> _shareToExternal(BuildContext context, String filePath) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음 파일을 찾을 수 없습니다')));
+      }
+      return;
+    }
+    await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
+  }
+
   String _formatDate(DateTime date) {
     return '${date.month}/${date.day} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
@@ -607,9 +659,10 @@ class _RecordingItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: recording.isRepresentative ? 2 : 0,
-      color: recording.isRepresentative
-          ? AppColors.primaryLight
-          : AppColors.surfaceLight,
+      color:
+          recording.isRepresentative
+              ? AppColors.primaryLight
+              : AppColors.surfaceLight,
       child: ListTile(
         leading: IconButton.filled(
           onPressed: onPlay,
@@ -656,17 +709,11 @@ class _RecordingItem extends StatelessWidget {
             ),
             if (recording.isShared) ...[
               SizedBox(width: AppSpacing.space2),
-              Icon(
-                Icons.check_circle,
-                size: 14,
-                color: Colors.green,
-              ),
+              Icon(Icons.check_circle, size: 14, color: Colors.green),
               SizedBox(width: 4),
               Text(
                 '공유됨',
-                style: AppTypography.caption.copyWith(
-                  color: Colors.green,
-                ),
+                style: AppTypography.caption.copyWith(color: Colors.green),
               ),
             ],
           ],
@@ -677,34 +724,48 @@ class _RecordingItem extends StatelessWidget {
               case 'representative':
                 onSetRepresentative();
                 break;
+              case 'share_external':
+                _shareToExternal(context, recording.localPath);
+                break;
               case 'delete':
                 onDelete();
                 break;
             }
           },
-          itemBuilder: (context) => [
-            if (!recording.isRepresentative)
-              const PopupMenuItem(
-                value: 'representative',
-                child: Row(
-                  children: [
-                    Icon(Icons.star_outline),
-                    SizedBox(width: 8),
-                    Text('대표로 선택'),
-                  ],
+          itemBuilder:
+              (context) => [
+                if (!recording.isRepresentative)
+                  const PopupMenuItem(
+                    value: 'representative',
+                    child: Row(
+                      children: [
+                        Icon(Icons.star_outline),
+                        SizedBox(width: 8),
+                        Text('대표로 선택'),
+                      ],
+                    ),
+                  ),
+                const PopupMenuItem(
+                  value: 'share_external',
+                  child: Row(
+                    children: [
+                      Icon(Icons.share),
+                      SizedBox(width: 8),
+                      Text('외부 앱 공유'),
+                    ],
+                  ),
                 ),
-              ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete_outline, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('삭제', style: TextStyle(color: Colors.red)),
-                ],
-              ),
-            ),
-          ],
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_outline, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('삭제', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
         ),
       ),
     );
