@@ -65,13 +65,18 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
     // Separate upcoming and past
     final now = DateTime.now();
-    final upcoming = sortedExceptions
-        .where((e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))))
-        .toList();
-    final past = sortedExceptions
-        .where(
-            (e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))))
-        .toList();
+    final upcoming =
+        sortedExceptions
+            .where(
+              (e) => e.endDate.isAfter(now.subtract(const Duration(days: 1))),
+            )
+            .toList();
+    final past =
+        sortedExceptions
+            .where(
+              (e) => e.endDate.isBefore(now.subtract(const Duration(days: 1))),
+            )
+            .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -85,10 +90,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
           // Upcoming exceptions
           if (upcoming.isNotEmpty) ...[
-            Text(
-              '예정된 휴무',
-              style: AppTypography.headingSmall,
-            ),
+            Text('예정된 휴무', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space3),
             ...upcoming.map((e) => _buildExceptionCard(e)),
           ],
@@ -122,11 +124,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            size: 24,
-            color: AppColors.info,
-          ),
+          Icon(Icons.info_outline, size: 24, color: AppColors.info),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -156,7 +154,10 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
 
   Widget _buildExceptionCard(TimeException exception, {bool isPast = false}) {
     final icon = _getExceptionIcon(exception.type);
-    final color = isPast ? AppColors.textTertiaryLight : _getExceptionColor(exception.type);
+    final color =
+        isPast
+            ? AppColors.textTertiaryLight
+            : _getExceptionColor(exception.type);
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -173,11 +174,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: color,
-          ),
+          child: Icon(icon, size: 20, color: color),
         ),
         title: Text(
           _formatDateRange(exception.startDate, exception.endDate),
@@ -204,13 +201,14 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
               ),
           ],
         ),
-        trailing: isPast
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.delete_outline),
-                color: AppColors.textSecondaryLight,
-                onPressed: () => _confirmDelete(exception),
-              ),
+        trailing:
+            isPast
+                ? null
+                : IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  color: AppColors.textSecondaryLight,
+                  onPressed: () => _confirmDelete(exception),
+                ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space2,
@@ -249,21 +247,25 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   }
 
   Widget _buildErrorState(Object error) {
+    final teacherId = ref.read(currentUserIdProvider);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 48,
-            color: AppColors.error,
-          ),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
             ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          TextButton(
+            onPressed: () {
+              ref.invalidate(teacherAvailabilityProvider(teacherId));
+            },
+            child: const Text('다시 시도'),
           ),
         ],
       ),
@@ -322,25 +324,24 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   Future<void> _confirmDelete(TimeException exception) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('휴무 삭제'),
-        content: Text(
-          '${_formatDateRange(exception.startDate, exception.endDate)} 휴무를 삭제하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('휴무 삭제'),
+            content: Text(
+              '${_formatDateRange(exception.startDate, exception.endDate)} 휴무를 삭제하시겠습니까?',
             ),
-            child: const Text('삭제'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed == true && mounted) {
@@ -408,10 +409,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                 const SizedBox(height: AppSpacing.space5),
 
                 // Title
-                Text(
-                  '휴무 추가',
-                  style: AppTypography.headingMedium,
-                ),
+                Text('휴무 추가', style: AppTypography.headingMedium),
 
                 const SizedBox(height: AppSpacing.space6),
 
@@ -439,7 +437,9 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                   children: [
                     Expanded(child: _buildDatePicker('시작일', _startDate, true)),
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space2,
+                      ),
                       child: Text('~'),
                     ),
                     Expanded(child: _buildDatePicker('종료일', _endDate, false)),
@@ -461,8 +461,9 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                   decoration: InputDecoration(
                     hintText: '휴무 사유를 입력하세요',
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.space4,
@@ -515,25 +516,31 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
   Widget _buildTypeSelector() {
     return Wrap(
       spacing: AppSpacing.space2,
-      children: ExceptionType.values
-          .where((t) => t != ExceptionType.additionalSlot)
-          .map((type) {
-        final isSelected = _selectedType == type;
-        return ChoiceChip(
-          label: Text(type.displayName),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) {
-              setState(() => _selectedType = type);
-            }
-          },
-          selectedColor: AppColors.primary.withValues(alpha: 0.2),
-          labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          ),
-        );
-      }).toList(),
+      children:
+          ExceptionType.values
+              .where((t) => t != ExceptionType.additionalSlot)
+              .map((type) {
+                final isSelected = _selectedType == type;
+                return ChoiceChip(
+                  label: Text(type.displayName),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() => _selectedType = type);
+                    }
+                  },
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: AppTypography.bodySmall.copyWith(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                );
+              })
+              .toList(),
     );
   }
 

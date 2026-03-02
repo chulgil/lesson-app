@@ -81,10 +81,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           const SizedBox(height: AppSpacing.space6),
 
           // Weekly overview
-          Text(
-            '주간 스케줄',
-            style: AppTypography.headingSmall,
-          ),
+          Text('주간 스케줄', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
 
           // Days grid
@@ -120,11 +117,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             // Header
             Row(
               children: [
-                Icon(
-                  Icons.settings,
-                  size: 20,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.settings, size: 20, color: AppColors.primary),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '레슨 시간 설정',
@@ -134,11 +127,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                   ),
                 ),
                 const Spacer(),
-                Icon(
-                  Icons.chevron_right,
-                  size: 20,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.chevron_right, size: 20, color: AppColors.primary),
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -218,9 +207,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         Text(
           label,
@@ -232,16 +219,19 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     );
   }
 
-  Future<void> _showLessonSettingsDialog(TeacherAvailability availability) async {
+  Future<void> _showLessonSettingsDialog(
+    TeacherAvailability availability,
+  ) async {
     final result = await showModalBottomSheet<Map<String, int>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _LessonSettingsBottomSheet(
-        currentLessonDuration: availability.slotDurationMinutes,
-        currentStartInterval: availability.slotStartInterval,
-        currentBreakTime: availability.breakTimeBetweenLessons,
-      ),
+      builder:
+          (context) => _LessonSettingsBottomSheet(
+            currentLessonDuration: availability.slotDurationMinutes,
+            currentStartInterval: availability.slotStartInterval,
+            currentBreakTime: availability.breakTimeBetweenLessons,
+          ),
     );
 
     if (result != null && mounted) {
@@ -274,9 +264,10 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: hasSchedules
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : isWeekend
+            color:
+                hasSchedules
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
                     : AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -286,27 +277,30 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               dayName,
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
-                color: hasSchedules
-                    ? AppColors.primary
-                    : isWeekend
+                color:
+                    hasSchedules
+                        ? AppColors.primary
+                        : isWeekend
                         ? AppColors.secondary
                         : AppColors.textSecondaryLight,
               ),
             ),
           ),
         ),
-        title: hasSchedules
-            ? Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space1,
-                children: schedules.map((s) => _buildTimeChip(s)).toList(),
-              )
-            : Text(
-                '휴무',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
+        title:
+            hasSchedules
+                ? Wrap(
+                  spacing: AppSpacing.space2,
+                  runSpacing: AppSpacing.space1,
+                  children: schedules.map((s) => _buildTimeChip(s)).toList(),
+                )
+                : Text(
+                  '탭하여 시간 추가',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
-              ),
         trailing: IconButton(
           icon: Icon(
             hasSchedules ? Icons.edit_outlined : Icons.add,
@@ -333,22 +327,25 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           vertical: 4,
         ),
         decoration: BoxDecoration(
-          color: schedule.isActive
-              ? AppColors.practiceGood.withValues(alpha: 0.1)
-              : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+          color:
+              schedule.isActive
+                  ? AppColors.practiceGood.withValues(alpha: 0.1)
+                  : AppColors.textTertiaryLight.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: schedule.isActive
-                ? AppColors.practiceGood.withValues(alpha: 0.3)
-                : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+            color:
+                schedule.isActive
+                    ? AppColors.practiceGood.withValues(alpha: 0.3)
+                    : AppColors.textTertiaryLight.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
           '${schedule.startTime} - ${schedule.endTime}',
           style: AppTypography.caption.copyWith(
-            color: schedule.isActive
-                ? AppColors.practiceGood
-                : AppColors.textTertiaryLight,
+            color:
+                schedule.isActive
+                    ? AppColors.practiceGood
+                    : AppColors.textTertiaryLight,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -390,21 +387,25 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   }
 
   Widget _buildErrorState(Object error) {
+    final teacherId = ref.read(currentUserIdProvider);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 48,
-            color: AppColors.error,
-          ),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
             ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          TextButton(
+            onPressed: () {
+              ref.invalidate(teacherAvailabilityProvider(teacherId));
+            },
+            child: const Text('다시 시도'),
           ),
         ],
       ),
@@ -416,9 +417,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _ScheduleEditBottomSheet(
-        preselectedDay: preselectedDay,
-      ),
+      builder:
+          (context) => _ScheduleEditBottomSheet(preselectedDay: preselectedDay),
     );
 
     if (result != null && mounted) {
@@ -434,9 +434,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _ScheduleEditBottomSheet(
-        existingSchedule: schedule,
-      ),
+      builder:
+          (context) => _ScheduleEditBottomSheet(existingSchedule: schedule),
     );
 
     if (result != null && mounted) {
@@ -453,25 +452,24 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
   Future<void> _confirmDelete(WeeklySchedule schedule) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('스케줄 삭제'),
-        content: Text(
-          '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('스케줄 삭제'),
+            content: Text(
+              '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
             ),
-            child: const Text('삭제'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed == true && mounted) {
@@ -488,10 +486,7 @@ class _ScheduleEditBottomSheet extends StatefulWidget {
   final int? preselectedDay;
   final WeeklySchedule? existingSchedule;
 
-  const _ScheduleEditBottomSheet({
-    this.preselectedDay,
-    this.existingSchedule,
-  });
+  const _ScheduleEditBottomSheet({this.preselectedDay, this.existingSchedule});
 
   @override
   State<_ScheduleEditBottomSheet> createState() =>
@@ -520,10 +515,7 @@ class _ScheduleEditBottomSheetState extends State<_ScheduleEditBottomSheet> {
 
   TimeOfDay _parseTime(String time) {
     final parts = time.split(':');
-    return TimeOfDay(
-      hour: int.parse(parts[0]),
-      minute: int.parse(parts[1]),
-    );
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   String _formatTime(TimeOfDay time) {
@@ -591,18 +583,20 @@ class _ScheduleEditBottomSheetState extends State<_ScheduleEditBottomSheet> {
                     return ChoiceChip(
                       label: Text(days[index]),
                       selected: isSelected,
-                      onSelected: isEditing
-                          ? null
-                          : (selected) {
-                              if (selected) {
-                                setState(() => _selectedDay = index);
-                              }
-                            },
+                      onSelected:
+                          isEditing
+                              ? null
+                              : (selected) {
+                                if (selected) {
+                                  setState(() => _selectedDay = index);
+                                }
+                              },
                       selectedColor: AppColors.primary.withValues(alpha: 0.2),
                       labelStyle: AppTypography.bodySmall.copyWith(
-                        color: isSelected
-                            ? AppColors.primary
-                            : isWeekend
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : isWeekend
                                 ? AppColors.secondary
                                 : AppColors.textSecondaryLight,
                         fontWeight:
@@ -626,8 +620,9 @@ class _ScheduleEditBottomSheetState extends State<_ScheduleEditBottomSheet> {
                   children: [
                     Expanded(child: _buildTimePicker('시작', _startTime, true)),
                     const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space2,
+                      ),
                       child: Text('~'),
                     ),
                     Expanded(child: _buildTimePicker('종료', _endTime, false)),
@@ -638,10 +633,7 @@ class _ScheduleEditBottomSheetState extends State<_ScheduleEditBottomSheet> {
 
                 // Active toggle
                 SwitchListTile(
-                  title: Text(
-                    '활성화',
-                    style: AppTypography.bodyMedium,
-                  ),
+                  title: Text('활성화', style: AppTypography.bodyMedium),
                   subtitle: Text(
                     _isActive ? '학생들이 이 시간에 예약할 수 있습니다' : '이 스케줄은 비활성화 상태입니다',
                     style: AppTypography.bodySmall.copyWith(
@@ -808,7 +800,8 @@ class _LessonSettingsBottomSheet extends StatefulWidget {
       _LessonSettingsBottomSheetState();
 }
 
-class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> {
+class _LessonSettingsBottomSheetState
+    extends State<_LessonSettingsBottomSheet> {
   late int _lessonDuration;
   late int _startInterval;
   late int _breakTime;
@@ -856,10 +849,7 @@ class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> 
                 const SizedBox(height: AppSpacing.space5),
 
                 // Title
-                Text(
-                  '레슨 시간 설정',
-                  style: AppTypography.headingMedium,
-                ),
+                Text('레슨 시간 설정', style: AppTypography.headingMedium),
 
                 const SizedBox(height: AppSpacing.space2),
 
@@ -965,9 +955,7 @@ class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> 
       children: [
         Text(
           title,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
@@ -979,21 +967,26 @@ class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> 
         const SizedBox(height: AppSpacing.space2),
         Wrap(
           spacing: AppSpacing.space2,
-          children: options.map((value) {
-            final isSelected = selectedValue == value;
-            return ChoiceChip(
-              label: Text('$value$suffix'),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) onChanged(value);
-              },
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              options.map((value) {
+                final isSelected = selectedValue == value;
+                return ChoiceChip(
+                  label: Text('$value$suffix'),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) onChanged(value);
+                  },
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: AppTypography.bodySmall.copyWith(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -1028,11 +1021,7 @@ class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> 
         children: [
           Row(
             children: [
-              Icon(
-                Icons.preview,
-                size: 18,
-                color: AppColors.primary,
-              ),
+              Icon(Icons.preview, size: 18, color: AppColors.primary),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '미리보기',
@@ -1047,33 +1036,29 @@ class _LessonSettingsBottomSheetState extends State<_LessonSettingsBottomSheet> 
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: exampleSlots.map((slot) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  border: Border.all(color: AppColors.borderLight),
-                ),
-                child: Text(
-                  slot,
-                  style: AppTypography.bodySmall,
-                ),
-              );
-            }).toList(),
+            children:
+                exampleSlots.map((slot) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                      vertical: AppSpacing.space2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
+                      border: Border.all(color: AppColors.borderLight),
+                    ),
+                    child: Text(slot, style: AppTypography.bodySmall),
+                  );
+                }).toList(),
           ),
           if (_startInterval == 30 && _lessonDuration > 30) ...[
             const SizedBox(height: AppSpacing.space3),
             Row(
               children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 14,
-                  color: AppColors.secondary,
-                ),
+                Icon(Icons.info_outline, size: 14, color: AppColors.secondary),
                 const SizedBox(width: AppSpacing.space1),
                 Expanded(
                   child: Text(

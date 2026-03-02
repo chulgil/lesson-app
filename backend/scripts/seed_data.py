@@ -114,7 +114,7 @@ async def seed(db: AsyncSession) -> None:
         SubscriptionUsage,
         UsageType,
     )
-    from app.models.teacher import Teacher, TeacherCareer, TeacherEducation
+    from app.models.teacher import Teacher
     from app.models.user import User, UserRole
 
     # ── Idempotency check ────────────────────────────────────────────
@@ -140,37 +140,12 @@ async def seed(db: AsyncSession) -> None:
     teacher = Teacher(
         id=TEACHER_ID,
         user_id=TEACHER_USER_ID,
-        instruments=["바이올린", "피아노"],
-        introduction="서울대 음악과 졸업, 교향악단 경력의 바이올린 전문 강사입니다.",
-        experience_years=5,
-        lesson_areas=["서울 강남", "서울 서초"],
-        lesson_types=["개인레슨", "그룹레슨"],
-        fee_min=50000,
-        fee_max=80000,
-        fee_duration=60,
+        instruments=["바이올린"],
     )
     db.add(teacher)
 
-    education = TeacherEducation(
-        id="seed-edu-0001",
-        teacher_id=TEACHER_ID,
-        school="서울대학교",
-        major="음악과 (바이올린 전공)",
-        degree="학사",
-        graduation_year=2020,
-    )
-    db.add(education)
-
-    career = TeacherCareer(
-        id="seed-career-0001",
-        teacher_id=TEACHER_ID,
-        organization="서울시립교향악단",
-        position="제2바이올린 단원",
-        start_year=2020,
-        end_year=2023,
-        description="정기 공연 및 교육 프로그램 참여",
-    )
-    db.add(career)
+    # NOTE: No education, career, fee, or lesson area data seeded.
+    # Teachers should fill in their profile through the app.
 
     # ═══════════════════════════════════════════════════════════════════
     # 2. Lesson Policy

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/network/api_client.dart';
@@ -18,9 +19,19 @@ class RemoteTeacherAvailabilityRepository
 
   @override
   Future<TeacherAvailability?> getAvailability(String teacherId) async {
-    final response = await _apiClient.get('/schedule/availability');
-    if (response.data == null) return null;
-    return TeacherAvailability.fromJson(response.data as Map<String, dynamic>);
+    try {
+      final response = await _apiClient.get('/schedule/availability');
+      if (response.data == null) return null;
+      return TeacherAvailability.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } on DioException catch (e) {
+      // Return null (empty state) for 404 or unimplemented endpoints
+      if (e.response?.statusCode == 404 || e.response?.statusCode == 405) {
+        return null;
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -146,23 +157,32 @@ class RemoteTeacherAvailabilityRepository
     DateTime date, {
     String? currentStudentId,
   }) async {
-    final dateStr =
-        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-    final response = await _apiClient.get(
-      '/schedule/slots',
-      queryParameters: {
-        'teacher_id': teacherId,
-        'date': dateStr,
-        if (currentStudentId != null) 'student_id': currentStudentId,
-      },
-    );
-    final data = response.data;
-    final items =
-        (data is Map
-            ? data['slots'] as List<dynamic>?
-            : data as List<dynamic>?) ??
-        [];
-    return items.map((e) => _slotFromJson(e as Map<String, dynamic>)).toList();
+    try {
+      final dateStr =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final response = await _apiClient.get(
+        '/schedule/slots',
+        queryParameters: {
+          'teacher_id': teacherId,
+          'date': dateStr,
+          if (currentStudentId != null) 'student_id': currentStudentId,
+        },
+      );
+      final data = response.data;
+      final items =
+          (data is Map
+              ? data['slots'] as List<dynamic>?
+              : data as List<dynamic>?) ??
+          [];
+      return items
+          .map((e) => _slotFromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404 || e.response?.statusCode == 405) {
+        return [];
+      }
+      rethrow;
+    }
   }
 
   @override

@@ -21,61 +21,73 @@ void showExperienceDialog(
 
   showDialog(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('교육 경력'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$years년',
-              style: AppTypography.headingLarge,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: years > 0
-                      ? () => setState(() => years--)
-                      : null,
-                  icon: const Icon(Icons.remove_circle_outline),
-                  iconSize: 32,
+    builder:
+        (context) => StatefulBuilder(
+          builder:
+              (context, setState) => AlertDialog(
+                title: const Text('교육 경력'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('$years년', style: AppTypography.headingLarge),
+                    const SizedBox(height: AppSpacing.space4),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed:
+                              years > 0 ? () => setState(() => years--) : null,
+                          icon: const Icon(Icons.remove_circle_outline),
+                          iconSize: 28,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            value: years.toDouble(),
+                            min: 0,
+                            max: 50,
+                            divisions: 50,
+                            label: '$years년',
+                            onChanged:
+                                (value) =>
+                                    setState(() => years = value.round()),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed:
+                              years < 50 ? () => setState(() => years++) : null,
+                          icon: const Icon(Icons.add_circle_outline),
+                          iconSize: 28,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                Slider(
-                  value: years.toDouble(),
-                  min: 0,
-                  max: 50,
-                  divisions: 50,
-                  onChanged: (value) => setState(() => years = value.round()),
-                ),
-                IconButton(
-                  onPressed: years < 50
-                      ? () => setState(() => years++)
-                      : null,
-                  icon: const Icon(Icons.add_circle_outline),
-                  iconSize: 32,
-                ),
-              ],
-            ),
-          ],
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      ref
+                          .read(teacherExtendedProfileProvider.notifier)
+                          .updateExperienceYears(years);
+                      Navigator.pop(context);
+                    },
+                    child: const Text('저장'),
+                  ),
+                ],
+              ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(teacherExtendedProfileProvider.notifier)
-                  .updateExperienceYears(years);
-              Navigator.pop(context);
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -91,78 +103,106 @@ void showFeeDialog(
 
   showDialog(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('레슨료 설정'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('레슨 시간', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: AppSpacing.space2),
-            SegmentedButton<int>(
-              segments: const [
-                ButtonSegment(value: 30, label: Text('30분')),
-                ButtonSegment(value: 45, label: Text('45분')),
-                ButtonSegment(value: 60, label: Text('60분')),
-              ],
-              selected: {duration},
-              onSelectionChanged: (value) {
-                setState(() => duration = value.first);
-              },
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text('최소 레슨료', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-            Slider(
-              value: minFee.toDouble(),
-              min: 10000,
-              max: 200000,
-              divisions: 38,
-              label: '${minFee ~/ 10000}만원',
-              onChanged: (value) {
-                setState(() {
-                  minFee = value.round();
-                  if (maxFee < minFee) maxFee = minFee;
-                });
-              },
-            ),
-            Text('최대 레슨료', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-            Slider(
-              value: maxFee.toDouble(),
-              min: minFee.toDouble(),
-              max: 300000,
-              divisions: 58,
-              label: '${maxFee ~/ 10000}만원',
-              onChanged: (value) => setState(() => maxFee = value.round()),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Center(
-              child: Text(
-                FeeRange(minFee: minFee, maxFee: maxFee, duration: duration).formatted,
-                style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.primary,
+    builder:
+        (context) => StatefulBuilder(
+          builder:
+              (context, setState) => AlertDialog(
+                title: const Text('레슨료 설정'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '레슨 시간',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space2),
+                    SegmentedButton<int>(
+                      segments: const [
+                        ButtonSegment(value: 30, label: Text('30분')),
+                        ButtonSegment(value: 45, label: Text('45분')),
+                        ButtonSegment(value: 60, label: Text('60분')),
+                      ],
+                      selected: {duration},
+                      onSelectionChanged: (value) {
+                        setState(() => duration = value.first);
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    Text(
+                      '최소 레슨료',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Slider(
+                      value: minFee.toDouble(),
+                      min: 10000,
+                      max: 200000,
+                      divisions: 38,
+                      label: '${minFee ~/ 10000}만원',
+                      onChanged: (value) {
+                        setState(() {
+                          minFee = value.round();
+                          if (maxFee < minFee) maxFee = minFee;
+                        });
+                      },
+                    ),
+                    Text(
+                      '최대 레슨료',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Slider(
+                      value: maxFee.toDouble(),
+                      min: minFee.toDouble(),
+                      max: 300000,
+                      divisions: 58,
+                      label: '${maxFee ~/ 10000}만원',
+                      onChanged:
+                          (value) => setState(() => maxFee = value.round()),
+                    ),
+                    const SizedBox(height: AppSpacing.space2),
+                    Center(
+                      child: Text(
+                        FeeRange(
+                          minFee: minFee,
+                          maxFee: maxFee,
+                          duration: duration,
+                        ).formatted,
+                        style: AppTypography.headingSmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      ref
+                          .read(teacherExtendedProfileProvider.notifier)
+                          .updateFeeRange(
+                            FeeRange(
+                              minFee: minFee,
+                              maxFee: maxFee,
+                              duration: duration,
+                            ),
+                          );
+                      Navigator.pop(context);
+                    },
+                    child: const Text('저장'),
+                  ),
+                ],
               ),
-            ),
-          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(teacherExtendedProfileProvider.notifier).updateFeeRange(
-                FeeRange(minFee: minFee, maxFee: maxFee, duration: duration),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -176,44 +216,48 @@ void showLessonTypesDialog(
 
   showDialog(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('레슨 방식'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: LessonType.values.map((type) {
-            return CheckboxListTile(
-              title: Text(getLessonTypeLabel(type)),
-              subtitle: Text(getLessonTypeDescription(type)),
-              value: selected.contains(type),
-              onChanged: (value) {
-                setState(() {
-                  if (value == true) {
-                    selected.add(type);
-                  } else {
-                    selected.remove(type);
-                  }
-                });
-              },
-            );
-          }).toList(),
+    builder:
+        (context) => StatefulBuilder(
+          builder:
+              (context, setState) => AlertDialog(
+                title: const Text('레슨 방식'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children:
+                      LessonType.values.map((type) {
+                        return CheckboxListTile(
+                          title: Text(getLessonTypeLabel(type)),
+                          subtitle: Text(getLessonTypeDescription(type)),
+                          value: selected.contains(type),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value == true) {
+                                selected.add(type);
+                              } else {
+                                selected.remove(type);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      ref
+                          .read(teacherExtendedProfileProvider.notifier)
+                          .updateLessonTypes(selected.toList());
+                      Navigator.pop(context);
+                    },
+                    child: const Text('저장'),
+                  ),
+                ],
+              ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(teacherExtendedProfileProvider.notifier)
-                  .updateLessonTypes(selected.toList());
-              Navigator.pop(context);
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -228,72 +272,76 @@ void showAreasDialog(
 
   showDialog(
     context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        title: const Text('레슨 가능 지역'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      decoration: const InputDecoration(
-                        hintText: '예: 서울 강남구',
-                        isDense: true,
+    builder:
+        (context) => StatefulBuilder(
+          builder:
+              (context, setState) => AlertDialog(
+                title: const Text('레슨 가능 지역'),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: controller,
+                              decoration: const InputDecoration(
+                                hintText: '예: 서울 강남구',
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              if (controller.text.isNotEmpty) {
+                                setState(() {
+                                  areas.add(controller.text);
+                                  controller.clear();
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.add),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: AppSpacing.space3),
+                      if (areas.isNotEmpty)
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children:
+                              areas.map((area) {
+                                return Chip(
+                                  label: Text(area),
+                                  deleteIcon: const Icon(Icons.close, size: 18),
+                                  onDeleted: () {
+                                    setState(() => areas.remove(area));
+                                  },
+                                );
+                              }).toList(),
+                        ),
+                    ],
                   ),
-                  IconButton(
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
+                  ),
+                  FilledButton(
                     onPressed: () {
-                      if (controller.text.isNotEmpty) {
-                        setState(() {
-                          areas.add(controller.text);
-                          controller.clear();
-                        });
-                      }
+                      ref
+                          .read(teacherExtendedProfileProvider.notifier)
+                          .updateLessonAreas(areas);
+                      Navigator.pop(context);
                     },
-                    icon: const Icon(Icons.add),
+                    child: const Text('저장'),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.space3),
-              if (areas.isNotEmpty)
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: areas.map((area) {
-                    return Chip(
-                      label: Text(area),
-                      deleteIcon: const Icon(Icons.close, size: 18),
-                      onDeleted: () {
-                        setState(() => areas.remove(area));
-                      },
-                    );
-                  }).toList(),
-                ),
-            ],
-          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(teacherExtendedProfileProvider.notifier)
-                  .updateLessonAreas(areas);
-              Navigator.pop(context);
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
-    ),
   );
 }
 
@@ -305,26 +353,25 @@ void showDeleteConfirmDialog(
 ) {
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text('$itemType 삭제'),
-      content: Text('이 $itemType 정보를 삭제하시겠습니까?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
+    builder:
+        (context) => AlertDialog(
+          title: Text('$itemType 삭제'),
+          content: Text('이 $itemType 정보를 삭제하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () {
+                onConfirm();
+                Navigator.pop(context);
+              },
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: const Text('삭제'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () {
-            onConfirm();
-            Navigator.pop(context);
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.error,
-          ),
-          child: const Text('삭제'),
-        ),
-      ],
-    ),
   );
 }
 
