@@ -239,6 +239,7 @@ docs/
 
 | 문서 | 상태 | 설명 |
 |------|------|------|
+| [launch_roadmap.md](launch_roadmap.md) | 📋 계획 | **출시 로드맵** (iOS App Store 런칭 → Android) |
 | [implementation_roadmap.md](specs/dev/implementation_roadmap.md) | 📋 계획 | **구현 로드맵** (학원/수강권/3자 관계) |
 | [test_scenarios.md](specs/dev/test_scenarios.md) | ✅ 확정 | 로그인 테스트 시나리오 |
 
