@@ -515,3 +515,57 @@ lib/features/practice/
 | PDF 내보내기 | 2 | 리포트를 PDF로 저장/공유 |
 | 연간 리포트 | 2 | 연간 통계 및 성장 그래프 |
 | 비교 기능 | 2 | 다른 학생/평균과 비교 (익명) |
+
+---
+
+## 11. 공유 시스템 연동
+
+> 추가일: 2026-03-02
+> 관련 스펙: [practice_sharing_spec.md](practice_sharing_spec.md)
+
+### 11.1 선생님 공유 시 리포트 포함
+
+학생이 연습 기록을 선생님에게 공유할 때, 주간/월간 리포트 데이터도 함께 공유된다.
+선생님은 학생 상세 > [연습 현황] 탭에서 리포트를 확인할 수 있다.
+
+| 공유 데이터 | 선생님 뷰 | 학부모 뷰 (Phase 2) |
+|------------|----------|-------------------|
+| 주간 연습 시간 | ✅ 이번 주 요약 카드 | ✅ 퀵스탯 |
+| 일별 연습 기록 | ✅ 주간 캘린더 | ✅ 연습 캘린더 |
+| 스트릭 | ✅ 스트릭 배지 | ✅ 퀵스탯 |
+| 공유된 녹음 | ✅ 재생 가능 | Phase 3 |
+| 주간/월간 리포트 | [상세 통계 보기] | Phase 3 |
+
+### 11.2 Provider 연동
+
+```dart
+/// 선생님이 보는 학생 주간 리포트 (공유 권한 확인 포함)
+@riverpod
+Future<WeeklyReport?> sharedWeeklyReport(
+  SharedWeeklyReportRef ref,
+  String studentId,
+  String teacherId,
+) async {
+  final relationship = ref.watch(teacherStudentRelationshipProvider(studentId, teacherId));
+  if (!relationship.canViewPractice) return null;
+
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  final now = DateTime.now();
+  final weekStart = now.subtract(Duration(days: now.weekday - 1));
+  return repository.getWeeklyReport(studentId, weekStart);
+}
+```
+
+### 11.3 접근 경로
+
+```
+[선생님 앱]
+├── 학생 상세 > 연습 현황 탭
+│   └── [📈 상세 통계 보기]
+│       → WeeklyReportScreen (studentId, teacherView: true)
+│
+[학부모 앱] (Phase 2)
+├── 대시보드 > 연습 통계 영역
+│   └── [더보기]
+│       → WeeklyReportScreen (childStudentId, parentView: true)
+```

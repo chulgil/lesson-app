@@ -1,6 +1,6 @@
 # lesson-app 문서
 
-> 마지막 업데이트: 2026-02-05
+> 마지막 업데이트: 2026-03-02
 
 음악 레슨 예약 및 연습 관리 앱 문서입니다.
 
@@ -12,6 +12,7 @@
 |------|------|------|
 | [architecture.md](architecture.md) | **앱 아키텍처 가이드** | 폴더 구조, Provider 패턴, 코드 위치 |
 | [../CLAUDE.md](../CLAUDE.md) | **프로젝트 가이드** | 명령어, 규칙, 작업 우선순위 |
+| [specs/feature_hub.md](specs/feature_hub.md) | **기능 허브** | 전체 기능 × 역할 × 스펙 매트릭스, Pain Point 매핑 |
 | [specs/glossary.md](specs/glossary.md) | **용어 정의** | 연결, 팔로우, 수강권 등 핵심 용어 |
 | [registry.md](registry.md) | **문서 레지스트리** | 토큰/컴포넌트/패턴 의존성 추적 |
 | [refactoring_tasks.md](refactoring_tasks.md) | 리팩토링 진행 현황 | Clean Architecture 마이그레이션 |
@@ -130,6 +131,7 @@ docs/
 | [student_centered_architecture.md](specs/lesson/student_centered_architecture.md) | ✅ 확정 | 학생 중심 아키텍처 |
 | [Unified_Lesson_Booking_Spec.md](specs/lesson/Unified_Lesson_Booking_Spec.md) | ✅ 확정 | 통합 레슨 예약 스펙 |
 | [Multi_Option_Schedule_Spec.md](specs/lesson/Multi_Option_Schedule_Spec.md) | ✅ 확정 | **양방향 다중 옵션 스케줄 제안** (학생→선생님 + 선생님→학생) |
+| [lesson_note_spec.md](specs/lesson/lesson_note_spec.md) | 🆕 구현 완료 | **레슨 노트 시스템** (피드백/포인트/팁 — 코드 기반 문서화, Pain Point A·G) |
 
 ### 연습 시스템 (practice/)
 
@@ -145,6 +147,9 @@ docs/
 | [recording_requirement.md](specs/practice/recording_requirement.md) | ✅ 확정 | 녹음 기능 요구사항 |
 | [recording_player_ui.md](specs/practice/recording_player_ui.md) | ✅ 확정 | 녹음 재생 UI 스펙 |
 | [waveform_improvements.md](specs/practice/waveform_improvements.md) | ✅ 확정 | 파형 UI 개선 (모듈화, 핀치줌) |
+| [recording_comparison_spec.md](specs/practice/recording_comparison_spec.md) | 🆕 설계 완료 | **녹음 비교 재생** (A/B 순차 비교, 성장 체감, Pain Point C) |
+| [practice_sharing_spec.md](specs/practice/practice_sharing_spec.md) | 🆕 설계 완료 | **연습 공유 시스템** (학생→선생님 공유, 선생님 연습현황 탭, Pain Point B·D) |
+| [repertoire_history_spec.md](specs/practice/repertoire_history_spec.md) | 🆕 설계 완료 | **레퍼토리 히스토리** (월별 타임라인, 학습 이력, Pain Point A) |
 
 ### 메트로놈 (metronome/)
 
@@ -181,6 +186,7 @@ docs/
 | [parent_system.md](specs/user/parent_system.md) | ✅ 확정 | 학부모 시스템 |
 | [parent_login_flow.md](specs/user/parent_login_flow.md) | ✅ 확정 | 학부모 로그인 플로우 |
 | [teacher_registration.md](specs/user/teacher_registration.md) | ✅ 확정 | 외부 선생님 등록 |
+| [parent_dashboard_spec.md](specs/user/parent_dashboard_spec.md) | 🆕 구현 완료 | **학부모 대시보드** (4탭 — 코드 기반 문서화, Mock→실데이터 GAP 분석, Pain Point D) |
 
 ### 학생 시스템 (student/)
 
