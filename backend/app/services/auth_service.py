@@ -67,10 +67,10 @@ class AuthService:
         """
         from app.core.config import settings
 
-        if settings.ENVIRONMENT != "development":
+        if settings.ENVIRONMENT not in ("development", "beta"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Dev login is only available in development environment",
+                detail="Dev login is only available in development/beta environment",
             )
 
         from app.models.user import User, UserRole

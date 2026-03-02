@@ -18,7 +18,7 @@ from app.schemas.auth import (
     TokenResponse,
 )
 from app.schemas.common import SuccessResponse
-from app.schemas.user import UserResponse
+from app.schemas.user import RoleUpdate, UserResponse
 from app.services.auth_service import AuthService
 
 router = APIRouter()
@@ -97,4 +97,40 @@ async def get_me(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> UserResponse:
     """Return the currently authenticated user."""
+    return UserResponse.model_validate(current_user)
+
+
+@router.patch(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update current user role (onboarding)",
+)
+async def update_my_role(
+    body: RoleUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """Set the role for a newly registered user (role must be null)."""
+    from app.models.user import UserRole
+
+    if current_user.role is not None:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role is already set. Contact support to change it.",
+        )
+
+    role_enum = UserRole(body.role)
+    current_user.role = role_enum
+    db.add(current_user)
+
+    # Auto-create role-specific profile
+    service = AuthService(db)
+    await service._ensure_role_profile(current_user, role_enum)
+
+    await db.flush()
+    await db.commit()
+    await db.refresh(current_user)
     return UserResponse.model_validate(current_user)

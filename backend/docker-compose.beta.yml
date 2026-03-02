@@ -1,0 +1,56 @@
+# ============================================================
+# Lessonaza Backend - Beta Docker Compose
+# ============================================================
+# For codenavi server (108.61.162.25)
+# - Uses existing MySQL container on data_internal network
+# - Uses Traefik reverse proxy on traefiknet for HTTPS
+# - Separate DB schema (lessonaza_beta) from production
+# - Host: beta-lesson.chulgil.me
+#
+# Usage:
+#   docker-compose -f docker-compose.beta.yml up -d --build
+#   docker-compose -f docker-compose.beta.yml exec app uv run alembic upgrade head
+#   docker-compose -f docker-compose.beta.yml exec app uv run python scripts/seed_data.py
+
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lessonaza-beta-api
+    restart: unless-stopped
+    env_file:
+      - .env.beta
+    environment:
+      DATABASE_URL: mysql+asyncmy://${MYSQL_USER:-lessonaza_beta}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-lessonaza_beta}
+      ENVIRONMENT: beta
+      DEBUG: "true"
+    volumes:
+      - beta-logs:/app/logs
+    networks:
+      - traefiknet
+      - data_internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=lessonaza-beta-api"
+      - "traefik.docker.network=traefiknet"
+      - "traefik.frontend.rule=Host:beta-lesson.chulgil.me"
+      - "traefik.port=8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+networks:
+  traefiknet:
+    external: true
+  data_internal:
+    external: true
+
+volumes:
+  beta-logs:
+    driver: local

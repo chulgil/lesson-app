@@ -1,5 +1,5 @@
 # Keep Oboe metronome JNI callback methods
--keep class com.lessonapp.lesson_app.audio.OboeMetronomeEngine {
+-keep class app.lessonaza.audio.OboeMetronomeEngine {
     void onBeatCallback(int, boolean);
     void onSubdivisionCallback(int, boolean);
 }

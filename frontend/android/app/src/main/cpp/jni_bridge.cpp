@@ -97,7 +97,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeInit(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeInit(
     JNIEnv* env,
     jobject thiz,
     jint bpm,
@@ -180,7 +180,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeInit(
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeStart(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeStart(
     JNIEnv* env,
     jobject thiz) {
     LOGD("nativeStart");
@@ -191,7 +191,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeStart(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeStop(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeStop(
     JNIEnv* env,
     jobject thiz) {
     LOGD("nativeStop");
@@ -201,7 +201,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeStop(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetBpm(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeSetBpm(
     JNIEnv* env,
     jobject thiz,
     jint bpm) {
@@ -211,7 +211,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetBpm(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetBeatsPerMeasure(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeSetBeatsPerMeasure(
     JNIEnv* env,
     jobject thiz,
     jint beats) {
@@ -221,7 +221,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetBeatsPerMeasur
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetAccentPattern(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeSetAccentPattern(
     JNIEnv* env,
     jobject thiz,
     jstring pattern) {
@@ -233,7 +233,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetAccentPattern(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetSubdivision(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeSetSubdivision(
     JNIEnv* env,
     jobject thiz,
     jint subdivision) {
@@ -243,7 +243,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetSubdivision(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetSoundPattern(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeSetSoundPattern(
     JNIEnv* env,
     jobject thiz,
     jbooleanArray pattern) {
@@ -260,7 +260,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeSetSoundPattern(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeLoadSounds(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeLoadSounds(
     JNIEnv* env,
     jobject thiz,
     jobject assetManager,
@@ -285,7 +285,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeLoadSounds(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativePlayTapSound(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativePlayTapSound(
     JNIEnv* env,
     jobject thiz) {
     if (gEngine) {
@@ -294,7 +294,7 @@ Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativePlayTapSound(
 }
 
 JNIEXPORT void JNICALL
-Java_com_lessonapp_lesson_1app_audio_OboeMetronomeEngine_nativeDispose(
+Java_app_lessonaza_audio_OboeMetronomeEngine_nativeDispose(
     JNIEnv* env,
     jobject thiz) {
     LOGD("nativeDispose");
