@@ -365,6 +365,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     // Remote mode: actual Google Sign-In
     if (_isLoading) return;
+
+    // Guard: check if Google OAuth credentials are configured
+    if (EnvironmentConfig.googleServerClientId.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Google 로그인이 아직 설정되지 않았습니다. 테스트 계정을 사용해주세요.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -412,10 +426,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleKakaoLogin(BuildContext context) {
+    if (!EnvironmentConfig.useMockData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('카카오 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
     _showRoleSelectDialog(context, authProvider: 'kakao');
   }
 
   void _handleAppleLogin(BuildContext context) {
+    if (!EnvironmentConfig.useMockData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Apple 로그인은 준비 중입니다. 테스트 계정을 사용해주세요.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
     _showRoleSelectDialog(context, authProvider: 'apple');
   }
 
