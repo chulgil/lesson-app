@@ -1,171 +1,60 @@
-# Recording Player UI Specification
+# 녹음 재생 플레이어 UI 스펙
 
 > 작성일: 2025-12-30
-> 최종 수정: 2026-01-12
+> 최종 수정: 2026-03-02
 > 상태: 구현 완료
 
-## Overview
+## 1. 개요
 
-녹음 재생을 위한 바텀시트 플레이어 UI 스펙. iOS Voice Memos 스타일의 웨이브폼 시각화와 고급 재생 기능을 포함한다.
+녹음 재생을 위한 바텀시트 플레이어 UI. iOS Voice Memos 스타일의 웨이브폼 시각화, 재생 속도 조절, A-B 루프, 외부 공유 기능을 포함.
 
-## User Decision Summary
-
+**핵심 결정사항**:
 | 항목 | 선택 |
 |------|------|
-| UI 스타일 | Option B: 웨이브폼 + 컨트롤 |
-| 추가 기능 | 재생 속도 조절, 구간 반복 (A-B Loop) |
-| 파일 저장 | UUID + DB 메타데이터 |
+| UI 스타일 | 웨이브폼 + 컨트롤 (다크 모드 바텀시트) |
+| 파일명 | UUID.m4a (DB 메타데이터 분리) |
+| 파형 줌 | 핀치 줌 1x~10x, 미니맵 오버뷰 |
+| 마커 조작 | A-B 마커 드래그 핸들 |
 
 ---
 
-## 1. UI Design
-
-### 1.1 바텀시트 레이아웃
+## 2. 바텀시트 레이아웃
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    ─────                            │  <- Drag handle
+│                    ─────                            │  Drag handle
+│               녹음 제목 또는 날짜                    │
 │                                                     │
-│  ∿∿∿∿∿∿∿∿∿∿∿∿●∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿  │  <- Waveform (터치로 seek)
+│  ∿∿∿∿∿∿∿∿∿∿∿∿●∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿  │  Waveform (터치/핀치줌)
 │                                                     │
-│      00:45                              02:30       │  <- Current / Total time
+│      00:45                              02:30       │  Current / Total time
 │                                                     │
-│   [A][B]  ×1.0 ▼                          ▶/⏸      │  <- Controls (한 줄)
+│   [A][B]  ×1.0 ▼  [📤]                    ▶/⏸      │  Controls
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
 
-**컨트롤 배치:**
-- 왼쪽: A-B Loop 버튼 + 재생 속도
-- 오른쪽: 재생/정지 버튼
+**컨트롤 배치 (좌→우)**:
+- A-B Loop 버튼 (36dp 사각형) + 연결선
+- Speed 드롭다운 (`grey[800]` 배경, 둥근 모서리)
+- Share 버튼 (`Icons.ios_share`, Speed와 동일 스타일)
+- Spacer
+- Play/Pause (56dp 원형, `AppColors.primary`)
 
-### 1.2 컴포넌트 상세
+---
 
-#### Header (Drag Handle)
-- 너비: 40dp, 높이: 4dp
-- 색상: `AppColors.textSecondaryLight`
-- 상단 마진: 12dp
+## 3. 컴포넌트 상세
 
-#### Waveform Area
-- 높이: 80dp
-- 배경: `AppColors.surfaceLight`
-- 파형 색상 (재생 전): `AppColors.textSecondaryLight`
-- 파형 색상 (재생 후): `AppColors.primary`
-- 현재 위치 인디케이터: 2dp 흰색 세로선 + 원형 노브
-- 터치 제스처: 탭/드래그로 seek 가능
-
-#### Time Display
-- 폰트: `AppTypography.bodyMedium`
-- 좌측: 현재 재생 시간
-- 우측: 전체 녹음 시간
-- 색상: `AppColors.textPrimaryLight`
-
-#### Control Buttons (한 줄 배치)
-- **재생/정지**: 56dp 원형, `AppColors.primary`, 오른쪽 정렬
-- **A-B Loop**: 왼쪽 정렬, A/B 버튼 36dp 사각형
-- **Speed**: A-B Loop 옆, 드롭다운 버튼
-
-#### A-B Loop Control
-- A 버튼: 시작점 설정 (누르면 현재 위치 기록)
-- B 버튼: 종료점 설정 (누르면 현재 위치 기록)
-- 구간 표시: 웨이브폼에 하이라이트로 표시
-- 활성 시: 구간만 반복 재생
-- 해제: A 또는 B 길게 눌러 해제
-
-#### Speed Control
-- 드롭다운/버튼 토글
-- 옵션: 0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x
-- 기본값: 1.0x
-- 선택된 속도 표시: `×1.0` 형식
-
-### 1.3 색상 정의
+### 3.1 색상
 
 ```dart
-// Player specific colors
 static const playerBackground = Color(0xFF1C1C1E);  // iOS dark sheet
 static const playerWaveformPlayed = AppColors.primary;
 static const playerWaveformUnplayed = Color(0xFF3A3A3C);
 static const playerSeekIndicator = Colors.white;
-static const playerButtonActive = AppColors.primary;
-static const playerButtonInactive = Color(0xFF636366);
 ```
 
-### 1.4 애니메이션
-
-| 요소 | 애니메이션 | Duration |
-|------|-----------|----------|
-| 바텀시트 열기 | slideUp + fade | 300ms |
-| 바텀시트 닫기 | slideDown + fade | 200ms |
-| 재생 버튼 | scale pulse | 150ms |
-| 웨이브폼 진행 | linear | realtime |
-| A-B 마커 | bounce | 200ms |
-
----
-
-## 2. File Storage
-
-### 2.1 파일명 규칙
-
-```
-{UUID}.m4a
-```
-
-- UUID v4 형식 (예: `a1b2c3d4-e5f6-7890-abcd-ef1234567890.m4a`)
-- 중복 불가능
-- 파일명에 메타데이터 포함하지 않음
-
-### 2.2 저장 경로
-
-```
-Documents/
-└── recordings/
-    └── {repertoireId}/
-        ├── a1b2c3d4-e5f6-7890-abcd-ef1234567890.m4a
-        ├── b2c3d4e5-f6a7-8901-bcde-f12345678901.m4a
-        └── ...
-```
-
-### 2.3 메타데이터 (Hive DB)
-
-```dart
-@HiveType(typeId: 22)
-class Recording {
-  @HiveField(0) final String id;           // UUID (파일명과 동일)
-  @HiveField(1) final String repertoireId;
-  @HiveField(2) final String studentId;
-  @HiveField(3) final RecordingType type;
-  @HiveField(4) final String localPath;    // 전체 경로
-  @HiveField(5) final String? serverUrl;
-  @HiveField(6) final int durationSeconds;
-  @HiveField(7) final bool isRepresentative;
-  @HiveField(8) final DateTime recordedAt;
-  @HiveField(9) final DateTime? sharedAt;
-  @HiveField(10) final StorageStatus storageStatus;
-  @HiveField(11) final String? title;      // 사용자 지정 제목 (선택)
-}
-```
-
-### 2.4 녹음 설정
-
-| 항목 | 값 |
-|------|-----|
-| 포맷 | M4A (AAC-LC) |
-| 비트레이트 | 128kbps |
-| 샘플레이트 | 44100Hz |
-| 채널 | Mono |
-| 최대 길이 | 180초 (3분) |
-
----
-
-## 3. Playback Features
-
-### 3.1 기본 재생
-
-- 재생/일시정지 토글
-- 슬라이더로 위치 이동 (웨이브폼 터치)
-- 재생 완료 시 자동 정지 및 처음으로
-
-### 3.2 재생 속도 조절
+### 3.2 재생 속도
 
 ```dart
 enum PlaybackSpeed {
@@ -178,79 +67,146 @@ enum PlaybackSpeed {
 }
 ```
 
-- 현재 속도 유지 (다음 녹음에도 적용)
-- UI에 현재 속도 표시
-
-### 3.3 구간 반복 (A-B Loop)
+### 3.3 A-B 루프
 
 ```dart
 class ABLoop {
-  Duration? pointA;  // 시작점 (null = 설정 안됨)
-  Duration? pointB;  // 종료점 (null = 설정 안됨)
+  Duration? pointA;  // 시작점
+  Duration? pointB;  // 종료점
   bool get isActive => pointA != null && pointB != null;
 }
 ```
 
-**동작 플로우:**
-1. A 버튼 탭 → 현재 위치를 A점으로 설정
-2. B 버튼 탭 → 현재 위치를 B점으로 설정
-3. A-B 설정 완료 시 → 해당 구간만 반복 재생
-4. A 또는 B 길게 누름 → 해당 점 해제
-5. 둘 다 해제 시 → 전체 재생 모드
+- A 탭 → 현재 위치를 A점 설정 (재탭: 해제)
+- B 탭 → 현재 위치를 B점 설정 (A 이후만 가능)
+- 활성 시 구간 반복 재생 + 웨이브폼 하이라이트
 
-**UI 피드백:**
-- 웨이브폼에 A-B 구간 하이라이트 표시
-- A, B 버튼 활성화 시 색상 변경
+### 3.4 외부 공유 버튼
 
----
+```dart
+// Controls Row에서 Speed 버튼 뒤, Spacer 앞 위치
+GestureDetector(
+  onTap: () => _shareToExternal(context),
+  child: Container(/* grey[800] 배경, 둥근 모서리 */),
+)
 
-## 4. Implementation Status
-
-### Phase 1: 기본 플레이어 UI ✅
-- [x] `RecordingPlayerBottomSheet` 위젯 생성
-- [x] 웨이브폼 시각화 (`RecordingWaveform`)
-- [x] 기본 컨트롤 (재생/정지, seek)
-- [x] 시간 표시
-- [x] 핀치 줌 (웨이브폼 확대/축소)
-
-### Phase 2: 고급 기능 ✅
-- [x] 재생 속도 조절 (0.5x ~ 2.0x)
-- [x] A-B Loop 구간 반복
-- [x] 스마트 녹음 연동 (트림 메타데이터)
-
-### Phase 3: 파일 시스템 정리 ✅
-- [x] UUID 기반 파일명
-- [x] 경로 구조 정리 (`recordings/{repertoireId}/`)
-- [x] Hive 메타데이터 저장
-
-### Phase 4: 추가 기능 ✅
-- [x] 날짜별 필터링/정렬
-- [x] 대표녹음 시스템 (첫 녹음 자동 지정)
-- [x] 녹음 초기화 (전체 삭제)
-- [x] 삭제 시 대표녹음 자동 재지정
-
----
-
-## 5. File Structure
-
-```
-lib/
-├── features/practice/presentation/
-│   ├── screens/
-│   │   └── practice_recording_screen.dart  # 기존
-│   └── widgets/
-│       ├── recording_waveform.dart         # 기존 (수정)
-│       └── recording_player_sheet.dart     # 신규
-├── providers/recording/
-│   └── recording_provider.dart             # 수정 (속도, A-B loop)
-└── services/
-    └── audio_player_service.dart           # 수정 (속도, seek)
+Future<void> _shareToExternal(BuildContext context) async {
+  final file = File(widget.recording.localPath);
+  if (!await file.exists()) {
+    // 스낵바: '녹음 파일을 찾을 수 없습니다'
+    return;
+  }
+  await SharePlus.instance.share(
+    ShareParams(files: [XFile(widget.recording.localPath)]),
+  );
+}
 ```
 
+- `share_plus` 패키지 사용 (기존 백업/초대 패턴과 동일)
+- 카카오톡, 메시지, 이메일 등 OS 공유 시트 표시
+
 ---
 
-## References
+## 4. 파형 시각화
 
-- [Tubik Studio - Echo Music App UX/UI](https://blog.tubikstudio.com/case-study-echo-designing-uxui/)
-- [Onething Design - Music Streaming UX](https://www.onething.design/post/tuning-ux-for-music-streaming-apps)
-- iOS Human Interface Guidelines - Controls
+### 4.1 녹음 시 파형
+
+두 가지 모듈 선택 가능:
+
+| 모듈 | 설명 | enum |
+|------|------|------|
+| WaveWaveform | 곡선 웨이브 애니메이션 | `WaveformStyle.wave` |
+| AmplitudeWaveform | 실시간 진폭 막대 그래프 | `WaveformStyle.amplitude` |
+
+**막대 그래프 스펙**: 너비 3dp, 간격 2dp, 업데이트 100ms, 최소 녹음 5초
+
+### 4.2 재생 시 파형 (핀치 줌)
+
+| 제스처 | 동작 |
+|--------|------|
+| 탭 | 해당 위치로 seek |
+| 핀치 아웃 | 줌 인 (최대 10x) |
+| 핀치 인 | 줌 아웃 (최소 1x) |
+| 수평 드래그 | 줌 상태에서 파형 스크롤 |
+| A/B 핸들 드래그 | 마커 위치 조정 (20px 터치 영역) |
+
+- 1.5x 이상 줌 시 미니맵 오버뷰 표시
+- A-B 구간 하이라이트: `AppColors.primary.withOpacity(0.3)`
+- 마커 핸들: 24dp 원형, `AppColors.primary`
+
+---
+
+## 5. 파일 저장
+
+### 5.1 파일명 규칙
+```
+{UUID}.m4a    (예: a1b2c3d4-e5f6-7890-abcd-ef1234567890.m4a)
+```
+
+### 5.2 저장 경로
+```
+Documents/recordings/{repertoireId}/{UUID}.m4a
+Documents/recordings/{repertoireId}/{UUID}.m4a.trim  # 스마트 녹음 메타데이터
+```
+
+### 5.3 녹음 설정
+
+| 항목 | 값 |
+|------|-----|
+| 포맷 | M4A (AAC-LC) |
+| 비트레이트 | 128kbps |
+| 샘플레이트 | 44100Hz |
+| 채널 | Mono |
+| 최대 길이 | 180초 (3분) |
+
+### 5.4 Hive DB 모델
+
+```dart
+@HiveType(typeId: 22)
+class Recording {
+  @HiveField(0) final String id;
+  @HiveField(1) final String repertoireId;
+  @HiveField(2) final String studentId;
+  @HiveField(3) final RecordingType type;
+  @HiveField(4) final String localPath;
+  @HiveField(5) final String? serverUrl;
+  @HiveField(6) final int durationSeconds;
+  @HiveField(7) final bool isRepresentative;
+  @HiveField(8) final DateTime recordedAt;
+  @HiveField(9) final DateTime? sharedAt;
+  @HiveField(10) final StorageStatus storageStatus;
+  @HiveField(11) final String? title;
+}
+```
+
+---
+
+## 6. 구현 상태 (전체 완료)
+
+- [x] Phase 1: 바텀시트 플레이어, 웨이브폼, 기본 컨트롤
+- [x] Phase 2: 재생 속도 조절, A-B 루프, 스마트 녹음 연동
+- [x] Phase 3: UUID 파일명, 경로 구조, Hive 메타데이터
+- [x] Phase 4: 날짜별 필터링, 대표녹음, 녹음 초기화
+- [x] 녹음 시 막대 그래프 모듈, 핀치 줌, A-B 드래그 핸들
+- [x] 외부 앱 공유 버튼 (share_plus)
+
+---
+
+## 7. 파일 구조
+
+```
+frontend/lib/features/practice/presentation/
+├── screens/
+│   └── practice_recording_screen.dart  # 녹음 화면 + PopupMenu 공유
+├── widgets/
+│   ├── recording_waveform.dart         # 팩토리 위젯 + exports
+│   ├── recording_player_sheet.dart     # 바텀시트 플레이어 + 공유 버튼
+│   ├── section_detail/
+│   │   └── section_recording_list_item.dart  # PopupMenu 공유
+│   └── waveform/
+│       ├── waveform_style.dart         # enum WaveformStyle
+│       ├── wave_waveform.dart          # 곡선 웨이브 애니메이션
+│       ├── amplitude_waveform.dart     # 실시간 진폭 막대 그래프
+│       ├── zoomable_waveform.dart      # 핀치 줌 + A-B 드래그
+│       └── ab_loop.dart               # ABLoop 클래스
+```

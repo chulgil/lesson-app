@@ -507,7 +507,60 @@ lib/features/practice/
 
 ---
 
-## 10. 향후 확장
+## 10. 레퍼토리별 통계 (RepertoireStats)
+
+> practice_stats_report_spec.md에서 통합
+
+### 10.1 데이터 모델
+
+```dart
+/// 레퍼토리별 통계
+class RepertoireStats {
+  final String repertoireId;
+  final String repertoireName;
+  final int practiceSeconds;
+  final int completedSections;
+  final int totalSections;
+
+  int get practiceMinutes => practiceSeconds ~/ 60;
+  double get completionRate =>
+    totalSections == 0 ? 0.0 : completedSections / totalSections * 100;
+}
+```
+
+### 10.2 레퍼토리별 분석 UI
+
+주간/월간 리포트 하단에 레퍼토리별 연습 비중을 표시:
+
+```
+┌─────────────────────────────────────────┐
+│ 🎵 레퍼토리별 연습                       │
+│ ┌─────────────────────────────────────┐ │
+│ │ 바흐 미뉴엣      45분 ████████ 60% │ │
+│ │ 스케일 A장조     20분 ████     27% │ │
+│ │ 에튀드 No.3      10분 ██       13% │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+### 10.3 Provider
+
+```dart
+@riverpod
+Future<List<RepertoireStats>> repertoireStats(
+  RepertoireStatsRef ref,
+  String studentId,
+  DateTime startDate,
+  DateTime endDate,
+) async {
+  final repository = ref.watch(practiceReportRepositoryProvider);
+  return repository.getRepertoireStats(studentId, startDate, endDate);
+}
+```
+
+---
+
+## 11. 향후 확장
 
 | 기능 | Phase | 설명 |
 |------|:-----:|------|

@@ -1,10 +1,22 @@
 # 녹음 기능 요구사항
 
+> 작성일: 2024-12-24
+> 최종 수정: 2026-03-02
+> 상태: Phase 1~1.5 구현 완료
+
 ## 개요
 
 음악 레슨 앱의 녹음 기능은 크게 두 가지로 구분됩니다:
 1. **레슨 피드백 녹음**: AI 음성→텍스트 변환 (파일 저장 없음)
 2. **레퍼토리 곡 녹음**: 학생 연습 녹음 및 선생님 참고 음원
+
+**관련 스펙 (상세 구현은 각 문서 참조)**:
+| 스펙 | 설명 |
+|------|------|
+| [recording_player_ui.md](recording_player_ui.md) | 재생 플레이어 UI, 파형, A-B 루프, 공유 버튼 |
+| [smart_recording_spec.md](smart_recording_spec.md) | 스마트 녹음 (무음 트리밍), `.trim` 메타데이터 |
+| [backup_implementation_spec.md](backup_implementation_spec.md) | ZIP 백업/복원, iCloud/Google Drive 연동 |
+| [practice_sharing_spec.md](practice_sharing_spec.md) | 선생님/학부모 공유 시스템 |
 
 ---
 
@@ -22,26 +34,11 @@
 
 | 항목 | 내용 |
 |------|------|
-| **녹음 시점** | 레슨 종료 후 |
-| **녹음 주체** | 선생님 |
-| **최대 길이** | 5분 이내 |
-| **파일 저장** | 없음 (변환 후 삭제) |
-| **결과물** | 레슨 노트에 텍스트로 자동 추가 |
-
-### UI 흐름
-```
-레슨 상세 화면
-├── [피드백 녹음 버튼] 클릭
-├── 녹음 중... (타이머 표시)
-├── [녹음 완료] 클릭
-├── "AI가 정리 중..." 로딩
-└── 레슨 노트에 텍스트 추가됨
-```
-
-### 기술 요구사항
-- Speech-to-Text API 연동 (OpenAI Whisper 또는 Google STT)
-- 녹음 파일은 변환 완료 후 즉시 삭제
-- AI가 자연스러운 문장으로 다듬어서 저장
+| 녹음 주체 | 선생님 |
+| 최대 길이 | 5분 이내 |
+| 파일 저장 | 없음 (변환 후 삭제) |
+| 결과물 | 레슨 노트에 텍스트로 자동 추가 |
+| AI 엔진 | OpenAI Whisper 또는 Google STT |
 
 ---
 
@@ -49,182 +46,48 @@
 
 ### 2-1. 학생 연습 녹음
 
-#### 목적
-학생이 레퍼토리별로 연습 녹음을 하고, 가장 잘 된 녹음을 선생님에게 공유
+| 항목 | 내용 |
+|------|------|
+| 녹음 주체 | 학생 |
+| 최대 길이 | 3분 이내 |
+| 로컬 저장 | 무제한 (기기 용량 허용 범위) |
+| 대표 녹음 | 레퍼토리당 1개 선택 가능 |
+| 공유 방식 | 별도 공유 버튼 클릭 시 서버 업로드 |
 
-#### 저장 방식
-- **로컬 저장**: 학생 기기에만 저장 (무제한)
-- **대표 녹음 선택**: 가장 잘 된 녹음 1개 선택 가능
-- **공유 시 서버 저장**: 보관 정책에 따라 관리 (아래 참조)
-
-#### 사용 흐름
+**사용 흐름**
 ```
 [학생 연습 화면]
 ├── 레퍼토리 선택 (예: "바흐 미뉴엣")
 ├── [녹음 시작] → 연주 → [녹음 종료]
 ├── 녹음 목록에 추가 (로컬 저장)
-├── 녹음 목록에서 재생/삭제 가능
 ├── 잘 된 녹음을 [대표로 선택]
+├── [외부 앱 공유] → 카카오톡/메시지 등으로 공유
 └── [선생님께 공유] 버튼 → 서버 업로드
 ```
 
-#### 상세 요구사항
-
-| 항목 | 내용 |
-|------|------|
-| **녹음 주체** | 학생 |
-| **최대 길이** | 3분 이내 |
-| **로컬 저장** | 무제한 (기기 용량 허용 범위) |
-| **대표 녹음** | 레퍼토리당 1개 선택 가능 |
-| **공유 방식** | 별도 공유 버튼 클릭 시 서버 업로드 |
-| **서버 보관** | 보관 정책에 따라 자동 관리 |
-
-#### 대표 녹음 공유 후
-- 선생님의 **학생 주차 요약**에 표시
-- 레퍼토리 옆에 녹음 아이콘으로 표시
-- 클릭하면 재생 가능
-
-#### 공유받은 녹음 다운로드 (선생님)
-
-선생님은 학생이 공유한 녹음을 자신의 기기에 다운로드하여 영구 보관할 수 있습니다.
-
-| 항목 | 내용 |
-|------|------|
-| **다운로드 대상** | 학생이 공유한 녹음 파일 |
-| **저장 위치** | 선생님 기기 로컬 저장소 |
-| **보관 기간** | 영구 (서버 보관 정책 무관) |
-| **사용 목적** | 서버 삭제 후에도 참고 가능 |
-
-**사용 흐름**
-```
-[학생 주차 요약 - 공유된 녹음]
-├── 녹음 재생 ▶
-├── [⬇ 다운로드] 버튼
-│   ├── 다운로드 완료
-│   └── 로컬에 저장됨 (서버 삭제와 무관)
-└── 다운로드한 녹음은 별도 목록에서 관리
-```
-
-**다운로드 안내 UI**
-```
-┌─────────────────────────────────────────┐
-│ 🎵 김서연 - 바흐 미뉴엣                 │
-│ 녹음일: 2024.12.20                      │
-│ ─────────────────────────────────────── │
-│ ⚠️ 서버 보관: 5일 남음                   │
-│ ℹ️ 다운로드하면 영구 보관 가능           │
-│                                         │
-│    [▶ 재생]    [⬇ 다운로드]             │
-└─────────────────────────────────────────┘
-```
-
----
-
 ### 2-2. 선생님 참고 음원
-
-#### 목적
-선생님이 각 레퍼토리에 참고 음원을 연결하여 학생이 연습 시 참고할 수 있도록 함
-
-#### 참고 음원 유형
 
 | 유형 | 설명 | 저장 방식 |
 |------|------|----------|
-| **유튜브 링크** | 외부 연주 영상 | URL만 저장 |
-| **선생님 녹음** | 선생님이 직접 연주 녹음 | 서버 업로드 |
-
-#### 사용 흐름 (선생님)
-```
-[레퍼토리 관리]
-├── 곡 선택 (예: "바흐 미뉴엣")
-├── [참고 음원 추가]
-│   ├── 유튜브 링크 입력
-│   └── 또는 [녹음] → 직접 연주
-└── 저장
-```
-
-#### 사용 흐름 (학생)
-```
-[연습 화면 - 레퍼토리]
-├── "바흐 미뉴엣" 선택
-├── [참고 음원 재생] 버튼
-│   ├── 유튜브: 유튜브 앱으로 이동
-│   └── 선생님 녹음: 앱 내 재생
-└── 본인 녹음 시작
-```
-
----
+| 유튜브 링크 | 외부 연주 영상 | URL만 저장 |
+| 선생님 녹음 | 선생님이 직접 연주 녹음 | 서버 업로드 |
 
 ### 2-3. 선생님 피드백 (학생 녹음에 대한)
 
-#### 목적
-학생이 공유한 녹음을 듣고 선생님이 피드백 작성
+- 텍스트 직접 입력 또는 음성 입력 → AI 텍스트 변환
+- 공유된 녹음에 대해 선생님이 피드백 작성 → 학생에게 표시
 
-#### 피드백 입력 방식
-- **텍스트 입력**: 기본 키보드 입력
-- **음성 입력**: 마이크 버튼 → 음성 녹음 → AI가 텍스트로 변환 및 정리
+### 2-4. 공유받은 녹음 다운로드 (선생님)
 
-#### 사용 흐름
-```
-[학생 주차 요약 - 공유된 녹음]
-├── 녹음 재생
-├── [피드백 작성]
-│   ├── 텍스트 직접 입력
-│   └── 또는 [마이크] → 음성 입력 → AI 텍스트 변환
-└── 저장 → 학생에게 표시
-```
+| 항목 | 내용 |
+|------|------|
+| 다운로드 대상 | 학생이 공유한 녹음 파일 |
+| 저장 위치 | 선생님 기기 로컬 저장소 |
+| 보관 기간 | 영구 (서버 보관 정책 무관) |
 
 ---
 
-## 화면 구성
-
-### 학생 - 연습 녹음 화면
-
-```
-┌─────────────────────────────────┐
-│ < 바흐 미뉴엣                   │
-├─────────────────────────────────┤
-│ [참고 음원 재생 ▶]              │  ← 선생님이 지정한 음원
-├─────────────────────────────────┤
-│ 내 녹음 (3/10)                  │
-│ ┌─────────────────────────────┐ │
-│ │ ⭐ 12/20 14:30  2:45  ▶ 🗑 │ │  ← 대표 녹음
-│ │    12/19 20:15  2:30  ▶ 🗑 │ │
-│ │    12/18 19:00  2:15  ▶ 🗑 │ │
-│ └─────────────────────────────┘ │
-├─────────────────────────────────┤
-│      [🎙 녹음 시작]             │
-├─────────────────────────────────┤
-│ [선생님께 공유]                 │  ← 대표 녹음 업로드
-└─────────────────────────────────┘
-```
-
-### 선생님 - 학생 주차 요약
-
-```
-┌─────────────────────────────────┐
-│ 김서연 - 12월 3주차             │
-├─────────────────────────────────┤
-│ 레퍼토리 연습 현황              │
-│ ┌─────────────────────────────┐ │
-│ │ 바흐 미뉴엣    🎵 ▶ ⬇       │ │  ← 재생/다운로드 가능
-│ │ └─ 피드백: "템포 좋아졌어요" │ │
-│ │ 스케일 A장조                 │ │  ← 공유된 녹음 없음
-│ └─────────────────────────────┘ │
-├─────────────────────────────────┤
-│ 📥 다운로드한 녹음 (2)          │  ← 로컬 저장 목록
-│ ┌─────────────────────────────┐ │
-│ │ 12/15 바흐 미뉴엣  ▶ 🗑     │ │
-│ │ 12/08 스케일 연습  ▶ 🗑     │ │
-│ └─────────────────────────────┘ │
-├─────────────────────────────────┤
-│ 레슨 노트                       │
-│ - 12/21 레슨 완료               │
-└─────────────────────────────────┘
-```
-
----
-
-## 데이터 모델
+## 3. 데이터 모델
 
 ### Recording (녹음)
 ```dart
@@ -235,42 +98,26 @@ class Recording {
   RecordingType type;       // student, teacher, feedback
   String? localPath;        // 로컬 파일 경로
   String? serverUrl;        // 서버 업로드 URL (공유 시)
-  int durationSeconds;      // 녹음 길이
+  int durationSeconds;
   bool isRepresentative;    // 대표 녹음 여부
   DateTime recordedAt;
   DateTime? sharedAt;       // 선생님께 공유한 시간
-  StorageStatus storageStatus; // 서버 저장 상태
-}
-
-enum RecordingType {
-  student,   // 학생 연습 녹음
-  teacher,   // 선생님 참고 녹음
-  feedback   // AI 변환 피드백 (텍스트로 저장)
-}
-
-enum StorageStatus {
-  local,     // 로컬에만 저장
-  active,    // 서버 활성 저장소 (빠른 접근)
-  archived,  // S3 아카이브 (지연 재생)
-  deleted    // 서버에서 삭제됨
+  StorageStatus storageStatus;
 }
 ```
+
+> Hive DB 모델, 파일 저장 경로/포맷 상세는 → [recording_player_ui.md](recording_player_ui.md#2-file-storage)
 
 ### ReferenceAudio (참고 음원)
 ```dart
 class ReferenceAudio {
   String id;
-  String pieceId;           // 레퍼토리 ID
+  String pieceId;
   ReferenceType type;       // youtube, recording
-  String? youtubeUrl;       // 유튜브 URL
-  String? recordingUrl;     // 선생님 녹음 URL
-  String? title;            // 표시 제목
+  String? youtubeUrl;
+  String? recordingUrl;
+  String? title;
   DateTime createdAt;
-}
-
-enum ReferenceType {
-  youtube,   // 유튜브 링크
-  recording  // 선생님 직접 녹음
 }
 ```
 
@@ -278,9 +125,9 @@ enum ReferenceType {
 ```dart
 class RecordingFeedback {
   String id;
-  String recordingId;       // 학생 녹음 ID
+  String recordingId;
   String teacherId;
-  String content;           // 피드백 텍스트
+  String content;
   DateTime createdAt;
 }
 ```
@@ -289,417 +136,53 @@ class RecordingFeedback {
 ```dart
 class DownloadedRecording {
   String id;
-  String originalRecordingId;  // 원본 녹음 ID
-  String studentId;            // 학생 ID
-  String studentName;          // 학생 이름
-  String pieceId;              // 레퍼토리 ID
-  String pieceName;            // 곡명
-  String localPath;            // 로컬 저장 경로
-  int durationSeconds;         // 녹음 길이
-  DateTime originalRecordedAt; // 원본 녹음일
-  DateTime downloadedAt;       // 다운로드 시간
+  String originalRecordingId;
+  String studentId;
+  String studentName;
+  String pieceId;
+  String pieceName;
+  String localPath;
+  int durationSeconds;
+  DateTime originalRecordedAt;
+  DateTime downloadedAt;
 }
 ```
 
 ---
 
-## 저장소 및 보관 정책
+## 4. 서버 보관 정책
 
-### 로컬 저장 (학생 기기)
-
-| 항목 | 정책 |
-|------|------|
-| **저장 용량** | 무제한 (기기 용량 허용 범위) |
-| **삭제** | 사용자 수동 삭제만 |
-| **백업** | 클라우드 백업 미지원 (로컬만) |
-
-### 서버 저장 (공유된 녹음)
-
-공유된 녹음은 **녹음 시작일 기준**으로 보관 정책이 적용됩니다.
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  녹음 시작일                                                │
-│      │                                                      │
-│      ▼                                                      │
-│  ┌────────────────┐    ┌────────────────┐    ┌──────────┐  │
-│  │  활성 저장소   │ → │   S3 아카이브  │ → │   삭제   │  │
-│  │  (1개월)       │    │   (5개월)      │    │          │  │
-│  │  빠른 접근     │    │   저비용 보관  │    │          │  │
-│  └────────────────┘    └────────────────┘    └──────────┘  │
-│       0일               30일               180일(6개월)     │
-└─────────────────────────────────────────────────────────────┘
-```
+공유된 녹음은 녹음 시작일 기준으로 보관 정책이 적용됩니다:
 
 | 기간 | 저장소 | 설명 |
 |------|--------|------|
-| **0~30일** | 활성 저장소 | 빠른 스트리밍 재생 가능 |
-| **31~180일** | S3 아카이브 | 저비용 보관, 재생 시 지연 가능 |
-| **180일 이후** | 삭제 | 자동 영구 삭제 |
+| 0~30일 | 활성 저장소 | 빠른 스트리밍 재생 가능 |
+| 31~180일 | S3 아카이브 | 저비용 보관, 재생 시 지연 가능 |
+| 180일 이후 | 삭제 | 자동 영구 삭제 |
 
-### 보관 정책 UI 안내
-
-```
-┌─────────────────────────────────────────┐
-│ 🎵 바흐 미뉴엣 녹음                     │
-│ 녹음일: 2024.12.20                      │
-│ ─────────────────────────────────────── │
-│ ⏰ 서버 보관: 29일 남음                  │
-│ ℹ️ 30일 후 아카이브로 이동됩니다        │
-└─────────────────────────────────────────┘
-```
-
-### 아카이브 재생 안내
-
-아카이브된 녹음 재생 시:
-```
-┌─────────────────────────────────────────┐
-│ 📦 아카이브된 녹음입니다                │
-│ 재생 준비에 몇 초가 소요될 수 있습니다  │
-│                                         │
-│    [재생 준비 중...]                    │
-└─────────────────────────────────────────┘
-```
+> 로컬 백업/영속성 전략 → [backup_implementation_spec.md](backup_implementation_spec.md)
 
 ---
 
-## 저장소 영속성 전략 (앱 삭제 후 보존)
-
-> **설계 목표**: 앱을 삭제하더라도 녹음 파일이 사용자 기기에 남아있도록 하는 하이브리드 저장 전략
-
-### 배경 및 타사 분석
-
-iOS 앱은 샌드박스 환경에서 실행되어 기본적으로 앱 삭제 시 모든 데이터가 삭제됩니다.
-타사 앱들의 저장 전략을 분석한 결과:
-
-| 앱 | 저장 전략 | 앱 삭제 후 유지 |
-|---|---|---|
-| Apple Voice Memos | iCloud 동기화 | ✅ iCloud에 남음 |
-| Yousician | 앱 내 저장 + 서버 | ⚠️ 서버에만 남음 |
-| ForScore | iCloud/Dropbox 연동 | ✅ 클라우드에 남음 |
-| 일반 녹음 앱 | Files 앱 내보내기 | ✅ Files 앱에 남음 |
-
-### 하이브리드 저장 전략 (채택)
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    하이브리드 저장 전략                          │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   앱 내부    │    │   iCloud     │    │   수동       │      │
-│  │   저장소     │ ←→ │   백업       │    │   내보내기   │      │
-│  │  (기본)     │    │  (선택)      │    │  (선택)      │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│        │                    │                    │              │
-│        ▼                    ▼                    ▼              │
-│   앱 삭제 시            앱 삭제 후           사용자 지정        │
-│   함께 삭제            iCloud에 유지        위치에 유지         │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### 저장소 옵션
-
-#### 1. 앱 내부 저장소 (기본)
-- **위치**: `getApplicationDocumentsDirectory()`
-- **특징**: 현재 구현 방식, 앱 삭제 시 함께 삭제
-- **용도**: 일상적인 녹음 저장
-
-#### 2. iCloud Drive 백업 (선택)
-- **위치**: `iCloud Drive/LessonApp/Recordings/`
-- **특징**: 앱 삭제 후에도 유지, 기기 간 동기화
-- **구현**: `NSUbiquitousContainers` 설정 필요
-- **용도**: 중요한 녹음 백업
-
-#### 3. 수동 내보내기
-- **방식**: UIDocumentPickerViewController 사용
-- **대상**: Files 앱, Dropbox, Google Drive 등
-- **특징**: 사용자가 원하는 위치에 저장
-- **용도**: 일괄 백업, 공유
-
-### 일괄 내보내기 기능
-
-학생별/곡별 녹음을 ZIP으로 압축하여 내보내기:
-
-```
-[내보내기 옵션]
-├── 전체 내보내기 (모든 녹음)
-├── 학생별 내보내기
-│   └── 김서연_녹음_2026-01.zip
-│       ├── 바흐_미뉴엣/
-│       │   ├── 2026-01-01_14-30.m4a
-│       │   └── 2026-01-02_15-00.m4a
-│       └── 스케일_A장조/
-│           └── 2026-01-03_10-00.m4a
-└── 곡별 내보내기
-    └── 바흐_미뉴엣_녹음.zip
-```
-
-### UI 설계
-
-#### 설정 화면
-```
-┌─────────────────────────────────────────┐
-│ 녹음 저장 설정                          │
-├─────────────────────────────────────────┤
-│                                         │
-│ 📁 기본 저장                            │
-│    앱 내부 저장소 (자동)           ✓    │
-│                                         │
-│ ☁️ iCloud 백업                          │
-│    새 녹음을 iCloud에 자동 백업    [○]  │
-│    ℹ️ 앱 삭제 후에도 iCloud에 유지      │
-│                                         │
-│ 📤 녹음 내보내기                        │
-│    [전체 내보내기]                      │
-│    [학생별 내보내기]                    │
-│                                         │
-└─────────────────────────────────────────┘
-```
-
-#### 내보내기 진행 화면
-```
-┌─────────────────────────────────────────┐
-│ 녹음 내보내기                           │
-├─────────────────────────────────────────┤
-│                                         │
-│ 📦 ZIP 파일 생성 중...                  │
-│ ━━━━━━━━━━━━━━━━━━━━━━━━━ 75%          │
-│                                         │
-│ 포함된 녹음: 15개                       │
-│ 예상 크기: 45.2 MB                      │
-│                                         │
-│ [취소]                                  │
-└─────────────────────────────────────────┘
-```
-
-### 기술 구현
-
-#### Info.plist 설정 (Files 앱 노출)
-```xml
-<!-- 앱 Documents를 Files 앱에서 볼 수 있도록 -->
-<key>UIFileSharingEnabled</key>
-<true/>
-<key>LSSupportsOpeningDocumentsInPlace</key>
-<true/>
-
-<!-- iCloud Container 설정 -->
-<key>NSUbiquitousContainers</key>
-<dict>
-    <key>iCloud.com.lessonapp.lessonApp</key>
-    <dict>
-        <key>NSUbiquitousContainerIsDocumentScopePublic</key>
-        <true/>
-        <key>NSUbiquitousContainerSupportedFolderLevels</key>
-        <string>Any</string>
-        <key>NSUbiquitousContainerName</key>
-        <string>LessonApp</string>
-    </dict>
-</dict>
-```
-
-#### 내보내기 서비스
-```dart
-class RecordingExportService {
-  /// 학생별 녹음을 ZIP으로 내보내기
-  Future<void> exportByStudent({
-    required String studentId,
-    required String studentName,
-  }) async {
-    // 1. 학생의 모든 녹음 수집
-    // 2. 폴더 구조 생성 (곡별)
-    // 3. ZIP 압축
-    // 4. UIDocumentPickerViewController로 저장 위치 선택
-  }
-
-  /// iCloud에 녹음 백업
-  Future<void> backupToICloud(Recording recording) async {
-    // iCloud Container에 파일 복사
-  }
-
-  /// iCloud 백업 복원
-  Future<List<Recording>> restoreFromICloud() async {
-    // iCloud에서 녹음 파일 목록 조회 및 복원
-  }
-}
-```
-
-### 구현 우선순위
-
-| 순위 | 기능 | 복잡도 | 우선순위 |
-|:---:|------|:---:|:---:|
-| 1 | Files 앱 노출 (Info.plist) | 낮음 | 🔴 높음 |
-| 2 | 일괄 내보내기 (ZIP) | 중간 | 🔴 높음 |
-| 3 | iCloud 백업 옵션 | 높음 | 🟡 중간 |
-| 4 | iCloud 복원 | 높음 | 🟡 중간 |
-
-### 참고 자료
-
-- [UIDocumentPickerViewController - Apple](https://developer.apple.com/documentation/uikit/uidocumentpickerviewcontroller)
-- [iOS File Provider Extension - Kodeco](https://www.kodeco.com/697468-ios-file-provider-extension-tutorial)
-- [path_provider - Flutter](https://pub.dev/packages/path_provider)
-- [Voice Memos iCloud Sync - Apple](https://support.apple.com/en-us/118285)
-
----
-
-## 기술 요구사항
-
-### 음성 녹음
-- Flutter `record` 또는 `audio_recorder` 패키지
-- 녹음 포맷: AAC 또는 M4A (용량 효율)
-- 최대 3분 제한 (곡 녹음)
-- 최대 5분 제한 (레슨 피드백)
-
-### 음성→텍스트 변환 (AI)
-- OpenAI Whisper API 또는 Google Speech-to-Text
-- 한국어 지원 필수
-- 변환 후 GPT로 문장 다듬기 (선택)
-
-### 로컬 저장
-- 앱 Documents 디렉토리에 저장
-- 레퍼토리별 폴더 구조
-- 무제한 저장 (기기 용량 허용 범위)
-- 사용자 수동 삭제만 가능
-
-### 서버 업로드 (대표 녹음 공유 시)
-- 압축 후 업로드 (용량 최적화)
-- 업로드 완료 후 로컬 원본 유지
-- 스트리밍 재생 지원
-
-### 다운로드 (공유받은 녹음)
-- 서버에서 로컬로 파일 다운로드
-- 다운로드된 파일은 서버 보관 정책과 무관하게 영구 보관
-- 학생별/레퍼토리별 폴더 구조로 정리
-
----
-
-## 프로 구독 모델 (Pro Subscription)
-
-### 개요
-
-스마트 녹음 기능은 **프로 구독** 전용 기능으로 제공됩니다.
+## 5. 프로 구독 모델 (Pro Subscription)
 
 | 기능 | 무료 | 프로 |
 |------|:----:|:----:|
 | 일반 녹음 | ✅ | ✅ |
-| 녹음 재생/삭제 | ✅ | ✅ |
-| A-B 루프, 속도 조절 | ✅ | ✅ |
+| 재생/삭제/A-B 루프/속도 조절 | ✅ | ✅ |
 | 대표 녹음 선택 | ✅ | ✅ |
 | **스마트 녹음** (무음 트리밍) | ❌ | ✅ |
 | **중간 무음 스킵** | ❌ | ✅ |
 
-### 구독 해지 후 동작
-
-**중요**: 구독 해지 후에도 **기존에 스마트 녹음된 파일들은 정상 재생**되어야 합니다.
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  구독 상태에 따른 기능 차이                                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  [프로 구독 중]                                                  │
-│  ├── 새 녹음: 스마트 녹음 가능                                   │
-│  └── 기존 녹음: 트림/스킵 정상 재생                               │
-│                                                                 │
-│  [구독 해지 후]                                                  │
-│  ├── 새 녹음: 일반 녹음만 가능 (스마트 녹음 버튼 비활성화)         │
-│  └── 기존 녹음: 트림/스킵 정상 재생 ✅ (메타데이터 유지)           │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### 구현 원칙
-
-1. **메타데이터 기반 재생**: `.trim` 파일이 있으면 항상 적용 (구독 상태 무관)
-2. **녹음 시에만 구독 체크**: 스마트 녹음 버튼 활성화 여부만 구독으로 제어
-3. **재생은 무조건 지원**: 기존 녹음 재생 시 구독 상태 확인하지 않음
+**구독 해지 후**: 기존 스마트 녹음 파일은 정상 재생 (`.trim` 메타데이터 유지). 새 녹음만 일반 녹음으로 제한.
 
 ---
 
-## 데이터 영속성 요구사항
+## 6. iOS 녹음 경로 복구 (Issue #9) ✅
 
-### 필수 요구사항
+iOS에서 앱 재배포 시 컨테이너 UUID가 변경되어 Hive DB의 녹음 경로가 무효화되는 문제.
 
-녹음 파일과 메타데이터는 다음 상황에서도 **유지되어야** 합니다:
-
-| 상황 | 데이터 유지 | 구현 방안 |
-|------|:----------:|----------|
-| 앱 업데이트 | ✅ 필수 | Documents 디렉토리 (기본 지원) |
-| 앱 삭제 후 재설치 | ✅ 필수 | iCloud 백업 또는 Files 앱 |
-| 기기 변경 | ⭕ 선택 | iCloud 동기화 |
-
-### 현재 저장 구조
-
-```
-Documents/
-├── recordings/
-│   └── [repertoireId]/
-│       ├── recording_uuid.m4a      # 오디오 파일
-│       └── recording_uuid.m4a.trim # 트림 메타데이터 (JSON)
-└── recording_backups/              # 원본 백업 (선택적)
-```
-
-### iOS 앱 삭제 시 데이터 보존 전략
-
-iOS에서 앱 삭제 시 Documents 폴더도 함께 삭제됩니다. 데이터 보존을 위한 옵션:
-
-#### 1. iCloud 자동 백업 (권장)
-```xml
-<!-- Info.plist -->
-<key>NSUbiquitousContainers</key>
-<dict>
-    <key>iCloud.com.lessonapp.lessonApp</key>
-    <dict>
-        <key>NSUbiquitousContainerIsDocumentScopePublic</key>
-        <true/>
-    </dict>
-</dict>
-```
-
-#### 2. Files 앱 노출
-```xml
-<!-- Info.plist -->
-<key>UIFileSharingEnabled</key>
-<true/>
-<key>LSSupportsOpeningDocumentsInPlace</key>
-<true/>
-```
-
-#### 3. 일괄 내보내기 (ZIP)
-- 학생별/곡별 녹음을 ZIP으로 압축하여 내보내기
-- 사용자가 원하는 위치에 저장
-
----
-
-## iOS 녹음 경로 복구 (Issue #9)
-
-> 구현 완료: 2026-01-03
-
-### 문제 상황
-
-iOS에서 앱을 개발 모드로 재배포하면 앱 컨테이너 UUID가 변경됩니다:
-
-```
-이전 경로: /var/mobile/.../Application/OLD-UUID/Documents/recordings/...
-새 경로:   /var/mobile/.../Application/NEW-UUID/Documents/recordings/...
-```
-
-이로 인해 Hive DB에 저장된 녹음 파일 경로가 무효화되어 재생이 불가능해집니다.
-
-### 해결 방안
-
-앱 시작 시 자동 경로 복구 로직 실행 (`main.dart`):
-
-```dart
-Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
-  // 1. 현재 Documents 디렉토리 경로 획득
-  // 2. recordings/ 폴더 스캔하여 파일 맵 구축
-  // 3. DB 기록 순회하며 경로 복구 시도
-}
-```
-
-#### 복구 전략
+### 복구 전략 (우선순위)
 
 | 순서 | 전략 | 설명 |
 |:---:|------|------|
@@ -707,250 +190,90 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
 | 2 | 파일명 검색 | 파일명으로 파일 맵에서 검색 |
 | 3 | ID 패턴 검색 | 녹음 ID 앞 8자리로 파일명 패턴 매칭 |
 
-#### 복구 후 정리
-
+- 앱 시작 시(`main.dart`) 자동 실행
 - 복구 불가능한 고아 기록은 DB에서 자동 삭제
-- 앱 시작 시 복구 결과 로깅
-
-### 파일 없음 UI
-
-녹음 파일이 존재하지 않는 경우 "파일 없음" 상태 표시:
-
-```
-┌─────────────────────────────────────────┐
-│ ⚠️ 파일 없음                             │
-│ 2026.01.01 14:30 · 2:45                 │
-│ 녹음 파일이 삭제되었거나 찾을 수 없습니다  │
-│                                    [🗑]  │
-└─────────────────────────────────────────┘
-```
-
-- 재생 버튼 대신 경고 아이콘 표시
-- 삭제 버튼으로 DB 기록 정리 가능
 
 ---
 
-## 녹음 진단 화면 (디버그 모드)
+## 7. 녹음 완전 삭제 ✅
 
-> 구현 완료: 2026-01-03
+녹음 삭제 시 **오디오 파일 + .trim 메타데이터 + DB 기록** 모두 삭제:
 
-### 접근 방법
+| 삭제 대상 | 설명 |
+|------|------|
+| `*.m4a` | 오디오 파일 |
+| `*.m4a.trim` | 스마트 녹음 트림 메타데이터 |
+| Hive DB 기록 | PracticeRecording 엔트리 |
 
-1. 디버그 FAB (역할 전환 버튼) **길게 누르기**
-2. 개발자 옵션 시트 → "녹음 파일 진단" 선택
+---
 
-### 진단 정보
+## 8. 녹음 진단 화면 (디버그 모드) ✅
 
-| 항목 | 설명 |
+디버그 FAB 길게 누르기 → 개발자 옵션 → "녹음 파일 진단"
+
+| 진단 항목 | 설명 |
 |------|------|
 | 기본 경로 | 현재 Documents 디렉토리 경로 |
 | 실제 파일 수 | recordings/ 폴더 내 오디오 파일 수 |
 | DB 기록 수 | Hive practice_recordings box 기록 수 |
 | 매칭됨 | DB 기록 중 파일이 존재하는 수 |
 | DB 불일치 | DB 기록 중 파일이 없는 수 |
-| 고아 파일 | 파일은 있으나 DB에 없는 수 |
-
-### 고아 파일 관리
-
-디스크에는 존재하지만 DB에 기록이 없는 파일들:
-
-- 개별 삭제: 각 파일 옆 삭제 버튼
-- 전체 삭제: "고아 파일 전체 삭제" 버튼
-
-```dart
-// 고아 파일 = 실제 파일 - DB 기록 파일
-_orphanedFiles = _physicalFiles.where(
-  (path) => !dbFilePaths.contains(path)
-).toList();
-```
-
-### UI 구성
-
-```
-┌─────────────────────────────────────────┐
-│ 녹음 파일 진단                      [↻] │
-├─────────────────────────────────────────┤
-│ 요약                                    │
-│ ─────────────────────────────────────── │
-│ 기본 경로: /var/.../Documents           │
-│ 실제 파일 수: 51개                      │
-│ DB 기록 수: 19개                        │
-│ 매칭됨: 19개 ✅                         │
-│ DB 불일치: 0개 ✅                       │
-│ 고아 파일: 32개 ⚠️                      │
-├─────────────────────────────────────────┤
-│ 고아 파일 - DB에 없음 (32개)            │
-│ [고아 파일 전체 삭제 (32개)]            │
-│ ⚠️ file1.m4a                       [🗑] │
-│ ⚠️ file2.m4a                       [🗑] │
-│ ...                                     │
-├─────────────────────────────────────────┤
-│ 파일 존재 (19개)                        │
-│ ✅ recording1.m4a                       │
-│ ...                                     │
-└─────────────────────────────────────────┘
-```
+| 고아 파일 | 파일은 있으나 DB에 없는 수 (개별/전체 삭제 가능) |
 
 ---
 
-## 녹음 완전 삭제
+## 9. 구현 로드맵
 
-> 구현 완료: 2026-01-03
+### Phase 1 (MVP) ✅
+- [x] 학생 연습 녹음 (로컬 저장), 재생/삭제
+- [x] 대표 녹음 선택, 스마트 녹음
+- [x] A-B 루프, 속도 조절, 핀치 줌, 파형 시각화
 
-### 이전 동작
-- DB 기록만 삭제
-- 실제 파일은 디스크에 남음 → 고아 파일 발생
-
-### 현재 동작
-녹음 삭제 시 모든 관련 파일 삭제:
-
-```dart
-Future<void> deleteRecording(String id) async {
-  // 1. DB에서 파일 경로 조회
-  final recording = box.get(id);
-  final filePath = recording?.filePath;
-
-  // 2. 실제 파일 삭제
-  if (filePath != null) {
-    final audioFile = File(filePath);
-    if (await audioFile.exists()) {
-      await audioFile.delete();
-    }
-    // .trim 메타데이터 파일도 삭제
-    final trimFile = File('$filePath.trim');
-    if (await trimFile.exists()) {
-      await trimFile.delete();
-    }
-  }
-
-  // 3. DB 기록 삭제
-  await box.delete(id);
-}
-```
-
-### 삭제 대상 파일
-
-| 파일 | 설명 |
-|------|------|
-| `*.m4a` | 오디오 파일 |
-| `*.m4a.trim` | 스마트 녹음 트림 메타데이터 |
-
----
-
-### 메타데이터 파일 형식
-
-`.trim` 파일은 JSON 형식으로 저장:
-
-```json
-{
-  "trimStart": 1500,
-  "trimEnd": 2000,
-  "totalDuration": 65000,
-  "contentStart": 1500,
-  "contentEnd": 63000,
-  "segments": [
-    {"start": 1500, "end": 30000},
-    {"start": 35000, "end": 63000}
-  ]
-}
-```
-
-| 필드 | 설명 |
-|------|------|
-| `trimStart` | 시작 무음 트림 (ms) |
-| `trimEnd` | 끝 무음 트림 (ms) |
-| `contentStart` | 실제 콘텐츠 시작점 (ms) |
-| `contentEnd` | 실제 콘텐츠 끝점 (ms) |
-| `segments` | 중간 무음 스킵 시 재생 구간 목록 |
-
----
-
-## 구현 우선순위
-
-### Phase 1 (MVP) - ✅ 완료
-- [x] 학생 연습 녹음 (로컬 저장)
-- [x] 녹음 재생/삭제
-- [x] 대표 녹음 선택 (첫 녹음 자동 지정, 삭제 시 최신순 재지정)
-- [x] 스마트 녹음 (앞뒤 무음 자동 트리밍)
-- [x] 녹음 초기화 버튼 (전체 녹음 삭제)
-- [x] 날짜별 필터링/정렬
-- [x] 메트로놈 연동 BPM 표시 (미사용 시 null)
-- [x] A-B 루프 재생, 속도 조절, 핀치 줌
-
-### Phase 1.5 (버그 수정/개선) - ✅ 완료
-- [x] 녹음 파일 영속성 (Hive 동기화)
-- [x] 연습완료 시 대표녹음 공유 안내 메시지
-- [x] iOS 컨테이너 UUID 변경 시 녹음 경로 자동 복구 (Issue #9)
-- [x] 녹음 삭제 시 실제 파일도 함께 삭제 (완전 삭제)
-- [x] 녹음 진단 화면 추가 (디버그 모드)
-- [x] 파일 없음 UI 표시 및 고아 파일 관리
+### Phase 1.5 (버그 수정/개선) ✅
+- [x] iOS 컨테이너 UUID 경로 복구, 녹음 완전 삭제, 진단 화면
 - [ ] 트림 후 실제 재생 시간 표시 (Issue #7)
 - [ ] 연습완료 날짜별 동기화 (Issue #8)
 
 ### Phase 2
-- [ ] 대표 녹음 서버 업로드 (공유)
-- [ ] 선생님 주차 요약에 표시
-- [ ] 선생님 텍스트 피드백
+- [ ] 대표 녹음 서버 업로드, 선생님 주차 요약 표시, 텍스트 피드백
 
 ### Phase 3
-- [ ] 레슨 피드백 AI 음성→텍스트
-- [ ] 선생님 참고 음원 (유튜브 링크)
-- [ ] 선생님 참고 녹음
+- [ ] 레슨 피드백 AI 음성→텍스트, 선생님 참고 음원
 
 ### Phase 4
-- [ ] 선생님 음성 피드백 (AI 변환)
-- [ ] 선생님 직접 참고 녹음
+- [ ] 선생님 음성 피드백 (AI 변환), 선생님 직접 참고 녹음
 
 ### Phase 5 (데이터 영속성)
-- [ ] iCloud 자동 백업 구현
-- [ ] Files 앱 노출 (Info.plist)
-- [ ] 일괄 내보내기 (ZIP)
-- [ ] iCloud 복원 기능
+- [ ] iCloud/ZIP 백업 → [backup_implementation_spec.md](backup_implementation_spec.md)
 
 ### Phase 6 (프로 구독)
-- [ ] 구독 상태 관리 Provider
-- [ ] 스마트 녹음 버튼 구독 체크
-- [ ] 구독 안내 UI
+- [ ] 구독 상태 관리, 스마트 녹음 버튼 구독 체크
 
 ---
 
-## 관련 파일
+## 10. 관련 파일
 
 ```
-lib/
-├── core/
-│   └── widgets/
-│       ├── debug_role_switcher.dart        # 디버그 옵션 시트 (진단 화면 연결)
-│       └── recording_diagnostic_screen.dart # 녹음 진단 화면 ✅ NEW
+frontend/lib/
+├── core/widgets/
+│   ├── debug_role_switcher.dart        # 디버그 옵션 시트
+│   └── recording_diagnostic_screen.dart # 녹음 진단 화면
 ├── models/
 │   ├── recording.dart
-│   ├── practice_repertoire.dart            # PracticeRecording 모델
+│   ├── practice_repertoire.dart        # PracticeRecording 모델
 │   ├── downloaded_recording.dart
 │   └── reference_audio.dart
-├── repositories/
-│   ├── recording_repository.dart
-│   ├── practice_repertoire_repository.dart # deleteRecording (완전 삭제) ✅ 수정
-│   └── downloaded_recording_repository.dart
-├── providers/
-│   └── recording/
 ├── services/
 │   ├── audio_recorder_service.dart
-│   ├── audio_trimmer_service.dart          # 스마트 녹음 트리밍
-│   ├── speech_to_text_service.dart
-│   ├── audio_upload_service.dart
-│   └── audio_download_service.dart
-├── main.dart                               # 앱 시작 시 경로 복구 로직 ✅ 수정
-└── features/
-    └── practice/
-        └── presentation/
-            ├── screens/
-            │   ├── practice_recording_screen.dart
-            │   ├── section_detail_screen.dart
-            │   └── downloaded_recordings_screen.dart
-            └── widgets/
-                ├── section_detail/
-                │   └── section_recording_list_item.dart  # 파일 없음 UI ✅ 수정
-                ├── recording_list_widget.dart
-                ├── audio_player_widget.dart
-                └── download_button_widget.dart
+│   ├── audio_player_service.dart
+│   └── audio_trimmer_service.dart      # 스마트 녹음 트리밍
+├── features/practice/presentation/
+│   ├── screens/
+│   │   └── practice_recording_screen.dart
+│   └── widgets/
+│       ├── recording_player_sheet.dart
+│       ├── recording_waveform.dart
+│       └── section_detail/
+│           └── section_recording_list_item.dart
+└── main.dart                           # 앱 시작 시 경로 복구 로직
 ```
