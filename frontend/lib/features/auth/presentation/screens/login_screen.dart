@@ -370,6 +370,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
+        clientId: EnvironmentConfig.googleIosClientId,
         serverClientId: EnvironmentConfig.googleServerClientId,
       );
       final account = await googleSignIn.signIn();

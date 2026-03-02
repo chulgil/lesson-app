@@ -42,6 +42,7 @@ COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
+COPY scripts/ ./scripts/
 
 # Set ownership
 RUN chown -R appuser:appuser /app

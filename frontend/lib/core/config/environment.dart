@@ -35,4 +35,11 @@ class EnvironmentConfig {
     'GOOGLE_SERVER_CLIENT_ID',
     defaultValue: '',
   );
+
+  /// Google OAuth iOS Client ID.
+  /// Set via --dart-define=GOOGLE_IOS_CLIENT_ID=<your-ios-client-id>
+  static const String googleIosClientId = String.fromEnvironment(
+    'GOOGLE_IOS_CLIENT_ID',
+    defaultValue: '',
+  );
 }
