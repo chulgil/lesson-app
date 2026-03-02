@@ -43,9 +43,12 @@ class SubscriptionService:
         offset: int,
         student_id: str | None = None,
         membership_id: str | None = None,
+        teacher_id: str | None = None,
+        payment_confirmed: str | None = None,
         status: str | None = None,
     ) -> PaginatedResponse[SubscriptionResponse]:
         """List subscriptions with filters."""
+        from app.models.lesson import ClassMembership, LessonClass
         from app.models.subscription import Subscription
 
         query = select(Subscription)
@@ -55,6 +58,17 @@ class SubscriptionService:
             query = query.where(Subscription.membership_id == membership_id)
         if status:
             query = query.where(Subscription.status == status)
+        if payment_confirmed is not None:
+            confirmed = payment_confirmed.lower() not in ("false", "0", "no")
+            query = query.where(Subscription.payment_confirmed == confirmed)
+        if teacher_id:
+            query = query.join(
+                ClassMembership,
+                Subscription.membership_id == ClassMembership.id,
+            ).join(
+                LessonClass,
+                ClassMembership.lesson_class_id == LessonClass.id,
+            ).where(LessonClass.teacher_id == teacher_id)
 
         count_query = select(func.count()).select_from(query.subquery())
         total = await self.db.scalar(count_query) or 0

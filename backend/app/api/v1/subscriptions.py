@@ -46,6 +46,8 @@ async def list_subscriptions(
     pagination: Annotated[dict, Depends(get_pagination)],
     student_id: str | None = None,
     membership_id: str | None = None,
+    teacher_id: str | None = None,
+    payment_confirmed: str | None = None,
     sub_status: Annotated[str | None, Query(alias="status")] = None,
 ) -> PaginatedResponse[SubscriptionResponse]:
     """List subscriptions with optional filters."""
@@ -57,6 +59,8 @@ async def list_subscriptions(
         offset=pagination["offset"],
         student_id=student_id,
         membership_id=membership_id,
+        teacher_id=teacher_id,
+        payment_confirmed=payment_confirmed,
         status=sub_status,
     )
 
