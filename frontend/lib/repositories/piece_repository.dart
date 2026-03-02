@@ -15,11 +15,21 @@ abstract class PieceRepository {
   Future<void> assignPieceToStudent(String pieceId, String studentId);
   Future<void> removePieceFromStudent(String pieceId, String studentId);
   Future<void> updatePieceProgress(
-      String pieceId, String studentId, PieceProgress progress);
+    String pieceId,
+    String studentId,
+    PieceProgress progress,
+  );
 }
 
 /// Mock implementation of PieceRepository
 class MockPieceRepository implements PieceRepository {
+  MockPieceRepository({bool empty = false}) {
+    if (empty) {
+      _pieces.clear();
+      _studentPieces.clear();
+    }
+  }
+
   final List<Piece> _pieces = [
     Piece(
       id: 'piece_1',
@@ -198,12 +208,14 @@ class MockPieceRepository implements PieceRepository {
     final studentPieces =
         _pieces.where((p) => pieceIds.contains(p.id)).toList();
 
-    final currentPieces = studentPieces
-        .where((p) => p.progress != PieceProgress.completed)
-        .toList();
-    final completedPieces = studentPieces
-        .where((p) => p.progress == PieceProgress.completed)
-        .toList();
+    final currentPieces =
+        studentPieces
+            .where((p) => p.progress != PieceProgress.completed)
+            .toList();
+    final completedPieces =
+        studentPieces
+            .where((p) => p.progress == PieceProgress.completed)
+            .toList();
 
     return Repertoire(
       studentId: studentId,
@@ -231,7 +243,10 @@ class MockPieceRepository implements PieceRepository {
 
   @override
   Future<void> updatePieceProgress(
-      String pieceId, String studentId, PieceProgress progress) async {
+    String pieceId,
+    String studentId,
+    PieceProgress progress,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _pieces.indexWhere((p) => p.id == pieceId);
     if (index != -1) {
@@ -244,14 +259,12 @@ class MockPieceRepository implements PieceRepository {
           percentage = 0;
           break;
         case PieceProgress.inProgress:
-          percentage = piece.progressPercentage > 0
-              ? piece.progressPercentage
-              : 25;
+          percentage =
+              piece.progressPercentage > 0 ? piece.progressPercentage : 25;
           break;
         case PieceProgress.polishing:
-          percentage = piece.progressPercentage > 75
-              ? piece.progressPercentage
-              : 75;
+          percentage =
+              piece.progressPercentage > 75 ? piece.progressPercentage : 75;
           break;
         case PieceProgress.completed:
           percentage = 100;

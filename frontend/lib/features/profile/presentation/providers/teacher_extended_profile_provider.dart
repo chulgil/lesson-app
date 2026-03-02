@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../models/teacher_profile.dart';
+import '../../../../providers/auth/user_role_provider.dart';
 import '../../../../providers/onboarding/teacher_profile_repository_provider.dart';
 
 part 'teacher_extended_profile_provider.g.dart';
@@ -19,8 +20,8 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     state = const AsyncValue.loading();
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
-      // For now, use a mock user ID - will be replaced with actual auth
-      final profile = await repo.getProfileByUserId('user_teacher_1');
+      final userId = ref.read(currentUserIdProvider);
+      final profile = await repo.getProfileByUserId(userId);
       state = AsyncValue.data(profile);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -231,9 +232,10 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
-      final newList = current.verification.certificates.map((c) {
-        return c.id == id ? certificate : c;
-      }).toList();
+      final newList =
+          current.verification.certificates.map((c) {
+            return c.id == id ? certificate : c;
+          }).toList();
       final newVerification = current.verification.copyWith(
         certificates: newList,
       );
@@ -253,9 +255,8 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
 
     try {
       final repo = ref.read(teacherProfileRepositoryProvider);
-      final newList = current.verification.certificates
-          .where((c) => c.id != id)
-          .toList();
+      final newList =
+          current.verification.certificates.where((c) => c.id != id).toList();
       final newVerification = current.verification.copyWith(
         certificates: newList,
       );
@@ -282,7 +283,8 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
 
   /// Update visibility settings
   Future<void> updateVisibilitySettings(
-      ProfileVisibilitySettings settings) async {
+    ProfileVisibilitySettings settings,
+  ) async {
     final current = state.valueOrNull;
     if (current == null) return;
 
@@ -302,8 +304,9 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     final current = state.valueOrNull;
     if (current == null) return;
 
-    final newSettings =
-        current.visibilitySettings.copyWith(isSearchable: isSearchable);
+    final newSettings = current.visibilitySettings.copyWith(
+      isSearchable: isSearchable,
+    );
     await updateVisibilitySettings(newSettings);
   }
 }

@@ -1,16 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../models/teacher_search.dart';
 import '../../../../repositories/teacher_search_repository.dart';
 
 part 'teacher_search_provider.g.dart';
 
-/// Provider for teacher search repository
+/// Provider for teacher search repository - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
 TeacherSearchRepository teacherSearchRepository(Ref ref) {
-  return MockTeacherSearchRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockTeacherSearchRepository();
+  }
+  // No remote API yet — use empty mock to avoid dummy data
+  return MockTeacherSearchRepository(empty: true);
 }
 
 /// Current search tab state (academy vs individual)
@@ -120,13 +125,15 @@ class TeacherSearchResults extends _$TeacherSearchResults {
       pageSize: currentResult.pageSize,
     );
 
-    state = AsyncValue.data(TeacherSearchResult(
-      teachers: [...currentResult.teachers, ...nextResult.teachers],
-      totalCount: nextResult.totalCount,
-      page: nextResult.page,
-      pageSize: nextResult.pageSize,
-      hasMore: nextResult.hasMore,
-    ));
+    state = AsyncValue.data(
+      TeacherSearchResult(
+        teachers: [...currentResult.teachers, ...nextResult.teachers],
+        totalCount: nextResult.totalCount,
+        page: nextResult.page,
+        pageSize: nextResult.pageSize,
+        hasMore: nextResult.hasMore,
+      ),
+    );
   }
 
   Future<void> refresh() async {
@@ -137,7 +144,9 @@ class TeacherSearchResults extends _$TeacherSearchResults {
 /// Teacher public profile provider
 @riverpod
 Future<TeacherPublicProfile?> teacherPublicProfile(
-    Ref ref, String teacherId) async {
+  Ref ref,
+  String teacherId,
+) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getTeacherPublicProfile(teacherId);
 }
@@ -151,8 +160,7 @@ Future<TeacherProfile?> teacherFullProfile(Ref ref, String teacherId) async {
 
 /// Featured teachers provider
 @riverpod
-Future<List<TeacherPublicProfile>> featuredTeachers(
-    Ref ref) async {
+Future<List<TeacherPublicProfile>> featuredTeachers(Ref ref) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getFeaturedTeachers(limit: 5);
 }
@@ -181,7 +189,9 @@ Future<AcademyInfo?> academyInfo(Ref ref, String organizationId) async {
 /// Academy teachers provider - get all teachers in an academy
 @riverpod
 Future<List<TeacherPublicProfile>> academyTeachers(
-    Ref ref, String organizationId) async {
+  Ref ref,
+  String organizationId,
+) async {
   final repo = ref.watch(teacherSearchRepositoryProvider);
   return repo.getTeachersByOrganization(organizationId);
 }

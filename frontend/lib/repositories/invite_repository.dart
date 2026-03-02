@@ -96,8 +96,8 @@ class MockInviteRepository implements InviteRepository {
   static const _appScheme = 'lessonapp';
   static const _inviteHost = 'invite';
 
-  MockInviteRepository() {
-    _initMockData();
+  MockInviteRepository({bool empty = false}) {
+    if (!empty) _initMockData();
   }
 
   void _initMockData() {
@@ -268,9 +268,7 @@ class MockInviteRepository implements InviteRepository {
   @override
   Future<List<Invite>> getInvitesByCreator(String creatorId) async {
     await Future.delayed(const Duration(milliseconds: 150));
-    return _invites.values
-        .where((i) => i.creatorId == creatorId)
-        .toList()
+    return _invites.values.where((i) => i.creatorId == creatorId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
@@ -326,13 +324,15 @@ class MockInviteRepository implements InviteRepository {
     }
 
     // Check for existing pending request
-    final existingRequest = _requests.values.cast<ConnectionRequest?>().firstWhere(
-      (r) =>
-          r!.requesterId == requesterId &&
-          r.targetId == targetId &&
-          r.status == ConnectionRequestStatus.pending,
-      orElse: () => null,
-    );
+    final existingRequest = _requests.values
+        .cast<ConnectionRequest?>()
+        .firstWhere(
+          (r) =>
+              r!.requesterId == requesterId &&
+              r.targetId == targetId &&
+              r.status == ConnectionRequestStatus.pending,
+          orElse: () => null,
+        );
     if (existingRequest != null) {
       throw Exception('이미 요청이 진행 중입니다');
     }
@@ -371,13 +371,16 @@ class MockInviteRepository implements InviteRepository {
 
   @override
   Future<List<ConnectionRequest>> getPendingRequestsForUser(
-      String userId) async {
+    String userId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 150));
     return _requests.values
-        .where((r) =>
-            r.targetId == userId &&
-            r.status == ConnectionRequestStatus.pending &&
-            r.isActionable)
+        .where(
+          (r) =>
+              r.targetId == userId &&
+              r.status == ConnectionRequestStatus.pending &&
+              r.isActionable,
+        )
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -442,8 +445,10 @@ class MockInviteRepository implements InviteRepository {
   }
 
   @override
-  Future<void> rejectConnectionRequest(String requestId,
-      {String? reason}) async {
+  Future<void> rejectConnectionRequest(
+    String requestId, {
+    String? reason,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
     final request = _requests[requestId];
@@ -485,15 +490,18 @@ class MockInviteRepository implements InviteRepository {
   Future<List<Connection>> getConnectionsByUser(String userId) async {
     await Future.delayed(const Duration(milliseconds: 150));
     return _connections.values
-        .where((c) =>
-            (c.teacherId == userId || c.studentId == userId) && c.isActive)
+        .where(
+          (c) => (c.teacherId == userId || c.studentId == userId) && c.isActive,
+        )
         .toList()
       ..sort((a, b) => b.connectedAt.compareTo(a.connectedAt));
   }
 
   @override
   Future<Connection?> getConnectionBetween(
-      String teacherId, String studentId) async {
+    String teacherId,
+    String studentId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 100));
     return _findConnection(teacherId, studentId);
   }
@@ -541,21 +549,27 @@ class MockInviteRepository implements InviteRepository {
   @override
   Future<bool> areConnected(String userId1, String userId2) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _connections.values.any((c) =>
-        c.isActive &&
-        ((c.teacherId == userId1 && c.studentId == userId2) ||
-            (c.teacherId == userId2 && c.studentId == userId1)));
+    return _connections.values.any(
+      (c) =>
+          c.isActive &&
+          ((c.teacherId == userId1 && c.studentId == userId2) ||
+              (c.teacherId == userId2 && c.studentId == userId1)),
+    );
   }
 
   @override
   Future<List<Connection>> getInactiveConnectionsByUser(String userId) async {
     await Future.delayed(const Duration(milliseconds: 150));
     return _connections.values
-        .where((c) =>
-            (c.teacherId == userId || c.studentId == userId) && !c.isActive)
+        .where(
+          (c) =>
+              (c.teacherId == userId || c.studentId == userId) && !c.isActive,
+        )
         .toList()
-      ..sort((a, b) =>
-          (b.deactivatedAt ?? b.connectedAt)
-              .compareTo(a.deactivatedAt ?? a.connectedAt));
+      ..sort(
+        (a, b) => (b.deactivatedAt ?? b.connectedAt).compareTo(
+          a.deactivatedAt ?? a.connectedAt,
+        ),
+      );
   }
 }

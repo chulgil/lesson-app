@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../core/utils/time_format_utils.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
 import '../../domain/entities/entities.dart';
@@ -8,10 +9,14 @@ import '../../domain/repositories/practice_stats_repository.dart';
 
 part 'practice_report_provider.g.dart';
 
-/// Practice stats repository provider
+/// Practice stats repository provider - switches between Mock and Remote.
 @riverpod
 PracticeStatsRepository practiceReportRepository(Ref ref) {
-  return MockPracticeStatsRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockPracticeStatsRepository();
+  }
+  // No remote API yet — use empty mock to avoid dummy data
+  return MockPracticeStatsRepository(empty: true);
 }
 
 /// Weekly report params
@@ -69,11 +74,7 @@ class ReportDateState {
     required this.month,
   });
 
-  ReportDateState copyWith({
-    DateTime? weekStart,
-    int? year,
-    int? month,
-  }) {
+  ReportDateState copyWith({DateTime? weekStart, int? year, int? month}) {
     return ReportDateState(
       weekStart: weekStart ?? this.weekStart,
       year: year ?? this.year,

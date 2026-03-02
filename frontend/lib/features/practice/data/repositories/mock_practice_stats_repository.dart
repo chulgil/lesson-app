@@ -3,12 +3,33 @@ import '../../domain/repositories/practice_stats_repository.dart';
 
 /// Mock implementation for practice stats repository
 class MockPracticeStatsRepository implements PracticeStatsRepository {
+  final bool _empty;
+
+  MockPracticeStatsRepository({bool empty = false}) : _empty = empty;
+
   @override
   Future<PracticeStatsReport> getWeeklyReport(
     String studentId,
     DateTime weekStart,
   ) async {
     await Future.delayed(const Duration(milliseconds: 200));
+
+    if (_empty) {
+      final start = DateTime(weekStart.year, weekStart.month, weekStart.day);
+      return PracticeStatsReport(
+        startDate: start,
+        endDate: start.add(const Duration(days: 6)),
+        type: ReportType.weekly,
+        totalPracticeSeconds: 0,
+        practiceDayCount: 0,
+        completedSectionCount: 0,
+        totalSectionCount: 0,
+        dailyStats: [],
+        repertoireStats: [],
+        currentStreak: 0,
+        maxStreak: 0,
+      );
+    }
 
     final normalizedStart = DateTime(
       weekStart.year,
@@ -26,24 +47,31 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       final isFuture = date.isAfter(now);
 
       // Generate mock data (varying practice time)
-      final practiceSeconds = isFuture
-          ? 0
-          : [1800, 2400, 1200, 0, 3000, 2100, 1500][i]; // Mock values
+      final practiceSeconds =
+          isFuture
+              ? 0
+              : [1800, 2400, 1200, 0, 3000, 2100, 1500][i]; // Mock values
 
-      dailyStats.add(DailyStats(
-        date: date,
-        practiceSeconds: practiceSeconds,
-        completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
-        hasPracticed: practiceSeconds > 0,
-      ));
+      dailyStats.add(
+        DailyStats(
+          date: date,
+          practiceSeconds: practiceSeconds,
+          completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
+          hasPracticed: practiceSeconds > 0,
+        ),
+      );
     }
 
     // Calculate totals
-    final totalSeconds =
-        dailyStats.fold<int>(0, (sum, s) => sum + s.practiceSeconds);
+    final totalSeconds = dailyStats.fold<int>(
+      0,
+      (sum, s) => sum + s.practiceSeconds,
+    );
     final practiceDays = dailyStats.where((s) => s.hasPracticed).length;
-    final completedSections =
-        dailyStats.fold<int>(0, (sum, s) => sum + s.completedSections);
+    final completedSections = dailyStats.fold<int>(
+      0,
+      (sum, s) => sum + s.completedSections,
+    );
 
     // Mock repertoire stats
     final repertoireStats = [
@@ -93,6 +121,22 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
   ) async {
     await Future.delayed(const Duration(milliseconds: 250));
 
+    if (_empty) {
+      return PracticeStatsReport(
+        startDate: DateTime(year, month, 1),
+        endDate: DateTime(year, month + 1, 0),
+        type: ReportType.monthly,
+        totalPracticeSeconds: 0,
+        practiceDayCount: 0,
+        completedSectionCount: 0,
+        totalSectionCount: 0,
+        dailyStats: [],
+        repertoireStats: [],
+        currentStreak: 0,
+        maxStreak: 0,
+      );
+    }
+
     final startDate = DateTime(year, month, 1);
     final endDate = DateTime(year, month + 1, 0); // Last day of month
     final daysInMonth = endDate.day;
@@ -116,12 +160,14 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
         if (i % 7 == 3) practiceSeconds = 0;
       }
 
-      dailyStats.add(DailyStats(
-        date: date,
-        practiceSeconds: practiceSeconds,
-        completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
-        hasPracticed: practiceSeconds > 0,
-      ));
+      dailyStats.add(
+        DailyStats(
+          date: date,
+          practiceSeconds: practiceSeconds,
+          completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
+          hasPracticed: practiceSeconds > 0,
+        ),
+      );
     }
 
     // Calculate weekly stats for trend
@@ -133,27 +179,35 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       final weekEndIndex = (weekStartIndex + 6).clamp(0, daysInMonth - 1);
       final weekDays = dailyStats.sublist(weekStartIndex, weekEndIndex + 1);
 
-      final weekSeconds =
-          weekDays.fold<int>(0, (sum, s) => sum + s.practiceSeconds);
+      final weekSeconds = weekDays.fold<int>(
+        0,
+        (sum, s) => sum + s.practiceSeconds,
+      );
       final weekPracticeDays = weekDays.where((s) => s.hasPracticed).length;
 
-      weeklyStats.add(WeeklyStats(
-        weekStart: dailyStats[weekStartIndex].date,
-        weekNumber: weekNum,
-        practiceSeconds: weekSeconds,
-        practiceDays: weekPracticeDays,
-      ));
+      weeklyStats.add(
+        WeeklyStats(
+          weekStart: dailyStats[weekStartIndex].date,
+          weekNumber: weekNum,
+          practiceSeconds: weekSeconds,
+          practiceDays: weekPracticeDays,
+        ),
+      );
 
       weekNum++;
       weekStartIndex = weekEndIndex + 1;
     }
 
     // Calculate totals
-    final totalSeconds =
-        dailyStats.fold<int>(0, (sum, s) => sum + s.practiceSeconds);
+    final totalSeconds = dailyStats.fold<int>(
+      0,
+      (sum, s) => sum + s.practiceSeconds,
+    );
     final practiceDays = dailyStats.where((s) => s.hasPracticed).length;
-    final completedSections =
-        dailyStats.fold<int>(0, (sum, s) => sum + s.completedSections);
+    final completedSections = dailyStats.fold<int>(
+      0,
+      (sum, s) => sum + s.completedSections,
+    );
 
     // Mock repertoire stats
     final repertoireStats = [
@@ -204,19 +258,24 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
   ) async {
     await Future.delayed(const Duration(milliseconds: 100));
 
+    if (_empty) return [];
+
     final stats = <DailyStats>[];
     var current = startDate;
 
     while (!current.isAfter(endDate)) {
       final dayIndex = current.difference(startDate).inDays;
-      final practiceSeconds = [1800, 2400, 0, 1500, 3000, 1200, 0][dayIndex % 7];
+      final practiceSeconds =
+          [1800, 2400, 0, 1500, 3000, 1200, 0][dayIndex % 7];
 
-      stats.add(DailyStats(
-        date: current,
-        practiceSeconds: practiceSeconds,
-        completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
-        hasPracticed: practiceSeconds > 0,
-      ));
+      stats.add(
+        DailyStats(
+          date: current,
+          practiceSeconds: practiceSeconds,
+          completedSections: practiceSeconds > 0 ? (practiceSeconds ~/ 600) : 0,
+          hasPracticed: practiceSeconds > 0,
+        ),
+      );
 
       current = current.add(const Duration(days: 1));
     }

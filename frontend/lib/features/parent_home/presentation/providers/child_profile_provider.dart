@@ -2,33 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../models/child_profile.dart';
 import '../../../../repositories/child_profile_repository.dart';
 
 part 'child_profile_provider.g.dart';
 
-/// Provider for the child profile repository
+/// Provider for the child profile repository - switches between Mock and Remote.
 @riverpod
 ChildProfileRepository childProfileRepository(Ref ref) {
-  return MockChildProfileRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockChildProfileRepository();
+  }
+  // No remote API yet — use empty mock to avoid dummy data
+  return MockChildProfileRepository(empty: true);
 }
 
 /// Provider for child profiles of a specific parent
 @riverpod
-Future<List<ChildProfile>> childProfiles(
-  Ref ref,
-  String parentId,
-) async {
+Future<List<ChildProfile>> childProfiles(Ref ref, String parentId) async {
   final repository = ref.watch(childProfileRepositoryProvider);
   return repository.getChildProfilesByParent(parentId);
 }
 
 /// Provider for a single child profile
 @riverpod
-Future<ChildProfile?> childProfile(
-  Ref ref,
-  String childId,
-) async {
+Future<ChildProfile?> childProfile(Ref ref, String childId) async {
   final repository = ref.watch(childProfileRepositoryProvider);
   return repository.getChildProfile(childId);
 }
@@ -140,8 +139,11 @@ class ChildProfileManager extends _$ChildProfileManager {
     final repository = ref.read(childProfileRepositoryProvider);
 
     try {
-      final result =
-          await repository.connectTeacher(childId, teacherId, teacherName);
+      final result = await repository.connectTeacher(
+        childId,
+        teacherId,
+        teacherName,
+      );
 
       // Invalidate related providers
       ref.invalidate(childProfilesProvider(parentId));

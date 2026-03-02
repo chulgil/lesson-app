@@ -1,17 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_practice_note_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_note_repository.dart';
 
-/// Practice note repository provider
+/// Practice note repository provider - switches between Mock and Remote.
 final practiceNoteRepositoryProvider = Provider<PracticeNoteRepository>((ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockPracticeNoteRepository();
+  }
+  // Mock already starts empty — safe to use in remote mode
   return MockPracticeNoteRepository();
 });
 
 /// Section notes provider - gets all notes for a section
-final sectionNotesProvider =
-    FutureProvider.family<List<PracticeNote>, String>((ref, sectionId) async {
+final sectionNotesProvider = FutureProvider.family<List<PracticeNote>, String>((
+  ref,
+  sectionId,
+) async {
   final repository = ref.watch(practiceNoteRepositoryProvider);
   return repository.getNotes(sectionId);
 });
@@ -83,5 +90,5 @@ class PracticeNoteCrudNotifier extends AsyncNotifier<void> {
 
 final practiceNoteCrudProvider =
     AsyncNotifierProvider<PracticeNoteCrudNotifier, void>(
-  PracticeNoteCrudNotifier.new,
-);
+      PracticeNoteCrudNotifier.new,
+    );

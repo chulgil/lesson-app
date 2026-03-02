@@ -21,7 +21,10 @@ abstract class ChildProfileRepository {
 
   /// Connect a teacher to a child profile
   Future<ChildProfile> connectTeacher(
-      String childId, String teacherId, String teacherName);
+    String childId,
+    String teacherId,
+    String teacherName,
+  );
 
   /// Disconnect teacher from a child profile
   Future<ChildProfile> disconnectTeacher(String childId);
@@ -29,6 +32,10 @@ abstract class ChildProfileRepository {
 
 /// Mock implementation of ChildProfileRepository
 class MockChildProfileRepository implements ChildProfileRepository {
+  MockChildProfileRepository({bool empty = false}) {
+    if (empty) _profiles.clear();
+  }
+
   final List<ChildProfile> _profiles = [
     ChildProfile(
       id: 'child_1',
@@ -75,8 +82,10 @@ class MockChildProfileRepository implements ChildProfileRepository {
   Future<List<ChildProfile>> getChildProfilesByParent(String parentId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return _profiles
-        .where((p) =>
-            p.parentId == parentId && p.status == ChildProfileStatus.active)
+        .where(
+          (p) =>
+              p.parentId == parentId && p.status == ChildProfileStatus.active,
+        )
         .toList();
   }
 
@@ -120,13 +129,17 @@ class MockChildProfileRepository implements ChildProfileRepository {
     if (index == -1) {
       throw Exception('Child profile not found: $childId');
     }
-    _profiles[index] =
-        _profiles[index].copyWith(status: ChildProfileStatus.inactive);
+    _profiles[index] = _profiles[index].copyWith(
+      status: ChildProfileStatus.inactive,
+    );
   }
 
   @override
   Future<ChildProfile> connectTeacher(
-      String childId, String teacherId, String teacherName) async {
+    String childId,
+    String teacherId,
+    String teacherName,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _profiles.indexWhere((p) => p.id == childId);
     if (index == -1) {

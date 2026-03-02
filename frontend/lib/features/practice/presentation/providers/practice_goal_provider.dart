@@ -1,44 +1,61 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_practice_goal_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_goal_repository.dart';
 
-/// Practice goal repository provider
+/// Practice goal repository provider - switches between Mock and Remote.
 final practiceGoalRepositoryProvider = Provider<PracticeGoalRepository>((ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockPracticeGoalRepository();
+  }
+  // Mock already starts empty — safe to use in remote mode
   return MockPracticeGoalRepository();
 });
 
 /// Student's current active goal
-final practiceGoalProvider =
-    FutureProvider.family<PracticeGoal?, String>((ref, studentId) async {
+final practiceGoalProvider = FutureProvider.family<PracticeGoal?, String>((
+  ref,
+  studentId,
+) async {
   final repository = ref.watch(practiceGoalRepositoryProvider);
   return repository.getActiveGoal(studentId);
 });
 
 /// Today's progress
 final todayProgressProvider =
-    FutureProvider.family<DailyPracticeProgress, String>((ref, studentId) async {
-  final repository = ref.watch(practiceGoalRepositoryProvider);
-  return repository.getDailyProgress(studentId, DateTime.now());
-});
+    FutureProvider.family<DailyPracticeProgress, String>((
+      ref,
+      studentId,
+    ) async {
+      final repository = ref.watch(practiceGoalRepositoryProvider);
+      return repository.getDailyProgress(studentId, DateTime.now());
+    });
 
 /// This week's progress
 final weeklyProgressProvider =
-    FutureProvider.family<WeeklyPracticeProgress, String>((ref, studentId) async {
-  final repository = ref.watch(practiceGoalRepositoryProvider);
-  final now = DateTime.now();
-  // Calculate this Monday
-  final weekStart = now.subtract(Duration(days: now.weekday - 1));
-  final normalizedWeekStart = DateTime(weekStart.year, weekStart.month, weekStart.day);
-  return repository.getWeeklyProgress(studentId, normalizedWeekStart);
-});
+    FutureProvider.family<WeeklyPracticeProgress, String>((
+      ref,
+      studentId,
+    ) async {
+      final repository = ref.watch(practiceGoalRepositoryProvider);
+      final now = DateTime.now();
+      // Calculate this Monday
+      final weekStart = now.subtract(Duration(days: now.weekday - 1));
+      final normalizedWeekStart = DateTime(
+        weekStart.year,
+        weekStart.month,
+        weekStart.day,
+      );
+      return repository.getWeeklyProgress(studentId, normalizedWeekStart);
+    });
 
 /// Goal CRUD notifier
 final practiceGoalCrudProvider =
     AsyncNotifierProvider<PracticeGoalCrudNotifier, void>(
-  PracticeGoalCrudNotifier.new,
-);
+      PracticeGoalCrudNotifier.new,
+    );
 
 class PracticeGoalCrudNotifier extends AsyncNotifier<void> {
   @override
@@ -83,11 +100,17 @@ class PracticeGoalCrudNotifier extends AsyncNotifier<void> {
 }
 
 /// Combined goal status provider for widgets
-final goalStatusProvider =
-    FutureProvider.family<GoalStatus, String>((ref, studentId) async {
+final goalStatusProvider = FutureProvider.family<GoalStatus, String>((
+  ref,
+  studentId,
+) async {
   final goal = await ref.watch(practiceGoalProvider(studentId).future);
-  final todayProgress = await ref.watch(todayProgressProvider(studentId).future);
-  final weeklyProgress = await ref.watch(weeklyProgressProvider(studentId).future);
+  final todayProgress = await ref.watch(
+    todayProgressProvider(studentId).future,
+  );
+  final weeklyProgress = await ref.watch(
+    weeklyProgressProvider(studentId).future,
+  );
 
   return GoalStatus(
     goal: goal,
@@ -126,19 +149,22 @@ class GoalStatus {
   /// Daily time progress percentage (0-100+)
   int get dailyTimeProgressPercent {
     if (goal?.dailyTimeMinutes == null) return 0;
-    return (todayProgress.timeProgressRate(goal!.dailyTimeMinutes) * 100).round();
+    return (todayProgress.timeProgressRate(goal!.dailyTimeMinutes) * 100)
+        .round();
   }
 
   /// Daily section progress percentage (0-100+)
   int get dailySectionProgressPercent {
     if (goal?.dailySectionCount == null) return 0;
-    return (todayProgress.sectionProgressRate(goal!.dailySectionCount) * 100).round();
+    return (todayProgress.sectionProgressRate(goal!.dailySectionCount) * 100)
+        .round();
   }
 
   /// Weekly time progress percentage (0-100+)
   int get weeklyTimeProgressPercent {
     if (goal?.weeklyTimeMinutes == null) return 0;
-    return (weeklyProgress.timeProgressRate(goal!.weeklyTimeMinutes) * 100).round();
+    return (weeklyProgress.timeProgressRate(goal!.weeklyTimeMinutes) * 100)
+        .round();
   }
 
   /// Weekly day progress percentage (0-100+)

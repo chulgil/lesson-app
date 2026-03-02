@@ -1,8 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../repositories/piece_repository.dart';
 
-/// Piece repository provider
+/// Piece repository provider - switches between Mock and Remote.
 final pieceRepositoryProvider = Provider<PieceRepository>((ref) {
-  return MockPieceRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockPieceRepository();
+  }
+  // No remote API yet — use empty mock to avoid dummy data
+  return MockPieceRepository(empty: true);
 });

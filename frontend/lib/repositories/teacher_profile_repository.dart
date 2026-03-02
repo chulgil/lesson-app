@@ -70,8 +70,7 @@ class TeacherProfileFilter {
 
     // Check instruments
     if (instruments != null && instruments!.isNotEmpty) {
-      final hasMatch =
-          profile.instruments.any((i) => instruments!.contains(i));
+      final hasMatch = profile.instruments.any((i) => instruments!.contains(i));
       if (!hasMatch) return false;
     }
 
@@ -86,8 +85,9 @@ class TeacherProfileFilter {
     if (lessonTypes != null &&
         lessonTypes!.isNotEmpty &&
         profile.lessonTypes != null) {
-      final hasMatch =
-          profile.lessonTypes!.any((t) => lessonTypes!.contains(t));
+      final hasMatch = profile.lessonTypes!.any(
+        (t) => lessonTypes!.contains(t),
+      );
       if (!hasMatch) return false;
     }
 
@@ -122,11 +122,12 @@ class TeacherProfileFilter {
 class MockTeacherProfileRepository implements TeacherProfileRepository {
   final Map<String, TeacherProfile> _profiles = {};
 
-  MockTeacherProfileRepository() {
-    // Initialize with some mock data
-    final mockProfiles = _generateMockProfiles();
-    for (final profile in mockProfiles) {
-      _profiles[profile.id] = profile;
+  MockTeacherProfileRepository({bool empty = false}) {
+    if (!empty) {
+      final mockProfiles = _generateMockProfiles();
+      for (final profile in mockProfiles) {
+        _profiles[profile.id] = profile;
+      }
     }
   }
 
@@ -222,8 +223,9 @@ class MockTeacherProfileRepository implements TeacherProfileRepository {
 
     // Find profile with this certificate
     for (final profile in _profiles.values) {
-      final certIndex = profile.verification.certificates
-          .indexWhere((c) => c.id == certificateId);
+      final certIndex = profile.verification.certificates.indexWhere(
+        (c) => c.id == certificateId,
+      );
       if (certIndex != -1) {
         final cert = profile.verification.certificates[certIndex];
         final updatedCert = cert.copyWith(
@@ -272,21 +274,20 @@ class MockTeacherProfileRepository implements TeacherProfileRepository {
   Future<List<TeacherProfile>> getFeaturedProfiles() async {
     await Future.delayed(const Duration(milliseconds: 300));
     final results =
-        _profiles.values.where((p) => p.canBeSearched).toList()
-          ..sort((a, b) {
-            // Prioritize by: premium badge, completion level
-            final aHasPremium =
-                a.allBadges.contains(VerificationBadge.premium) ? 1 : 0;
-            final bHasPremium =
-                b.allBadges.contains(VerificationBadge.premium) ? 1 : 0;
-            if (bHasPremium != aHasPremium) return bHasPremium - aHasPremium;
+        _profiles.values.where((p) => p.canBeSearched).toList()..sort((a, b) {
+          // Prioritize by: premium badge, completion level
+          final aHasPremium =
+              a.allBadges.contains(VerificationBadge.premium) ? 1 : 0;
+          final bHasPremium =
+              b.allBadges.contains(VerificationBadge.premium) ? 1 : 0;
+          if (bHasPremium != aHasPremium) return bHasPremium - aHasPremium;
 
-            return ProfileCompletionLevel.values
-                .indexOf(b.completionLevel)
-                .compareTo(
-                  ProfileCompletionLevel.values.indexOf(a.completionLevel),
-                );
-          });
+          return ProfileCompletionLevel.values
+              .indexOf(b.completionLevel)
+              .compareTo(
+                ProfileCompletionLevel.values.indexOf(a.completionLevel),
+              );
+        });
 
     return results.take(5).toList();
   }
@@ -301,7 +302,8 @@ List<TeacherProfile> _generateMockProfiles() {
       name: '김선생님',
       profileImage: 'https://example.com/profile1.jpg',
       instruments: ['바이올린', '비올라'],
-      introduction: '서울대학교 음악대학 졸업 후 15년간 바이올린을 가르치고 있습니다. '
+      introduction:
+          '서울대학교 음악대학 졸업 후 15년간 바이올린을 가르치고 있습니다. '
           '초보자부터 전공생까지 다양한 학생들을 지도한 경험이 있습니다.',
       experienceYears: 15,
       lessonAreas: ['서울 강남구', '서울 서초구'],

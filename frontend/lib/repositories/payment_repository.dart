@@ -25,7 +25,8 @@ abstract class PaymentRepository {
 class MockPaymentRepository implements PaymentRepository {
   List<Payment> _payments = [];
 
-  MockPaymentRepository() {
+  MockPaymentRepository({bool empty = false}) {
+    if (empty) return;
     final now = DateTime.now();
     final currentMonth = DateTime(now.year, now.month, 1);
     final monthEnd = DateTime(now.year, now.month + 1, 0);
@@ -199,9 +200,7 @@ class MockPaymentRepository implements PaymentRepository {
   @override
   Future<List<Payment>> getPaymentsByStudent(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return _payments
-        .where((p) => p.studentId == studentId)
-        .toList()
+    return _payments.where((p) => p.studentId == studentId).toList()
       ..sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
   }
 
@@ -265,7 +264,9 @@ class MockPaymentRepository implements PaymentRepository {
   }
 
   @override
-  Future<TuitionSettings> updateTuitionSettings(TuitionSettings settings) async {
+  Future<TuitionSettings> updateTuitionSettings(
+    TuitionSettings settings,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     _tuitionSettings[settings.studentId] = settings;
     return settings;
@@ -279,15 +280,18 @@ class MockPaymentRepository implements PaymentRepository {
     final targetYear = year ?? now.year;
     final targetMonth = month ?? now.month;
 
-    final monthPayments = _payments.where((p) {
-      return p.periodStart.year == targetYear &&
-          p.periodStart.month == targetMonth;
-    }).toList();
+    final monthPayments =
+        _payments.where((p) {
+          return p.periodStart.year == targetYear &&
+              p.periodStart.month == targetMonth;
+        }).toList();
 
-    final completed =
-        monthPayments.where((p) => p.status == PaymentStatus.confirmed);
-    final pending =
-        monthPayments.where((p) => p.status == PaymentStatus.pending);
+    final completed = monthPayments.where(
+      (p) => p.status == PaymentStatus.confirmed,
+    );
+    final pending = monthPayments.where(
+      (p) => p.status == PaymentStatus.pending,
+    );
     final overdue = pending.where((p) => p.isOverdue);
 
     return PaymentSummary(

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../domain/entities/invite.dart';
 import '../../../../repositories/invite_repository.dart';
 import '../../../../providers/auth/user_role_provider.dart';
@@ -9,10 +10,14 @@ import '../../../notifications/presentation/providers/notification_providers.dar
 
 part 'invite_provider.g.dart';
 
-/// Provider for invite repository
+/// Provider for invite repository - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
 InviteRepository inviteRepository(Ref ref) {
-  return MockInviteRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockInviteRepository();
+  }
+  // No remote API yet — use empty mock to avoid dummy data
+  return MockInviteRepository(empty: true);
 }
 
 /// Current user role - synced with app's role system
@@ -244,8 +249,12 @@ class ConnectionRequestResponder extends _$ConnectionRequestResponder {
   }
 
   /// Send notification to the requester when their connection request is accepted
-  Future<void> _sendConnectionAcceptedNotification(Connection connection) async {
-    final connectionNotificationService = ref.read(connectionNotificationServiceProvider);
+  Future<void> _sendConnectionAcceptedNotification(
+    Connection connection,
+  ) async {
+    final connectionNotificationService = ref.read(
+      connectionNotificationServiceProvider,
+    );
     final currentRole = ref.read(currentInviteUserRoleProvider);
 
     // Determine who is the requester (the one who should receive the notification)

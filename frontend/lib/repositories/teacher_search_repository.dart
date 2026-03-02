@@ -50,7 +50,8 @@ abstract class TeacherSearchRepository {
 
   /// Get all teachers belonging to an organization/academy
   Future<List<TeacherPublicProfile>> getTeachersByOrganization(
-      String organizationId);
+    String organizationId,
+  );
 
   /// Get all academies (unique organizations)
   Future<List<AcademyInfo>> getAllAcademies();
@@ -58,6 +59,10 @@ abstract class TeacherSearchRepository {
 
 /// Mock implementation for development
 class MockTeacherSearchRepository implements TeacherSearchRepository {
+  MockTeacherSearchRepository({bool empty = false}) {
+    if (empty) _mockTeachers.clear();
+  }
+
   // Mock teacher profiles for search
   // Some are academies (organizationId != null), some are individuals (organizationId == null)
   final List<TeacherProfile> _mockTeachers = [
@@ -97,11 +102,7 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           startYear: 2012,
           endYear: 2015,
         ),
-        const Career(
-          organization: '김지수 음악학원',
-          position: '원장',
-          startYear: 2015,
-        ),
+        const Career(organization: '김지수 음악학원', position: '원장', startYear: 2015),
       ],
       verification: TeacherVerification(
         isPhoneVerified: true,
@@ -327,11 +328,14 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
       name: '최유진',
       profileImage: 'https://i.pravatar.cc/150?u=teacher5',
       instruments: ['플룻', '리코더'],
-      introduction:
-          '관악기의 맑고 청아한 소리를 함께 배워보세요. 호흡부터 테크닉까지 체계적으로 지도합니다.',
+      introduction: '관악기의 맑고 청아한 소리를 함께 배워보세요. 호흡부터 테크닉까지 체계적으로 지도합니다.',
       experienceYears: 6,
       lessonAreas: ['경기 분당', '경기 수원', '온라인'],
-      lessonTypes: [LessonTypeOption.inPerson, LessonTypeOption.online, LessonTypeOption.visit],
+      lessonTypes: [
+        LessonTypeOption.inPerson,
+        LessonTypeOption.online,
+        LessonTypeOption.visit,
+      ],
       feeRange: const FeeRange(minFee: 45000, maxFee: 65000, duration: 60),
       education: [
         const Education(
@@ -393,88 +397,104 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    var filtered = _mockTeachers
-        .where((t) => t.visibilitySettings.isSearchable)
-        .where((t) => t.canBeSearched)
-        .toList();
+    var filtered =
+        _mockTeachers
+            .where((t) => t.visibilitySettings.isSearchable)
+            .where((t) => t.canBeSearched)
+            .toList();
 
     // Apply teacher type filter (academy vs individual)
     if (filter.teacherType != null) {
-      filtered = filtered.where((t) {
-        return filter.teacherType == TeacherSearchType.academy
-            ? t.isAcademy
-            : t.isIndividual;
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return filter.teacherType == TeacherSearchType.academy
+                ? t.isAcademy
+                : t.isIndividual;
+          }).toList();
     }
 
     // Apply filters
     if (filter.keyword != null && filter.keyword!.isNotEmpty) {
       final keyword = filter.keyword!.toLowerCase();
-      filtered = filtered.where((t) {
-        return t.name.toLowerCase().contains(keyword) ||
-            t.instruments.any((i) => i.toLowerCase().contains(keyword)) ||
-            t.introduction.toLowerCase().contains(keyword) ||
-            (t.lessonAreas?.any((a) => a.toLowerCase().contains(keyword)) ??
-                false);
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return t.name.toLowerCase().contains(keyword) ||
+                t.instruments.any((i) => i.toLowerCase().contains(keyword)) ||
+                t.introduction.toLowerCase().contains(keyword) ||
+                (t.lessonAreas?.any((a) => a.toLowerCase().contains(keyword)) ??
+                    false);
+          }).toList();
     }
 
     if (filter.instruments != null && filter.instruments!.isNotEmpty) {
-      filtered = filtered.where((t) {
-        return t.instruments
-            .any((i) => filter.instruments!.contains(i));
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return t.instruments.any((i) => filter.instruments!.contains(i));
+          }).toList();
     }
 
     if (filter.areas != null && filter.areas!.isNotEmpty) {
-      filtered = filtered.where((t) {
-        return t.lessonAreas
-                ?.any((a) => filter.areas!.any((fa) => a.contains(fa))) ??
-            false;
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return t.lessonAreas?.any(
+                  (a) => filter.areas!.any((fa) => a.contains(fa)),
+                ) ??
+                false;
+          }).toList();
     }
 
     if (filter.lessonTypes != null && filter.lessonTypes!.isNotEmpty) {
-      filtered = filtered.where((t) {
-        return t.lessonTypes
-                ?.any((lt) => filter.lessonTypes!.contains(lt)) ??
-            false;
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return t.lessonTypes?.any(
+                  (lt) => filter.lessonTypes!.contains(lt),
+                ) ??
+                false;
+          }).toList();
     }
 
     if (filter.minExperience != null) {
-      filtered = filtered.where((t) {
-        return (t.experienceYears ?? 0) >= filter.minExperience!;
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return (t.experienceYears ?? 0) >= filter.minExperience!;
+          }).toList();
     }
 
     if (filter.hasVerifiedCertificate == true) {
-      filtered = filtered.where((t) {
-        return t.verification.hasVerifiedCertificate;
-      }).toList();
+      filtered =
+          filtered.where((t) {
+            return t.verification.hasVerifiedCertificate;
+          }).toList();
     }
 
     // Apply sorting
     switch (sort) {
       case TeacherSortOption.experienceDesc:
-        filtered.sort((a, b) =>
-            (b.experienceYears ?? 0).compareTo(a.experienceYears ?? 0));
+        filtered.sort(
+          (a, b) => (b.experienceYears ?? 0).compareTo(a.experienceYears ?? 0),
+        );
         break;
       case TeacherSortOption.experienceAsc:
-        filtered.sort((a, b) =>
-            (a.experienceYears ?? 0).compareTo(b.experienceYears ?? 0));
+        filtered.sort(
+          (a, b) => (a.experienceYears ?? 0).compareTo(b.experienceYears ?? 0),
+        );
         break;
       case TeacherSortOption.feeAsc:
-        filtered.sort((a, b) =>
-            (a.feeRange?.minFee ?? 0).compareTo(b.feeRange?.minFee ?? 0));
+        filtered.sort(
+          (a, b) =>
+              (a.feeRange?.minFee ?? 0).compareTo(b.feeRange?.minFee ?? 0),
+        );
         break;
       case TeacherSortOption.feeDesc:
-        filtered.sort((a, b) =>
-            (b.feeRange?.minFee ?? 0).compareTo(a.feeRange?.minFee ?? 0));
+        filtered.sort(
+          (a, b) =>
+              (b.feeRange?.minFee ?? 0).compareTo(a.feeRange?.minFee ?? 0),
+        );
         break;
       case TeacherSortOption.completionLevel:
-        filtered.sort((a, b) =>
-            b.completionPercentage.compareTo(a.completionPercentage));
+        filtered.sort(
+          (a, b) => b.completionPercentage.compareTo(a.completionPercentage),
+        );
         break;
       case TeacherSortOption.relevance:
       case TeacherSortOption.rating:
@@ -486,9 +506,10 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
     final totalCount = filtered.length;
     final startIndex = page * pageSize;
     final endIndex = (startIndex + pageSize).clamp(0, totalCount);
-    final pagedTeachers = startIndex < totalCount
-        ? filtered.sublist(startIndex, endIndex)
-        : <TeacherProfile>[];
+    final pagedTeachers =
+        startIndex < totalCount
+            ? filtered.sublist(startIndex, endIndex)
+            : <TeacherProfile>[];
 
     return TeacherSearchResult(
       teachers: pagedTeachers,
@@ -500,7 +521,9 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
   }
 
   @override
-  Future<TeacherPublicProfile?> getTeacherPublicProfile(String teacherId) async {
+  Future<TeacherPublicProfile?> getTeacherPublicProfile(
+    String teacherId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
     final teacher = _mockTeachers.firstWhere(
@@ -523,7 +546,9 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
   }
 
   @override
-  Future<List<TeacherPublicProfile>> getFeaturedTeachers({int limit = 10}) async {
+  Future<List<TeacherPublicProfile>> getFeaturedTeachers({
+    int limit = 10,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 400));
 
     return _mockTeachers
@@ -562,9 +587,8 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
     await Future.delayed(const Duration(milliseconds: 200));
 
     // Find teachers belonging to this organization
-    final orgTeachers = _mockTeachers
-        .where((t) => t.organizationId == organizationId)
-        .toList();
+    final orgTeachers =
+        _mockTeachers.where((t) => t.organizationId == organizationId).toList();
 
     if (orgTeachers.isEmpty) return null;
 
@@ -589,14 +613,17 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
 
   @override
   Future<List<TeacherPublicProfile>> getTeachersByOrganization(
-      String organizationId) async {
+    String organizationId,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
     return _mockTeachers
-        .where((t) =>
-            t.organizationId == organizationId &&
-            t.visibilitySettings.isSearchable &&
-            t.canBeSearched)
+        .where(
+          (t) =>
+              t.organizationId == organizationId &&
+              t.visibilitySettings.isSearchable &&
+              t.canBeSearched,
+        )
         .map((t) => TeacherPublicProfile.fromProfile(t))
         .toList();
   }
