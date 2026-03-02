@@ -35,8 +35,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     final repertoiresAsync = ref.watch(repertoiresForDateProvider(params));
 
     // Get all repertoires to find practiced dates
-    final allRepertoiresAsync =
-        ref.watch(studentRepertoiresProvider(studentId));
+    final allRepertoiresAsync = ref.watch(
+      studentRepertoiresProvider(studentId),
+    );
     final practicedDates = allRepertoiresAsync.whenOrNull(
       data: (repertoires) => _getPracticedDates(repertoires),
     );
@@ -57,20 +58,33 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('내 연습', style: AppTypography.headingLarge),
-                  FilledButton.icon(
-                    onPressed: () {
-                      context.push(
-                        '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
-                      );
-                    },
-                    icon: const Icon(Icons.add, size: 18),
-                    label: const Text('레퍼토리 추가'),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space4,
-                        vertical: AppSpacing.space2,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            () => context.push(
+                              '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                            ),
+                        icon: const Icon(Icons.history),
+                        tooltip: '레퍼토리 히스토리',
                       ),
-                    ),
+                      FilledButton.icon(
+                        onPressed: () {
+                          context.push(
+                            '${AppRoutes.quickAddRepertoire}?studentId=$studentId',
+                          );
+                        },
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('레퍼토리 추가'),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.space4,
+                            vertical: AppSpacing.space2,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -107,7 +121,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   // Calculate total section count for selected date
                   final sectionCount = repertoires.fold<int>(
                     0,
-                    (sum, rep) => sum + rep.getSectionsForDate(_selectedDate).length,
+                    (sum, rep) =>
+                        sum + rep.getSectionsForDate(_selectedDate).length,
                   );
                   return Row(
                     children: [
@@ -126,8 +141,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSmall),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             '오늘',
@@ -152,30 +168,32 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                     ],
                   );
                 },
-                loading: () => Row(
-                  children: [
-                    Text(
-                      _formatDate(_selectedDate),
-                      style: AppTypography.headingSmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
+                loading:
+                    () => Row(
+                      children: [
+                        Text(
+                          _formatDate(_selectedDate),
+                          style: AppTypography.headingSmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        const Spacer(),
+                        _buildSortDropdown(),
+                      ],
                     ),
-                    const Spacer(),
-                    _buildSortDropdown(),
-                  ],
-                ),
-                error: (_, __) => Row(
-                  children: [
-                    Text(
-                      _formatDate(_selectedDate),
-                      style: AppTypography.headingSmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
+                error:
+                    (_, __) => Row(
+                      children: [
+                        Text(
+                          _formatDate(_selectedDate),
+                          style: AppTypography.headingSmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                        const Spacer(),
+                        _buildSortDropdown(),
+                      ],
                     ),
-                    const Spacer(),
-                    _buildSortDropdown(),
-                  ],
-                ),
               ),
             ),
 
@@ -191,11 +209,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   final sortedRepertoires = repertoires.sortBy(sortType);
                   return _buildRepertoireList(sortedRepertoires, studentId);
                 },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => Center(
-                  child: Text('오류가 발생했습니다: $error'),
-                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error:
+                    (error, stack) => Center(child: Text('오류가 발생했습니다: $error')),
               ),
             ),
           ],
@@ -224,35 +240,42 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
       onSelected: (type) {
         ref.read(repertoireSortTypeProvider.notifier).state = type;
       },
-      itemBuilder: (context) => RepertoireSortType.values
-          .where((type) => type != RepertoireSortType.custom)
-          .map((type) {
-        return PopupMenuItem<RepertoireSortType>(
-          value: type,
-          child: Row(
-            children: [
-              Icon(
-                _getSortIcon(type),
-                size: 18,
-                color: type == sortType
-                    ? AppColors.primary
-                    : AppColors.textSecondaryLight,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                type.displayName,
-                style: TextStyle(
-                  color: type == sortType
-                      ? AppColors.primary
-                      : AppColors.textPrimaryLight,
-                  fontWeight:
-                      type == sortType ? FontWeight.w600 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+      itemBuilder:
+          (context) =>
+              RepertoireSortType.values
+                  .where((type) => type != RepertoireSortType.custom)
+                  .map((type) {
+                    return PopupMenuItem<RepertoireSortType>(
+                      value: type,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getSortIcon(type),
+                            size: 18,
+                            color:
+                                type == sortType
+                                    ? AppColors.primary
+                                    : AppColors.textSecondaryLight,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            type.displayName,
+                            style: TextStyle(
+                              color:
+                                  type == sortType
+                                      ? AppColors.primary
+                                      : AppColors.textPrimaryLight,
+                              fontWeight:
+                                  type == sortType
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  })
+                  .toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -316,7 +339,9 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   Widget _buildEmptyState(String studentId) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -338,7 +363,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
     );
   }
 
-  Widget _buildRepertoireList(List<PracticeRepertoire> repertoires, String studentId) {
+  Widget _buildRepertoireList(
+    List<PracticeRepertoire> repertoires,
+    String studentId,
+  ) {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
@@ -383,8 +411,9 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
 
   @override
   Widget build(BuildContext context) {
-    final visibleSections =
-        widget.repertoire.getSectionsForDate(widget.selectedDate);
+    final visibleSections = widget.repertoire.getSectionsForDate(
+      widget.selectedDate,
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -461,11 +490,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                    child: const Icon(Icons.add, color: Colors.white, size: 18),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -495,15 +520,16 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
           // Sections list
           if (_isExpanded && visibleSections.isNotEmpty)
             Column(
-              children: visibleSections.map((section) {
-                return _SectionTile(
-                  section: section,
-                  repertoireId: widget.repertoire.id,
-                  studentId: widget.studentId,
-                  selectedDate: widget.selectedDate,
-                  isToday: widget.isToday,
-                );
-              }).toList(),
+              children:
+                  visibleSections.map((section) {
+                    return _SectionTile(
+                      section: section,
+                      repertoireId: widget.repertoire.id,
+                      studentId: widget.studentId,
+                      selectedDate: widget.selectedDate,
+                      isToday: widget.isToday,
+                    );
+                  }).toList(),
             ),
 
           if (_isExpanded && visibleSections.isEmpty)
@@ -544,9 +570,7 @@ class _SectionTile extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: InkWell(
         onTap: () {
@@ -588,9 +612,10 @@ class _SectionTile extends ConsumerWidget {
                   isCompletedForDate
                       ? Icons.check_circle
                       : Icons.radio_button_unchecked,
-                  color: isCompletedForDate
-                      ? AppColors.success
-                      : AppColors.textSecondaryLight,
+                  color:
+                      isCompletedForDate
+                          ? AppColors.success
+                          : AppColors.textSecondaryLight,
                   size: 22,
                 ),
               const SizedBox(width: AppSpacing.space2),
@@ -603,12 +628,14 @@ class _SectionTile extends ConsumerWidget {
                     Text(
                       section.pieceName,
                       style: AppTypography.bodyMedium.copyWith(
-                        decoration: isCompletedForDate
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color: isCompletedForDate
-                            ? AppColors.textSecondaryLight
-                            : null,
+                        decoration:
+                            isCompletedForDate
+                                ? TextDecoration.lineThrough
+                                : null,
+                        color:
+                            isCompletedForDate
+                                ? AppColors.textSecondaryLight
+                                : null,
                       ),
                     ),
                     Text(
@@ -625,17 +652,18 @@ class _SectionTile extends ConsumerWidget {
               if (isToday)
                 IconButton(
                   onPressed: () async {
-                    await ref.read(sectionCrudProvider.notifier).toggleRepeat(
-                          section.id,
-                          repertoireId,
-                          studentId,
-                        );
+                    await ref
+                        .read(sectionCrudProvider.notifier)
+                        .toggleRepeat(section.id, repertoireId, studentId);
                   },
                   icon: Icon(
                     Icons.repeat,
-                    color: section.isRepeat
-                        ? AppColors.primary
-                        : AppColors.textSecondaryLight.withValues(alpha: 0.5),
+                    color:
+                        section.isRepeat
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight.withValues(
+                              alpha: 0.5,
+                            ),
                     size: 20,
                   ),
                   tooltip: section.isRepeat ? '매일 반복' : '반복 안함',

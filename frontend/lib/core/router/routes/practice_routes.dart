@@ -15,6 +15,7 @@ import '../../../features/practice/presentation/screens/repertoire_archive_scree
 import '../../../features/practice/presentation/screens/practice_note_list_screen.dart';
 import '../../../features/practice/presentation/screens/practice_goal_setting_screen.dart';
 import '../../../features/practice/presentation/screens/practice_stats_screen.dart';
+import '../../../features/practice/presentation/screens/repertoire_history_screen.dart';
 import '../../../features/practice/presentation/screens/tuner_screen.dart';
 import '../app_routes.dart';
 
@@ -104,10 +105,7 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final repertoireId = state.uri.queryParameters['repertoireId'] ?? '';
       final studentId = state.uri.queryParameters['studentId'] ?? '';
-      return AddSectionScreen(
-        repertoireId: repertoireId,
-        studentId: studentId,
-      );
+      return AddSectionScreen(repertoireId: repertoireId, studentId: studentId);
     },
   ),
 
@@ -187,6 +185,16 @@ List<GoRoute> practiceRoutes = [
     builder: (context, state) {
       final studentId = state.uri.queryParameters['studentId'] ?? '';
       return PracticeStatsScreen(studentId: studentId);
+    },
+  ),
+
+  // Repertoire History
+  GoRoute(
+    path: AppRoutes.repertoireHistory,
+    name: 'repertoireHistory',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return RepertoireHistoryScreen(studentId: studentId);
     },
   ),
 
