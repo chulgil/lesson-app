@@ -1,56 +1,97 @@
-# Backend - Lesson App API
+# Lessonaza Backend
 
-> FastAPI 기반 백엔드 서버 (개발 예정)
+> FastAPI + MySQL 8.0 + Docker | [lessonaza.app](https://lessonaza.app)
 
-## 기술 스택
+음악 레슨/연습 관리 앱 Lessonaza의 백엔드 API 서버
 
-- **Framework**: FastAPI
-- **Database**: PostgreSQL (예정)
-- **ORM**: SQLAlchemy / SQLModel
-- **Package Manager**: UV
+## Tech Stack
 
-## 폴더 구조
+| 항목 | 기술 |
+|------|------|
+| Framework | FastAPI |
+| ORM | SQLAlchemy 2.0 (async) |
+| Database | MySQL 8.0 |
+| Auth | JWT + OAuth (Google, Kakao, Apple) |
+| Storage | Vultr Object Storage |
+| Package Manager | UV |
+| Container | Docker + Docker Compose |
+
+## Quick Start
+
+### Docker (권장)
+
+```bash
+# 환경변수 설정
+cp .env.example .env
+nano .env
+
+# 실행
+docker compose up -d
+
+# 마이그레이션
+docker compose exec app uv run alembic upgrade head
+
+# 로그 확인
+docker compose logs -f app
+```
+
+### Local Development
+
+```bash
+# 의존성 설치
+uv sync
+
+# 환경변수
+cp .env.example .env
+
+# 서버 실행
+uv run uvicorn app.main:app --reload --port 8000
+
+# 마이그레이션
+uv run alembic upgrade head
+```
+
+## API Docs
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health Check: http://localhost:8000/health
+
+## Tests
+
+```bash
+uv run pytest
+uv run pytest --cov=app
+```
+
+## Deployment
+
+```bash
+# 서버에서 배포
+git pull && docker compose build --no-cache app && docker compose up -d
+
+# 또는 배포 스크립트 사용
+./scripts/deploy.sh
+```
+
+-> 상세: [docs/deployment.md](docs/deployment.md)
+
+## Project Structure
 
 ```
 backend/
 ├── app/
-│   ├── api/           # API 라우터
-│   ├── core/          # 설정, 보안
-│   ├── models/        # DB 모델
-│   ├── schemas/       # Pydantic 스키마
-│   ├── services/      # 비즈니스 로직
-│   └── main.py        # 앱 엔트리포인트
-├── tests/             # 테스트
-├── pyproject.toml     # 의존성
-└── README.md
-```
-
-## 명령어
-
-```bash
-# 가상환경 생성 및 의존성 설치
-uv sync
-
-# 개발 서버 실행
-uv run uvicorn app.main:app --reload
-
-# 테스트 실행
-uv run pytest
-
-# 타입 체크
-uv run mypy app/
-```
-
-## API 문서
-
-서버 실행 후:
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## 환경 변수
-
-`.env` 파일 생성:
-```env
-DATABASE_URL=postgresql://user:pass@localhost:5432/lesson_app
-SECRET_KEY=your-secret-key
+│   ├── main.py              # FastAPI entry point
+│   ├── core/                # Config, DB, Auth, i18n
+│   ├── models/              # SQLAlchemy ORM models
+│   ├── schemas/             # Pydantic v2 schemas
+│   ├── api/v1/              # API routes
+│   ├── services/            # Business logic
+│   └── utils/               # Utilities
+├── alembic/                 # DB migrations
+├── tests/                   # Test suite
+├── nginx/                   # Nginx config
+├── docker-compose.yml
+├── Dockerfile
+└── pyproject.toml
 ```

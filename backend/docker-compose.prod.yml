@@ -1,0 +1,53 @@
+# ============================================================
+# Lessonaza Backend - Production Docker Compose
+# ============================================================
+# For codenavi server (108.61.162.25)
+# - Uses existing MySQL container on data_internal network
+# - Uses Traefik reverse proxy on traefiknet for HTTPS
+# - No separate DB or Nginx needed
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml exec app uv run alembic upgrade head
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lessonaza-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Connect to existing MySQL on data_internal network
+      DATABASE_URL: mysql+asyncmy://${MYSQL_USER:-lessonaza}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-lessonaza}
+      ENVIRONMENT: production
+      DEBUG: "false"
+    volumes:
+      - app-logs:/app/logs
+    networks:
+      - traefiknet
+      - data_internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=lessonaza-api"
+      - "traefik.docker.network=traefiknet"
+      - "traefik.frontend.rule=Host:lesson.chulgil.me"
+      - "traefik.port=8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+networks:
+  traefiknet:
+    external: true
+  data_internal:
+    external: true
+
+volumes:
+  app-logs:
+    driver: local

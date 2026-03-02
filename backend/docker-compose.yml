@@ -1,0 +1,78 @@
+services:
+  # --- MySQL 8.0 ---
+  db:
+    image: mysql:8.0
+    container_name: lessonaza-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lessonaza}
+      MYSQL_USER: ${MYSQL_USER:-lessonaza}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lessonaza}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=caching_sha2_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - lessonaza-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # --- FastAPI Application ---
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lessonaza-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Override DATABASE_URL for Docker networking
+      DATABASE_URL: mysql+asyncmy://${MYSQL_USER:-lessonaza}:${MYSQL_PASSWORD:-lessonaza}@db:3306/${MYSQL_DATABASE:-lessonaza}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Hot reload in development: mount source code
+      - ./app:/app/app
+      - app-logs:/app/logs
+    networks:
+      - lessonaza-network
+
+  # --- Nginx Reverse Proxy ---
+  nginx:
+    image: nginx:alpine
+    container_name: lessonaza-nginx
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+    networks:
+      - lessonaza-network
+
+networks:
+  lessonaza-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  app-logs:
+    driver: local

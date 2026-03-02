@@ -1,0 +1,96 @@
+"""User profile endpoints."""
+
+from __future__ import annotations
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.deps import get_current_user, get_db
+from app.models.user import User
+from app.schemas.user import (
+    LocaleUpdate,
+    RoleUpdate,
+    SupportedLocalesResponse,
+    UserResponse,
+    UserUpdate,
+)
+from app.services.user_service import UserService
+
+router = APIRouter()
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get my profile",
+)
+async def get_my_profile(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> UserResponse:
+    """Return the current user's profile."""
+    return UserResponse.model_validate(current_user)
+
+
+@router.put(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update my profile",
+)
+async def update_my_profile(
+    body: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """Update the current user's profile fields."""
+    service = UserService(db)
+    user = await service.update_profile(current_user.id, body)
+    return UserResponse.model_validate(user)
+
+
+@router.put(
+    "/me/role",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Set role (onboarding)",
+)
+async def update_my_role(
+    body: RoleUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """Set the user's role during onboarding."""
+    service = UserService(db)
+    user = await service.update_role(current_user.id, body.role)
+    return UserResponse.model_validate(user)
+
+
+@router.put(
+    "/me/locale",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update locale settings",
+)
+async def update_my_locale(
+    body: LocaleUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """Update locale / country / timezone / currency."""
+    service = UserService(db)
+    user = await service.update_locale(current_user.id, body)
+    return UserResponse.model_validate(user)
+
+
+@router.get(
+    "/supported-locales",
+    response_model=SupportedLocalesResponse,
+    status_code=status.HTTP_200_OK,
+    summary="List supported locales",
+)
+async def get_supported_locales() -> SupportedLocalesResponse:
+    """Return the list of locales the application supports."""
+    return UserService.get_supported_locales()
