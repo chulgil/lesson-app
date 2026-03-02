@@ -186,48 +186,48 @@ LessonScheduleChange _$LessonScheduleChangeFromJson(
         Map<String, dynamic> json) =>
     LessonScheduleChange(
       id: json['id'] as String,
-      studentId: json['studentId'] as String,
-      teacherId: json['teacherId'] as String,
-      changeType: $enumDecode(_$ScheduleChangeTypeEnumMap, json['changeType']),
-      previousDayOfWeek: (json['previousDayOfWeek'] as num?)?.toInt(),
-      previousTime: json['previousTime'] as String?,
-      newDayOfWeek: (json['newDayOfWeek'] as num?)?.toInt(),
-      newTime: json['newTime'] as String?,
-      effectiveFrom: DateTime.parse(json['effectiveFrom'] as String),
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
+      changeType: $enumDecode(_$ScheduleChangeTypeEnumMap, json['change_type']),
+      previousDayOfWeek: (json['previous_day_of_week'] as num?)?.toInt(),
+      previousTime: json['previous_time'] as String?,
+      newDayOfWeek: (json['new_day_of_week'] as num?)?.toInt(),
+      newTime: json['new_time'] as String?,
+      effectiveFrom: DateTime.parse(json['effective_from'] as String),
       status:
           $enumDecodeNullable(_$ScheduleChangeStatusEnumMap, json['status']) ??
               ScheduleChangeStatus.pending,
-      requestedAt: DateTime.parse(json['requestedAt'] as String),
-      processedAt: json['processedAt'] == null
+      requestedAt: DateTime.parse(json['requested_at'] as String),
+      processedAt: json['processed_at'] == null
           ? null
-          : DateTime.parse(json['processedAt'] as String),
-      requestReason: json['requestReason'] as String?,
-      responseMessage: json['responseMessage'] as String?,
-      alternativeTimes: (json['alternativeTimes'] as List<dynamic>?)
+          : DateTime.parse(json['processed_at'] as String),
+      requestReason: json['request_reason'] as String?,
+      responseMessage: json['response_message'] as String?,
+      alternativeTimes: (json['alternative_times'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      requestedBy: json['requestedBy'] as String,
+      requestedBy: json['requested_by'] as String,
     );
 
 Map<String, dynamic> _$LessonScheduleChangeToJson(
         LessonScheduleChange instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'studentId': instance.studentId,
-      'teacherId': instance.teacherId,
-      'changeType': _$ScheduleChangeTypeEnumMap[instance.changeType]!,
-      'previousDayOfWeek': instance.previousDayOfWeek,
-      'previousTime': instance.previousTime,
-      'newDayOfWeek': instance.newDayOfWeek,
-      'newTime': instance.newTime,
-      'effectiveFrom': instance.effectiveFrom.toIso8601String(),
+      'student_id': instance.studentId,
+      'teacher_id': instance.teacherId,
+      'change_type': _$ScheduleChangeTypeEnumMap[instance.changeType]!,
+      'previous_day_of_week': instance.previousDayOfWeek,
+      'previous_time': instance.previousTime,
+      'new_day_of_week': instance.newDayOfWeek,
+      'new_time': instance.newTime,
+      'effective_from': instance.effectiveFrom.toIso8601String(),
       'status': _$ScheduleChangeStatusEnumMap[instance.status]!,
-      'requestedAt': instance.requestedAt.toIso8601String(),
-      'processedAt': instance.processedAt?.toIso8601String(),
-      'requestReason': instance.requestReason,
-      'responseMessage': instance.responseMessage,
-      'alternativeTimes': instance.alternativeTimes,
-      'requestedBy': instance.requestedBy,
+      'requested_at': instance.requestedAt.toIso8601String(),
+      'processed_at': instance.processedAt?.toIso8601String(),
+      'request_reason': instance.requestReason,
+      'response_message': instance.responseMessage,
+      'alternative_times': instance.alternativeTimes,
+      'requested_by': instance.requestedBy,
     };
 
 const _$ScheduleChangeTypeEnumMap = {

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lesson_app/features/calendar/domain/entities/calendar_event.dart';
+import 'package:lessonaza/features/calendar/domain/entities/calendar_event.dart';
 
 void main() {
   group('CalendarEventType', () {

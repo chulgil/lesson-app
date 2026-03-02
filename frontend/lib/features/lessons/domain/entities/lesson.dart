@@ -1,3 +1,7 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'lesson.g.dart';
+
 /// Lesson status enum
 enum LessonStatus {
   // Basic states
@@ -71,6 +75,7 @@ enum LessonStatus {
 }
 
 /// Piece practiced in a lesson
+@JsonSerializable()
 class LessonPiece {
   final String id;
   final String name;
@@ -95,6 +100,11 @@ class LessonPiece {
     return parts.join(' - ');
   }
 
+  factory LessonPiece.fromJson(Map<String, dynamic> json) =>
+      _$LessonPieceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LessonPieceToJson(this);
+
   LessonPiece copyWith({
     String? id,
     String? name,
@@ -115,9 +125,11 @@ class LessonPiece {
 }
 
 /// Recording attached to a lesson
+@JsonSerializable()
 class LessonRecording {
   final String id;
   final String filePath;
+  @JsonKey(fromJson: _durationFromSeconds, toJson: _durationToSeconds)
   final Duration duration;
   final DateTime recordedAt;
   final String? transcription;
@@ -131,20 +143,32 @@ class LessonRecording {
     this.transcription,
     this.aiSummary,
   });
+
+  factory LessonRecording.fromJson(Map<String, dynamic> json) =>
+      _$LessonRecordingFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LessonRecordingToJson(this);
 }
 
+Duration _durationFromSeconds(int seconds) => Duration(seconds: seconds);
+int _durationToSeconds(Duration duration) => duration.inSeconds;
+
 /// Lesson location info (simplified for display)
+@JsonSerializable()
 class LessonLocationInfo {
   final String name; // "남부터미널 우드브릿지", "학생 집"
   final String? address; // Optional address
 
-  const LessonLocationInfo({
-    required this.name,
-    this.address,
-  });
+  const LessonLocationInfo({required this.name, this.address});
+
+  factory LessonLocationInfo.fromJson(Map<String, dynamic> json) =>
+      _$LessonLocationInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LessonLocationInfoToJson(this);
 }
 
 /// Lesson model
+@JsonSerializable()
 class Lesson {
   final String id;
   final String studentId;
@@ -187,6 +211,10 @@ class Lesson {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory Lesson.fromJson(Map<String, dynamic> json) => _$LessonFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LessonToJson(this);
 
   /// Check if lesson is upcoming
   bool get isUpcoming =>

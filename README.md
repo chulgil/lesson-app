@@ -1,4 +1,4 @@
-# Lesson App
+# Lessonaza
 
 음악 레슨/연습 관리 앱
 

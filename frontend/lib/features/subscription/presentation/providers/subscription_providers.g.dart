@@ -6,28 +6,6 @@ part of 'subscription_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$subscriptionRepositoryHash() =>
-    r'c56e0bbd90157c9653efda4ae19f54e0e352d6e6';
-
-/// Repository provider for Subscription.
-///
-/// Copied from [subscriptionRepository].
-@ProviderFor(subscriptionRepository)
-final subscriptionRepositoryProvider =
-    AutoDisposeProvider<SubscriptionRepository>.internal(
-  subscriptionRepository,
-  name: r'subscriptionRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$subscriptionRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SubscriptionRepositoryRef
-    = AutoDisposeProviderRef<SubscriptionRepository>;
 String _$studentSubscriptionsHash() =>
     r'7d9d99eabed4bbd20dac63a7de85a2b6ee911c0a';
 
@@ -964,7 +942,7 @@ class _TeacherStudentSubscriptionsProviderElement
 }
 
 String _$unpaidSubscriptionsHash() =>
-    r'af205ce203e95861c646305d0ee209e2c0c6d19b';
+    r'326a47ae02a452ad832c0de6f0633b9afffac49e';
 
 /// Get unpaid subscriptions for a teacher.
 ///
@@ -1110,7 +1088,7 @@ class _UnpaidSubscriptionsProviderElement
   String get teacherId => (origin as UnpaidSubscriptionsProvider).teacherId;
 }
 
-String _$unpaidSummaryHash() => r'8c5bbae1c1adeb686d26785e109361c210f40cdf';
+String _$unpaidSummaryHash() => r'bd094da01cf0d07078715e542de884470bb0afbd';
 
 /// Get unpaid summary (total amount + student count) for a teacher.
 ///

@@ -2,9 +2,13 @@
 // Handles booking creation, cancellation, and waitlist management
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_group_class_booking_repository.dart';
+import '../../data/repositories/remote_group_class_booking_repository.dart';
 import '../../domain/entities/group_class_booking.dart';
 import '../../domain/repositories/group_class_booking_repository.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
@@ -13,25 +17,22 @@ import '../../../notifications/domain/entities/notification.dart';
 part 'group_class_booking_providers.g.dart';
 
 // ============================================================
-// Repository Provider
+// Repository Provider - switches between Mock and Remote.
 // ============================================================
 
-@Riverpod(keepAlive: true)
-GroupClassBookingRepository groupClassBookingRepository(
-  GroupClassBookingRepositoryRef ref,
-) {
-  return MockGroupClassBookingRepository(
-    onWaitlistPromotion: (promoted) {
-      // Send notification when promoted from waitlist
-      _sendWaitlistPromotionNotification(ref, promoted);
-    },
-  );
-}
+final groupClassBookingRepositoryProvider =
+    Provider<GroupClassBookingRepository>((ref) {
+      if (EnvironmentConfig.useMockData) {
+        return MockGroupClassBookingRepository(
+          onWaitlistPromotion: (promoted) {
+            _sendWaitlistPromotionNotification(ref, promoted);
+          },
+        );
+      }
+      return RemoteGroupClassBookingRepository(ref.read(apiClientProvider));
+    });
 
-void _sendWaitlistPromotionNotification(
-  GroupClassBookingRepositoryRef ref,
-  GroupClassBooking promoted,
-) {
+void _sendWaitlistPromotionNotification(Ref ref, GroupClassBooking promoted) {
   try {
     final notificationService = ref.read(notificationServiceProvider);
     final notification = AppNotification(
@@ -299,7 +300,9 @@ class GroupClassBookingNotifier extends _$GroupClassBookingNotifier {
 
       return cancelled;
     } catch (e) {
-      debugPrint('[GroupClassBookingNotifier] Failed to auto-cancel waitlist: $e');
+      debugPrint(
+        '[GroupClassBookingNotifier] Failed to auto-cancel waitlist: $e',
+      );
       rethrow;
     }
   }
@@ -323,7 +326,9 @@ class GroupClassBookingNotifier extends _$GroupClassBookingNotifier {
       );
       notificationService.showNotification(notification);
     } catch (e) {
-      debugPrint('[GroupClassBookingNotifier] Failed to send auto-cancel notification: $e');
+      debugPrint(
+        '[GroupClassBookingNotifier] Failed to send auto-cancel notification: $e',
+      );
     }
   }
 }

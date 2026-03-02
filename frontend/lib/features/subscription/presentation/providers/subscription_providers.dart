@@ -1,17 +1,23 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
+import '../../data/repositories/remote_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../../domain/repositories/subscription_repository.dart';
 
 part 'subscription_providers.g.dart';
 
-/// Repository provider for Subscription.
-@riverpod
-SubscriptionRepository subscriptionRepository(SubscriptionRepositoryRef ref) {
-  return MockSubscriptionRepository();
-}
+/// Repository provider for Subscription - switches between Mock and Remote.
+final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockSubscriptionRepository();
+  }
+  return RemoteSubscriptionRepository(ref.read(apiClientProvider));
+});
 
 /// Get all subscriptions for a student.
 @riverpod
@@ -32,9 +38,11 @@ Future<List<Subscription>> activeStudentSubscriptions(
   final repository = ref.watch(subscriptionRepositoryProvider);
   final subscriptions = await repository.getByStudentId(studentId);
   return subscriptions
-      .where((s) =>
-          s.status == SubscriptionStatus.active ||
-          s.status == SubscriptionStatus.expiringSoon)
+      .where(
+        (s) =>
+            s.status == SubscriptionStatus.active ||
+            s.status == SubscriptionStatus.expiringSoon,
+      )
       .toList();
 }
 
@@ -254,13 +262,16 @@ Future<Subscription?> activeSubscriptionBetween(
   final teacherSubscriptions = await repository.getByTeacherId(teacherId);
 
   // Find active subscription for this student
-  final studentSubscriptions = teacherSubscriptions
-      .where((s) =>
-          s.studentId == studentId &&
-          (s.status == SubscriptionStatus.active ||
-              s.status == SubscriptionStatus.expiringSoon) &&
-          (s.remainingLessons ?? 0) > 0)
-      .toList();
+  final studentSubscriptions =
+      teacherSubscriptions
+          .where(
+            (s) =>
+                s.studentId == studentId &&
+                (s.status == SubscriptionStatus.active ||
+                    s.status == SubscriptionStatus.expiringSoon) &&
+                (s.remainingLessons ?? 0) > 0,
+          )
+          .toList();
 
   if (studentSubscriptions.isEmpty) {
     return null;

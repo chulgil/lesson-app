@@ -30,10 +30,7 @@ final _selectedRequestIdsProvider = StateProvider<Set<String>>((ref) => {});
 class LessonRequestsScreen extends ConsumerWidget {
   final String teacherId;
 
-  const LessonRequestsScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const LessonRequestsScreen({super.key, required this.teacherId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,27 +44,36 @@ class LessonRequestsScreen extends ConsumerWidget {
       body: SafeArea(
         child: requestsAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
-            child: Text('오류가 발생했습니다: $e'),
-          ),
+          error: (e, _) => Center(child: Text('오류가 발생했습니다: $e')),
           data: (requests) {
             // Get pending requests
-            final pendingRequests = requests
-                .where((r) =>
-                    r.status == LessonRequestStatus.pending && !r.isExpired)
-                .toList();
+            final pendingRequests =
+                requests
+                    .where(
+                      (r) =>
+                          r.status == LessonRequestStatus.pending &&
+                          !r.isExpired,
+                    )
+                    .toList();
             final pendingCount = pendingRequests.length;
 
             // Get dates with requests
-            final markedDates = requests
-                .map((r) => DateTime(
-                    r.createdAt.year, r.createdAt.month, r.createdAt.day))
-                .toSet();
+            final markedDates =
+                requests
+                    .map(
+                      (r) => DateTime(
+                        r.createdAt.year,
+                        r.createdAt.month,
+                        r.createdAt.day,
+                      ),
+                    )
+                    .toSet();
 
             // Get selected pending requests
-            final selectedRequests = pendingRequests
-                .where((r) => selectedIds.contains(r.id))
-                .toList();
+            final selectedRequests =
+                pendingRequests
+                    .where((r) => selectedIds.contains(r.id))
+                    .toList();
 
             return Column(
               children: [
@@ -88,14 +94,16 @@ class LessonRequestsScreen extends ConsumerWidget {
                             // Exit selection mode
                             ref.read(_isSelectionModeProvider.notifier).state =
                                 false;
-                            ref.read(_selectedRequestIdsProvider.notifier).state =
-                                {};
+                            ref
+                                .read(_selectedRequestIdsProvider.notifier)
+                                .state = {};
                           } else {
                             context.pop();
                           }
                         },
                         icon: Icon(
-                            isSelectionMode ? Icons.close : Icons.arrow_back),
+                          isSelectionMode ? Icons.close : Icons.arrow_back,
+                        ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -156,8 +164,9 @@ class LessonRequestsScreen extends ConsumerWidget {
                           // Enter selection mode button
                           TextButton(
                             onPressed: () {
-                              ref.read(_isSelectionModeProvider.notifier).state =
-                                  true;
+                              ref
+                                  .read(_isSelectionModeProvider.notifier)
+                                  .state = true;
                             },
                             child: Text(
                               '선택',
@@ -202,11 +211,14 @@ class LessonRequestsScreen extends ConsumerWidget {
                       final current =
                           ref.read(_selectedRequestIdsProvider.notifier).state;
                       if (current.contains(requestId)) {
-                        ref.read(_selectedRequestIdsProvider.notifier).state =
-                            {...current}..remove(requestId);
+                        ref.read(_selectedRequestIdsProvider.notifier).state = {
+                          ...current,
+                        }..remove(requestId);
                       } else {
-                        ref.read(_selectedRequestIdsProvider.notifier).state =
-                            {...current, requestId};
+                        ref.read(_selectedRequestIdsProvider.notifier).state = {
+                          ...current,
+                          requestId,
+                        };
                       }
                     },
                   ),
@@ -232,9 +244,7 @@ class LessonRequestsScreen extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -250,8 +260,9 @@ class LessonRequestsScreen extends ConsumerWidget {
             // Decline all button
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () =>
-                    _showBatchDeclineDialog(context, ref, selectedRequests),
+                onPressed:
+                    () =>
+                        _showBatchDeclineDialog(context, ref, selectedRequests),
                 icon: const Icon(Icons.schedule, size: 16),
                 label: const Text('모두 다음에'),
                 style: OutlinedButton.styleFrom(
@@ -269,8 +280,12 @@ class LessonRequestsScreen extends ConsumerWidget {
             Expanded(
               flex: 2,
               child: FilledButton.icon(
-                onPressed: () =>
-                    _navigateToBatchProposal(context, ref, selectedRequests),
+                onPressed:
+                    () => _navigateToBatchProposal(
+                      context,
+                      ref,
+                      selectedRequests,
+                    ),
                 icon: const Icon(Icons.card_giftcard, size: 16),
                 label: Text('${selectedRequests.length}명에게 수강권 제안'),
                 style: FilledButton.styleFrom(
@@ -292,12 +307,13 @@ class LessonRequestsScreen extends ConsumerWidget {
     WidgetRef ref,
     List<LessonRequest> requests,
   ) {
-    // Get student IDs
+    // Get student IDs and lesson request IDs
     final studentIds = requests.map((r) => r.studentId).toList();
+    final requestIds = requests.map((r) => r.id).toList();
 
-    // Navigate with multiple student IDs
+    // Navigate with multiple student IDs and request IDs
     context.push(
-      '${AppRoutes.issueSubscription}?studentIds=${studentIds.join(',')}',
+      '${AppRoutes.issueSubscription}?studentIds=${studentIds.join(',')}&lessonRequestIds=${requestIds.join(',')}',
     );
 
     // Exit selection mode
@@ -314,52 +330,53 @@ class LessonRequestsScreen extends ConsumerWidget {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${requests.length}명 레슨 요청 보류'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('선택한 ${requests.length}명의 학생에게 동일한 안내 메시지를 전달합니다.'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: '예: 현재 스케줄이 꽉 차서 다음 기회에 연락드릴게요.',
-                border: OutlineInputBorder(),
+      builder:
+          (context) => AlertDialog(
+            title: Text('${requests.length}명 레슨 요청 보류'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('선택한 ${requests.length}명의 학생에게 동일한 안내 메시지를 전달합니다.'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: reasonController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '예: 현재 스케줄이 꽉 차서 다음 기회에 연락드릴게요.',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.textSecondaryLight,
+                ),
+                child: const Text('모두 보류'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.textSecondaryLight,
-            ),
-            child: const Text('모두 보류'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
       try {
-        final reason = reasonController.text.isEmpty
-            ? '현재 스케줄 조정이 어려워요. 다음에 꼭 연락드릴게요!'
-            : reasonController.text;
+        final reason =
+            reasonController.text.isEmpty
+                ? '현재 스케줄 조정이 어려워요. 다음에 꼭 연락드릴게요!'
+                : reasonController.text;
 
         // Decline all selected requests
         for (final request in requests) {
-          await ref.read(lessonRequestActionsProvider.notifier).declineRequest(
-                requestId: request.id,
-                reason: reason,
-              );
+          await ref
+              .read(lessonRequestActionsProvider.notifier)
+              .declineRequest(requestId: request.id, reason: reason);
         }
 
         // Exit selection mode
@@ -410,13 +427,16 @@ class _LessonRequestList extends StatelessWidget {
     final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
 
     // Filter requests for selected date
-    final dayRequests = requests
-        .where((r) =>
-            r.createdAt.year == selectedDate.year &&
-            r.createdAt.month == selectedDate.month &&
-            r.createdAt.day == selectedDate.day)
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final dayRequests =
+        requests
+            .where(
+              (r) =>
+                  r.createdAt.year == selectedDate.year &&
+                  r.createdAt.month == selectedDate.month &&
+                  r.createdAt.day == selectedDate.day,
+            )
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     final isToday = _isToday(selectedDate);
 
@@ -436,10 +456,7 @@ class _LessonRequestList extends StatelessWidget {
             if (isToday) ...[
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -466,15 +483,17 @@ class _LessonRequestList extends StatelessWidget {
 
         // Requests for selected date
         if (dayRequests.isNotEmpty)
-          ...dayRequests.map((request) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: _LessonRequestCard(
-                  request: request,
-                  isSelectionMode: isSelectionMode,
-                  isSelected: selectedIds.contains(request.id),
-                  onToggleSelection: () => onToggleSelection(request.id),
-                ),
-              )),
+          ...dayRequests.map(
+            (request) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: _LessonRequestCard(
+                request: request,
+                isSelectionMode: isSelectionMode,
+                isSelected: selectedIds.contains(request.id),
+                onToggleSelection: () => onToggleSelection(request.id),
+              ),
+            ),
+          ),
 
         // Empty state
         if (dayRequests.isEmpty) _buildEmptyState(context),
@@ -556,14 +575,16 @@ class _LessonRequestCard extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.05)
-              : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : isPending
+            color:
+                isSelected
+                    ? AppColors.primary
+                    : isPending
                     ? AppColors.warning.withValues(alpha: 0.5)
                     : AppColors.borderLight,
             width: isSelected ? 2 : 1,
@@ -806,11 +827,7 @@ class _LessonRequestCard extends ConsumerWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 16,
-                      color: AppColors.info,
-                    ),
+                    Icon(Icons.info_outline, size: 16, color: AppColors.info),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Column(
@@ -858,7 +875,7 @@ class _LessonRequestCard extends ConsumerWidget {
                     child: FilledButton.icon(
                       onPressed: () {
                         context.push(
-                          '${AppRoutes.issueSubscription}?studentId=${request.studentId}',
+                          '${AppRoutes.issueSubscription}?studentId=${request.studentId}&lessonRequestId=${request.id}',
                         );
                       },
                       icon: const Icon(Icons.card_giftcard, size: 16),
@@ -925,10 +942,7 @@ class _LessonRequestCard extends ConsumerWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
@@ -955,47 +969,51 @@ class _LessonRequestCard extends ConsumerWidget {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레슨 요청 보류'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('학생에게 전달할 안내 메시지를 입력해주세요. (선택)'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: reasonController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: '예: 현재 스케줄이 꽉 차서 다음 기회에 연락드릴게요.',
-                border: OutlineInputBorder(),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('레슨 요청 보류'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('학생에게 전달할 안내 메시지를 입력해주세요. (선택)'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: reasonController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    hintText: '예: 현재 스케줄이 꽉 차서 다음 기회에 연락드릴게요.',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.textSecondaryLight,
+                ),
+                child: const Text('보류'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.textSecondaryLight,
-            ),
-            child: const Text('보류'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
       try {
-        await ref.read(lessonRequestActionsProvider.notifier).declineRequest(
+        await ref
+            .read(lessonRequestActionsProvider.notifier)
+            .declineRequest(
               requestId: request.id,
-              reason: reasonController.text.isEmpty
-                  ? '현재 스케줄 조정이 어려워요. 다음에 꼭 연락드릴게요!'
-                  : reasonController.text,
+              reason:
+                  reasonController.text.isEmpty
+                      ? '현재 스케줄 조정이 어려워요. 다음에 꼭 연락드릴게요!'
+                      : reasonController.text,
             );
 
         if (context.mounted) {

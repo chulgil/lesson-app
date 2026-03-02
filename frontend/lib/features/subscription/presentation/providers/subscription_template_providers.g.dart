@@ -6,26 +6,6 @@ part of 'subscription_template_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$subscriptionTemplateRepositoryHash() =>
-    r'8d7091691b44a33d40ac9c412f647af93c04b088';
-
-/// See also [subscriptionTemplateRepository].
-@ProviderFor(subscriptionTemplateRepository)
-final subscriptionTemplateRepositoryProvider =
-    Provider<SubscriptionTemplateRepository>.internal(
-  subscriptionTemplateRepository,
-  name: r'subscriptionTemplateRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$subscriptionTemplateRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SubscriptionTemplateRepositoryRef
-    = ProviderRef<SubscriptionTemplateRepository>;
 String _$teacherTemplatesHash() => r'3ece1db7ec611ed16fe64b09532f42026f0725f9';
 
 /// Copied from Dart SDK

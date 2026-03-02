@@ -182,37 +182,37 @@ class MakeupReasonAdapter extends TypeAdapter<MakeupReason> {
 
 MakeupLesson _$MakeupLessonFromJson(Map<String, dynamic> json) => MakeupLesson(
       id: json['id'] as String,
-      studentId: json['studentId'] as String,
-      teacherId: json['teacherId'] as String,
-      originalLessonId: json['originalLessonId'] as String?,
-      scheduledLessonId: json['scheduledLessonId'] as String?,
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
+      originalLessonId: json['original_lesson_id'] as String?,
+      scheduledLessonId: json['scheduled_lesson_id'] as String?,
       status: $enumDecodeNullable(_$MakeupStatusEnumMap, json['status']) ??
           MakeupStatus.pending,
       reason: $enumDecode(_$MakeupReasonEnumMap, json['reason']),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
-      scheduledAt: json['scheduledAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      expiresAt: DateTime.parse(json['expires_at'] as String),
+      scheduledAt: json['scheduled_at'] == null
           ? null
-          : DateTime.parse(json['scheduledAt'] as String),
-      completedAt: json['completedAt'] == null
+          : DateTime.parse(json['scheduled_at'] as String),
+      completedAt: json['completed_at'] == null
           ? null
-          : DateTime.parse(json['completedAt'] as String),
+          : DateTime.parse(json['completed_at'] as String),
       note: json['note'] as String?,
     );
 
 Map<String, dynamic> _$MakeupLessonToJson(MakeupLesson instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'studentId': instance.studentId,
-      'teacherId': instance.teacherId,
-      'originalLessonId': instance.originalLessonId,
-      'scheduledLessonId': instance.scheduledLessonId,
+      'student_id': instance.studentId,
+      'teacher_id': instance.teacherId,
+      'original_lesson_id': instance.originalLessonId,
+      'scheduled_lesson_id': instance.scheduledLessonId,
       'status': _$MakeupStatusEnumMap[instance.status]!,
       'reason': _$MakeupReasonEnumMap[instance.reason]!,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'expiresAt': instance.expiresAt.toIso8601String(),
-      'scheduledAt': instance.scheduledAt?.toIso8601String(),
-      'completedAt': instance.completedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'expires_at': instance.expiresAt.toIso8601String(),
+      'scheduled_at': instance.scheduledAt?.toIso8601String(),
+      'completed_at': instance.completedAt?.toIso8601String(),
       'note': instance.note,
     };
 

@@ -142,43 +142,43 @@ class GroupBookingStatusAdapter extends TypeAdapter<GroupBookingStatus> {
 GroupClassBooking _$GroupClassBookingFromJson(Map<String, dynamic> json) =>
     GroupClassBooking(
       id: json['id'] as String,
-      scheduleId: json['scheduleId'] as String,
-      studentId: json['studentId'] as String,
-      subscriptionId: json['subscriptionId'] as String?,
+      scheduleId: json['schedule_id'] as String,
+      studentId: json['student_id'] as String,
+      subscriptionId: json['subscription_id'] as String?,
       status: $enumDecode(_$GroupBookingStatusEnumMap, json['status']),
-      waitlistPosition: (json['waitlistPosition'] as num?)?.toInt(),
-      attendedAt: json['attendedAt'] == null
+      waitlistPosition: (json['waitlist_position'] as num?)?.toInt(),
+      attendedAt: json['attended_at'] == null
           ? null
-          : DateTime.parse(json['attendedAt'] as String),
-      subscriptionDeducted: json['subscriptionDeducted'] as bool? ?? false,
-      cancelReason: json['cancelReason'] as String?,
-      cancelledAt: json['cancelledAt'] == null
+          : DateTime.parse(json['attended_at'] as String),
+      subscriptionDeducted: json['subscription_deducted'] as bool? ?? false,
+      cancelReason: json['cancel_reason'] as String?,
+      cancelledAt: json['cancelled_at'] == null
           ? null
-          : DateTime.parse(json['cancelledAt'] as String),
-      promotedAt: json['promotedAt'] == null
+          : DateTime.parse(json['cancelled_at'] as String),
+      promotedAt: json['promoted_at'] == null
           ? null
-          : DateTime.parse(json['promotedAt'] as String),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+          : DateTime.parse(json['promoted_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$GroupClassBookingToJson(GroupClassBooking instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'scheduleId': instance.scheduleId,
-      'studentId': instance.studentId,
-      'subscriptionId': instance.subscriptionId,
+      'schedule_id': instance.scheduleId,
+      'student_id': instance.studentId,
+      'subscription_id': instance.subscriptionId,
       'status': _$GroupBookingStatusEnumMap[instance.status]!,
-      'waitlistPosition': instance.waitlistPosition,
-      'attendedAt': instance.attendedAt?.toIso8601String(),
-      'subscriptionDeducted': instance.subscriptionDeducted,
-      'cancelReason': instance.cancelReason,
-      'cancelledAt': instance.cancelledAt?.toIso8601String(),
-      'promotedAt': instance.promotedAt?.toIso8601String(),
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'waitlist_position': instance.waitlistPosition,
+      'attended_at': instance.attendedAt?.toIso8601String(),
+      'subscription_deducted': instance.subscriptionDeducted,
+      'cancel_reason': instance.cancelReason,
+      'cancelled_at': instance.cancelledAt?.toIso8601String(),
+      'promoted_at': instance.promotedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$GroupBookingStatusEnumMap = {

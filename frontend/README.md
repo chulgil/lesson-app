@@ -1,4 +1,4 @@
-# Frontend - Lesson App
+# Frontend - Lessonaza
 
 > Flutter 기반 음악 레슨/연습 관리 앱
 

@@ -12,8 +12,6 @@ import '../../../../providers/booking/booking_providers.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../schedule/domain/entities/lesson_request.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
-import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
-import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
 import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
@@ -51,10 +49,7 @@ class StudentDashboardTab extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    '오늘도 화이팅!',
-                    style: AppTypography.headingLarge,
-                  ),
+                  Text('오늘도 화이팅!', style: AppTypography.headingLarge),
                 ],
               ),
               Row(
@@ -76,9 +71,8 @@ class StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // ═══════════════════════════════════════════════════════════
-          // 섹션 2: 🔴 액션 필요 (최우선 - 스케줄 확인, 수강권 제안)
+          // 섹션 2: 🔴 액션 필요 (수강권 제안, 레슨 요청)
           // ═══════════════════════════════════════════════════════════
-          _buildScheduleConfirmationCards(context, ref, currentStudentId),
           _buildPendingProposalsBanner(context, ref, currentStudentId),
           _buildLessonRequestsBanner(context, ref, currentStudentId),
 
@@ -95,7 +89,9 @@ class StudentDashboardTab extends ConsumerWidget {
           StudentSubscriptionSummary(
             studentId: currentStudentId,
             onViewAll: () {
-              context.push('${AppRoutes.subscriptions}?studentId=$currentStudentId');
+              context.push(
+                '${AppRoutes.subscriptions}?studentId=$currentStudentId',
+              );
             },
           ),
 
@@ -255,15 +251,16 @@ class StudentDashboardTab extends ConsumerWidget {
                   width: 24,
                   height: 40 * value,
                   decoration: BoxDecoration(
-                    color: isFuture
-                        ? AppColors.borderLight
-                        : value >= 0.8
+                    color:
+                        isFuture
+                            ? AppColors.borderLight
+                            : value >= 0.8
                             ? AppColors.practiceGood
                             : value >= 0.5
-                                ? AppColors.practiceNormal
-                                : value > 0
-                                    ? AppColors.practicePoor
-                                    : AppColors.borderLight,
+                            ? AppColors.practiceNormal
+                            : value > 0
+                            ? AppColors.practicePoor
+                            : AppColors.borderLight,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -272,7 +269,8 @@ class StudentDashboardTab extends ConsumerWidget {
               Text(
                 days[index],
                 style: AppTypography.caption.copyWith(
-                  color: isToday ? AppColors.primary : AppColors.textTertiaryLight,
+                  color:
+                      isToday ? AppColors.primary : AppColors.textTertiaryLight,
                   fontWeight: isToday ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -306,7 +304,10 @@ class StudentDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildNextLessonCard(
-      BuildContext context, WidgetRef ref, String studentId) {
+    BuildContext context,
+    WidgetRef ref,
+    String studentId,
+  ) {
     final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
 
     return bookingsAsync.when(
@@ -315,10 +316,11 @@ class StudentDashboardTab extends ConsumerWidget {
       data: (bookings) {
         // Find next upcoming lesson
         final now = DateTime.now();
-        final upcomingBookings = bookings
-            .where((b) => b.status.isActive && b.lessonDate.isAfter(now))
-            .toList()
-          ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
+        final upcomingBookings =
+            bookings
+                .where((b) => b.status.isActive && b.lessonDate.isAfter(now))
+                .toList()
+              ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
 
         if (upcomingBookings.isEmpty) {
           return _buildNextLessonEmptyState(context);
@@ -619,21 +621,32 @@ class StudentDashboardTab extends ConsumerWidget {
       error: (_, __) => const SizedBox.shrink(),
       data: (requests) {
         // Filter active requests (pending or proposal received)
-        final activeRequests = requests.where((r) =>
-            (r.status == LessonRequestStatus.pending && !r.isExpired) ||
-            r.status == LessonRequestStatus.proposalSent).toList();
+        final activeRequests =
+            requests
+                .where(
+                  (r) =>
+                      (r.status == LessonRequestStatus.pending &&
+                          !r.isExpired) ||
+                      r.status == LessonRequestStatus.proposalSent,
+                )
+                .toList();
 
         if (activeRequests.isEmpty) {
           return const SizedBox.shrink();
         }
 
         // Count by status
-        final proposalCount = activeRequests
-            .where((r) => r.status == LessonRequestStatus.proposalSent)
-            .length;
-        final pendingCount = activeRequests
-            .where((r) => r.status == LessonRequestStatus.pending && !r.isExpired)
-            .length;
+        final proposalCount =
+            activeRequests
+                .where((r) => r.status == LessonRequestStatus.proposalSent)
+                .length;
+        final pendingCount =
+            activeRequests
+                .where(
+                  (r) =>
+                      r.status == LessonRequestStatus.pending && !r.isExpired,
+                )
+                .length;
 
         // Determine display based on status
         Color bannerColor;
@@ -645,23 +658,23 @@ class StudentDashboardTab extends ConsumerWidget {
           bannerColor = AppColors.success;
           bannerIcon = Icons.card_giftcard;
           title = '수강권 제안 도착!';
-          subtitle = proposalCount == 1
-              ? '선생님이 수강권을 제안했습니다'
-              : '$proposalCount건의 수강권 제안이 있습니다';
+          subtitle =
+              proposalCount == 1
+                  ? '선생님이 수강권을 제안했습니다'
+                  : '$proposalCount건의 수강권 제안이 있습니다';
         } else {
           bannerColor = AppColors.info;
           bannerIcon = Icons.hourglass_empty;
           title = '레슨 요청 대기 중';
-          subtitle = pendingCount == 1
-              ? '선생님 응답을 기다리고 있습니다'
-              : '$pendingCount건의 요청이 대기 중입니다';
+          subtitle =
+              pendingCount == 1
+                  ? '선생님 응답을 기다리고 있습니다'
+                  : '$pendingCount건의 요청이 대기 중입니다';
         }
 
         return GestureDetector(
           onTap: () {
-            context.push(
-              '${AppRoutes.myLessonRequests}?studentId=$studentId',
-            );
+            context.push('${AppRoutes.myLessonRequests}?studentId=$studentId');
           },
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
@@ -678,11 +691,7 @@ class StudentDashboardTab extends ConsumerWidget {
                     color: bannerColor.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    bannerIcon,
-                    color: bannerColor,
-                    size: 20,
-                  ),
+                  child: Icon(bannerIcon, color: bannerColor, size: 20),
                 ),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
@@ -716,56 +725,15 @@ class StudentDashboardTab extends ConsumerWidget {
     );
   }
 
-  /// Schedule confirmation cards - shows pending schedule confirmations (Issue #62)
-  Widget _buildScheduleConfirmationCards(
-    BuildContext context,
-    WidgetRef ref,
-    String studentId,
-  ) {
-    final cardsAsync =
-        ref.watch(pendingScheduleConfirmationCardsProvider(studentId));
-
-    return cardsAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (cards) {
-        if (cards.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        // Display all pending cards
-        return Column(
-          children: cards.map((card) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space4),
-              child: ScheduleConfirmationCardWidget(
-                card: card,
-                onConfirmed: () {
-                  // Refresh the cards list
-                  ref.invalidate(
-                      pendingScheduleConfirmationCardsProvider(studentId));
-                },
-                onSelectDifferentTime: () {
-                  // Refresh the cards list
-                  ref.invalidate(
-                      pendingScheduleConfirmationCardsProvider(studentId));
-                },
-              ),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-
   /// Pending proposals banner - shows if there are pending proposals
   Widget _buildPendingProposalsBanner(
     BuildContext context,
     WidgetRef ref,
     String studentId,
   ) {
-    final pendingProposalsAsync =
-        ref.watch(pendingStudentProposalsProvider(studentId));
+    final pendingProposalsAsync = ref.watch(
+      pendingStudentProposalsProvider(studentId),
+    );
 
     return pendingProposalsAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -783,7 +751,8 @@ class StudentDashboardTab extends ConsumerWidget {
             if (count == 1) {
               // 1개: 해당 제안 상세로 바로 이동
               context.push(
-                  AppRoutes.proposalDetail.replaceFirst(':id', proposal.id));
+                AppRoutes.proposalDetail.replaceFirst(':id', proposal.id),
+              );
             } else {
               // 2개 이상: 알림 화면으로 이동 (모든 제안 알림 표시)
               context.push(AppRoutes.notifications);
@@ -794,8 +763,9 @@ class StudentDashboardTab extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              border:
-                  Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: AppColors.warning.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [

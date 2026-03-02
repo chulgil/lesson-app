@@ -6,9 +6,9 @@ part of 'follow_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followRepositoryHash() => r'd754c33b8e9757aa46bd379fc8658681b38f8c4c';
+String _$followRepositoryHash() => r'f4615e20b5345b32d520bf713ea18432c368fad9';
 
-/// Repository provider
+/// Repository provider - switches between Mock and Remote.
 ///
 /// Copied from [followRepository].
 @ProviderFor(followRepository)

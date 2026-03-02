@@ -68,7 +68,7 @@ class PhoneVerification {
 
 /// Tutorial steps for onboarding
 enum TutorialStep {
-  welcome, // "Welcome to LessonApp!"
+  welcome, // "Welcome to Lessonaza!"
   inviteStudent, // "How to invite students"
   createLesson, // "Create lesson schedule"
   writeFeedback, // "Write lesson notes"
@@ -126,7 +126,8 @@ class TutorialProgress {
     if (completedSteps.contains(step)) return this;
 
     final newSteps = [...completedSteps, step];
-    final isNowCompleted = step == TutorialStep.completed ||
+    final isNowCompleted =
+        step == TutorialStep.completed ||
         newSteps.length >= TutorialStep.values.length;
 
     return copyWith(
@@ -136,10 +137,7 @@ class TutorialProgress {
   }
 
   TutorialProgress skip() {
-    return copyWith(
-      isSkipped: true,
-      completedAt: DateTime.now(),
-    );
+    return copyWith(isSkipped: true, completedAt: DateTime.now());
   }
 }
 

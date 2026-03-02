@@ -11,7 +11,13 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../students/domain/entities/lesson_class.dart';
+import '../../../students/presentation/providers/lesson_class_providers.dart';
+import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/domain/entities/subscription_proposal.dart';
+import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
+import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../../../calendar/presentation/screens/calendar_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 import '../../../students/presentation/screens/students_tab.dart';
@@ -99,6 +105,9 @@ class _DashboardTab extends ConsumerWidget {
     final pendingBookingsAsync = ref.watch(
       pendingBookingsCountProvider(teacherId),
     );
+    final awaitingConfirmAsync = ref.watch(
+      awaitingConfirmationProposalsProvider(teacherId),
+    );
 
     // Get today's lessons
     final now = DateTime.now();
@@ -120,6 +129,7 @@ class _DashboardTab extends ConsumerWidget {
         ref.invalidate(unpaidSummaryProvider(teacherId));
         ref.invalidate(pendingLessonRequestCountProvider(teacherId));
         ref.invalidate(pendingBookingsCountProvider(teacherId));
+        ref.invalidate(awaitingConfirmationProposalsProvider(teacherId));
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -145,9 +155,10 @@ class _DashboardTab extends ConsumerWidget {
             // Urgent Actions Section (즉시 확인 필요)
             _buildUrgentActionsSection(
               context,
+              ref,
               pendingRequestsAsync,
               pendingBookingsAsync,
-              unpaidSummaryAsync,
+              awaitingConfirmAsync,
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -180,7 +191,7 @@ class _DashboardTab extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'lesson-app',
+          'Lessonaza',
           style: AppTypography.headingLarge.copyWith(
             color: AppColors.primary,
             fontWeight: FontWeight.bold,
@@ -292,16 +303,18 @@ class _DashboardTab extends ConsumerWidget {
 
   Widget _buildUrgentActionsSection(
     BuildContext context,
+    WidgetRef ref,
     AsyncValue<int> pendingRequestsAsync,
     AsyncValue<int> pendingBookingsAsync,
-    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
+    AsyncValue<List<SubscriptionProposal>> awaitingConfirmAsync,
   ) {
     final pendingRequests = pendingRequestsAsync.valueOrNull ?? 0;
     final pendingBookings = pendingBookingsAsync.valueOrNull ?? 0;
-    final unpaidStudents = unpaidSummaryAsync.valueOrNull?.studentCount ?? 0;
+    final awaitingConfirmCount = awaitingConfirmAsync.valueOrNull?.length ?? 0;
+    final teacherId = ref.watch(currentUserIdProvider);
 
     final totalUrgent =
-        pendingRequests + pendingBookings + (unpaidStudents > 0 ? 1 : 0);
+        pendingRequests + pendingBookings + (awaitingConfirmCount > 0 ? 1 : 0);
 
     if (totalUrgent == 0) {
       return const SizedBox.shrink();
@@ -371,15 +384,15 @@ class _DashboardTab extends ConsumerWidget {
                   onTap: () => context.push(AppRoutes.pendingBookings),
                   showDivider: pendingRequests > 0,
                 ),
-              if (unpaidStudents > 0)
+              if (awaitingConfirmCount > 0)
                 _buildUrgentItem(
                   context,
                   icon: Icons.payments,
                   iconColor: AppColors.warning,
-                  title: '입금 확인 $unpaidStudents건 대기',
+                  title: '입금 확인 $awaitingConfirmCount건 대기',
                   onTap:
                       () => context.push(
-                        '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
+                        '${AppRoutes.proposalConfirm}?teacherId=$teacherId',
                       ),
                   showDivider: pendingRequests > 0 || pendingBookings > 0,
                 ),
@@ -716,6 +729,7 @@ class _LessonCard extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    _buildBadgesRow(ref),
                     if (lesson.pieces.isNotEmpty)
                       Text(
                         lesson.pieces.first.displayName,
@@ -890,5 +904,58 @@ class _LessonCard extends ConsumerWidget {
       case LessonStatus.studentAbsent:
         return AppColors.error;
     }
+  }
+
+  /// Build context badge (🏫/👤) and subscription badge row.
+  Widget _buildBadgesRow(WidgetRef ref) {
+    final memberships =
+        ref
+            .watch(activeStudentMembershipsProvider(lesson.studentId))
+            .valueOrNull;
+    final subscriptions =
+        ref
+            .watch(activeStudentSubscriptionsProvider(lesson.studentId))
+            .valueOrNull;
+
+    // Context badge from lesson class
+    Widget? contextBadge;
+    if (memberships != null && memberships.isNotEmpty) {
+      final lessonClass =
+          ref
+              .watch(lessonClassProvider(memberships.first.lessonClassId))
+              .valueOrNull;
+      if (lessonClass != null) {
+        final isAcademy = lessonClass.type == LessonClassType.academy;
+        contextBadge = Text(
+          isAcademy ? '🏫 ${lessonClass.name}' : '👤 개인레슨',
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textSecondaryLight,
+            fontSize: 11,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
+    }
+
+    final subscription =
+        (subscriptions?.isNotEmpty == true) ? subscriptions!.first : null;
+
+    if (contextBadge == null && subscription == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Row(
+        children: [
+          if (contextBadge != null) Flexible(child: contextBadge),
+          if (contextBadge != null && subscription != null)
+            const SizedBox(width: 6),
+          if (subscription != null)
+            SubscriptionBadge(subscription: subscription, showIcon: false),
+        ],
+      ),
+    );
   }
 }

@@ -85,38 +85,39 @@ class LessonPolicyAdapter extends TypeAdapter<LessonPolicy> {
 
 LessonPolicy _$LessonPolicyFromJson(Map<String, dynamic> json) => LessonPolicy(
       id: json['id'] as String,
-      lessonClassId: json['lessonClassId'] as String?,
-      teacherId: json['teacherId'] as String,
-      minCancelHours: (json['minCancelHours'] as num?)?.toInt() ?? 4,
-      maxChangesPerMonth: (json['maxChangesPerMonth'] as num?)?.toInt() ?? 2,
-      allowSameDayCancel: json['allowSameDayCancel'] as bool? ?? false,
-      lateCancelDeadline: json['lateCancelDeadline'] as String?,
-      deductLessonOnNoShow: json['deductLessonOnNoShow'] as bool? ?? true,
-      gracePeriodMinutes: (json['gracePeriodMinutes'] as num?)?.toInt() ?? 15,
-      allowCarryover: json['allowCarryover'] as bool? ?? true,
-      maxCarryoverLessons: (json['maxCarryoverLessons'] as num?)?.toInt() ?? 1,
+      lessonClassId: json['lesson_class_id'] as String?,
+      teacherId: json['teacher_id'] as String,
+      minCancelHours: (json['min_cancel_hours'] as num?)?.toInt() ?? 4,
+      maxChangesPerMonth: (json['max_changes_per_month'] as num?)?.toInt() ?? 2,
+      allowSameDayCancel: json['allow_same_day_cancel'] as bool? ?? false,
+      lateCancelDeadline: json['late_cancel_deadline'] as String?,
+      deductLessonOnNoShow: json['deduct_lesson_on_no_show'] as bool? ?? true,
+      gracePeriodMinutes: (json['grace_period_minutes'] as num?)?.toInt() ?? 15,
+      allowCarryover: json['allow_carryover'] as bool? ?? true,
+      maxCarryoverLessons:
+          (json['max_carryover_lessons'] as num?)?.toInt() ?? 1,
       carryoverPeriodMonths:
-          (json['carryoverPeriodMonths'] as num?)?.toInt() ?? 1,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+          (json['carryover_period_months'] as num?)?.toInt() ?? 1,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$LessonPolicyToJson(LessonPolicy instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'lessonClassId': instance.lessonClassId,
-      'teacherId': instance.teacherId,
-      'minCancelHours': instance.minCancelHours,
-      'maxChangesPerMonth': instance.maxChangesPerMonth,
-      'allowSameDayCancel': instance.allowSameDayCancel,
-      'lateCancelDeadline': instance.lateCancelDeadline,
-      'deductLessonOnNoShow': instance.deductLessonOnNoShow,
-      'gracePeriodMinutes': instance.gracePeriodMinutes,
-      'allowCarryover': instance.allowCarryover,
-      'maxCarryoverLessons': instance.maxCarryoverLessons,
-      'carryoverPeriodMonths': instance.carryoverPeriodMonths,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'lesson_class_id': instance.lessonClassId,
+      'teacher_id': instance.teacherId,
+      'min_cancel_hours': instance.minCancelHours,
+      'max_changes_per_month': instance.maxChangesPerMonth,
+      'allow_same_day_cancel': instance.allowSameDayCancel,
+      'late_cancel_deadline': instance.lateCancelDeadline,
+      'deduct_lesson_on_no_show': instance.deductLessonOnNoShow,
+      'grace_period_minutes': instance.gracePeriodMinutes,
+      'allow_carryover': instance.allowCarryover,
+      'max_carryover_lessons': instance.maxCarryoverLessons,
+      'carryover_period_months': instance.carryoverPeriodMonths,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };

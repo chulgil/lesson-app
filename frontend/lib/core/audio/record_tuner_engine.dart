@@ -8,7 +8,7 @@ import 'dart:typed_data';
 import 'package:pitch_detector_dart/pitch_detector.dart';
 import 'package:record/record.dart';
 
-import 'package:lesson_app/features/practice/domain/entities/tuner_types.dart';
+import 'package:lessonaza/features/practice/domain/entities/tuner_types.dart';
 
 import 'pitch_detection/stability_filter.dart';
 import 'tuner_engine.dart';

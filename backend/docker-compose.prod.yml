@@ -7,8 +7,10 @@
 # - No separate DB or Nginx needed
 #
 # Usage:
-#   docker compose -f docker-compose.prod.yml up -d --build
-#   docker compose -f docker-compose.prod.yml exec app uv run alembic upgrade head
+#   docker-compose -f docker-compose.prod.yml up -d --build
+#   docker-compose -f docker-compose.prod.yml exec app uv run alembic upgrade head
+
+version: "3.8"
 
 services:
   app:

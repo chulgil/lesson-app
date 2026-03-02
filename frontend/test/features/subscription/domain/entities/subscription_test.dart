@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lesson_app/features/subscription/domain/entities/subscription.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
 
 void main() {
   // ═══════════════════════════════════════════════════════════════════════════

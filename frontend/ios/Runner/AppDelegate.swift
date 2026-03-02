@@ -9,7 +9,7 @@ import UIKit
   ) -> Bool {
     // Register custom MetronomePlugin BEFORE GeneratedPluginRegistrant
     // to avoid duplicate registration
-    if let registrar = self.registrar(forPlugin: "com.lessonapp.metronome") {
+    if let registrar = self.registrar(forPlugin: "app.lessonaza.metronome") {
       MetronomePlugin.register(with: registrar)
     }
 

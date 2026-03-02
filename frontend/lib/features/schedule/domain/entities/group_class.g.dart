@@ -181,57 +181,57 @@ class NoShowPolicyAdapter extends TypeAdapter<NoShowPolicy> {
 
 GroupClass _$GroupClassFromJson(Map<String, dynamic> json) => GroupClass(
       id: json['id'] as String,
-      teacherId: json['teacherId'] as String,
-      organizationId: json['organizationId'] as String?,
+      teacherId: json['teacher_id'] as String,
+      organizationId: json['organization_id'] as String?,
       name: json['name'] as String,
       description: json['description'] as String?,
       type: $enumDecode(_$GroupClassTypeEnumMap, json['type']),
-      maxCapacity: (json['maxCapacity'] as num).toInt(),
-      waitlistCapacity: (json['waitlistCapacity'] as num?)?.toInt(),
-      durationMinutes: (json['durationMinutes'] as num).toInt(),
+      maxCapacity: (json['max_capacity'] as num).toInt(),
+      waitlistCapacity: (json['waitlist_capacity'] as num?)?.toInt(),
+      durationMinutes: (json['duration_minutes'] as num).toInt(),
       bookingDeadlineMinutes:
-          (json['bookingDeadlineMinutes'] as num?)?.toInt() ?? 60,
+          (json['booking_deadline_minutes'] as num?)?.toInt() ?? 60,
       cancelDeadlineMinutes:
-          (json['cancelDeadlineMinutes'] as num?)?.toInt() ?? 1440,
+          (json['cancel_deadline_minutes'] as num?)?.toInt() ?? 1440,
       noShowPolicy:
-          $enumDecodeNullable(_$NoShowPolicyEnumMap, json['noShowPolicy']) ??
+          $enumDecodeNullable(_$NoShowPolicyEnumMap, json['no_show_policy']) ??
               NoShowPolicy.deduct,
-      maxNoShowCount: (json['maxNoShowCount'] as num?)?.toInt(),
-      repeatDaysOfWeek: (json['repeatDaysOfWeek'] as List<dynamic>?)
+      maxNoShowCount: (json['max_no_show_count'] as num?)?.toInt(),
+      repeatDaysOfWeek: (json['repeat_days_of_week'] as List<dynamic>?)
           ?.map((e) => (e as num).toInt())
           .toList(),
-      repeatTimeOfDay: json['repeatTimeOfDay'] as String?,
+      repeatTimeOfDay: json['repeat_time_of_day'] as String?,
       instrument: json['instrument'] as String?,
-      pricePerSession: (json['pricePerSession'] as num?)?.toInt(),
-      isActive: json['isActive'] as bool? ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      pricePerSession: (json['price_per_session'] as num?)?.toInt(),
+      isActive: json['is_active'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$GroupClassToJson(GroupClass instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'teacherId': instance.teacherId,
-      'organizationId': instance.organizationId,
+      'teacher_id': instance.teacherId,
+      'organization_id': instance.organizationId,
       'name': instance.name,
       'description': instance.description,
       'type': _$GroupClassTypeEnumMap[instance.type]!,
-      'maxCapacity': instance.maxCapacity,
-      'waitlistCapacity': instance.waitlistCapacity,
-      'durationMinutes': instance.durationMinutes,
-      'bookingDeadlineMinutes': instance.bookingDeadlineMinutes,
-      'cancelDeadlineMinutes': instance.cancelDeadlineMinutes,
-      'noShowPolicy': _$NoShowPolicyEnumMap[instance.noShowPolicy]!,
-      'maxNoShowCount': instance.maxNoShowCount,
-      'repeatDaysOfWeek': instance.repeatDaysOfWeek,
-      'repeatTimeOfDay': instance.repeatTimeOfDay,
+      'max_capacity': instance.maxCapacity,
+      'waitlist_capacity': instance.waitlistCapacity,
+      'duration_minutes': instance.durationMinutes,
+      'booking_deadline_minutes': instance.bookingDeadlineMinutes,
+      'cancel_deadline_minutes': instance.cancelDeadlineMinutes,
+      'no_show_policy': _$NoShowPolicyEnumMap[instance.noShowPolicy]!,
+      'max_no_show_count': instance.maxNoShowCount,
+      'repeat_days_of_week': instance.repeatDaysOfWeek,
+      'repeat_time_of_day': instance.repeatTimeOfDay,
       'instrument': instance.instrument,
-      'pricePerSession': instance.pricePerSession,
-      'isActive': instance.isActive,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'price_per_session': instance.pricePerSession,
+      'is_active': instance.isActive,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$GroupClassTypeEnumMap = {

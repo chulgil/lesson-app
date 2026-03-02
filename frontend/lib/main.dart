@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'core/audio/audio_session_manager.dart';
+import 'core/config/environment.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/practice/domain/entities/practice_repertoire.dart';
@@ -65,7 +66,9 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
     // Strategy 1: Extract relative path and reconstruct with current base
     final documentsIndex = storedPath.indexOf('/Documents/');
     if (documentsIndex != -1) {
-      final relativePath = storedPath.substring(documentsIndex + '/Documents/'.length);
+      final relativePath = storedPath.substring(
+        documentsIndex + '/Documents/'.length,
+      );
       final reconstructedPath = '$currentBasePath/$relativePath';
       final reconstructedFile = File(reconstructedPath);
       if (await reconstructedFile.exists()) {
@@ -123,7 +126,9 @@ Future<int> _recoverPracticeRecordingPaths(Box<PracticeRecording> box) async {
 
 /// Clean up orphaned practice recordings (DB entries without actual files).
 /// Returns the number of cleaned up recordings.
-Future<int> _cleanupOrphanedPracticeRecordings(Box<PracticeRecording> box) async {
+Future<int> _cleanupOrphanedPracticeRecordings(
+  Box<PracticeRecording> box,
+) async {
   final orphanedKeys = <dynamic>[];
 
   for (final recording in box.values) {
@@ -147,7 +152,8 @@ Future<int> _cleanupOrphanedPracticeRecordings(Box<PracticeRecording> box) async
 }
 
 /// Get the startup recovery result.
-({int recovered, int cleanedUp, int total})? getStartupRecoveryResult() => _startupRecoveryResult;
+({int recovered, int cleanedUp, int total})? getStartupRecoveryResult() =>
+    _startupRecoveryResult;
 
 /// Clear the startup recovery result after showing.
 void clearStartupRecoveryResult() {
@@ -172,7 +178,9 @@ void main() async {
 
   // Open Hive boxes at startup to ensure persistence
   final recordingsBox = await Hive.openBox<Recording>('recordings');
-  final practiceRecordingsBox = await Hive.openBox<PracticeRecording>('practice_recordings');
+  final practiceRecordingsBox = await Hive.openBox<PracticeRecording>(
+    'practice_recordings',
+  );
 
   // Recover recording paths at startup (fixes Issue #9)
   // We have two types of recordings: Recording and PracticeRecording
@@ -184,8 +192,12 @@ void main() async {
   final recordingCleanedUp = await repository.cleanupOrphanedRecordings();
 
   // 2. Recover PracticeRecording paths (for practice recordings - this is the main one!)
-  final practiceRecovered = await _recoverPracticeRecordingPaths(practiceRecordingsBox);
-  final practiceCleanedUp = await _cleanupOrphanedPracticeRecordings(practiceRecordingsBox);
+  final practiceRecovered = await _recoverPracticeRecordingPaths(
+    practiceRecordingsBox,
+  );
+  final practiceCleanedUp = await _cleanupOrphanedPracticeRecordings(
+    practiceRecordingsBox,
+  );
 
   // Combine results for UI display
   final totalRecordings = recordingsBox.length + practiceRecordingsBox.length;
@@ -208,21 +220,17 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(
-    const ProviderScope(
-      child: LessonApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: LessonazaApp()));
 }
 
-class LessonApp extends ConsumerStatefulWidget {
-  const LessonApp({super.key});
+class LessonazaApp extends ConsumerStatefulWidget {
+  const LessonazaApp({super.key});
 
   @override
-  ConsumerState<LessonApp> createState() => _LessonAppState();
+  ConsumerState<LessonazaApp> createState() => _LessonazaAppState();
 }
 
-class _LessonAppState extends ConsumerState<LessonApp> {
+class _LessonazaAppState extends ConsumerState<LessonazaApp> {
   @override
   void initState() {
     super.initState();
@@ -237,8 +245,14 @@ class _LessonAppState extends ConsumerState<LessonApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Use auth-aware router in remote mode, static router in mock mode
+    final routerConfig =
+        EnvironmentConfig.useMockData
+            ? AppRouter.router
+            : AppRouter.createRouter(ref);
+
     return MaterialApp.router(
-      title: 'Lesson App',
+      title: 'Lessonaza',
       debugShowCheckedModeBanner: false,
 
       // Localization
@@ -247,10 +261,7 @@ class _LessonAppState extends ConsumerState<LessonApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('ko', 'KR'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: const [Locale('ko', 'KR'), Locale('en', 'US')],
       locale: const Locale('ko', 'KR'),
 
       // Theme
@@ -259,7 +270,7 @@ class _LessonAppState extends ConsumerState<LessonApp> {
       themeMode: ThemeMode.light,
 
       // Router
-      routerConfig: AppRouter.router,
+      routerConfig: routerConfig,
     );
   }
 }

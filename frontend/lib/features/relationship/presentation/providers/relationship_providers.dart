@@ -1,6 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_teacher_student_relation_repository.dart';
+import '../../data/repositories/remote_teacher_student_relation_repository.dart';
 import '../../domain/entities/notification_setting.dart';
 import '../../domain/entities/relationship_status.dart';
 import '../../domain/entities/teacher_student_relation.dart';
@@ -8,12 +11,15 @@ import '../../domain/repositories/teacher_student_relation_repository.dart';
 
 part 'relationship_providers.g.dart';
 
-/// Repository provider
+/// Repository provider - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
 TeacherStudentRelationRepository teacherStudentRelationRepository(
   TeacherStudentRelationRepositoryRef ref,
 ) {
-  return MockTeacherStudentRelationRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockTeacherStudentRelationRepository();
+  }
+  return RemoteTeacherStudentRelationRepository(ref.read(apiClientProvider));
 }
 
 /// Get relationship by ID
@@ -134,11 +140,8 @@ Future<NotificationSetting?> relationshipNotificationSetting(
 // ============================================================
 
 /// Previous schedule data record
-typedef PreviousSchedule = ({
-  int lessonDay,
-  String lessonTime,
-  int? lessonDuration,
-});
+typedef PreviousSchedule =
+    ({int lessonDay, String lessonTime, int? lessonDuration});
 
 /// Get previous schedule for a student-teacher pair.
 /// Returns the last known regular lesson schedule for re-enrollment restoration.
@@ -154,9 +157,7 @@ Future<PreviousSchedule?> previousSchedule(
     studentId: studentId,
   );
 
-  if (result == null ||
-      result.lessonDay == null ||
-      result.lessonTime == null) {
+  if (result == null || result.lessonDay == null || result.lessonTime == null) {
     return null;
   }
 
@@ -228,10 +229,7 @@ class ScheduleRecorder extends _$ScheduleRecorder {
 
     // Invalidate the previous schedule cache
     ref.invalidate(
-      previousScheduleProvider(
-        teacherId: teacherId,
-        studentId: studentId,
-      ),
+      previousScheduleProvider(teacherId: teacherId, studentId: studentId),
     );
   }
 }

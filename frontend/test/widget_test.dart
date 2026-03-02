@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lesson_app/models/metronome_settings.dart';
-import 'package:lesson_app/providers/metronome/metronome_provider.dart';
+import 'package:lessonaza/models/metronome_settings.dart';
+import 'package:lessonaza/providers/metronome/metronome_provider.dart';
 
 import 'test_helper.dart';
 
@@ -72,26 +72,21 @@ void main() {
           metronomeProvider.overrideWith(() => MockMetronome()),
         ],
         child: const MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: Text('Lesson App'),
-            ),
-          ),
+          home: Scaffold(body: Center(child: Text('Lessonaza'))),
         ),
       ),
     );
 
     // Verify the app builds without error
-    expect(find.text('Lesson App'), findsOneWidget);
+    expect(find.text('Lessonaza'), findsOneWidget);
   });
 
-  testWidgets('Metronome provider initializes correctly',
-      (WidgetTester tester) async {
+  testWidgets('Metronome provider initializes correctly', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          metronomeProvider.overrideWith(() => MockMetronome()),
-        ],
+        overrides: [metronomeProvider.overrideWith(() => MockMetronome())],
         child: MaterialApp(
           home: Consumer(
             builder: (context, ref, child) {
@@ -112,9 +107,7 @@ void main() {
   testWidgets('Metronome state shows ready', (WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          metronomeProvider.overrideWith(() => MockMetronome()),
-        ],
+        overrides: [metronomeProvider.overrideWith(() => MockMetronome())],
         child: MaterialApp(
           home: Consumer(
             builder: (context, ref, child) {

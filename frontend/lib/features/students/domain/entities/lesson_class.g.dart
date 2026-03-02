@@ -157,35 +157,35 @@ class PaymentTypeAdapter extends TypeAdapter<PaymentType> {
 
 LessonClass _$LessonClassFromJson(Map<String, dynamic> json) => LessonClass(
       id: json['id'] as String,
-      teacherId: json['teacherId'] as String,
+      teacherId: json['teacher_id'] as String,
       name: json['name'] as String,
       type: $enumDecode(_$LessonClassTypeEnumMap, json['type']),
-      paymentType: $enumDecode(_$PaymentTypeEnumMap, json['paymentType']),
-      contactPerson: json['contactPerson'] as String?,
-      contactPhone: json['contactPhone'] as String?,
+      paymentType: $enumDecode(_$PaymentTypeEnumMap, json['payment_type']),
+      contactPerson: json['contact_person'] as String?,
+      contactPhone: json['contact_phone'] as String?,
       address: json['address'] as String?,
-      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
-      isArchived: json['isArchived'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+      isArchived: json['is_archived'] as bool? ?? false,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$LessonClassToJson(LessonClass instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'teacherId': instance.teacherId,
+      'teacher_id': instance.teacherId,
       'name': instance.name,
       'type': _$LessonClassTypeEnumMap[instance.type]!,
-      'paymentType': _$PaymentTypeEnumMap[instance.paymentType]!,
-      'contactPerson': instance.contactPerson,
-      'contactPhone': instance.contactPhone,
+      'payment_type': _$PaymentTypeEnumMap[instance.paymentType]!,
+      'contact_person': instance.contactPerson,
+      'contact_phone': instance.contactPhone,
       'address': instance.address,
-      'sortOrder': instance.sortOrder,
-      'isArchived': instance.isArchived,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'sort_order': instance.sortOrder,
+      'is_archived': instance.isArchived,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$LessonClassTypeEnumMap = {

@@ -4,8 +4,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:lesson_app/features/practice/domain/entities/tuner_settings.dart';
-import 'package:lesson_app/features/practice/domain/entities/tuner_types.dart';
+import 'package:lessonaza/features/practice/domain/entities/tuner_settings.dart';
+import 'package:lessonaza/features/practice/domain/entities/tuner_types.dart';
 
 import 'tuner_engine.dart';
 

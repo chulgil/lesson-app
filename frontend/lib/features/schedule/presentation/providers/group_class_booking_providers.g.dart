@@ -6,26 +6,6 @@ part of 'group_class_booking_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groupClassBookingRepositoryHash() =>
-    r'70063b313568da921c6077a2b8180bc9f9f2b91c';
-
-/// See also [groupClassBookingRepository].
-@ProviderFor(groupClassBookingRepository)
-final groupClassBookingRepositoryProvider =
-    Provider<GroupClassBookingRepository>.internal(
-  groupClassBookingRepository,
-  name: r'groupClassBookingRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$groupClassBookingRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GroupClassBookingRepositoryRef
-    = ProviderRef<GroupClassBookingRepository>;
 String _$scheduleBookingsHash() => r'a5f707ddb0d514fcd71a44ac27e623c030b8c6de';
 
 /// Copied from Dart SDK

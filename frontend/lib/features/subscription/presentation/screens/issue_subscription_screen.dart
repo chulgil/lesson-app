@@ -12,6 +12,7 @@ import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
+import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
@@ -25,11 +26,15 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   /// For batch issuance, this will contain multiple IDs.
   final List<String> studentIds;
   final String? membershipId;
+  final String? lessonRequestId;
+  final List<String> lessonRequestIds;
 
   const IssueSubscriptionScreen({
     super.key,
     required this.studentIds,
     this.membershipId,
+    this.lessonRequestId,
+    this.lessonRequestIds = const [],
   });
 
   /// Whether this is a batch issuance (multiple students)
@@ -39,23 +44,26 @@ class IssueSubscriptionScreen extends ConsumerStatefulWidget {
   String get primaryStudentId => studentIds.isNotEmpty ? studentIds.first : '';
 
   @override
-  ConsumerState<IssueSubscriptionScreen> createState() => _IssueSubscriptionScreenState();
+  ConsumerState<IssueSubscriptionScreen> createState() =>
+      _IssueSubscriptionScreenState();
 }
 
-class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScreen> {
+class _IssueSubscriptionScreenState
+    extends ConsumerState<IssueSubscriptionScreen> {
   final _formKey = GlobalKey<FormState>();
 
   SubscriptionType _selectedType = SubscriptionType.package;
   String? _selectedMembershipId;
   bool _isPaymentConfirmed = true;
-  SubscriptionPaymentMethod _selectedPaymentMethod = SubscriptionPaymentMethod.bankTransfer;
+  SubscriptionPaymentMethod _selectedPaymentMethod =
+      SubscriptionPaymentMethod.bankTransfer;
   int _totalLessons = 8;
-  int _validityDays = 90;   // 회차권 유효기간 (일)
+  int _validityDays = 90; // 회차권 유효기간 (일)
   int _monthsCount = 1;
-  int _originalAmount = 0;  // 정가
+  int _originalAmount = 0; // 정가
   int _discountPercent = 0; // 할인율 (0~100)
-  int _bonusLessons = 0;    // 보너스 횟수
-  String? _bonusReason;     // 보너스 사유 (선택된 칩)
+  int _bonusLessons = 0; // 보너스 횟수
+  String? _bonusReason; // 보너스 사유 (선택된 칩)
   String _customBonusReason = ''; // 기타 선택 시 직접 입력 사유
   DateTime? _startDate;
 
@@ -106,39 +114,43 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   Widget build(BuildContext context) {
     // For single student mode, use membership selector
     // For batch mode, skip membership selection (use subscription template approach)
-    final membershipsAsync = widget.isBatchMode
-        ? const AsyncValue<List<ClassMembership>>.data([])
-        : ref.watch(studentMembershipsProvider(widget.primaryStudentId));
+    final membershipsAsync =
+        widget.isBatchMode
+            ? const AsyncValue<List<ClassMembership>>.data([])
+            : ref.watch(studentMembershipsProvider(widget.primaryStudentId));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isBatchMode
-            ? '수강권 발급 (${widget.studentIds.length}명)'
-            : '수강권 발급'),
+        title: Text(
+          widget.isBatchMode
+              ? '수강권 발급 (${widget.studentIds.length}명)'
+              : '수강권 발급',
+        ),
         centerTitle: true,
       ),
-      body: widget.isBatchMode
-          ? _buildBatchForm()
-          : membershipsAsync.when(
-              data: (memberships) {
-                if (memberships.isEmpty) {
-                  return _buildNoMembershipState();
-                }
+      body:
+          widget.isBatchMode
+              ? _buildBatchForm()
+              : membershipsAsync.when(
+                data: (memberships) {
+                  if (memberships.isEmpty) {
+                    return _buildNoMembershipState();
+                  }
 
-                // Auto-select first membership if none selected
-                if (_selectedMembershipId == null && memberships.isNotEmpty) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _selectedMembershipId = memberships.first.id;
+                  // Auto-select first membership if none selected
+                  if (_selectedMembershipId == null && memberships.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        _selectedMembershipId = memberships.first.id;
+                      });
                     });
-                  });
-                }
+                  }
 
-                return _buildForm(memberships);
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => _buildErrorState(error.toString()),
-            ),
+                  return _buildForm(memberships);
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, _) => _buildErrorState(error.toString()),
+              ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
@@ -156,8 +168,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           ],
 
           // Selected membership info
-          if (_selectedMembershipId != null)
-            _buildMembershipInfo(memberships),
+          if (_selectedMembershipId != null) _buildMembershipInfo(memberships),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -216,14 +227,14 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('결제 상태', style: AppTypography.headingSmall),
+        Text('결제 방식', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
             Expanded(
               child: _buildPaymentStatusChip(
-                label: '입금 확인됨',
-                icon: Icons.check_circle_outline,
+                label: '선불',
+                icon: Icons.payment,
                 isSelected: _isPaymentConfirmed,
                 onTap: () => setState(() => _isPaymentConfirmed = true),
               ),
@@ -231,7 +242,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: _buildPaymentStatusChip(
-                label: '나중에 결제',
+                label: '후불',
                 icon: Icons.schedule,
                 isSelected: !_isPaymentConfirmed,
                 onTap: () => setState(() => _isPaymentConfirmed = false),
@@ -241,34 +252,43 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           ],
         ),
 
-        // Payment method selector (only when confirmed)
+        // Payment method selector (only when prepaid)
         if (_isPaymentConfirmed) ...[
           const SizedBox(height: AppSpacing.space3),
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: SubscriptionPaymentMethod.values.map((method) {
-              final isSelected = _selectedPaymentMethod == method;
-              return ChoiceChip(
-                label: Text(method.label),
-                selected: isSelected,
-                onSelected: (_) => setState(() => _selectedPaymentMethod = method),
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
-                backgroundColor: AppColors.surfaceLight,
-                side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
-                ),
-                labelStyle: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-              );
-            }).toList(),
+            children:
+                SubscriptionPaymentMethod.values.map((method) {
+                  final isSelected = _selectedPaymentMethod == method;
+                  return ChoiceChip(
+                    label: Text(method.label),
+                    selected: isSelected,
+                    onSelected:
+                        (_) => setState(() => _selectedPaymentMethod = method),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                    checkmarkColor: AppColors.primary,
+                    backgroundColor: AppColors.surfaceLight,
+                    side: BorderSide(
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.borderLight,
+                    ),
+                    labelStyle: AppTypography.bodySmall.copyWith(
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.textSecondaryLight,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  );
+                }).toList(),
           ),
         ],
 
-        // Warning for unpaid
+        // Info for postpaid
         if (!_isPaymentConfirmed) ...[
           const SizedBox(height: AppSpacing.space3),
           Container(
@@ -283,7 +303,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '미수금으로 표시됩니다. 입금 확인 후 변경할 수 있습니다.',
+                    '후불 수강권은 미수금으로 표시됩니다. 입금 확인 후 결제완료 처리할 수 있습니다.',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.warning,
                     ),
@@ -313,7 +333,10 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           horizontal: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? color.withValues(alpha: 0.1)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.borderLight,
@@ -350,21 +373,26 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         const SizedBox(height: AppSpacing.space3),
         ...memberships.map((membership) {
           final isSelected = _selectedMembershipId == membership.id;
-          final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
+          final lessonClassAsync = ref.watch(
+            lessonClassProvider(membership.lessonClassId),
+          );
 
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.space2),
             child: GestureDetector(
-              onTap: () => setState(() => _selectedMembershipId = membership.id),
+              onTap:
+                  () => setState(() => _selectedMembershipId = membership.id),
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.surfaceLight,
+                  color:
+                      isSelected
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : AppColors.surfaceLight,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.borderLight,
+                    color:
+                        isSelected ? AppColors.primary : AppColors.borderLight,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -373,7 +401,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                     Radio<String>(
                       value: membership.id,
                       groupValue: _selectedMembershipId,
-                      onChanged: (value) => setState(() => _selectedMembershipId = value),
+                      onChanged:
+                          (value) =>
+                              setState(() => _selectedMembershipId = value),
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
@@ -381,12 +411,13 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           lessonClassAsync.when(
-                            data: (lessonClass) => Text(
-                              lessonClass?.name ?? '개인레슨',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            data:
+                                (lessonClass) => Text(
+                                  lessonClass?.name ?? '개인레슨',
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                             loading: () => const Text('...'),
                             error: (_, __) => const Text('레슨'),
                           ),
@@ -414,7 +445,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       (m) => m.id == _selectedMembershipId,
       orElse: () => memberships.first,
     );
-    final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
+    final lessonClassAsync = ref.watch(
+      lessonClassProvider(membership.lessonClassId),
+    );
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -426,7 +459,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         children: [
           lessonClassAsync.when(
             data: (lessonClass) {
-              final isAcademy = lessonClass?.type.toString().contains('academy') ?? false;
+              final isAcademy =
+                  lessonClass?.type.toString().contains('academy') ?? false;
               return Container(
                 width: 48,
                 height: 48,
@@ -442,23 +476,29 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                 ),
               );
             },
-            loading: () => Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-            ),
-            error: (_, __) => Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: const Icon(Icons.person),
-            ),
+            loading:
+                () => Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                ),
+            error:
+                (_, __) => Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                  child: const Icon(Icons.person),
+                ),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -466,12 +506,13 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 lessonClassAsync.when(
-                  data: (lessonClass) => Text(
-                    lessonClass?.name ?? '개인레슨',
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  data:
+                      (lessonClass) => Text(
+                        lessonClass?.name ?? '개인레슨',
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                   loading: () => const Text('...'),
                   error: (_, __) => const Text('개인레슨'),
                 ),
@@ -499,12 +540,64 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           children: [
             _buildTypeChip(SubscriptionType.trial, '체험', Icons.star_outline),
             const SizedBox(width: AppSpacing.space2),
-            _buildTypeChip(SubscriptionType.package, '회차제', Icons.confirmation_number_outlined),
+            _buildTypeChip(
+              SubscriptionType.package,
+              '회차제',
+              Icons.confirmation_number_outlined,
+            ),
             const SizedBox(width: AppSpacing.space2),
-            _buildTypeChip(SubscriptionType.monthly, '월정액', Icons.calendar_month),
+            _buildTypeChip(
+              SubscriptionType.monthly,
+              '월정액',
+              Icons.calendar_month,
+            ),
           ],
         ),
+        const SizedBox(height: AppSpacing.space3),
+        _buildTypeDescription(),
       ],
+    );
+  }
+
+  Widget _buildTypeDescription() {
+    final String description;
+    final IconData icon;
+
+    switch (_selectedType) {
+      case SubscriptionType.trial:
+        description =
+            '1회 체험 레슨으로, 학생과 선생님의 적합성을 확인합니다. 무료 또는 할인 금액으로 설정할 수 있습니다.';
+        icon = Icons.lightbulb_outline;
+      case SubscriptionType.package:
+        description = '정해진 횟수만큼 레슨을 진행합니다. 매 레슨마다 유연하게 스케줄을 조율할 수 있습니다.';
+        icon = Icons.swap_horiz;
+      case SubscriptionType.monthly:
+        description = '월 단위 정기 수강권입니다. 고정된 요일·시간에 레슨이 자동 배정되어 스케줄 관리가 편리합니다.';
+        icon = Icons.event_repeat;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: AppColors.primary.withValues(alpha: 0.7)),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              description,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -514,13 +607,12 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       child: GestureDetector(
         onTap: () => setState(() => _selectedType = type),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSpacing.space3,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
           decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : AppColors.surfaceLight,
+            color:
+                isSelected
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
               color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -531,13 +623,19 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             children: [
               Icon(
                 icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                color:
+                    isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondaryLight,
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
                 label,
                 style: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                  color:
+                      isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondaryLight,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -606,24 +704,30 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: [1, 3, 6, 12].map((months) {
-            final isSelected = _monthsCount == months;
-            return ChoiceChip(
-              label: Text('$months개월'),
-              selected: isSelected,
-              onSelected: (_) => setState(() => _monthsCount = months),
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
-              checkmarkColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
-              side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
-              ),
-              labelStyle: AppTypography.bodyMedium.copyWith(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              [1, 3, 6, 12].map((months) {
+                final isSelected = _monthsCount == months;
+                return ChoiceChip(
+                  label: Text('$months개월'),
+                  selected: isSelected,
+                  onSelected: (_) => setState(() => _monthsCount = months),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                  checkmarkColor: AppColors.primary,
+                  backgroundColor: AppColors.surfaceLight,
+                  side: BorderSide(
+                    color:
+                        isSelected ? AppColors.primary : AppColors.borderLight,
+                  ),
+                  labelStyle: AppTypography.bodyMedium.copyWith(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -643,9 +747,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           Expanded(
             child: Text(
               '체험 레슨은 1회 수강권이 발급됩니다.\n무료 또는 할인된 금액으로 설정할 수 있습니다.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
             ),
           ),
         ],
@@ -667,35 +769,47 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: presets.map((amount) {
-              final isSelected = _originalAmount == amount;
-              return Padding(
-                padding: const EdgeInsets.only(right: AppSpacing.space2),
-                child: ChoiceChip(
-                  label: Text('${amount ~/ 10000}만원'),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      setState(() {
-                        _originalAmount = amount;
-                        _amountController.text = NumberFormat('#,###').format(amount);
-                      });
-                    }
-                  },
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  labelStyle: AppTypography.bodySmall.copyWith(
-                    color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  side: BorderSide(
-                    color: isSelected ? AppColors.primary : AppColors.borderLight,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                presets.map((amount) {
+                  final isSelected = _originalAmount == amount;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.space2),
+                    child: ChoiceChip(
+                      label: Text('${amount ~/ 10000}만원'),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() {
+                            _originalAmount = amount;
+                            _amountController.text = NumberFormat(
+                              '#,###',
+                            ).format(amount);
+                          });
+                        }
+                      },
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      labelStyle: AppTypography.bodySmall.copyWith(
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.textPrimaryLight,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                      side: BorderSide(
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.borderLight,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ),
 
@@ -735,7 +849,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             return null;
           },
         ),
-        if (_selectedType == SubscriptionType.package && _originalAmount > 0) ...[
+        if (_selectedType == SubscriptionType.package &&
+            _originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
             '회당 ${NumberFormat('#,###').format((_originalAmount / _totalLessons).round())}원',
@@ -903,9 +1018,7 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
                 Icon(Icons.calendar_today, color: AppColors.textSecondaryLight),
                 const SizedBox(width: AppSpacing.space3),
                 Text(
-                  _startDate != null
-                      ? dateFormat.format(_startDate!)
-                      : '날짜 선택',
+                  _startDate != null ? dateFormat.format(_startDate!) : '날짜 선택',
                   style: AppTypography.bodyMedium,
                 ),
                 const Spacer(),
@@ -924,7 +1037,11 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
     if (_startDate != null) {
       if (_selectedType == SubscriptionType.monthly) {
-        endDate = DateTime(_startDate!.year, _startDate!.month + _monthsCount, _startDate!.day);
+        endDate = DateTime(
+          _startDate!.year,
+          _startDate!.month + _monthsCount,
+          _startDate!.day,
+        );
       } else if (_selectedType == SubscriptionType.trial) {
         endDate = _startDate!.add(const Duration(days: 7));
       } else if (_selectedType == SubscriptionType.package) {
@@ -937,9 +1054,10 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     if (_selectedType == SubscriptionType.trial) {
       lessonsDisplay = '체험 (1회)';
     } else if (_selectedType == SubscriptionType.package) {
-      lessonsDisplay = _bonusLessons > 0
-          ? '회차제 ($_totalLessons + $_bonusLessons회, $_validityDays일)'
-          : '회차제 ($_totalLessons회, $_validityDays일)';
+      lessonsDisplay =
+          _bonusLessons > 0
+              ? '회차제 ($_totalLessons + $_bonusLessons회, $_validityDays일)'
+              : '회차제 ($_totalLessons회, $_validityDays일)';
     } else {
       lessonsDisplay = '월정액 ($_monthsCount개월)';
     }
@@ -1036,7 +1154,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             value,
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
-              color: valueColor ?? (strikethrough ? AppColors.textTertiaryLight : null),
+              color:
+                  valueColor ??
+                  (strikethrough ? AppColors.textTertiaryLight : null),
               decoration: strikethrough ? TextDecoration.lineThrough : null,
             ),
           ),
@@ -1050,13 +1170,14 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: FilledButton(
-          onPressed: widget.isBatchMode ? _issueBatchSubscription : _issueSubscription,
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
+          onPressed:
+              widget.isBatchMode ? _issueBatchSubscription : _issueSubscription,
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+          child: Text(
+            widget.isBatchMode
+                ? '${widget.studentIds.length}명에게 수강권 발급'
+                : '수강권 발급',
           ),
-          child: Text(widget.isBatchMode
-              ? '${widget.studentIds.length}명에게 수강권 발급'
-              : '수강권 발급'),
         ),
       ),
     );
@@ -1065,23 +1186,23 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   void _issueSubscription() async {
     if (_formKey.currentState?.validate() != true) return;
     if (_selectedMembershipId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('레슨을 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('레슨을 선택해주세요')));
       return;
     }
     if (_startDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('시작일을 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('시작일을 선택해주세요')));
       return;
     }
 
     // Validate bonus reason if bonus is set
     if (_bonusLessons > 0 && _effectiveBonusReason == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('보너스 사유를 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('보너스 사유를 선택해주세요')));
       return;
     }
 
@@ -1090,7 +1211,11 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     int? totalLessons;
 
     if (_selectedType == SubscriptionType.monthly) {
-      endDate = DateTime(_startDate!.year, _startDate!.month + _monthsCount, _startDate!.day);
+      endDate = DateTime(
+        _startDate!.year,
+        _startDate!.month + _monthsCount,
+        _startDate!.day,
+      );
     } else if (_selectedType == SubscriptionType.trial) {
       totalLessons = 1;
       endDate = _startDate!.add(const Duration(days: 7));
@@ -1112,14 +1237,15 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
       bonusReason: _effectiveBonusReason,
       startDate: _startDate,
       endDate: endDate,
-      amount: _finalAmount,  // 할인 적용된 금액
+      amount: _finalAmount, // 할인 적용된 금액
       status: SubscriptionStatus.active,
       createdAt: now,
       paymentConfirmed: _isPaymentConfirmed,
       paymentMethod: _isPaymentConfirmed ? _selectedPaymentMethod : null,
       paymentConfirmedAt: _isPaymentConfirmed ? now : null,
       originalAmount: _discountPercent > 0 ? _originalAmount : null,
-      discountAmount: _discountPercent > 0 ? (_originalAmount - _finalAmount) : null,
+      discountAmount:
+          _discountPercent > 0 ? (_originalAmount - _finalAmount) : null,
       discountReason: _discountPercent > 0 ? '$_discountPercent% 할인' : null,
     );
 
@@ -1129,6 +1255,16 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
       // Create schedule confirmation card for student (Issue #62)
       await _createScheduleConfirmationCard(subscription);
+
+      // Update lesson request status to proposalSent
+      if (widget.lessonRequestId != null) {
+        await ref
+            .read(lessonRequestActionsProvider.notifier)
+            .sendProposal(
+              requestId: widget.lessonRequestId!,
+              proposalId: subscription.id,
+            );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1152,9 +1288,13 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   }
 
   /// Create a schedule confirmation card for the student after subscription issuance.
-  Future<void> _createScheduleConfirmationCard(Subscription subscription) async {
+  Future<void> _createScheduleConfirmationCard(
+    Subscription subscription,
+  ) async {
     // Get membership info for instrument and lesson class
-    final memberships = ref.read(studentMembershipsProvider(widget.primaryStudentId));
+    final memberships = ref.read(
+      studentMembershipsProvider(widget.primaryStudentId),
+    );
     final membership = memberships.valueOrNull?.firstWhere(
       (m) => m.id == subscription.membershipId,
       orElse: () => throw Exception('Membership not found'),
@@ -1163,19 +1303,31 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     if (membership == null) return;
 
     // Get lesson class to find teacher info
-    final lessonClassAsync = await ref.read(lessonClassProvider(membership.lessonClassId).future);
+    final lessonClassAsync = await ref.read(
+      lessonClassProvider(membership.lessonClassId).future,
+    );
 
-    // Determine card type based on context
-    // For now, assume afterTrial since we're issuing from this screen
-    // TODO: Detect re-enrollment vs additional instrument scenarios
-    final cardType = ScheduleCardType.afterTrial;
+    // Determine card type based on subscription history
+    final cardType = await _detectScheduleCardType(subscription, membership);
 
     // Convert lessonDay string to int (1=Mon, 7=Sun)
     int? parseLessonDay(String? day) {
       if (day == null) return null;
       const dayMap = {
-        'Mon': 1, 'Tue': 2, 'Wed': 3, 'Thu': 4, 'Fri': 5, 'Sat': 6, 'Sun': 7,
-        '월': 1, '화': 2, '수': 3, '목': 4, '금': 5, '토': 6, '일': 7,
+        'Mon': 1,
+        'Tue': 2,
+        'Wed': 3,
+        'Thu': 4,
+        'Fri': 5,
+        'Sat': 6,
+        'Sun': 7,
+        '월': 1,
+        '화': 2,
+        '수': 3,
+        '목': 4,
+        '금': 5,
+        '토': 6,
+        '일': 7,
       };
       return dayMap[day];
     }
@@ -1191,7 +1343,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           .createCard(
             studentId: widget.primaryStudentId,
             teacherId: lessonClassAsync?.teacherId ?? '',
-            teacherName: lessonClassAsync?.name ?? '선생님', // Use class name as fallback
+            teacherName:
+                lessonClassAsync?.name ?? '선생님', // Use class name as fallback
             instrument: membership.instrument,
             subscriptionId: subscription.id,
             cardType: cardType,
@@ -1203,6 +1356,53 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     } catch (e) {
       // Log error but don't fail the subscription issuance
       debugPrint('Failed to create schedule confirmation card: $e');
+    }
+  }
+
+  /// Detect the schedule card type based on subscription history.
+  ///
+  /// - afterTrial: First non-trial subscription (after trial lesson)
+  /// - reEnrollment: Same membership already had expired subscriptions
+  /// - additionalInstrument: Student has subscriptions for other instruments
+  Future<ScheduleCardType> _detectScheduleCardType(
+    Subscription subscription,
+    ClassMembership membership,
+  ) async {
+    try {
+      final allSubscriptions = await ref.read(
+        studentSubscriptionsProvider(widget.primaryStudentId).future,
+      );
+
+      // Check if same membership had previous subscriptions (exclude current)
+      final sameMembershipSubs =
+          allSubscriptions
+              .where(
+                (s) =>
+                    s.membershipId == membership.id && s.id != subscription.id,
+              )
+              .toList();
+
+      if (sameMembershipSubs.isNotEmpty) {
+        // Had previous subscriptions for this membership → re-enrollment
+        return ScheduleCardType.reEnrollment;
+      }
+
+      // Check if student has subscriptions for other memberships
+      final otherMembershipSubs =
+          allSubscriptions
+              .where((s) => s.membershipId != membership.id)
+              .toList();
+
+      if (otherMembershipSubs.isNotEmpty) {
+        // Has subscriptions for other instruments → additional instrument
+        return ScheduleCardType.additionalInstrument;
+      }
+
+      // First subscription ever → after trial
+      return ScheduleCardType.afterTrial;
+    } catch (e) {
+      debugPrint('Failed to detect schedule card type: $e');
+      return ScheduleCardType.afterTrial;
     }
   }
 
@@ -1346,7 +1546,11 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
     if (_startDate != null) {
       if (_selectedType == SubscriptionType.monthly) {
-        endDate = DateTime(_startDate!.year, _startDate!.month + _monthsCount, _startDate!.day);
+        endDate = DateTime(
+          _startDate!.year,
+          _startDate!.month + _monthsCount,
+          _startDate!.day,
+        );
       } else if (_selectedType == SubscriptionType.trial) {
         endDate = _startDate!.add(const Duration(days: 7));
       } else if (_selectedType == SubscriptionType.package) {
@@ -1359,9 +1563,10 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     if (_selectedType == SubscriptionType.trial) {
       lessonsDisplay = '체험 (1회)';
     } else if (_selectedType == SubscriptionType.package) {
-      lessonsDisplay = _bonusLessons > 0
-          ? '회차제 ($_totalLessons + $_bonusLessons회, $_validityDays일)'
-          : '회차제 ($_totalLessons회, $_validityDays일)';
+      lessonsDisplay =
+          _bonusLessons > 0
+              ? '회차제 ($_totalLessons + $_bonusLessons회, $_validityDays일)'
+              : '회차제 ($_totalLessons회, $_validityDays일)';
     } else {
       lessonsDisplay = '월정액 ($_monthsCount개월)';
     }
@@ -1440,17 +1645,17 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
   void _issueBatchSubscription() async {
     if (_formKey.currentState?.validate() != true) return;
     if (_startDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('시작일을 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('시작일을 선택해주세요')));
       return;
     }
 
     // Validate bonus reason if bonus is set
     if (_bonusLessons > 0 && _effectiveBonusReason == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('보너스 사유를 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('보너스 사유를 선택해주세요')));
       return;
     }
 
@@ -1459,7 +1664,11 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
     int? totalLessons;
 
     if (_selectedType == SubscriptionType.monthly) {
-      endDate = DateTime(_startDate!.year, _startDate!.month + _monthsCount, _startDate!.day);
+      endDate = DateTime(
+        _startDate!.year,
+        _startDate!.month + _monthsCount,
+        _startDate!.day,
+      );
     } else if (_selectedType == SubscriptionType.trial) {
       totalLessons = 1;
       endDate = _startDate!.add(const Duration(days: 7));
@@ -1476,7 +1685,8 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
 
       // Issue subscription to each student
       final now = DateTime.now();
-      for (final studentId in widget.studentIds) {
+      for (int i = 0; i < widget.studentIds.length; i++) {
+        final studentId = widget.studentIds[i];
         try {
           final subscription = Subscription(
             id: const Uuid().v4(),
@@ -1496,10 +1706,23 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
             paymentMethod: _isPaymentConfirmed ? _selectedPaymentMethod : null,
             paymentConfirmedAt: _isPaymentConfirmed ? now : null,
             originalAmount: _discountPercent > 0 ? _originalAmount : null,
-            discountAmount: _discountPercent > 0 ? (_originalAmount - _finalAmount) : null,
-            discountReason: _discountPercent > 0 ? '$_discountPercent% 할인' : null,
+            discountAmount:
+                _discountPercent > 0 ? (_originalAmount - _finalAmount) : null,
+            discountReason:
+                _discountPercent > 0 ? '$_discountPercent% 할인' : null,
           );
           await repository.create(subscription);
+
+          // Update lesson request status to proposalSent
+          if (i < widget.lessonRequestIds.length) {
+            await ref
+                .read(lessonRequestActionsProvider.notifier)
+                .sendProposal(
+                  requestId: widget.lessonRequestIds[i],
+                  proposalId: subscription.id,
+                );
+          }
+
           successCount++;
         } catch (e) {
           failCount++;
@@ -1519,9 +1742,10 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('$successCount명 발급 완료, $failCount명 실패'),
-              backgroundColor: failCount == widget.studentIds.length
-                  ? AppColors.error
-                  : AppColors.warning,
+              backgroundColor:
+                  failCount == widget.studentIds.length
+                      ? AppColors.error
+                      : AppColors.warning,
             ),
           );
         }
@@ -1546,16 +1770,9 @@ class _IssueSubscriptionScreenState extends ConsumerState<IssueSubscriptionScree
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.error,
-            ),
+            Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: AppSpacing.space3),
-            Text(
-              '오류가 발생했습니다',
-              style: AppTypography.headingSmall,
-            ),
+            Text('오류가 발생했습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),
             Text(
               error,

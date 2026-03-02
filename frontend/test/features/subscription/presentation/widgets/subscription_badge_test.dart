@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lesson_app/features/subscription/domain/entities/subscription.dart';
-import 'package:lesson_app/features/subscription/presentation/widgets/subscription_badge.dart';
+import 'package:lessonaza/features/subscription/domain/entities/subscription.dart';
+import 'package:lessonaza/features/subscription/presentation/widgets/subscription_badge.dart';
 
 void main() {
   // Helper to create test subscriptions

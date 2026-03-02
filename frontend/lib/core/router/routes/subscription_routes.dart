@@ -6,6 +6,7 @@ import '../../../features/subscription/presentation/screens/subscription_detail_
 import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
 import '../../../features/subscription/presentation/screens/lesson_policy_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
+import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 
 /// Subscription-related routes.
 /// NOTE: More specific routes (like /issue, /policy) must come BEFORE parameterized routes (like /:id)
@@ -27,19 +28,38 @@ List<RouteBase> subscriptionRoutes = [
       final studentIdParam = state.uri.queryParameters['studentId'];
       final membershipId = state.uri.queryParameters['membershipId'];
 
+      final lessonRequestId = state.uri.queryParameters['lessonRequestId'];
+      final lessonRequestIdsParam =
+          state.uri.queryParameters['lessonRequestIds'];
+
       // Parse studentIds from comma-separated string or single studentId
       final List<String> studentIds;
       if (studentIdsParam != null && studentIdsParam.isNotEmpty) {
-        studentIds = studentIdsParam.split(',').where((s) => s.isNotEmpty).toList();
+        studentIds =
+            studentIdsParam.split(',').where((s) => s.isNotEmpty).toList();
       } else if (studentIdParam != null && studentIdParam.isNotEmpty) {
         studentIds = [studentIdParam];
       } else {
         studentIds = [];
       }
 
+      // Parse lessonRequestIds from comma-separated string
+      final List<String> lessonRequestIds;
+      if (lessonRequestIdsParam != null && lessonRequestIdsParam.isNotEmpty) {
+        lessonRequestIds =
+            lessonRequestIdsParam
+                .split(',')
+                .where((s) => s.isNotEmpty)
+                .toList();
+      } else {
+        lessonRequestIds = [];
+      }
+
       return IssueSubscriptionScreen(
         studentIds: studentIds,
         membershipId: membershipId,
+        lessonRequestId: lessonRequestId,
+        lessonRequestIds: lessonRequestIds,
       );
     },
   ),
@@ -53,6 +73,14 @@ List<RouteBase> subscriptionRoutes = [
         teacherId: teacherId,
         lessonClassId: lessonClassId,
       );
+    },
+  ),
+  // Proposal confirm route must come before parameterized proposal detail route
+  GoRoute(
+    path: AppRoutes.proposalConfirm,
+    builder: (context, state) {
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      return ProposalConfirmScreen(teacherId: teacherId);
     },
   ),
   GoRoute(

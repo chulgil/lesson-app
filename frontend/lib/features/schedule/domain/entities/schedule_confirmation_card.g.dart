@@ -184,44 +184,44 @@ ScheduleConfirmationCard _$ScheduleConfirmationCardFromJson(
         Map<String, dynamic> json) =>
     ScheduleConfirmationCard(
       id: json['id'] as String,
-      studentId: json['studentId'] as String,
-      teacherId: json['teacherId'] as String,
-      teacherName: json['teacherName'] as String,
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
+      teacherName: json['teacher_name'] as String,
       instrument: json['instrument'] as String?,
-      subscriptionId: json['subscriptionId'] as String,
-      suggestedDay: (json['suggestedDay'] as num?)?.toInt(),
-      suggestedTime: json['suggestedTime'] as String?,
-      lessonDuration: (json['lessonDuration'] as num?)?.toInt(),
-      cardType: $enumDecode(_$ScheduleCardTypeEnumMap, json['cardType']),
+      subscriptionId: json['subscription_id'] as String,
+      suggestedDay: (json['suggested_day'] as num?)?.toInt(),
+      suggestedTime: json['suggested_time'] as String?,
+      lessonDuration: (json['lesson_duration'] as num?)?.toInt(),
+      cardType: $enumDecode(_$ScheduleCardTypeEnumMap, json['card_type']),
       status:
           $enumDecodeNullable(_$ScheduleCardStatusEnumMap, json['status']) ??
               ScheduleCardStatus.pending,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      respondedAt: json['respondedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      respondedAt: json['responded_at'] == null
           ? null
-          : DateTime.parse(json['respondedAt'] as String),
-      totalLessons: (json['totalLessons'] as num?)?.toInt(),
-      lessonRequestId: json['lessonRequestId'] as String?,
+          : DateTime.parse(json['responded_at'] as String),
+      totalLessons: (json['total_lessons'] as num?)?.toInt(),
+      lessonRequestId: json['lesson_request_id'] as String?,
     );
 
 Map<String, dynamic> _$ScheduleConfirmationCardToJson(
         ScheduleConfirmationCard instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'studentId': instance.studentId,
-      'teacherId': instance.teacherId,
-      'teacherName': instance.teacherName,
+      'student_id': instance.studentId,
+      'teacher_id': instance.teacherId,
+      'teacher_name': instance.teacherName,
       'instrument': instance.instrument,
-      'subscriptionId': instance.subscriptionId,
-      'suggestedDay': instance.suggestedDay,
-      'suggestedTime': instance.suggestedTime,
-      'lessonDuration': instance.lessonDuration,
-      'cardType': _$ScheduleCardTypeEnumMap[instance.cardType]!,
+      'subscription_id': instance.subscriptionId,
+      'suggested_day': instance.suggestedDay,
+      'suggested_time': instance.suggestedTime,
+      'lesson_duration': instance.lessonDuration,
+      'card_type': _$ScheduleCardTypeEnumMap[instance.cardType]!,
       'status': _$ScheduleCardStatusEnumMap[instance.status]!,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'respondedAt': instance.respondedAt?.toIso8601String(),
-      'totalLessons': instance.totalLessons,
-      'lessonRequestId': instance.lessonRequestId,
+      'created_at': instance.createdAt.toIso8601String(),
+      'responded_at': instance.respondedAt?.toIso8601String(),
+      'total_lessons': instance.totalLessons,
+      'lesson_request_id': instance.lessonRequestId,
     };
 
 const _$ScheduleCardTypeEnumMap = {

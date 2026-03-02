@@ -1,16 +1,24 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_lesson_request_repository.dart';
+import '../../data/repositories/remote_lesson_request_repository.dart';
 import '../../domain/entities/lesson_request.dart';
 import '../../domain/repositories/lesson_request_repository.dart';
 
 part 'lesson_request_providers.g.dart';
 
-/// Repository provider
-@riverpod
-LessonRequestRepository lessonRequestRepository(LessonRequestRepositoryRef ref) {
-  return MockLessonRequestRepository();
-}
+/// Repository provider - switches between Mock and Remote.
+final lessonRequestRepositoryProvider = Provider<LessonRequestRepository>((
+  ref,
+) {
+  if (EnvironmentConfig.useMockData) {
+    return MockLessonRequestRepository();
+  }
+  return RemoteLessonRequestRepository(ref.read(apiClientProvider));
+});
 
 /// Get all lesson requests for a teacher
 @riverpod
@@ -38,7 +46,9 @@ Future<int> pendingLessonRequestCount(
   PendingLessonRequestCountRef ref,
   String teacherId,
 ) async {
-  final requests = await ref.watch(pendingLessonRequestsProvider(teacherId).future);
+  final requests = await ref.watch(
+    pendingLessonRequestsProvider(teacherId).future,
+  );
   return requests.length;
 }
 

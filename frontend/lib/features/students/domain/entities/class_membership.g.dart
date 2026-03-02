@@ -135,39 +135,39 @@ class MembershipStatusAdapter extends TypeAdapter<MembershipStatus> {
 ClassMembership _$ClassMembershipFromJson(Map<String, dynamic> json) =>
     ClassMembership(
       id: json['id'] as String,
-      lessonClassId: json['lessonClassId'] as String,
-      studentId: json['studentId'] as String,
+      lessonClassId: json['lesson_class_id'] as String,
+      studentId: json['student_id'] as String,
       instrument: json['instrument'] as String,
       status: $enumDecode(_$MembershipStatusEnumMap, json['status']),
       level: json['level'] as String?,
-      monthlyFee: (json['monthlyFee'] as num).toInt(),
-      lessonsPerWeek: (json['lessonsPerWeek'] as num?)?.toInt() ?? 1,
-      lessonDay: json['lessonDay'] as String?,
-      lessonTime: json['lessonTime'] as String?,
-      lessonDuration: (json['lessonDuration'] as num?)?.toInt() ?? 60,
+      monthlyFee: (json['monthly_fee'] as num).toInt(),
+      lessonsPerWeek: (json['lessons_per_week'] as num?)?.toInt() ?? 1,
+      lessonDay: json['lesson_day'] as String?,
+      lessonTime: json['lesson_time'] as String?,
+      lessonDuration: (json['lesson_duration'] as num?)?.toInt() ?? 60,
       notes: json['notes'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$ClassMembershipToJson(ClassMembership instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'lessonClassId': instance.lessonClassId,
-      'studentId': instance.studentId,
+      'lesson_class_id': instance.lessonClassId,
+      'student_id': instance.studentId,
       'instrument': instance.instrument,
       'status': _$MembershipStatusEnumMap[instance.status]!,
       'level': instance.level,
-      'monthlyFee': instance.monthlyFee,
-      'lessonsPerWeek': instance.lessonsPerWeek,
-      'lessonDay': instance.lessonDay,
-      'lessonTime': instance.lessonTime,
-      'lessonDuration': instance.lessonDuration,
+      'monthly_fee': instance.monthlyFee,
+      'lessons_per_week': instance.lessonsPerWeek,
+      'lesson_day': instance.lessonDay,
+      'lesson_time': instance.lessonTime,
+      'lesson_duration': instance.lessonDuration,
       'notes': instance.notes,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$MembershipStatusEnumMap = {

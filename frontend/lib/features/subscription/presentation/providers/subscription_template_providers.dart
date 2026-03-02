@@ -1,6 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_subscription_template_repository.dart';
+import '../../data/repositories/remote_subscription_template_repository.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../../domain/repositories/subscription_template_repository.dart';
 
@@ -10,12 +14,14 @@ part 'subscription_template_providers.g.dart';
 // Repository Provider
 // ============================================================
 
-@Riverpod(keepAlive: true)
-SubscriptionTemplateRepository subscriptionTemplateRepository(
-  SubscriptionTemplateRepositoryRef ref,
-) {
-  return MockSubscriptionTemplateRepository();
-}
+/// Template repository provider - switches between Mock and Remote.
+final subscriptionTemplateRepositoryProvider =
+    Provider<SubscriptionTemplateRepository>((ref) {
+      if (EnvironmentConfig.useMockData) {
+        return MockSubscriptionTemplateRepository();
+      }
+      return RemoteSubscriptionTemplateRepository(ref.read(apiClientProvider));
+    });
 
 // ============================================================
 // Teacher Templates
@@ -143,7 +149,8 @@ class SubscriptionTemplateNotifier extends _$SubscriptionTemplateNotifier {
   }
 
   Future<SubscriptionTemplate> updateTemplate(
-      SubscriptionTemplate template) async {
+    SubscriptionTemplate template,
+  ) async {
     state = const AsyncValue.loading();
 
     try {
@@ -191,7 +198,8 @@ class SubscriptionTemplateNotifier extends _$SubscriptionTemplateNotifier {
   }
 
   Future<SubscriptionTemplate> toggleActive(
-      SubscriptionTemplate template) async {
+    SubscriptionTemplate template,
+  ) async {
     state = const AsyncValue.loading();
 
     try {

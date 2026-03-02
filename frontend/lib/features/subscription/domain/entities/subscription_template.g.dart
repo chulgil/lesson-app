@@ -130,43 +130,43 @@ SubscriptionTemplate _$SubscriptionTemplateFromJson(
         Map<String, dynamic> json) =>
     SubscriptionTemplate(
       id: json['id'] as String,
-      ownerId: json['ownerId'] as String,
+      ownerId: json['owner_id'] as String,
       ownerType: $enumDecode(
-          _$SubscriptionTemplateOwnerTypeEnumMap, json['ownerType']),
+          _$SubscriptionTemplateOwnerTypeEnumMap, json['owner_type']),
       name: json['name'] as String,
-      totalLessons: (json['totalLessons'] as num).toInt(),
-      lessonDurationMinutes: (json['lessonDurationMinutes'] as num).toInt(),
-      validityDays: (json['validityDays'] as num).toInt(),
+      totalLessons: (json['total_lessons'] as num).toInt(),
+      lessonDurationMinutes: (json['lesson_duration_minutes'] as num).toInt(),
+      validityDays: (json['validity_days'] as num).toInt(),
       price: (json['price'] as num).toInt(),
-      isActive: json['isActive'] as bool? ?? true,
-      displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
+      isActive: json['is_active'] as bool? ?? true,
+      displayOrder: (json['display_order'] as num?)?.toInt() ?? 0,
       description: json['description'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
-      rescheduleAllowance: (json['rescheduleAllowance'] as num?)?.toInt() ?? 2,
-      isAutoProposalEnabled: json['isAutoProposalEnabled'] as bool? ?? true,
+          : DateTime.parse(json['updated_at'] as String),
+      rescheduleAllowance: (json['reschedule_allowance'] as num?)?.toInt() ?? 2,
+      isAutoProposalEnabled: json['is_auto_proposal_enabled'] as bool? ?? true,
     );
 
 Map<String, dynamic> _$SubscriptionTemplateToJson(
         SubscriptionTemplate instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'ownerId': instance.ownerId,
-      'ownerType': _$SubscriptionTemplateOwnerTypeEnumMap[instance.ownerType]!,
+      'owner_id': instance.ownerId,
+      'owner_type': _$SubscriptionTemplateOwnerTypeEnumMap[instance.ownerType]!,
       'name': instance.name,
-      'totalLessons': instance.totalLessons,
-      'lessonDurationMinutes': instance.lessonDurationMinutes,
-      'validityDays': instance.validityDays,
+      'total_lessons': instance.totalLessons,
+      'lesson_duration_minutes': instance.lessonDurationMinutes,
+      'validity_days': instance.validityDays,
       'price': instance.price,
-      'isActive': instance.isActive,
-      'displayOrder': instance.displayOrder,
+      'is_active': instance.isActive,
+      'display_order': instance.displayOrder,
       'description': instance.description,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
-      'rescheduleAllowance': instance.rescheduleAllowance,
-      'isAutoProposalEnabled': instance.isAutoProposalEnabled,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'reschedule_allowance': instance.rescheduleAllowance,
+      'is_auto_proposal_enabled': instance.isAutoProposalEnabled,
     };
 
 const _$SubscriptionTemplateOwnerTypeEnumMap = {

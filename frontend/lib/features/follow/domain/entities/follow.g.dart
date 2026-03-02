@@ -61,20 +61,20 @@ class FollowAdapter extends TypeAdapter<Follow> {
 
 Follow _$FollowFromJson(Map<String, dynamic> json) => Follow(
       id: json['id'] as String,
-      followerId: json['followerId'] as String,
-      followingId: json['followingId'] as String,
-      targetType: $enumDecode(_$FollowTargetTypeEnumMap, json['targetType']),
-      notificationEnabled: json['notificationEnabled'] as bool? ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      followerId: json['follower_id'] as String,
+      followingId: json['following_id'] as String,
+      targetType: $enumDecode(_$FollowTargetTypeEnumMap, json['target_type']),
+      notificationEnabled: json['notification_enabled'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
 
 Map<String, dynamic> _$FollowToJson(Follow instance) => <String, dynamic>{
       'id': instance.id,
-      'followerId': instance.followerId,
-      'followingId': instance.followingId,
-      'targetType': _$FollowTargetTypeEnumMap[instance.targetType]!,
-      'notificationEnabled': instance.notificationEnabled,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'follower_id': instance.followerId,
+      'following_id': instance.followingId,
+      'target_type': _$FollowTargetTypeEnumMap[instance.targetType]!,
+      'notification_enabled': instance.notificationEnabled,
+      'created_at': instance.createdAt.toIso8601String(),
     };
 
 const _$FollowTargetTypeEnumMap = {

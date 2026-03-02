@@ -71,26 +71,26 @@ class NotificationSettingAdapter extends TypeAdapter<NotificationSetting> {
 NotificationSetting _$NotificationSettingFromJson(Map<String, dynamic> json) =>
     NotificationSetting(
       id: json['id'] as String,
-      userId: json['userId'] as String,
-      targetUserId: json['targetUserId'] as String,
-      pushEnabled: json['pushEnabled'] as bool? ?? true,
-      practiceShareEnabled: json['practiceShareEnabled'] as bool? ?? true,
-      lessonReminderEnabled: json['lessonReminderEnabled'] as bool? ?? true,
-      paymentReminderEnabled: json['paymentReminderEnabled'] as bool? ?? true,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
+      userId: json['user_id'] as String,
+      targetUserId: json['target_user_id'] as String,
+      pushEnabled: json['push_enabled'] as bool? ?? true,
+      practiceShareEnabled: json['practice_share_enabled'] as bool? ?? true,
+      lessonReminderEnabled: json['lesson_reminder_enabled'] as bool? ?? true,
+      paymentReminderEnabled: json['payment_reminder_enabled'] as bool? ?? true,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$NotificationSettingToJson(
         NotificationSetting instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'userId': instance.userId,
-      'targetUserId': instance.targetUserId,
-      'pushEnabled': instance.pushEnabled,
-      'practiceShareEnabled': instance.practiceShareEnabled,
-      'lessonReminderEnabled': instance.lessonReminderEnabled,
-      'paymentReminderEnabled': instance.paymentReminderEnabled,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
+      'user_id': instance.userId,
+      'target_user_id': instance.targetUserId,
+      'push_enabled': instance.pushEnabled,
+      'practice_share_enabled': instance.practiceShareEnabled,
+      'lesson_reminder_enabled': instance.lessonReminderEnabled,
+      'payment_reminder_enabled': instance.paymentReminderEnabled,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
     };

@@ -14,20 +14,20 @@ import '../widgets/section_form/date_range_section.dart';
 class AddRepertoireScreen extends ConsumerStatefulWidget {
   final String studentId;
 
-  const AddRepertoireScreen({
-    super.key,
-    required this.studentId,
-  });
+  const AddRepertoireScreen({super.key, required this.studentId});
 
   @override
-  ConsumerState<AddRepertoireScreen> createState() => _AddRepertoireScreenState();
+  ConsumerState<AddRepertoireScreen> createState() =>
+      _AddRepertoireScreenState();
 }
 
 class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _nameFocusNode = FocusNode();
   bool _isLoading = false;
+  bool _isNameFocused = false;
 
   // Date fields
   DateTime _startDate = DateTime.now();
@@ -49,9 +49,18 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _nameFocusNode.addListener(() {
+      setState(() => _isNameFocused = _nameFocusNode.hasFocus);
+    });
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
@@ -61,12 +70,15 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
+      final repertoire = await ref
+          .read(repertoireCrudProvider.notifier)
+          .createRepertoire(
             studentId: widget.studentId,
             name: _nameController.text.trim(),
-            description: _descriptionController.text.trim().isEmpty
-                ? null
-                : _descriptionController.text.trim(),
+            description:
+                _descriptionController.text.trim().isEmpty
+                    ? null
+                    : _descriptionController.text.trim(),
             startDate: _startDate,
             endDate: _endDate,
           );
@@ -142,9 +154,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('레퍼토리 추가'),
-      ),
+      appBar: AppBar(title: const Text('레퍼토리 추가')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -155,6 +165,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               // Name field
               TextFormField(
                 controller: _nameController,
+                focusNode: _nameFocusNode,
                 decoration: const InputDecoration(
                   labelText: '레퍼토리 이름 *',
                   hintText: '예: 스즈키 6권, 바흐 협주곡',
@@ -183,6 +194,25 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 textInputAction: TextInputAction.done,
               ),
 
+              // Suggestions section (only visible when name field is focused)
+              if (_isNameFocused) ...[
+                const SizedBox(height: AppSpacing.space3),
+
+                // Suggestion chips
+                Wrap(
+                  spacing: AppSpacing.space2,
+                  runSpacing: AppSpacing.space2,
+                  children:
+                      _suggestions.map((suggestion) {
+                        return ActionChip(
+                          label: Text(suggestion.name),
+                          onPressed: () => _selectSuggestion(suggestion),
+                          avatar: const Icon(Icons.add, size: 18),
+                        );
+                      }).toList(),
+                ),
+              ],
+
               const SizedBox(height: AppSpacing.space6),
 
               // Period section using DateRangeSection
@@ -196,36 +226,6 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 showHintMessage: true,
               ),
 
-              const SizedBox(height: AppSpacing.space6),
-
-              // Suggestions section
-              Text(
-                '빠른 선택',
-                style: AppTypography.headingSmall,
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '자주 사용하는 레퍼토리를 선택하세요',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              // Suggestion chips
-              Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space2,
-                children: _suggestions.map((suggestion) {
-                  return ActionChip(
-                    label: Text(suggestion.name),
-                    onPressed: () => _selectSuggestion(suggestion),
-                    avatar: const Icon(Icons.add, size: 18),
-                  );
-                }).toList(),
-              ),
-
               const SizedBox(height: AppSpacing.space8),
 
               // Submit button
@@ -233,16 +233,17 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : () => _submit(),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('레퍼토리 추가'),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('레퍼토리 추가'),
                 ),
               ),
 
@@ -252,7 +253,8 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _isLoading ? null : () => _submit(addSectionAfter: true),
+                  onPressed:
+                      _isLoading ? null : () => _submit(addSectionAfter: true),
                   icon: const Icon(Icons.playlist_add),
                   label: const Text('저장 후 섹션 추가하기'),
                 ),

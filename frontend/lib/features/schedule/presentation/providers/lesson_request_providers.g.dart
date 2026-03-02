@@ -6,28 +6,6 @@ part of 'lesson_request_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lessonRequestRepositoryHash() =>
-    r'0a2fcd48a81ae901d721196df6d4607ca99949cf';
-
-/// Repository provider
-///
-/// Copied from [lessonRequestRepository].
-@ProviderFor(lessonRequestRepository)
-final lessonRequestRepositoryProvider =
-    AutoDisposeProvider<LessonRequestRepository>.internal(
-  lessonRequestRepository,
-  name: r'lessonRequestRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$lessonRequestRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef LessonRequestRepositoryRef
-    = AutoDisposeProviderRef<LessonRequestRepository>;
 String _$teacherLessonRequestsHash() =>
     r'39cc1b79ccffd3ec0a1b5cdc3f8da67d7e8eac35';
 

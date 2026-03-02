@@ -6,26 +6,6 @@ part of 'subscription_proposal_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$subscriptionProposalRepositoryHash() =>
-    r'bda8ddb079e39d381580d34d2ed9b934e0a6d830';
-
-/// See also [subscriptionProposalRepository].
-@ProviderFor(subscriptionProposalRepository)
-final subscriptionProposalRepositoryProvider =
-    Provider<SubscriptionProposalRepository>.internal(
-  subscriptionProposalRepository,
-  name: r'subscriptionProposalRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$subscriptionProposalRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SubscriptionProposalRepositoryRef
-    = ProviderRef<SubscriptionProposalRepository>;
 String _$teacherProposalsHash() => r'cb636e8ef7832c9d5798fba5ccbbd90b6d3a6ba8';
 
 /// Copied from Dart SDK

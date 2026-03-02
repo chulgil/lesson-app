@@ -1,7 +1,7 @@
 // Tuner engine interface
 // Abstract interface for pitch detection engines
 
-import 'package:lesson_app/features/practice/domain/entities/tuner_types.dart';
+import 'package:lessonaza/features/practice/domain/entities/tuner_types.dart';
 
 /// Callback type for pitch detection events.
 typedef OnPitchDetected = void Function(TunerNote? note);

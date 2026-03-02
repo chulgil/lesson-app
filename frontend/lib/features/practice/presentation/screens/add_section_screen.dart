@@ -29,8 +29,10 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pieceNameController = TextEditingController();
   final _sectionNameController = TextEditingController();
+  final _pieceNameFocusNode = FocusNode();
   bool _isLoading = false;
   bool _isInitialized = false;
+  bool _isPieceNameFocused = false;
 
   // Repertoire info for context display
   PracticeRepertoire? _repertoire;
@@ -72,11 +74,15 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   void initState() {
     super.initState();
     _loadRepertoireData();
+    _pieceNameFocusNode.addListener(() {
+      setState(() => _isPieceNameFocused = _pieceNameFocusNode.hasFocus);
+    });
   }
 
   Future<void> _loadRepertoireData() async {
-    final repertoire =
-        await ref.read(repertoireProvider(widget.repertoireId).future);
+    final repertoire = await ref.read(
+      repertoireProvider(widget.repertoireId).future,
+    );
     if (mounted) {
       setState(() {
         _repertoire = repertoire;
@@ -89,6 +95,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   void dispose() {
     _pieceNameController.dispose();
     _sectionNameController.dispose();
+    _pieceNameFocusNode.dispose();
     super.dispose();
   }
 
@@ -111,8 +118,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     }
 
     // Check for duplicate section (same name + range)
-    final repertoire =
-        await ref.read(repertoireProvider(widget.repertoireId).future);
+    final repertoire = await ref.read(
+      repertoireProvider(widget.repertoireId).future,
+    );
     if (repertoire != null && _isDuplicateSection(repertoire)) {
       if (!mounted) return;
       _showErrorSnackBar('동일한 곡명과 범위의 섹션이 이미 존재합니다');
@@ -122,7 +130,9 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(sectionCrudProvider.notifier).createSection(
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .createSection(
             repertoireId: widget.repertoireId,
             pieceName: _pieceNameController.text.trim(),
             rangeType: _rangeType,
@@ -130,19 +140,20 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 _rangeType == SectionRangeType.measure ? _startMeasure : 1,
             endMeasure:
                 _rangeType == SectionRangeType.measure ? _endMeasure : 1,
-            startLine:
-                _rangeType == SectionRangeType.line ? _startLine : null,
+            startLine: _rangeType == SectionRangeType.line ? _startLine : null,
             endLine: _rangeType == SectionRangeType.line ? _endLine : null,
-            sectionName: _sectionNameController.text.trim().isEmpty
-                ? null
-                : _sectionNameController.text.trim(),
+            sectionName:
+                _sectionNameController.text.trim().isEmpty
+                    ? null
+                    : _sectionNameController.text.trim(),
             isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
             repeatCount: _repeatCount,
             startDate: null, // 섹션 날짜는 레퍼토리에서 상속
             endDate: null,
-            targetPracticeSeconds: _targetPracticeMinutes != null
-                ? _targetPracticeMinutes! * 60
-                : null,
+            targetPracticeSeconds:
+                _targetPracticeMinutes != null
+                    ? _targetPracticeMinutes! * 60
+                    : null,
           );
 
       // Invalidate providers to refresh
@@ -185,9 +196,11 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
   void _invalidateProviders() {
     ref.invalidate(studentRepertoiresProvider(widget.studentId));
     final today = DateTime.now();
-    ref.invalidate(repertoiresForDateProvider(
-      RepertoiresForDateParams(studentId: widget.studentId, date: today),
-    ));
+    ref.invalidate(
+      repertoiresForDateProvider(
+        RepertoiresForDateParams(studentId: widget.studentId, date: today),
+      ),
+    );
   }
 
   void _showErrorSnackBar(String message) {
@@ -201,24 +214,25 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 마디' : '끝 마디',
-        unit: '마디',
-        initialValue: initialValue,
-        maxValue: 100,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startMeasure = value;
-              if (_endMeasure < _startMeasure) {
-                _endMeasure = _startMeasure;
-              }
-            } else {
-              _endMeasure = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 마디' : '끝 마디',
+            unit: '마디',
+            initialValue: initialValue,
+            maxValue: 100,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startMeasure = value;
+                  if (_endMeasure < _startMeasure) {
+                    _endMeasure = _startMeasure;
+                  }
+                } else {
+                  _endMeasure = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -227,24 +241,25 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 줄' : '끝 줄',
-        unit: '줄',
-        initialValue: initialValue,
-        maxValue: 10,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startLine = value;
-              if (_endLine < _startLine) {
-                _endLine = _startLine;
-              }
-            } else {
-              _endLine = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 줄' : '끝 줄',
+            unit: '줄',
+            initialValue: initialValue,
+            maxValue: 10,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startLine = value;
+                  if (_endLine < _startLine) {
+                    _endLine = _startLine;
+                  }
+                } else {
+                  _endLine = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -325,6 +340,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
               // Piece name field
               TextFormField(
                 controller: _pieceNameController,
+                focusNode: _pieceNameFocusNode,
                 decoration: const InputDecoration(
                   labelText: '곡/연습곡 이름 *',
                   hintText: '예: 1번, Allegro, Etude No.1',
@@ -338,13 +354,15 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: AppSpacing.space3),
 
-              // Quick piece selection
-              PieceSuggestionChips(
-                suggestions: _pieceSuggestions,
-                onSelected: (name) => _pieceNameController.text = name,
-              ),
+              // Quick piece selection (only visible when piece name is focused)
+              if (_isPieceNameFocused) ...[
+                const SizedBox(height: AppSpacing.space3),
+                PieceSuggestionChips(
+                  suggestions: _pieceSuggestions,
+                  onSelected: (name) => _pieceNameController.text = name,
+                ),
+              ],
               const SizedBox(height: AppSpacing.space6),
 
               // Range type selector
@@ -365,8 +383,8 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
               // 목표 연습시간 설정
               TargetTimeSection(
                 targetMinutes: _targetPracticeMinutes,
-                onChanged: (value) =>
-                    setState(() => _targetPracticeMinutes = value),
+                onChanged:
+                    (value) => setState(() => _targetPracticeMinutes = value),
               ),
               const SizedBox(height: AppSpacing.space8),
 
@@ -375,16 +393,17 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('섹션 추가'),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('섹션 추가'),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -457,12 +476,14 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
           startLabel: isMeasure ? '시작 마디' : '시작 줄',
           endLabel: isMeasure ? '끝 마디' : '끝 줄',
           unit: isMeasure ? '마디' : '줄',
-          onStartTap: isMeasure
-              ? () => _showMeasurePicker(isStart: true)
-              : () => _showLinePicker(isStart: true),
-          onEndTap: isMeasure
-              ? () => _showMeasurePicker(isStart: false)
-              : () => _showLinePicker(isStart: false),
+          onStartTap:
+              isMeasure
+                  ? () => _showMeasurePicker(isStart: true)
+                  : () => _showLinePicker(isStart: true),
+          onEndTap:
+              isMeasure
+                  ? () => _showMeasurePicker(isStart: false)
+                  : () => _showLinePicker(isStart: false),
         ),
         const SizedBox(height: AppSpacing.space2),
 

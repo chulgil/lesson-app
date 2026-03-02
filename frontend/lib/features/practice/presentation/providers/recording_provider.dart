@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
+import '../../data/repositories/remote_recording_repository.dart';
 import '../../domain/entities/recording.dart';
 import '../../../../repositories/recording_repository.dart';
 import '../../../../services/audio_recorder_service.dart';
@@ -81,20 +84,27 @@ class RecordingState {
       isPlaying: isPlaying ?? this.isPlaying,
       hasMicInput: hasMicInput ?? this.hasMicInput,
       currentRecordingPath: currentRecordingPath ?? this.currentRecordingPath,
-      currentRecordingDuration: currentRecordingDuration ?? this.currentRecordingDuration,
+      currentRecordingDuration:
+          currentRecordingDuration ?? this.currentRecordingDuration,
       playingRecordingId: playingRecordingId ?? this.playingRecordingId,
       playbackPosition: playbackPosition ?? this.playbackPosition,
       playbackDuration: playbackDuration ?? this.playbackDuration,
       error: error,
-      recoveryMessage: clearRecoveryMessage ? null : (recoveryMessage ?? this.recoveryMessage),
+      recoveryMessage:
+          clearRecoveryMessage
+              ? null
+              : (recoveryMessage ?? this.recoveryMessage),
     );
   }
 }
 
-/// Provider for recording repository.
+/// Provider for recording repository - switches between Hive (local) and Remote.
 @Riverpod(keepAlive: true)
 RecordingRepository recordingRepository(Ref ref) {
-  return HiveRecordingRepository();
+  if (EnvironmentConfig.useMockData) {
+    return HiveRecordingRepository();
+  }
+  return RemoteRecordingRepository(ref.read(apiClientProvider));
 }
 
 /// Provider for audio recorder service.
@@ -126,8 +136,11 @@ Future<bool> microphonePermission(Ref ref) async {
 @riverpod
 class RecordingNotifier extends _$RecordingNotifier {
   static const _uuid = Uuid();
-  static const _micInputThreshold = 0.05; // Minimum amplitude to consider as input
-  static const _micCheckDuration = Duration(milliseconds: 1500); // Time to check for input
+  static const _micInputThreshold =
+      0.05; // Minimum amplitude to consider as input
+  static const _micCheckDuration = Duration(
+    milliseconds: 1500,
+  ); // Time to check for input
 
   RecordingRepository get _repository => ref.read(recordingRepositoryProvider);
   AudioRecorderService get _recorder => ref.read(audioRecorderServiceProvider);
@@ -181,7 +194,9 @@ class RecordingNotifier extends _$RecordingNotifier {
         message = parts.join(', ');
       }
 
-      final recordings = await _repository.getRecordingsForRepertoire(_repertoireId);
+      final recordings = await _repository.getRecordingsForRepertoire(
+        _repertoireId,
+      );
       state = state.copyWith(
         recordings: recordings,
         isLoading: false,
@@ -245,7 +260,10 @@ class RecordingNotifier extends _$RecordingNotifier {
         return false;
       }
     } catch (e) {
-      state = state.copyWith(isRecording: false, error: 'Failed to start recording');
+      state = state.copyWith(
+        isRecording: false,
+        error: 'Failed to start recording',
+      );
       return false;
     }
   }
@@ -257,7 +275,9 @@ class RecordingNotifier extends _$RecordingNotifier {
     bool hasDetectedInput = false;
     final startTime = DateTime.now();
 
-    _micInputCheckSubscription = _recorder.normalizedAmplitudeStream.listen((amplitude) {
+    _micInputCheckSubscription = _recorder.normalizedAmplitudeStream.listen((
+      amplitude,
+    ) {
       // If we detect any amplitude above threshold, mark as having input
       if (amplitude > _micInputThreshold) {
         hasDetectedInput = true;
@@ -321,7 +341,8 @@ class RecordingNotifier extends _$RecordingNotifier {
         localPath: path,
         durationSeconds: durationSeconds,
         recordedAt: DateTime.now(),
-        isRepresentative: state.recordings.isEmpty, // First recording is representative
+        isRepresentative:
+            state.recordings.isEmpty, // First recording is representative
       );
 
       // Save to repository
@@ -442,9 +463,8 @@ class RecordingNotifier extends _$RecordingNotifier {
 
       await _repository.deleteRecording(recordingId);
 
-      final updatedRecordings = state.recordings
-          .where((r) => r.id != recordingId)
-          .toList();
+      final updatedRecordings =
+          state.recordings.where((r) => r.id != recordingId).toList();
 
       state = state.copyWith(recordings: updatedRecordings);
     } catch (e) {
@@ -457,12 +477,13 @@ class RecordingNotifier extends _$RecordingNotifier {
     try {
       await _repository.setRepresentative(recordingId);
 
-      final updatedRecordings = state.recordings.map((r) {
-        if (r.id == recordingId) {
-          return r.copyWith(isRepresentative: true);
-        }
-        return r.copyWith(isRepresentative: false);
-      }).toList();
+      final updatedRecordings =
+          state.recordings.map((r) {
+            if (r.id == recordingId) {
+              return r.copyWith(isRepresentative: true);
+            }
+            return r.copyWith(isRepresentative: false);
+          }).toList();
 
       state = state.copyWith(recordings: updatedRecordings);
     } catch (e) {
@@ -481,15 +502,16 @@ class RecordingNotifier extends _$RecordingNotifier {
     try {
       await _repository.markAsShared(representative.id);
 
-      final updatedRecordings = state.recordings.map((r) {
-        if (r.id == representative.id) {
-          return r.copyWith(
-            sharedAt: DateTime.now(),
-            storageStatus: StorageStatus.active,
-          );
-        }
-        return r;
-      }).toList();
+      final updatedRecordings =
+          state.recordings.map((r) {
+            if (r.id == representative.id) {
+              return r.copyWith(
+                sharedAt: DateTime.now(),
+                storageStatus: StorageStatus.active,
+              );
+            }
+            return r;
+          }).toList();
 
       state = state.copyWith(recordings: updatedRecordings);
     } catch (e) {

@@ -19,14 +19,14 @@ class MetronomePlugin: NSObject, FlutterPlugin {
 
         // Method channel for commands
         let methodChannel = FlutterMethodChannel(
-            name: "com.lessonapp/metronome",
+            name: "app.lessonaza/metronome",
             binaryMessenger: registrar.messenger()
         )
         registrar.addMethodCallDelegate(instance, channel: methodChannel)
 
         // Event channel for beat callbacks
         let eventChannel = FlutterEventChannel(
-            name: "com.lessonapp/metronome_events",
+            name: "app.lessonaza/metronome_events",
             binaryMessenger: registrar.messenger()
         )
         eventChannel.setStreamHandler(instance)

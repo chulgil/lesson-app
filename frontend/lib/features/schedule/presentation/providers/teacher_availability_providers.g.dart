@@ -6,26 +6,6 @@ part of 'teacher_availability_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$teacherAvailabilityRepositoryHash() =>
-    r'16aa352a505644d906c12b353b494bee3f7ade15';
-
-/// See also [teacherAvailabilityRepository].
-@ProviderFor(teacherAvailabilityRepository)
-final teacherAvailabilityRepositoryProvider =
-    AutoDisposeProvider<TeacherAvailabilityRepository>.internal(
-  teacherAvailabilityRepository,
-  name: r'teacherAvailabilityRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$teacherAvailabilityRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TeacherAvailabilityRepositoryRef
-    = AutoDisposeProviderRef<TeacherAvailabilityRepository>;
 String _$teacherAvailabilityHash() =>
     r'c8a488ca035b8e9370023cd62fd2868e23592120';
 

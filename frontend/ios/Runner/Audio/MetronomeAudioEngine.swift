@@ -55,7 +55,7 @@ protocol MetronomeAnimationDelegate: AnyObject {
 /// This ensures animations fire correctly even for rest beats.
 class MetronomeUICallback {
     private var timer: DispatchSourceTimer?
-    private let timerQueue = DispatchQueue(label: "com.lessonapp.metronome.ui", qos: .userInteractive)
+    private let timerQueue = DispatchQueue(label: "app.lessonaza.metronome.ui", qos: .userInteractive)
 
     private var timing: MetronomeTiming
     private var soundPattern: [Bool]
@@ -179,7 +179,7 @@ class MetronomeAudioEngine: MetronomeAnimationDelegate {
     private var nextBeatSampleTime: Double = 0
 
     private let beatsToScheduleAhead = 4
-    private let syncQueue = DispatchQueue(label: "com.lessonapp.metronome.sync")
+    private let syncQueue = DispatchQueue(label: "app.lessonaza.metronome.sync")
 
     // UI callback manager (timer-based, independent of audio scheduling)
     private var uiCallback: MetronomeUICallback?

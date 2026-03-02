@@ -11,8 +11,8 @@ import 'metronome_engine_interface.dart';
 class NativeMetronomeEngine implements MetronomeEngineInterface {
   NativeMetronomeEngine();
 
-  static const _methodChannel = MethodChannel('com.lessonapp/metronome');
-  static const _eventChannel = EventChannel('com.lessonapp/metronome_events');
+  static const _methodChannel = MethodChannel('app.lessonaza/metronome');
+  static const _eventChannel = EventChannel('app.lessonaza/metronome_events');
 
   StreamSubscription<dynamic>? _beatSubscription;
   MetronomeSettings _settings = const MetronomeSettings();
@@ -75,28 +75,27 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
 
   void _setupEventChannel() {
     _beatSubscription?.cancel();
-    _beatSubscription = _eventChannel.receiveBroadcastStream().listen(
-      (dynamic event) {
-        if (event is Map) {
-          final eventType = event['type'] as String? ?? 'beat';
+    _beatSubscription = _eventChannel.receiveBroadcastStream().listen((
+      dynamic event,
+    ) {
+      if (event is Map) {
+        final eventType = event['type'] as String? ?? 'beat';
 
-          if (eventType == 'subdivision') {
-            // Subdivision event
-            final subBeat = event['subBeat'] as int? ?? 0;
-            final isMainBeat = event['isMainBeat'] as bool? ?? false;
-            onSubdivision?.call(subBeat, isMainBeat);
-          } else {
-            // Beat event (main beat only)
-            final beat = event['beat'] as int? ?? 0;
-            final isAccent = event['isAccent'] as bool? ?? false;
+        if (eventType == 'subdivision') {
+          // Subdivision event
+          final subBeat = event['subBeat'] as int? ?? 0;
+          final isMainBeat = event['isMainBeat'] as bool? ?? false;
+          onSubdivision?.call(subBeat, isMainBeat);
+        } else {
+          // Beat event (main beat only)
+          final beat = event['beat'] as int? ?? 0;
+          final isAccent = event['isAccent'] as bool? ?? false;
 
-            _currentBeat = beat;
-            onBeat?.call(beat, isAccent);
-          }
+          _currentBeat = beat;
+          onBeat?.call(beat, isAccent);
         }
-      },
-      onError: (_) {},
-    );
+      }
+    }, onError: (_) {});
   }
 
   @override
@@ -111,8 +110,7 @@ class NativeMetronomeEngine implements MetronomeEngineInterface {
         _settings.timeSignature != newSettings.timeSignature;
     final accentPatternChanged =
         _settings.accentPattern != newSettings.accentPattern;
-    final subdivisionChanged =
-        _settings.subdivision != newSettings.subdivision;
+    final subdivisionChanged = _settings.subdivision != newSettings.subdivision;
 
     _settings = newSettings;
 

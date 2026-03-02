@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../models/teacher.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
@@ -9,6 +12,7 @@ import '../../../search/presentation/providers/teacher_providers.dart';
 import '../../../subscription/domain/entities/subscription.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../data/repositories/mock_teacher_availability_repository.dart';
+import '../../data/repositories/remote_teacher_availability_repository.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/repositories/teacher_availability_repository.dart';
@@ -18,15 +22,16 @@ import '../services/booking_notification_service.dart';
 part 'teacher_availability_providers.g.dart';
 
 // ============================================================
-// Repository Provider
+// Repository Provider - switches between Mock and Remote.
 // ============================================================
 
-@riverpod
-TeacherAvailabilityRepository teacherAvailabilityRepository(
-  TeacherAvailabilityRepositoryRef ref,
-) {
-  return MockTeacherAvailabilityRepository();
-}
+final teacherAvailabilityRepositoryProvider =
+    Provider<TeacherAvailabilityRepository>((ref) {
+      if (EnvironmentConfig.useMockData) {
+        return MockTeacherAvailabilityRepository();
+      }
+      return RemoteTeacherAvailabilityRepository(ref.read(apiClientProvider));
+    });
 
 // ============================================================
 // Teacher Availability Settings
@@ -294,14 +299,17 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
   }) async {
     debugPrint('[SlotBookingNotifier] bookSlot called');
     debugPrint('[SlotBookingNotifier] slotId: $slotId');
-    debugPrint('[SlotBookingNotifier] studentId: $studentId, studentName: $studentName');
+    debugPrint(
+      '[SlotBookingNotifier] studentId: $studentId, studentName: $studentName',
+    );
     state = const AsyncValue.loading();
 
     try {
       // 1. Update availability slot status
       debugPrint('[SlotBookingNotifier] Step 1: Updating availability slot...');
-      final availabilityRepository =
-          ref.read(teacherAvailabilityRepositoryProvider);
+      final availabilityRepository = ref.read(
+        teacherAvailabilityRepositoryProvider,
+      );
       final bookedSlot = await availabilityRepository.bookSlot(
         slotId,
         studentId,
@@ -329,7 +337,9 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
         request: request,
         fee: fee,
       );
-      debugPrint('[SlotBookingNotifier] Step 2 completed, booking id: ${booking.id}');
+      debugPrint(
+        '[SlotBookingNotifier] Step 2 completed, booking id: ${booking.id}',
+      );
 
       state = AsyncValue.data(bookedSlot);
 
@@ -387,13 +397,13 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       if (studentId != null && teacherName != null) {
         final notification =
             BookingNotificationService.createCancellationNotification(
-          userId: studentId,
-          teacherName: teacherName,
-          lessonDate: cancelledSlot.date,
-          startTime: cancelledSlot.startTime,
-          isTeacherInitiated: isTeacherInitiated,
-          reason: reason,
-        );
+              userId: studentId,
+              teacherName: teacherName,
+              lessonDate: cancelledSlot.date,
+              startTime: cancelledSlot.startTime,
+              isTeacherInitiated: isTeacherInitiated,
+              reason: reason,
+            );
         // TODO: Send notification via notification service
         debugPrint('Cancellation notification created: ${notification.title}');
       }
@@ -454,14 +464,14 @@ class SlotBookingNotifier extends _$SlotBookingNotifier {
       if (teacherName != null && oldSlot != null) {
         final notification =
             BookingNotificationService.createRescheduleNotification(
-          userId: studentId,
-          teacherName: teacherName,
-          oldDate: oldSlot.date,
-          oldTime: oldSlot.startTime,
-          newDate: newSlot.date,
-          newTime: newSlot.startTime,
-          isTeacherInitiated: isTeacherInitiated,
-        );
+              userId: studentId,
+              teacherName: teacherName,
+              oldDate: oldSlot.date,
+              oldTime: oldSlot.startTime,
+              newDate: newSlot.date,
+              newTime: newSlot.startTime,
+              isTeacherInitiated: isTeacherInitiated,
+            );
         // TODO: Send notification via notification service
         debugPrint('Reschedule notification created: ${notification.title}');
       }

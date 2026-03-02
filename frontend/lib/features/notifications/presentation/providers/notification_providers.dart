@@ -2,14 +2,25 @@ import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../models/notification_settings.dart';
 import '../../../../services/notification/notification_service.dart';
 import '../../../../services/notification/practice_reminder_scheduler.dart';
+import '../../data/repositories/remote_notification_repository.dart';
 import '../../domain/entities/notification.dart';
+import '../../domain/repositories/notification_repository.dart';
 import '../../domain/services/connection_notification_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
 
 part 'notification_providers.g.dart';
+
+/// Notification repository provider (only used for remote mode).
+@Riverpod(keepAlive: true)
+NotificationRepository? notificationApiRepository(Ref ref) {
+  if (EnvironmentConfig.useMockData) return null;
+  return RemoteNotificationRepository(ref.read(apiClientProvider));
+}
 
 /// Provider for the notification service
 @riverpod
@@ -43,7 +54,8 @@ ProposalNotificationService proposalNotificationService(Ref ref) {
 /// Provider for student notification settings
 /// TODO: Load from Hive storage
 @riverpod
-class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsNotifier {
+class StudentNotificationSettingsNotifier
+    extends _$StudentNotificationSettingsNotifier {
   @override
   StudentNotificationSettings build() {
     // Return default settings for now
@@ -84,7 +96,12 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
     state = state.copyWith(dndEnabled: enabled);
   }
 
-  void setDndTimes({int? startHour, int? startMinute, int? endHour, int? endMinute}) {
+  void setDndTimes({
+    int? startHour,
+    int? startMinute,
+    int? endHour,
+    int? endMinute,
+  }) {
     state = state.copyWith(
       dndStart: TimeOfDay(
         hour: startHour ?? state.dndStart.hour,
@@ -101,7 +118,8 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 /// Provider for teacher notification settings
 /// TODO: Load from Hive storage
 @riverpod
-class TeacherNotificationSettingsNotifier extends _$TeacherNotificationSettingsNotifier {
+class TeacherNotificationSettingsNotifier
+    extends _$TeacherNotificationSettingsNotifier {
   @override
   TeacherNotificationSettings build() {
     // Return default settings for now
@@ -148,10 +166,15 @@ class TeacherNotificationSettingsNotifier extends _$TeacherNotificationSettingsN
 // ============================================================
 
 /// Provider for user's notifications list
-/// TODO: Replace with actual API/Hive data source
 @riverpod
 Future<List<AppNotification>> userNotifications(Ref ref) async {
-  // Mock data for now - replace with actual repository
+  // Use remote repository if available
+  final apiRepo = ref.watch(notificationApiRepositoryProvider);
+  if (apiRepo != null) {
+    return apiRepo.getNotifications();
+  }
+
+  // Mock data fallback
   await Future.delayed(const Duration(milliseconds: 300));
 
   final now = DateTime.now();
@@ -183,7 +206,6 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     // ============================================================
     // 기존 알림
     // ============================================================
-
     AppNotification(
       id: 'n1',
       userId: 'current_user',
@@ -252,20 +274,25 @@ class NotificationActions extends _$NotificationActions {
 
   /// Mark a single notification as read
   Future<void> markAsRead(String notificationId) async {
-    // TODO: Implement with actual repository
-    // For now, just invalidate the provider to refresh
+    final apiRepo = ref.read(notificationApiRepositoryProvider);
+    if (apiRepo != null) {
+      await apiRepo.markAsRead(notificationId);
+    }
     ref.invalidate(userNotificationsProvider);
   }
 
   /// Mark all notifications as read
   Future<void> markAllAsRead() async {
-    // TODO: Implement with actual repository
+    final apiRepo = ref.read(notificationApiRepositoryProvider);
+    if (apiRepo != null) {
+      await apiRepo.markAllAsRead();
+    }
     ref.invalidate(userNotificationsProvider);
   }
 
   /// Delete a notification
   Future<void> deleteNotification(String notificationId) async {
-    // TODO: Implement with actual repository
+    // Server-side delete not yet supported; just refresh
     ref.invalidate(userNotificationsProvider);
   }
 }

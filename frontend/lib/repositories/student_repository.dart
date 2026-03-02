@@ -3,3 +3,4 @@
 
 export '../features/students/domain/repositories/student_repository.dart';
 export '../features/students/data/repositories/mock_student_repository.dart';
+export '../features/students/data/repositories/remote_student_repository.dart';

@@ -7,9 +7,9 @@ part of 'relationship_providers.dart';
 // **************************************************************************
 
 String _$teacherStudentRelationRepositoryHash() =>
-    r'ceb4f40afc252f4542b51bb960bb51e00d5c1497';
+    r'93fa0da06a54ed3a4840676597205de2710c2a30';
 
-/// Repository provider
+/// Repository provider - switches between Mock and Remote.
 ///
 /// Copied from [teacherStudentRelationRepository].
 @ProviderFor(teacherStudentRelationRepository)

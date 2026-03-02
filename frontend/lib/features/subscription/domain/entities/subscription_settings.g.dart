@@ -159,7 +159,7 @@ class DiscountTypeAdapter extends TypeAdapter<DiscountType> {
 PackageDiscountPolicy _$PackageDiscountPolicyFromJson(
         Map<String, dynamic> json) =>
     PackageDiscountPolicy(
-      minLessons: (json['minLessons'] as num).toInt(),
+      minLessons: (json['min_lessons'] as num).toInt(),
       type: $enumDecode(_$DiscountTypeEnumMap, json['type']),
       value: (json['value'] as num).toInt(),
       description: json['description'] as String?,
@@ -168,7 +168,7 @@ PackageDiscountPolicy _$PackageDiscountPolicyFromJson(
 Map<String, dynamic> _$PackageDiscountPolicyToJson(
         PackageDiscountPolicy instance) =>
     <String, dynamic>{
-      'minLessons': instance.minLessons,
+      'min_lessons': instance.minLessons,
       'type': _$DiscountTypeEnumMap[instance.type]!,
       'value': instance.value,
       'description': instance.description,
@@ -183,37 +183,38 @@ SubscriptionSettings _$SubscriptionSettingsFromJson(
         Map<String, dynamic> json) =>
     SubscriptionSettings(
       id: json['id'] as String,
-      teacherId: json['teacherId'] as String?,
-      organizationId: json['organizationId'] as String?,
+      teacherId: json['teacher_id'] as String?,
+      organizationId: json['organization_id'] as String?,
       renewalAlertThreshold:
-          (json['renewalAlertThreshold'] as num?)?.toInt() ?? 1,
-      renewalAlertDays: (json['renewalAlertDays'] as num?)?.toInt() ?? 7,
-      discountPolicies: (json['discountPolicies'] as List<dynamic>?)
+          (json['renewal_alert_threshold'] as num?)?.toInt() ?? 1,
+      renewalAlertDays: (json['renewal_alert_days'] as num?)?.toInt() ?? 7,
+      discountPolicies: (json['discount_policies'] as List<dynamic>?)
               ?.map((e) =>
                   PackageDiscountPolicy.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      enablePushNotification: json['enablePushNotification'] as bool? ?? true,
-      enableBadge: json['enableBadge'] as bool? ?? true,
-      notifyParent: json['notifyParent'] as bool? ?? false,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      enablePushNotification: json['enable_push_notification'] as bool? ?? true,
+      enableBadge: json['enable_badge'] as bool? ?? true,
+      notifyParent: json['notify_parent'] as bool? ?? false,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$SubscriptionSettingsToJson(
         SubscriptionSettings instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'teacherId': instance.teacherId,
-      'organizationId': instance.organizationId,
-      'renewalAlertThreshold': instance.renewalAlertThreshold,
-      'renewalAlertDays': instance.renewalAlertDays,
-      'discountPolicies': instance.discountPolicies,
-      'enablePushNotification': instance.enablePushNotification,
-      'enableBadge': instance.enableBadge,
-      'notifyParent': instance.notifyParent,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'teacher_id': instance.teacherId,
+      'organization_id': instance.organizationId,
+      'renewal_alert_threshold': instance.renewalAlertThreshold,
+      'renewal_alert_days': instance.renewalAlertDays,
+      'discount_policies':
+          instance.discountPolicies.map((e) => e.toJson()).toList(),
+      'enable_push_notification': instance.enablePushNotification,
+      'enable_badge': instance.enableBadge,
+      'notify_parent': instance.notifyParent,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };

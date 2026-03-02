@@ -7,9 +7,9 @@ part of 'recording_provider.dart';
 // **************************************************************************
 
 String _$recordingRepositoryHash() =>
-    r'8b5080b46841b8ce52fe47b041aaac1c72312203';
+    r'3aa0f99922fa7077a0b96c6319251b14604f4483';
 
-/// Provider for recording repository.
+/// Provider for recording repository - switches between Hive (local) and Remote.
 ///
 /// Copied from [recordingRepository].
 @ProviderFor(recordingRepository)

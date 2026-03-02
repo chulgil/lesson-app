@@ -192,46 +192,47 @@ class LessonRequestStatusAdapter extends TypeAdapter<LessonRequestStatus> {
 LessonRequest _$LessonRequestFromJson(Map<String, dynamic> json) =>
     LessonRequest(
       id: json['id'] as String,
-      studentId: json['studentId'] as String,
-      teacherId: json['teacherId'] as String,
+      studentId: json['student_id'] as String,
+      teacherId: json['teacher_id'] as String,
       message: json['message'] as String?,
       preferredTiming: $enumDecodeNullable(
-              _$PreferredStartTimingEnumMap, json['preferredTiming']) ??
+              _$PreferredStartTimingEnumMap, json['preferred_timing']) ??
           PreferredStartTiming.nextWeek,
-      keepPreviousSchedule: json['keepPreviousSchedule'] as bool? ?? true,
-      previousLessonDay: (json['previousLessonDay'] as num?)?.toInt(),
-      previousLessonTime: json['previousLessonTime'] as String?,
-      previousLessonDuration: (json['previousLessonDuration'] as num?)?.toInt(),
+      keepPreviousSchedule: json['keep_previous_schedule'] as bool? ?? true,
+      previousLessonDay: (json['previous_lesson_day'] as num?)?.toInt(),
+      previousLessonTime: json['previous_lesson_time'] as String?,
+      previousLessonDuration:
+          (json['previous_lesson_duration'] as num?)?.toInt(),
       status:
           $enumDecodeNullable(_$LessonRequestStatusEnumMap, json['status']) ??
               LessonRequestStatus.pending,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
-      proposalId: json['proposalId'] as String?,
-      declineReason: json['declineReason'] as String?,
-      statusUpdatedAt: json['statusUpdatedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      expiresAt: DateTime.parse(json['expires_at'] as String),
+      proposalId: json['proposal_id'] as String?,
+      declineReason: json['decline_reason'] as String?,
+      statusUpdatedAt: json['status_updated_at'] == null
           ? null
-          : DateTime.parse(json['statusUpdatedAt'] as String),
+          : DateTime.parse(json['status_updated_at'] as String),
     );
 
 Map<String, dynamic> _$LessonRequestToJson(LessonRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'studentId': instance.studentId,
-      'teacherId': instance.teacherId,
+      'student_id': instance.studentId,
+      'teacher_id': instance.teacherId,
       'message': instance.message,
-      'preferredTiming':
+      'preferred_timing':
           _$PreferredStartTimingEnumMap[instance.preferredTiming]!,
-      'keepPreviousSchedule': instance.keepPreviousSchedule,
-      'previousLessonDay': instance.previousLessonDay,
-      'previousLessonTime': instance.previousLessonTime,
-      'previousLessonDuration': instance.previousLessonDuration,
+      'keep_previous_schedule': instance.keepPreviousSchedule,
+      'previous_lesson_day': instance.previousLessonDay,
+      'previous_lesson_time': instance.previousLessonTime,
+      'previous_lesson_duration': instance.previousLessonDuration,
       'status': _$LessonRequestStatusEnumMap[instance.status]!,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'expiresAt': instance.expiresAt.toIso8601String(),
-      'proposalId': instance.proposalId,
-      'declineReason': instance.declineReason,
-      'statusUpdatedAt': instance.statusUpdatedAt?.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
+      'expires_at': instance.expiresAt.toIso8601String(),
+      'proposal_id': instance.proposalId,
+      'decline_reason': instance.declineReason,
+      'status_updated_at': instance.statusUpdatedAt?.toIso8601String(),
     };
 
 const _$PreferredStartTimingEnumMap = {

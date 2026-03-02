@@ -78,6 +78,43 @@ class MockStudentRepository implements StudentRepository {
         phone: '010-5678-9012',
         notes: '휴강 중',
       ),
+      // Past students (referenced by proposals, lesson requests, subscriptions)
+      Student(
+        id: 'student_6',
+        name: '김소연',
+        instrument: '바이올린',
+        level: StudentLevel.advanced,
+        status: StudentStatus.inactive,
+        isActive: false,
+        profileColor: const Color(0xFFB0B0B0),
+        createdAt: now.subtract(const Duration(days: 180)),
+        phone: '010-6789-0123',
+        notes: '수강권 발급 완료 (과거 학생)',
+      ),
+      Student(
+        id: 'student_7',
+        name: '한지민',
+        instrument: '피아노',
+        level: StudentLevel.beginner,
+        status: StudentStatus.inactive,
+        isActive: false,
+        profileColor: const Color(0xFFC0C0C0),
+        createdAt: now.subtract(const Duration(days: 240)),
+        phone: '010-7890-1234',
+        notes: '제안 거절 (과거 학생)',
+      ),
+      Student(
+        id: 'student_8',
+        name: '윤서준',
+        instrument: '첼로',
+        level: StudentLevel.intermediate,
+        status: StudentStatus.inactive,
+        isActive: false,
+        profileColor: const Color(0xFFD0D0D0),
+        createdAt: now.subtract(const Duration(days: 200)),
+        phone: '010-8901-2345',
+        notes: '요청 만료됨 (과거 학생)',
+      ),
     ]);
   }
 
@@ -132,14 +169,19 @@ class MockStudentRepository implements StudentRepository {
     await Future.delayed(const Duration(milliseconds: 200));
     final lowerQuery = query.toLowerCase();
     return _students
-        .where((s) =>
-            s.name.toLowerCase().contains(lowerQuery) ||
-            s.instrument.toLowerCase().contains(lowerQuery))
+        .where(
+          (s) =>
+              s.name.toLowerCase().contains(lowerQuery) ||
+              s.instrument.toLowerCase().contains(lowerQuery),
+        )
         .toList();
   }
 
   @override
-  Future<Student> updateStudentStatus(String studentId, StudentStatus status) async {
+  Future<Student> updateStudentStatus(
+    String studentId,
+    StudentStatus status,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _students.indexWhere((s) => s.id == studentId);
     if (index == -1) {
@@ -147,7 +189,8 @@ class MockStudentRepository implements StudentRepository {
     }
 
     // Update isActive based on status
-    final isActive = status == StudentStatus.trial || status == StudentStatus.active;
+    final isActive =
+        status == StudentStatus.trial || status == StudentStatus.active;
 
     final updated = _students[index].copyWith(
       status: status,

@@ -1,4 +1,4 @@
-# CLAUDE.md - Lesson App {#overview}
+# CLAUDE.md - Lessonaza {#overview}
 
 > 마지막 업데이트: 2026-03-02
 

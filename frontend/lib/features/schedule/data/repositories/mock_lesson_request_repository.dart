@@ -16,14 +16,14 @@ class MockLessonRequestRepository implements LessonRequestRepository {
     // 선생님 1 (teacher_1)이 받은 레슨 요청들
     // ============================================================
 
-    // 요청 1: 2개월 휴식 후 재등록 요청 (pending - 대기 중)
+    // 요청 1: 체험 레슨 후 정규 레슨 신청 (pending - 대기 중)
     final request1 = LessonRequest(
       id: 'req_1',
-      studentId: 'student_4', // 휴식 중인 학생 (expired 상태)
+      studentId: 'student_4', // 체험(trial) 학생
       teacherId: 'teacher_1',
-      message: '다시 레슨 받고 싶습니다. 요즘 연습을 열심히 하고 있어요!',
+      message: '체험 레슨이 너무 좋았어요! 정규 레슨 시작하고 싶습니다.',
       preferredTiming: PreferredStartTiming.nextWeek,
-      keepPreviousSchedule: true,
+      keepPreviousSchedule: false,
       previousLessonDay: 2, // 화요일
       previousLessonTime: '15:00',
       previousLessonDuration: 60,
@@ -202,18 +202,14 @@ class MockLessonRequestRepository implements LessonRequestRepository {
   @override
   Future<List<LessonRequest>> getByTeacherId(String teacherId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _requests.values
-        .where((r) => r.teacherId == teacherId)
-        .toList()
+    return _requests.values.where((r) => r.teacherId == teacherId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   @override
   Future<List<LessonRequest>> getByStudentId(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _requests.values
-        .where((r) => r.studentId == studentId)
-        .toList()
+    return _requests.values.where((r) => r.studentId == studentId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
@@ -221,10 +217,12 @@ class MockLessonRequestRepository implements LessonRequestRepository {
   Future<List<LessonRequest>> getPendingByTeacherId(String teacherId) async {
     await Future.delayed(const Duration(milliseconds: 100));
     return _requests.values
-        .where((r) =>
-            r.teacherId == teacherId &&
-            r.status == LessonRequestStatus.pending &&
-            !r.isExpired)
+        .where(
+          (r) =>
+              r.teacherId == teacherId &&
+              r.status == LessonRequestStatus.pending &&
+              !r.isExpired,
+        )
         .toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
@@ -238,9 +236,7 @@ class MockLessonRequestRepository implements LessonRequestRepository {
     try {
       return _requests.values.firstWhere(
         (r) =>
-            r.studentId == studentId &&
-            r.teacherId == teacherId &&
-            r.isActive,
+            r.studentId == studentId && r.teacherId == teacherId && r.isActive,
       );
     } catch (_) {
       return null;

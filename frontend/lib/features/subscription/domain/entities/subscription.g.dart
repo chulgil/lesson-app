@@ -358,80 +358,81 @@ class SubscriptionPaymentMethodAdapter
 
 Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       id: json['id'] as String,
-      studentId: json['studentId'] as String,
-      membershipId: json['membershipId'] as String,
-      paymentId: json['paymentId'] as String?,
+      studentId: json['student_id'] as String,
+      membershipId: json['membership_id'] as String,
+      paymentId: json['payment_id'] as String?,
       type: $enumDecode(_$SubscriptionTypeEnumMap, json['type']),
-      totalLessons: (json['totalLessons'] as num?)?.toInt(),
-      lessonsPerMonth: (json['lessonsPerMonth'] as num?)?.toInt(),
-      usedLessons: (json['usedLessons'] as num?)?.toInt() ?? 0,
-      startDate: json['startDate'] == null
+      totalLessons: (json['total_lessons'] as num?)?.toInt(),
+      lessonsPerMonth: (json['lessons_per_month'] as num?)?.toInt(),
+      usedLessons: (json['used_lessons'] as num?)?.toInt() ?? 0,
+      startDate: json['start_date'] == null
           ? null
-          : DateTime.parse(json['startDate'] as String),
-      endDate: json['endDate'] == null
+          : DateTime.parse(json['start_date'] as String),
+      endDate: json['end_date'] == null
           ? null
-          : DateTime.parse(json['endDate'] as String),
+          : DateTime.parse(json['end_date'] as String),
       amount: (json['amount'] as num).toInt(),
       status: $enumDecode(_$SubscriptionStatusEnumMap, json['status']),
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: json['updatedAt'] == null
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
-      bonusCount: (json['bonusCount'] as num?)?.toInt() ?? 0,
+          : DateTime.parse(json['updated_at'] as String),
+      bonusCount: (json['bonus_count'] as num?)?.toInt() ?? 0,
       billingType:
-          $enumDecodeNullable(_$BillingTypeEnumMap, json['billingType']),
-      billingDay: (json['billingDay'] as num?)?.toInt(),
+          $enumDecodeNullable(_$BillingTypeEnumMap, json['billing_type']),
+      billingDay: (json['billing_day'] as num?)?.toInt(),
       fifthWeekPolicy: $enumDecodeNullable(
-          _$FifthWeekPolicyEnumMap, json['fifthWeekPolicy']),
-      bonusReason: json['bonusReason'] as String?,
+          _$FifthWeekPolicyEnumMap, json['fifth_week_policy']),
+      bonusReason: json['bonus_reason'] as String?,
       totalRescheduleAllowance:
-          (json['totalRescheduleAllowance'] as num?)?.toInt() ?? 2,
-      usedRescheduleCount: (json['usedRescheduleCount'] as num?)?.toInt() ?? 0,
-      paymentConfirmed: json['paymentConfirmed'] as bool? ?? true,
+          (json['total_reschedule_allowance'] as num?)?.toInt() ?? 2,
+      usedRescheduleCount:
+          (json['used_reschedule_count'] as num?)?.toInt() ?? 0,
+      paymentConfirmed: json['payment_confirmed'] as bool? ?? true,
       paymentMethod: $enumDecodeNullable(
-          _$SubscriptionPaymentMethodEnumMap, json['paymentMethod']),
-      paidAt: json['paidAt'] == null
+          _$SubscriptionPaymentMethodEnumMap, json['payment_method']),
+      paidAt: json['paid_at'] == null
           ? null
-          : DateTime.parse(json['paidAt'] as String),
-      paymentConfirmedAt: json['paymentConfirmedAt'] == null
+          : DateTime.parse(json['paid_at'] as String),
+      paymentConfirmedAt: json['payment_confirmed_at'] == null
           ? null
-          : DateTime.parse(json['paymentConfirmedAt'] as String),
-      discountAmount: (json['discountAmount'] as num?)?.toInt(),
-      discountReason: json['discountReason'] as String?,
-      originalAmount: (json['originalAmount'] as num?)?.toInt(),
+          : DateTime.parse(json['payment_confirmed_at'] as String),
+      discountAmount: (json['discount_amount'] as num?)?.toInt(),
+      discountReason: json['discount_reason'] as String?,
+      originalAmount: (json['original_amount'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'studentId': instance.studentId,
-      'membershipId': instance.membershipId,
-      'paymentId': instance.paymentId,
+      'student_id': instance.studentId,
+      'membership_id': instance.membershipId,
+      'payment_id': instance.paymentId,
       'type': _$SubscriptionTypeEnumMap[instance.type]!,
-      'totalLessons': instance.totalLessons,
-      'usedLessons': instance.usedLessons,
-      'startDate': instance.startDate?.toIso8601String(),
-      'endDate': instance.endDate?.toIso8601String(),
+      'total_lessons': instance.totalLessons,
+      'used_lessons': instance.usedLessons,
+      'start_date': instance.startDate?.toIso8601String(),
+      'end_date': instance.endDate?.toIso8601String(),
       'amount': instance.amount,
       'status': _$SubscriptionStatusEnumMap[instance.status]!,
-      'lessonsPerMonth': instance.lessonsPerMonth,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
-      'bonusCount': instance.bonusCount,
-      'billingType': _$BillingTypeEnumMap[instance.billingType],
-      'billingDay': instance.billingDay,
-      'fifthWeekPolicy': _$FifthWeekPolicyEnumMap[instance.fifthWeekPolicy],
-      'bonusReason': instance.bonusReason,
-      'totalRescheduleAllowance': instance.totalRescheduleAllowance,
-      'usedRescheduleCount': instance.usedRescheduleCount,
-      'paymentConfirmed': instance.paymentConfirmed,
-      'paymentMethod':
+      'lessons_per_month': instance.lessonsPerMonth,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'bonus_count': instance.bonusCount,
+      'billing_type': _$BillingTypeEnumMap[instance.billingType],
+      'billing_day': instance.billingDay,
+      'fifth_week_policy': _$FifthWeekPolicyEnumMap[instance.fifthWeekPolicy],
+      'bonus_reason': instance.bonusReason,
+      'total_reschedule_allowance': instance.totalRescheduleAllowance,
+      'used_reschedule_count': instance.usedRescheduleCount,
+      'payment_confirmed': instance.paymentConfirmed,
+      'payment_method':
           _$SubscriptionPaymentMethodEnumMap[instance.paymentMethod],
-      'paidAt': instance.paidAt?.toIso8601String(),
-      'paymentConfirmedAt': instance.paymentConfirmedAt?.toIso8601String(),
-      'discountAmount': instance.discountAmount,
-      'discountReason': instance.discountReason,
-      'originalAmount': instance.originalAmount,
+      'paid_at': instance.paidAt?.toIso8601String(),
+      'payment_confirmed_at': instance.paymentConfirmedAt?.toIso8601String(),
+      'discount_amount': instance.discountAmount,
+      'discount_reason': instance.discountReason,
+      'original_amount': instance.originalAmount,
     };
 
 const _$SubscriptionTypeEnumMap = {

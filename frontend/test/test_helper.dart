@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:lesson_app/models/recording.dart';
+import 'package:lessonaza/models/recording.dart';
 
 /// Initialize test environment with Hive and other dependencies.
 Future<void> initializeTestEnvironment() async {
@@ -12,14 +12,14 @@ Future<void> initializeTestEnvironment() async {
   // Mock path_provider
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(
-    const MethodChannel('plugins.flutter.io/path_provider'),
-    (MethodCall methodCall) async {
-      return Directory.systemTemp.path;
-    },
-  );
+        const MethodChannel('plugins.flutter.io/path_provider'),
+        (MethodCall methodCall) async {
+          return Directory.systemTemp.path;
+        },
+      );
 
   // Initialize Hive with temp directory
-  final tempDir = Directory.systemTemp.createTempSync('lesson_app_test_');
+  final tempDir = Directory.systemTemp.createTempSync('lessonaza_test_');
   Hive.init(tempDir.path);
 
   // Register adapters if not already registered

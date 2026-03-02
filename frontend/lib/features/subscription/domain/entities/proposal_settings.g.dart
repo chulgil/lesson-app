@@ -70,36 +70,36 @@ class ProposalSettingsAdapter extends TypeAdapter<ProposalSettings> {
 
 ProposalSettings _$ProposalSettingsFromJson(Map<String, dynamic> json) =>
     ProposalSettings(
-      teacherId: json['teacherId'] as String,
-      autoProposalEnabled: json['autoProposalEnabled'] as bool? ?? true,
+      teacherId: json['teacher_id'] as String,
+      autoProposalEnabled: json['auto_proposal_enabled'] as bool? ?? true,
       autoProposalTemplateIds:
-          (json['autoProposalTemplateIds'] as List<dynamic>?)
+          (json['auto_proposal_template_ids'] as List<dynamic>?)
                   ?.map((e) => e as String)
                   .toList() ??
               const [],
-      recommendedTemplateId: json['recommendedTemplateId'] as String?,
+      recommendedTemplateId: json['recommended_template_id'] as String?,
       goldenTimeDiscountPercent:
-          (json['goldenTimeDiscountPercent'] as num?)?.toInt() ?? 10,
-      goldenTimeHours: (json['goldenTimeHours'] as num?)?.toInt() ?? 24,
-      autoReminderEnabled: json['autoReminderEnabled'] as bool? ?? true,
-      reminderHours: (json['reminderHours'] as List<dynamic>?)
+          (json['golden_time_discount_percent'] as num?)?.toInt() ?? 10,
+      goldenTimeHours: (json['golden_time_hours'] as num?)?.toInt() ?? 24,
+      autoReminderEnabled: json['auto_reminder_enabled'] as bool? ?? true,
+      reminderHours: (json['reminder_hours'] as List<dynamic>?)
               ?.map((e) => (e as num).toInt())
               .toList() ??
           const [24, 48, 72],
-      updatedAt: json['updatedAt'] == null
+      updatedAt: json['updated_at'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : DateTime.parse(json['updated_at'] as String),
     );
 
 Map<String, dynamic> _$ProposalSettingsToJson(ProposalSettings instance) =>
     <String, dynamic>{
-      'teacherId': instance.teacherId,
-      'autoProposalEnabled': instance.autoProposalEnabled,
-      'autoProposalTemplateIds': instance.autoProposalTemplateIds,
-      'recommendedTemplateId': instance.recommendedTemplateId,
-      'goldenTimeDiscountPercent': instance.goldenTimeDiscountPercent,
-      'goldenTimeHours': instance.goldenTimeHours,
-      'autoReminderEnabled': instance.autoReminderEnabled,
-      'reminderHours': instance.reminderHours,
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'teacher_id': instance.teacherId,
+      'auto_proposal_enabled': instance.autoProposalEnabled,
+      'auto_proposal_template_ids': instance.autoProposalTemplateIds,
+      'recommended_template_id': instance.recommendedTemplateId,
+      'golden_time_discount_percent': instance.goldenTimeDiscountPercent,
+      'golden_time_hours': instance.goldenTimeHours,
+      'auto_reminder_enabled': instance.autoReminderEnabled,
+      'reminder_hours': instance.reminderHours,
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };

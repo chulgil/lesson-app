@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/theme/app_colors.dart';
 // Import shared enums from core layer
@@ -8,11 +9,13 @@ import '../../../../core/models/shared_enums.dart';
 export '../../../../core/models/shared_enums.dart'
     show AgeGroup, ConnectionStatus, PracticeLevel, ConnectionStatusHelper;
 
+part 'student.g.dart';
+
 /// Student status enum (enrollment status)
 enum StudentStatus {
-  trial,    // 체험 중
-  active,   // 정규 등록
-  paused,   // 휴강
+  trial, // 체험 중
+  active, // 정규 등록
+  paused, // 휴강
   inactive; // 수강 종료
 
   String get label {
@@ -42,15 +45,16 @@ enum StudentStatus {
   }
 
   /// Check if student is currently enrolled (trial or active)
-  bool get isEnrolled => this == StudentStatus.trial || this == StudentStatus.active;
+  bool get isEnrolled =>
+      this == StudentStatus.trial || this == StudentStatus.active;
 }
 
 /// Student level enum
 enum StudentLevel {
-  beginner,    // 입문
-  elementary,  // 초급
+  beginner, // 입문
+  elementary, // 초급
   intermediate, // 중급
-  advanced;    // 고급
+  advanced; // 고급
 
   String get label {
     switch (this) {
@@ -117,19 +121,39 @@ enum PracticeStatus {
   }
 }
 
+/// Name-based profile color generation for API responses.
+Color _profileColorFromName(String name) {
+  const colors = [
+    Color(0xFF6B5B95),
+    Color(0xFFF4A460),
+    Color(0xFF2E8B57),
+    Color(0xFF4A90D9),
+    Color(0xFFE74C3C),
+    Color(0xFF1ABC9C),
+    Color(0xFF9B59B6),
+    Color(0xFFE67E22),
+  ];
+  if (name.isEmpty) return colors[0];
+  final hash = name.codeUnits.fold(0, (sum, c) => sum + c);
+  return colors[hash % colors.length];
+}
+
 /// Student model
+@JsonSerializable()
 class Student {
   final String id;
   final String name;
   final String instrument;
   final StudentLevel level;
-  final StudentStatus status; // Enrollment status (trial, active, paused, inactive)
+  final StudentStatus
+  status; // Enrollment status (trial, active, paused, inactive)
   final int monthlyFee; // Custom monthly fee (can differ from level default)
   final int lessonsPerWeek; // 1 = 주 1회 (월 4회), 2 = 주 2회 (월 8회)
   final String? phone;
   final String? parentPhone;
   final String? email;
   final String? profileImageUrl;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final Color profileColor;
   final String? lessonDay;
   final String? lessonTime;
@@ -149,7 +173,8 @@ class Student {
 
   // V2: Connection status (mutual follow system)
   final ConnectionStatus connectionStatus; // App connection status
-  final DateTime? connectedAt; // When mutual follow was established (for newStudent check)
+  final DateTime?
+  connectedAt; // When mutual follow was established (for newStudent check)
 
   // V2: Break (휴강) related fields
   final String? breakReason; // Reason for break
@@ -158,9 +183,9 @@ class Student {
   // V2: Practice level (calculated from practice records)
   final PracticeLevel? practiceLevel; // Calculated practice performance
 
-  const Student({
+  Student({
     required this.id,
-    required this.name,
+    required String name,
     required this.instrument,
     this.level = StudentLevel.intermediate,
     this.status = StudentStatus.trial, // Default to trial for new students
@@ -170,7 +195,7 @@ class Student {
     this.parentPhone,
     this.email,
     this.profileImageUrl,
-    required this.profileColor,
+    Color? profileColor,
     this.lessonDay,
     this.lessonTime,
     this.lessonDuration = 60,
@@ -189,7 +214,15 @@ class Student {
     this.breakReason,
     this.expectedReturnDate,
     this.practiceLevel,
-  });
+  }) : name = name,
+       profileColor = profileColor ?? _profileColorFromName(name);
+
+  /// Create from JSON (profileColor is auto-generated from name).
+  factory Student.fromJson(Map<String, dynamic> json) =>
+      _$StudentFromJson(json);
+
+  /// Serialize to JSON.
+  Map<String, dynamic> toJson() => _$StudentToJson(this);
 
   /// Calculate age group from birth date (private)
   AgeGroup? get calculatedAgeGroup {
@@ -235,18 +268,18 @@ class Student {
   /// Format monthly fee as Korean won
   String get formattedMonthlyFee {
     final formatter = monthlyFee.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 
   /// Format lesson fee as Korean won
   String get formattedLessonFee {
     final formatter = lessonFee.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
     return '$formatter원';
   }
 

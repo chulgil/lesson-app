@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lesson_app/features/student_home/domain/entities/student_dashboard.dart';
+import 'package:lessonaza/features/student_home/domain/entities/student_dashboard.dart';
 
 void main() {
   group('StudentTab', () {

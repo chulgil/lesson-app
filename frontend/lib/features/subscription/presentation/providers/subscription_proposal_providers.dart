@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_subscription_proposal_repository.dart';
+import '../../data/repositories/remote_subscription_proposal_repository.dart';
 import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/repositories/subscription_proposal_repository.dart';
 import '../../domain/services/proposal_reminder_service.dart';
@@ -13,12 +17,14 @@ part 'subscription_proposal_providers.g.dart';
 // Repository Provider
 // ============================================================
 
-@Riverpod(keepAlive: true)
-SubscriptionProposalRepository subscriptionProposalRepository(
-  SubscriptionProposalRepositoryRef ref,
-) {
-  return MockSubscriptionProposalRepository();
-}
+/// Proposal repository provider - switches between Mock and Remote.
+final subscriptionProposalRepositoryProvider =
+    Provider<SubscriptionProposalRepository>((ref) {
+      if (EnvironmentConfig.useMockData) {
+        return MockSubscriptionProposalRepository();
+      }
+      return RemoteSubscriptionProposalRepository(ref.read(apiClientProvider));
+    });
 
 // ============================================================
 // Teacher Proposals
@@ -193,7 +199,9 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
       // 🆕 Send notification to student
       if (teacherName != null) {
         try {
-          final notificationService = ref.read(proposalNotificationServiceProvider);
+          final notificationService = ref.read(
+            proposalNotificationServiceProvider,
+          );
           await notificationService.sendProposalReceivedNotification(
             studentId: studentId,
             teacherName: teacherName,
@@ -240,7 +248,9 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
       // 🆕 Send notification to teacher
       if (studentName != null) {
         try {
-          final notificationService = ref.read(proposalNotificationServiceProvider);
+          final notificationService = ref.read(
+            proposalNotificationServiceProvider,
+          );
           await notificationService.sendPaymentNotifiedNotification(
             teacherId: updated.teacherId,
             studentName: studentName,
@@ -275,13 +285,18 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
 
     try {
       final repository = ref.read(subscriptionProposalRepositoryProvider);
-      final updated = await repository.confirmPayment(proposalId, subscriptionId);
+      final updated = await repository.confirmPayment(
+        proposalId,
+        subscriptionId,
+      );
       state = AsyncValue.data(updated);
 
       // 🆕 Send notification to student
       if (teacherName != null) {
         try {
-          final notificationService = ref.read(proposalNotificationServiceProvider);
+          final notificationService = ref.read(
+            proposalNotificationServiceProvider,
+          );
           await notificationService.sendProposalAcceptedNotification(
             studentId: updated.studentId,
             teacherName: teacherName,
@@ -350,7 +365,9 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
 
   /// Student selects a template from multi-choice proposal (v4)
   Future<SubscriptionProposal> selectTemplate(
-      String proposalId, String templateId) async {
+    String proposalId,
+    String templateId,
+  ) async {
     state = const AsyncValue.loading();
 
     try {

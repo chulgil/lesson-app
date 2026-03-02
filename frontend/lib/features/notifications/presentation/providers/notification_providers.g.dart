@@ -6,6 +6,27 @@ part of 'notification_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$notificationApiRepositoryHash() =>
+    r'7353adb52930040f49f8a22bb1bdeae5275338fa';
+
+/// Notification repository provider (only used for remote mode).
+///
+/// Copied from [notificationApiRepository].
+@ProviderFor(notificationApiRepository)
+final notificationApiRepositoryProvider =
+    Provider<NotificationRepository?>.internal(
+  notificationApiRepository,
+  name: r'notificationApiRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$notificationApiRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef NotificationApiRepositoryRef = ProviderRef<NotificationRepository?>;
 String _$notificationServiceHash() =>
     r'86fee7f1e80c839a0014f1d8283c4fb9e26a098f';
 
@@ -94,10 +115,9 @@ final proposalNotificationServiceProvider =
 // ignore: unused_element
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
-String _$userNotificationsHash() => r'36244a4eb7055852f8e92ede0b5450b111772c78';
+String _$userNotificationsHash() => r'7458c3c54f429d3ec639c0951e4f0770de1cbb80';
 
 /// Provider for user's notifications list
-/// TODO: Replace with actual API/Hive data source
 ///
 /// Copied from [userNotifications].
 @ProviderFor(userNotifications)
@@ -179,7 +199,7 @@ final teacherNotificationSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$TeacherNotificationSettingsNotifier
     = AutoDisposeNotifier<TeacherNotificationSettings>;
 String _$notificationActionsHash() =>
-    r'cf400ff0cd517044543cf73e31e2a7d34a859054';
+    r'1c405e5a278e513847f77d920a193f970c40d892';
 
 /// Notifier for notification actions (mark as read, delete, etc.)
 ///
