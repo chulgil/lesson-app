@@ -51,12 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.borderLight,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight, width: 1)),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -98,21 +93,23 @@ class _DashboardTab extends ConsumerWidget {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final teacherId = ref.watch(currentUserIdProvider);
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
-    final pendingRequestsAsync =
-        ref.watch(pendingLessonRequestCountProvider(teacherId));
-    final pendingBookingsAsync =
-        ref.watch(pendingBookingsCountProvider(teacherId));
+    final pendingRequestsAsync = ref.watch(
+      pendingLessonRequestCountProvider(teacherId),
+    );
+    final pendingBookingsAsync = ref.watch(
+      pendingBookingsCountProvider(teacherId),
+    );
 
     // Get today's lessons
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final todayLessons = lessonsAsync.whenData((lessons) {
       return lessons.where((lesson) {
-        final lessonDate = lesson.date;
-        return lessonDate.year == today.year &&
-            lessonDate.month == today.month &&
-            lessonDate.day == today.day;
-      }).toList()
+          final lessonDate = lesson.date;
+          return lessonDate.year == today.year &&
+              lessonDate.month == today.month &&
+              lessonDate.day == today.day;
+        }).toList()
         ..sort((a, b) => a.startTime.compareTo(b.startTime));
     });
 
@@ -161,12 +158,13 @@ class _DashboardTab extends ConsumerWidget {
 
             todayLessons.when(
               data: (lessons) => _buildLessonsList(context, lessons),
-              loading: () => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.space4),
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+              loading:
+                  () => const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(AppSpacing.space4),
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
               error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
             ),
 
@@ -213,72 +211,80 @@ class _DashboardTab extends ConsumerWidget {
       cards: [
         // Today's lesson count
         todayLessons.when(
-          data: (lessons) => StatCard(
-            title: '오늘 레슨',
-            value: '${lessons.length}회',
-            color: AppColors.primary,
-            icon: Icons.today,
-          ),
-          loading: () => StatCard(
-            title: '오늘 레슨',
-            value: '-',
-            color: AppColors.primary,
-            icon: Icons.today,
-          ),
-          error: (_, __) => StatCard(
-            title: '오늘 레슨',
-            value: '-',
-            color: AppColors.primary,
-          ),
+          data:
+              (lessons) => StatCard(
+                title: '오늘 레슨',
+                value: '${lessons.length}회',
+                color: AppColors.primary,
+                icon: Icons.today,
+              ),
+          loading:
+              () => StatCard(
+                title: '오늘 레슨',
+                value: '-',
+                color: AppColors.primary,
+                icon: Icons.today,
+              ),
+          error:
+              (_, __) => StatCard(
+                title: '오늘 레슨',
+                value: '-',
+                color: AppColors.primary,
+              ),
         ),
         // Unpaid amount (from Subscription)
         unpaidSummaryAsync.when(
           data: (summary) {
-            final formattedAmount = summary.totalAmount >= 10000
-                ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
-                : '${summary.totalAmount}원';
+            final formattedAmount =
+                summary.totalAmount >= 10000
+                    ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
+                    : '${summary.totalAmount}원';
             return StatCard(
               title: '미수금',
               value: summary.totalAmount > 0 ? formattedAmount : '0원',
-              subtitle: summary.studentCount > 0 ? '${summary.studentCount}명' : null,
-              color: summary.studentCount > 0
-                  ? AppColors.warning
-                  : AppColors.success,
+              subtitle:
+                  summary.studentCount > 0 ? '${summary.studentCount}명' : null,
+              color:
+                  summary.studentCount > 0
+                      ? AppColors.warning
+                      : AppColors.success,
               icon: Icons.account_balance_wallet_outlined,
               onTap: () => context.push(AppRoutes.paymentManagement),
             );
           },
-          loading: () => StatCard(
-            title: '미수금',
-            value: '-',
-            color: AppColors.textSecondaryLight,
-          ),
-          error: (_, __) => StatCard(
-            title: '미수금',
-            value: '-',
-            color: AppColors.textSecondaryLight,
-          ),
+          loading:
+              () => StatCard(
+                title: '미수금',
+                value: '-',
+                color: AppColors.textSecondaryLight,
+              ),
+          error:
+              (_, __) => StatCard(
+                title: '미수금',
+                value: '-',
+                color: AppColors.textSecondaryLight,
+              ),
         ),
         // This month completed
         lessonStatsAsync.when(
-          data: (stats) => StatCard(
-            title: '이번 달',
-            value: '${stats['completed'] ?? 0}회',
-            subtitle: '완료',
-            color: AppColors.success,
-            icon: Icons.check_circle_outline,
-          ),
-          loading: () => StatCard(
-            title: '이번 달',
-            value: '-',
-            color: AppColors.success,
-            icon: Icons.check_circle_outline,
-          ),
-          error: (_, __) => StatCard(
-            title: '이번 달',
-            value: '-',
-            color: AppColors.success,
-          ),
+          data:
+              (stats) => StatCard(
+                title: '이번 달',
+                value: '${stats['completed'] ?? 0}회',
+                subtitle: '완료',
+                color: AppColors.success,
+                icon: Icons.check_circle_outline,
+              ),
+          loading:
+              () => StatCard(
+                title: '이번 달',
+                value: '-',
+                color: AppColors.success,
+                icon: Icons.check_circle_outline,
+              ),
+          error:
+              (_, __) =>
+                  StatCard(title: '이번 달', value: '-', color: AppColors.success),
         ),
       ],
     );
@@ -294,7 +300,8 @@ class _DashboardTab extends ConsumerWidget {
     final pendingBookings = pendingBookingsAsync.valueOrNull ?? 0;
     final unpaidStudents = unpaidSummaryAsync.valueOrNull?.studentCount ?? 0;
 
-    final totalUrgent = pendingRequests + pendingBookings + (unpaidStudents > 0 ? 1 : 0);
+    final totalUrgent =
+        pendingRequests + pendingBookings + (unpaidStudents > 0 ? 1 : 0);
 
     if (totalUrgent == 0) {
       return const SizedBox.shrink();
@@ -305,7 +312,11 @@ class _DashboardTab extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+            Icon(
+              Icons.warning_amber_rounded,
+              color: AppColors.warning,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '즉시 확인 필요',
@@ -335,9 +346,7 @@ class _DashboardTab extends ConsumerWidget {
           decoration: BoxDecoration(
             color: AppColors.warning.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(
-              color: AppColors.warning.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -347,10 +356,11 @@ class _DashboardTab extends ConsumerWidget {
                   icon: Icons.person_add,
                   iconColor: AppColors.error,
                   title: '레슨 요청 $pendingRequests건 대기',
-                  onTap: () => context.push(
-                    AppRoutes.lessonRequests,
-                    extra: {'teacherId': 'teacher_1'},
-                  ),
+                  onTap:
+                      () => context.push(
+                        AppRoutes.lessonRequests,
+                        extra: {'teacherId': 'teacher_1'},
+                      ),
                 ),
               if (pendingBookings > 0)
                 _buildUrgentItem(
@@ -367,9 +377,10 @@ class _DashboardTab extends ConsumerWidget {
                   icon: Icons.payments,
                   iconColor: AppColors.warning,
                   title: '입금 확인 $unpaidStudents건 대기',
-                  onTap: () => context.push(
-                    '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
-                  ),
+                  onTap:
+                      () => context.push(
+                        '${AppRoutes.proposalConfirm}?teacherId=teacher_1',
+                      ),
                   showDivider: pendingRequests > 0 || pendingBookings > 0,
                 ),
             ],
@@ -390,10 +401,7 @@ class _DashboardTab extends ConsumerWidget {
     return Column(
       children: [
         if (showDivider)
-          Divider(
-            height: 1,
-            color: AppColors.warning.withValues(alpha: 0.2),
-          ),
+          Divider(height: 1, color: AppColors.warning.withValues(alpha: 0.2)),
         InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -429,11 +437,7 @@ class _DashboardTab extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.primary,
-                  size: 18,
-                ),
+                Icon(Icons.chevron_right, color: AppColors.primary, size: 18),
               ],
             ),
           ),
@@ -455,10 +459,7 @@ class _DashboardTab extends ConsumerWidget {
           children: [
             Icon(Icons.schedule, size: 20, color: AppColors.textSecondaryLight),
             const SizedBox(width: AppSpacing.space2),
-            Text(
-              '오늘의 레슨',
-              style: AppTypography.headingMedium,
-            ),
+            Text('오늘의 레슨', style: AppTypography.headingMedium),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '($lessonCount)',
@@ -469,7 +470,14 @@ class _DashboardTab extends ConsumerWidget {
           ],
         ),
         TextButton.icon(
-          onPressed: () => context.push('/lessons/add'),
+          onPressed: () {
+            final now = DateTime.now();
+            int nextHour = now.hour + 1;
+            if (nextHour > 23) nextHour = 9;
+            final dateStr =
+                '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+            context.push('/lessons/add?date=$dateStr&hour=$nextHour');
+          },
           icon: const Icon(Icons.add, size: 18),
           label: const Text('레슨 추가'),
         ),
@@ -479,18 +487,20 @@ class _DashboardTab extends ConsumerWidget {
 
   Widget _buildLessonRequestsButton(BuildContext context, WidgetRef ref) {
     final teacherId = ref.watch(currentUserIdProvider);
-    final pendingCountAsync =
-        ref.watch(pendingLessonRequestCountProvider(teacherId));
+    final pendingCountAsync = ref.watch(
+      pendingLessonRequestCountProvider(teacherId),
+    );
 
     return pendingCountAsync.when(
       data: (count) {
         return Stack(
           children: [
             IconButton(
-              onPressed: () => context.push(
-                AppRoutes.lessonRequests,
-                extra: {'teacherId': teacherId},
-              ),
+              onPressed:
+                  () => context.push(
+                    AppRoutes.lessonRequests,
+                    extra: {'teacherId': teacherId},
+                  ),
               icon: const Icon(Icons.person_add_outlined),
               tooltip: '레슨 요청',
             ),
@@ -522,21 +532,25 @@ class _DashboardTab extends ConsumerWidget {
           ],
         );
       },
-      loading: () => IconButton(
-        onPressed: () => context.push(
-          AppRoutes.lessonRequests,
-          extra: {'teacherId': teacherId},
-        ),
-        icon: const Icon(Icons.person_add_outlined),
-        tooltip: '레슨 요청',
-      ),
+      loading:
+          () => IconButton(
+            onPressed:
+                () => context.push(
+                  AppRoutes.lessonRequests,
+                  extra: {'teacherId': teacherId},
+                ),
+            icon: const Icon(Icons.person_add_outlined),
+            tooltip: '레슨 요청',
+          ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
 
   Widget _buildPendingBookingsButton(BuildContext context, WidgetRef ref) {
     final teacherId = ref.watch(currentUserIdProvider);
-    final pendingCountAsync = ref.watch(pendingBookingsCountProvider(teacherId));
+    final pendingCountAsync = ref.watch(
+      pendingBookingsCountProvider(teacherId),
+    );
 
     return pendingCountAsync.when(
       data: (count) {
@@ -557,7 +571,10 @@ class _DashboardTab extends ConsumerWidget {
                     color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
-                  constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                  constraints: const BoxConstraints(
+                    minWidth: 18,
+                    minHeight: 18,
+                  ),
                   child: Text(
                     count > 9 ? '9+' : '$count',
                     style: AppTypography.caption.copyWith(
@@ -572,11 +589,12 @@ class _DashboardTab extends ConsumerWidget {
           ],
         );
       },
-      loading: () => IconButton(
-        onPressed: () => context.push(AppRoutes.pendingBookings),
-        icon: const Icon(Icons.event_note_outlined),
-        tooltip: '승인 대기',
-      ),
+      loading:
+          () => IconButton(
+            onPressed: () => context.push(AppRoutes.pendingBookings),
+            icon: const Icon(Icons.event_note_outlined),
+            tooltip: '승인 대기',
+          ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
@@ -605,15 +623,16 @@ class _DashboardTab extends ConsumerWidget {
     }
 
     return Column(
-      children: lessons.map((lesson) {
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-          child: _LessonCard(
-            lesson: lesson,
-            onTap: () => context.push('/lessons/${lesson.id}'),
-          ),
-        );
-      }).toList(),
+      children:
+          lessons.map((lesson) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: _LessonCard(
+                lesson: lesson,
+                onTap: () => context.push('/lessons/${lesson.id}'),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -630,9 +649,7 @@ class _DashboardTab extends ConsumerWidget {
           const SizedBox(width: AppSpacing.space3),
           Text(
             message,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
-            ),
+            style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
           ),
         ],
       ),
@@ -646,10 +663,7 @@ class _LessonCard extends ConsumerWidget {
   final Lesson lesson;
   final VoidCallback onTap;
 
-  const _LessonCard({
-    required this.lesson,
-    required this.onTap,
-  });
+  const _LessonCard({required this.lesson, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -657,12 +671,7 @@ class _LessonCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border(
-          left: BorderSide(
-            color: _getStatusColor(),
-            width: 4,
-          ),
-        ),
+        border: Border(left: BorderSide(color: _getStatusColor(), width: 4)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -735,6 +744,24 @@ class _LessonCard extends ConsumerWidget {
 
               const SizedBox(width: AppSpacing.space1),
 
+              // Repeat button
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: IconButton(
+                  onPressed: () => _showRepeatConfirmation(context, ref),
+                  icon: Icon(
+                    Icons.repeat,
+                    size: 18,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                  padding: EdgeInsets.zero,
+                  tooltip: '다음 주 반복',
+                ),
+              ),
+
+              const SizedBox(width: AppSpacing.space1),
+
               // Arrow
               const Icon(
                 Icons.chevron_right,
@@ -746,6 +773,85 @@ class _LessonCard extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Show confirmation dialog and create a repeated lesson for next week
+  void _showRepeatConfirmation(BuildContext context, WidgetRef ref) {
+    final nextWeekDate = lesson.date.add(const Duration(days: 7));
+    final dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+    final dayName = dayNames[nextWeekDate.weekday];
+    final dateStr = '${nextWeekDate.month}/${nextWeekDate.day}($dayName)';
+
+    showDialog(
+      context: context,
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('다음 레슨 추가'),
+            content: Text(
+              '${lesson.studentName} 다음 레슨을 추가할까요?\n'
+              '다음 주 $dateStr ${lesson.startTime} · ${lesson.duration}분',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  await _createRepeatedLesson(context, ref, nextWeekDate);
+                },
+                child: const Text('추가'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  /// Create a new lesson for next week with the same details
+  Future<void> _createRepeatedLesson(
+    BuildContext context,
+    WidgetRef ref,
+    DateTime nextWeekDate,
+  ) async {
+    final newLesson = Lesson(
+      id: '',
+      studentId: lesson.studentId,
+      studentName: lesson.studentName,
+      teacherId: lesson.teacherId,
+      teacherName: lesson.teacherName,
+      instrument: lesson.instrument,
+      date: nextWeekDate,
+      startTime: lesson.startTime,
+      duration: lesson.duration,
+      status: LessonStatus.scheduled,
+      pieces: lesson.pieces,
+      location: lesson.location,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      await ref.read(lessonsNotifierProvider.notifier).addLesson(newLesson);
+      ref.invalidate(lessonsProvider);
+
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${lesson.studentName} 학생의 다음 주 레슨이 추가되었습니다'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.practiceGood,
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('레슨 추가 실패: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   String _getStatusLabel() {
@@ -786,4 +892,3 @@ class _LessonCard extends ConsumerWidget {
     }
   }
 }
-

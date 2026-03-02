@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../models/lesson.dart';
+import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
 import '../widgets/lesson_form_widgets.dart';
 
@@ -43,14 +44,6 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   void initState() {
     super.initState();
 
-    // Handle preselected student
-    if (widget.preselectedStudentId != null) {
-      _selectedStudent = _mockStudents.firstWhere(
-        (s) => s.id == widget.preselectedStudentId,
-        orElse: () => _mockStudents.first,
-      );
-    }
-
     // Handle preselected date (format: YYYY-MM-DD)
     if (widget.preselectedDate != null) {
       try {
@@ -72,6 +65,26 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       final hour = widget.preselectedHour!.clamp(0, 23);
       _selectedTime = TimeOfDay(hour: hour, minute: 0);
     }
+
+    // Handle preselected student after first frame (ref not available in initState)
+    if (widget.preselectedStudentId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final studentsAsync = ref.read(studentsProvider);
+        final students = studentsAsync.valueOrNull ?? [];
+        if (students.isNotEmpty) {
+          final match = students.where(
+            (s) => s.id == widget.preselectedStudentId,
+          );
+          if (match.isNotEmpty) {
+            final student = match.first;
+            setState(() {
+              _selectedStudent = _studentToInfo(student);
+            });
+            _autoFillFromStudent(student);
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -87,19 +100,15 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       appBar: AppBar(
         title: const Text('레슨 추가'),
         leading: IconButton(
-          onPressed: () => showLessonExitConfirmation(
-            context: context,
-            hasData: _hasFormData(),
-            onExit: () => context.pop(),
-          ),
+          onPressed:
+              () => showLessonExitConfirmation(
+                context: context,
+                hasData: _hasFormData(),
+                onExit: () => context.pop(),
+              ),
           icon: const Icon(Icons.close),
         ),
-        actions: [
-          TextButton(
-            onPressed: _saveLesson,
-            child: const Text('저장'),
-          ),
-        ],
+        actions: [TextButton(onPressed: _saveLesson, child: const Text('저장'))],
       ),
       body: Form(
         key: _formKey,
@@ -215,13 +224,33 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         _notesController.text.isNotEmpty;
   }
 
+  /// Convert Student entity to LessonStudentInfo for picker display
+  LessonStudentInfo _studentToInfo(Student student) {
+    return LessonStudentInfo(
+      id: student.id,
+      name: student.name,
+      instrument: student.instrument,
+      currentPiece: student.lessonSchedule ?? student.level.label,
+      color: student.profileColor,
+    );
+  }
+
   void _showStudentPicker() {
+    final studentsAsync = ref.read(studentsProvider);
+    final students = studentsAsync.valueOrNull ?? [];
+
+    // Convert Student entities to LessonStudentInfo for picker
+    final studentInfos = students.map(_studentToInfo).toList();
+
     showLessonStudentPicker(
       context: context,
-      students: _mockStudents,
+      students: studentInfos,
       selectedStudent: _selectedStudent,
-      onStudentSelected: (student) {
-        setState(() => _selectedStudent = student);
+      onStudentSelected: (selected) {
+        setState(() => _selectedStudent = selected);
+        // Auto-fill from student's regular lesson pattern
+        final student = students.firstWhere((s) => s.id == selected.id);
+        _autoFillFromStudent(student);
       },
     );
   }
@@ -264,11 +293,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     // Create lesson pieces from input
     final pieces = <LessonPiece>[];
     if (_pieceController.text.isNotEmpty) {
-      pieces.add(LessonPiece(
-        id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
-        name: _pieceController.text,
-        notes: _notesController.text.isNotEmpty ? _notesController.text : null,
-      ));
+      pieces.add(
+        LessonPiece(
+          id: 'piece_${DateTime.now().millisecondsSinceEpoch}',
+          name: _pieceController.text,
+          notes:
+              _notesController.text.isNotEmpty ? _notesController.text : null,
+        ),
+      );
     }
 
     // Create the lesson object
@@ -322,42 +354,54 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
   }
 
-  // Mock data
-  List<LessonStudentInfo> get _mockStudents => [
-        LessonStudentInfo(
-          id: 'student_1',
-          name: '홍길동',
-          instrument: '바이올린',
-          currentPiece: '바흐 파르티타 2번',
-          color: Colors.blue,
-        ),
-        LessonStudentInfo(
-          id: 'student_2',
-          name: '김철수',
-          instrument: '피아노',
-          currentPiece: '쇼팽 에튀드 Op.10',
-          color: Colors.green,
-        ),
-        LessonStudentInfo(
-          id: 'student_3',
-          name: '이영희',
-          instrument: '첼로',
-          currentPiece: '드보르작 첼로 협주곡',
-          color: Colors.orange,
-        ),
-        LessonStudentInfo(
-          id: 'student_4',
-          name: '박민수',
-          instrument: '플루트',
-          currentPiece: '모차르트 플루트 협주곡',
-          color: Colors.purple,
-        ),
-        LessonStudentInfo(
-          id: 'student_5',
-          name: '최지원',
-          instrument: '바이올린',
-          currentPiece: '비발디 사계 - 봄',
-          color: Colors.teal,
-        ),
-      ];
+  /// Auto-fill lesson date, time, and duration from student's regular lesson pattern
+  void _autoFillFromStudent(Student student) {
+    setState(() {
+      // Auto-fill lesson day
+      if (student.lessonDay != null) {
+        final nextDate = _getNextLessonDate(student.lessonDay!);
+        if (nextDate != null) {
+          _selectedDate = nextDate;
+        }
+      }
+
+      // Auto-fill lesson time
+      if (student.lessonTime != null) {
+        final parts = student.lessonTime!.split(':');
+        if (parts.length == 2) {
+          final hour = int.tryParse(parts[0]);
+          final minute = int.tryParse(parts[1]);
+          if (hour != null && minute != null) {
+            _selectedTime = TimeOfDay(hour: hour, minute: minute);
+          }
+        }
+      }
+
+      // Auto-fill lesson duration
+      if (student.lessonDuration > 0) {
+        _lessonDuration = student.lessonDuration;
+      }
+    });
+  }
+
+  /// Calculate the next occurrence of a given day name
+  DateTime? _getNextLessonDate(String dayName) {
+    const dayMap = {
+      '월요일': DateTime.monday,
+      '화요일': DateTime.tuesday,
+      '수요일': DateTime.wednesday,
+      '목요일': DateTime.thursday,
+      '금요일': DateTime.friday,
+      '토요일': DateTime.saturday,
+      '일요일': DateTime.sunday,
+    };
+
+    final targetDay = dayMap[dayName];
+    if (targetDay == null) return null;
+
+    final now = DateTime.now();
+    var daysUntil = targetDay - now.weekday;
+    if (daysUntil <= 0) daysUntil += 7;
+    return DateTime(now.year, now.month, now.day + daysUntil);
+  }
 }
