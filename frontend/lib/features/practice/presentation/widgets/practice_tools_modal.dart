@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/default_ids.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
@@ -113,6 +116,30 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
     }
   }
 
+  /// Handle recording button tap.
+  /// If on a section detail screen, close modal and navigate to record in that section.
+  /// Otherwise, close modal and navigate to the default quick-record section.
+  void _onRecordingButtonTap(BuildContext context) {
+    final currentRoute = GoRouterState.of(context).uri.path;
+    final sectionMatch = RegExp(
+      r'/practice/section/([^/]+)$',
+    ).firstMatch(currentRoute);
+
+    Navigator.pop(context); // Close modal
+
+    if (sectionMatch != null) {
+      // On section detail screen - navigate to recording for current section
+      final sectionId = sectionMatch.group(1)!;
+      context.push('/practice/section/$sectionId');
+    } else {
+      // Other screen - navigate to default quick-record section
+      context.push(
+        '/practice/section/${DefaultIds.quickRecordSectionId}'
+        '?repertoireId=${DefaultIds.repertoireId}',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -134,6 +161,37 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
             ),
           ),
 
+          // Quick recording button
+          Padding(
+            padding: EdgeInsets.only(top: AppSpacing.space3),
+            child: GestureDetector(
+              onTap: () => _onRecordingButtonTap(context),
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.error, width: 2),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.mic, color: AppColors.error, size: 32),
+                    const SizedBox(height: 2),
+                    Text(
+                      '녹음',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
           // Header with tabs
           Padding(
             padding: EdgeInsets.symmetric(
@@ -145,7 +203,10 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                   padding: EdgeInsets.zero,
                 ),
                 Expanded(
@@ -164,10 +225,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                       fontSize: 18,
                       fontWeight: FontWeight.normal,
                     ),
-                    tabs: const [
-                      Tab(text: '메트로놈'),
-                      Tab(text: '튜너'),
-                    ],
+                    tabs: const [Tab(text: '메트로놈'), Tab(text: '튜너')],
                   ),
                 ),
                 // Settings button for tuner
@@ -176,11 +234,14 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                   builder: (context, child) {
                     return _tabController.index == 1
                         ? IconButton(
-                            icon: const Icon(Icons.settings_outlined),
-                            onPressed: () => TunerSettingsSheet.show(context),
-                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-                            padding: EdgeInsets.zero,
-                          )
+                          icon: const Icon(Icons.settings_outlined),
+                          onPressed: () => TunerSettingsSheet.show(context),
+                          constraints: const BoxConstraints(
+                            minWidth: 40,
+                            minHeight: 40,
+                          ),
+                          padding: EdgeInsets.zero,
+                        )
                         : const SizedBox(width: 40);
                   },
                 ),
@@ -193,10 +254,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
             child: TabBarView(
               controller: _tabController,
               physics: const NeverScrollableScrollPhysics(),
-              children: const [
-                MetronomePanel(),
-                TunerPanel(),
-              ],
+              children: const [MetronomePanel(), TunerPanel()],
             ),
           ),
         ],
