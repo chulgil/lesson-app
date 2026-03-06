@@ -200,6 +200,9 @@ class LessonNotifier extends _$LessonNotifier {
 | Dropdown assertion | value가 items에 없음 | 유효성 검증 후 null 처리 |
 | Provider not found | 코드 생성 미완료 | `build_runner build` 실행 |
 | go_router extra | ShellRoute에서 extra 전달 누락 | `GoRouterState.of(context)` 확인 |
+| Mock 데이터 변경 후 크래시 | Hive 캐시된 이전 데이터와 새 enum/타입 충돌 | 앱 삭제 후 재설치 또는 Hive box 초기화 |
+| 튜너 음 끊김 | stream + callback 이중 경로로 상태 충돌 | 단일 경로(stream)만 사용, callback 제거 |
+| 튜너 불안정 감지 | StabilityFilter에서 낮은 확률 시 smoothedFrequency 미리셋 | probability 미달 시 `_smoothedFrequency = 0` 리셋 필수 |
 
 ---
 
@@ -276,4 +279,30 @@ cd frontend/android && ./gradlew clean && cd .. && flutter clean && flutter pub 
 
 # Provider 코드 생성 에러
 cd frontend && dart run build_runner build --delete-conflicting-outputs
+
+# Mock 데이터 변경 후 앱 크래시 (Hive 캐시 충돌)
+# 1) 앱 삭제 후 재설치 또는
+# 2) flutter clean && flutter run (debug 모드로 먼저 확인)
 ```
+
+---
+
+# Lessons Learned
+
+## 1. Mock 데이터 대규모 변경 시 반드시 실행 검증 - error-pattern
+- **날짜**: 2026-03-06
+- **분류**: error-pattern
+- **교훈**: 병렬 에이전트로 4개 mock repository를 동시 변경(student 8→12, lesson 8→15, subscription 8→19, schedule card 1→5)한 후 앱이 즉시 크래시. `flutter analyze` 통과해도 런타임 크래시 가능. Hive에 캐시된 이전 데이터와 새 enum/타입 충돌이 원인일 수 있음.
+- **조치**: Mock 데이터 변경 후 반드시 `flutter run`으로 실행 검증. 대규모 변경은 단계적으로 진행하고 각 단계마다 실행 확인.
+
+## 2. 오디오 엔진 이벤트 경로는 반드시 단일화 - error-pattern
+- **날짜**: 2026-03-06
+- **분류**: error-pattern
+- **교훈**: TunerEngine에서 `noteStream`(stream)과 `onPitchDetected`(callback) 두 경로로 동시에 노트를 전달하면, provider에서 같은 노트를 2번 처리하여 상태 충돌 발생 (음 감지 → 즉시 사라짐 → 다시 감지 반복).
+- **조치**: stream만 사용하고 callback 제거. 오디오 파이프라인에서 데이터 흐름은 항상 단일 경로 유지.
+
+## 3. iPhone 배포 시 provisioning profile 사전 확인 - error-pattern
+- **날짜**: 2026-03-06
+- **분류**: error-pattern
+- **교훈**: `flutter run --release`로 iPhone 배포 시 provisioning profile 에러 빈번. CLI에서 `--allowProvisioningUpdates` 플래그가 flutter에서 지원되지 않음.
+- **조치**: 배포 전 Xcode에서 Signing & Capabilities 확인. 문제 시 Xcode에서 직접 빌드하거나 `xcodebuild -allowProvisioningUpdates` 사용.
