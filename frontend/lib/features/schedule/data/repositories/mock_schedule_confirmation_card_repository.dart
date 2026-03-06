@@ -16,21 +16,101 @@ class MockScheduleConfirmationCardRepository
   }
 
   void _initializeMockData() {
-    // Add sample pending card for testing
+    final now = DateTime.now();
+
+    // card_1: 최유진 체험 후 정규 등록 대기
     _cards.add(
       ScheduleConfirmationCard(
         id: 'card_1',
-        studentId: 'student_1',
+        studentId: 'student_4',
         teacherId: 'teacher_1',
-        teacherName: '김바이올린',
-        instrument: '바이올린',
-        subscriptionId: 'sub_1',
+        teacherName: '김지수',
+        instrument: '플루트',
+        subscriptionId: 'sub_4',
         suggestedDay: 6, // Saturday
         suggestedTime: '15:00',
         lessonDuration: 60,
         cardType: ScheduleCardType.afterTrial,
         status: ScheduleCardStatus.pending,
-        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        createdAt: now.subtract(const Duration(hours: 2)),
+        totalLessons: 8,
+      ),
+    );
+
+    // card_2: 김민준 이전 수강권 만료 후 재등록 대기
+    _cards.add(
+      ScheduleConfirmationCard(
+        id: 'card_2',
+        studentId: 'student_1',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '바이올린',
+        subscriptionId: 'sub_1',
+        suggestedDay: 3, // Wednesday
+        suggestedTime: '10:00',
+        lessonDuration: 60,
+        cardType: ScheduleCardType.reEnrollment,
+        status: ScheduleCardStatus.pending,
+        createdAt: now.subtract(const Duration(hours: 5)),
+        totalLessons: 12,
+      ),
+    );
+
+    // card_3: 이하은 피아노 추가 악기 (자유 선택)
+    _cards.add(
+      ScheduleConfirmationCard(
+        id: 'card_3',
+        studentId: 'student_11',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '피아노',
+        subscriptionId: 'sub_11',
+        suggestedDay: null,
+        suggestedTime: null,
+        lessonDuration: 45,
+        cardType: ScheduleCardType.additionalInstrument,
+        status: ScheduleCardStatus.pending,
+        createdAt: now.subtract(const Duration(hours: 1)),
+        totalLessons: 4,
+      ),
+    );
+
+    // card_4: 이서연 체험 후 등록 확정 완료
+    _cards.add(
+      ScheduleConfirmationCard(
+        id: 'card_4',
+        studentId: 'student_2',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '피아노',
+        subscriptionId: 'sub_2',
+        suggestedDay: 2, // Tuesday
+        suggestedTime: '16:00',
+        lessonDuration: 60,
+        cardType: ScheduleCardType.afterTrial,
+        status: ScheduleCardStatus.confirmed,
+        createdAt: now.subtract(const Duration(days: 3)),
+        respondedAt: now.subtract(const Duration(days: 2)),
+        totalLessons: 8,
+      ),
+    );
+
+    // card_5: 김민준 재등록 거절
+    _cards.add(
+      ScheduleConfirmationCard(
+        id: 'card_5',
+        studentId: 'student_1',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '바이올린',
+        subscriptionId: 'sub_1_old',
+        suggestedDay: 5, // Friday
+        suggestedTime: '14:00',
+        lessonDuration: 60,
+        cardType: ScheduleCardType.reEnrollment,
+        status: ScheduleCardStatus.dismissed,
+        createdAt: now.subtract(const Duration(days: 7)),
+        respondedAt: now.subtract(const Duration(days: 6)),
         totalLessons: 8,
       ),
     );
