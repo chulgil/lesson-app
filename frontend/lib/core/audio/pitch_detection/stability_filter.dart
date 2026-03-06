@@ -81,8 +81,9 @@ class StabilityFilter {
     // Probability too low = unreliable
     if (probability < config.minProbability) {
       _stableCount = 0;
+      _smoothedFrequency = 0;
       return StabilityResult(
-        frequency: _smoothedFrequency,
+        frequency: 0,
         isStable: false,
         confidence: probability,
       );
@@ -207,7 +208,7 @@ class StabilityFilter {
 class AmplitudeGate {
   AmplitudeGate({
     this.threshold = 0.05,
-    this.holdTime = const Duration(milliseconds: 500),
+    this.holdTime = const Duration(milliseconds: 300),
   });
 
   /// Minimum amplitude to pass through (0.0-1.0).

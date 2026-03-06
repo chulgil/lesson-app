@@ -150,10 +150,10 @@ class Tuner extends _$Tuner {
         ),
     };
 
-    _engine!.onPitchDetected = _onPitchDetected;
     _engine!.onError = _onError;
 
-    // Subscribe to note stream
+    // Subscribe to note stream only (onPitchDetected callback removed to prevent double processing)
+    _noteSubscription?.cancel();
     _noteSubscription = _engine!.noteStream.listen(_onPitchDetected);
   }
 

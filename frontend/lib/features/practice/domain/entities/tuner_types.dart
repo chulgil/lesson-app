@@ -101,15 +101,15 @@ enum JudgementResult {
 enum TunerDifficulty {
   /// Beginner: generous thresholds (relaxed for beginners)
   /// 0.5 second grace period, 2 reactivation chances
-  beginner('초보', perfectCent: 20, goodCent: 40, gracePeriodMs: 500, reactivationChances: 2),
+  beginner('초보', perfectCent: 20, goodCent: 40, gracePeriodMs: 600, reactivationChances: 2),
 
   /// Intermediate: moderate thresholds
-  /// 0.3 second grace period, 1 reactivation chance
-  intermediate('중급', perfectCent: 15, goodCent: 30, gracePeriodMs: 300, reactivationChances: 1),
+  /// 0.4 second grace period, 1 reactivation chance
+  intermediate('중급', perfectCent: 15, goodCent: 30, gracePeriodMs: 400, reactivationChances: 1),
 
   /// Advanced: strict thresholds (professional level)
-  /// 0.1 second grace period, 1 reactivation chance
-  advanced('고급', perfectCent: 5, goodCent: 10, gracePeriodMs: 100, reactivationChances: 1);
+  /// 0.2 second grace period, 1 reactivation chance
+  advanced('고급', perfectCent: 5, goodCent: 10, gracePeriodMs: 200, reactivationChances: 1);
 
   const TunerDifficulty(
     this.label, {

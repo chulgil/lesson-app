@@ -66,10 +66,6 @@ class RecordTunerEngine implements TunerEngine {
   // Buffer for accumulating audio samples
   final List<double> _sampleBuffer = [];
 
-  // Note hold mechanism - keeps last note during brief gaps
-  TunerNote? _lastValidNote;
-  DateTime? _lastValidNoteTime;
-  static const Duration _noteHoldDuration = Duration(milliseconds: 800);
 
   @override
   Stream<TunerNote?> get noteStream => _streamController.stream;
@@ -157,8 +153,6 @@ class RecordTunerEngine implements TunerEngine {
       _stabilityFilter.reset();
       _amplitudeGate.reset();
       _sampleBuffer.clear();
-      _lastValidNote = null;
-      _lastValidNoteTime = null;
 
       // Start stream if not already active
       if (!_isStreamActive) {
@@ -215,11 +209,8 @@ class RecordTunerEngine implements TunerEngine {
 
       _currentNote = null;
       _sampleBuffer.clear();
-      _lastValidNote = null;
-      _lastValidNoteTime = null;
 
       _streamController.add(null);
-      onPitchDetected?.call(null);
     } catch (e) {
       onError?.call('Failed to stop audio capture: $e');
     }
@@ -267,8 +258,6 @@ class RecordTunerEngine implements TunerEngine {
     _stabilityFilter.reset();
     _amplitudeGate.reset();
     _sampleBuffer.clear();
-    _lastValidNote = null;
-    _lastValidNoteTime = null;
   }
 
   /// Disable pitch processing but keep the stream active.
@@ -280,11 +269,8 @@ class RecordTunerEngine implements TunerEngine {
     _isProcessingEnabled = false;
     _currentNote = null;
     _sampleBuffer.clear();
-    _lastValidNote = null;
-    _lastValidNoteTime = null;
 
     _streamController.add(null);
-    onPitchDetected?.call(null);
   }
 
   /// Check if the stream is active (warmed up or started).
@@ -342,8 +328,7 @@ class RecordTunerEngine implements TunerEngine {
     // Check amplitude (noise gate)
     final amplitude = _calculateAmplitude(samples);
     if (!_amplitudeGate.check(amplitude)) {
-      // Use note hold - emit last valid note if within hold duration
-      _emitWithHold(null);
+      _emitNote(null);
       return;
     }
 
@@ -361,40 +346,12 @@ class RecordTunerEngine implements TunerEngine {
     if (stabilityResult.isStable && stabilityResult.frequency > 0) {
       final note = _frequencyToNote(stabilityResult.frequency);
       if (note != null) {
-        // Update last valid note and emit
-        _lastValidNote = note;
-        _lastValidNoteTime = DateTime.now();
         _emitNote(note);
         return;
       }
     }
 
-    // Not stable - use note hold mechanism
-    _emitWithHold(null);
-  }
-
-  /// Emit note with hold mechanism - keeps last note during brief gaps.
-  void _emitWithHold(TunerNote? note) {
-    if (note != null) {
-      _lastValidNote = note;
-      _lastValidNoteTime = DateTime.now();
-      _emitNote(note);
-      return;
-    }
-
-    // Check if we should hold the last valid note
-    if (_lastValidNote != null && _lastValidNoteTime != null) {
-      final elapsed = DateTime.now().difference(_lastValidNoteTime!);
-      if (elapsed < _noteHoldDuration) {
-        // Keep emitting last valid note (don't emit null)
-        // This prevents flickering during brief detection gaps
-        return;
-      }
-    }
-
-    // Hold duration expired - clear note
-    _lastValidNote = null;
-    _lastValidNoteTime = null;
+    // Not stable - emit null (provider handles grace period)
     _emitNote(null);
   }
 
@@ -454,6 +411,5 @@ class RecordTunerEngine implements TunerEngine {
   void _emitNote(TunerNote? note) {
     _currentNote = note;
     _streamController.add(note);
-    onPitchDetected?.call(note);
   }
 }
