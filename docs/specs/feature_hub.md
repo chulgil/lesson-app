@@ -1,169 +1,231 @@
-# Feature Hub — 기능 × 역할 × 스펙 매트릭스
+# Feature Hub - 기능 x 역할 x 스펙 매트릭스
 
-> 작성일: 2026-03-02
+> Last updated: 2026-03-06
 > 상태: 관리 중
 > 목적: 전체 기능의 스펙/코드/상태를 한눈에 파악하는 중앙 허브
-> 관련 문서: [flow_with_app.md](lesson/flow_with_app.md) (Pain Point 원본)
 
 ---
 
-## 1. Pain Point A~H ↔ 기능 매핑
+## 1. 마스터 스펙 인덱스
 
-> 출처: [flow_with_app.md §장기 수강생 Pain Point](lesson/flow_with_app.md)
+> 전면 재작성 완료 (2026-03-06). 각 도메인별 단일 마스터 문서가 **Single Source of Truth**.
+
+| # | 도메인 | 마스터 스펙 | 통합된 기존 스펙 수 | 비고 |
+|---|--------|-----------|:-----------------:|------|
+| 1 | 레슨 | [lesson_master.md](lesson/lesson_master.md) | 16개 | 플로우 7개 + 예약 + 노트 + 그룹 등 |
+| 2 | 연습 | [practice_master.md](practice/practice_master.md) | 18개 | 녹음 5개 + 레퍼토리 4개 + 시스템 등 |
+| 3 | 구독/결제 | [subscription_master.md](subscription/subscription_master.md) | 9개 | 결제 + 정책 + 법적문서 포함 |
+| 4 | 사용자 | [user_master.md](user/user_master.md) | 10개 | 인증/초대/학생/학부모/리뷰/체험 통합 |
+| 5 | 스케줄 | [schedule_master.md](schedule/schedule_master.md) | 2개 | 가용시간 + 확인카드 |
+| 6 | 메트로놈 | [metronome_master.md](metronome/metronome_master.md) | 4개 | 시스템 + 사운드 + 서브디비전 |
+| 7 | 알림 | [notification_master.md](notification/notification_master.md) | 1개 보강 | 기존 스펙 + 구현 코드 통합 |
+| 8 | 디자인 | [design_master.md](design/design_master.md) | 6개 | UX + 토큰 + 화면설계 + 경쟁분석 |
+| 9 | 캘린더 | [calendar_master.md](calendar/calendar_master.md) | 신규 | 코드 역공학 |
+| 10 | 온보딩 | [onboarding_master.md](onboarding/onboarding_master.md) | 신규 | 코드 역공학 |
+| 11 | 학생홈 | [student_home_master.md](student_home/student_home_master.md) | 신규 | 코드 역공학 |
+| 12 | 팔로우 | [follow_master.md](follow/follow_master.md) | 신규 | 코드 역공학 |
+| 13 | 설정 | [settings_master.md](settings/settings_master.md) | 신규 | 코드 역공학 |
+
+### 기타 루트 문서
+
+| 문서 | 역할 |
+|------|------|
+| [glossary.md](glossary.md) | 용어집 |
+| [tech_decision.md](tech_decision.md) | 기술 스택 결정 |
+
+### 참고 자료 (docs/ 루트)
+
+| 폴더 | 내용 |
+|------|------|
+| [reference/](../../reference/) | 아키텍처 참고 (student_centered_architecture, metronome_timing_analysis 등) |
+| [research/](../../research/) | 시장 조사 (competitive_analysis, figma_templates 등) |
+
+---
+
+## 2. Pain Point A~H - 기능 매핑
+
+> 출처: lesson_master.md (App vs Non-App Flow Comparison)
 > "오래된 수강생에게 앱의 가치는 편리함이 아니라 **성장 증명**이다."
 
-| # | Pain Point | 해결 기능 | 스펙 문서 | 해결율 |
-|---|------------|----------|----------|:------:|
-| A | 2년간 뭘 배웠는지 기록 없음 | 레슨 노트 타임라인, 레퍼토리 히스토리 | [lesson_note_spec](lesson/lesson_note_spec.md), [repertoire_history_spec](practice/repertoire_history_spec.md) | 🔥 100% |
-| B | 연습 진도 블랙박스 | 연습 기록 실시간 공유 | [practice_sharing_spec](practice/practice_sharing_spec.md) | 🔥 90% |
-| C | 실력 성장 체감 불가 | 녹음 A/B 비교 재생 | [recording_comparison_spec](practice/recording_comparison_spec.md) | 🔥 90% |
-| D | 학부모에게 보여줄 근거 없음 | 학부모 대시보드 실데이터 | [parent_dashboard_spec](user/parent_dashboard_spec.md), [practice_sharing_spec](practice/practice_sharing_spec.md) | 🔥 95% |
-| E | 레슨 시간 최적화 근거 없음 | 레슨별 진도 데이터 | (Phase 2 — 백엔드 필요) | 🟡 60% |
-| F | 발표회/콩쿠르 준비 관리 | 섹션별 완성도 추적 | [practice_goal_spec](practice/practice_goal_spec.md) | 🔥 85% |
-| G | 선생님 부재 시 대체 레슨 | 레슨 노트 + 레퍼토리 공유 | [lesson_note_spec](lesson/lesson_note_spec.md) | 🔥 90% |
-| H | 수강료 인상 근거 | 성장 데이터 기반 협의 | [practice_report_spec](practice/practice_report_spec.md) | 🟡 70% |
+| # | Pain Point | 해결 기능 | 마스터 스펙 섹션 | 구현 상태 |
+|---|------------|----------|----------------|:--------:|
+| A | 2년간 뭘 배웠는지 기록 없음 | 레슨 노트 타임라인, 레퍼토리 히스토리 | lesson_master #5, practice_master #3.4 | 부분 구현 |
+| B | 연습 진도 블랙박스 | 연습 기록 실시간 공유 | practice_master #5.1 | 설계 완료 |
+| C | 실력 성장 체감 불가 | 녹음 A/B 비교 재생 | practice_master #4.5 | 설계 완료 |
+| D | 학부모에게 보여줄 근거 없음 | 학부모 대시보드 실데이터 | user_master #5.2, practice_master #5.1 | 부분 구현 |
+| E | 레슨 시간 최적화 근거 없음 | 레슨별 진도 데이터 | (Phase 2 - 백엔드 필요) | 미착수 |
+| F | 발표회/콩쿠르 준비 관리 | 섹션별 완성도 추적 | practice_master #2.2 | 설계 완료 |
+| G | 선생님 부재 시 대체 레슨 | 레슨 노트 + 레퍼토리 공유 | lesson_master #5 | 구현 완료 |
+| H | 수강료 인상 근거 | 성장 데이터 기반 협의 | practice_master #5.2 | 설계 완료 |
 
 ---
 
-## 2. 기능 × 역할(T/S/P) × 스펙 × 코드 매트릭스
+## 3. 기능 x 역할(T/S/P) x 구현 상태 매트릭스
 
 > T = 선생님, S = 학생, P = 학부모
-> 상태: ✅ 구현 완료 | 📋 스펙 완료 | 🆕 스펙 작성 중 | ❌ 미착수
+> 상태: 완료 | 설계 | 미착수
 
-### 2.1 레슨 도메인
+### 3.1 레슨 도메인 → [lesson_master.md](lesson/lesson_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 레슨 캘린더 (월/주) | ✅ | ✅ | 읽기 | [lesson_schedule](lesson/lesson_schedule.md) | `features/lessons/` | ✅ |
-| 레슨 노트 (피드백/포인트/팁) | 편집 | 읽기 | 읽기 | [lesson_note_spec](lesson/lesson_note_spec.md) | `features/lessons/presentation/widgets/lesson_detail/` | 🆕 |
-| 레슨 예약 (다중 옵션) | ✅ | ✅ | — | [Multi_Option_Schedule_Spec](lesson/Multi_Option_Schedule_Spec.md) | `features/lessons/` | ✅ |
-| 체험 레슨 | ✅ | ✅ | — | [trial_lesson_system](../specs/../trial/trial_lesson_system.md) | `features/lessons/` | ✅ |
-| 레슨 추가 (빠른) | ✅ | — | — | [quick_add_lesson](lesson/quick_add_lesson.md) | `features/lessons/` | 📋 |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 레슨 캘린더 (월/주) | O | O | 읽기 | 완료 |
+| 레슨 노트 (피드백/포인트/팁) | 편집 | 읽기 | 읽기 | 완료 |
+| 통합 레슨 예약 | O | O | - | 완료 |
+| 체험 레슨 플로우 | O | O | - | 완료 |
+| 빠른 레슨 추가 | O | - | - | 설계 |
+| 그룹 레슨 (GX) | O | O | - | 설계 |
+| 레슨 장소 선택 | O | - | - | 완료 |
+| 3자 관계 (학원) | O | O | - | 설계 |
 
-### 2.2 연습 도메인
+### 3.2 연습 도메인 → [practice_master.md](practice/practice_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 연습 화면 (주간 캘린더) | 조회 | ✅ | — | [practice_screen_spec](practice/practice_screen_spec.md) | `features/practice/presentation/screens/` | ✅ |
-| 연습 스트릭 | — | ✅ | 읽기 | [practice_streak_spec](practice/practice_streak_spec.md) | `features/practice/` | ✅ |
-| 연습 목표 | 설정 | ✅ | — | [practice_goal_spec](practice/practice_goal_spec.md) | `features/practice/` | 📋 |
-| 레퍼토리 관리 | ✅ | ✅ | — | [repertoire_detail_spec](practice/repertoire_detail_spec.md) | `features/practice/` | ✅ |
-| 섹션 상세 | ✅ | ✅ | — | [section_detail_spec](practice/section_detail_spec.md) | `features/practice/` | ✅ |
-| 녹음 기본 (시작/정지/저장) | ✅ | ✅ | — | [recording_requirement](practice/recording_requirement.md) | `features/practice/` | ✅ |
-| 녹음 재생 (A-B루프/속도) | ✅ | ✅ | — | [recording_player_ui](practice/recording_player_ui.md) | `features/practice/presentation/widgets/` | ✅ |
-| 파형 시각화 (핀치줌) | — | ✅ | — | [waveform_improvements](practice/waveform_improvements.md) | `features/practice/presentation/widgets/waveform/` | ✅ |
-| 스마트 녹음 (무음 트리밍) | — | ✅ | — | [smart_recording_spec](practice/smart_recording_spec.md) | `features/practice/` | ✅ |
-| **녹음 비교 재생** | — | ✅ | — | [recording_comparison_spec](practice/recording_comparison_spec.md) | (미구현) | 🆕 |
-| **연습 공유** | 수신 | 전송 | 읽기 | [practice_sharing_spec](practice/practice_sharing_spec.md) | (미구현) | 🆕 |
-| **레퍼토리 히스토리** | 조회 | ✅ | — | [repertoire_history_spec](practice/repertoire_history_spec.md) | (미구현) | 🆕 |
-| 연습 통계 리포트 | 조회 | ✅ | 읽기 | [practice_report_spec](practice/practice_report_spec.md) | (미구현) | 📋 |
-| 바로 녹음 | — | ✅ | — | [quick_recording_spec](practice/quick_recording_spec.md) | (미구현) | 📋 |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 연습 화면 (주간 캘린더) | 조회 | O | - | 완료 |
+| 연습 스트릭 | - | O | 읽기 | 완료 |
+| 연습 목표 | 설정 | O | - | 설계 |
+| 연습 노트 | - | O | - | 설계 |
+| 레퍼토리 관리 | O | O | - | 완료 |
+| 섹션 상세 | O | O | - | 완료 |
+| 녹음 (시작/정지/저장) | O | O | - | 완료 |
+| 녹음 재생 (A-B루프/속도) | O | O | - | 완료 |
+| 스마트 녹음 (무음 트리밍) | - | O | - | 완료 |
+| 녹음 비교 재생 (A/B) | - | O | - | 설계 |
+| 연습 공유 | 수신 | 전송 | 읽기 | 설계 |
+| 레퍼토리 히스토리 | 조회 | O | - | 설계 |
+| 연습 통계 리포트 | 조회 | O | 읽기 | 설계 |
+| 바로 녹음 | - | O | - | 설계 |
+| 백업 시스템 | - | O | - | 설계 |
 
-### 2.3 메트로놈/튜너 도메인
+### 3.3 메트로놈/튜너 → [metronome_master.md](metronome/metronome_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 메트로놈 시스템 | ✅ | ✅ | — | [metronome_system](metronome/metronome_system.md) | `core/audio/`, `ios/Runner/Audio/` | ✅ |
-| 메트로놈 사운드 | — | ✅ | — | [metronome_sound](metronome/metronome_sound.md) | `core/audio/` | ✅ |
-| 메트로놈 인디케이터 | — | ✅ | — | [metronome_indicator](metronome/metronome_indicator.md) | `features/practice/presentation/widgets/` | ✅ |
-| 중앙 연습 버튼 | — | ✅ | — | [central_practice_button](practice/central_practice_button.md) | `core/widgets/` | ✅ |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 메트로놈 (커스텀 네이티브) | O | O | - | 완료 |
+| 서브디비전 (12패턴) | - | O | - | 완료 |
+| 튜너 (YIN 피치 감지) | - | O | - | 완료 |
+| 중앙 연습 버튼 (FAB) | - | O | - | 완료 |
 
-### 2.4 결제/수강권 도메인
+### 3.4 구독/결제 → [subscription_master.md](subscription/subscription_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 통합 결제 시스템 | ✅ | ✅ | — | [payment_unified_spec](payment/payment_unified_spec.md) | `features/payment/` | ✅ |
-| 수강권 시스템 | ✅ | ✅ | — | [subscription_system_spec](subscription/subscription_system_spec.md) | `features/subscription/` | 📋 |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 수강권 시스템 | O | O | - | 완료 |
+| 수강권 제안 플로우 | O | O | - | 완료 |
+| 통합 결제 시스템 | O | O | - | 완료 |
+| 수강권 상태 컬러 | O | O | - | 완료 |
+| 취소/변경 정책 | O | O | - | 완료 |
+| 레슨 정책 설정 | O | - | - | 설계 |
+| 레슨 요청 (재등록) | O | O | - | 진행중 |
 
-### 2.5 사용자/초대 도메인
+### 3.5 스케줄 → [schedule_master.md](schedule/schedule_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 학부모 시스템 (프로필 전환) | — | — | ✅ | [parent_system](user/parent_system.md) | `features/parent_home/` | ✅ |
-| **학부모 대시보드 (4탭)** | — | — | ✅ | [parent_dashboard_spec](user/parent_dashboard_spec.md) | `features/parent_home/presentation/screens/` | 🆕 |
-| 학부모 로그인 플로우 | — | — | ✅ | [parent_login_flow](user/parent_login_flow.md) | `features/onboarding/` | ✅ |
-| 양방향 초대 (QR/코드) | ✅ | ✅ | ✅ | [invite_system_v2](invite/invite_system_v2.md) | `features/invite/` | ✅ |
-| 수강권 기반 관계 | ✅ | ✅ | — | [subscription_based_relationship](invite/subscription_based_relationship.md) | `features/invite/` | ✅ |
-| 외부 선생님 등록 | ✅ | — | — | [teacher_registration](user/teacher_registration.md) | `features/profile/` | ✅ |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 선생님 가용시간 (슬롯) | O | 조회 | - | 완료 |
+| 레슨 예약/확정 | O | O | - | 완료 |
+| 예약 변경/취소 | O | O | - | 완료 |
+| 스케줄 확인 카드 | - | O | - | 완료 |
+| 그룹 클래스 출석 | O | O | - | 설계 |
 
-### 2.6 알림/설계 도메인
+### 3.6 사용자 → [user_master.md](user/user_master.md)
 
-| 기능 | T | S | P | 스펙 문서 | 코드 위치 | 상태 |
-|------|:-:|:-:|:-:|----------|----------|:----:|
-| 알림 시스템 | ✅ | ✅ | ✅ | [notification_system](notification/notification_system.md) | `features/notifications/` | ✅ |
-| 역할별 화면 개요 | T | S | P | [role_based_screens](design/role_based_screens.md) | — | 📋 |
-| UX 가이드라인 | — | — | — | [ux_guidelines](design/ux_guidelines.md) | — | ✅ |
+| 기능 | T | S | P | 상태 |
+|------|:-:|:-:|:-:|:----:|
+| 소셜 로그인 (Google/Kakao/Apple) | O | O | O | 완료 |
+| 선생님 등록/온보딩 | O | - | - | 완료 |
+| 초대 시스템 (QR/URL/코드) | O | O | O | 완료 |
+| 수강권 기반 관계 모델 | O | O | - | 완료 |
+| 학생/클래스 관리 | O | - | - | 완료 |
+| 학부모 대시보드 (4탭) | - | - | O | 완료 |
+| 선생님 프로필 & 검색 | O | O | - | 완료 |
+| 리뷰 시스템 | 응답 | O | - | 설계 |
+| 체험 레슨 시스템 | O | O | - | 설계 |
 
----
+### 3.7 기타 도메인
 
-## 3. 스펙 작성 현황 대시보드
-
-### 3.1 이번 라운드 신규/보완 문서
-
-| # | 문서 | 유형 | Pain Point | 상태 |
-|---|------|------|-----------|:----:|
-| 1 | [feature_hub.md](feature_hub.md) | 허브 | — | ✅ 완료 |
-| 2 | [lesson_note_spec.md](lesson/lesson_note_spec.md) | 코드 기반 | A, G | ✅ 완료 |
-| 3 | [parent_dashboard_spec.md](user/parent_dashboard_spec.md) | 코드 기반 | D | ✅ 완료 |
-| 4 | [recording_comparison_spec.md](practice/recording_comparison_spec.md) | 신규 설계 | C | ✅ 완료 |
-| 5 | [practice_sharing_spec.md](practice/practice_sharing_spec.md) | 신규 설계 | B, D | ✅ 완료 |
-| 6 | [repertoire_history_spec.md](practice/repertoire_history_spec.md) | 신규 설계 | A | ✅ 완료 |
-| 7 | [practice_report_spec.md](practice/practice_report_spec.md) | 보완 | H | ✅ 완료 |
-
-### 3.2 전체 스펙 커버리지
-
-| 도메인 | 총 기능 | 스펙 있음 | 스펙 없음 | 커버율 |
-|--------|:-------:|:--------:|:--------:|:------:|
-| 레슨 | 5 | 5 | 0 | 100% |
-| 연습 | 14 | 14 | 0 | 100% |
-| 메트로놈 | 4 | 4 | 0 | 100% |
-| 결제/수강권 | 2 | 2 | 0 | 100% |
-| 사용자/초대 | 6 | 6 | 0 | 100% |
-| 알림/설계 | 3 | 3 | 0 | 100% |
+| 기능 | 마스터 스펙 | 상태 |
+|------|-----------|:----:|
+| 알림 시스템 | [notification_master.md](notification/notification_master.md) | 기본 구현 |
+| 캘린더 탭 | [calendar_master.md](calendar/calendar_master.md) | 완료 |
+| 온보딩 플로우 | [onboarding_master.md](onboarding/onboarding_master.md) | 완료 |
+| 학생홈 대시보드 | [student_home_master.md](student_home/student_home_master.md) | 완료 |
+| 팔로우 시스템 | [follow_master.md](follow/follow_master.md) | 데이터만 |
+| 설정/백업/녹음관리 | [settings_master.md](settings/settings_master.md) | 완료 |
 
 ---
 
-## 4. 문서 의존성 그래프
+## 4. 문서 구조
 
 ```
-                    ┌──────────────┐
-                    │ feature_hub  │ (이 문서)
-                    └──────┬───────┘
-                           │ 참조
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   ┌─────────────┐  ┌───────────┐  ┌──────────────┐
-   │ lesson_note │  │ recording │  │ practice     │
-   │ _spec       │  │ comparison│  │ _sharing_spec│
-   └──────┬──────┘  │ _spec     │  └───────┬──────┘
-          │         └───────────┘          │
-          │                                ▼
-          │                        ┌───────────────┐
-          ▼                        │ practice      │
-   ┌─────────────┐                │ _report_spec  │
-   │ repertoire  │                │ (공유 섹션)    │
-   │ _history    │                └───────────────┘
-   │ _spec       │
-   └─────────────┘
-          │
-          ▼
-   ┌─────────────┐
-   │ parent      │
-   │ _dashboard  │◄── practice_sharing_spec
-   │ _spec       │
-   └─────────────┘
+docs/specs/
+├── feature_hub.md              ← 이 문서 (중앙 허브)
+├── glossary.md                 # 용어집
+├── tech_decision.md            # 기술 스택 결정
+│
+├── lesson/                     # 레슨 도메인
+│   ├── lesson_master.md        ← Master Spec
+│   └── (개별 스펙 16개 - 아카이브)
+│
+├── practice/                   # 연습 도메인
+│   ├── practice_master.md      ← Master Spec
+│   └── (개별 스펙 18개 - 아카이브)
+│
+├── subscription/               # 구독/결제 도메인
+│   ├── subscription_master.md  ← Master Spec
+│   └── (개별 스펙 8개 - 아카이브)
+│
+├── user/                       # 사용자 도메인 (auth+invite+student+review+trial 통합)
+│   ├── user_master.md          ← Master Spec
+│   └── (개별 스펙 4개 - 아카이브)
+│
+├── schedule/                   # 스케줄 도메인
+│   ├── schedule_master.md      ← Master Spec
+│   └── (개별 스펙 2개 - 아카이브)
+│
+├── metronome/                  # 메트로놈 도메인
+│   ├── metronome_master.md     ← Master Spec
+│   └── (개별 스펙 4개 - 아카이브)
+│
+├── design/                     # 디자인 도메인
+│   ├── design_master.md        ← Master Spec
+│   └── (개별 스펙 6개 - 아카이브)
+│
+├── notification/               # 알림 도메인
+│   ├── notification_master.md  ← Master Spec
+│   └── notification_system.md  (원본 참조용 유지)
+│
+├── calendar/                   # 캘린더 (신규)
+│   └── calendar_master.md      ← Master Spec
+│
+├── onboarding/                 # 온보딩 (신규)
+│   └── onboarding_master.md    ← Master Spec
+│
+├── student_home/               # 학생홈 (신규)
+│   └── student_home_master.md  ← Master Spec
+│
+├── follow/                     # 팔로우 (신규)
+│   └── follow_master.md        ← Master Spec
+│
+├── settings/                   # 설정 (신규)
+│   └── settings_master.md      ← Master Spec
+│
+├── dev/                        # 개발 참고
+│   ├── implementation_roadmap.md
+│   ├── test_data.md
+│   └── test_scenarios.md
+│
+├── old/                        # 아카이브 (원본 유지)
+│   └── (20개 - 대체됨/참고용)
+│
+├── auth/                       # → user_master.md로 통합됨
+├── invite/                     # → user_master.md로 통합됨
+├── student/                    # → user_master.md로 통합됨
+├── review/                     # → user_master.md로 통합됨
+├── trial/                      # → user_master.md로 통합됨
+└── payment/                    # → subscription_master.md로 통합됨
 ```
-
-### 핵심 의존성
-
-| 문서 | 참조하는 엔티티 | 참조하는 스펙 |
-|------|---------------|-------------|
-| lesson_note_spec | `Lesson` (feedback/keyPoints/practiceTips) | recording_requirement, practice_sharing_spec |
-| parent_dashboard_spec | `ChildProfile`, `UserProfile` | practice_sharing_spec, practice_report_spec |
-| recording_comparison_spec | `PracticeRecording` (sectionId/bpm/createdAt) | recording_player_ui, waveform_improvements |
-| practice_sharing_spec | `Recording` (sharedAt), `PracticeRecording` | practice_report_spec, parent_dashboard_spec |
-| repertoire_history_spec | `PracticeRepertoire` (startDate/endDate/isArchived) | repertoire_detail_spec |
-| practice_report_spec | `WeeklyReport`, `MonthlyReport` | practice_sharing_spec |
 
 ---
 
@@ -171,4 +233,5 @@
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
-| 1.0 | 2026-03-02 | 초안 작성 — 전체 매트릭스 + Pain Point 매핑 + 의존성 그래프 |
+| 2.0 | 2026-03-06 | 전면 재작성 - 13개 도메인 마스터 스펙 기반으로 재구성. 누락 스펙 6개 신규 작성. old/ 참고자료 reference/research/ 분리. |
+| 1.0 | 2026-03-02 | 초안 작성 - 전체 매트릭스 + Pain Point 매핑 + 의존성 그래프 |
