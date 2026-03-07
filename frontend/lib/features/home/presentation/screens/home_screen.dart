@@ -292,7 +292,7 @@ class _DashboardTab extends ConsumerWidget {
                 subtitle: '${summary.studentCount}명',
                 color: AppColors.warning,
                 icon: Icons.account_balance_wallet_outlined,
-                onTap: () => context.push(AppRoutes.paymentManagement),
+                onTap: () => context.push(AppRoutes.outstandingPayments),
               );
             }(),
           ],
