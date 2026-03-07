@@ -1,6 +1,6 @@
 # Practice System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > Status: Single Source of Truth for practice domain
 > 원본 문서 18개 통합
 
@@ -15,8 +15,9 @@
 5. [공유 및 리포트](#5-공유-및-리포트)
 6. [백업 시스템](#6-백업-시스템)
 7. [구현 현황](#7-구현-현황)
-8. [관련 스펙](#8-관련-스펙)
-9. [변경 이력](#9-변경-이력)
+8. [Claude 구현 가이드](#8-claude-구현-가이드)
+9. [관련 스펙](#9-관련-스펙)
+10. [변경 이력](#10-변경-이력)
 
 ---
 
@@ -33,7 +34,24 @@
 - 뱃지/보상 시스템을 통한 동기 부여
 - 연령별 최적화된 UI/UX 제공
 
-### 1.3 대상 사용자
+### 1.3 경쟁사 대비 차별점
+
+| 기능 | Lessonaza | Practice Space | Tonara | Simply Piano |
+|------|:---------:|:--------------:|:------:|:------------:|
+| 메트로놈 (커스텀 네이티브) | O | 기본 | X | X |
+| 튜너 (실시간 음고 감지) | O | X | X | O (피아노만) |
+| 녹음 + 스마트 트림 | O | X | X | X |
+| A-B 구간 반복 재생 | O | X | X | X |
+| 중간 무음 스킵 | O | X | X | X |
+| 파형 핀치줌 + 속도 조절 | O | X | X | X |
+| 선생님-학생 연습 연동 | O | O | O | X |
+| 연령별 UI 최적화 (3단계) | O | X | X | X |
+| 레퍼토리 히스토리 타임라인 | O | X | X | X |
+| 연습 스트릭 (주말 제외) | O | X | O | X |
+
+**핵심 차별점**: 메트로놈 + 튜너 + 녹음 + 스마트 트림을 **단일 앱 내 통합** 제공. 경쟁사 Practice Space는 기본 메트로놈만, Tonara는 게이미피케이션에 집중하되 녹음/튜너 부재. 레슨 관리 앱과 연습 도구 앱을 분리해 사용해야 하는 불편함을 해소.
+
+### 1.4 대상 사용자
 
 | 사용자 | 역할 |
 |--------|------|
@@ -41,7 +59,7 @@
 | 학생 | 연습 확인, 완료 체크, 뱃지 수집, 녹음 관리 |
 | 학부모 | (향후) 연습 현황 알림 수신, 대시보드 조회 |
 
-### 1.4 용어
+### 1.5 용어
 
 | 기존 용어 | 변경 용어 | 사용 맥락 |
 |-----------|-----------|-----------|
@@ -49,7 +67,7 @@
 | 과제 추가 | **연습 설정** | 선생님 화면 |
 | 과제 완료 | **연습 완료** | 공통 |
 
-### 1.5 우선순위
+### 1.6 우선순위
 
 | 코드 | 표시명 | 색상 | 의미 |
 |------|--------|------|------|
@@ -57,7 +75,43 @@
 | `should` | 추천 / 해오면 좋아요 | 노랑 | 권장사항 |
 | `could` | 도전 / 도전해볼까? | 초록 | 선택적 도전 |
 
-### 1.6 연령 그룹
+#### PracticePriority Enum (정식 정의)
+
+> 소스: `features/practice/domain/entities/practice_item.dart`
+
+```dart
+enum PracticePriority {
+  must,    // 필수 - 꼭 해오기 (빨강, AppColors.error)
+  should,  // 추천 - 해오면 좋아요 (노랑, AppColors.practiceNormal)
+  could;   // 도전 - 도전해볼까? (초록, AppColors.practiceGood)
+
+  String get label;       // 선생님 UI: 필수/추천/도전
+  String get childLabel;  // 어린이 UI: 꼭 해와요!/해보면 좋아요~/도전해볼까?
+  String get shortLabel;  // 성인 UI: 필수/권장/선택
+  Color get color;        // 우선순위별 색상
+  String get emoji;       // 어린이 UI: 별 개수 (⭐⭐⭐/⭐⭐/⭐)
+  String get dot;         // 학생/성인 UI: 색상 점 (🔴/🟡/🟢)
+  int get sortOrder;      // 정렬 순서 (0/1/2)
+}
+```
+
+#### PracticeType Enum (정식 정의)
+
+> 소스: `features/practice/domain/entities/practice_item.dart`
+
+```dart
+enum PracticeType {
+  repertoire,  // 레퍼토리에서 선택
+  technique,   // 테크닉/스케일
+  theory,      // 이론
+  custom;      // 직접 입력
+
+  String get label;     // 레퍼토리/테크닉/이론/직접입력
+  IconData get icon;    // music_note/piano/menu_book/edit_note
+}
+```
+
+### 1.7 연령 그룹
 
 | 코드 | 명칭 | 연령 기준 | UI 특성 |
 |------|------|-----------|---------|
@@ -67,7 +121,7 @@
 
 연령 판단: 생년월일 기반 자동 계산 (학생 앱) 또는 선생님이 수동 설정 (기본값: 학생)
 
-### 1.7 핵심 데이터 모델 요약
+### 1.8 핵심 데이터 모델 요약
 
 | 모델 | 저장 | 설명 |
 |------|:----:|------|
@@ -1551,10 +1605,68 @@ frontend/lib/features/practice/
 
 ---
 
-## 8. 관련 스펙
+## 8. Claude 구현 가이드
+
+### 8.1 핵심 Provider 설계
+
+> Claude가 새 기능을 구현할 때 참조할 Provider 상세. `@riverpod` 어노테이션 사용 필수.
+
+| Provider | 파라미터 | 반환 타입 | 설명 | 파일 |
+|----------|---------|----------|------|------|
+| practiceRepertoiresProvider | studentId: String | `AsyncValue<List<PracticeRepertoire>>` | 학생의 활성 레퍼토리 목록 | `practice_repertoire_repository_provider.dart` |
+| practiceItemsProvider | lessonId: String | `AsyncValue<List<PracticeItem>>` | 레슨별 연습 항목 목록 | `practice_item_providers.dart` |
+| practiceStreakProvider | studentId: String | `AsyncValue<PracticeStreak>` | 학생 연습 스트릭 상태 | `practice_streak_provider.dart` |
+| practiceGoalProvider | studentId: String | `AsyncValue<PracticeGoal?>` | 학생 연습 목표 (없으면 null) | `practice_goal_provider.dart` |
+| practiceNotesProvider | sectionId: String | `AsyncValue<List<PracticeNote>>` | 섹션별 연습 노트 목록 | `practice_note_provider.dart` |
+| practiceStatsProvider | studentId: String, period: DateRange | `AsyncValue<PracticeStats>` | 기간별 연습 통계 | `practice_stats_provider.dart` |
+| practiceReportProvider | studentId: String, type: ReportType | `AsyncValue<WeeklyReport \| MonthlyReport>` | 주간/월간 리포트 | `practice_report_provider.dart` |
+| recordingProvider | sectionId: String | `AsyncValue<List<Recording>>` | 섹션별 녹음 목록 | `recording_provider.dart` |
+| smartRecordingProvider | - | `SmartRecordingState` | 스마트 녹음 상태/설정 | `smart_recording_provider.dart` |
+| repertoireArchiveProvider | studentId: String | `AsyncValue<List<PracticeRepertoire>>` | 아카이브된 레퍼토리 | `repertoire_archive_provider.dart` |
+| repertoireHistoryProvider | studentId: String | `AsyncValue<RepertoireTimeline>` | 레퍼토리 타임라인 | `repertoire_history_provider.dart` |
+| metronomeProvider | - | `MetronomeState` | 메트로놈 상태 (BPM, 박자, 재생) | `metronome_provider.dart` |
+| tunerProvider | - | `TunerState` | 튜너 상태 (주파수, 음고, 센트) | `tuner_provider.dart` |
+
+### 8.2 구현 파일-코드 매핑 (미구현 기능)
+
+Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
+
+#### 연습 목표 시스템 (Practice Goal)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/practice_goal.dart` | 정의 완료 |
+| Repository (인터페이스) | `domain/repositories/practice_goal_repository.dart` | 정의 완료 |
+| Repository (Mock) | `data/repositories/mock_practice_goal_repository.dart` | 정의 완료 |
+| Provider | `presentation/providers/practice_goal_provider.dart` | 정의 완료 |
+| Screen | `presentation/screens/practice_goal_setting_screen.dart` | 정의 완료 |
+| Widget | `presentation/widgets/goal/goal_progress_widget.dart` | 생성 필요 |
+| Widget | `presentation/widgets/goal/goal_achieved_dialog.dart` | 생성 필요 |
+
+#### 뱃지 시스템 (Badge)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/badge.dart` | 생성 필요 |
+| Service | `domain/services/badge_checker.dart` | 생성 필요 |
+| Provider | `presentation/providers/badge_provider.dart` | 생성 필요 |
+| Widget | `presentation/widgets/badge/badge_popup.dart` | 생성 필요 |
+| Widget | `presentation/widgets/badge/badge_collection.dart` | 생성 필요 |
+
+#### 녹음 비교 (Recording Comparison)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `domain/entities/recording_comparison.dart` | 생성 필요 |
+| Widget | `presentation/widgets/recording_comparison_sheet.dart` | 생성 필요 |
+
+---
+
+## 9. 관련 스펙
 
 | 스펙 | 위치 | 설명 |
 |------|------|------|
+| 게이미피케이션 | `docs/specs/practice/gamification_spec.md` | 포인트/레벨/뱃지 시스템 (신규) |
 | 메트로놈 | `docs/specs/metronome/` | 커스텀 MetronomePlugin, 박자/세분화 |
 | 튜너 | `docs/specs/tuner/` | 실시간 음고 감지 |
 | 학생 홈 | `docs/specs/user/` | 학생 홈 화면 탭 구성 |
@@ -1563,13 +1675,19 @@ frontend/lib/features/practice/
 | 알림 | `docs/specs/notification/` | 연습 완료 알림, 스트릭 경고 |
 | 디자인 토큰 | `docs/_tokens/` | 색상, 타이포그래피 |
 | UX 가이드라인 | `docs/specs/design/ux_guidelines.md` | 원샷 UX 원칙 |
+| 사용자 시스템 | `docs/specs/user/user_master.md` | 역할/관계/인증 통합 마스터 |
 
 ---
 
-## 9. 변경 이력
+## 10. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-07 | Enum 정식 정의 추가 (PracticePriority, PracticeType dart 코드 블록) |
+| | 경쟁사 대비 차별점 섹션 추가 (1.3) |
+| | Claude 구현 가이드 섹션 추가 (8장) - Provider 설계 상세, 미구현 파일 매핑 |
+| | 관련 스펙에 gamification_spec.md, user_master.md 참조 추가 |
+| | 목차 갱신 (8~10장 추가/재번호) |
 | 2026-03-06 | 마스터 스펙 초안 작성 - 18개 원본 문서 통합 |
 | | 원본: Practice_System_Spec.md (v2.0, 2026-01-05) |
 | | 원본: practice_screen_spec.md (v1.0, 2026-01-05) |

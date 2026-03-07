@@ -1,6 +1,6 @@
 # Student Home Dashboard Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 
 ## 1. 개요
 
@@ -171,12 +171,15 @@ StudentHomeScreen
 
 ### StudentTab (enum)
 
-| 값 | 인덱스 | 라벨 |
-|----|--------|------|
-| `home` | 0 | 홈 |
-| `lessons` | 1 | 레슨 |
-| `practice` | 2 | 연습 |
-| `profile` | 3 | 프로필 |
+```dart
+/// student_home/domain/entities/student_dashboard.dart
+enum StudentTab {
+  home,      // 인덱스 0 - 홈
+  lessons,   // 인덱스 1 - 레슨
+  practice,  // 인덱스 2 - 연습
+  profile;   // 인덱스 3 - 프로필
+}
+```
 
 ### WeeklyPracticeStatus
 
@@ -242,7 +245,31 @@ StudentHomeScreen
 - `LessonRequest` / `LessonRequestStatus` - 레슨 요청
 - `ParentInvitation` / `InvitationSource` - 학부모 초대
 
-## 5. 구현 현황
+## 5. 구현 파일 위치
+
+> `features/student_home/` 기준 상대 경로. 새 파일 추가 시 이 표를 업데이트한다.
+
+| 레이어 | 파일 경로 | 설명 |
+|--------|----------|------|
+| **Entity** | `student_home/domain/entities/student_dashboard.dart` | StudentTab, WeeklyPracticeStatus, TeacherFeedback, NextLessonInfo 등 |
+| **Screen** | `student_home/presentation/screens/student_home_screen.dart` | 학생 홈 메인 (IndexedStack + BottomNavigationBar) |
+| **Screen** | `student_home/presentation/screens/student_dashboard_tab.dart` | 대시보드 탭 (7개 섹션) |
+| **Screen** | `student_home/presentation/screens/student_lessons_tab.dart` | 스케줄 탭 (주간 캘린더 + 레슨 목록) |
+| **Screen** | `student_home/presentation/screens/student_practice_tab.dart` | 연습 탭 (캘린더 + 레퍼토리) |
+| **Screen** | `student_home/presentation/screens/student_profile_tab.dart` | 프로필 탭 (설정 포함) |
+| **Widget** | `student_home/presentation/widgets/student_subscription_summary.dart` | 수강권 요약 위젯 |
+| **Widget** | `student_home/presentation/widgets/trial_bookings_section.dart` | 체험 레슨 섹션 |
+| **Widget** | `student_home/presentation/widgets/compact_trial_booking_card.dart` | 체험 레슨 미니 카드 |
+| **Widget** | `student_home/presentation/widgets/trial_booking_card.dart` | 체험 레슨 전체 카드 |
+| **Widget** | `student_home/presentation/widgets/student_lesson_card.dart` | 학생 레슨 카드 |
+| **Widget** | `student_home/presentation/widgets/weekly_practice_widget.dart` | 주간 연습 차트 |
+| **Widget** | `student_home/presentation/widgets/week_calendar_widget.dart` | 학생 전용 캘린더 위젯 |
+| **공통 위젯** | `core/widgets/week_calendar_widget.dart` | 주간 캘린더 공통 위젯 |
+| **공통 위젯** | `core/widgets/practice_center_button.dart` | 중앙 연습 버튼 |
+
+---
+
+## 6. 구현 현황
 
 | 기능 | 상태 |
 |------|------|
@@ -275,19 +302,21 @@ StudentHomeScreen
 | 다크 모드 | 미구현 (TODO) |
 | 언어 설정 | 미구현 (TODO) |
 
-## 6. 관련 스펙
+## 7. 관련 스펙
 
-- `docs/specs/calendar/calendar_master.md` - 선생님 캘린더 (유사 구조)
-- `docs/specs/design/ux_guidelines.md` - UX 가이드라인
-- `core/widgets/week_calendar_widget.dart` - 공통 주간 캘린더 위젯
-- `core/widgets/practice_center_button.dart` - 중앙 연습 버튼
-- `features/subscription/` - 수강권 도메인
-- `features/practice/` - 연습 도메인
-- `features/schedule/` - 스케줄/예약 도메인
-- `features/students/` - 학생/멤버십 도메인
+| 스펙 | 관계 |
+|------|------|
+| [선생님 캘린더](../calendar/calendar_master.md) | 선생님 스케줄 탭 (유사 구조) |
+| [게이미피케이션](../practice/gamification_spec.md) | 학생 대시보드 헤더에 게이미피케이션 요소 표시 예정 |
+| [연습 시스템](../practice/practice_master.md) | 연습 탭 레퍼토리/섹션 관리 |
+| [UX 가이드라인](../design/ux_guidelines.md) | UI/UX 규칙 |
+| [알림 시스템](../notification/notification_master.md) | 알림 벨 아이콘, 수강권 제안 배너 |
 
-## 7. 변경 이력
+---
+
+## 8. 변경 이력
 
 | 날짜 | 내용 |
 |------|------|
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
+| 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 게이미피케이션 및 알림 크로스 레퍼런스 추가 |

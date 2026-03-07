@@ -1,8 +1,9 @@
 # Lesson System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > 이 문서는 레슨 도메인의 **단일 진실 공급원(Single Source of Truth)**입니다.
 > 기존 개별 스펙 문서(flow_*.md, lesson_schedule.md 등)의 내용을 통합합니다.
+> 관련 문서: [schedule_master.md](../schedule/schedule_master.md)
 
 ---
 
@@ -17,9 +18,12 @@
 7. [빠른 레슨 등록 (Quick Add)](#7-빠른-레슨-등록-quick-add)
 8. [그룹 레슨](#8-그룹-레슨)
 9. [3자 관계 (학원-선생님-학생)](#9-3자-관계-학원-선생님-학생)
-10. [구현 현황](#10-구현-현황)
-11. [관련 스펙](#11-관련-스펙)
-12. [변경 이력](#12-변경-이력)
+10. [Enum 정의](#10-enum-정의)
+11. [구현 파일 매핑](#11-구현-파일-매핑)
+12. [경쟁사 대비 차별점](#12-경쟁사-대비-차별점)
+13. [구현 현황](#13-구현-현황)
+14. [관련 스펙](#14-관련-스펙)
+15. [변경 이력](#15-변경-이력)
 
 ---
 
@@ -509,15 +513,17 @@ class MakeupLesson {
 
 ### 4.3 BookingStatus
 
+> 정식 enum 정의는 [10.2절](#102-bookingstatus-7개-값) 참조
+
 | 상태 | 설명 |
 |------|------|
-| `pending` | 승인 대기 |
-| `approved` / `confirmed` | 승인/확정됨 |
-| `rejected` | 거절됨 |
-| `cancelled` | 취소됨 |
-| `completed` | 완료됨 |
-| `noShow` | 노쇼 |
-| `change_requested` | 변경 요청 중 |
+| `pending` | 신청완료 (승인 대기) |
+| `confirmed` | 확정 (선생님 승인) |
+| `changeRequested` | 변경 요청 중 |
+| `completed` | 완료 |
+| `cancelled` | 취소 |
+| `unavailable` | 일정 조율 필요 (선생님이 해당 시간 불가) |
+| `expired` | 응답 대기 만료 (48시간 초과) |
 
 ### 4.4 시간 선택 UI
 
@@ -530,13 +536,22 @@ class MakeupLesson {
 | 스마트 추천 | 평소 레슨 시간 하이라이트 |
 | 빈 상태 대응 | 가용 시간 없으면 대안 날짜 제안 |
 
-**슬롯 상태:**
+**슬롯 상태 (AvailabilitySlotStatus):**
+
+> 정식 enum 정의는 [10.3절](#103-availabilityslotstatus-5개-값) 참조
+
 | 상태 | 설명 | UI |
 |------|------|-----|
 | `available` | 선택 가능 | 흰 배경, 테두리 |
-| `unavailable` | 선택 불가 | 회색 배경 |
-| `booked` | 예약됨 | 회색 배경 |
-| `selected` | 선택됨 | Primary 색상 |
+| `booked` | 예약됨 (다른 학생) | 회색 배경 (비노출) |
+| `myBooking` | 내 예약 | Primary 색상 |
+| `cancelled` | 취소됨 (휴무 등) | 회색 배경 (비노출) |
+| `past` | 지난 시간 | 회색 배경 (비노출) |
+
+**UI에서 추가 사용하는 선택 상태:**
+| 상태 | 설명 | UI |
+|------|------|-----|
+| 선택됨 (UI only) | 사용자가 선택한 슬롯 | Primary 색상 |
 
 ### 4.5 동시 신청 정책
 
@@ -915,9 +930,227 @@ class Membership {
 
 ---
 
-## 10. 구현 현황
+## 10. Enum 정의
 
-### 10.1 구현된 파일 구조
+이 섹션은 레슨 도메인에서 사용하는 모든 enum을 정식 Dart 코드 블록으로 정의한다.
+
+### 10.1 LessonStatus (10개 값)
+
+```dart
+enum LessonStatus {
+  // Basic states
+  scheduled,                   // 예정
+  completed,                   // 완료
+
+  // Cancellation states (detailed)
+  cancelled,                   // 취소 (레거시 호환)
+  cancelledByStudentAdvance,   // 학생 사전 취소 (24h+ 전, 차감 없음)
+  cancelledByStudentLate,      // 학생 당일 취소 (24h 이내, 차감)
+  cancelledByTeacher,          // 선생님 취소 (보강, 차감 없음)
+  cancelledMutual,             // 합의 취소 (보강, 차감 없음)
+
+  // Absence
+  noShow,                      // 결석 (레거시)
+  studentAbsent,               // 학생 불참 (차감)
+
+  // Reschedule pending
+  reschedulePending,           // 변경 대기 (확인 전)
+}
+```
+
+**차감 대상**: `completed`, `cancelledByStudentLate`, `noShow`, `studentAbsent`
+**보강 허용**: `cancelledByStudentAdvance`, `cancelledByTeacher`, `cancelledMutual`, `reschedulePending`
+
+> 코드 위치: `features/lessons/domain/entities/lesson.dart`
+
+### 10.2 BookingStatus (7개 값)
+
+```dart
+enum BookingStatus {
+  pending,          // 신청완료 (승인 대기)
+  confirmed,        // 확정 (선생님 승인)
+  changeRequested,  // 변경 요청 중
+  completed,        // 완료
+  cancelled,        // 취소
+  unavailable,      // 일정 조율 필요 (선생님이 해당 시간 불가)
+  expired,          // 응답 대기 만료 (48시간 초과)
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/lesson_booking.dart`
+
+### 10.3 AvailabilitySlotStatus (5개 값)
+
+```dart
+enum AvailabilitySlotStatus {
+  available,   // 예약 가능
+  booked,      // 예약됨 (다른 학생)
+  myBooking,   // 내 예약
+  cancelled,   // 취소됨 (휴무 등)
+  past,        // 지난 시간
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/availability_slot.dart`
+
+### 10.4 SlotStatus (3개 값)
+
+```dart
+@HiveType(typeId: 71)
+enum SlotStatus {
+  available,   // 예약 가능
+  booked,      // 예약됨
+  cancelled,   // 취소됨 (휴무 등)
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/teacher_availability.dart`
+
+### 10.5 NoShowPolicy (4개 값)
+
+```dart
+@HiveType(typeId: 88)
+enum NoShowPolicy {
+  deductCredit,  // 1회 차감 (기본값)
+  halfCredit,    // 0.5회 차감
+  noDeduction,   // 차감 없음
+  reschedule,    // 보강으로 전환
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/no_show_policy.dart`
+
+### 10.6 MakeupStatus (5개 값) / MakeupReason (4개 값)
+
+```dart
+@HiveType(typeId: 85)
+enum MakeupStatus {
+  pending,     // 시간 미정
+  scheduled,   // 시간 확정
+  completed,   // 완료
+  expired,     // 만료 (30일)
+  waived,      // 선생님 면제 처리
+}
+
+@HiveType(typeId: 86)
+enum MakeupReason {
+  studentCancellation,   // 학생 취소 (D-1 이전)
+  teacherCancellation,   // 선생님 취소
+  noShowReschedule,      // 노쇼 (reschedule 정책)
+  other,                 // 기타
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/makeup_lesson.dart`
+
+### 10.7 FifthWeekPolicy (4개 값)
+
+```dart
+enum FifthWeekPolicy {
+  skip,       // 5주차 자동 휴강 (기본값)
+  optional,   // 5주차 학생 선택
+  credit,     // 5주차 진행 -> 다음달 크레딧
+  always,     // 5주차 항상 진행
+}
+```
+
+> 참고: 현재 코드에 아직 반영되지 않음. 스펙 확정 상태.
+
+### 10.8 LessonType (3개 값)
+
+```dart
+enum LessonType {
+  trial,    // 체험 레슨
+  regular,  // 정규 레슨
+  oneTime,  // 1회 레슨
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/lesson_booking.dart`
+
+---
+
+## 11. 구현 파일 매핑
+
+### 11.1 엔티티 -> 코드 매핑
+
+| 스펙 항목 | 코드 파일 |
+|----------|----------|
+| LessonStatus | `features/lessons/domain/entities/lesson.dart` |
+| Lesson | `features/lessons/domain/entities/lesson.dart` |
+| LessonPiece | `features/lessons/domain/entities/lesson.dart` |
+| LessonRecording | `features/lessons/domain/entities/lesson.dart` |
+| LessonLocationInfo | `features/lessons/domain/entities/lesson.dart` |
+| BookingStatus | `features/schedule/domain/entities/lesson_booking.dart` |
+| LessonBooking | `features/schedule/domain/entities/lesson_booking.dart` |
+| LessonType | `features/schedule/domain/entities/lesson_booking.dart` |
+| ScheduleOption (deprecated) | `features/schedule/domain/entities/lesson_booking.dart` |
+| NoShowPolicy | `features/schedule/domain/entities/no_show_policy.dart` |
+| NoShowRecord | `features/schedule/domain/entities/no_show_policy.dart` |
+| MakeupLesson | `features/schedule/domain/entities/makeup_lesson.dart` |
+| MakeupStatus / MakeupReason | `features/schedule/domain/entities/makeup_lesson.dart` |
+| LessonScheduleChange | `features/schedule/domain/entities/lesson_schedule_change.dart` |
+| ScheduleChangeType / Status | `features/schedule/domain/entities/lesson_schedule_change.dart` |
+| GroupClass | `features/schedule/domain/entities/group_class.dart` |
+| GroupClassSchedule | `features/schedule/domain/entities/group_class_schedule.dart` |
+| GroupClassBooking | `features/schedule/domain/entities/group_class_booking.dart` |
+| TipTemplate | `features/lessons/domain/entities/tip_template.dart` |
+| Payment (레거시) | `features/lessons/domain/entities/payment.dart` |
+
+### 11.2 화면 -> 코드 매핑
+
+| 스펙 항목 | 코드 파일 |
+|----------|----------|
+| 레슨 추가 | `features/lessons/presentation/screens/add_lesson_screen.dart` |
+| 레슨 상세 (노트/녹음/과제) | `features/lessons/presentation/screens/lesson_detail_screen.dart` |
+| 레슨 수정 | `features/lessons/presentation/screens/edit_lesson_screen.dart` |
+| 레슨 노트 히스토리 | `features/lessons/presentation/screens/lesson_note_history_screen.dart` |
+| 그룹 클래스 상세 | `features/schedule/presentation/screens/group_class_detail_screen.dart` |
+| 그룹 출석 관리 | `features/schedule/presentation/screens/group_class_attendance_screen.dart` |
+
+### 11.3 Provider -> 코드 매핑
+
+| 스펙 항목 | 코드 파일 |
+|----------|----------|
+| 레슨 CRUD | `features/lessons/presentation/providers/lesson_crud_provider.dart` |
+| 레슨 캘린더 | `features/lessons/presentation/providers/lesson_calendar_provider.dart` |
+| 레슨 통계 | `features/lessons/presentation/providers/lesson_stats_provider.dart` |
+| 레슨 노트 | `features/lessons/presentation/providers/lesson_note_providers.dart` |
+| 예약 관리 | `features/lessons/presentation/providers/booking_providers.dart` |
+| 결제 관리 | `features/lessons/presentation/providers/payment_providers.dart` |
+
+> 모든 경로는 `frontend/lib/` 기준 상대 경로
+
+---
+
+## 12. 경쟁사 대비 차별점
+
+### 12.1 레슨 시스템 차별화
+
+| 기능 | Lessonaza | 스튜디오메이트/Studiomate | 숨고/크몽 |
+|------|:---------:|:------------------------:|:---------:|
+| 1:1 + 그룹 통합 | O | 그룹 중심 | X |
+| 선생님 가용시간 + 예외 관리 | O | 제한적 | X |
+| 멀티옵션 스케줄링 | O (칩 선택) | X (관리자 배정) | X |
+| 수강권 기반 자동 관계 관리 | O | 수동 | X |
+| 세분화된 취소 정책 (10개 상태) | O | 단순 취소/완료 | X |
+| 학생별 노쇼 정책 설정 | O | 일괄 정책 | X |
+| 보강 30일 만료 추적 | O | 수동 관리 | X |
+| 학부모 대시보드 | O (계획) | 제한적 | X |
+| 앱 전환 플로우 (기존 레슨 이관) | O | X | X |
+
+### 12.2 핵심 경쟁력
+
+1. **개인 선생님 최적화**: 학원 관리 시스템(POS/ERP)이 아닌 개인 선생님의 레슨 관리에 초점
+2. **슬롯 기반 선착순 예약**: 제안-승인 왕복을 제거하여 예약 프로세스 간소화
+3. **수강권 중심 라이프사이클**: 수강권 발급 -> 관계 자동 관리 -> 갱신까지 원스톱
+4. **유연한 레슨 정책**: 5주차, 노쇼, 취소, 보강을 선생님이 학생별로 커스터마이징
+
+---
+
+## 13. 구현 현황
+
+### 13.1 구현된 파일 구조
 
 ```
 frontend/lib/features/lessons/
@@ -976,7 +1209,7 @@ frontend/lib/features/schedule/
     └── widgets/             # time_slot, availability, approval 위젯들
 ```
 
-### 10.2 기능별 구현 상태
+### 13.2 기능별 구현 상태
 
 | 기능 | 상태 | 완료율 | 비고 |
 |------|:----:|:------:|------|
@@ -1002,7 +1235,7 @@ frontend/lib/features/schedule/
 | **FCM 푸시 알림** | 미구현 | 0% | 전체 알림 시스템 미연동 |
 | **백엔드 API** | 개발 중 | 20% | FastAPI 기본 구조 |
 
-### 10.3 테스트 환경
+### 13.3 테스트 환경
 
 현재 앱은 Mock 데이터 모드로 실행.
 
@@ -1015,7 +1248,7 @@ frontend/lib/features/schedule/
 | 레슨 요청 | `MockLessonRequestRepository` |
 | 스케줄 확인 카드 | `MockScheduleConfirmationCardRepository` |
 
-### 10.4 우선순위 (다음 단계)
+### 13.4 우선순위 (다음 단계)
 
 1. **FCM 연동** - 푸시 알림 설정, 수신 처리, 알림 탭 UI
 2. **백엔드 API** - 인증, 예약, 수강권 API
@@ -1023,27 +1256,28 @@ frontend/lib/features/schedule/
 
 ---
 
-## 11. 관련 스펙
+## 14. 관련 스펙
 
 | 문서 | 설명 |
 |------|------|
+| [schedule_master.md](../schedule/schedule_master.md) | 스케줄 시스템 마스터 (가용시간, 예약, 확인 카드) |
 | [subscription_system_spec.md](../subscription/subscription_system_spec.md) | 수강권 시스템 |
 | [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 시스템 |
 | [lesson_request_system.md](../subscription/lesson_request_system.md) | 레슨 요청 시스템 (재등록) |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용시간 |
-| [teacher_availability_system.md](../schedule/teacher_availability_system.md) | 가용시간 설정 시스템 |
 | [payment_unified_spec.md](../payment/payment_unified_spec.md) | 결제 시스템 통합 |
 | [subscription_based_relationship.md](../invite/subscription_based_relationship.md) | 수강권 중심 관계 모델 |
 | [invite_system_v2.md](../invite/invite_system_v2.md) | 초대 시스템 |
 | [student_class_system.md](../student/student_class_system.md) | LessonClass, ClassMembership 엔티티 |
 | [ux_guidelines.md](../design/ux_guidelines.md) | UX 가이드라인 |
 | [notification_system.md](../notification/notification_system.md) | 알림 시스템 |
+| [attendance_spec.md](attendance_spec.md) | 출석 관리 시스템 |
+| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
 
 ### 엔티티 스키마
 
 | 엔티티 | 위치 |
 |--------|------|
-| Lesson | `docs/schema/entities/lesson.md` |
 | Booking | `docs/schema/entities/booking.md` |
 | Subscription | `docs/schema/entities/subscription.md` |
 | LessonSchedule | `docs/schema/entities/lesson_schedule.md` |
@@ -1051,10 +1285,11 @@ frontend/lib/features/schedule/
 
 ---
 
-## 12. 변경 이력
+## 15. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-07 | Enum 정의 완전성 보강 (LessonStatus 10값 등), 구현 파일 매핑 추가, 경쟁사 차별점 추가, schedule_master 상호 참조, attendance/gamification 스펙 참조 추가, 깨진 링크 수정 |
 | 2026-03-06 | Master Spec 초안 작성 - 15개 개별 스펙 통합 |
 
 ### 통합 원본 문서 목록
@@ -1071,7 +1306,7 @@ frontend/lib/features/schedule/
 | `flow_package.md` | 3.4 (회차권 레슨) |
 | `flow_payment.md` | 3.5 (결제/미수금) |
 | `flow_cancel.md` | 3.6 (취소/변경/노쇼/보강) |
-| `flow_test_checklist.md` | 10 (구현 현황) |
+| `flow_test_checklist.md` | 13 (구현 현황) |
 | `Unified_Lesson_Booking_Spec.md` | 4 (예약 시스템) |
 | `lesson_schedule.md` | 2, 3.6 (스케줄 유형, 5주차, 노쇼, 보강, 일괄 변경) |
 | `lesson_note_spec.md` | 5 (레슨 노트) |

@@ -1,6 +1,6 @@
 # Subscription & Payment Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > 상태: 통합 스펙 (기존 9개 문서 통합)
 > 관련 엔티티: [subscription.md](../../schema/entities/subscription.md), [payment.md](../../schema/entities/payment.md)
 
@@ -146,7 +146,48 @@ Teacher ──┬── Membership ──── Organization (학원)
 | 결제 주기 | 매월 고정일 | 불규칙 (수업 시작 전) |
 | 적합 대상 | 규칙적 수강 | 불규칙 일정 |
 
-#### 2.2.2 필드 구조
+#### 2.2.2 Enum 정의
+
+```dart
+/// 수강권 유형
+enum SubscriptionType {
+  trial,    // 체험 (1회)
+  monthly,  // 월정액 (기간제, 월 N회 포함)
+  package,  // 회차권 (횟수제, N회권)
+}
+
+/// 수강권 상태
+enum SubscriptionStatus {
+  active,       // 이용중 (정상 사용 가능)
+  expiringSoon, // 만료 임박 (D-7 이내 또는 1회 남음)
+  expired,      // 만료됨 (기간 초과 또는 횟수 소진)
+  paused,       // 일시정지 (학생 요청)
+}
+
+/// 결제 방식
+enum BillingType {
+  perPackage, // 회차 결제 (수업 시작 전 일괄)
+  monthly,    // 월정액 결제 (매월 고정일)
+}
+
+/// 5주차 정책 (월정액 전용)
+enum FifthWeekPolicy {
+  skip,     // 휴강
+  bonus,    // 보너스 지급 (+1회)
+  deduct,   // 기존에서 차감
+  optional, // 학생 선택
+}
+
+/// 결제 수단
+enum SubscriptionPaymentMethod {
+  cash,         // 현금
+  bankTransfer, // 계좌이체
+  card,         // 카드
+  other,        // 기타
+}
+```
+
+#### 2.2.3 필드 구조
 
 | 필드 | 체험 | 월정액 | 회차권 | 설명 |
 |------|:----:|:-----:|:------:|------|
@@ -172,7 +213,7 @@ int get remainingLessons {
 }
 ```
 
-#### 2.2.3 회차권 발급 프리셋
+#### 2.2.4 회차권 발급 프리셋
 
 | 회차 프리셋 | 자동 유효기간 |
 |:----------:|:------------:|
@@ -182,7 +223,7 @@ int get remainingLessons {
 | 48회 | 1년 (365일) |
 | 직접 입력 | 커스텀 |
 
-#### 2.2.4 보너스 수강권 (bonusCount)
+#### 2.2.5 보너스 수강권 (bonusCount)
 
 5주차 보너스, 이벤트, 추천, 대량 구매 등으로 추가 지급되는 횟수.
 
@@ -194,7 +235,7 @@ int get remainingLessons {
 └── 사용: 0회
 ```
 
-#### 2.2.5 5주차 정책 (월정액 전용)
+#### 2.2.6 5주차 정책 (월정액 전용)
 
 | 정책 | 설명 | 학생 표시 |
 |------|------|----------|
@@ -203,14 +244,14 @@ int get remainingLessons {
 | **deduct** | 기존 수강권에서 차감 | "수강권 -1회 차감" |
 | **optional** | 학생 선택 | "5주차 수업 선택" |
 
-#### 2.2.6 대량 구매 할인/보너스
+#### 2.2.7 대량 구매 할인/보너스
 
 | 유형 | 설명 | 예시 |
 |------|------|------|
 | 할인율 (discount) | 금액에서 N% 할인 | 10회권 10% 할인 |
 | 보너스 횟수 (bonusLessons) | 무료 N회 추가 | 10회 구매 시 +1회 무료 |
 
-#### 2.2.7 부가 서비스 옵션 (학원)
+#### 2.2.8 부가 서비스 옵션 (학원)
 
 | 유형 | 제한 방식 | 예시 |
 |------|----------|------|
@@ -219,7 +260,7 @@ int get remainingLessons {
 | 녹음실 | 횟수제 | 월 2회 |
 | 합주실 | 횟수제 | 월 4회 |
 
-#### 2.2.8 교차 수강권 (학원)
+#### 2.2.9 교차 수강권 (학원)
 
 하나의 수강권으로 여러 악기/클래스를 자유롭게 수강하는 모델.
 
@@ -1107,6 +1148,7 @@ class LessonRequest extends HiveObject {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-07 | Enum 정의 추가(2.2.2) 후 섹션 넘버링 수정 (2.2.3~2.2.9), 링크 검증 완료 |
 | 2026-03-06 | 마스터 스펙 초판 작성 (9개 문서 통합) |
 | 2026-02-06 | UnpaidPolicy 삭제, paymentConfirmed 기반 단순 미수금 모델 |
 | 2026-02-02 | 레슨 요청 시스템 v4 (복수 선택 제안 기능) |

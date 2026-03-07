@@ -1,6 +1,6 @@
 # 알림 시스템 Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > 기존 스펙: [notification_system.md](notification_system.md)
 
 ## 1. 개요
@@ -129,7 +129,40 @@
 | `rescheduleAllowanceUsed` | normal | X | O |
 | `rescheduleAllowanceDepleted` | normal | X | O |
 
-### 2.2 알림 우선순위 (NotificationPriority)
+### 2.2 알림 유형 상세 (Claude 구현 가이드)
+
+아래 표는 주요 알림 유형별 트리거 조건, 제목, 본문 예시, 아이콘, 딥링크를 정리한 것이다. Claude가 알림 생성 로직을 구현할 때 이 표를 참조한다.
+
+| 유형 | 트리거 | 제목 | 본문 예시 | 아이콘 | 딥링크 |
+|------|--------|------|----------|--------|--------|
+| `lessonReminder` | 레슨 30분 전 | 레슨 알림 | "김민수 바이올린 14:00" | calendar | `/lessons/{id}` |
+| `lessonStarting` | 레슨 시작 시점 | 레슨 시작 | "김민수 바이올린 레슨이 시작됩니다" | alarm | `/lessons/{id}` |
+| `lessonCancelled` | 레슨 취소 시 | 레슨 취소 | "김민수 3/7 14:00 레슨이 취소되었습니다" | cancel | `/lessons/{id}` |
+| `lessonCompleted` | 레슨 종료 시 | 레슨 완료 | "김민수 바이올린 레슨이 완료되었습니다" | check_circle | `/lessons/{id}` |
+| `lessonNoteShared` | 선생님 레슨 노트 작성 시 | 레슨 노트 | "선생님이 레슨 노트를 공유했습니다" | note | `/lessons/{id}/note` |
+| `lessonsRunningLow` | 수강권 잔여 횟수 ≤ 2 | 수강권 임박 | "김민수 수강권 1회 남음" | warning | `/subscriptions/{id}` |
+| `paymentRequested` | 수강권 발급 후 미입금 | 결제 요청 | "김민수 수강권 결제를 확인해주세요" | payment | `/subscriptions/{id}` |
+| `paymentReminder` | 발급 후 3일 미입금 | 미수금 알림 | "김민수 수강권 미결제" | payment | `/subscriptions/{id}` |
+| `paymentReceived` | 입금 확인 시 | 입금 확인 | "김민수 수강권 결제가 확인되었습니다" | payment | `/subscriptions/{id}` |
+| `streakMilestone` | 연속 N일 달성 | 연습 축하 | "7일 연속 연습!" | celebration | `/practice/stats` |
+| `streakWarning` | 연속 기록 위기 (당일 미연습) | 스트릭 경고 | "연속 연습 기록이 끊어질 수 있어요" | warning | `/practice` |
+| `practiceReminder` | 설정된 연습 리마인더 시간 | 연습 알림 | "오늘의 연습 목표를 달성해보세요" | music_note | `/practice` |
+| `practiceAssigned` | 선생님 과제 등록 시 | 과제 등록 | "선생님이 새 연습 과제를 등록했습니다" | task | `/practice/assignments` |
+| `trialBookingRequest` | 학생 체험 요청 시 | 레슨 요청 | "새 체험 요청이 있습니다" | person_add | `/schedule/lesson-requests` |
+| `noshowWarning` | 레슨 시작 10분 경과, 미도착 | 노쇼 경고 | "김민수 레슨에 출석하지 않았습니다" | warning | `/lessons/{id}` |
+| `noshowConfirmed` | 노쇼 확정 시 | 노쇼 확정 | "김민수 레슨이 노쇼 처리되었습니다" | error | `/lessons/{id}` |
+| `connectionRequestReceived` | 연결 요청 수신 시 | 연결 요청 | "김민수님이 연결을 요청했습니다" | person | `/profile/connections` |
+| `connectionEstablished` | 연결 수락 시 | 연결 완료 | "김선생님과 연결되었습니다" | check | `/profile/connections` |
+| `proposalReceived` | 수강권 제안 수신 시 | 수강권 제안 | "김선생님이 수강권을 제안했습니다" | ticket | `/subscriptions/{id}` |
+| `proposalExpired` | 수강권 제안 72시간 경과 | 제안 만료 | "수강권 제안이 만료되었습니다" | timer_off | `/subscriptions` |
+| `makeupLessonCreated` | 보강 레슨 생성 시 | 보강 레슨 | "보강 레슨이 등록되었습니다" | event | `/lessons/{id}` |
+| `makeupLessonExpiring` | 보강 유효기간 D-3 | 보강 임박 | "보강 레슨 유효기간이 3일 남았습니다" | warning | `/lessons/{id}` |
+| `scheduleChangeRequested` | 스케줄 변경 요청 시 | 스케줄 변경 | "김민수 3/10 레슨 변경 요청" | schedule | `/schedule/{id}` |
+| `reviewReceived` | 학생 리뷰 작성 시 | 리뷰 알림 | "김민수님이 리뷰를 남겼습니다" | star | `/profile/reviews` |
+
+> **참고**: `{id}` 부분은 `AppNotification.data` 맵에서 해당 리소스 ID를 추출하여 동적으로 치환한다.
+
+### 2.3 알림 우선순위 (NotificationPriority)
 
 | 레벨 | 용도 | 아이콘 배경색 |
 |------|------|-------------|
@@ -138,7 +171,7 @@
 | `normal` | 리마인더 | primary (보라) |
 | `low` | 성과, 보고서 | secondary (회색) |
 
-### 2.3 알림 템플릿 (NotificationTemplate)
+### 2.4 알림 템플릿 (NotificationTemplate)
 
 구현된 템플릿 (13개):
 - 레슨: `lessonReminder`, `lessonStarting`
@@ -318,6 +351,65 @@ TeacherNotificationSettings
 | `notificationActionsProvider` | 알림 액션 (markAsRead, markAllAsRead, delete) |
 | `notificationSchedulerServiceProvider` | 알림 스케줄링 서비스 (keepAlive) |
 
+### Provider 설계 (Claude 구현 가이드)
+
+아래는 주요 Provider의 코드 수준 설계이다. 새 Provider 추가 시 이 패턴을 따른다.
+
+```dart
+// 알림 목록 조회 (화면 진입 시 자동 fetch)
+@riverpod
+Future<List<AppNotification>> notifications(Ref ref) async {
+  final repo = ref.read(notificationRepositoryProvider);
+  return repo.getNotifications();
+}
+
+// 미읽음 수 (뱃지용, 여러 화면에서 참조)
+@riverpod
+Future<int> unreadNotificationCount(Ref ref) async {
+  final repo = ref.read(notificationRepositoryProvider);
+  return repo.getUnreadCount();
+}
+
+// 알림 액션 (읽음 처리, 전체 읽음, 삭제)
+@riverpod
+class NotificationNotifier extends _$NotificationNotifier {
+  @override
+  Future<List<AppNotification>> build() async {
+    final repo = ref.read(notificationRepositoryProvider);
+    return repo.getNotifications();
+  }
+
+  Future<void> markAsRead(String id) async {
+    final repo = ref.read(notificationRepositoryProvider);
+    await repo.markAsRead(id);
+    ref.invalidateSelf();
+    ref.invalidate(unreadNotificationCountProvider);
+  }
+
+  Future<void> markAllAsRead() async {
+    final repo = ref.read(notificationRepositoryProvider);
+    await repo.markAllAsRead();
+    ref.invalidateSelf();
+    ref.invalidate(unreadNotificationCountProvider);
+  }
+}
+
+// 알림 설정 관리 (학생용)
+@Riverpod(keepAlive: true)
+class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsNotifier {
+  @override
+  StudentNotificationSettings build() {
+    return StudentNotificationSettings.defaults();
+  }
+
+  void updateLessonReminder({bool? enabled, List<Duration>? times}) { ... }
+  void updatePracticeReminder({bool? enabled, TimeOfDay? time}) { ... }
+  void updateDnd({bool? enabled, TimeOfDay? start, TimeOfDay? end}) { ... }
+}
+```
+
+> **참고**: `markAsRead` 호출 시 반드시 `unreadNotificationCountProvider`도 invalidate하여 뱃지가 즉시 갱신되도록 한다.
+
 ### 백엔드 API (RemoteNotificationRepository)
 
 | 메서드 | API 엔드포인트 |
@@ -329,7 +421,30 @@ TeacherNotificationSettings
 
 ---
 
-## 5. 구현 현황
+## 5. 구현 파일 위치
+
+> `features/notifications/` 기준 상대 경로. 새 파일 추가 시 이 표를 업데이트한다.
+
+| 레이어 | 파일 경로 | 설명 |
+|--------|----------|------|
+| **Entity** | `domain/entities/notification.dart` | AppNotification, NotificationType, NotificationPriority |
+| **Entity** | `domain/entities/notification_settings.dart` | StudentNotificationSettings, TeacherNotificationSettings |
+| **Entity** | `domain/entities/notification_template.dart` | NotificationTemplate (템플릿 패턴) |
+| **Repository Interface** | `domain/repositories/notification_repository.dart` | NotificationRepository 인터페이스 |
+| **Service** | `domain/services/connection_notification_service.dart` | 연결 알림 생성 |
+| **Service** | `domain/services/proposal_notification_service.dart` | 수강권 제안 알림 생성 |
+| **Service** | `domain/services/notification_scheduler_service.dart` | 알림 예약/취소 |
+| **Mock Repository** | `data/repositories/mock_notification_repository.dart` | Mock 데이터 |
+| **Remote Repository** | `data/repositories/remote_notification_repository.dart` | 백엔드 API 연동 |
+| **Provider** | `presentation/providers/notification_providers.dart` | 모든 알림 Provider |
+| **Screen** | `presentation/screens/notification_list_screen.dart` | 알림 목록 화면 |
+| **Widget** | `presentation/widgets/notification_bell_icon.dart` | 앱바 알림 벨 아이콘 |
+| **Widget** | `presentation/widgets/notification_item.dart` | 개별 알림 항목 위젯 |
+| **Route** | `core/router/routes/notification_routes.dart` | 알림 관련 라우트 정의 |
+
+---
+
+## 6. 구현 현황
 
 ### 완료
 
@@ -370,7 +485,7 @@ TeacherNotificationSettings
 
 ---
 
-## 6. 관련 스펙
+## 7. 관련 스펙
 
 | 스펙 | 관계 |
 |------|------|
@@ -382,10 +497,11 @@ TeacherNotificationSettings
 
 ---
 
-## 7. 변경 이력
+## 8. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2025-12-27 | 기존 스펙 작성 (notification_system.md) |
 | 2026-01-27 | 인앱 알림 UI 구현 완료 |
 | 2026-03-06 | 구현 코드 기반 Master Spec 작성 (기존 스펙 + 구현 현실 통합) |
+| 2026-03-07 | 알림 유형 상세 테이블(트리거/제목/본문/아이콘/딥링크), Provider 코드 설계, 구현 파일 위치 섹션 추가 |

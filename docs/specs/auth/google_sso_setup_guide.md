@@ -292,7 +292,7 @@ curl -X POST https://beta-lesson.chulgil.me/api/v1/auth/dev-login \
    ```
 2. 로그인 화면에서 "Google로 계속하기" 버튼 탭
 3. Google 계정 선택 → 로그인
-4. 신규 유저: 역할 선택 화면 → 선생님/학생/학부모 선택
+4. 신규 유저: **약관 동의 화면** → 역할 선택 화면 → 선생님/학생/학부모 선택
 5. 기존 유저: 바로 홈 화면 진입
 
 ### 4. Google SSO 플로우 검증
@@ -303,7 +303,7 @@ curl -X POST https://beta-lesson.chulgil.me/api/v1/auth/dev-login \
 | serverAuthCode 획득 | 앱 → 백엔드에 code 전송 |
 | 백엔드 code 교환 | Google 토큰 엔드포인트에서 access_token 획득 |
 | 유저 정보 조회 | Google userinfo API에서 email, name, picture 획득 |
-| 신규 유저 | role=null → AuthNeedsRole → 역할 선택 화면 |
+| 신규 유저 | role=null → AuthNeedsRole → **약관 동의** → 역할 선택 화면 |
 | 기존 유저 | role 있음 → AuthAuthenticated → 홈 화면 |
 
 ---

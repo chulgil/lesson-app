@@ -1,6 +1,6 @@
 # 팔로우 시스템 Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 
 ## 1. 개요
 
@@ -57,11 +57,87 @@
 
 ## 3. 화면/UI 구조
 
+### 3.1 현재 상태
+
 현재 팔로우 전용 화면(Screen)은 구현되어 있지 않다. 팔로우 기능은 아래 화면들에서 사용된다:
 
 - **선생님 프로필 화면**: 팔로우/언팔로우 버튼, 팔로워 수 표시
 - **학원 프로필 화면**: 팔로우/언팔로우 버튼
 - **선생님 검색 결과**: 팔로우 상태 표시
+
+### 3.2 화면 설계 (Phase 3 구현 예정)
+
+#### FollowListScreen (팔로우 목록)
+
+팔로우 중인 선생님/학원 목록을 표시하는 화면. 프로필 탭 또는 설정에서 진입한다.
+
+```
+/profile/following
+┌──────────────────────────────────┐
+│  <- 팔로잉               [전체|선생님|학원] │
+├──────────────────────────────────┤
+│  ┌──────────────────────────────┐│
+│  │ [👤] 김선생님                    ││
+│  │     바이올린 · 팔로워 128명       ││
+│  │                    [팔로잉 ✓]  ││
+│  └──────────────────────────────┘│
+│  ┌──────────────────────────────┐│
+│  │ [👤] 박선생님                    ││
+│  │     첼로 · 팔로워 56명           ││
+│  │                    [팔로잉 ✓]  ││
+│  └──────────────────────────────┘│
+│  ┌──────────────────────────────┐│
+│  │ [🏫] 음악나라학원                 ││
+│  │     종합음악 · 팔로워 342명       ││
+│  │                    [팔로잉 ✓]  ││
+│  └──────────────────────────────┘│
+└──────────────────────────────────┘
+```
+
+- **상단 탭**: 전체 / 선생님 / 학원 필터 (FollowTargetType 기반)
+- **카드 탭**: 선생님/학원 프로필 화면으로 이동
+- **빈 상태**: "아직 팔로우한 선생님이 없습니다" + 선생님 검색 버튼
+
+#### FollowFeedScreen (팔로잉 소식 피드)
+
+팔로우 중인 선생님/학원의 소식을 시간순으로 표시하는 피드 화면.
+
+```
+/follow/feed
+┌──────────────────────────────────┐
+│  <- 소식                          │
+├──────────────────────────────────┤
+│  ┌──────────────────────────────┐│
+│  │ [👤] 김선생님              3시간 전 ││
+│  │ 🎵 발표회 안내                    ││
+│  │ "3월 정기 발표회를 진행합니다.     ││
+│  │  일시: 3/15 토 14:00..."         ││
+│  │                    [자세히 보기]  ││
+│  └──────────────────────────────┘│
+│  ┌──────────────────────────────┐│
+│  │ [🏫] 음악나라학원           1일 전 ││
+│  │ 🎉 이벤트                        ││
+│  │ "신규 등록 할인 이벤트 진행중..."   ││
+│  └──────────────────────────────┘│
+└──────────────────────────────────┘
+```
+
+- **피드 정렬**: 최신순 (createdAt DESC)
+- **피드 유형**: 공연/발표회, 이벤트, 공지사항
+- **빈 상태**: "팔로우한 선생님의 소식이 표시됩니다"
+
+#### 재사용 위젯
+
+| 위젯 | 용도 | 위치 |
+|------|------|------|
+| `FollowButton` | 팔로우/언팔로우 토글 버튼 | 선생님 프로필, 검색 결과, FollowCard |
+| `FollowCard` | 팔로우 목록의 선생님/학원 카드 | FollowListScreen |
+| `FollowFeedItem` | 피드 개별 소식 항목 | FollowFeedScreen |
+
+**FollowButton 동작**:
+- 미팔로우 상태: "팔로우" (outlined 스타일) → 탭 시 팔로우 + filled 스타일로 전환
+- 팔로우 상태: "팔로잉 ✓" (filled 스타일) → 탭 시 "언팔로우 하시겠습니까?" 확인 다이얼로그
+- 로딩 중: 버튼 비활성화 + CircularProgressIndicator
 
 ---
 
@@ -119,6 +195,69 @@ enum FollowTargetType { teacher, academy }
 | `followedTeachersProvider` | 팔로우한 선생님 목록 |
 | `followedAcademiesProvider` | 팔로우한 학원 목록 |
 
+### Provider 설계 (Claude 구현 가이드)
+
+아래는 주요 Provider의 코드 수준 설계이다. Phase 3 화면 구현 시 이 패턴을 따른다.
+
+```dart
+// 사용자의 팔로잉 목록 (FollowListScreen용)
+@riverpod
+Future<List<Follow>> followingList(Ref ref) async {
+  final repo = ref.read(followRepositoryProvider);
+  final userId = ref.read(currentUserIdProvider);
+  return repo.getByFollower(userId);
+}
+
+// 팔로우/언팔로우 액션 (FollowButton에서 사용)
+@riverpod
+class FollowNotifier extends _$FollowNotifier {
+  @override
+  FutureOr<void> build() {}
+
+  Future<void> follow(String teacherId, {FollowTargetType type = FollowTargetType.teacher}) async {
+    final repo = ref.read(followRepositoryProvider);
+    final userId = ref.read(currentUserIdProvider);
+    await repo.follow(
+      followerId: userId,
+      followingId: teacherId,
+      targetType: type,
+    );
+    // 관련 Provider 갱신
+    ref.invalidate(followingListProvider);
+    ref.invalidate(isFollowingProvider(teacherId));
+    ref.invalidate(followerCountProvider(teacherId));
+  }
+
+  Future<void> unfollow(String teacherId) async {
+    final repo = ref.read(followRepositoryProvider);
+    final userId = ref.read(currentUserIdProvider);
+    await repo.unfollow(userId, teacherId);
+    // 관련 Provider 갱신
+    ref.invalidate(followingListProvider);
+    ref.invalidate(isFollowingProvider(teacherId));
+    ref.invalidate(followerCountProvider(teacherId));
+  }
+}
+
+// 팔로우 여부 확인 (FollowButton 상태 표시용)
+@riverpod
+Future<bool> isFollowing(Ref ref, String targetId) async {
+  final repo = ref.read(followRepositoryProvider);
+  final userId = ref.read(currentUserIdProvider);
+  return repo.isFollowing(userId, targetId);
+}
+
+// 타입별 팔로잉 필터 (FollowListScreen 탭 전환용)
+@riverpod
+Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
+  final repo = ref.read(followRepositoryProvider);
+  final userId = ref.read(currentUserIdProvider);
+  return repo.getByFollowerAndType(userId, type);
+}
+```
+
+> **참고**: `follow()`/`unfollow()` 호출 시 반드시 `isFollowingProvider`, `followerCountProvider`, `followingListProvider`를 invalidate하여 UI가 즉시 반영되도록 한다.
+
 ### 백엔드 API (RemoteFollowRepository)
 
 | 메서드 | API 엔드포인트 |
@@ -151,7 +290,22 @@ enum FollowTargetType { teacher, academy }
 
 ---
 
-## 6. 관련 스펙
+## 6. 구현 우선순위
+
+팔로우 시스템의 전용 화면 및 피드 기능은 **Phase 3 (MVP 후)** 에 구현 예정이다.
+
+| Phase | 범위 | 상태 |
+|-------|------|:----:|
+| **Phase 1 (MVP)** | Follow 엔티티, Repository (Mock/Remote), 기본 Provider | 완료 |
+| **Phase 2** | FollowButton 위젯, 선생님 프로필/검색에서 팔로우 기능 통합 | 미구현 |
+| **Phase 3** | FollowListScreen, FollowFeedScreen, FollowCard, 피드 시스템 | 미구현 |
+
+**Phase 2 선행 조건**: 선생님 프로필 화면 완성
+**Phase 3 선행 조건**: 선생님/학원의 소식(Post) 엔티티 및 작성 기능 구현
+
+---
+
+## 7. 관련 스펙
 
 | 스펙 | 관계 |
 |------|------|
@@ -160,8 +314,9 @@ enum FollowTargetType { teacher, academy }
 
 ---
 
-## 7. 변경 이력
+## 8. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2026-03-06 | 코드 기반 역설계로 초기 스펙 작성 |
+| 2026-03-07 | 화면 설계 상세(FollowListScreen, FollowFeedScreen, 위젯), Provider 코드 설계, 구현 우선순위 섹션 추가 |

@@ -1,6 +1,6 @@
 # Design System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > 통합 출처: ux_guidelines.md, figma/design_system.md, role_based_screens.md, teacher_app_screens.md, booking_system_comparison.md, competitor_ux_analysis.md
 
 ---
@@ -189,9 +189,10 @@ BottomNavigation:
 |   +-- 학생 상세 (수강권, 학부모 정보, 레슨 장소)
 |   +-- 수강권 발급 (개인레슨)
 +-- 프로필 (profile)
-    +-- 내 정보
-    +-- 미수금 관리
-    +-- 설정
+    +-- 내 프로필 (프로필 상세, 가용 시간, 레슨 정책)
+    +-- 설정 (알림, 다크모드, 녹음 관리)
+    +-- 지원 (도움말, 피드백, 앱 정보)
+    +-- 계정 (약관, 로그아웃)
 ```
 
 학생 앱:
@@ -1193,19 +1194,21 @@ class AppMotion {
 
 #### 프로필 탭
 
+> **#63 개선 완료**: 20개 메뉴 → 10개로 축소 (Miller's Law 준수). 레슨 관리 기능은 홈/학생 탭으로 이동.
+
 | 섹션 | 항목 | 경로 |
 |------|------|------|
-| 레슨 관리 | 프로필 상세 수정 | `/profile/extended` |
-| | 가용 시간 설정 | `/profile/availability` |
-| | 예약 관리 | `/booking-list` |
-| | 수강료 관리 | `/payment-management` |
-| | 미수금 관리 | `/outstanding-payments` |
+| 내 프로필 | 프로필 상세 수정 (악기/레퍼토리/경력 통합) | `/profile/extended` |
+| | 가용 시간 관리 | `/profile/availability` |
+| | 레슨 정책 설정 (수강료+시간+취소 통합) | `/lesson-policy` |
 | 설정 | 알림 설정 | `/settings/notifications` |
-| | 전체 녹음 관리 | `/settings/all-recordings` |
-| | 녹음 백업 | `/settings/backup` |
+| | 다크 모드 | - |
+| | 녹음 관리 | `/settings/all-recordings` |
 | 지원 | 도움말 | 외부 링크 |
-| | 피드백 | 외부 링크 |
-| 계정 | 로그아웃 | - |
+| | 피드백 보내기 | 외부 링크 |
+| | 앱 정보 | - |
+| 계정 | 이용약관 / 개인정보처리방침 | - |
+| | 로그아웃 | - |
 
 #### 레슨 상세 화면
 
@@ -1491,6 +1494,68 @@ TabBar 구성: 노트 | 녹음 | 과제
 2. **3자 소통**: 선생님-학생-학부모 연결
 3. **연습 관리**: 레퍼토리 템플릿, 녹음, 메트로놈
 
+### 5.3 경쟁사 대비 UX 원칙 요약
+
+경쟁사 분석 및 UX 리뷰(#63~#73)를 통해 확립된 핵심 UX 원칙.
+
+#### 대시보드 정보 계층 (Info Hierarchy)
+
+```
+1순위: 긴급 (빨강/주황) → 즉시 액션 필요
+       예: 미수금 D+, 예약 승인 대기, 결제 기한
+2순위: 오늘 → 당일 해야 할 일
+       예: 오늘의 레슨, 오늘의 과제
+3순위: 트렌드 → 진행 현황/통계
+       예: 스트릭, 이번주 연습, 이번달 레슨
+4순위: 도구 → 필요시 접근
+       예: 메트로놈, 튜너, 녹음
+```
+
+#### 수강권 카드 표준 표시
+
+수강권 카드에 반드시 포함해야 할 3가지 정보:
+
+| 요소 | 표시 | 예시 |
+|------|------|------|
+| **프로그레스바** | 잔여/총 횟수 비율 | `======----` (5/8회) |
+| **만료일** | D-day 또는 날짜 | `만료: 3/31` 또는 `[!] 7일 후 만료` |
+| **변경 횟수** | 잔여/총 변경권 | `변경: 1/2회` |
+
+#### 예약 슬롯 색상 체계 (Booking Color System)
+
+| 상태 | 색상 | HEX | 의미 |
+|------|------|-----|------|
+| **예약 가능** | 녹색 (Green) | `#4CAF50` | 빈 슬롯, 예약 가능 |
+| **내 예약** | 파랑 (Blue) | `#2196F3` | 내가 예약한 슬롯 |
+| **거의 만석** | 노랑 (Yellow) | `#FFC107` | 정원 80% 이상 |
+| **예약 불가** | 회색 (Gray) | `#9E9E9E` | 휴무, 마감, 불가 |
+
+> 색맹 접근성: 아이콘 + 텍스트를 색상과 함께 사용. 색상 범례를 예약 화면 상단에 항상 표시.
+
+#### UX 리뷰 개선 요약 (#63~#73)
+
+| 이슈 | 개선 내용 | 상태 |
+|------|----------|:----:|
+| #63 프로필 탭 과부하 | 20개 → 10개 메뉴 축소 (Miller's Law 준수) | 구현 완료 |
+| #64 접근 경로 정리 | 주 진입점 1곳 확정, 나머지 바로가기 | 구현 완료 |
+| #65 홈/스케줄 역할 분리 | 홈=대시보드(조회), 스케줄=관리(CRUD) | 구현 완료 |
+| #66 수강권 발급 뎁스 | 학생 카드에서 바로 갱신 가능 | 구현 완료 |
+| #67 과제 현황 대시보드 | 홈에 "이번 주 과제 현황" 섹션 추가 | 구현 완료 |
+| #68 레슨 노트 히스토리 | 학생 상세에 노트 히스토리 추가 | 구현 완료 |
+| #69 CalendarTab 리네이밍 | calendar → schedule 리팩토링 | 구현 완료 |
+| #70 빈 상태 UI 통일 | 공통 empty_state 컴포넌트 적용 | 구현 완료 |
+| #71 학생 카드 연습률 | 연습률 점 패턴 표시 구현 | 구현 완료 |
+| #72 통계/리포트 스펙 | 통계 스펙 작성 완료 | 스펙 완료 |
+| #73 출석 관리 스펙 | [attendance_spec.md](../lesson/attendance_spec.md) 작성 | 스펙 완료 |
+
+#### 관련 신규 스펙
+
+| 스펙 | 설명 | 상태 |
+|------|------|:----:|
+| [gamification_spec.md](../practice/gamification_spec.md) | 포인트/레벨/뱃지 시스템 (Tonara 벤치마크) | 구현 대기 |
+| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 + 수강권 차감 연동 | 구현 대기 |
+| [teacher_ux_review.md](teacher_ux_review.md) | 선생님 앱 UX 종합 검토 보고서 | 검토 완료 |
+
 ---
 
 ## 6. Change History
@@ -1513,6 +1578,7 @@ TabBar 구성: 노트 | 녹음 | 과제
 | 2026-02-05 | 역할별 화면 설계 최종 수정 | role_based_screens.md |
 | 2026-03-02 | WeekCalendarWidget 월간/주간 토글 기반 스펙 정리 | teacher_app_screens.md |
 | 2026-03-06 | **Design Master Spec 통합 문서 생성** | 전체 통합 |
+| 2026-03-07 | 프로필 탭 재구성 반영 (#63), UX 리뷰 결과 반영 (#63~#73), 경쟁사 대비 UX 원칙 추가, 새 스펙 참조 추가 (gamification, attendance, teacher_ux_review) | teacher_ux_review.md, gamification_spec.md, attendance_spec.md |
 
 ---
 
@@ -1523,11 +1589,14 @@ TabBar 구성: 노트 | 녹음 | 과제
 | [ux_guidelines.md](ux_guidelines.md) | UX 가이드라인 원본 |
 | [role_based_screens.md](role_based_screens.md) | 역할별 화면 개요 원본 |
 | [teacher_app_screens.md](teacher_app_screens.md) | 선생님 앱 화면 설계 원본 |
+| [teacher_ux_review.md](teacher_ux_review.md) | 선생님 앱 UX 종합 검토 (#63~#73) |
 | [booking_system_comparison.md](booking_system_comparison.md) | 예약 시스템 경쟁 분석 원본 |
 | [competitor_ux_analysis.md](competitor_ux_analysis.md) | 경쟁사 UX 분석 원본 |
 | [figma/design_system.md](figma/design_system.md) | 디자인 시스템 원본 |
 | [student_class_system.md](../student/student_class_system.md) | 학생 클래스/소속 시스템 |
 | [parent_system.md](../user/parent_system.md) | 학부모 시스템 |
-| [subscription_system_spec.md](../subscription/subscription_system_spec.md) | 수강권 시스템 |
-| [Multi_Option_Schedule_Spec.md](../lesson/Multi_Option_Schedule_Spec.md) | 다중 옵션 스케줄 |
+| [subscription_master.md](../subscription/subscription_master.md) | 수강권 시스템 |
+| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (포인트/레벨/뱃지) |
+| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 시스템 |
+| [Multi_Option_Schedule_Spec.md](../old/Multi_Option_Schedule_Spec.md) | 다중 옵션 스케줄 (archived) |
 | [teacher_availability_spec.md](../schedule/teacher_availability_spec.md) | 선생님 가용 슬롯 |

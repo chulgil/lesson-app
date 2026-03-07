@@ -1,6 +1,6 @@
 # User System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 > 통합 대상: parent_system, parent_dashboard_spec, parent_login_flow, teacher_registration, student_class_system, invite_system_v2, subscription_based_relationship, review_system, trial_lesson_system, google_sso_setup_guide
 
 ---
@@ -11,7 +11,22 @@
 
 Lessonaza는 음악 레슨 관리 앱으로, 선생님-학생-학부모 3자 간의 레슨/연습/과제/결제를 통합 관리한다.
 
-### 1.2 역할 (3 Roles)
+### 1.2 경쟁사 대비 차별점
+
+| 특성 | Lessonaza | Tonara | Lessonpal | Simply Music |
+|------|:---------:|:------:|:---------:|:------------:|
+| 선생님-학생-학부모 3역할 통합 | O (단일 앱) | 분리 (Teacher/Student 앱) | 선생님만 | X |
+| 학부모 대시보드 | O | 분리 앱 | X | X |
+| 수강권 기반 관계 자동 전환 | O | X | X | X |
+| 다중 선생님/학원 동시 소속 | O | X | X | X |
+| 체험 레슨 예약 시스템 | O | X | O | X |
+| 자녀 프로필 (14세 미만 법적 대응) | O | X | X | X |
+| 프로필 전환 (학부모/학생/자녀) | O | X | X | X |
+| QR 제로탭 초대 | O | X | X | X |
+
+**핵심 차별점**: 선생님, 학생, 학부모 3자가 **하나의 앱**에서 각자의 역할로 활동. 경쟁사 Tonara는 Teacher 앱/Student 앱 분리, Lessonpal은 선생님 전용. 만 14세 미만 자녀의 개인정보보호법 대응(자녀 프로필 방식)과 학부모-학생 프로필 전환은 업계 유일.
+
+### 1.3 역할 (3 Roles)
 
 | 역할 | 설명 | 계정 유형 |
 |------|------|----------|
@@ -19,13 +34,29 @@ Lessonaza는 음악 레슨 관리 앱으로, 선생님-학생-학부모 3자 간
 | **학생 (Student)** | 레슨 수강, 연습 기록, 과제 수행 | 소셜 로그인 계정 (만 14세 이상) 또는 자녀 프로필 (만 14세 미만) |
 | **학부모 (Parent)** | 자녀 레슨 모니터링, 결제, 과제 확인 | 소셜 로그인 계정 |
 
-### 1.3 다중 소속 모델 (Multi-Affiliation)
+#### UserRole Enum (정식 정의)
+
+> 소스: `features/auth/domain/entities/user_role.dart`
+
+```dart
+enum UserRole {
+  teacher,   // 선생님
+  student,   // 학생
+  parent;    // 학부모
+
+  String get label;      // 선생님/학생/학부모
+  String get emoji;      // 역할별 이모지
+  String get homeRoute;  // /home, /student-home, /parent-home
+}
+```
+
+### 1.4 다중 소속 모델 (Multi-Affiliation)
 
 - 선생님: 여러 학원 + 개인레슨 동시 관리 가능
 - 학생: 여러 선생님에게 동시 레슨 가능 (악기별)
 - 학부모: N명의 자녀 관리, 이중 역할(학부모+학생) 가능
 
-### 1.4 활동 컨텍스트
+### 1.5 활동 컨텍스트
 
 | 컨텍스트 | 설명 | organizationId |
 |----------|------|----------------|
@@ -330,16 +361,37 @@ features/parent_home/presentation/widgets/profile_switcher.dart
 | 자동 전환 | 없음 | **30일 후 "이전 레슨"으로 전환** |
 | 팔로우 용도 | 레슨 관계 | **소식 구독** (공연/이벤트) |
 
-#### RelationshipStatus (상태)
+#### RelationshipStatus Enum (정식 정의)
+
+> 소스: `features/relationship/domain/entities/relationship_status.dart`
 
 ```dart
+@HiveType(typeId: 91)
 enum RelationshipStatus {
-  trialBooked,  // 체험대기 - 체험 레슨 예약됨
-  active,       // 활성 - 수강권 유효 (정규 레슨 진행 중)
-  expired,      // 수강권 만료 - 만료 후 30일 이내
-  past,         // 이전 레슨 - 만료 후 30일 초과
+  @HiveField(0) trialBooked,  // 체험대기 - 체험 레슨 예약됨
+  @HiveField(1) active,       // 활성 - 수강권 유효 (정규 레슨 진행 중)
+  @HiveField(2) expired,      // 수강권 만료 - 만료 후 30일 이내
+  @HiveField(3) past,         // 이전 레슨 - 만료 후 30일 초과
+}
+
+extension RelationshipStatusExtension on RelationshipStatus {
+  String get displayName;        // 체험 예정/수강 중/수강권 만료/이전 레슨
+  bool get canBookLesson;        // active만 true
+  bool get canRequestLesson;     // expired, past만 true
+  bool get canSharePractice;     // active만 true
+  bool get isActiveRelationship; // past가 아니면 true
 }
 ```
+
+> **용어 주의 -- ConnectionStatus vs RelationshipStatus**
+>
+> | 용어 | 정의 | 소스 파일 | 용도 |
+> |------|------|----------|------|
+> | `RelationshipStatus` | 수강권 기반 선생님-학생 관계 (trialBooked/active/expired/past) | `features/relationship/domain/entities/relationship_status.dart` | 레슨/과제/공유 권한 결정 |
+> | `ConnectionStatus` | 앱 연결 상태 (offline/inviteSent/inviteReceived/connected/disconnected) | `core/models/shared_enums.dart` | 학생 목록 인디케이터 표시 |
+> | `ChildConnectionStatus` | 자녀 프로필 연결 상태 (connected/pending/unconnected) | `features/parent_home/domain/entities/child_profile.dart` | 학부모 대시보드 자녀 상태 |
+>
+> `RelationshipStatus`는 비즈니스 관계(수강권), `ConnectionStatus`는 기술적 연결(앱 팔로우) 상태. 이 두 개념은 독립적이며, 한 학생이 `ConnectionStatus.connected` + `RelationshipStatus.expired`일 수 있다.
 
 #### 상태 전이
 
@@ -1504,10 +1556,75 @@ features/schedule/presentation/widgets/booking_card.dart
 
 ---
 
-## 9. 관련 스펙
+## 9. Claude 구현 가이드
+
+### 9.1 핵심 Provider 설계
+
+> Claude가 새 기능을 구현할 때 참조할 Provider 상세. `@riverpod` 어노테이션 사용 필수.
+
+| Provider | 파라미터 | 반환 타입 | 설명 | 파일 |
+|----------|---------|----------|------|------|
+| authProvider | - | `AsyncValue<AuthUser?>` | 현재 로그인 사용자 | `features/auth/presentation/providers/auth_provider.dart` |
+| userRoleProvider | - | `UserRole` | 현재 선택된 역할 | `features/auth/presentation/providers/user_role_provider.dart` |
+| teacherClassesProvider | teacherId: String | `AsyncValue<List<LessonClass>>` | 선생님 클래스 목록 | `features/students/presentation/providers/lesson_class_providers.dart` |
+| classMembershipsProvider | classId: String | `AsyncValue<List<StudentWithMembership>>` | 클래스별 학생 목록 | `features/students/presentation/providers/membership_providers.dart` |
+| groupedStudentsProvider | teacherId: String | `AsyncValue<Map<LessonClass, List<StudentWithMembership>>>` | 클래스별 그룹화된 학생 | `features/students/presentation/providers/grouped_students_provider.dart` |
+| childProfilesProvider | parentId: String | `AsyncValue<List<ChildProfile>>` | 학부모의 자녀 목록 | `features/parent_home/presentation/providers/child_profile_provider.dart` |
+| selectedChildProfileProvider | - | `ChildProfile?` | 현재 선택된 자녀 | `features/parent_home/presentation/providers/child_profile_provider.dart` |
+| teacherExtendedProfileProvider | teacherId: String | `AsyncValue<TeacherProfile>` | 선생님 확장 프로필 | `features/profile/presentation/providers/teacher_extended_profile_provider.dart` |
+| inviteProvider | - | `InviteState` | 초대 코드 생성/검증 | `features/profile/presentation/providers/invite_provider.dart` |
+| teacherSearchProvider | filter: SearchFilter | `AsyncValue<List<Teacher>>` | 선생님 검색 결과 | `features/search/presentation/providers/teacher_search_provider.dart` |
+
+### 9.2 구현 파일-코드 매핑 (미구현 기능)
+
+Claude가 미구현 기능을 구현할 때 생성해야 할 파일 목록.
+
+#### 팔로우 시스템 (Follow)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `features/relationship/domain/entities/follow.dart` | 생성 필요 |
+| Repository | `features/relationship/domain/repositories/follow_repository.dart` | 생성 필요 |
+| Repository (Mock) | `features/relationship/data/repositories/mock_follow_repository.dart` | 생성 필요 |
+| Provider | `features/relationship/presentation/providers/follow_provider.dart` | 생성 필요 |
+| Screen | `features/relationship/presentation/screens/followers_screen.dart` | 생성 필요 |
+
+#### 리뷰 시스템 (Review)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `features/profile/domain/entities/review.dart` | 정의 완료 |
+| Repository | `features/profile/domain/repositories/review_repository.dart` | 생성 필요 |
+| Repository (Mock) | `features/profile/data/repositories/mock_review_repository.dart` | 생성 필요 |
+| Provider | `features/profile/presentation/providers/review_provider.dart` | 생성 필요 |
+| Screen (작성) | `features/profile/presentation/screens/review_write_screen.dart` | 생성 필요 |
+| Screen (목록) | `features/profile/presentation/screens/review_list_screen.dart` | 생성 필요 |
+
+#### 자격증 인증 시스템
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `features/profile/domain/entities/certificate.dart` | 정의 완료 (teacher_profile.dart 내) |
+| Provider | `features/profile/presentation/providers/certificate_provider.dart` | 생성 필요 |
+| Screen | `features/profile/presentation/screens/certificate_edit_screen.dart` | 구현 완료 (업로드/검토 로직 미구현) |
+
+#### 수강권 자동 전환 (백엔드 의존)
+
+| 계층 | 파일 | 상태 |
+|------|------|:----:|
+| Entity | `features/relationship/domain/entities/teacher_student_relation.dart` | 정의 완료 |
+| Repository | `features/relationship/domain/repositories/teacher_student_relation_repository.dart` | 정의 완료 |
+| Repository (Remote) | `features/relationship/data/repositories/remote_teacher_student_relation_repository.dart` | 정의 완료 |
+| Provider | `features/relationship/presentation/providers/relationship_providers.dart` | 정의 완료 |
+| 자동 전환 로직 | 백엔드 cron/trigger 필요 | 미구현 |
+
+---
+
+## 10. 관련 스펙
 
 | 문서 | 경로 | 설명 |
 |------|------|------|
+| 연습 시스템 마스터 | `specs/practice/practice_master.md` | 연습/녹음/레퍼토리 통합 마스터 |
 | 학부모 시스템 | `specs/user/parent_system.md` | 학부모 상세 (본 문서에 통합) |
 | 학부모 대시보드 | `specs/user/parent_dashboard_spec.md` | 대시보드 상세 (본 문서에 통합) |
 | 학부모 로그인 | `specs/user/parent_login_flow.md` | 로그인 플로우 (본 문서에 통합) |
@@ -1526,8 +1643,34 @@ features/schedule/presentation/widgets/booking_card.dart
 
 ---
 
-## 10. 변경 이력
+## 11. 용어 사전 (Glossary)
+
+> 본 문서에서 사용하는 핵심 용어의 정의. 혼동하기 쉬운 용어를 명확히 구분.
+
+| 용어 | 정의 | 관련 Enum/Entity |
+|------|------|------------------|
+| **역할 (Role)** | 사용자의 앱 내 역할: 선생님/학생/학부모 | `UserRole` |
+| **관계 (Relationship)** | 수강권 기반 선생님-학생 레슨 관계 | `RelationshipStatus` |
+| **연결 (Connection)** | 앱 내 팔로우/초대 기술적 연결 상태 | `ConnectionStatus` |
+| **팔로우 (Follow)** | 소식 구독 (레슨 관계와 무관, 일방향) | `Follow` entity |
+| **수강권 (Subscription)** | 레슨 이용권 (기간제/회차제) | `Subscription` entity |
+| **클래스 (LessonClass)** | 선생님의 레슨 소속 그룹 (학원/개인) | `LessonClass` entity |
+| **멤버십 (ClassMembership)** | 학생의 클래스 소속 관계 | `ClassMembership` entity |
+| **자녀 프로필 (ChildProfile)** | 만 14세 미만 학부모 종속 프로필 | `ChildProfile` entity |
+| **자녀 연결 (ChildConnection)** | 자녀 프로필의 선생님 연결 상태 | `ChildConnectionStatus` |
+| **수기 학생** | 앱 미사용, 선생님이 직접 등록한 학생 | `ConnectionStatus.offline` |
+| **프로필 전환** | 학부모/학생/자녀 간 역할 전환 | `ProfileSwitcher` widget |
+
+---
+
+## 12. 변경 이력
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.1 | 2026-03-07 | Enum 정식 정의 추가 (UserRole, RelationshipStatus dart 코드 블록) |
+| | | 경쟁사 대비 차별점 섹션 추가 (1.2) |
+| | | ConnectionStatus vs RelationshipStatus 용어 명확화 추가 |
+| | | Claude 구현 가이드 섹션 추가 (9장) - Provider 설계 상세, 미구현 파일 매핑 |
+| | | 용어 사전 (Glossary) 섹션 추가 (11장) |
+| | | 관련 스펙에 practice_master.md 참조 추가 |
 | 1.0 | 2026-03-06 | 초안 -- 10개 스펙 파일 통합 마스터 스펙 작성 |

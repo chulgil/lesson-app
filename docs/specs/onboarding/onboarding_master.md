@@ -1,6 +1,6 @@
 # Onboarding System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 
 ## 1. 개요
 
@@ -137,7 +137,31 @@
 | 프로필 설정 | `AppRoutes.teacherProfileSetup` |
 | 튜토리얼 | `AppRoutes.teacherTutorial` |
 
-## 4. 데이터 모델
+## 4. Enum 정의 (Dart)
+
+> 모든 enum은 `features/profile/domain/entities/teacher_onboarding.dart`에 정의.
+
+```dart
+enum OnboardingStep {
+  roleSelect,         // 역할 선택
+  phoneVerification,  // 휴대폰 인증
+  profileSetup,       // 프로필 설정
+  tutorial,           // 튜토리얼
+  completed;          // 완료
+}
+
+enum TutorialStep {
+  welcome,        // "Welcome to Lessonaza!"
+  inviteStudent,  // 학생 초대 방법
+  createLesson,   // 레슨 생성 방법
+  writeFeedback,  // 피드백 작성 방법
+  completed;      // 완료 축하
+}
+```
+
+---
+
+## 5. 데이터 모델
 
 ### TeacherOnboardingState
 
@@ -187,7 +211,25 @@
 | `isProfileFormValidProvider` | `Provider<bool>` | 프로필 폼 유효성 |
 | `profileMissingFieldsProvider` | `Provider<List<String>>` | 누락 필드 목록 |
 
-## 5. 구현 현황
+## 6. 구현 파일 위치
+
+> `features/onboarding/` 기준 상대 경로. 새 파일 추가 시 이 표를 업데이트한다.
+
+| 레이어 | 파일 경로 | 설명 |
+|--------|----------|------|
+| **Entity (Enum)** | `profile/domain/entities/teacher_onboarding.dart` | OnboardingStep, TutorialStep, TeacherOnboardingState, PhoneVerification 등 |
+| **Entity (Extension)** | `onboarding/domain/entities/onboarding_step.dart` | OnboardingStep UI 헬퍼 (label, stepNumber, progress) |
+| **Provider** | `onboarding/presentation/providers/onboarding_providers.dart` | TeacherOnboardingNotifier 등 모든 온보딩 Provider |
+| **Provider** | `onboarding/presentation/providers/teacher_profile_repository_provider.dart` | TeacherProfileRepository Provider |
+| **Screen** | `onboarding/presentation/screens/phone_verification_screen.dart` | 휴대폰 인증 화면 |
+| **Screen** | `onboarding/presentation/screens/profile_setup_screen.dart` | 프로필 설정 화면 |
+| **Screen** | `onboarding/presentation/screens/tutorial_screen.dart` | 튜토리얼 화면 |
+| **Repository** | `repositories/teacher_profile_repository.dart` | TeacherProfileRepository 인터페이스 + Mock (레거시 위치) |
+| **Route** | `core/router/routes/auth_routes.dart` | 온보딩 라우트 정의 |
+
+---
+
+## 7. 구현 현황
 
 | 기능 | 상태 |
 |------|------|
@@ -207,14 +249,18 @@
 | 실제 이미지 업로드 | 미구현 (mock) |
 | Remote API Repository | 미구현 |
 
-## 6. 관련 스펙
+## 8. 관련 스펙
 
-- `features/profile/domain/entities/teacher_onboarding.dart` - OnboardingStep enum 정의
-- `features/auth/` - 인증 및 역할 관리
-- `repositories/teacher_profile_repository.dart` - 프로필 Repository 인터페이스 및 Mock
+| 스펙 | 관계 |
+|------|------|
+| [선생님 등록 스펙](../../specs/user/teacher_registration.md) | 선생님 가입 전체 플로우 |
+| [UX 가이드라인](../design/ux_guidelines.md) | UI/UX 규칙 |
 
-## 7. 변경 이력
+---
+
+## 9. 변경 이력
 
 | 날짜 | 내용 |
 |------|------|
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
+| 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 |

@@ -1,6 +1,6 @@
 # Calendar System Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 
 ## 1. 개요
 
@@ -81,19 +81,41 @@ CalendarTab (ConsumerWidget)
 
 ### CalendarEventType (enum)
 
-| 값 | 라벨 |
-|----|------|
-| `lesson` | 레슨 |
-| `practice` | 연습 |
-| `break_` | 휴강 |
+```dart
+/// calendar/domain/entities/calendar_event.dart
+enum CalendarEventType {
+  lesson,    // 레슨
+  practice,  // 연습
+  break_;    // 휴강
+
+  String get label {
+    switch (this) {
+      case CalendarEventType.lesson: return '레슨';
+      case CalendarEventType.practice: return '연습';
+      case CalendarEventType.break_: return '휴강';
+    }
+  }
+}
+```
 
 ### CalendarViewType (enum)
 
-| 값 | 라벨 |
-|----|------|
-| `month` | 월 |
-| `week` | 주 |
-| `day` | 일 |
+```dart
+/// calendar/domain/entities/calendar_event.dart
+enum CalendarViewType {
+  month,  // 월
+  week,   // 주
+  day;    // 일
+
+  String get label {
+    switch (this) {
+      case CalendarViewType.month: return '월';
+      case CalendarViewType.week: return '주';
+      case CalendarViewType.day: return '일';
+    }
+  }
+}
+```
 
 > 현재 코드에서 `CalendarViewType`과 `CalendarEventType`은 정의되어 있으나, 화면에서는 주간 뷰만 구현됨.
 
@@ -115,7 +137,20 @@ CalendarTab (ConsumerWidget)
 - `LessonClass` / `LessonClassType` - 레슨 클래스 (학원/개인)
 - `Subscription` - 수강권 정보
 
-## 5. 구현 현황
+## 5. 구현 파일 위치
+
+> `features/calendar/` 기준 상대 경로. 새 파일 추가 시 이 표를 업데이트한다.
+
+| 레이어 | 파일 경로 | 설명 |
+|--------|----------|------|
+| **Entity** | `calendar/domain/entities/calendar_event.dart` | CalendarEventType, CalendarViewType enum |
+| **Entity** | `calendar/domain/entities/entities.dart` | Entity barrel export |
+| **Screen** | `calendar/presentation/screens/calendar_tab.dart` | 캘린더 탭 메인 화면 (선생님용) |
+| **공통 위젯** | `core/widgets/week_calendar_widget.dart` | 주간 캘린더 공통 위젯 |
+
+---
+
+## 6. 구현 현황
 
 | 기능 | 상태 |
 |------|------|
@@ -130,15 +165,19 @@ CalendarTab (ConsumerWidget)
 | 빈 상태/에러 상태 | 구현 완료 |
 | 월간/일간 뷰 전환 | 미구현 (enum만 정의) |
 
-## 6. 관련 스펙
+## 7. 관련 스펙
 
-- `docs/specs/design/ux_guidelines.md` - UX 가이드라인
-- `core/widgets/week_calendar_widget.dart` - 공통 주간 캘린더 위젯
-- `features/subscription/` - 수강권 도메인
-- `features/students/` - 학생/멤버십 도메인
+| 스펙 | 관계 |
+|------|------|
+| [UX 가이드라인](../design/ux_guidelines.md) | UX 규칙 |
+| [학생 홈 대시보드](../student_home/student_home_master.md) | 학생 스케줄 탭 (유사 구조) |
+| [연습 시스템](../practice/practice_master.md) | 연습 일정 연동 |
 
-## 7. 변경 이력
+---
+
+## 8. 변경 이력
 
 | 날짜 | 내용 |
 |------|------|
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
+| 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 |

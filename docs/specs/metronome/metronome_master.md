@@ -1,6 +1,6 @@
 # 메트로놈 시스템 마스터 스펙
 
-> 최종 수정: 2026-03-06
+> 최종 수정: 2026-03-07
 > 상태: Phase 2 구현 완료 / Phase 3 예정
 > 통합 문서: metronome_system.md, metronome_sound.md, subdivision_ui_design.md, avaudioengine_guide.md
 
@@ -537,9 +537,66 @@ void _timingIsolateEntry(SendPort mainSendPort) {
 
 ---
 
-## 7. 데이터 모델
+## 7. Enum 정의 (Dart)
 
-### 7.1 MetronomeSettings
+> 모든 enum은 `features/practice/domain/entities/metronome_settings.dart`에 정의.
+
+```dart
+enum TimeSignature {
+  twoFour,   // 2/4
+  threeFour, // 3/4
+  fourFour,  // 4/4 (기본값)
+  sixEight,  // 6/8
+  nineEight, // 9/8
+  twelveEight; // 12/8
+}
+
+enum MetronomeSound {
+  pen,         // 기본값
+  drum,
+  happyKitten,
+  stick,
+  woodblock,
+  silent;
+}
+
+enum AccentPattern {
+  uniform,           // 모든 박 동일
+  firstBeatOnly,     // 첫박만 강조
+  strongMediumWeak;  // 강중약 (기본값)
+}
+
+enum BeatType {
+  strong,  // 첫 박 (악센트)
+  medium,  // 중간 박
+  weak;    // 약박 및 서브디비전
+}
+
+enum Subdivision {
+  quarter,              // 1분할 (기본)
+  eighth,               // 2분할
+  triplet,              // 3분할
+  sixteenth,            // 4분할
+  quintuplet,           // 5분할
+  sextuplet,            // 6분할
+  eighthOffbeat,        // 뒷박
+  tripletFirst,         // 셋잇단-첫음
+  tripletLast,          // 셋잇단-끝음
+  tripletSkipFirst,     // 첫음빼고
+  sixteenthOffbeat,     // 16분-엇박
+  sixteenthSkipFirst,   // 1빼고
+  sixteenthFirstLast,   // 처음끝
+  sixteenthMiddle,      // 중간
+  sextupletFirst,       // 6연음-첫음
+  sextupletAccents;     // 6연음-3+3
+}
+```
+
+---
+
+## 8. 데이터 모델
+
+### 8.1 MetronomeSettings
 
 ```dart
 class MetronomeSettings {
@@ -553,7 +610,7 @@ class MetronomeSettings {
 }
 ```
 
-### 7.2 MetronomeState (Provider)
+### 8.2 MetronomeState (Provider)
 
 ```dart
 class MetronomeState {
@@ -568,7 +625,7 @@ class MetronomeState {
 }
 ```
 
-### 7.3 연습 기록 연동
+### 8.3 연습 기록 연동
 
 ```dart
 // PracticeRecording 확장
@@ -599,13 +656,13 @@ class PracticeLog {
 
 ---
 
-## 8. UI 설계
+## 9. UI 설계
 
-### 8.1 디자인 컨셉: "고양이 메트로놈"
+### 9.1 디자인 컨셉: "고양이 메트로놈"
 
 어린이 사용자를 고려한 친근한 비주얼. 고양이 두 마리가 눈을 감았다 뜨는 애니메이션.
 
-### 8.2 하단 컨트롤러 바 (Compact Mode)
+### 9.2 하단 컨트롤러 바 (Compact Mode)
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -622,7 +679,7 @@ Compact 모드 고양이 깜박임:
 | 스케일 피크 | 1.15 |
 | Curve | easeOut |
 
-### 8.3 풀스크린 모달
+### 9.3 풀스크린 모달
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -642,7 +699,7 @@ Compact 모드 고양이 깜박임:
 └─────────────────────────────────────────────────────┘
 ```
 
-### 8.4 발바닥 애니메이션 상세
+### 9.4 발바닥 애니메이션 상세
 
 **드롭 애니메이션 ("툭 올려놓기" 모션):**
 
@@ -691,7 +748,7 @@ Compact 모드 고양이 깜박임:
 
 ---
 
-## 9. 구현 현황
+## 10. 구현 현황
 
 ### Phase 1: 기본 메트로놈 (MVP) ✅ 완료
 
@@ -727,7 +784,7 @@ Compact 모드 고양이 깜박임:
 
 ---
 
-## 10. 변경 이력
+## 11. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
@@ -739,6 +796,7 @@ Compact 모드 고양이 깜박임:
 | 2026-01-17 | 서브디비전 UI 설계 문서 작성, AVAudioEngine 가이드 작성 |
 | 2026-01-19 | Android Oboe 엔진 구현: C++ Oboe 기반 저지연 메트로놈, JNI 브릿지, ProGuard 설정 |
 | 2026-03-06 | **마스터 스펙 통합**: 4개 문서(metronome_system, metronome_sound, subdivision_ui_design, avaudioengine_guide)를 단일 문서로 통합. 실제 구현 코드 기준으로 데이터 모델 및 아키텍처 정보 업데이트 |
+| 2026-03-07 | Dart enum 정의 섹션 추가, 깨진 링크 수정 (practice_system→practice_master), 섹션 번호 정리 |
 
 ---
 
@@ -746,7 +804,7 @@ Compact 모드 고양이 깜박임:
 
 | 문서 | 설명 |
 |------|------|
-| [practice_system.md](../practice/practice_system.md) | 연습 시스템 기본 스펙 |
+| [practice_master.md](../practice/practice_master.md) | 연습 시스템 마스터 스펙 |
 | [architecture.md](../../architecture.md) | 전체 아키텍처 가이드 |
 
 ## 참고 자료

@@ -1,8 +1,8 @@
 # Schedule System Master Spec
 
-> 최종 업데이트: 2026-03-06
+> 최종 업데이트: 2026-03-07
 > 통합 문서: `teacher_availability_spec.md`, `schedule_confirmation_card_spec.md`
-> 관련 문서: [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)
+> 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)
 
 ---
 
@@ -660,9 +660,303 @@ pending -> dismissed (카드 닫기/만료)
 
 ---
 
-## 10. 구현 현황
+## 10. Enum 정의
 
-### 10.1 선생님 가용 시간 시스템
+이 섹션은 스케줄 도메인에서 사용하는 모든 enum을 정식 Dart 코드 블록으로 정의한다.
+
+### 10.1 AvailabilitySlotStatus (5개 값)
+
+```dart
+enum AvailabilitySlotStatus {
+  available,   // 예약 가능
+  booked,      // 예약됨 (다른 학생)
+  myBooking,   // 내 예약
+  cancelled,   // 취소됨 (휴무 등)
+  past,        // 지난 시간
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/availability_slot.dart`
+
+### 10.2 SlotStatus (3개 값)
+
+```dart
+@HiveType(typeId: 71)
+enum SlotStatus {
+  available,   // 예약 가능
+  booked,      // 예약됨
+  cancelled,   // 취소됨 (휴무 등)
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/teacher_availability.dart`
+
+### 10.3 AvailabilityType (2개 값)
+
+```dart
+@HiveType(typeId: 70)
+enum AvailabilityType {
+  regular,   // 주간 반복
+  oneTime,   // 1회성
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/teacher_availability.dart`
+
+### 10.4 ExceptionType (3개 값)
+
+```dart
+@HiveType(typeId: 74)
+enum ExceptionType {
+  holiday,          // 특정 날짜 1일 휴무
+  vacation,         // 기간 휴무 (startDate ~ endDate)
+  additionalSlot,   // 1회성 추가 슬롯
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/teacher_availability.dart`
+
+### 10.5 BookingStatus (7개 값)
+
+```dart
+enum BookingStatus {
+  pending,          // 신청완료 (승인 대기)
+  confirmed,        // 확정 (선생님 승인)
+  changeRequested,  // 변경 요청 중
+  completed,        // 완료
+  cancelled,        // 취소
+  unavailable,      // 일정 조율 필요 (선생님이 해당 시간 불가)
+  expired,          // 응답 대기 만료 (48시간 초과)
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/lesson_booking.dart`
+
+### 10.6 ScheduleStatus (6개 값 - 그룹 클래스)
+
+```dart
+@HiveType(typeId: 82)
+enum ScheduleStatus {
+  open,         // 예약 가능
+  full,         // 만석 (대기자 가능)
+  closed,       // 예약 마감
+  cancelled,    // 수업 취소
+  inProgress,   // 수업 진행 중
+  completed,    // 수업 완료
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/group_class_schedule.dart`
+
+### 10.7 GroupBookingStatus (6개 값)
+
+```dart
+@HiveType(typeId: 84)
+enum GroupBookingStatus {
+  confirmed,       // 예약 확정
+  waitlist,        // 대기 중
+  attended,        // 출석 완료
+  noShow,          // 미참석
+  cancelled,       // 취소됨
+  autoCancelled,   // 자동 취소 (수업 시작 시 대기자)
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/group_class_booking.dart`
+
+### 10.8 GroupClassType (2개 값)
+
+```dart
+@HiveType(typeId: 80)
+enum GroupClassType {
+  regular,   // 정기 반복 클래스
+  dropIn,    // 1회성 클래스
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/group_class.dart`
+
+### 10.9 ScheduleChangeType (2개 값) / ScheduleChangeStatus (5개 값)
+
+```dart
+@HiveType(typeId: 90)
+enum ScheduleChangeType {
+  singleLesson,   // 1회성 변경 (이번 주만)
+  bulkChange,      // 일괄 변경 (앞으로 모든 레슨)
+}
+
+@HiveType(typeId: 91)
+enum ScheduleChangeStatus {
+  pending,                // 대기 중
+  approved,               // 승인됨
+  rejected,               // 거절됨
+  alternativeProposed,    // 대안 제시됨
+  cancelled,              // 취소됨
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/lesson_schedule_change.dart`
+
+### 10.10 NoShowPolicy (4개 값)
+
+```dart
+@HiveType(typeId: 88)
+enum NoShowPolicy {
+  deductCredit,   // 1회 차감 (기본값)
+  halfCredit,     // 0.5회 차감
+  noDeduction,    // 차감 없음
+  reschedule,     // 보강으로 전환
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/no_show_policy.dart`
+> 주의: `group_class.dart`에도 별도 `NoShowPolicy` enum 존재 (TypeId: 86, `deduct`/`noDeduct` 2개 값). 백엔드 전환 시 통합 필요.
+
+### 10.11 MakeupStatus (5개 값) / MakeupReason (4개 값)
+
+```dart
+@HiveType(typeId: 85)
+enum MakeupStatus {
+  pending,     // 시간 미정
+  scheduled,   // 시간 확정
+  completed,   // 완료
+  expired,     // 만료 (30일)
+  waived,      // 선생님 면제 처리
+}
+
+@HiveType(typeId: 86)
+enum MakeupReason {
+  studentCancellation,   // 학생 취소 (D-1 이전)
+  teacherCancellation,   // 선생님 취소
+  noShowReschedule,      // 노쇼 (reschedule 정책)
+  other,                 // 기타
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/makeup_lesson.dart`
+
+### 10.12 LessonRequestStatus (6개 값)
+
+```dart
+@HiveType(typeId: 99)
+enum LessonRequestStatus {
+  pending,         // 요청 대기 (7일 만료)
+  proposalSent,    // 수강권 제안됨
+  accepted,        // 수락 + 결제 완료
+  declined,        // 선생님 거절 (사유 포함)
+  expired,         // 7일 만료
+  cancelled,       // 학생 취소
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/lesson_request.dart`
+
+### 10.13 ScheduleCardType (3개 값) / ScheduleCardStatus (4개 값)
+
+```dart
+@HiveType(typeId: 100)
+enum ScheduleCardType {
+  afterTrial,              // 체험 후 등록
+  reEnrollment,            // 재등록
+  additionalInstrument,    // 추가 악기
+}
+
+@HiveType(typeId: 101)
+enum ScheduleCardStatus {
+  pending,       // 확인 대기
+  confirmed,     // 확정됨
+  changedTime,   // 시간 변경됨
+  dismissed,     // 닫힘
+}
+```
+
+> 코드 위치: `features/schedule/domain/entities/schedule_confirmation_card.dart`
+
+---
+
+## 11. 구현 파일 매핑
+
+### 11.1 엔티티 -> 코드 매핑
+
+| 스펙 항목 | 코드 파일 |
+|----------|----------|
+| TeacherAvailability | `features/schedule/domain/entities/teacher_availability.dart` |
+| WeeklySchedule | `features/schedule/domain/entities/teacher_availability.dart` |
+| TimeException | `features/schedule/domain/entities/teacher_availability.dart` |
+| AvailabilitySlot (UI 모델) | `features/schedule/domain/entities/availability_slot.dart` |
+| LessonBooking | `features/schedule/domain/entities/lesson_booking.dart` |
+| GroupClass | `features/schedule/domain/entities/group_class.dart` |
+| GroupClassSchedule | `features/schedule/domain/entities/group_class_schedule.dart` |
+| GroupClassBooking | `features/schedule/domain/entities/group_class_booking.dart` |
+| MakeupLesson | `features/schedule/domain/entities/makeup_lesson.dart` |
+| NoShowPolicy / NoShowRecord | `features/schedule/domain/entities/no_show_policy.dart` |
+| LessonScheduleChange | `features/schedule/domain/entities/lesson_schedule_change.dart` |
+| LessonRequest | `features/schedule/domain/entities/lesson_request.dart` |
+| ScheduleConfirmationCard | `features/schedule/domain/entities/schedule_confirmation_card.dart` |
+| TimeSlot | `features/schedule/domain/entities/time_slot.dart` |
+
+### 11.2 Repository -> 코드 매핑
+
+| 스펙 항목 | 인터페이스 | Mock 구현 |
+|----------|----------|----------|
+| 가용시간 | `domain/repositories/teacher_availability_repository.dart` | `data/repositories/mock_teacher_availability_repository.dart` |
+| 그룹클래스 | `domain/repositories/group_class_booking_repository.dart` | `data/repositories/mock_group_class_booking_repository.dart` |
+| 레슨요청 | `domain/repositories/lesson_request_repository.dart` | `data/repositories/mock_lesson_request_repository.dart` |
+| 확인카드 | `domain/repositories/schedule_confirmation_card_repository.dart` | `data/repositories/mock_schedule_confirmation_card_repository.dart` |
+
+### 11.3 화면 -> 코드 매핑
+
+| 스펙 항목 | 코드 파일 |
+|----------|----------|
+| 레슨 예약 | `presentation/screens/lesson_booking_screen.dart` |
+| 예약 확인 | `presentation/screens/booking_confirmation_screen.dart` |
+| 예약 취소 | `presentation/screens/booking_cancel_screen.dart` |
+| 예약 변경 | `presentation/screens/booking_reschedule_screen.dart` |
+| 내 예약 목록 | `presentation/screens/my_bookings_screen.dart` |
+| 대기 예약 (선생님) | `presentation/screens/pending_bookings_screen.dart` |
+| 선생님 가용시간 설정 | `presentation/screens/teacher_availability_screen.dart` |
+| 주간 스케줄 | `presentation/screens/weekly_schedule_screen.dart` |
+| 시간 예외 관리 | `presentation/screens/time_exception_screen.dart` |
+| 정기 레슨 등록 | `presentation/screens/register_regular_lesson_screen.dart` |
+| 그룹 클래스 상세 | `presentation/screens/group_class_detail_screen.dart` |
+| 그룹 출석 관리 | `presentation/screens/group_class_attendance_screen.dart` |
+| 레슨 요청 (학생) | `presentation/screens/lesson_request_screen.dart` |
+| 레슨 요청 목록 (선생님) | `presentation/screens/lesson_requests_screen.dart` |
+| 내 레슨 요청 (학생) | `presentation/screens/my_lesson_requests_screen.dart` |
+| 스케줄 탭 | `presentation/screens/schedule_tab.dart` |
+
+> 모든 경로는 `frontend/lib/features/schedule/` 기준 상대 경로
+
+---
+
+## 12. 경쟁사 대비 차별점
+
+### 12.1 스케줄 시스템 차별화
+
+| 기능 | Lessonaza | 스튜디오메이트/Studiomate | 일반 예약 시스템 |
+|------|:---------:|:------------------------:|:---------------:|
+| 슬롯 기반 선착순 예약 | O | X (관리자 배정) | 부분적 |
+| 선생님 주간 스케줄 + 예외 관리 | O | 제한적 | X |
+| 스마트 추천 (이전 레슨 시간 기반) | O | X | X |
+| 1:1 = 정원 1명 클래스 (통합 로직) | O | X (별도 구현) | X |
+| 스케줄 확인 카드 (3 시나리오 자동 분기) | O | X | X |
+| 정기 레슨 일괄 시간 변경 + 대안 제시 | O | 수동 | X |
+| 보강 30일 자동 만료 추적 | O | 수동 | X |
+| 학생별 노쇼 정책 커스터마이징 | O | 일괄 정책 | X |
+| 대기자 자동 승급 (그룹 클래스) | O | 수동 | 부분적 |
+
+### 12.2 핵심 경쟁력
+
+1. **제로 핑퐁 예약**: 기존 3단계 왕복(제안-선택-승인)을 2단계(등록-예약)로 단축, 알림 1회만 발생
+2. **통합 슬롯 로직**: 1:1과 그룹 레슨이 동일한 예약 엔진 사용하여 일관성 보장
+3. **멀티옵션 스케줄링**: 선생님이 복수 가용시간 등록, 학생이 칩 UI로 원클릭 선택
+4. **자동 시나리오 분기**: 수강권 발급 시 체험후/재등록/추가악기를 자동 판별하여 최적 스케줄 카드 표시
+
+---
+
+## 13. 구현 현황
+
+### 13.1 선생님 가용 시간 시스템
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -679,7 +973,7 @@ pending -> dismissed (카드 닫기/만료)
 | AvailabilityBlockGrid (선생님 블록 그리드) | 완료 | `presentation/widgets/availability/availability_block_grid.dart` |
 | AvailabilityBlock / AvailabilityLegend | 완료 | `presentation/widgets/availability/` |
 
-### 10.2 학생 예약 플로우
+### 13.2 학생 예약 플로우
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -695,7 +989,7 @@ pending -> dismissed (카드 닫기/만료)
 | 예약 가능 시간만 표시 (blocked 미노출) | 완료 | - |
 | 회원 자동 인식 (게스트 다이얼로그 생략) | 완료 | - |
 
-### 10.3 예약 변경/취소
+### 13.3 예약 변경/취소
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -705,7 +999,7 @@ pending -> dismissed (카드 닫기/만료)
 | BookingNotificationService | 완료 | `presentation/services/booking_notification_service.dart` |
 | SlotRecommendationService | 완료 | `domain/services/slot_recommendation_service.dart` |
 
-### 10.4 스케줄 확인 카드
+### 13.4 스케줄 확인 카드
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -716,7 +1010,7 @@ pending -> dismissed (카드 닫기/만료)
 | 카드 타입 분기 로직 | 완료 | `subscription/.../issue_subscription_screen.dart` (`_detectScheduleCardType`) |
 | 대시보드 표시 | **비활성** | 설계 재검토 필요 시 재활성화 |
 
-### 10.5 그룹 클래스
+### 13.5 그룹 클래스
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -727,7 +1021,7 @@ pending -> dismissed (카드 닫기/만료)
 | GroupClassAttendanceScreen | 완료 | `presentation/screens/group_class_attendance_screen.dart` |
 | GroupClassBookingProviders | 완료 | `presentation/providers/group_class_booking_providers.dart` |
 
-### 10.6 정기 레슨 변경 / 보강 / 노쇼
+### 13.6 정기 레슨 변경 / 보강 / 노쇼
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -735,7 +1029,7 @@ pending -> dismissed (카드 닫기/만료)
 | MakeupLesson 엔티티 | 완료 | `domain/entities/makeup_lesson.dart` |
 | NoShowPolicy / NoShowRecord 엔티티 | 완료 | `domain/entities/no_show_policy.dart` |
 
-### 10.7 레슨 요청 (재등록)
+### 13.7 레슨 요청 (재등록)
 
 | 기능 | 상태 | 파일 |
 |------|:----:|------|
@@ -747,7 +1041,7 @@ pending -> dismissed (카드 닫기/만료)
 | MyLessonRequestsScreen (학생) | 완료 | `presentation/screens/my_lesson_requests_screen.dart` |
 | LessonRequestProviders | 완료 | `presentation/providers/lesson_request_providers.dart` |
 
-### 10.8 미완료 / 향후 개선
+### 13.8 미완료 / 향후 개선
 
 | 항목 | 우선순위 | 상태 |
 |------|:--------:|:----:|
@@ -759,22 +1053,26 @@ pending -> dismissed (카드 닫기/만료)
 
 ---
 
-## 11. 관련 스펙
+## 14. 관련 스펙
 
 | 문서 | 설명 |
 |------|------|
+| [lesson_master.md](../lesson/lesson_master.md) | 레슨 시스템 마스터 (레슨 플로우, 예약, 취소/변경) |
 | [subscription_system_spec.md](../subscription/subscription_system_spec.md) | 수강권 시스템 |
 | [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md) | 수강권 제안 (결제 전 플로우) |
 | [group_lesson_spec.md](../lesson/group_lesson_spec.md) | 그룹레슨 시스템 |
+| [attendance_spec.md](../lesson/attendance_spec.md) | 출석 관리 시스템 |
+| [gamification_spec.md](../practice/gamification_spec.md) | 게이미피케이션 (연습/학생 참여) |
 | [ux_guidelines.md](../design/ux_guidelines.md) | UX 가이드라인 (섹션 11~12) |
 | [subscription.md](../../schema/entities/subscription.md) | 수강권 엔티티 스키마 |
 
 ---
 
-## 12. 변경 이력
+## 15. 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-03-07 | Enum 정의 완전성 보강 (모든 enum Dart 코드 블록 추가), 구현 파일 매핑 추가, 경쟁사 차별점 추가, lesson_master 상호 참조, attendance/gamification 스펙 참조 추가 |
 | 2026-03-06 | Master Spec 작성 (teacher_availability_spec.md + schedule_confirmation_card_spec.md 통합) |
 | 2026-03-02 | 스케줄 확인 카드 타입 분기 로직 구현, 대시보드 표시 비활성화 |
 | 2026-02-01 | 예약 가능 시간만 표시 + 회원 자동 인식 구현 |

@@ -1,6 +1,6 @@
 # 설정 시스템 Master Spec
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-07
 
 ## 1. 개요
 
@@ -226,7 +226,28 @@ OrphanRecordingsDiagnostic
 
 ---
 
-## 5. 구현 현황
+## 5. 구현 파일 위치
+
+> `features/settings/` 기준 상대 경로. 새 파일 추가 시 이 표를 업데이트한다.
+
+| 레이어 | 파일 경로 | 설명 |
+|--------|----------|------|
+| **Entity** | `settings/domain/entities/backup_state.dart` | BackupState, BackupMetadata, RestoreResult, BackupFileInfo |
+| **Service** | `settings/data/services/backup_service.dart` | BackupService (ZIP 아카이브 생성/복원) |
+| **Provider** | `settings/presentation/providers/teacher_settings_provider.dart` | 선생님 설정 CRUD |
+| **Provider** | `settings/presentation/providers/settings_repository_provider.dart` | SettingsRepository (Mock/Remote 전환) |
+| **Provider** | `settings/presentation/providers/settings_providers.dart` | Provider barrel export |
+| **Provider** | `settings/presentation/providers/backup_provider.dart` | 백업 상태 관리 (AsyncNotifier) |
+| **Provider** | `settings/presentation/providers/orphan_recording_provider.dart` | 미연결 녹음 관리 |
+| **Screen** | `settings/presentation/screens/backup_settings_screen.dart` | 녹음 백업 설정 화면 |
+| **Screen** | `settings/presentation/screens/all_recordings_screen.dart` | 전체 녹음 파일 관리 화면 |
+| **Screen** | `settings/presentation/screens/orphan_recordings_screen.dart` | 미연결 녹음 진단/관리 화면 |
+| **Screen** | `settings/presentation/screens/settings_screens.dart` | Screen barrel export |
+| **Widget** | `settings/presentation/widgets/backup_widgets.dart` | 백업 관련 재사용 위젯 |
+
+---
+
+## 6. 구현 현황
 
 ### 선생님 설정
 
@@ -279,17 +300,20 @@ backup_2026-03-01T14-30-00.lessonbackup (ZIP)
 
 ---
 
-## 6. 관련 스펙
+## 7. 관련 스펙
 
 | 스펙 | 관계 |
 |------|------|
-| [연습 시스템](../practice/) | 녹음 관리 대상 (PracticeRecording, PracticeSection) |
+| [연습 시스템](../practice/practice_master.md) | 녹음 관리 대상 (PracticeRecording, PracticeSection) |
+| [백업 구현 스펙](../practice/backup_implementation_spec.md) | 백업 아카이브 포맷 상세 |
+| [학생 홈 프로필 탭](../student_home/student_home_master.md) | 프로필 탭에서 백업/녹음 설정 진입 |
 | Issue #15 | 데이터 백업 기능 요구사항 |
 
 ---
 
-## 7. 변경 이력
+## 8. 변경 이력
 
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2026-03-06 | 코드 기반 역설계로 초기 스펙 작성 |
+| 2026-03-07 | 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 (practice_master, backup_implementation_spec, student_home_master) |

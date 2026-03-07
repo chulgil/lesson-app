@@ -1,7 +1,7 @@
 # 문서 레지스트리
 
-> 버전: 1.2
-> 최종 업데이트: 2026-01-24
+> 버전: 1.3
+> 최종 업데이트: 2026-03-07
 
 이 문서는 모든 스펙 문서와 공통 모듈 간의 의존성을 추적합니다.
 
@@ -84,6 +84,26 @@
 ---
 
 ## 4. 스펙 문서
+
+> 전체 문서 인덱스는 [DOCUMENT_INDEX.md](DOCUMENT_INDEX.md) 참조
+
+### 마스터 문서 (도메인별 SSOT)
+
+| 도메인 | 마스터 문서 |
+|--------|-----------|
+| 디자인 | [design_master.md](specs/design/design_master.md) |
+| 레슨 | [lesson_master.md](specs/lesson/lesson_master.md) |
+| 수강권 | [subscription_master.md](specs/subscription/subscription_master.md) |
+| 스케줄 | [schedule_master.md](specs/schedule/schedule_master.md) |
+| 캘린더 | [calendar_master.md](specs/calendar/calendar_master.md) |
+| 연습 | [practice_master.md](specs/practice/practice_master.md) |
+| 사용자 | [user_master.md](specs/user/user_master.md) |
+| 알림 | [notification_master.md](specs/notification/notification_master.md) |
+| 온보딩 | [onboarding_master.md](specs/onboarding/onboarding_master.md) |
+| 메트로놈 | [metronome_master.md](specs/metronome/metronome_master.md) |
+| 팔로우/초대 | [follow_master.md](specs/follow/follow_master.md) |
+| 설정 | [settings_master.md](specs/settings/settings_master.md) |
+| 학생 홈 | [student_home_master.md](specs/student_home/student_home_master.md) |
 
 ### 연습 도메인 (`specs/practice/`)
 
@@ -192,6 +212,7 @@ class MockPracticeRepertoireRepository extends PracticeRepositoryBase
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 1.3 | 2026-03-07 | 마스터 문서 13개 등록, DOCUMENT_INDEX.md 연결 |
 | 1.2 | 2026-01-24 | student_form_widgets barrel_file 사용처 추가 |
 | 1.1 | 2026-01-24 | 코드 패턴 섹션 추가 (barrel_file, mixin_split) |
 | 1.0 | 2026-01-04 | 초기 레지스트리 생성 |
