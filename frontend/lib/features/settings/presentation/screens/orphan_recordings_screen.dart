@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/screens/section_picker_screen.dart';
 import '../providers/orphan_recording_provider.dart';
@@ -53,9 +55,9 @@ class OrphanRecordingsScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.space4),
                 Text('오류: $e', style: const TextStyle(color: AppColors.error)),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.space4),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(orphanedRecordingsWithDiagnosticProvider),
                   child: const Text('다시 시도'),
@@ -78,7 +80,7 @@ class _EmptyStateWithDiagnostic extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       children: [
         // Diagnostic card at top
         _DiagnosticCard(diagnostic: diagnostic),
@@ -92,27 +94,24 @@ class _EmptyStateWithDiagnostic extends StatelessWidget {
                 size: 64,
                 color: AppColors.success.withValues(alpha: 0.5),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              const SizedBox(height: AppSpacing.space4),
+              Text(
                 '연결되지 않은 녹음이 없습니다',
-                style: TextStyle(
-                  fontSize: 16,
+                style: AppTypography.bodyLarge.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              const SizedBox(height: AppSpacing.space2),
+              Text(
                 '모든 녹음이 섹션에 연결되어 있습니다',
-                style: TextStyle(
-                  fontSize: 14,
+                style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textTertiaryLight,
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
+              const SizedBox(height: AppSpacing.space6),
+              Text(
                 '아래로 당겨서 새로고침 (경로 복구 포함)',
-                style: TextStyle(
-                  fontSize: 12,
+                style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textTertiaryLight,
                 ),
               ),
@@ -139,14 +138,14 @@ class _DiagnosticCard extends StatelessWidget {
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.info_outline, size: 18, color: AppColors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 const Text(
                   '진단 정보',
                   style: TextStyle(
@@ -156,7 +155,7 @@ class _DiagnosticCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space3),
             _buildStatRow('Hive에 저장된 녹음', '${diagnostic.totalRecordingsInHive}개'),
             _buildStatRow('섹션 수', '${diagnostic.totalSections}개'),
             _buildStatRow('연결되지 않은 녹음', '${diagnostic.orphanCount}개'),
@@ -168,21 +167,19 @@ class _DiagnosticCard extends StatelessWidget {
 
   Widget _buildStatRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.textSecondaryLight,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 13,
+            style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -200,22 +197,21 @@ class _RecordingsListWithDiagnostic extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       itemCount: diagnostic.orphans.length + 2, // +2 for diagnostic card and header
       itemBuilder: (context, index) {
         if (index == 0) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: AppSpacing.space4),
             child: _DiagnosticCard(diagnostic: diagnostic),
           );
         }
         if (index == 1) {
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: AppSpacing.space4),
             child: Text(
               '${diagnostic.orphans.length}개의 녹음이 섹션에 연결되지 않았습니다.\n각 녹음을 섹션에 연결하거나 삭제할 수 있습니다.',
-              style: const TextStyle(
-                fontSize: 14,
+              style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
             ),
@@ -364,7 +360,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
     final dateFormat = DateFormat('yyyy.MM.dd HH:mm');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -375,7 +371,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
         children: [
           // Compact row: play | date | duration | bpm | link | delete
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
             child: Row(
               children: [
                 // Play button (smaller)
@@ -389,7 +385,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 // Date
                 Expanded(
                   child: Column(
@@ -398,8 +394,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                     children: [
                       Text(
                         dateFormat.format(widget.recording.createdAt),
-                        style: const TextStyle(
-                          fontSize: 13,
+                        style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -407,8 +402,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                         children: [
                           Text(
                             _formatDuration(_duration),
-                            style: const TextStyle(
-                              fontSize: 11,
+                            style: AppTypography.caption.copyWith(
                               color: AppColors.textSecondaryLight,
                             ),
                           ),
@@ -416,8 +410,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                             const SizedBox(width: 6),
                             Text(
                               '${widget.recording.bpm}bpm',
-                              style: TextStyle(
-                                fontSize: 11,
+                              style: AppTypography.caption.copyWith(
                                 color: AppColors.primary.withValues(alpha: 0.8),
                               ),
                             ),
@@ -451,7 +444,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
           // Progress bar (when playing)
           if (_isPlaying || _position.inSeconds > 0)
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.space2, 0, AppSpacing.space2, AppSpacing.space2),
               child: LinearProgressIndicator(
                 value: _duration.inMilliseconds > 0
                     ? _position.inMilliseconds / _duration.inMilliseconds

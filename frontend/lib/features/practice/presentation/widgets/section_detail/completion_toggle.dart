@@ -119,7 +119,7 @@ class CompletionToggle extends StatelessWidget {
                 children: List.generate(totalCount, (index) {
                   final isCompleted = index < completedCount;
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                     child: Opacity(
                       opacity: isCompleted ? 1.0 : 0.3,
                       child: Text(

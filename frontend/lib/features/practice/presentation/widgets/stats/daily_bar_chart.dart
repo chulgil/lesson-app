@@ -102,11 +102,10 @@ class DailyBarChart extends StatelessWidget {
           Text(
             '${stat.practiceMinutes}분',
             style: AppTypography.caption.copyWith(
-              fontSize: 10,
               color: AppColors.textSecondaryLight,
             ),
           ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
 
         // Bar
         AnimatedContainer(

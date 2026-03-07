@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../providers/tuner_provider.dart';
 import '../widgets/tuner/circular_tuner_indicator.dart';
 import '../widgets/tuner/normalized_staff_widget.dart';
@@ -123,7 +125,7 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
               bottom: 0,
               child: Container(
                 color: AppColors.backgroundLight,
-                padding: const EdgeInsets.only(top: 16, bottom: 32),
+                padding: const EdgeInsets.only(top: AppSpacing.space4, bottom: AppSpacing.space8),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -135,11 +137,11 @@ class _TunerScreenState extends ConsumerState<TunerScreen>
                       height: 70,
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.space3),
 
                     // Info bar
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.space8),
                       child: TunerInfoBar(),
                     ),
                   ],
@@ -166,10 +168,10 @@ class CompactTunerWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () => ref.read(tunerProvider.notifier).toggle(),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
           border: Border.all(
             color: isListening ? AppColors.primary : AppColors.borderLight,
           ),
@@ -181,7 +183,7 @@ class CompactTunerWidget extends ConsumerWidget {
               isListening ? Icons.graphic_eq : Icons.mic_none,
               color: isListening ? AppColors.primary : AppColors.textTertiaryLight,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             Text(
               currentNote?.fullName ?? (isListening ? '감지 중...' : '튜너'),
               style: TextStyle(
@@ -190,11 +192,10 @@ class CompactTunerWidget extends ConsumerWidget {
               ),
             ),
             if (currentNote != null) ...[
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.space1),
               Text(
                 currentNote.centDisplayString,
-                style: TextStyle(
-                  fontSize: 12,
+                style: AppTypography.bodySmall.copyWith(
                   color: tunerState.isPerfect ? AppColors.success : AppColors.warning,
                 ),
               ),

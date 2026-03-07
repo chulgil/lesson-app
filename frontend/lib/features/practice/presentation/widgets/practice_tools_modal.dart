@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
@@ -158,12 +159,10 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                     indicatorColor: AppColors.primary,
                     indicatorWeight: 3,
                     labelPadding: EdgeInsets.zero,
-                    labelStyle: const TextStyle(
-                      fontSize: 20,
+                    labelStyle: AppTypography.headingMedium.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontSize: 18,
+                    unselectedLabelStyle: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.normal,
                     ),
                     tabs: const [Tab(text: '메트로놈'), Tab(text: '튜너')],

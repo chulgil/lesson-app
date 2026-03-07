@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/section_sort_type.dart';
 import '../../providers/section_sort_provider.dart';
@@ -20,10 +21,10 @@ class SectionSortDropdown extends ConsumerWidget {
     final currentSort = ref.watch(sectionSortTypeProvider);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space1),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: DropdownButtonHideUnderline(
@@ -45,7 +46,7 @@ class SectionSortDropdown extends ConsumerWidget {
                         ? AppColors.primary
                         : AppColors.textSecondaryLight,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Text(
                     type.displayName,
                     style: TextStyle(

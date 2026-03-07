@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_combo_provider.dart';
 import 'tuner_cat_painters.dart';
@@ -43,7 +45,7 @@ class StatusBubble extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: 6),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -57,8 +59,7 @@ class StatusBubble extends StatelessWidget {
       ),
       child: Text(
         message,
-        style: TextStyle(
-          fontSize: 14,
+        style: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w600,
           color: textColor,
         ),

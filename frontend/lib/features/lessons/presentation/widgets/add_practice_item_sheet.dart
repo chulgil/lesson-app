@@ -133,7 +133,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               // Handle
               Center(
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
+                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
@@ -181,7 +181,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(priority.emoji),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(priority.label),
                       ],
                     ),
@@ -554,7 +554,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space2),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
@@ -583,7 +583,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space2),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
@@ -607,7 +607,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               },
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               child: Padding(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(AppSpacing.space1),
                 child: Icon(
                   Icons.close,
                   size: 20,

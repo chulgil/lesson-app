@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/repertoire_archive_provider.dart';
@@ -21,9 +22,9 @@ class ArchiveRepertoireTile extends ConsumerWidget {
     final dateFormat = DateFormat('yyyy-MM-dd');
 
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space4, vertical: AppSpacing.space2),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -34,7 +35,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                   color: AppColors.textSecondaryLight,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     repertoire.name,
@@ -50,7 +51,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(Icons.restore, color: AppColors.primary),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           const Text('복원'),
                         ],
                       ),
@@ -60,7 +61,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(Icons.delete_forever, color: AppColors.error),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           Text('영구 삭제', style: TextStyle(color: AppColors.error)),
                         ],
                       ),
@@ -69,7 +70,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.space2),
             Text(
               '아카이브: ${repertoire.archivedAt != null ? dateFormat.format(repertoire.archivedAt!) : '-'}',
               style: AppTypography.bodySmall.copyWith(
@@ -77,7 +78,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
               ),
             ),
             if (repertoire.description != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.space1),
               Text(
                 repertoire.description!,
                 style: AppTypography.bodySmall.copyWith(
@@ -87,14 +88,14 @@ class ArchiveRepertoireTile extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ],
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.space2),
             Row(
               children: [
                 _InfoChip(
                   icon: Icons.library_music,
                   label: '${repertoire.sections.length}개 섹션',
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 _InfoChip(
                   icon: Icons.timer_outlined,
                   label: repertoire.formattedTotalTime,
@@ -165,21 +166,21 @@ class ArchiveRepertoireTile extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('"${repertoire.name}"을(를) 영구 삭제할까요?'),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.space4),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.errorLight,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 children: [
                   Icon(Icons.warning_amber, color: AppColors.error, size: 20),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '이 작업은 되돌릴 수 없습니다.\n모든 섹션, 녹음, 연습 기록이 함께 삭제됩니다.',
-                      style: TextStyle(fontSize: 12, color: AppColors.error),
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.error),
                     ),
                   ),
                 ],
@@ -230,7 +231,7 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondaryLight,
         borderRadius: BorderRadius.circular(12),
@@ -239,7 +240,7 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: AppColors.textSecondaryLight),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(

@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../../../settings/presentation/providers/orphan_recording_provider.dart';
 
@@ -80,7 +82,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
         children: [
           // Search bar
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.space4),
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
@@ -96,20 +98,20 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                       )
                     : null,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: const BorderSide(color: AppColors.primary),
                 ),
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4, vertical: AppSpacing.space3),
               ),
               onChanged: (value) {
                 setState(() => _searchQuery = value.toLowerCase());
@@ -148,7 +150,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space4),
                   itemCount: grouped.length,
                   itemBuilder: (context, index) {
                     final repertoireId = grouped.keys.elementAt(index);
@@ -170,7 +172,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.space4),
                     Text('오류: $e', style: const TextStyle(color: AppColors.error)),
                   ],
                 ),
@@ -185,7 +187,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.space8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -194,21 +196,19 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               size: 64,
               color: AppColors.textTertiaryLight,
             ),
-            const SizedBox(height: 16),
-            const Text(
+            const SizedBox(height: AppSpacing.space4),
+            Text(
               '섹션이 없습니다',
-              style: TextStyle(
-                fontSize: 18,
+              style: AppTypography.headingSmall.copyWith(
                 fontWeight: FontWeight.w500,
                 color: AppColors.textSecondaryLight,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: AppSpacing.space2),
+            Text(
               '먼저 레퍼토리와 섹션을 만들어주세요.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textTertiaryLight,
               ),
             ),
@@ -221,7 +221,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
   Widget _buildNoResultsState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.space8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -230,11 +230,10 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
               size: 64,
               color: AppColors.textTertiaryLight,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.space4),
             Text(
               '"$_searchQuery" 검색 결과 없음',
-              style: const TextStyle(
-                fontSize: 16,
+              style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
             ),
@@ -273,7 +272,7 @@ class _RepertoireGroup extends StatelessWidget {
         // Repertoire header
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.space4, AppSpacing.space4, AppSpacing.space4, AppSpacing.space2),
           color: AppColors.surfaceSecondaryLight,
           child: Row(
             children: [
@@ -282,13 +281,12 @@ class _RepertoireGroup extends StatelessWidget {
                 size: 20,
                 color: AppColors.primary.withValues(alpha: 0.7),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: _buildHighlightedText(
                   repertoire.name,
                   searchQuery,
-                  const TextStyle(
-                    fontSize: 14,
+                  AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimaryLight,
                   ),
@@ -296,8 +294,7 @@ class _RepertoireGroup extends StatelessWidget {
               ),
               Text(
                 '${sections.length}개 섹션',
-                style: TextStyle(
-                  fontSize: 12,
+                style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
@@ -365,7 +362,7 @@ class _SectionTile extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: const Icon(
           Icons.music_note,
@@ -376,16 +373,14 @@ class _SectionTile extends StatelessWidget {
       title: _buildHighlightedText(
         section.pieceName,
         searchQuery,
-        const TextStyle(
-          fontSize: 15,
+        AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w500,
         ),
       ),
       subtitle: _buildHighlightedText(
         section.rangeText,
         searchQuery,
-        TextStyle(
-          fontSize: 13,
+        AppTypography.bodySmall.copyWith(
           color: AppColors.textSecondaryLight,
         ),
       ),

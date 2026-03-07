@@ -457,7 +457,7 @@ class _SectionListItem extends ConsumerWidget {
                   },
                   tooltip: '녹음 재생',
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.space2),
                 ),
               )
             else
@@ -473,7 +473,7 @@ class _SectionListItem extends ConsumerWidget {
                   },
                   tooltip: '녹음',
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.space2),
                 ),
               ),
 

@@ -632,7 +632,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space2),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
@@ -647,8 +647,7 @@ class TapTempoSpeechBubble extends StatelessWidget {
       child: Text(
         message,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 11,
+        style: AppTypography.caption.copyWith(
           fontWeight: FontWeight.w600,
           color: textColor,
         ),

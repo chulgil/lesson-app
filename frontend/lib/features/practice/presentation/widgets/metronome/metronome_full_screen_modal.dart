@@ -305,9 +305,8 @@ class _CircleButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: AppTypography.buttonSmall.copyWith(
+          style: AppTypography.button.copyWith(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
           ),
         ),
       ),
@@ -384,7 +383,7 @@ class _TimeSignatureSelector extends StatelessWidget {
             final isSelected = ts == selected;
             return Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                 child: ChoiceChip(
                   label: Text(ts.label),
                   selected: isSelected,
@@ -537,8 +536,7 @@ class _SubdivisionChip extends StatelessWidget {
           children: [
             Text(
               subdivision.visualPattern,
-              style: TextStyle(
-                fontSize: 12,
+              style: AppTypography.bodySmall.copyWith(
                 color: isSelected ? Colors.white : AppColors.textPrimaryLight,
                 fontWeight: FontWeight.bold,
               ),
@@ -546,8 +544,7 @@ class _SubdivisionChip extends StatelessWidget {
             SizedBox(height: 2),
             Text(
               subdivision.label,
-              style: TextStyle(
-                fontSize: 10,
+              style: AppTypography.caption.copyWith(
                 color: isSelected
                     ? Colors.white.withValues(alpha: 0.9)
                     : AppColors.textSecondaryLight,

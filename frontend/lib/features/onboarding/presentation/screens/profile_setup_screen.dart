@@ -560,7 +560,7 @@ class _ProgressDivider extends StatelessWidget {
     return Container(
       width: 24,
       height: 2,
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space5),
       color: isActive ? AppColors.primary : AppColors.borderLight,
     );
   }

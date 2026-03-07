@@ -421,7 +421,7 @@ class PieceSuggestionChips extends StatelessWidget {
       runSpacing: AppSpacing.space1,
       children: suggestions.take(maxItems).map((name) {
         return ActionChip(
-          label: Text(name, style: const TextStyle(fontSize: 12)),
+          label: Text(name, style: AppTypography.bodySmall),
           onPressed: () => onSelected(name),
           visualDensity: VisualDensity.compact,
         );

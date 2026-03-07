@@ -114,7 +114,7 @@ class TimeSignaturePicker extends StatelessWidget {
               final isSelected = ts == current;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                   child: _TimeSignatureCard(
                     timeSignature: ts,
                     isSelected: isSelected,
@@ -180,7 +180,6 @@ class _TimeSignatureCard extends StatelessWidget {
                 '큰박 ${timeSignature.mainBeats}개',
                 style: AppTypography.bodySmall.copyWith(
                   color: isSelected ? Colors.white70 : AppColors.textSecondaryLight,
-                  fontSize: 10,
                 ),
               ),
             ],

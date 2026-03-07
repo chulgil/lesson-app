@@ -189,9 +189,9 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         _ProgressStep(step: 1, label: '휴대폰', isActive: false, isCompleted: true),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.space1),
         _ProgressStep(step: 2, label: '프로필', isActive: false, isCompleted: true),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.space1),
         _ProgressStep(step: 3, label: '튜토리얼', isActive: true),
       ],
     );
@@ -278,7 +278,7 @@ class _PageIndicator extends StatelessWidget {
     return Container(
       width: isActive ? 24 : 8,
       height: 8,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.primary : AppColors.borderLight,
         borderRadius: BorderRadius.circular(4),
@@ -324,7 +324,6 @@ class _ProgressStep extends StatelessWidget {
                           ? Colors.white
                           : AppColors.textTertiaryLight,
                       fontWeight: FontWeight.w600,
-                      fontSize: 10,
                     ),
                   ),
           ),

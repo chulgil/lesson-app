@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
@@ -39,7 +41,7 @@ class TunerSettingsSheet extends ConsumerWidget {
           children: [
             // Handle bar
             Container(
-              margin: const EdgeInsets.only(top: 12),
+              margin: const EdgeInsets.only(top: AppSpacing.space3),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -49,12 +51,11 @@ class TunerSettingsSheet extends ConsumerWidget {
             ),
 
             // Title
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
               child: Text(
                 '튜너 설정',
-                style: TextStyle(
-                  fontSize: 18,
+                style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -65,7 +66,7 @@ class TunerSettingsSheet extends ConsumerWidget {
             // Settings list
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.space4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -77,7 +78,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.space6),
 
                     // Transposition
                     _TranspositionSection(
@@ -87,7 +88,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.space6),
 
                     // Difficulty
                     _DifficultySection(
@@ -97,7 +98,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.space6),
 
                     // Clef type
                     _ClefSection(
@@ -111,7 +112,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.space6),
 
                     // Enharmonic mode
                     _EnharmonicSection(
@@ -121,7 +122,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.space6),
 
                     // Toggles
                     _ToggleSection(
@@ -135,7 +136,7 @@ class TunerSettingsSheet extends ConsumerWidget {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.space4),
                   ],
                 ),
               ),
@@ -162,27 +163,25 @@ class _ReferenceFrequencySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '기준 주파수 (A4)',
-          style: TextStyle(
-            fontSize: 16,
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '오케스트라나 앙상블에 맞춰 조절하세요',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         // Preset buttons
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
           children: TunerSettings.frequencyPresets.map((freq) {
             final isSelected = (currentFrequency - freq).abs() < 0.1;
             return ChoiceChip(
@@ -198,14 +197,14 @@ class _ReferenceFrequencySection extends StatelessWidget {
           }).toList(),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         // Slider for fine tuning
         Row(
           children: [
             Text(
               '${TunerSettings.minReferenceFrequency.toInt()}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondaryLight),
             ),
             Expanded(
               child: Slider(
@@ -220,7 +219,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
             ),
             Text(
               '${TunerSettings.maxReferenceFrequency.toInt()}',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondaryLight),
             ),
           ],
         ),
@@ -228,8 +227,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
         Center(
           child: Text(
             'A4 = ${currentFrequency.toStringAsFixed(1)}Hz',
-            style: const TextStyle(
-              fontSize: 14,
+            style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -254,26 +252,24 @@ class _TranspositionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '조옮김 (관악기용)',
-          style: TextStyle(
-            fontSize: 16,
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '악보 기준 음을 실음으로 변환합니다',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
           children: Transposition.values.map((trans) {
             final isSelected = currentTransposition == trans;
             return ChoiceChip(
@@ -291,11 +287,10 @@ class _TranspositionSection extends StatelessWidget {
 
         if (currentTransposition != Transposition.c)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: AppSpacing.space2),
             child: Text(
               '${currentTransposition.description} 악기용',
-              style: TextStyle(
-                fontSize: 12,
+              style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textSecondaryLight,
                 fontStyle: FontStyle.italic,
               ),
@@ -321,29 +316,27 @@ class _DifficultySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '판정 난이도',
-          style: TextStyle(
-            fontSize: 16,
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           'Perfect/Good 판정 기준을 조절합니다',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         Row(
           children: TunerDifficulty.values.map((diff) {
             final isSelected = currentDifficulty == diff;
             return Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                 child: ChoiceChip(
                   label: Text(diff.label),
                   selected: isSelected,
@@ -360,11 +353,10 @@ class _DifficultySection extends StatelessWidget {
         ),
 
         Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: AppSpacing.space2),
           child: Text(
             'Perfect: ±${currentDifficulty.perfectCent}¢ / Good: ±${currentDifficulty.goodCent}¢',
-            style: TextStyle(
-              fontSize: 12,
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.textSecondaryLight,
             ),
           ),
@@ -389,26 +381,24 @@ class _EnharmonicSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '이명동음 표시',
-          style: TextStyle(
-            fontSize: 16,
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '반음 표기 방식을 선택합니다',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space2,
           children: EnharmonicMode.values.map((mode) {
             final isSelected = currentMode == mode;
             return ChoiceChip(
@@ -419,7 +409,6 @@ class _EnharmonicSection extends StatelessWidget {
               labelStyle: TextStyle(
                 color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 12,
               ),
             );
           }).toList(),
@@ -448,29 +437,27 @@ class _ClefSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '음자리표',
-          style: TextStyle(
-            fontSize: 16,
+          style: AppTypography.bodyLarge.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '오선지 표기 방식을 선택합니다',
-          style: TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         Row(
           children: ClefType.values.map((clef) {
             final isSelected = currentClef == clef;
             return Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                 child: ChoiceChip(
                   label: Text('${clef.symbol} ${clef.label}'),
                   selected: isSelected,
@@ -479,7 +466,6 @@ class _ClefSection extends StatelessWidget {
                   labelStyle: TextStyle(
                     color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 11,
                   ),
                 ),
               ),
@@ -487,14 +473,14 @@ class _ClefSection extends StatelessWidget {
           }).toList(),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
 
         // Auto-switch toggle
         InkWell(
           onTap: onAutoSwitchChanged,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
             child: Row(
               children: [
                 Checkbox(
@@ -503,22 +489,20 @@ class _ClefSection extends StatelessWidget {
                   activeColor: AppColors.primary,
                   visualDensity: VisualDensity.compact,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '자동 전환',
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
                         '음역대에 따라 음자리표 자동 전환 (첼로 등)',
-                        style: TextStyle(
-                          fontSize: 11,
+                        style: AppTypography.caption.copyWith(
                           color: AppColors.textSecondaryLight,
                         ),
                       ),

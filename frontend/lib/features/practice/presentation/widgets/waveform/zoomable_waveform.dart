@@ -1,6 +1,8 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 import 'ab_loop.dart';
 
 /// Zoomable waveform progress bar with pinch-to-zoom support.
@@ -243,24 +245,22 @@ class _ZoomableWaveformProgressBarState
             // Zoom indicator (only show when zoomed)
             if (_scale > 1.0)
               Padding(
-                padding: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.only(bottom: AppSpacing.space1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       '${_scale.toStringAsFixed(1)}x zoom',
-                      style: TextStyle(
+                      style: AppTypography.caption.copyWith(
                         color: AppColors.textTertiaryDark,
-                        fontSize: 10,
                       ),
                     ),
                     GestureDetector(
                       onTap: resetZoom,
                       child: Text(
                         '초기화',
-                        style: TextStyle(
+                        style: AppTypography.caption.copyWith(
                           color: AppColors.primary,
-                          fontSize: 10,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -305,7 +305,7 @@ class _ZoomableWaveformProgressBarState
             // Mini map (overview) when zoomed
             if (_scale > 1.5)
               Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.only(top: AppSpacing.space2),
                 child: _MiniMap(
                   progress: widget.progress,
                   scale: _scale,

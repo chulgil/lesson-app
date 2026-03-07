@@ -88,7 +88,7 @@ class PracticeStreakCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: Text(
                     '일 연속',
                     style: AppTypography.bodyLarge.copyWith(
@@ -169,7 +169,7 @@ class PracticeStreakCard extends ConsumerWidget {
                     : null,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Text(
               weekDays[index],
               style: AppTypography.caption.copyWith(

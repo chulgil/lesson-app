@@ -14,6 +14,8 @@ import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../models/recording.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
@@ -65,9 +67,9 @@ class AllRecordingsScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.space4),
                 Text('오류: $e', style: const TextStyle(color: AppColors.error)),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.space4),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(allRecordingsWithSectionInfoProvider),
                   child: const Text('다시 시도'),
@@ -172,11 +174,10 @@ class AllRecordingsScreen extends ConsumerWidget {
                 size: 64,
                 color: AppColors.textTertiaryLight,
               ),
-              const SizedBox(height: 16),
-              const Text(
+              const SizedBox(height: AppSpacing.space4),
+              Text(
                 '녹음 파일이 없습니다',
-                style: TextStyle(
-                  fontSize: 16,
+                style: AppTypography.bodyLarge.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
               ),
@@ -199,11 +200,11 @@ class _RecordingsList extends StatelessWidget {
     final orphaned = recordings.where((r) => r.section == null).toList();
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       children: [
         // Stats card
         _buildStatsCard(connected.length, orphaned.length),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.space4),
 
         // Orphaned recordings section (show first if any)
         if (orphaned.isNotEmpty) ...[
@@ -213,7 +214,7 @@ class _RecordingsList extends StatelessWidget {
             section: null,
             repertoire: null,
           )),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.space4),
         ],
 
         // Connected recordings section
@@ -239,7 +240,7 @@ class _RecordingsList extends StatelessWidget {
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -257,16 +258,14 @@ class _RecordingsList extends StatelessWidget {
       children: [
         Text(
           '$count',
-          style: TextStyle(
-            fontSize: 24,
+          style: AppTypography.headingLarge.copyWith(
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
+          style: AppTypography.bodySmall.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
@@ -276,7 +275,7 @@ class _RecordingsList extends StatelessWidget {
 
   Widget _buildSectionHeader(String title, int count, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: Row(
         children: [
           Container(
@@ -287,26 +286,24 @@ class _RecordingsList extends StatelessWidget {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 14,
+            style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimaryLight,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: 2),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '$count개',
-              style: TextStyle(
-                fontSize: 12,
+              style: AppTypography.bodySmall.copyWith(
                 color: color,
                 fontWeight: FontWeight.w500,
               ),
@@ -432,7 +429,7 @@ class _RecordingCard extends ConsumerWidget {
     final isOrphaned = section == null;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -441,7 +438,7 @@ class _RecordingCard extends ConsumerWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
         child: Row(
           children: [
             // Play button
@@ -455,7 +452,7 @@ class _RecordingCard extends ConsumerWidget {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             // Date and section info
             Expanded(
               child: Column(
@@ -471,12 +468,11 @@ class _RecordingCard extends ConsumerWidget {
                           size: 12,
                           color: AppColors.primary.withValues(alpha: 0.7),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Expanded(
                           child: Text(
                             '${repertoire!.name} > ${section!.pieceName}',
-                            style: TextStyle(
-                              fontSize: 12,
+                            style: AppTypography.bodySmall.copyWith(
                               fontWeight: FontWeight.w500,
                               color: AppColors.primary.withValues(alpha: 0.9),
                             ),
@@ -494,11 +490,10 @@ class _RecordingCard extends ConsumerWidget {
                           size: 12,
                           color: AppColors.warning,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           '연결되지 않음',
-                          style: TextStyle(
-                            fontSize: 12,
+                          style: AppTypography.bodySmall.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppColors.warning,
                           ),
@@ -512,16 +507,14 @@ class _RecordingCard extends ConsumerWidget {
                     children: [
                       Text(
                         dateFormat.format(recording.createdAt),
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: AppTypography.caption.copyWith(
                           color: AppColors.textSecondaryLight,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       Text(
                         _formatDuration(recording.durationSeconds),
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: AppTypography.caption.copyWith(
                           color: AppColors.textSecondaryLight,
                         ),
                       ),
@@ -529,8 +522,7 @@ class _RecordingCard extends ConsumerWidget {
                         const SizedBox(width: 6),
                         Text(
                           '${recording.bpm}bpm',
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: AppTypography.caption.copyWith(
                             color: AppColors.primary.withValues(alpha: 0.8),
                           ),
                         ),

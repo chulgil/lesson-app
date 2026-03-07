@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 /// Circle button for BPM increment/decrement.
 class CircleButton extends StatelessWidget {
@@ -38,10 +39,9 @@ class CircleButton extends StatelessWidget {
             child: Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.backgroundLight,
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
               ),
             ),
           ),
@@ -205,8 +205,7 @@ class SmallButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
+          style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),

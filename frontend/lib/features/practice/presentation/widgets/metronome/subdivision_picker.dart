@@ -223,8 +223,7 @@ class _SubdivisionChip extends StatelessWidget {
             // Visual pattern
             Text(
               subdivision.visualPattern,
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: isSelected ? Colors.white : AppColors.textPrimaryLight,
                 letterSpacing: 1,
@@ -234,8 +233,7 @@ class _SubdivisionChip extends StatelessWidget {
             // Korean label
             Text(
               subdivision.label,
-              style: AppTypography.bodySmall.copyWith(
-                fontSize: 11,
+              style: AppTypography.caption.copyWith(
                 color: isSelected ? Colors.white : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

@@ -300,7 +300,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
                 runSpacing: AppSpacing.space1,
                 children: _repertoireSuggestions.map((name) {
                   return ActionChip(
-                    label: Text(name, style: const TextStyle(fontSize: 12)),
+                    label: Text(name, style: AppTypography.bodySmall),
                     onPressed: () => _repertoireNameController.text = name,
                     visualDensity: VisualDensity.compact,
                   );
@@ -444,10 +444,10 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
               runSpacing: AppSpacing.space1,
               children: _pieceSuggestions.take(5).map((name) {
                 return ActionChip(
-                  label: Text(name, style: const TextStyle(fontSize: 11)),
+                  label: Text(name, style: AppTypography.caption),
                   onPressed: () => section.pieceNameController.text = name,
                   visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
                 );
               }).toList(),
             ),
@@ -479,15 +479,15 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
             segments: const [
               ButtonSegment(
                 value: SectionRangeType.full,
-                label: Text('전체', style: TextStyle(fontSize: 12)),
+                label: Text('전체', style: AppTypography.bodySmall),
               ),
               ButtonSegment(
                 value: SectionRangeType.line,
-                label: Text('줄', style: TextStyle(fontSize: 12)),
+                label: Text('줄', style: AppTypography.bodySmall),
               ),
               ButtonSegment(
                 value: SectionRangeType.measure,
-                label: Text('마디', style: TextStyle(fontSize: 12)),
+                label: Text('마디', style: AppTypography.bodySmall),
               ),
             ],
             selected: {section.rangeType},

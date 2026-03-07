@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
@@ -343,10 +345,10 @@ class TunerInfoBar extends ConsumerWidget {
     final centText = note != null ? '${note.centDisplayString}¢' : '--';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -363,8 +365,7 @@ class TunerInfoBar extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(
             centText,
-            style: TextStyle(
-              fontSize: 18,
+            style: AppTypography.headingSmall.copyWith(
               fontWeight: FontWeight.bold,
               color: note != null
                   ? (tunerState.isPerfect
