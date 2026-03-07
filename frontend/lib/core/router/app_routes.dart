@@ -66,6 +66,7 @@ class AppRoutes {
   static const careerEdit = '/profile/career/edit';
   static const certificateEdit = '/profile/certificate/edit';
   static const profileVisibility = '/profile/visibility';
+  static const outstandingPayments = '/profile/outstanding-payments';
 
   // Settings routes
   static const backupSettings = '/settings/backup';

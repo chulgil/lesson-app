@@ -11,6 +11,7 @@ import '../../../features/profile/presentation/screens/extended_profile_screen.d
 import '../../../features/profile/presentation/screens/education_edit_screen.dart';
 import '../../../features/profile/presentation/screens/career_edit_screen.dart';
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
+import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
 import '../app_routes.dart';
 
@@ -95,5 +96,12 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.profileVisibility,
     name: 'profileVisibility',
     builder: (context, state) => const ProfileVisibilityScreen(),
+  ),
+
+  // Outstanding Payments
+  GoRoute(
+    path: AppRoutes.outstandingPayments,
+    name: 'outstandingPayments',
+    builder: (context, state) => const OutstandingPaymentsScreen(),
   ),
 ];

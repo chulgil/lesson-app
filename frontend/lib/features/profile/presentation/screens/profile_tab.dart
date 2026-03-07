@@ -10,6 +10,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
+import '../../../students/presentation/providers/grouped_students_provider.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 
 /// Profile tab with user info and settings
 class ProfileTab extends ConsumerWidget {
@@ -39,13 +41,9 @@ class ProfileTab extends ConsumerWidget {
 
           // Menu sections
           _buildMenuSection(
-            title: '내 프로필',
+            title: '레슨 관리',
             items: [
-              _MenuItem(
-                icon: Icons.person_outline,
-                label: '프로필 상세 수정',
-                onTap: () => context.push(AppRoutes.extendedProfile),
-              ),
+              _buildUnpaidMenuItem(context, ref, teacherId),
               _MenuItem(
                 icon: Icons.calendar_month,
                 label: '가용 시간 관리',
@@ -58,6 +56,19 @@ class ProfileTab extends ConsumerWidget {
                     () => context.push(
                       '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
                     ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          _buildMenuSection(
+            title: '내 프로필',
+            items: [
+              _MenuItem(
+                icon: Icons.person_outline,
+                label: '프로필 상세 수정',
+                onTap: () => context.push(AppRoutes.extendedProfile),
               ),
             ],
           ),
@@ -233,11 +244,53 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
+  _MenuItem _buildUnpaidMenuItem(
+    BuildContext context,
+    WidgetRef ref,
+    String teacherId,
+  ) {
+    final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
+    final unpaidCount = unpaidSummaryAsync.whenOrNull(
+      data: (summary) => summary.studentCount,
+    ) ?? 0;
+
+    return _MenuItem(
+      icon: Icons.payment_outlined,
+      label: '미수금 관리',
+      trailing: unpaidCount > 0
+          ? Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+              ),
+              child: Text(
+                '$unpaidCount',
+                style: AppTypography.caption.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : null,
+      onTap: () => context.push(AppRoutes.outstandingPayments),
+    );
+  }
+
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
+    final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
 
-    // Student count from memberships
-    final studentCountValue = '-';
+    // Student count from grouped students
+    final studentCountValue = groupsAsync.whenOrNull(
+      data: (groups) {
+        final total = groups.fold(0, (sum, g) => sum + g.students.length);
+        return '$total명';
+      },
+    ) ?? '-';
     // Lesson stats
     final lessonCountValue =
         lessonStatsAsync.whenOrNull(
