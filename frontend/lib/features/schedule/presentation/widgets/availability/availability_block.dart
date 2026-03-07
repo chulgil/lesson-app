@@ -76,26 +76,26 @@ class AvailabilityBlock extends StatelessWidget {
     }
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return const Color(0xFFE8F5E9); // Light green
+        return AppColors.successLight; // Light green
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return const Color(0xFFE3F2FD); // Light blue
+        return AppColors.infoLight; // Light blue
       case AvailabilitySlotStatus.cancelled:
       case AvailabilitySlotStatus.past:
-        return const Color(0xFFF5F5F5); // Light gray
+        return AppColors.surfaceSecondaryLight; // Light gray
     }
   }
 
   Color get _borderColor {
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return const Color(0xFFA5D6A7); // Green border
+        return AppColors.successBorder; // Green border
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return const Color(0xFF90CAF9); // Blue border
+        return AppColors.infoBorder; // Blue border
       case AvailabilitySlotStatus.cancelled:
       case AvailabilitySlotStatus.past:
-        return const Color(0xFFE0E0E0); // Gray border
+        return AppColors.borderLight; // Gray border
     }
   }
 

@@ -43,7 +43,7 @@ class TunerSettingsSheet extends ConsumerWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: AppColors.borderLight,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -174,7 +174,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
           '오케스트라나 앙상블에 맞춰 조절하세요',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -191,7 +191,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
               onSelected: (_) => onChanged(freq),
               selectedColor: AppColors.primary.withValues(alpha: 0.2),
               labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : Colors.grey[700],
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             );
@@ -205,7 +205,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
           children: [
             Text(
               '${TunerSettings.minReferenceFrequency.toInt()}',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
             ),
             Expanded(
               child: Slider(
@@ -220,7 +220,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
             ),
             Text(
               '${TunerSettings.maxReferenceFrequency.toInt()}',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
             ),
           ],
         ),
@@ -266,7 +266,7 @@ class _TranspositionSection extends StatelessWidget {
           '악보 기준 음을 실음으로 변환합니다',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -282,7 +282,7 @@ class _TranspositionSection extends StatelessWidget {
               onSelected: (_) => onChanged(trans),
               selectedColor: AppColors.primary.withValues(alpha: 0.2),
               labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : Colors.grey[700],
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             );
@@ -296,7 +296,7 @@ class _TranspositionSection extends StatelessWidget {
               '${currentTransposition.description} 악기용',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[600],
+                color: AppColors.textSecondaryLight,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -333,7 +333,7 @@ class _DifficultySection extends StatelessWidget {
           'Perfect/Good 판정 기준을 조절합니다',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -350,7 +350,7 @@ class _DifficultySection extends StatelessWidget {
                   onSelected: (_) => onChanged(diff),
                   selectedColor: AppColors.primary.withValues(alpha: 0.2),
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.primary : Colors.grey[700],
+                    color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -365,7 +365,7 @@ class _DifficultySection extends StatelessWidget {
             'Perfect: ±${currentDifficulty.perfectCent}¢ / Good: ±${currentDifficulty.goodCent}¢',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey[600],
+              color: AppColors.textSecondaryLight,
             ),
           ),
         ),
@@ -401,7 +401,7 @@ class _EnharmonicSection extends StatelessWidget {
           '반음 표기 방식을 선택합니다',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -417,7 +417,7 @@ class _EnharmonicSection extends StatelessWidget {
               onSelected: (_) => onChanged(mode),
               selectedColor: AppColors.primary.withValues(alpha: 0.2),
               labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : Colors.grey[700],
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 12,
               ),
@@ -460,7 +460,7 @@ class _ClefSection extends StatelessWidget {
           '오선지 표기 방식을 선택합니다',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -477,7 +477,7 @@ class _ClefSection extends StatelessWidget {
                   onSelected: (_) => onChanged(clef),
                   selectedColor: AppColors.primary.withValues(alpha: 0.2),
                   labelStyle: TextStyle(
-                    color: isSelected ? AppColors.primary : Colors.grey[700],
+                    color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: 11,
                   ),
@@ -519,7 +519,7 @@ class _ClefSection extends StatelessWidget {
                         '음역대에 따라 음자리표 자동 전환 (첼로 등)',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey[600],
+                          color: AppColors.textSecondaryLight,
                         ),
                       ),
                     ],

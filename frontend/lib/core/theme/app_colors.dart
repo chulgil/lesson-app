@@ -30,21 +30,50 @@ class AppColors {
   static const practicePoor = Color(0xFFDC143C);
   static const practicePaused = Color(0xFF9E9E9E);
 
+  // Semantic borders
+  static const successBorder = Color(0xFFA5D6A7);
+  static const infoBorder = Color(0xFF90CAF9);
+
+  // Amber/gold (goals, stars, achievements)
+  static const amber = Color(0xFFFFB800);
+  static const amberLight = Color(0xFFFFF8E1);
+
+  // Profile color palette (child profiles, categories)
+  static const profileBlue = Color(0xFF4A90D9);
+  static const profilePink = Color(0xFFE91E63);
+  static const profileGreen = Color(0xFF2E8B57);
+  static const profileOrange = Color(0xFFE67E22);
+  static const profilePurple = Color(0xFF9B59B6);
+  static const profileTeal = Color(0xFF1ABC9C);
+  static const profileRed = Color(0xFFE74C3C);
+  static const profileIndigo = Color(0xFF3F51B5);
+
+  // Streak gradients
+  static const streakGreat1 = Color(0xFFFFB800);
+  static const streakGreat2 = Color(0xFFFF8C00);
+  static const streakGood1 = Color(0xFFFF6B6B);
+  static const streakGood2 = Color(0xFFFF8E53);
+  static const streakPaused1 = Color(0xFF9E9E9E);
+  static const streakPaused2 = Color(0xFF757575);
+
   // Cat UI accent (metronome cat paw)
   static const catAccent = Color(0xFFB8A9C9);
 
+  // Tuner-specific colors
+  static const tunerNaturalNote = Color(0xFFB8D4E3);
+  static const tunerNaturalNoteActive = Color(0xFF6BA3C7);
+  static const tunerAccidentalNote = Color(0xFFB8E3C8);
+  static const tunerAccidentalNoteActive = Color(0xFF6BC790);
+  static const tunerCentPerfect = Color(0xFF90EE90);
+  static const tunerCentFlat = Color(0xFFFF6B6B);
+  static const tunerCentSharp = Color(0xFFFFB347);
+
   // Speech bubble colors (shared between metronome and tuner)
-  /// Idle/waiting state - light mint green background
   static const bubbleIdleBackground = Color(0xFFB8E3C8);
-  /// Idle/waiting state - gray text
   static const bubbleIdleText = Color(0xFF757575);
-  /// Success state - light green background
   static const bubbleSuccessBackground = Color(0xFFE8F5E9);
-  /// Success state - dark green text
   static const bubbleSuccessText = Color(0xFF2E7D32);
-  /// Warning/progress state - light orange background
   static const bubbleWarningBackground = Color(0xFFFFF3E0);
-  /// Warning/progress state - dark orange text
   static const bubbleWarningText = Color(0xFFE65100);
 
   // Light mode

@@ -306,8 +306,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 icon: const Icon(Icons.chat_bubble),
                 label: const Text('카카오톡'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF3C1E1E),
-                  backgroundColor: const Color(0xFFFEE500),
+                  foregroundColor: AppColors.textPrimaryLight,
+                  backgroundColor: AppColors.kakaoBackground,
                   side: BorderSide.none,
                   padding:
                       const EdgeInsets.symmetric(vertical: AppSpacing.space3),

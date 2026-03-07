@@ -250,7 +250,7 @@ class _ZoomableWaveformProgressBarState
                     Text(
                       '${_scale.toStringAsFixed(1)}x zoom',
                       style: TextStyle(
-                        color: Colors.grey[500],
+                        color: AppColors.textTertiaryDark,
                         fontSize: 10,
                       ),
                     ),
@@ -285,7 +285,7 @@ class _ZoomableWaveformProgressBarState
                 child: Container(
                   height: widget.height,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2C2C2E),
+                    color: AppColors.surfaceSecondaryDark,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: CustomPaint(
@@ -351,7 +351,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final unplayedPaint = Paint()
-      ..color = const Color(0xFF636366)
+      ..color = AppColors.textTertiaryDark
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
@@ -573,7 +573,7 @@ class _MiniMapState extends State<_MiniMap> {
           child: Container(
             height: 20,
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1C1E),
+              color: AppColors.surfaceDark,
               borderRadius: BorderRadius.circular(4),
             ),
             child: CustomPaint(
@@ -612,7 +612,7 @@ class _MiniMapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Draw simplified waveform
     final barPaint = Paint()
-      ..color = const Color(0xFF636366)
+      ..color = AppColors.textTertiaryDark
       ..strokeWidth = 1;
 
     const barCount = 30;

@@ -38,14 +38,14 @@ class _ChildProfileFormScreenState
 
   // Available profile colors
   static const _profileColors = [
-    Colors.blue,
-    Colors.pink,
-    Colors.green,
-    Colors.orange,
-    Colors.purple,
-    Colors.teal,
-    Colors.red,
-    Colors.indigo,
+    AppColors.profileBlue,
+    AppColors.profilePink,
+    AppColors.profileGreen,
+    AppColors.profileOrange,
+    AppColors.profilePurple,
+    AppColors.profileTeal,
+    AppColors.profileRed,
+    AppColors.profileIndigo,
   ];
 
   // Instruments

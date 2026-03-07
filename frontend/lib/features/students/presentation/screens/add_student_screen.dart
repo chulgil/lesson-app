@@ -239,10 +239,10 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     final profileColors = [
       AppColors.primary,
       AppColors.secondary,
-      const Color(0xFF2E8B57),
-      const Color(0xFF6B5B95),
-      const Color(0xFFE57373),
-      const Color(0xFF4FC3F7),
+      AppColors.success,
+      AppColors.profilePurple,
+      AppColors.profileRed,
+      AppColors.profileBlue,
     ];
     final profileColor =
         profileColors[DateTime.now().millisecond % profileColors.length];

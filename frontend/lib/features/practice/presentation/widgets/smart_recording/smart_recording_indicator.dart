@@ -124,7 +124,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
     return AlertDialog(
       title: const Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green),
+          Icon(Icons.check_circle, color: AppColors.success),
           SizedBox(width: 8),
           Text('녹음 저장됨'),
         ],
@@ -151,7 +151,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (trimmedStart > Duration.zero)
               Row(
                 children: [
-                  const Icon(Icons.content_cut, size: 16, color: Colors.grey),
+                  const Icon(Icons.content_cut, size: 16, color: AppColors.textTertiaryLight),
                   const SizedBox(width: 8),
                   Text('앞 ${_formatDuration(trimmedStart)} 트림'),
                 ],
@@ -159,7 +159,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (trimmedEnd > Duration.zero)
               Row(
                 children: [
-                  const Icon(Icons.content_cut, size: 16, color: Colors.grey),
+                  const Icon(Icons.content_cut, size: 16, color: AppColors.textTertiaryLight),
                   const SizedBox(width: 8),
                   Text('뒤 ${_formatDuration(trimmedEnd)} 트림'),
                 ],
@@ -167,7 +167,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (hasMiddleSilence)
               Row(
                 children: [
-                  const Icon(Icons.skip_next, size: 16, color: Colors.grey),
+                  const Icon(Icons.skip_next, size: 16, color: AppColors.textTertiaryLight),
                   const SizedBox(width: 8),
                   Text('중간 무음 $middleSilenceCount구간 스킵 (${_formatDuration(middleSilenceDuration)})'),
                 ],

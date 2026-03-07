@@ -124,14 +124,14 @@ enum PracticeStatus {
 /// Name-based profile color generation for API responses.
 Color _profileColorFromName(String name) {
   const colors = [
-    Color(0xFF6B5B95),
-    Color(0xFFF4A460),
-    Color(0xFF2E8B57),
-    Color(0xFF4A90D9),
-    Color(0xFFE74C3C),
-    Color(0xFF1ABC9C),
-    Color(0xFF9B59B6),
-    Color(0xFFE67E22),
+    AppColors.primary,
+    AppColors.secondary,
+    AppColors.success,
+    AppColors.info,
+    AppColors.profileRed,
+    AppColors.profileTeal,
+    AppColors.profilePurple,
+    AppColors.profileOrange,
   ];
   if (name.isEmpty) return colors[0];
   final hash = name.codeUnits.fold(0, (sum, c) => sum + c);

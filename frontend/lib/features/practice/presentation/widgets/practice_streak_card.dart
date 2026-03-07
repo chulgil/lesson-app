@@ -186,13 +186,13 @@ class PracticeStreakCard extends ConsumerWidget {
   List<Color> _getGradientColors(int streakLevel) {
     switch (streakLevel) {
       case 3: // 30+ days - Gold
-        return [const Color(0xFFFFB800), const Color(0xFFFF8C00)];
+        return [AppColors.streakGreat1, AppColors.streakGreat2];
       case 2: // 7-29 days - Orange/Red
-        return [const Color(0xFFFF6B6B), const Color(0xFFFF8E53)];
+        return [AppColors.streakGood1, AppColors.streakGood2];
       case 1: // 1-6 days - Purple
         return [AppColors.primary, AppColors.primaryLight];
       default: // No streak - Gray
-        return [const Color(0xFF9E9E9E), const Color(0xFF757575)];
+        return [AppColors.streakPaused1, AppColors.streakPaused2];
     }
   }
 
@@ -285,9 +285,9 @@ class PracticeStreakBadge extends ConsumerWidget {
   Color _getBadgeColor(int streakLevel) {
     switch (streakLevel) {
       case 3:
-        return const Color(0xFFFFB800);
+        return AppColors.streakGreat1;
       case 2:
-        return const Color(0xFFFF6B6B);
+        return AppColors.streakGood1;
       default:
         return AppColors.primary;
     }

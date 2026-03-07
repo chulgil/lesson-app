@@ -9,24 +9,11 @@ import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
 import 'tuner_fish_indicator.dart';
 
-/// Colors for tuner indicator.
+/// Colors for tuner indicator (delegates to AppColors).
 class TunerColors {
   TunerColors._();
 
-  // Natural notes (C, D, E, F, G, A, B) - blue-ish tones
-  static const naturalNote = Color(0xFFB8D4E3);
-  static const naturalNoteActive = Color(0xFF6BA3C7);
-
-  // Accidental notes (C#, D#, F#, G#, A#) - green-ish tones
-  static const accidentalNote = Color(0xFFB8E3C8);
-  static const accidentalNoteActive = Color(0xFF6BC790);
-
-  // Cent gauge colors
-  static const centPerfect = Color(0xFF90EE90);
-  static const centFlat = Color(0xFFFF6B6B);
-  static const centSharp = Color(0xFFFFB347);
-
-  // Effects
+  // Effects (no AppColors equivalent)
   static const glowPerfect = Color(0x6690EE90);
   static const circleStroke = Color(0x33808080);
 }
@@ -157,10 +144,10 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
 
     // Determine colors
     final baseColor =
-        widget.note.isAccidental ? TunerColors.accidentalNote : TunerColors.naturalNote;
+        widget.note.isAccidental ? AppColors.tunerAccidentalNote : AppColors.tunerNaturalNote;
     final activeColor = widget.note.isAccidental
-        ? TunerColors.accidentalNoteActive
-        : TunerColors.naturalNoteActive;
+        ? AppColors.tunerAccidentalNoteActive
+        : AppColors.tunerNaturalNoteActive;
 
     // Scale sizes based on circle size (base size 280), increased by 1.2x
     final scale = widget.circleSize / 280.0;
@@ -184,11 +171,11 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
       textColor = Colors.white;
     } else if (isPerfectMatch) {
       // Perfect pitch match: instant bright highlight with subtle glow
-      backgroundColor = TunerColors.centPerfect.withValues(alpha: 0.7);
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.tunerCentPerfect.withValues(alpha: 0.7);
+      textColor = AppColors.success;
       boxShadow = [
         BoxShadow(
-          color: TunerColors.centPerfect.withValues(alpha: 0.5),
+          color: AppColors.tunerCentPerfect.withValues(alpha: 0.5),
           blurRadius: 8,
           spreadRadius: 1,
         ),
@@ -196,7 +183,7 @@ class _NoteLabelState extends ConsumerState<_NoteLabel> {
     } else {
       // Normal style
       backgroundColor = baseColor.withValues(alpha: 0.3);
-      textColor = Colors.grey[600]!;
+      textColor = AppColors.textSecondaryLight;
     }
 
     return Transform.translate(
@@ -285,7 +272,7 @@ class _CentGaugePainter extends CustomPainter {
 
     // Background track
     final trackPaint = Paint()
-      ..color = Colors.grey[300]!
+      ..color = AppColors.borderLight
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
@@ -298,7 +285,7 @@ class _CentGaugePainter extends CustomPainter {
 
     // Center marker
     final centerMarkerPaint = Paint()
-      ..color = TunerColors.centPerfect
+      ..color = AppColors.tunerCentPerfect
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
@@ -316,8 +303,8 @@ class _CentGaugePainter extends CustomPainter {
 
       // Color based on deviation (flat=red, sharp=orange)
       final indicatorColor = centDeviation < 0
-          ? TunerColors.centFlat
-          : TunerColors.centSharp;
+          ? AppColors.tunerCentFlat
+          : AppColors.tunerCentSharp;
 
       final indicatorPaint = Paint()
         ..color = indicatorColor
@@ -381,11 +368,11 @@ class TunerInfoBar extends ConsumerWidget {
               fontWeight: FontWeight.bold,
               color: note != null
                   ? (tunerState.isPerfect
-                      ? Colors.green[700]
+                      ? AppColors.success
                       : (note.centDeviation < 0
-                          ? TunerColors.centFlat
-                          : TunerColors.centSharp))
-                  : Colors.grey[400],
+                          ? AppColors.tunerCentFlat
+                          : AppColors.tunerCentSharp))
+                  : AppColors.textTertiaryLight,
             ),
           ),
         ],

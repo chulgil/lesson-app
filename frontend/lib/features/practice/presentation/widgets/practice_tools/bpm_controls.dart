@@ -15,9 +15,6 @@ class CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Soft ivory text color (not pure white, easier on eyes)
-    const softIvory = Color(0xFFFFFAF0);
-
     return Container(
       width: 48,
       height: 48,
@@ -42,7 +39,7 @@ class CircleButton extends StatelessWidget {
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: softIvory,
+                color: AppColors.backgroundLight,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),

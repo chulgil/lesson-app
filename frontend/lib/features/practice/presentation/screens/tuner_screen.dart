@@ -179,14 +179,14 @@ class CompactTunerWidget extends ConsumerWidget {
           children: [
             Icon(
               isListening ? Icons.graphic_eq : Icons.mic_none,
-              color: isListening ? AppColors.primary : Colors.grey,
+              color: isListening ? AppColors.primary : AppColors.textTertiaryLight,
             ),
             const SizedBox(width: 8),
             Text(
               currentNote?.fullName ?? (isListening ? '감지 중...' : '튜너'),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: isListening ? AppColors.primary : Colors.grey[600],
+                color: isListening ? AppColors.primary : AppColors.textSecondaryLight,
               ),
             ),
             if (currentNote != null) ...[
@@ -195,7 +195,7 @@ class CompactTunerWidget extends ConsumerWidget {
                 currentNote.centDisplayString,
                 style: TextStyle(
                   fontSize: 12,
-                  color: tunerState.isPerfect ? Colors.green : Colors.orange,
+                  color: tunerState.isPerfect ? AppColors.success : AppColors.warning,
                 ),
               ),
             ],

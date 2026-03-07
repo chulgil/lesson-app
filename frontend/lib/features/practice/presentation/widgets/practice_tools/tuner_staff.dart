@@ -79,7 +79,7 @@ class TunerStaff extends ConsumerWidget {
               clefSvg,
               height: clefHeight,
               colorFilter: ColorFilter.mode(
-                Colors.grey[600]!,
+                AppColors.textSecondaryLight,
                 BlendMode.srcIn,
               ),
             ),
@@ -250,7 +250,7 @@ class StaffLinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey[400]!
+      ..color = AppColors.textTertiaryLight
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -359,7 +359,7 @@ class NotePainter extends CustomPainter {
 
     // Draw ledger lines if needed
     final ledgerPaint = Paint()
-      ..color = Colors.grey[500]!
+      ..color = AppColors.textTertiaryLight
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 

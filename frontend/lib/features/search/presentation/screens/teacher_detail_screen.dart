@@ -638,7 +638,7 @@ class _TeacherDetailContent extends ConsumerWidget {
       case VerificationBadge.certified:
         return AppColors.success;
       case VerificationBadge.premium:
-        return Colors.amber;
+        return AppColors.amber;
     }
   }
 

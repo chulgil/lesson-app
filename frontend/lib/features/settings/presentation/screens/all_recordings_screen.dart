@@ -170,7 +170,7 @@ class AllRecordingsScreen extends ConsumerWidget {
               Icon(
                 Icons.mic_none,
                 size: 64,
-                color: Colors.grey.shade400,
+                color: AppColors.textTertiaryLight,
               ),
               const SizedBox(height: 16),
               const Text(
@@ -207,7 +207,7 @@ class _RecordingsList extends StatelessWidget {
 
         // Orphaned recordings section (show first if any)
         if (orphaned.isNotEmpty) ...[
-          _buildSectionHeader('연결되지 않은 녹음', orphaned.length, Colors.orange),
+          _buildSectionHeader('연결되지 않은 녹음', orphaned.length, AppColors.warning),
           ...orphaned.map((r) => _RecordingCard(
             recording: r.recording,
             section: null,
@@ -245,7 +245,7 @@ class _RecordingsList extends StatelessWidget {
           children: [
             _buildStatItem('전체', total, AppColors.textPrimaryLight),
             _buildStatItem('연결됨', connectedCount, AppColors.success),
-            _buildStatItem('미연결', orphanedCount, Colors.orange),
+            _buildStatItem('미연결', orphanedCount, AppColors.warning),
           ],
         ),
       ),
@@ -437,7 +437,7 @@ class _RecordingCard extends ConsumerWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: isOrphaned ? Colors.orange.shade200 : Colors.grey.shade200,
+          color: isOrphaned ? AppColors.warning : AppColors.borderLight,
         ),
       ),
       child: Padding(
@@ -492,7 +492,7 @@ class _RecordingCard extends ConsumerWidget {
                         Icon(
                           Icons.link_off,
                           size: 12,
-                          color: Colors.orange.shade600,
+                          color: AppColors.warning,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -500,7 +500,7 @@ class _RecordingCard extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: Colors.orange.shade600,
+                            color: AppColors.warning,
                           ),
                         ),
                       ],
@@ -544,7 +544,7 @@ class _RecordingCard extends ConsumerWidget {
             IconButton(
               onPressed: () => _showSectionPicker(context, ref),
               icon: Icon(isOrphaned ? Icons.link_off : Icons.link),
-              color: isOrphaned ? Colors.orange : AppColors.primary,
+              color: isOrphaned ? AppColors.warning : AppColors.primary,
               tooltip: isOrphaned ? '섹션에 연결' : '섹션 변경',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),

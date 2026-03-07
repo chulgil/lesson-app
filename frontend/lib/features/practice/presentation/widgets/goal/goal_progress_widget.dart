@@ -182,14 +182,14 @@ class GoalProgressWidget extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.emoji_events,
-                        color: Colors.amber,
+                        color: AppColors.amber,
                         size: 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '주간 목표 달성!',
                         style: AppTypography.bodySmall.copyWith(
-                          color: Colors.amber[700],
+                          color: AppColors.amber,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

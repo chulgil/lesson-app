@@ -308,7 +308,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF1C1C1E),
+        color: AppColors.surfaceDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       child: SafeArea(
@@ -323,7 +323,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                 height: 4,
                 margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: Colors.grey[600],
+                  color: AppColors.textTertiaryDark,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -356,13 +356,13 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                   Text(
                     _formatDuration(_position),
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.grey[400],
+                      color: AppColors.textTertiaryDark,
                     ),
                   ),
                   Text(
                     _formatDuration(_duration),
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.grey[400],
+                      color: AppColors.textTertiaryDark,
                     ),
                   ),
                 ],
@@ -392,7 +392,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                           color:
                               _abLoop.isActive
                                   ? AppColors.primary
-                                  : Colors.grey[700],
+                                  : AppColors.textTertiaryDark,
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
@@ -434,7 +434,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                         vertical: AppSpacing.space2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[800],
+                        color: AppColors.surfaceSecondaryDark,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -457,7 +457,7 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                         vertical: AppSpacing.space2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey[800],
+                        color: AppColors.surfaceSecondaryDark,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -539,15 +539,15 @@ class _ABButton extends StatelessWidget {
 
     if (!isEnabled) {
       // Disabled state
-      backgroundColor = Colors.grey[900]!;
-      textColor = Colors.grey[600]!;
+      backgroundColor = AppColors.surfaceDark;
+      textColor = AppColors.textTertiaryDark;
     } else if (isSet) {
       // Active/set state
       backgroundColor = AppColors.primary;
       textColor = Colors.white;
     } else {
       // Enabled but not set
-      backgroundColor = Colors.grey[800]!;
+      backgroundColor = AppColors.surfaceSecondaryDark;
       textColor = Colors.white;
     }
 
@@ -564,7 +564,7 @@ class _ABButton extends StatelessWidget {
               isSet
                   ? null
                   : Border.all(
-                    color: isEnabled ? Colors.grey[600]! : Colors.grey[800]!,
+                    color: isEnabled ? AppColors.textTertiaryDark : AppColors.surfaceSecondaryDark,
                     width: 1,
                   ),
         ),

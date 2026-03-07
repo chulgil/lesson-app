@@ -10,15 +10,15 @@ import '../../../../models/piece.dart';
 Color getDifficultyColor(String? difficulty) {
   switch (difficulty) {
     case '초급':
-      return Colors.green;
+      return AppColors.success;
     case '초중급':
-      return Colors.lightGreen;
+      return AppColors.profileGreen;
     case '중급':
-      return Colors.amber;
+      return AppColors.amber;
     case '중상급':
-      return Colors.orange;
+      return AppColors.warning;
     case '상급':
-      return Colors.red;
+      return AppColors.error;
     default:
       return AppColors.textSecondaryLight;
   }

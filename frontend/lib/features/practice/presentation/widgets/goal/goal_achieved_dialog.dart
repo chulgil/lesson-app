@@ -90,8 +90,8 @@ class GoalAchievedDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.orange.shade100,
-                      Colors.red.shade100,
+                      AppColors.warning.withValues(alpha: 0.2),
+                      AppColors.error.withValues(alpha: 0.2),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -105,7 +105,7 @@ class GoalAchievedDialog extends StatelessWidget {
                       '$streakDays일 연속 스트릭!',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Colors.orange.shade800,
+                        color: AppColors.warning,
                       ),
                     ),
                   ],
@@ -119,16 +119,16 @@ class GoalAchievedDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: AppColors.amberLight,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  border: Border.all(color: Colors.amber.shade200),
+                  border: Border.all(color: AppColors.amber.withValues(alpha: 0.4)),
                 ),
                 child: Column(
                   children: [
                     Text(
                       '새로운 뱃지를 획득했어요!',
                       style: AppTypography.bodySmall.copyWith(
-                        color: Colors.amber.shade800,
+                        color: AppColors.amber,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space2),
@@ -141,7 +141,7 @@ class GoalAchievedDialog extends StatelessWidget {
                           '"$newBadge"',
                           style: AppTypography.bodyMedium.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: Colors.amber.shade900,
+                            color: AppColors.amber,
                           ),
                         ),
                       ],

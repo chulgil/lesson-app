@@ -26,20 +26,20 @@ class StatusBubble extends StatelessWidget {
 
     if (!isListening) {
       message = '마이크를 켜주세요';
-      backgroundColor = Colors.grey[200]!;
-      textColor = Colors.grey[600]!;
+      backgroundColor = AppColors.borderLight;
+      textColor = AppColors.textSecondaryLight;
     } else if (!hasNote) {
       message = '소리 감지 대기...';
-      backgroundColor = Colors.blue[50]!;
-      textColor = Colors.blue[700]!;
+      backgroundColor = AppColors.bubbleIdleBackground;
+      textColor = AppColors.bubbleIdleText;
     } else if (isPerfect) {
       message = '완벽해요! 🎵';
-      backgroundColor = Colors.green[100]!;
-      textColor = Colors.green[800]!;
+      backgroundColor = AppColors.bubbleSuccessBackground;
+      textColor = AppColors.bubbleSuccessText;
     } else {
       message = '소리 감지중';
-      backgroundColor = Colors.orange[50]!;
-      textColor = Colors.orange[800]!;
+      backgroundColor = AppColors.bubbleWarningBackground;
+      textColor = AppColors.bubbleWarningText;
     }
 
     return Container(
@@ -94,8 +94,8 @@ class CatSpeechBubble extends StatelessWidget {
 
     if (!isListening) {
       message = '마이크를 켜주세요';
-      backgroundColor = Colors.grey[200]!;
-      textColor = Colors.grey[600]!;
+      backgroundColor = AppColors.borderLight;
+      textColor = AppColors.textSecondaryLight;
     } else if (!hasNote) {
       message = '소리 감지 대기...';
       backgroundColor = AppColors.bubbleIdleBackground;
@@ -193,10 +193,10 @@ class NoteWithCent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final noteColor = isPerfect ? Colors.green : AppColors.primary;
+    final noteColor = isPerfect ? AppColors.success : AppColors.primary;
     final centColor = isPerfect
-        ? Colors.green
-        : (note.centDeviation < 0 ? Colors.red : Colors.orange);
+        ? AppColors.success
+        : (note.centDeviation < 0 ? AppColors.error : AppColors.warning);
 
     final centText = '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';
 

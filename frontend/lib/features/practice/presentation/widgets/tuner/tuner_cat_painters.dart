@@ -359,7 +359,7 @@ class CatFacePainter extends CustomPainter {
   void _drawBlush(Canvas canvas, Offset center, double radius) {
     // Pink blush circles on both cheeks
     final blushPaint = Paint()
-      ..color = Colors.pink.withValues(alpha: 0.35)
+      ..color = AppColors.profilePink.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill;
 
     // Left cheek blush

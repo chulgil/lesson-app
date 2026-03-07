@@ -368,7 +368,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -456,7 +456,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                 value: _duration.inMilliseconds > 0
                     ? _position.inMilliseconds / _duration.inMilliseconds
                     : 0,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: AppColors.borderLight,
                 valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                 minHeight: 3,
               ),

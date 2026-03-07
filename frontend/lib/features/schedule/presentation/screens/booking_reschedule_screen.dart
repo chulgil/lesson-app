@@ -291,7 +291,7 @@ class _BookingRescheduleScreenState
               color: isSelected ? AppColors.primary : AppColors.backgroundLight,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(
-                color: isSelected ? AppColors.primary : const Color(0xFFE0E0E0),
+                color: isSelected ? AppColors.primary : AppColors.borderLight,
                 width: isSelected ? 2 : 1,
               ),
             ),

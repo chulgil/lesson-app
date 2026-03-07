@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-
+import '../core/theme/app_colors.dart';
 import '../models/child_profile.dart';
 
 /// Repository interface for child profile operations
@@ -46,7 +45,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       level: 'elementary',
       teacherId: 'teacher_1',
       teacherName: '김선생님',
-      profileColor: Colors.blue,
+      profileColor: AppColors.profileBlue,
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 180)),
     ),
@@ -59,7 +58,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       level: 'beginner',
       teacherId: 'teacher_2',
       teacherName: '박선생님',
-      profileColor: Colors.pink,
+      profileColor: AppColors.profilePink,
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 90)),
     ),
@@ -72,7 +71,7 @@ class MockChildProfileRepository implements ChildProfileRepository {
       level: 'intermediate',
       teacherId: 'teacher_1',
       teacherName: '김선생님',
-      profileColor: Colors.green,
+      profileColor: AppColors.profileGreen,
       status: ChildProfileStatus.active,
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
     ),

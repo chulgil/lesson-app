@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/theme/app_colors.dart';
 import '../../../domain/entities/tuner_types.dart';
 
 /// Normalized staff widget that displays notes within a single octave range.
@@ -93,7 +94,7 @@ class _StaffPainter extends CustomPainter {
 
   void _drawStaffLines(Canvas canvas, Size size, double staffTop) {
     final linePaint = Paint()
-      ..color = Colors.grey[400]!
+      ..color = AppColors.textTertiaryLight
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -115,7 +116,7 @@ class _StaffPainter extends CustomPainter {
         text: '𝄞',
         style: TextStyle(
           fontSize: 38,
-          color: Colors.grey[600],
+          color: AppColors.textSecondaryLight,
           fontFamily: 'Noto Music',
         ),
       ),
@@ -135,8 +136,8 @@ class _StaffPainter extends CustomPainter {
     final noteY = _getNoteY(note.name, staffTop);
 
     // Colors
-    final noteColor = isPerfect ? Colors.green[700]! : Colors.grey[800]!;
-    final accentColor = isPerfect ? Colors.green[600]! : Colors.grey[600]!;
+    final noteColor = isPerfect ? AppColors.success : AppColors.textPrimaryLight;
+    final accentColor = isPerfect ? AppColors.success : AppColors.textSecondaryLight;
 
     // Draw ledger lines if needed
     _drawLedgerLines(canvas, centerX, staffTop, note.name, noteColor);

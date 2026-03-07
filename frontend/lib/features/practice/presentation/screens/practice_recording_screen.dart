@@ -206,7 +206,7 @@ class _PracticeRecordingScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
                 child: const Text('삭제'),
               ),
             ],
@@ -491,8 +491,8 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   onPressed: widget.onCancel,
                   icon: const Icon(Icons.close),
                   style: IconButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
                   ),
                   tooltip: '취소',
                 ),
@@ -505,7 +505,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   child: IconButton.filled(
                     onPressed: widget.onStop,
                     icon: const Icon(Icons.stop, size: 36),
-                    style: IconButton.styleFrom(backgroundColor: Colors.red),
+                    style: IconButton.styleFrom(backgroundColor: AppColors.error),
                     tooltip: '녹음 완료',
                   ),
                 ),
@@ -709,11 +709,11 @@ class _RecordingItem extends StatelessWidget {
             ),
             if (recording.isShared) ...[
               SizedBox(width: AppSpacing.space2),
-              Icon(Icons.check_circle, size: 14, color: Colors.green),
+              Icon(Icons.check_circle, size: 14, color: AppColors.success),
               SizedBox(width: 4),
               Text(
                 '공유됨',
-                style: AppTypography.caption.copyWith(color: Colors.green),
+                style: AppTypography.caption.copyWith(color: AppColors.success),
               ),
             ],
           ],
@@ -759,9 +759,9 @@ class _RecordingItem extends StatelessWidget {
                   value: 'delete',
                   child: Row(
                     children: [
-                      Icon(Icons.delete_outline, color: Colors.red),
+                      Icon(Icons.delete_outline, color: AppColors.error),
                       SizedBox(width: 8),
-                      Text('삭제', style: TextStyle(color: Colors.red)),
+                      Text('삭제', style: TextStyle(color: AppColors.error)),
                     ],
                   ),
                 ),

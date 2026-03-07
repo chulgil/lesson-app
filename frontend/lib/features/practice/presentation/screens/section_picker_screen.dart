@@ -97,11 +97,11 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -192,7 +192,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
             Icon(
               Icons.library_music_outlined,
               size: 64,
-              color: Colors.grey.shade400,
+              color: AppColors.textTertiaryLight,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -228,7 +228,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
             Icon(
               Icons.search_off,
               size: 64,
-              color: Colors.grey.shade400,
+              color: AppColors.textTertiaryLight,
             ),
             const SizedBox(height: 16),
             Text(
@@ -274,7 +274,7 @@ class _RepertoireGroup extends StatelessWidget {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceSecondaryLight,
           child: Row(
             children: [
               Icon(
@@ -298,7 +298,7 @@ class _RepertoireGroup extends StatelessWidget {
                 '${sections.length}개 섹션',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: AppColors.textSecondaryLight,
                 ),
               ),
             ],
@@ -386,10 +386,10 @@ class _SectionTile extends StatelessWidget {
         searchQuery,
         TextStyle(
           fontSize: 13,
-          color: Colors.grey.shade600,
+          color: AppColors.textSecondaryLight,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+      trailing: const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
       onTap: onTap,
     );
   }

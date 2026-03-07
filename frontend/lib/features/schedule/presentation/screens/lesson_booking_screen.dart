@@ -700,20 +700,20 @@ class _TimeChip extends StatelessWidget {
 
   Color get _backgroundColor {
     if (isBlocked) {
-      return const Color(0xFFF5F5F5); // Light gray for blocked
+      return AppColors.surfaceSecondaryLight; // Light gray for blocked
     }
     if (isSelected) {
       return AppColors.primary;
     }
     if (slot.isRecommended) {
-      return const Color(0xFFFFF5EB); // Light orange
+      return AppColors.warningLight; // Light orange
     }
     return AppColors.backgroundLight; // #FFFAF5
   }
 
   Color get _borderColor {
     if (isBlocked) {
-      return const Color(0xFFE0E0E0);
+      return AppColors.borderLight;
     }
     if (isSelected) {
       return AppColors.primary;
@@ -721,7 +721,7 @@ class _TimeChip extends StatelessWidget {
     if (slot.isRecommended) {
       return AppColors.secondary; // #F4A460
     }
-    return const Color(0xFFE0E0E0);
+    return AppColors.borderLight;
   }
 
   Color get _textColor {

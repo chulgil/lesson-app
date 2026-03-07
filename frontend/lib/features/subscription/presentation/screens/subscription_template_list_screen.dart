@@ -258,7 +258,7 @@ class _TemplateCard extends StatelessWidget {
               : AppColors.textTertiaryLight.withValues(alpha: 0.3),
         ),
       ),
-      color: template.isActive ? Colors.white : Colors.grey.shade50,
+      color: template.isActive ? Colors.white : AppColors.surfaceSecondaryLight,
       child: InkWell(
         onTap: onEdit,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

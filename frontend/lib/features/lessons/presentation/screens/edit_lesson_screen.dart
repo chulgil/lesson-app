@@ -327,19 +327,19 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
           id: 'student_1',
           name: '홍길동',
           instrument: '바이올린',
-          color: Colors.blue,
+          color: AppColors.profileBlue,
         ),
         EditLessonStudentInfo(
           id: 'student_2',
           name: '김철수',
           instrument: '피아노',
-          color: Colors.green,
+          color: AppColors.profileGreen,
         ),
         EditLessonStudentInfo(
           id: 'student_3',
           name: '이영희',
           instrument: '첼로',
-          color: Colors.orange,
+          color: AppColors.profileOrange,
         ),
       ];
 }
