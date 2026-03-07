@@ -794,24 +794,6 @@ class _LessonCard extends ConsumerWidget {
 
               const SizedBox(width: AppSpacing.space1),
 
-              // Repeat button
-              SizedBox(
-                width: 28,
-                height: 28,
-                child: IconButton(
-                  onPressed: () => _showRepeatConfirmation(context, ref),
-                  icon: Icon(
-                    Icons.repeat,
-                    size: 18,
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  padding: EdgeInsets.zero,
-                  tooltip: '다음 주 반복',
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.space1),
-
               // Arrow
               const Icon(
                 Icons.chevron_right,
@@ -823,85 +805,6 @@ class _LessonCard extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  /// Show confirmation dialog and create a repeated lesson for next week
-  void _showRepeatConfirmation(BuildContext context, WidgetRef ref) {
-    final nextWeekDate = lesson.date.add(const Duration(days: 7));
-    final dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
-    final dayName = dayNames[nextWeekDate.weekday];
-    final dateStr = '${nextWeekDate.month}/${nextWeekDate.day}($dayName)';
-
-    showDialog(
-      context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('다음 레슨 추가'),
-            content: Text(
-              '${lesson.studentName} 다음 레슨을 추가할까요?\n'
-              '다음 주 $dateStr ${lesson.startTime} · ${lesson.duration}분',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.pop(dialogContext);
-                  await _createRepeatedLesson(context, ref, nextWeekDate);
-                },
-                child: const Text('추가'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  /// Create a new lesson for next week with the same details
-  Future<void> _createRepeatedLesson(
-    BuildContext context,
-    WidgetRef ref,
-    DateTime nextWeekDate,
-  ) async {
-    final newLesson = Lesson(
-      id: '',
-      studentId: lesson.studentId,
-      studentName: lesson.studentName,
-      teacherId: lesson.teacherId,
-      teacherName: lesson.teacherName,
-      instrument: lesson.instrument,
-      date: nextWeekDate,
-      startTime: lesson.startTime,
-      duration: lesson.duration,
-      status: LessonStatus.scheduled,
-      pieces: lesson.pieces,
-      location: lesson.location,
-      createdAt: DateTime.now(),
-    );
-
-    try {
-      await ref.read(lessonsNotifierProvider.notifier).addLesson(newLesson);
-      ref.invalidate(lessonsProvider);
-
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${lesson.studentName} 학생의 다음 주 레슨이 추가되었습니다'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.practiceGood,
-        ),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('레슨 추가 실패: $e'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
-        ),
-      );
-    }
   }
 
   String _getStatusLabel() {
