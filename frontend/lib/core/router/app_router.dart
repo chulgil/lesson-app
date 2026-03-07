@@ -31,6 +31,7 @@ export 'app_routes.dart';
 /// Auth-aware redirect paths.
 const _publicPaths = [AppRoutes.login, '/login'];
 const _roleSelectPath = AppRoutes.roleSelect;
+const _termsAgreementPath = AppRoutes.termsAgreement;
 
 /// App router configuration
 class AppRouter {
@@ -55,6 +56,7 @@ class AppRouter {
                 final currentPath = state.matchedLocation;
                 final isPublic = _publicPaths.contains(currentPath);
                 final isRoleSelect = currentPath == _roleSelectPath;
+                final isTermsAgreement = currentPath == _termsAgreementPath;
 
                 if (authState is AuthLoading) return null;
 
@@ -62,13 +64,20 @@ class AppRouter {
                   return AppRoutes.login;
                 }
 
-                // New OAuth signup: needs role selection
-                if (authState is AuthNeedsRole && !isRoleSelect) {
-                  return AppRoutes.roleSelect;
+                // New OAuth signup: terms agreement → role selection
+                if (authState is AuthNeedsRole) {
+                  final termsAgreed =
+                      ref.read(authNotifierProvider.notifier).termsAgreed;
+                  if (!termsAgreed && !isTermsAgreement) {
+                    return AppRoutes.termsAgreement;
+                  }
+                  if (termsAgreed && !isRoleSelect) {
+                    return AppRoutes.roleSelect;
+                  }
                 }
 
                 if (authState is AuthAuthenticated &&
-                    (isPublic || isRoleSelect)) {
+                    (isPublic || isRoleSelect || isTermsAgreement)) {
                   return authState.role.homeRoute;
                 }
 

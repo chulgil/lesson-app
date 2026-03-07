@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -117,6 +118,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
                 _buildCarryoverPolicy(),
                 const SizedBox(height: AppSpacing.space6),
                 _buildPolicySummary(),
+                const SizedBox(height: AppSpacing.space6),
+                _buildRelatedSettings(),
                 const SizedBox(height: AppSpacing.space8),
               ],
             ),
@@ -357,6 +360,62 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRelatedSettings() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionHeader('관련 설정', Icons.settings),
+        const SizedBox(height: AppSpacing.space3),
+        _buildRelatedSettingItem(
+          icon: Icons.schedule,
+          label: '레슨 시간 설정',
+          onTap: () => context.push(AppRoutes.lessonTimeSettings),
+        ),
+        _buildRelatedSettingItem(
+          icon: Icons.payments_outlined,
+          label: '수강료 관리',
+          onTap: () => context.push(AppRoutes.paymentManagement),
+        ),
+        _buildRelatedSettingItem(
+          icon: Icons.library_books_outlined,
+          label: '템플릿 관리',
+          onTap: () => context.push(AppRoutes.tipTemplateManagement),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRelatedSettingItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.space3,
+          horizontal: AppSpacing.space2,
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Text(label, style: AppTypography.bodyMedium),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textTertiaryLight,
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }

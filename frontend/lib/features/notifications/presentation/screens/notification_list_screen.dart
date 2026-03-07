@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/notification.dart';
 import '../providers/notification_providers.dart';
 import '../widgets/notification_item.dart';
@@ -139,31 +140,10 @@ class NotificationListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.notifications_none_outlined,
-            size: 64,
-            color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '알림이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            '새로운 소식이 있으면 알려드릴게요',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.notifications_none_outlined,
+      title: '알림이 없습니다',
+      subtitle: '새로운 소식이 있으면 알려드릴게요',
     );
   }
 

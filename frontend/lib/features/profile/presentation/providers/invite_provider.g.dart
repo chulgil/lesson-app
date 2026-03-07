@@ -6,9 +6,9 @@ part of 'invite_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inviteRepositoryHash() => r'e669a8877c4163e196dc55fe98d7e0da633eb04f';
+String _$inviteRepositoryHash() => r'119b452eea312a9344b4b657a1064e65777cfef4';
 
-/// Provider for invite repository
+/// Provider for invite repository - switches between Mock and Remote.
 ///
 /// Copied from [inviteRepository].
 @ProviderFor(inviteRepository)

@@ -130,27 +130,22 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
     String label;
     IconData? icon;
 
-    if (subscription.status == SubscriptionStatus.expired) {
+    // Unpaid takes highest priority
+    if (subscription.isUnpaid) {
+      textColor = AppColors.error;
+      label = '미수금';
+      icon = Icons.warning_amber_rounded;
+    } else if (subscription.status == SubscriptionStatus.expired) {
       textColor = AppColors.error;
       label = '만료됨';
       icon = Icons.warning_amber_rounded;
     } else if (subscription.isExpiringSoon) {
       textColor = AppColors.warning;
-      if (subscription.type == SubscriptionType.package) {
-        label = '${subscription.remainingLessons}회 남음';
-      } else {
-        label = 'D-${subscription.daysUntilExpiration}';
-      }
+      label = _formatBadgeLabel(subscription);
       icon = Icons.access_time;
     } else {
       textColor = AppColors.success;
-      if (subscription.type == SubscriptionType.package) {
-        label = '${subscription.remainingLessons}회 남음';
-      } else if (subscription.type == SubscriptionType.monthly) {
-        label = 'D-${subscription.daysUntilExpiration}';
-      } else {
-        label = '체험권';
-      }
+      label = _formatBadgeLabel(subscription);
     }
 
     // Clean inline style - icon + text only, no background box
@@ -171,6 +166,20 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  /// Format badge label by subscription type.
+  /// Package: [used/total], Monthly: 월정액, Trial: 체험중
+  String _formatBadgeLabel(Subscription subscription) {
+    switch (subscription.type) {
+      case SubscriptionType.package:
+        final total = subscription.totalLessonsForDisplay ?? 0;
+        return '[${subscription.usedLessons}/$total]';
+      case SubscriptionType.monthly:
+        return '월정액';
+      case SubscriptionType.trial:
+        return '체험중';
+    }
   }
 }
 

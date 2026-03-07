@@ -7,7 +7,7 @@ part of 'location_providers.dart';
 // **************************************************************************
 
 String _$locationRepositoryHash() =>
-    r'bc4d918af1ab1bbc5c61e9e2e49701d8e9b1ff23';
+    r'6a773727c1f0f4b00a5adda2d00a2a81a1431d07';
 
 /// Repository provider for LessonLocation.
 ///

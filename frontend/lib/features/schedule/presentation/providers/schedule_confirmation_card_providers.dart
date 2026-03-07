@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_schedule_confirmation_card_repository.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
 import '../../domain/repositories/schedule_confirmation_card_repository.dart';
@@ -9,7 +10,12 @@ part 'schedule_confirmation_card_providers.g.dart';
 /// Repository provider for schedule confirmation cards.
 @Riverpod(keepAlive: true)
 ScheduleConfirmationCardRepository scheduleConfirmationCardRepository(
-    ScheduleConfirmationCardRepositoryRef ref) {
+  ScheduleConfirmationCardRepositoryRef ref,
+) {
+  if (EnvironmentConfig.useMockData) {
+    return MockScheduleConfirmationCardRepository();
+  }
+  // TODO: Replace with Remote repository when API is ready
   return MockScheduleConfirmationCardRepository();
 }
 

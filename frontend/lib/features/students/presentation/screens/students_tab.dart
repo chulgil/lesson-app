@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management
@@ -32,8 +36,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final groupedAsync =
-        ref.watch(filteredGroupedStudentsProvider('teacher_1'));
+    final teacherId = ref.watch(currentUserIdProvider);
+    final groupedAsync = ref.watch(filteredGroupedStudentsProvider(teacherId));
 
     return Column(
       children: [
@@ -70,20 +74,21 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return groups
         .map((group) {
-          final filtered = group.students.where((swm) {
-            switch (_currentFilter) {
-              case StudentFilter.all:
-                return true;
-              case StudentFilter.good:
-                return swm.practiceStatus == PracticeStatus.good;
-              case StudentFilter.normal:
-                return swm.practiceStatus == PracticeStatus.normal;
-              case StudentFilter.poor:
-                return swm.practiceStatus == PracticeStatus.poor;
-              case StudentFilter.paused:
-                return swm.practiceStatus == PracticeStatus.paused;
-            }
-          }).toList();
+          final filtered =
+              group.students.where((swm) {
+                switch (_currentFilter) {
+                  case StudentFilter.all:
+                    return true;
+                  case StudentFilter.good:
+                    return swm.practiceStatus == PracticeStatus.good;
+                  case StudentFilter.normal:
+                    return swm.practiceStatus == PracticeStatus.normal;
+                  case StudentFilter.poor:
+                    return swm.practiceStatus == PracticeStatus.poor;
+                  case StudentFilter.paused:
+                    return swm.practiceStatus == PracticeStatus.paused;
+                }
+              }).toList();
           return StudentGroup(
             lessonClass: group.lessonClass,
             students: filtered,
@@ -120,8 +125,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: TextField(
         controller: _searchController,
         onChanged: (value) {
@@ -132,17 +136,20 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           hintStyle: AppTypography.bodyMedium.copyWith(
             color: AppColors.textTertiaryLight,
           ),
-          prefixIcon:
-              const Icon(Icons.search, color: AppColors.textTertiaryLight),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  onPressed: () {
-                    _searchController.clear();
-                    ref.read(studentSearchQueryProvider.notifier).state = '';
-                  },
-                  icon: const Icon(Icons.clear, size: 20),
-                )
-              : null,
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.textTertiaryLight,
+          ),
+          suffixIcon:
+              _searchController.text.isNotEmpty
+                  ? IconButton(
+                    onPressed: () {
+                      _searchController.clear();
+                      ref.read(studentSearchQueryProvider.notifier).state = '';
+                    },
+                    icon: const Icon(Icons.clear, size: 20),
+                  )
+                  : null,
           filled: true,
           fillColor: AppColors.surfaceSecondaryLight,
           border: OutlineInputBorder(
@@ -175,16 +182,18 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             return Padding(
               padding: const EdgeInsets.only(right: AppSpacing.space2),
               child: FilterChip(
-                avatar: filter == ClassTypeFilter.academy
-                    ? const Text('🏫', style: TextStyle(fontSize: 12))
-                    : filter == ClassTypeFilter.private
+                avatar:
+                    filter == ClassTypeFilter.academy
+                        ? const Text('🏫', style: TextStyle(fontSize: 12))
+                        : filter == ClassTypeFilter.private
                         ? const Text('👤', style: TextStyle(fontSize: 12))
                         : null,
                 label: Text(filter.label),
                 selected: isSelected,
-                onSelected: (_) => ref
-                    .read(classTypeFilterNotifierProvider.notifier)
-                    .set(filter),
+                onSelected:
+                    (_) => ref
+                        .read(classTypeFilterNotifierProvider.notifier)
+                        .set(filter),
                 backgroundColor: AppColors.surfaceLight,
                 selectedColor: AppColors.info.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.info,
@@ -192,9 +201,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   color: isSelected ? AppColors.info : AppColors.borderLight,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color: isSelected
-                      ? AppColors.info
-                      : AppColors.textSecondaryLight,
+                  color:
+                      isSelected
+                          ? AppColors.info
+                          : AppColors.textSecondaryLight,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -225,9 +235,10 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   color: isSelected ? AppColors.primary : AppColors.borderLight,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.textSecondaryLight,
+                  color:
+                      isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondaryLight,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -249,8 +260,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
 
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -286,11 +296,13 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(groupedStudentsProvider('teacher_1'));
+        final teacherId = ref.read(currentUserIdProvider);
+        ref.invalidate(groupedStudentsProvider(teacherId));
       },
       child: ListView.builder(
-        padding:
-            const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+        ),
         itemCount: filtered.length,
         itemBuilder: (context, index) {
           return _ClassGroupSection(group: filtered[index]);
@@ -302,38 +314,12 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   Widget _buildEmptyState() {
     final query = ref.watch(studentSearchQueryProvider);
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.people_outline,
-            size: 64,
-            color: AppColors.textTertiaryLight,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            query.isNotEmpty ? '검색 결과가 없습니다' : '아직 등록된 학생이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (query.isEmpty) ...[
-            const SizedBox(height: AppSpacing.space3),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space8),
-              child: Text(
-                '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ],
-      ),
+    return EmptyStateWidget(
+      icon: Icons.people_outline,
+      title: query.isNotEmpty ? '검색 결과가 없습니다' : '아직 등록된 학생이 없습니다',
+      subtitle: query.isEmpty
+          ? '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요'
+          : null,
     );
   }
 
@@ -342,11 +328,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.error,
-          ),
+          Icon(Icons.error_outline, size: 64, color: AppColors.error),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '데이터를 불러오는데 실패했습니다',
@@ -357,7 +339,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           const SizedBox(height: AppSpacing.space6),
           OutlinedButton.icon(
             onPressed: () {
-              ref.invalidate(groupedStudentsProvider('teacher_1'));
+              final teacherId = ref.read(currentUserIdProvider);
+              ref.invalidate(groupedStudentsProvider(teacherId));
             },
             icon: const Icon(Icons.refresh),
             label: const Text('다시 시도'),
@@ -380,35 +363,61 @@ enum StudentFilter {
 }
 
 /// Section header + student cards for a single class group.
-class _ClassGroupSection extends StatelessWidget {
+/// Supports collapse/expand.
+class _ClassGroupSection extends StatefulWidget {
   final StudentGroup group;
 
   const _ClassGroupSection({required this.group});
+
+  @override
+  State<_ClassGroupSection> createState() => _ClassGroupSectionState();
+}
+
+class _ClassGroupSectionState extends State<_ClassGroupSection> {
+  bool _isExpanded = true;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section header
-        Padding(
-          padding: const EdgeInsets.only(
-            top: AppSpacing.space4,
-            bottom: AppSpacing.space2,
-          ),
-          child: Text(
-            '${group.icon} ${group.title} (${group.count})',
-            style: AppTypography.bodyLarge.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimaryLight,
+        // Section header (tappable)
+        GestureDetector(
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: AppSpacing.space4,
+              bottom: AppSpacing.space2,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${widget.group.icon} ${widget.group.title} (${widget.group.count})',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
+                ),
+                Icon(
+                  _isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: AppColors.textTertiaryLight,
+                  size: 20,
+                ),
+              ],
             ),
           ),
         ),
-        // Student cards
-        ...group.students.map((swm) => Padding(
+        // Student cards (collapsible)
+        if (_isExpanded)
+          ...widget.group.students.map(
+            (swm) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space3),
               child: _StudentCard(studentWithMembership: swm),
-            )),
+            ),
+          ),
       ],
     );
   }
@@ -485,16 +494,14 @@ class _StudentCard extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    // Row 3: Weekly practice dots
+                    _PracticeDots(studentId: swm.studentId),
                   ],
                 ),
               ),
 
-              // Status section (fixed width)
-              SizedBox(
-                width: 56,
-                child:
-                    StudentSubscriptionMiniBadge(studentId: swm.studentId),
-              ),
+              // Status section
+              _buildSubscriptionStatus(context, ref, swm.studentId),
 
               const SizedBox(width: AppSpacing.space1),
 
@@ -508,6 +515,139 @@ class _StudentCard extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSubscriptionStatus(
+    BuildContext context,
+    WidgetRef ref,
+    String studentId,
+  ) {
+    final subscriptionsAsync =
+        ref.watch(activeStudentSubscriptionsProvider(studentId));
+
+    return subscriptionsAsync.when(
+      data: (subscriptions) {
+        // Unpaid takes highest priority
+        final hasUnpaid = subscriptions.any((s) => s.isUnpaid);
+        if (hasUnpaid) {
+          return SizedBox(
+            width: 56,
+            child: GestureDetector(
+              onTap: () => context.push(
+                '${AppRoutes.issueSubscription}?studentId=$studentId',
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: AppColors.error.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Text(
+                  '미수금',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        }
+
+        final hasExpiring = subscriptions.any((s) => s.isExpiringSoon);
+        if (hasExpiring) {
+          return SizedBox(
+            width: 56,
+            child: GestureDetector(
+              onTap: () => context.push(
+                '${AppRoutes.issueSubscription}?studentId=$studentId',
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: AppColors.warning.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Text(
+                  '갱신',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.warning,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        }
+        return SizedBox(
+          width: 56,
+          child: StudentSubscriptionMiniBadge(studentId: studentId),
+        );
+      },
+      loading: () => const SizedBox(width: 56),
+      error: (_, __) => const SizedBox(width: 56),
+    );
+  }
+}
+
+/// Weekly practice dot pattern (●●●●●○○ style).
+class _PracticeDots extends ConsumerWidget {
+  final String studentId;
+
+  const _PracticeDots({required this.studentId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final weeklyAsync = ref.watch(weeklyPracticeProvider(studentId));
+
+    return weeklyAsync.when(
+      data: (days) {
+        final practiced = days.where((d) => d).length;
+        return Padding(
+          padding: const EdgeInsets.only(top: 3),
+          child: Row(
+            children: [
+              ...days.map((done) => Padding(
+                    padding: const EdgeInsets.only(right: 3),
+                    child: Icon(
+                      Icons.circle,
+                      size: 7,
+                      color: done
+                          ? AppColors.practiceGood
+                          : AppColors.borderLight,
+                    ),
+                  )),
+              const SizedBox(width: 4),
+              Text(
+                '$practiced/${days.length}일',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_lesson_class_repository.dart';
 import '../../domain/entities/lesson_class.dart';
 import '../../domain/repositories/lesson_class_repository.dart';
@@ -9,6 +10,10 @@ part 'lesson_class_providers.g.dart';
 /// Repository provider for LessonClass.
 @riverpod
 LessonClassRepository lessonClassRepository(LessonClassRepositoryRef ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockLessonClassRepository();
+  }
+  // TODO: Replace with Remote repository when API is ready
   return MockLessonClassRepository();
 }
 

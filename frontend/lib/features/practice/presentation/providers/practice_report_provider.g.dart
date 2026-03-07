@@ -7,9 +7,9 @@ part of 'practice_report_provider.dart';
 // **************************************************************************
 
 String _$practiceReportRepositoryHash() =>
-    r'ce4772d9e0b4121076adab75a7333f28ee269938';
+    r'4605c6a58e16c22eaf202d9ee0fec9cd4a974c68';
 
-/// Practice stats repository provider
+/// Practice stats repository provider - switches between Mock and Remote.
 ///
 /// Copied from [practiceReportRepository].
 @ProviderFor(practiceReportRepository)

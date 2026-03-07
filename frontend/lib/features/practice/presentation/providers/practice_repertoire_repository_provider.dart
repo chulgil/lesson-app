@@ -9,6 +9,6 @@ final practiceRepertoireRepositoryProvider =
       if (EnvironmentConfig.useMockData) {
         return MockPracticeRepertoireRepository();
       }
-      // Mock already starts empty — safe to use in remote mode
+      // TODO: Replace with Remote repository when API is ready
       return MockPracticeRepertoireRepository();
     });

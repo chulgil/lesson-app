@@ -7,7 +7,7 @@ part of 'lesson_policy_providers.dart';
 // **************************************************************************
 
 String _$lessonPolicyRepositoryHash() =>
-    r'51ae44cfd5863b2226ebe21d439a7ac6980cb027';
+    r'3ed5761d1ff93d7d84827b297359d90bcf7af393';
 
 /// Provider for the lesson policy repository.
 ///

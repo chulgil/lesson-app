@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_membership_repository.dart';
 import '../../domain/entities/class_membership.dart';
 import '../../domain/repositories/membership_repository.dart';
@@ -9,6 +10,10 @@ part 'membership_providers.g.dart';
 /// Repository provider for ClassMembership.
 @riverpod
 MembershipRepository membershipRepository(MembershipRepositoryRef ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockMembershipRepository();
+  }
+  // TODO: Replace with Remote repository when API is ready
   return MockMembershipRepository();
 }
 

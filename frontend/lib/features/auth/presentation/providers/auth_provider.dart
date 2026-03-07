@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/auth/auth_state.dart';
@@ -28,10 +29,20 @@ class AuthNotifier extends _$AuthNotifier {
   late final TokenStorage _tokenStorage;
   late final AuthRepository _authRepository;
 
+  /// Whether the user has agreed to terms in this session.
+  bool _termsAgreed = false;
+  bool get termsAgreed => _termsAgreed;
+
+  /// Mark terms as accepted (in-memory, valid for this session).
+  void acceptTerms() {
+    _termsAgreed = true;
+  }
+
   @override
   AuthState build() {
     _tokenStorage = ref.read(tokenStorageProvider);
     _authRepository = ref.read(authRepositoryProvider);
+    _termsAgreed = false;
 
     // In mock mode, skip authentication entirely
     if (EnvironmentConfig.useMockData) {
@@ -44,18 +55,40 @@ class AuthNotifier extends _$AuthNotifier {
   }
 
   /// Attempt to restore session from stored tokens.
+  ///
+  /// Only clears tokens on [UnauthorizedException] (401 after refresh failed).
+  /// For network/server errors, tokens are preserved for the next attempt.
   Future<void> _tryAutoLogin() async {
     try {
       final hasTokens = await _tokenStorage.hasTokens();
       if (!hasTokens) {
+        debugPrint('[Auth] No stored tokens, skipping auto-login');
         state = const AuthUnauthenticated();
         return;
       }
 
+      debugPrint('[Auth] Stored tokens found, attempting auto-login...');
       final user = await _authRepository.getMe();
+      debugPrint('[Auth] Auto-login succeeded: ${user.email}');
       state = _stateFromUser(user);
-    } on ApiException {
+    } on UnauthorizedException {
+      // Token is invalid/expired and refresh also failed — must re-login
+      debugPrint('[Auth] Token invalid (401), clearing tokens');
       await _tokenStorage.clearTokens();
+      state = const AuthUnauthenticated();
+    } on NetworkException catch (e) {
+      // Network error — preserve tokens for next auto-login attempt
+      debugPrint('[Auth] Auto-login failed (network): ${e.message}');
+      state = const AuthUnauthenticated();
+    } on ApiException catch (e) {
+      // Server error — preserve tokens for next auto-login attempt
+      debugPrint(
+        '[Auth] Auto-login failed (API ${e.statusCode}): ${e.message}',
+      );
+      state = const AuthUnauthenticated();
+    } catch (e) {
+      // Unexpected error — preserve tokens
+      debugPrint('[Auth] Auto-login failed (unexpected): $e');
       state = const AuthUnauthenticated();
     }
   }

@@ -148,6 +148,11 @@ class _StudentDetailContent extends ConsumerWidget {
                     // Recent lesson history
                     StudentRecentLessonsSection(studentId: student.id),
 
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Lesson notes history
+                    StudentNotesSection(studentId: student.id),
+
                     const SizedBox(height: AppSpacing.space8),
                   ],
                 ),

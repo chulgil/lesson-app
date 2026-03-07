@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/teacher_profile.dart';
@@ -64,6 +66,13 @@ class _ProfileContent extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Lesson content management shortcuts
+          _buildSectionTitle('레슨 콘텐츠'),
+          const SizedBox(height: AppSpacing.space3),
+          _buildQuickLinkRow(context),
+
+          const SizedBox(height: AppSpacing.space6),
+
           // Experience & Fee section
           _buildSectionTitle('기본 정보'),
           const SizedBox(height: AppSpacing.space3),
@@ -106,6 +115,28 @@ class _ProfileContent extends ConsumerWidget {
     return Text(
       title,
       style: AppTypography.headingSmall,
+    );
+  }
+
+  Widget _buildQuickLinkRow(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _QuickLinkCard(
+            icon: Icons.music_note,
+            label: '악기 관리',
+            onTap: () => context.push(AppRoutes.instrumentManagement),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: _QuickLinkCard(
+            icon: Icons.library_music,
+            label: '레퍼토리 관리',
+            onTap: () => context.push(AppRoutes.repertoireManagement),
+          ),
+        ),
+      ],
     );
   }
 
@@ -250,6 +281,46 @@ class _ProfileContent extends ConsumerWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _QuickLinkCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _QuickLinkCard({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 28),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

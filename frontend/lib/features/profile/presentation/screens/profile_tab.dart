@@ -1,35 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/auth/auth_state.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 
 /// Profile tab with user info and settings
-class ProfileTab extends StatelessWidget {
+class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final name = authState is AuthAuthenticated ? authState.name : '-';
+    final email = authState is AuthAuthenticated ? authState.email : '-';
+    final teacherId = ref.watch(currentUserIdProvider);
+
     return SingleChildScrollView(
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.space4),
 
           // Profile header
-          _buildProfileHeader(context),
+          _buildProfileHeader(context, name, email),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Stats section
-          _buildStatsSection(),
+          _buildStatsSection(ref, teacherId),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Menu sections
           _buildMenuSection(
-            title: '레슨 관리',
+            title: '내 프로필',
             items: [
               _MenuItem(
                 icon: Icons.person_outline,
@@ -37,44 +47,17 @@ class ProfileTab extends StatelessWidget {
                 onTap: () => context.push(AppRoutes.extendedProfile),
               ),
               _MenuItem(
-                icon: Icons.music_note,
-                label: '악기 관리',
-                onTap: () => context.push(AppRoutes.instrumentManagement),
-              ),
-              _MenuItem(
-                icon: Icons.library_music,
-                label: '레퍼토리 관리',
-                onTap: () => context.push(AppRoutes.repertoireManagement),
-              ),
-              _MenuItem(
-                icon: Icons.schedule,
-                label: '레슨 시간 설정',
-                onTap: () => context.push(AppRoutes.lessonTimeSettings),
-              ),
-              _MenuItem(
                 icon: Icons.calendar_month,
                 label: '가용 시간 관리',
                 onTap: () => context.push(AppRoutes.teacherAvailability),
               ),
               _MenuItem(
-                icon: Icons.pending_actions,
-                label: '승인 대기 목록',
-                onTap: () => context.push(AppRoutes.pendingBookings),
-              ),
-              _MenuItem(
-                icon: Icons.payments_outlined,
-                label: '수강료 관리',
-                onTap: () => context.push(AppRoutes.paymentManagement),
-              ),
-              _MenuItem(
                 icon: Icons.policy_outlined,
                 label: '레슨 정책 설정',
-                onTap: () => context.push('${AppRoutes.lessonPolicy}?teacherId=teacher_1'),
-              ),
-              _MenuItem(
-                icon: Icons.library_books_outlined,
-                label: '템플릿 관리',
-                onTap: () => context.push(AppRoutes.tipTemplateManagement),
+                onTap:
+                    () => context.push(
+                      '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
+                    ),
               ),
             ],
           ),
@@ -97,24 +80,8 @@ class ProfileTab extends StatelessWidget {
                 onTap: () {},
               ),
               _MenuItem(
-                icon: Icons.language,
-                label: '언어',
-                trailing: Text(
-                  '한국어',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-                onTap: () {},
-              ),
-              _MenuItem(
-                icon: Icons.backup_outlined,
-                label: '녹음 백업',
-                onTap: () => context.push(AppRoutes.backupSettings),
-              ),
-              _MenuItem(
                 icon: Icons.library_music_outlined,
-                label: '전체 녹음 관리',
+                label: '녹음 관리',
                 onTap: () => context.push(AppRoutes.allRecordings),
               ),
             ],
@@ -125,11 +92,7 @@ class ProfileTab extends StatelessWidget {
           _buildMenuSection(
             title: '지원',
             items: [
-              _MenuItem(
-                icon: Icons.help_outline,
-                label: '도움말',
-                onTap: () {},
-              ),
+              _MenuItem(icon: Icons.help_outline, label: '도움말', onTap: () {}),
               _MenuItem(
                 icon: Icons.feedback_outlined,
                 label: '피드백 보내기',
@@ -156,19 +119,14 @@ class ProfileTab extends StatelessWidget {
             items: [
               _MenuItem(
                 icon: Icons.description_outlined,
-                label: '이용약관',
-                onTap: () {},
-              ),
-              _MenuItem(
-                icon: Icons.privacy_tip_outlined,
-                label: '개인정보처리방침',
+                label: '이용약관 / 개인정보처리방침',
                 onTap: () {},
               ),
               _MenuItem(
                 icon: Icons.logout,
                 label: '로그아웃',
                 labelColor: AppColors.error,
-                onTap: () => _showLogoutDialog(context),
+                onTap: () => _showLogoutDialog(context, ref),
               ),
             ],
           ),
@@ -179,7 +137,9 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, String name, String email) {
+    final initial = name.isNotEmpty ? name[0] : '?';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
@@ -191,7 +151,7 @@ class ProfileTab extends StatelessWidget {
                 radius: 40,
                 backgroundColor: AppColors.primaryLight,
                 child: Text(
-                  '김',
+                  initial,
                   style: AppTypography.headingLarge.copyWith(
                     color: Colors.white,
                   ),
@@ -226,10 +186,7 @@ class ProfileTab extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      '김선생님',
-                      style: AppTypography.headingLarge,
-                    ),
+                    Text(name, style: AppTypography.headingLarge),
                     const SizedBox(width: AppSpacing.space2),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -252,7 +209,7 @@ class ProfileTab extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  'teacher@example.com',
+                  email,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -276,17 +233,25 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsSection() {
+  Widget _buildStatsSection(WidgetRef ref, String teacherId) {
+    final lessonStatsAsync = ref.watch(lessonStatsProvider);
+
+    // Student count from memberships
+    final studentCountValue = '-';
+    // Lesson stats
+    final lessonCountValue =
+        lessonStatsAsync.whenOrNull(
+          data: (stats) => '${stats['completed'] ?? 0}회',
+        ) ??
+        '-';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppColors.primary,
-              AppColors.primaryDark,
-            ],
+            colors: [AppColors.primary, AppColors.primaryDark],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -294,11 +259,11 @@ class ProfileTab extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _buildStatItem('학생', '6명'),
+            _buildStatItem('학생', studentCountValue),
             _buildStatDivider(),
-            _buildStatItem('이번 달 레슨', '24회'),
+            _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('평균 연습률', '72%'),
+            _buildStatItem('평균 연습률', '-'),
           ],
         ),
       ),
@@ -311,9 +276,7 @@ class ProfileTab extends StatelessWidget {
         children: [
           Text(
             value,
-            style: AppTypography.headingMedium.copyWith(
-              color: Colors.white,
-            ),
+            style: AppTypography.headingMedium.copyWith(color: Colors.white),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
@@ -365,23 +328,24 @@ class ProfileTab extends StatelessWidget {
               ],
             ),
             child: Column(
-              children: items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isLast = index == items.length - 1;
+              children:
+                  items.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    final isLast = index == items.length - 1;
 
-                return Column(
-                  children: [
-                    _buildMenuItem(item),
-                    if (!isLast)
-                      Divider(
-                        height: 1,
-                        indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                        color: AppColors.borderLight,
-                      ),
-                  ],
-                );
-              }).toList(),
+                    return Column(
+                      children: [
+                        _buildMenuItem(item),
+                        if (!isLast)
+                          Divider(
+                            height: 1,
+                            indent: AppSpacing.space4 + 24 + AppSpacing.space3,
+                            color: AppColors.borderLight,
+                          ),
+                      ],
+                    );
+                  }).toList(),
             ),
           ),
         ],
@@ -413,10 +377,7 @@ class ProfileTab extends StatelessWidget {
             ),
             if (item.trailing != null) item.trailing!,
             if (item.trailing == null)
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
           ],
         ),
       ),
@@ -431,29 +392,28 @@ class ProfileTab extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('로그아웃'),
-        content: const Text('정말 로그아웃 하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('로그아웃'),
+            content: const Text('정말 로그아웃 하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  await ref.read(authNotifierProvider.notifier).logout();
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('로그아웃'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.go(AppRoutes.login);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('로그아웃'),
-          ),
-        ],
-      ),
     );
   }
 }

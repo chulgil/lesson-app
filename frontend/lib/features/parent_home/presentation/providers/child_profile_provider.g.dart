@@ -7,9 +7,9 @@ part of 'child_profile_provider.dart';
 // **************************************************************************
 
 String _$childProfileRepositoryHash() =>
-    r'67e1ddc4a8ebe6220fa6a7afe0f1d0c8267d946e';
+    r'99d386c54b83a5c17ee7cd239997298def902f16';
 
-/// Provider for the child profile repository
+/// Provider for the child profile repository - switches between Mock and Remote.
 ///
 /// Copied from [childProfileRepository].
 @ProviderFor(childProfileRepository)

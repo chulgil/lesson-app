@@ -54,7 +54,7 @@ class MockMembershipRepository implements MembershipRepository {
         id: 'cm_003',
         lessonClassId: 'lc_002', // 개인레슨
         studentId: 'student_3',
-        instrument: '바이올린',
+        instrument: '첼로',
         status: MembershipStatus.active,
         level: '고급',
         monthlyFee: 250000,
@@ -69,7 +69,7 @@ class MockMembershipRepository implements MembershipRepository {
         id: 'cm_004',
         lessonClassId: 'lc_002', // 개인레슨
         studentId: 'student_4',
-        instrument: '첼로',
+        instrument: '플루트',
         status: MembershipStatus.trial,
         level: '입문',
         monthlyFee: 150000,
@@ -95,6 +95,51 @@ class MockMembershipRepository implements MembershipRepository {
         lessonDuration: 60,
         notes: '바이올린 외 피아노 추가 수업',
         createdAt: now.subtract(const Duration(days: 20)),
+      ),
+
+      // Student 11 - 복수 악기 (바이올린 + 피아노)
+      ClassMembership(
+        id: 'cm_010',
+        lessonClassId: 'lc_002', // 개인레슨
+        studentId: 'student_11',
+        instrument: '바이올린',
+        status: MembershipStatus.active,
+        level: '중급',
+        monthlyFee: 200000,
+        lessonsPerWeek: 1,
+        lessonDay: '화',
+        lessonTime: '17:00',
+        lessonDuration: 60,
+        createdAt: now.subtract(const Duration(days: 40)),
+      ),
+      ClassMembership(
+        id: 'cm_011',
+        lessonClassId: 'lc_001', // 행복음악학원
+        studentId: 'student_11',
+        instrument: '피아노',
+        status: MembershipStatus.active,
+        level: '초급',
+        monthlyFee: 160000,
+        lessonsPerWeek: 1,
+        lessonDay: '목',
+        lessonTime: '17:00',
+        lessonDuration: 60,
+        createdAt: now.subtract(const Duration(days: 40)),
+      ),
+      // Student 12 - 초급 바이올린
+      ClassMembership(
+        id: 'cm_012',
+        lessonClassId: 'lc_002', // 개인레슨
+        studentId: 'student_12',
+        instrument: '바이올린',
+        status: MembershipStatus.active,
+        level: '입문',
+        monthlyFee: 160000,
+        lessonsPerWeek: 1,
+        lessonDay: '수',
+        lessonTime: '18:00',
+        lessonDuration: 60,
+        createdAt: now.subtract(const Duration(days: 15)),
       ),
 
       // ============================================================

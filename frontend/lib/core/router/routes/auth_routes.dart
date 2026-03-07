@@ -6,6 +6,7 @@ import '../../../features/auth/presentation/screens/login_screen.dart';
 import '../../../features/auth/presentation/screens/parent_invite_code_screen.dart';
 import '../../../features/auth/presentation/screens/role_select_screen.dart';
 import '../../../features/auth/presentation/screens/student_invite_code_screen.dart';
+import '../../../features/auth/presentation/screens/terms_agreement_screen.dart';
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
 import '../../../features/onboarding/presentation/screens/tutorial_screen.dart';
@@ -18,6 +19,13 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.login,
     name: 'login',
     builder: (context, state) => const LoginScreen(),
+  ),
+
+  // Terms agreement (after first OAuth signup, before role selection)
+  GoRoute(
+    path: AppRoutes.termsAgreement,
+    name: 'termsAgreement',
+    builder: (context, state) => const TermsAgreementScreen(),
   ),
 
   // Role selection (after first OAuth signup)

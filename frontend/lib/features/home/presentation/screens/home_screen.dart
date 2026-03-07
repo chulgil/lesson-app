@@ -15,12 +15,14 @@ import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/domain/entities/subscription.dart';
 import '../../../subscription/domain/entities/subscription_proposal.dart';
 import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
-import '../../../calendar/presentation/screens/calendar_tab.dart';
+import '../../../schedule/presentation/screens/schedule_tab.dart';
 import '../../../profile/presentation/screens/profile_tab.dart';
 import '../../../students/presentation/screens/students_tab.dart';
+import '../widgets/assignment_summary_section.dart';
 
 /// Home screen (Teacher Dashboard)
 class HomeScreen extends StatefulWidget {
@@ -40,11 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
         body: SafeArea(
           child: IndexedStack(
             index: _currentIndex,
-            children: const [
-              _DashboardTab(),
-              CalendarTab(),
-              StudentsTab(),
-              ProfileTab(),
+            children: [
+              _DashboardTab(
+                onViewAllLessons: () => setState(() => _currentIndex = 1),
+              ),
+              const ScheduleTab(),
+              const StudentsTab(),
+              const ProfileTab(),
             ],
           ),
         ),
@@ -91,7 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 /// Dashboard Tab - 핵심 숫자 + 즉시 확인 필요 + 오늘의 레슨
 class _DashboardTab extends ConsumerWidget {
-  const _DashboardTab();
+  final VoidCallback onViewAllLessons;
+
+  const _DashboardTab({required this.onViewAllLessons});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -108,6 +114,7 @@ class _DashboardTab extends ConsumerWidget {
     final awaitingConfirmAsync = ref.watch(
       awaitingConfirmationProposalsProvider(teacherId),
     );
+    final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
 
     // Get today's lessons
     final now = DateTime.now();
@@ -130,6 +137,7 @@ class _DashboardTab extends ConsumerWidget {
         ref.invalidate(pendingLessonRequestCountProvider(teacherId));
         ref.invalidate(pendingBookingsCountProvider(teacherId));
         ref.invalidate(awaitingConfirmationProposalsProvider(teacherId));
+        ref.invalidate(expiringSoonSubscriptionsProvider);
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -159,7 +167,13 @@ class _DashboardTab extends ConsumerWidget {
               pendingRequestsAsync,
               pendingBookingsAsync,
               awaitingConfirmAsync,
+              expiringSoonAsync,
             ),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Assignment Summary Section (이번 주 과제)
+            const AssignmentSummarySection(),
 
             const SizedBox(height: AppSpacing.space6),
 
@@ -218,86 +232,76 @@ class _DashboardTab extends ConsumerWidget {
     AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
-    return StatCardRow(
-      cards: [
-        // Today's lesson count
-        todayLessons.when(
-          data:
-              (lessons) => StatCard(
-                title: '오늘 레슨',
-                value: '${lessons.length}회',
-                color: AppColors.primary,
-                icon: Icons.today,
-              ),
-          loading:
-              () => StatCard(
-                title: '오늘 레슨',
-                value: '-',
-                color: AppColors.primary,
-                icon: Icons.today,
-              ),
-          error:
-              (_, __) => StatCard(
-                title: '오늘 레슨',
-                value: '-',
-                color: AppColors.primary,
-              ),
-        ),
-        // Unpaid amount (from Subscription)
-        unpaidSummaryAsync.when(
-          data: (summary) {
-            final formattedAmount =
-                summary.totalAmount >= 10000
-                    ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
-                    : '${summary.totalAmount}원';
-            return StatCard(
-              title: '미수금',
-              value: summary.totalAmount > 0 ? formattedAmount : '0원',
-              subtitle:
-                  summary.studentCount > 0 ? '${summary.studentCount}명' : null,
-              color:
-                  summary.studentCount > 0
-                      ? AppColors.warning
-                      : AppColors.success,
-              icon: Icons.account_balance_wallet_outlined,
-              onTap: () => context.push(AppRoutes.paymentManagement),
-            );
-          },
-          loading:
-              () => StatCard(
+    // Today's lesson card (always shown)
+    final todayCard = todayLessons.when(
+      data:
+          (lessons) => StatCard(
+            title: '오늘 레슨',
+            value: '${lessons.length}회',
+            color: AppColors.primary,
+            icon: Icons.today,
+          ),
+      loading:
+          () => StatCard(
+            title: '오늘 레슨',
+            value: '-',
+            color: AppColors.primary,
+            icon: Icons.today,
+          ),
+      error:
+          (_, __) =>
+              StatCard(title: '오늘 레슨', value: '-', color: AppColors.primary),
+    );
+
+    // This month card (always shown)
+    final monthCard = lessonStatsAsync.when(
+      data:
+          (stats) => StatCard(
+            title: '이번 달',
+            value: '${stats['completed'] ?? 0}회',
+            subtitle: '완료',
+            color: AppColors.success,
+            icon: Icons.check_circle_outline,
+          ),
+      loading:
+          () => StatCard(
+            title: '이번 달',
+            value: '-',
+            color: AppColors.success,
+            icon: Icons.check_circle_outline,
+          ),
+      error:
+          (_, __) =>
+              StatCard(title: '이번 달', value: '-', color: AppColors.success),
+    );
+
+    // Unpaid card (only shown when totalAmount > 0)
+    return unpaidSummaryAsync.when(
+      data: (summary) {
+        final cards = <StatCard>[
+          todayCard,
+          if (summary.totalAmount > 0) ...[
+            () {
+              final formattedAmount =
+                  summary.totalAmount >= 10000
+                      ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
+                      : '${summary.totalAmount}원';
+              return StatCard(
                 title: '미수금',
-                value: '-',
-                color: AppColors.textSecondaryLight,
-              ),
-          error:
-              (_, __) => StatCard(
-                title: '미수금',
-                value: '-',
-                color: AppColors.textSecondaryLight,
-              ),
-        ),
-        // This month completed
-        lessonStatsAsync.when(
-          data:
-              (stats) => StatCard(
-                title: '이번 달',
-                value: '${stats['completed'] ?? 0}회',
-                subtitle: '완료',
-                color: AppColors.success,
-                icon: Icons.check_circle_outline,
-              ),
-          loading:
-              () => StatCard(
-                title: '이번 달',
-                value: '-',
-                color: AppColors.success,
-                icon: Icons.check_circle_outline,
-              ),
-          error:
-              (_, __) =>
-                  StatCard(title: '이번 달', value: '-', color: AppColors.success),
-        ),
-      ],
+                value: formattedAmount,
+                subtitle: '${summary.studentCount}명',
+                color: AppColors.warning,
+                icon: Icons.account_balance_wallet_outlined,
+                onTap: () => context.push(AppRoutes.paymentManagement),
+              );
+            }(),
+          ],
+          monthCard,
+        ];
+        return StatCardRow(cards: cards);
+      },
+      loading: () => StatCardRow(cards: [todayCard, monthCard]),
+      error: (_, __) => StatCardRow(cards: [todayCard, monthCard]),
     );
   }
 
@@ -307,14 +311,20 @@ class _DashboardTab extends ConsumerWidget {
     AsyncValue<int> pendingRequestsAsync,
     AsyncValue<int> pendingBookingsAsync,
     AsyncValue<List<SubscriptionProposal>> awaitingConfirmAsync,
+    AsyncValue<List<Subscription>> expiringSoonAsync,
   ) {
     final pendingRequests = pendingRequestsAsync.valueOrNull ?? 0;
     final pendingBookings = pendingBookingsAsync.valueOrNull ?? 0;
     final awaitingConfirmCount = awaitingConfirmAsync.valueOrNull?.length ?? 0;
+    final expiringSoonList = expiringSoonAsync.valueOrNull ?? [];
+    final expiringSoonStudentCount =
+        expiringSoonList.map((s) => s.studentId).toSet().length;
     final teacherId = ref.watch(currentUserIdProvider);
 
-    final totalUrgent =
-        pendingRequests + pendingBookings + (awaitingConfirmCount > 0 ? 1 : 0);
+    final totalUrgent = pendingRequests +
+        pendingBookings +
+        (awaitingConfirmCount > 0 ? 1 : 0) +
+        (expiringSoonStudentCount > 0 ? 1 : 0);
 
     if (totalUrgent == 0) {
       return const SizedBox.shrink();
@@ -372,7 +382,7 @@ class _DashboardTab extends ConsumerWidget {
                   onTap:
                       () => context.push(
                         AppRoutes.lessonRequests,
-                        extra: {'teacherId': 'teacher_1'},
+                        extra: {'teacherId': teacherId},
                       ),
                 ),
               if (pendingBookings > 0)
@@ -395,6 +405,17 @@ class _DashboardTab extends ConsumerWidget {
                         '${AppRoutes.proposalConfirm}?teacherId=$teacherId',
                       ),
                   showDivider: pendingRequests > 0 || pendingBookings > 0,
+                ),
+              if (expiringSoonStudentCount > 0)
+                _buildUrgentItem(
+                  context,
+                  icon: Icons.card_membership,
+                  iconColor: AppColors.warning,
+                  title: '수강권 임박 $expiringSoonStudentCount명',
+                  onTap: () => context.push(AppRoutes.subscriptions),
+                  showDivider: pendingRequests > 0 ||
+                      pendingBookings > 0 ||
+                      awaitingConfirmCount > 0,
                 ),
             ],
           ),
@@ -482,18 +503,12 @@ class _DashboardTab extends ConsumerWidget {
             ),
           ],
         ),
-        TextButton.icon(
-          onPressed: () {
-            final now = DateTime.now();
-            int nextHour = now.hour + 1;
-            if (nextHour > 23) nextHour = 9;
-            final dateStr =
-                '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-            context.push('/lessons/add?date=$dateStr&hour=$nextHour');
-          },
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('레슨 추가'),
-        ),
+        if (lessonCount > 3)
+          TextButton.icon(
+            onPressed: onViewAllLessons,
+            icon: const Icon(Icons.calendar_today, size: 16),
+            label: const Text('전체보기'),
+          ),
       ],
     );
   }
@@ -635,17 +650,38 @@ class _DashboardTab extends ConsumerWidget {
       );
     }
 
+    final hasMore = lessons.length > 3;
+    final displayLessons = hasMore ? lessons.take(3).toList() : lessons;
+
     return Column(
-      children:
-          lessons.map((lesson) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: _LessonCard(
-                lesson: lesson,
-                onTap: () => context.push('/lessons/${lesson.id}'),
+      children: [
+        ...displayLessons.map((lesson) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+            child: _LessonCard(
+              lesson: lesson,
+              onTap: () => context.push('/lessons/${lesson.id}'),
+            ),
+          );
+        }),
+        if (hasMore)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space1),
+            child: OutlinedButton(
+              onPressed: onViewAllLessons,
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(40),
+                side: BorderSide(color: AppColors.borderLight),
               ),
-            );
-          }).toList(),
+              child: Text(
+                '${lessons.length - 3}개 레슨 더보기',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

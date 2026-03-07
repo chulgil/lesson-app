@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../features/students/presentation/screens/add_student_screen.dart';
 import '../../../features/students/presentation/screens/add_student_method_screen.dart';
+import '../../../features/lessons/presentation/screens/lesson_note_history_screen.dart';
 import '../../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../../features/students/presentation/screens/student_detail_screen.dart';
 import '../app_routes.dart';
@@ -29,6 +30,15 @@ List<GoRoute> studentRoutes = [
     path: AppRoutes.studentDetail,
     name: 'studentDetail',
     builder: (context, state) => StudentDetailScreen(
+      studentId: state.pathParameters['id'] ?? '',
+    ),
+  ),
+
+  // Student Lesson Notes History
+  GoRoute(
+    path: AppRoutes.studentNotes,
+    name: 'studentNotes',
+    builder: (context, state) => LessonNoteHistoryScreen(
       studentId: state.pathParameters['id'] ?? '',
     ),
   ),

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../models/teacher.dart';
 import '../../../../repositories/teacher_repository.dart';
 
@@ -9,6 +10,10 @@ import '../../../../repositories/teacher_repository.dart';
 
 /// Teacher repository provider
 final teacherRepositoryProvider = Provider<TeacherRepository>((ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockTeacherRepository();
+  }
+  // TODO: Replace with Remote repository when API is ready
   return MockTeacherRepository();
 });
 
@@ -23,8 +28,10 @@ final allTeachersProvider = FutureProvider<List<Teacher>>((ref) async {
 });
 
 /// Single teacher provider
-final teacherProvider =
-    FutureProvider.family<Teacher?, String>((ref, teacherId) async {
+final teacherProvider = FutureProvider.family<Teacher?, String>((
+  ref,
+  teacherId,
+) async {
   final repository = ref.watch(teacherRepositoryProvider);
   return repository.getTeacherById(teacherId);
 });
@@ -38,16 +45,16 @@ final featuredTeachersProvider = FutureProvider<List<Teacher>>((ref) async {
 /// Teachers by instrument provider
 final teachersByInstrumentProvider =
     FutureProvider.family<List<Teacher>, String>((ref, instrument) async {
-  final repository = ref.watch(teacherRepositoryProvider);
-  return repository.getTeachersByInstrument(instrument);
-});
+      final repository = ref.watch(teacherRepositoryProvider);
+      return repository.getTeachersByInstrument(instrument);
+    });
 
 /// Filtered teachers provider
 final filteredTeachersProvider =
     FutureProvider.family<List<Teacher>, TeacherFilter>((ref, filter) async {
-  final repository = ref.watch(teacherRepositoryProvider);
-  return repository.searchTeachers(filter);
-});
+      final repository = ref.watch(teacherRepositoryProvider);
+      return repository.searchTeachers(filter);
+    });
 
 // =============================================================================
 // State Providers (for UI state)
@@ -77,11 +84,12 @@ final availableTeachersProvider = FutureProvider<List<Teacher>>((ref) async {
 
   // Apply search filter
   if (searchQuery.isNotEmpty) {
-    teachers = teachers.where((t) {
-      return t.name.toLowerCase().contains(searchQuery) ||
-          t.instruments.any((i) => i.toLowerCase().contains(searchQuery)) ||
-          (t.location?.toLowerCase().contains(searchQuery) ?? false);
-    }).toList();
+    teachers =
+        teachers.where((t) {
+          return t.name.toLowerCase().contains(searchQuery) ||
+              t.instruments.any((i) => i.toLowerCase().contains(searchQuery)) ||
+              (t.location?.toLowerCase().contains(searchQuery) ?? false);
+        }).toList();
   }
 
   return teachers;

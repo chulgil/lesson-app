@@ -8,6 +8,6 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((ref) {
   if (EnvironmentConfig.useMockData) {
     return MockSettingsRepository();
   }
-  // Settings defaults are reasonable starting values for any teacher
+  // TODO: Replace with Remote repository when API is ready
   return MockSettingsRepository();
 });

@@ -14,7 +14,69 @@ class MockPracticeRepository implements PracticeRepository {
   }
 
   void _initMockData() {
-    // No dummy data - users create their own practice logs
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Helper to create a practice log for a given day offset
+    PracticeLog makeLog(String studentId, int daysAgo, int minutes) {
+      final date = today.subtract(Duration(days: daysAgo));
+      return PracticeLog(
+        id: _uuid.v4(),
+        studentId: studentId,
+        date: date,
+        totalMinutes: minutes,
+        tasks: [
+          PracticeTask(
+            id: _uuid.v4(),
+            title: '음계 연습',
+            targetMinutes: 10,
+            isCompleted: true,
+            completedAt: date,
+          ),
+        ],
+        createdAt: date,
+      );
+    }
+
+    // student_1 (김민준): 이번 주 5/7일 연습
+    for (final d in [0, 1, 2, 3, 5]) {
+      _logs.putIfAbsent('student_1', () => []);
+      _logs['student_1']!.add(makeLog('student_1', d, 30));
+    }
+
+    // student_2 (이서연): 이번 주 6/7일 연습
+    for (final d in [0, 1, 2, 3, 4, 6]) {
+      _logs.putIfAbsent('student_2', () => []);
+      _logs['student_2']!.add(makeLog('student_2', d, 45));
+    }
+
+    // student_3 (박지호): 이번 주 3/7일 연습
+    for (final d in [0, 2, 4]) {
+      _logs.putIfAbsent('student_3', () => []);
+      _logs['student_3']!.add(makeLog('student_3', d, 20));
+    }
+
+    // student_4 (최유진): 체험 - 1/7일
+    _logs.putIfAbsent('student_4', () => []);
+    _logs['student_4']!.add(makeLog('student_4', 1, 15));
+
+    // student_5 (정다은): 이번 주 4/7일 연습
+    for (final d in [0, 1, 3, 5]) {
+      _logs.putIfAbsent('student_5', () => []);
+      _logs['student_5']!.add(makeLog('student_5', d, 25));
+    }
+
+    // student_11 (이하은): 이번 주 7/7일 연습 (모범생)
+    for (final d in [0, 1, 2, 3, 4, 5, 6]) {
+      _logs.putIfAbsent('student_11', () => []);
+      _logs['student_11']!.add(makeLog('student_11', d, 40));
+    }
+
+    // student_12 (박준혁): 이번 주 2/7일 연습
+    for (final d in [1, 4]) {
+      _logs.putIfAbsent('student_12', () => []);
+      _logs['student_12']!.add(makeLog('student_12', d, 15));
+    }
   }
 
   /// Check if a date is a weekend (Saturday or Sunday)

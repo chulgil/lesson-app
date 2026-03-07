@@ -382,9 +382,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final iosClientId = EnvironmentConfig.googleIosClientId;
       final googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
-        clientId: EnvironmentConfig.googleIosClientId,
+        clientId: iosClientId.isNotEmpty ? iosClientId : null,
         serverClientId: EnvironmentConfig.googleServerClientId,
       );
       final account = await googleSignIn.signIn();
@@ -408,7 +409,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
       } else if (authState is AuthNeedsRole) {
-        context.go(AppRoutes.roleSelect);
+        context.go(AppRoutes.termsAgreement);
       }
     } catch (e) {
       if (mounted) {

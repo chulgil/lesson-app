@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../data/repositories/mock_lesson_policy_repository.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/repositories/lesson_policy_repository.dart';
@@ -10,6 +11,10 @@ part 'lesson_policy_providers.g.dart';
 /// Provider for the lesson policy repository.
 @Riverpod(keepAlive: true)
 LessonPolicyRepository lessonPolicyRepository(Ref ref) {
+  if (EnvironmentConfig.useMockData) {
+    return MockLessonPolicyRepository();
+  }
+  // TODO: Replace with Remote repository when API is ready
   return MockLessonPolicyRepository();
 }
 
