@@ -5,12 +5,15 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../relationship/presentation/providers/relationship_providers.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
@@ -1253,6 +1256,21 @@ class _IssueSubscriptionScreenState
       final repository = ref.read(subscriptionRepositoryProvider);
       await repository.create(subscription);
 
+      // Transition relationship to active (Issue #59)
+      final teacherId = await _getTeacherIdFromMembership(
+        subscription.membershipId,
+      );
+      if (teacherId != null) {
+        final relationRepo = ref.read(
+          teacherStudentRelationRepositoryProvider,
+        );
+        await relationRepo.onSubscriptionIssued(
+          teacherId: teacherId,
+          studentId: widget.primaryStudentId,
+          subscriptionId: subscription.id,
+        );
+      }
+
       // Create schedule confirmation card for student (Issue #62)
       await _createScheduleConfirmationCard(subscription);
 
@@ -1273,7 +1291,24 @@ class _IssueSubscriptionScreenState
             backgroundColor: AppColors.primary,
           ),
         );
-        context.pop();
+
+        // Navigate to schedule registration for quick setup (Issue #59)
+        if (teacherId != null) {
+          final studentName = await _getStudentName();
+          if (!mounted) return;
+          context.pop();
+          context.push(
+            AppRoutes.registerRegularLesson,
+            extra: {
+              'teacherId': teacherId,
+              'teacherName': '선생님',
+              'studentId': widget.primaryStudentId,
+              'studentName': studentName,
+            },
+          );
+        } else {
+          context.pop();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -1285,6 +1320,31 @@ class _IssueSubscriptionScreenState
         );
       }
     }
+  }
+
+  /// Get teacher ID from membership's lesson class.
+  Future<String?> _getTeacherIdFromMembership(String membershipId) async {
+    final memberships = ref.read(
+      studentMembershipsProvider(widget.primaryStudentId),
+    );
+    final membership = memberships.valueOrNull?.firstWhere(
+      (m) => m.id == membershipId,
+      orElse: () => throw Exception('Membership not found'),
+    );
+    if (membership == null) return null;
+
+    final lessonClass = await ref.read(
+      lessonClassProvider(membership.lessonClassId).future,
+    );
+    return lessonClass?.teacherId;
+  }
+
+  /// Get student name for schedule registration screen.
+  Future<String> _getStudentName() async {
+    final student = await ref.read(
+      studentProvider(widget.primaryStudentId).future,
+    );
+    return student?.name ?? '';
   }
 
   /// Create a schedule confirmation card for the student after subscription issuance.
