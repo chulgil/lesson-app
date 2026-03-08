@@ -22,6 +22,10 @@
 
 ## 1. 레슨 피드백 녹음 (AI 음성 추출)
 
+> **⚠️ 이 섹션은 확장되어 별도 스펙으로 이관되었습니다.**
+> - AI 레슨 노트 (레슨 중 자동 녹음 → 노트 생성): **[ai_lesson_notes_spec.md](../lesson/ai_lesson_notes_spec.md)**
+> - 학습 자료 공유 (선생님 녹음/유튜브/링크): **[teaching_resources_spec.md](../lesson/teaching_resources_spec.md)**
+
 ### 목적
 레슨 종료 후 선생님이 피드백을 음성으로 녹음하면 AI가 텍스트로 변환하여 레슨 노트에 자동 추가
 
@@ -66,6 +70,9 @@
 ```
 
 ### 2-2. 선생님 참고 음원
+
+> **⚠️ 이 섹션은 [teaching_resources_spec.md](../lesson/teaching_resources_spec.md)로 이관되었습니다.**
+> 선생님 녹음, 유튜브 링크, 자료 라이브러리 등 상세 스펙은 해당 문서를 참조하세요.
 
 | 유형 | 설명 | 저장 방식 |
 |------|------|----------|
