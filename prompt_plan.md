@@ -47,8 +47,8 @@
 
 | 파일 | 줄 수 | 분할 제안 |
 |------|:-----:|----------|
-| `issue_subscription_screen.dart` | 1,875 | 폼 섹션/프리뷰/확인 위젯 5분할 |
-| `proposal_detail_screen.dart` | 1,285 | 제안/결제/액션 4분할 |
+| ~~`issue_subscription_screen.dart`~~ | ~~1,875~~ → 972 | **완료** (폼 섹션/멤버십/요약 위젯 3분할) |
+| ~~`proposal_detail_screen.dart`~~ | ~~1,285~~ → 799 | **완료** (카드 위젯 분리) |
 | ~~`weekly_schedule_screen.dart`~~ | ~~1,086~~ → 484 | **완료** (3분할) |
 | ~~`lesson_requests_screen.dart`~~ | ~~1,041~~ → 407 | **완료** (3분할) |
 
@@ -91,7 +91,7 @@
 | 1-4 | 약관 동의 화면 | in-progress |
 | 1-5 | Google SSO 연동 마무리 | in-progress |
 | 1-6 | Mock -> Backend 전환 준비 | todo |
-| 1-7 | **대형 파일 분할 (1,000줄+ 4개)** | todo |
+| 1-7 | **대형 파일 분할 (1,000줄+ 4개)** | done |
 | 1-8 | **백엔드 CRITICAL API Gap 3건** | todo |
 
 ### Phase 2: 핵심 차별화
