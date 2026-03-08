@@ -466,6 +466,284 @@ class MockLessonRepository implements LessonRepository {
         keyPoints: ['한국적 비브라토', '장식음 처리'],
         createdAt: today.subtract(const Duration(days: 14)),
       ),
+
+      // === Fix #7: Cancelled by Teacher ===
+      // lesson_016: student_2 이서연, cancelledByTeacher, 4 days ago
+      Lesson(
+        id: 'lesson_016',
+        studentId: 'student_2',
+        studentName: '이서연',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '피아노',
+        date: today.subtract(const Duration(days: 4)),
+        startTime: '14:00',
+        duration: 60,
+        status: LessonStatus.cancelledByTeacher,
+        pieces: const [],
+        location: const LessonLocationInfo(
+          name: '학생 자택 방문',
+          address: '서울시 서초구 반포동 45-7',
+        ),
+        createdAt: today.subtract(const Duration(days: 11)),
+      ),
+
+      // === Fix #6: Old Lessons (2-3 months ago, history/archive) ===
+      // lesson_017: student_1 김민준, completed, 30 days ago, 바이올린
+      Lesson(
+        id: 'lesson_017',
+        studentId: 'student_1',
+        studentName: '김민준',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '바이올린',
+        date: today.subtract(const Duration(days: 30)),
+        startTime: '10:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_019',
+            name: 'Concerto in G minor',
+            composer: 'Vivaldi',
+            opus: 'RV 317',
+            movement: '3악장',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '하모니 음악학원',
+          address: '서울시 강남구 테헤란로 123',
+        ),
+        feedback: 'G단조 협주곡 3악장 마무리 레슨. 피날레 부분 템포가 안정적이었어요.',
+        keyPoints: ['피날레 템포 안정', '마지막 카덴차'],
+        createdAt: today.subtract(const Duration(days: 44)),
+      ),
+
+      // lesson_018: student_2 이서연, completed, 45 days ago, 피아노
+      Lesson(
+        id: 'lesson_018',
+        studentId: 'student_2',
+        studentName: '이서연',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '피아노',
+        date: today.subtract(const Duration(days: 45)),
+        startTime: '14:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_020',
+            name: 'Invention No.8',
+            composer: 'Bach',
+            opus: 'BWV 779',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '학생 자택 방문',
+          address: '서울시 서초구 반포동 45-7',
+        ),
+        feedback: '인벤션 8번 양손 독립 연주가 좋아졌어요. 성부 간 밸런스에 신경 쓰세요.',
+        keyPoints: ['양손 독립', '성부 밸런스'],
+        createdAt: today.subtract(const Duration(days: 59)),
+      ),
+
+      // lesson_019: student_3 박지호, completed, 60 days ago, 첼로
+      Lesson(
+        id: 'lesson_019',
+        studentId: 'student_3',
+        studentName: '박지호',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '첼로',
+        date: today.subtract(const Duration(days: 60)),
+        startTime: '11:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_021',
+            name: 'Cello Sonata No.1',
+            composer: 'Brahms',
+            opus: 'Op.38',
+            movement: '1악장',
+          ),
+        ],
+        location: const LessonLocationInfo(name: '온라인 (Zoom)'),
+        feedback: '브람스 소나타 1악장 도입부 완성. 왼손 비브라토 폭을 넓혀보세요.',
+        keyPoints: ['비브라토 폭', '도입부 다이내믹'],
+        createdAt: today.subtract(const Duration(days: 74)),
+      ),
+
+      // lesson_020: student_1 김민준, completed, 75 days ago, 바이올린
+      Lesson(
+        id: 'lesson_020',
+        studentId: 'student_1',
+        studentName: '김민준',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '바이올린',
+        date: today.subtract(const Duration(days: 75)),
+        startTime: '10:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_022',
+            name: 'Partita No.2',
+            composer: 'Bach',
+            opus: 'BWV 1004',
+            movement: 'Sarabande',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '하모니 음악학원',
+          address: '서울시 강남구 테헤란로 123',
+        ),
+        feedback: '바흐 파르티타 사라반드 해석 레슨. 장식음 처리와 바로크 보잉 스타일 연습.',
+        keyPoints: ['바로크 보잉', '장식음 해석'],
+        createdAt: today.subtract(const Duration(days: 89)),
+      ),
+
+      // lesson_021: student_5 정다은, completed, 50 days ago, 바이올린
+      Lesson(
+        id: 'lesson_021',
+        studentId: 'student_5',
+        studentName: '정다은',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '바이올린',
+        date: today.subtract(const Duration(days: 50)),
+        startTime: '16:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_023',
+            name: '즐거운 농부',
+            composer: 'Schumann',
+            notes: '스즈키 교본 1권',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '하모니 음악학원',
+          address: '서울시 강남구 테헤란로 123',
+        ),
+        feedback: '즐거운 농부 리듬감이 좋아졌어요. 활 방향 전환 시 소리가 끊기지 않도록 연습하세요.',
+        createdAt: today.subtract(const Duration(days: 64)),
+      ),
+
+      // lesson_022: student_11 이하은, completed, 40 days ago, 피아노
+      Lesson(
+        id: 'lesson_022',
+        studentId: 'student_11',
+        studentName: '이하은',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '피아노',
+        date: today.subtract(const Duration(days: 40)),
+        startTime: '17:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_024',
+            name: 'Clair de Lune',
+            composer: 'Debussy',
+            notes: 'Suite bergamasque 3번',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '하모니 음악학원',
+          address: '서울시 강남구 테헤란로 123',
+        ),
+        feedback: '달빛 소나타 페달 사용이 섬세해졌어요. 중간부 아르페지오 균일한 터치 연습 필요.',
+        keyPoints: ['페달 섬세함', '아르페지오 균일'],
+        createdAt: today.subtract(const Duration(days: 54)),
+      ),
+
+      // lesson_023: student_3 박지호, completed, 90 days ago, 첼로
+      Lesson(
+        id: 'lesson_023',
+        studentId: 'student_3',
+        studentName: '박지호',
+        teacherId: 'teacher_1',
+        teacherName: '김지수',
+        instrument: '첼로',
+        date: today.subtract(const Duration(days: 90)),
+        startTime: '14:00',
+        duration: 60,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_025',
+            name: 'Kol Nidrei',
+            composer: 'Bruch',
+            opus: 'Op.47',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '하모니 음악학원',
+          address: '서울시 강남구 테헤란로 123',
+        ),
+        feedback: '콜 니드라이 감정 표현이 깊어졌어요. 첫 진입부 비브라토에 감정을 실어주세요.',
+        createdAt: today.subtract(const Duration(days: 104)),
+      ),
+
+      // === Fix #9: Teacher_2 Lessons (multi-teacher scenario) ===
+      // lesson_024: student_2 이서연, completed, 2 days ago, teacher_2 (이론 수업)
+      Lesson(
+        id: 'lesson_024',
+        studentId: 'student_2',
+        studentName: '이서연',
+        teacherId: 'teacher_2',
+        teacherName: '박영희',
+        instrument: '피아노',
+        date: today.subtract(const Duration(days: 2)),
+        startTime: '11:00',
+        duration: 45,
+        status: LessonStatus.completed,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_026',
+            name: '화성학 기초',
+            notes: '3화음 전위, 연결법',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '뮤직아트 스튜디오',
+          address: '서울시 마포구 합정동 12-3',
+        ),
+        feedback: '3화음 전위 이해가 좋아요. 다음 시간에 7화음으로 넘어갈게요.',
+        keyPoints: ['3화음 전위 완성', '연결법 규칙'],
+        createdAt: today.subtract(const Duration(days: 16)),
+      ),
+
+      // lesson_025: student_3 박지호, scheduled, tomorrow, teacher_2 (이론 수업)
+      Lesson(
+        id: 'lesson_025',
+        studentId: 'student_3',
+        studentName: '박지호',
+        teacherId: 'teacher_2',
+        teacherName: '박영희',
+        instrument: '첼로',
+        date: today.add(const Duration(days: 1)),
+        startTime: '13:00',
+        duration: 45,
+        status: LessonStatus.scheduled,
+        pieces: const [
+          LessonPiece(
+            id: 'piece_027',
+            name: '음악 이론',
+            notes: '조성 분석 - 소나타 형식',
+          ),
+        ],
+        location: const LessonLocationInfo(
+          name: '뮤직아트 스튜디오',
+          address: '서울시 마포구 합정동 12-3',
+        ),
+        createdAt: today.subtract(const Duration(days: 5)),
+      ),
     ]);
   }
 

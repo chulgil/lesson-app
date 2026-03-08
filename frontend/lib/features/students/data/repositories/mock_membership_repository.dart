@@ -213,6 +213,40 @@ class MockMembershipRepository implements MembershipRepository {
         notes: '요청 만료됨',
         createdAt: now.subtract(const Duration(days: 200)),
       ),
+
+      // Student 9 - 과거 학생 (수강권 만료 후 미갱신)
+      ClassMembership(
+        id: 'cm_013',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_9',
+        instrument: '피아노',
+        status: MembershipStatus.terminated,
+        level: '중급',
+        monthlyFee: 200000,
+        lessonsPerWeek: 1,
+        lessonDay: '금',
+        lessonTime: '15:00',
+        lessonDuration: 60,
+        notes: '수강권 만료 후 미갱신',
+        createdAt: now.subtract(const Duration(days: 150)),
+      ),
+
+      // Student 10 - 과거 학생 (이사로 인한 중단)
+      ClassMembership(
+        id: 'cm_014',
+        lessonClassId: 'lc_002', // 개인레슨 (teacher_1)
+        studentId: 'student_10',
+        instrument: '첼로',
+        status: MembershipStatus.terminated,
+        level: '초급',
+        monthlyFee: 180000,
+        lessonsPerWeek: 1,
+        lessonDay: '토',
+        lessonTime: '11:00',
+        lessonDuration: 60,
+        notes: '이사로 인한 중단',
+        createdAt: now.subtract(const Duration(days: 120)),
+      ),
     ]);
   }
 

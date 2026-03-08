@@ -126,7 +126,7 @@ class MockSubscriptionProposalRepository
         expiresAt: now.add(const Duration(days: 2)),
         paymentNotifiedAt: now.subtract(const Duration(days: 4)),
         confirmedAt: now.subtract(const Duration(days: 4)),
-        subscriptionId: 'sub_1',
+        subscriptionId: 'sub_paused_01',
         isAutoProposal: false,
       ),
 

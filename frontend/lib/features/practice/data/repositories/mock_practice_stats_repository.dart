@@ -7,6 +7,21 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
 
   MockPracticeStatsRepository({bool empty = false}) : _empty = empty;
 
+  /// Student-specific streak data (varies per student)
+  Map<String, (int current, int max)> get _streakByStudent => {
+    'student_1': (5, 12),
+    'student_2': (6, 14),
+    'student_3': (3, 8),
+    'student_4': (1, 1),  // trial student
+    'student_5': (4, 9),
+    'student_11': (7, 21), // model student
+    'student_12': (2, 5),
+  };
+
+  (int current, int max) _getStreak(String studentId) {
+    return _streakByStudent[studentId] ?? (0, 0);
+  }
+
   @override
   Future<PracticeStatsReport> getWeeklyReport(
     String studentId,
@@ -98,6 +113,7 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       ),
     ];
 
+    final streak = _getStreak(studentId);
     return PracticeStatsReport(
       startDate: normalizedStart,
       endDate: endDate,
@@ -108,8 +124,8 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       totalSectionCount: 12,
       dailyStats: dailyStats,
       repertoireStats: repertoireStats,
-      currentStreak: 5,
-      maxStreak: 12,
+      currentStreak: streak.$1,
+      maxStreak: streak.$2,
     );
   }
 
@@ -234,6 +250,7 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       ),
     ];
 
+    final streak = _getStreak(studentId);
     return PracticeStatsReport(
       startDate: startDate,
       endDate: endDate,
@@ -245,8 +262,8 @@ class MockPracticeStatsRepository implements PracticeStatsRepository {
       dailyStats: dailyStats,
       repertoireStats: repertoireStats,
       weeklyStats: weeklyStats,
-      currentStreak: 5,
-      maxStreak: 15,
+      currentStreak: streak.$1,
+      maxStreak: streak.$2 > streak.$1 ? streak.$2 + 3 : streak.$2, // monthly max slightly higher
     );
   }
 

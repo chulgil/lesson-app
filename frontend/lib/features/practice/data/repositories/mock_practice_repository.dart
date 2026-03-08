@@ -17,23 +17,44 @@ class MockPracticeRepository implements PracticeRepository {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
+    // Varied practice task templates
+    final taskTemplates = [
+      ('음계 연습', 10, true),
+      ('활 연습', 15, true),
+      ('에튀드 #3', 20, true),
+      ('비브라토 연습', 10, false),
+      ('시창·청음', 10, true),
+      ('곡 통주', 25, false),
+      ('포지션 이동', 15, true),
+      ('스타카토 연습', 10, true),
+      ('레가토 보잉', 15, false),
+      ('리듬 훈련', 10, true),
+    ];
+
     // Helper to create a practice log for a given day offset
     PracticeLog makeLog(String studentId, int daysAgo, int minutes) {
       final date = today.subtract(Duration(days: daysAgo));
+      // Pick 1-3 tasks based on hash of studentId + daysAgo
+      final seed = studentId.hashCode + daysAgo * 7;
+      final taskCount = (seed.abs() % 3) + 1;
+      final tasks = <PracticeTask>[];
+      for (int i = 0; i < taskCount; i++) {
+        final idx = (seed.abs() + i * 13) % taskTemplates.length;
+        final (title, target, completed) = taskTemplates[idx];
+        tasks.add(PracticeTask(
+          id: _uuid.v4(),
+          title: title,
+          targetMinutes: target,
+          isCompleted: completed,
+          completedAt: completed ? date : null,
+        ));
+      }
       return PracticeLog(
         id: _uuid.v4(),
         studentId: studentId,
         date: date,
         totalMinutes: minutes,
-        tasks: [
-          PracticeTask(
-            id: _uuid.v4(),
-            title: '음계 연습',
-            targetMinutes: 10,
-            isCompleted: true,
-            completedAt: date,
-          ),
-        ],
+        tasks: tasks,
         createdAt: date,
       );
     }

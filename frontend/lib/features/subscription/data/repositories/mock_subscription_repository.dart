@@ -108,6 +108,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
 
       // ═══════════════════════════════════════════════════════════════════
       // Active Monthly Subscriptions
+      // 월정액 가격 기준: 악기/레벨별 차등 (바이올린 320k, 피아노 280k, 피아노 보조 200k)
       // ═══════════════════════════════════════════════════════════════════
 
       // sub_mon_01: student_2 (이서연, active 신규) - 피아노 월 4회, 2/4 사용
