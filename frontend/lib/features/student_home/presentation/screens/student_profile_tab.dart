@@ -326,12 +326,8 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.notifications_outlined,
             title: '알림 설정',
-            trailing: Switch(
-              value: true,
-              onChanged: (value) {},
-              activeColor: AppColors.primary,
-            ),
-            onTap: () {},
+            subtitle: '카테고리별 알림 관리',
+            onTap: () => context.push(AppRoutes.notificationSettings),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -346,7 +342,11 @@ class StudentProfileTab extends ConsumerWidget {
             title: '다크 모드',
             trailing: Switch(
               value: false,
-              onChanged: (value) {},
+              onChanged: (value) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('다크 모드는 준비 중입니다')),
+                );
+              },
               activeColor: AppColors.primary,
             ),
             onTap: () {},
@@ -356,7 +356,13 @@ class StudentProfileTab extends ConsumerWidget {
             icon: Icons.language_outlined,
             title: '언어',
             subtitle: '한국어',
-            onTap: () {},
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('현재 한국어만 지원됩니다. 다른 언어는 준비 중입니다.'),
+                ),
+              );
+            },
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -368,13 +374,13 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.help_outline,
             title: '도움말',
-            onTap: () {},
+            onTap: () => context.push(AppRoutes.help),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.info_outline,
             title: '앱 정보',
-            onTap: () {},
+            onTap: () => context.push(AppRoutes.appInfo),
           ),
         ],
       ),

@@ -264,6 +264,10 @@ enum StudentTab {
 | **Widget** | `student_home/presentation/widgets/student_lesson_card.dart` | 학생 레슨 카드 |
 | **Widget** | `student_home/presentation/widgets/weekly_practice_widget.dart` | 주간 연습 차트 |
 | **Widget** | `student_home/presentation/widgets/week_calendar_widget.dart` | 학생 전용 캘린더 위젯 |
+| **Screen** | `student_home/presentation/screens/help_screen.dart` | 도움말 (FAQ + 문의) |
+| **Screen** | `student_home/presentation/screens/app_info_screen.dart` | 앱 정보 (버전 + 라이선스) |
+| **Screen** | `student_home/presentation/screens/notification_settings_screen.dart` | 알림 설정 (카테고리별 스위치) |
+| **Provider** | `student_home/presentation/providers/notification_settings_provider.dart` | 알림 설정 상태 관리 |
 | **공통 위젯** | `core/widgets/week_calendar_widget.dart` | 주간 캘린더 공통 위젯 |
 | **공통 위젯** | `core/widgets/practice_center_button.dart` | 중앙 연습 버튼 |
 
@@ -298,9 +302,11 @@ enum StudentTab {
 | 피드백 전체 보기 | 미구현 (TODO) |
 | 실제 연습 통계 연동 | 미구현 (하드코딩) |
 | 실제 프로필 데이터 연동 | 미구현 (하드코딩) |
-| 알림/리마인더 설정 | 미구현 (TODO) |
-| 다크 모드 | 미구현 (TODO) |
-| 언어 설정 | 미구현 (TODO) |
+| 알림 설정 화면 | 구현 완료 (#81, 카테고리별 스위치, FCM 미연동) |
+| 다크 모드 토글 | 구현 완료 (#79, "준비 중" SnackBar) |
+| 언어 설정 | 구현 완료 (#80, "준비 중" SnackBar) |
+| 도움말 화면 | 구현 완료 (#77, FAQ 아코디언 + 문의) |
+| 앱 정보 화면 | 구현 완료 (#78, 버전 + 라이선스) |
 
 ## 7. 관련 스펙
 
@@ -320,3 +326,4 @@ enum StudentTab {
 |------|------|
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
 | 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 게이미피케이션 및 알림 크로스 레퍼런스 추가 |
+| 2026-03-08 | Phase A 설정 화면 5개 구현 완료 (#77~#81), 파일 위치 추가 |
