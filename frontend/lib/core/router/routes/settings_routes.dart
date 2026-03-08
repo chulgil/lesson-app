@@ -6,11 +6,18 @@ import '../../../features/settings/presentation/screens/all_recordings_screen.da
 import '../../../features/settings/presentation/screens/backup_settings_screen.dart';
 import '../../../features/student_home/presentation/screens/app_info_screen.dart';
 import '../../../features/student_home/presentation/screens/help_screen.dart';
+import '../../../features/student_home/presentation/screens/my_teachers_screen.dart';
 import '../../../features/student_home/presentation/screens/notification_settings_screen.dart';
 import '../app_routes.dart';
 
 /// Settings routes
 List<GoRoute> settingsRoutes = [
+  // My Teachers (student)
+  GoRoute(
+    path: AppRoutes.myTeachers,
+    name: 'myTeachers',
+    builder: (context, state) => const MyTeachersScreen(),
+  ),
   // Backup Settings
   GoRoute(
     path: AppRoutes.backupSettings,

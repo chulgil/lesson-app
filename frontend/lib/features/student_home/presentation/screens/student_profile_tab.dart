@@ -280,7 +280,7 @@ class StudentProfileTab extends ConsumerWidget {
             icon: Icons.school_outlined,
             title: '내 선생님',
             subtitle: '김선생님',
-            onTap: () {},
+            onTap: () => context.push(AppRoutes.myTeachers),
           ),
           _buildMenuDivider(),
           _buildMenuItem(

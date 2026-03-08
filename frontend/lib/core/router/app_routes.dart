@@ -70,6 +70,9 @@ class AppRoutes {
   static const profileVisibility = '/profile/visibility';
   static const outstandingPayments = '/profile/outstanding-payments';
 
+  // Student routes
+  static const myTeachers = '/student/my-teachers';
+
   // Settings routes
   static const backupSettings = '/settings/backup';
   static const allRecordings = '/settings/recordings';
