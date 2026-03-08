@@ -150,6 +150,9 @@ class PracticeItem {
   // Priority
   final PracticePriority priority;
 
+  // Teaching resources attached to this practice item
+  final List<String> resourceIds;
+
   // Completion status
   final bool isCompleted;
   final int practiceCount; // 연습 횟수 (기본: 0, 완료 시 최소: 1)
@@ -173,6 +176,7 @@ class PracticeItem {
     this.description,
     this.repertoireId,
     this.sectionId,
+    this.resourceIds = const [],
     this.priority = PracticePriority.should,
     this.isCompleted = false,
     this.practiceCount = 0,
@@ -211,6 +215,7 @@ class PracticeItem {
     String? description,
     String? repertoireId,
     String? sectionId,
+    List<String>? resourceIds,
     PracticePriority? priority,
     bool? isCompleted,
     int? practiceCount,
@@ -230,6 +235,7 @@ class PracticeItem {
       description: description ?? this.description,
       repertoireId: repertoireId ?? this.repertoireId,
       sectionId: sectionId ?? this.sectionId,
+      resourceIds: resourceIds ?? this.resourceIds,
       priority: priority ?? this.priority,
       isCompleted: isCompleted ?? this.isCompleted,
       practiceCount: practiceCount ?? this.practiceCount,

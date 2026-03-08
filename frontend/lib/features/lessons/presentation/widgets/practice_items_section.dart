@@ -8,6 +8,7 @@ import '../../../../models/practice_item.dart';
 import '../../../../providers/providers.dart';
 import 'add_practice_item_sheet.dart';
 import 'edit_practice_item_sheet.dart';
+import 'resource_attachment_section.dart';
 
 /// Practice items section for lesson detail (teacher view)
 class PracticeItemsSection extends ConsumerWidget {
@@ -231,6 +232,9 @@ class PracticeItemsSection extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
+                      // Attached teaching resources
+                      if (item.resourceIds.isNotEmpty)
+                        ResourceAttachmentList(resourceIds: item.resourceIds),
                     ],
                   ),
                 ),

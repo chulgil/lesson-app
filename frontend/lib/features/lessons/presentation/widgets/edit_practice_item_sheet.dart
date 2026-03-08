@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_item.dart';
 import '../../../../providers/providers.dart';
+import 'resource_attachment_section.dart';
 
 /// Bottom sheet for editing practice item
 class EditPracticeItemSheet extends ConsumerStatefulWidget {
@@ -27,6 +28,7 @@ class EditPracticeItemSheet extends ConsumerStatefulWidget {
 class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late List<String> _resourceIds;
   bool _isSubmitting = false;
 
   @override
@@ -34,6 +36,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
     super.initState();
     _titleController = TextEditingController(text: widget.item.title);
     _descriptionController = TextEditingController(text: widget.item.description ?? '');
+    _resourceIds = List<String>.from(widget.item.resourceIds);
   }
 
   @override
@@ -141,6 +144,13 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                   ),
                 ),
               ),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Resource attachments
+              ResourceAttachmentEditor(
+                resourceIds: _resourceIds,
+                onChanged: (ids) => setState(() => _resourceIds = ids),
+              ),
               const SizedBox(height: AppSpacing.space6),
 
               // Submit button
@@ -182,6 +192,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
         description: _descriptionController.text.trim().isNotEmpty
             ? _descriptionController.text.trim()
             : null,
+        resourceIds: _resourceIds,
       );
 
       await ref

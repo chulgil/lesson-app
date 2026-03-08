@@ -70,6 +70,7 @@ class MockPracticeItemRepository implements PracticeItemRepository {
       PracticePriority priority = PracticePriority.should,
       bool isCompleted = false,
       int daysAgo = 0,
+      List<String> resourceIds = const [],
     }) {
       final created = now.subtract(Duration(days: daysAgo));
       return PracticeItem(
@@ -83,6 +84,7 @@ class MockPracticeItemRepository implements PracticeItemRepository {
         isCompleted: isCompleted,
         practiceCount: isCompleted ? 1 : 0,
         completedAt: isCompleted ? created.add(const Duration(hours: 2)) : null,
+        resourceIds: resourceIds,
         createdAt: created,
       );
     }
@@ -91,18 +93,22 @@ class MockPracticeItemRepository implements PracticeItemRepository {
       // student_1 (김민준) - 3 items, 2 completed
       makeItem(id: 'pi_01', lessonId: 'lesson_001', studentId: 'student_1',
           title: 'Canon in D - A섹션', priority: PracticePriority.must,
-          isCompleted: true, daysAgo: 3),
+          isCompleted: true, daysAgo: 3,
+          resourceIds: ['tr_001']),
       makeItem(id: 'pi_02', lessonId: 'lesson_001', studentId: 'student_1',
           title: 'G Major 음계 3옥타브', type: PracticeType.technique,
-          isCompleted: true, daysAgo: 3),
+          isCompleted: true, daysAgo: 3,
+          resourceIds: ['tr_003']),
       makeItem(id: 'pi_03', lessonId: 'lesson_001', studentId: 'student_1',
           title: 'Minuet No.2 - 리듬 연습', priority: PracticePriority.could,
-          daysAgo: 3),
+          daysAgo: 3,
+          resourceIds: ['tr_002']),
 
       // student_2 (이서연) - 4 items, 3 completed
       makeItem(id: 'pi_04', lessonId: 'lesson_002', studentId: 'student_2',
           title: 'Gavotte - 전체 통주', priority: PracticePriority.must,
-          isCompleted: true, daysAgo: 2),
+          isCompleted: true, daysAgo: 2,
+          resourceIds: ['tr_004']),
       makeItem(id: 'pi_05', lessonId: 'lesson_002', studentId: 'student_2',
           title: 'D Major 음계', type: PracticeType.technique,
           isCompleted: true, daysAgo: 2),
