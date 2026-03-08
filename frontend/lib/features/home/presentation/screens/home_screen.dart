@@ -193,6 +193,18 @@ class _DashboardTab extends ConsumerWidget {
               error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
             ),
 
+            const SizedBox(height: AppSpacing.space4),
+
+            // Quick feedback button
+            OutlinedButton.icon(
+              onPressed: () => context.push(AppRoutes.quickFeedbackList),
+              icon: const Icon(Icons.edit_note, size: 20),
+              label: const Text('피드백 보내기'),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 48),
+              ),
+            ),
+
             const SizedBox(height: AppSpacing.space8),
           ],
         ),

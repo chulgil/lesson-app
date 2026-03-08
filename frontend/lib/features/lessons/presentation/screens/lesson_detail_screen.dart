@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -31,6 +33,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   late TabController _tabController;
   bool _isRecording = false;
   int _recordingSeconds = 0;
+  Timer? _feedbackDebounce;
 
   @override
   void initState() {
@@ -40,6 +43,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   @override
   void dispose() {
+    _feedbackDebounce?.cancel();
     _tabController.dispose();
     super.dispose();
   }
@@ -246,7 +250,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               icon: Icons.edit_note,
             ),
             const SizedBox(height: AppSpacing.space3),
-            LessonNoteEditor(initialText: lesson.feedback),
+            LessonNoteEditor(
+              initialText: lesson.feedback,
+              onChanged: (text) => _saveFeedbackDebounced(lesson, text),
+            ),
           ] else ...[
             LessonDetailSectionHeader(
               title: '선생님 피드백',
@@ -450,6 +457,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       keyPoints: currentPoints.isEmpty ? null : currentPoints,
     );
     await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+  }
+
+  void _saveFeedbackDebounced(Lesson lesson, String text) {
+    _feedbackDebounce?.cancel();
+    _feedbackDebounce = Timer(const Duration(milliseconds: 800), () {
+      final updatedLesson = lesson.copyWith(
+        feedback: text.isEmpty ? null : text,
+      );
+      ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    });
   }
 
   Future<void> _setPracticeTip(Lesson lesson, String? content) async {

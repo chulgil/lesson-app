@@ -35,6 +35,8 @@ class AppRoutes {
   static const addLesson = '/lessons/add';
   static const lessonDetail = '/lessons/:id';
   static const editLesson = '/lessons/:id/edit';
+  static const quickFeedbackList = '/lessons/quick-feedback';
+  static const quickFeedback = '/lessons/quick-feedback/:id';
 
   // Practice routes
   static const practice = '/practice';
@@ -71,6 +73,9 @@ class AppRoutes {
   // Settings routes
   static const backupSettings = '/settings/backup';
   static const allRecordings = '/settings/recordings';
+  static const help = '/settings/help';
+  static const appInfo = '/settings/app-info';
+  static const notificationSettings = '/settings/notifications';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';

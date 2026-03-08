@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../features/lessons/presentation/screens/add_lesson_screen.dart';
 import '../../../features/lessons/presentation/screens/edit_lesson_screen.dart';
 import '../../../features/lessons/presentation/screens/lesson_detail_screen.dart';
+import '../../../features/lessons/presentation/screens/quick_feedback_screen.dart';
+import '../../../features/lessons/presentation/screens/quick_feedback_student_list.dart';
 import '../app_routes.dart';
 
 /// Lesson management routes
@@ -26,6 +28,22 @@ List<GoRoute> lessonRoutes = [
         preselectedHour: hour,
       );
     },
+  ),
+
+  // Quick Feedback - Student List (before lessonDetail to avoid :id matching)
+  GoRoute(
+    path: AppRoutes.quickFeedbackList,
+    name: 'quickFeedbackList',
+    builder: (context, state) => const QuickFeedbackStudentList(),
+  ),
+
+  // Quick Feedback - Write Feedback
+  GoRoute(
+    path: AppRoutes.quickFeedback,
+    name: 'quickFeedback',
+    builder: (context, state) => QuickFeedbackScreen(
+      lessonId: state.pathParameters['id'] ?? '',
+    ),
   ),
 
   // Lesson Detail
