@@ -65,8 +65,6 @@ class PracticeItemsSection extends ConsumerWidget {
       return _buildEmptyState(context, ref);
     }
 
-    final grouped = items.groupByPriority();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -74,12 +72,11 @@ class PracticeItemsSection extends ConsumerWidget {
         _buildSummaryBar(items),
         const SizedBox(height: AppSpacing.space4),
 
-        // Priority sections
-        for (final priority in PracticePriority.values)
-          if (grouped[priority]?.isNotEmpty == true) ...[
-            _buildPrioritySection(context, ref, priority, grouped[priority]!),
-            const SizedBox(height: AppSpacing.space4),
-          ],
+        // Flat list (no priority grouping)
+        ...items.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: _buildPracticeItemCard(context, ref, item),
+            )),
 
         // Add button (teacher only)
         if (isTeacher) ...[
@@ -178,96 +175,8 @@ class PracticeItemsSection extends ConsumerWidget {
               ],
             ),
           ),
-          // Priority counts
-          Row(
-            children: [
-              _buildPriorityDot(PracticePriority.must, items),
-              const SizedBox(width: AppSpacing.space2),
-              _buildPriorityDot(PracticePriority.should, items),
-              const SizedBox(width: AppSpacing.space2),
-              _buildPriorityDot(PracticePriority.could, items),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildPriorityDot(PracticePriority priority, List<PracticeItem> items) {
-    final count = items.where((i) => i.priority == priority).length;
-    if (count == 0) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: priority.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: priority.color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '$count',
-            style: AppTypography.caption.copyWith(
-              color: priority.color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPrioritySection(
-    BuildContext context,
-    WidgetRef ref,
-    PracticePriority priority,
-    List<PracticeItem> items,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section header
-        Row(
-          children: [
-            Text(
-              priority.emoji,
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              priority.label,
-              style: AppTypography.bodyMedium.copyWith(
-                color: priority.color,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              '${items.length}',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-
-        // Items
-        ...items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: _buildPracticeItemCard(context, ref, item),
-            )),
-      ],
     );
   }
 
@@ -280,11 +189,7 @@ class PracticeItemsSection extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(
-          color: item.isCompleted
-              ? AppColors.practiceGood.withValues(alpha: 0.3)
-              : AppColors.borderLight,
-        ),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Material(
         color: Colors.transparent,
@@ -304,44 +209,10 @@ class PracticeItemsSection extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          // Type badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _getTypeColor(item.type).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              item.type.label,
-                              style: AppTypography.caption.copyWith(
-                                color: _getTypeColor(item.type),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.space2),
-                          // Priority dot
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: item.priority.color,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.space1),
                       Text(
                         item.title,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          decoration: item.isCompleted ? TextDecoration.lineThrough : null,
                           color: item.isCompleted
                               ? AppColors.textTertiaryLight
                               : AppColors.textPrimaryLight,
@@ -352,7 +223,9 @@ class PracticeItemsSection extends ConsumerWidget {
                         Text(
                           item.description!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: item.isCompleted
+                                ? AppColors.textTertiaryLight
+                                : AppColors.textSecondaryLight,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -362,45 +235,40 @@ class PracticeItemsSection extends ConsumerWidget {
                   ),
                 ),
 
-                // Practice count & teacher feedback
-                Column(
-                  children: [
-                    if (item.practiceCount > 0)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceSecondaryLight,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${item.practiceCount}회',
-                          style: AppTypography.caption.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                // Practice count
+                if (item.practiceCount > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.space2),
+                    child: Text(
+                      '${item.practiceCount}회',
+                      style: AppTypography.caption.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondaryLight,
                       ),
-                    if (item.hasLike) ...[
-                      const SizedBox(height: AppSpacing.space1),
-                      Icon(
-                        Icons.favorite,
-                        size: 20,
-                        color: AppColors.error,
-                      ),
-                    ],
-                  ],
-                ),
+                    ),
+                  ),
 
-                // Teacher actions
-                if (isTeacher && item.isCompleted && !item.hasLike)
+                // Like toggle (teacher: interactive, student: read-only)
+                if (isTeacher)
                   IconButton(
                     onPressed: () => _toggleLike(ref, item),
-                    icon: const Icon(Icons.favorite_border),
-                    iconSize: 22,
-                    color: AppColors.textTertiaryLight,
+                    icon: Icon(
+                      item.hasLike ? Icons.thumb_up : Icons.thumb_up_outlined,
+                    ),
+                    iconSize: 20,
+                    color: item.hasLike
+                        ? AppColors.primary
+                        : AppColors.textTertiaryLight,
                     tooltip: '좋아요',
+                  )
+                else if (item.hasLike)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.space2),
+                    child: Icon(
+                      Icons.thumb_up,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
                   ),
               ],
             ),
@@ -429,19 +297,6 @@ class PracticeItemsSection extends ConsumerWidget {
             : null,
       ),
     );
-  }
-
-  Color _getTypeColor(PracticeType type) {
-    switch (type) {
-      case PracticeType.repertoire:
-        return AppColors.primary;
-      case PracticeType.technique:
-        return AppColors.secondary;
-      case PracticeType.theory:
-        return AppColors.info;
-      case PracticeType.custom:
-        return AppColors.textSecondaryLight;
-    }
   }
 
   Widget _buildAddButton(BuildContext context, WidgetRef ref) {

@@ -27,8 +27,6 @@ class EditPracticeItemSheet extends ConsumerStatefulWidget {
 class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  late PracticeType _selectedType;
-  late PracticePriority _selectedPriority;
   bool _isSubmitting = false;
 
   @override
@@ -36,8 +34,6 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
     super.initState();
     _titleController = TextEditingController(text: widget.item.title);
     _descriptionController = TextEditingController(text: widget.item.description ?? '');
-    _selectedType = widget.item.type;
-    _selectedPriority = widget.item.priority;
   }
 
   @override
@@ -91,46 +87,6 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Type selector
-              Text('유형', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                children: PracticeType.values.map((type) {
-                  final selected = type == _selectedType;
-                  return ChoiceChip(
-                    label: Text(type.label),
-                    selected: selected,
-                    onSelected: (value) => setState(() => _selectedType = type),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Priority selector
-              Text('우선순위', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                children: PracticePriority.values.map((priority) {
-                  final selected = priority == _selectedPriority;
-                  return ChoiceChip(
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(priority.emoji),
-                        const SizedBox(width: 4),
-                        Text(priority.label),
-                      ],
-                    ),
-                    selected: selected,
-                    selectedColor: priority.color.withValues(alpha: 0.2),
-                    onSelected: (value) => setState(() => _selectedPriority = priority),
-                  );
-                }).toList(),
               ),
               const SizedBox(height: AppSpacing.space4),
 
@@ -196,8 +152,6 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
     try {
       final updatedItem = widget.item.copyWith(
-        type: _selectedType,
-        priority: _selectedPriority,
         title: title,
         description: _descriptionController.text.trim().isNotEmpty
             ? _descriptionController.text.trim()

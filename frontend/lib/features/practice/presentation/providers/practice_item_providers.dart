@@ -78,7 +78,7 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
   Future<PracticeItem> addItem({
     required String studentId,
     required String teacherId,
-    required PracticeType type,
+    PracticeType type = PracticeType.repertoire,
     required String title,
     String? description,
     String? repertoireId,

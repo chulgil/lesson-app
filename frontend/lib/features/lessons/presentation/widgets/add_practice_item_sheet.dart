@@ -70,7 +70,6 @@ class AddPracticeItemSheet extends ConsumerStatefulWidget {
 }
 
 class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
-  final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _pieceNameController = TextEditingController();
   final _newRepertoireNameController = TextEditingController();
@@ -78,8 +77,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   // Multiple practice ranges
   final List<PracticeRangeEntry> _practiceRanges = [];
 
-  PracticeType _selectedType = PracticeType.repertoire;
-  PracticePriority _selectedPriority = PracticePriority.should;
   bool _isSubmitting = false;
 
   // Repertoire selection state
@@ -95,7 +92,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
   @override
   void dispose() {
-    _titleController.dispose();
     _descriptionController.dispose();
     _pieceNameController.dispose();
     _newRepertoireNameController.dispose();
@@ -146,72 +142,8 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               Text('연습 추가', style: AppTypography.headingMedium),
               const SizedBox(height: AppSpacing.space4),
 
-              // Type selector
-              Text('유형', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                children: PracticeType.values.map((type) {
-                  final selected = type == _selectedType;
-                  return ChoiceChip(
-                    label: Text(type.label),
-                    selected: selected,
-                    onSelected: (value) => setState(() {
-                      _selectedType = type;
-                      // Reset repertoire selection when type changes
-                      if (type != PracticeType.repertoire) {
-                        _selectedRepertoire = null;
-                        _isCreatingNewRepertoire = false;
-                      }
-                    }),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Priority selector
-              Text('우선순위', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: AppSpacing.space2),
-              Wrap(
-                spacing: AppSpacing.space2,
-                children: PracticePriority.values.map((priority) {
-                  final selected = priority == _selectedPriority;
-                  return ChoiceChip(
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(priority.emoji),
-                        const SizedBox(width: AppSpacing.space1),
-                        Text(priority.label),
-                      ],
-                    ),
-                    selected: selected,
-                    selectedColor: priority.color.withValues(alpha: 0.2),
-                    onSelected: (value) => setState(() => _selectedPriority = priority),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Repertoire selection (only for repertoire type)
-              if (_selectedType == PracticeType.repertoire)
-                _buildRepertoireSection(repertoiresAsync),
-
-              // Title (for non-repertoire types or manual input)
-              if (_selectedType != PracticeType.repertoire) ...[
-                Text('제목', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
-                const SizedBox(height: AppSpacing.space2),
-                TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    hintText: _getTitleHint(),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-              ],
+              // Repertoire-based form (all practice items are repertoire-based)
+              _buildRepertoireSection(repertoiresAsync),
 
               // Description
               Text('설명 (선택)', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
@@ -248,19 +180,6 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         ),
       ),
     );
-  }
-
-  String _getTitleHint() {
-    switch (_selectedType) {
-      case PracticeType.technique:
-        return '예: G Major 스케일 3옥타브';
-      case PracticeType.theory:
-        return '예: 음정 퀴즈 복습';
-      case PracticeType.custom:
-        return '예: 손목 스트레칭';
-      default:
-        return '예: 도레미송 1-8마디';
-    }
   }
 
   Widget _buildRepertoireSection(AsyncValue<List<PracticeRepertoire>> repertoiresAsync) {
@@ -623,49 +542,39 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   }
 
   Future<void> _submit() async {
-    // Validate based on type
-    if (_selectedType == PracticeType.repertoire) {
-      if (!_isCreatingNewRepertoire && _selectedRepertoire == null) {
+    // Validate repertoire selection
+    if (!_isCreatingNewRepertoire && _selectedRepertoire == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('레퍼토리를 선택해주세요')),
+      );
+      return;
+    }
+    if (_isCreatingNewRepertoire && _newRepertoireNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('새 레퍼토리 이름을 입력해주세요')),
+      );
+      return;
+    }
+    if (_pieceNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('곡명을 입력해주세요')),
+      );
+      return;
+    }
+    // Validate all practice ranges
+    for (int i = 0; i < _practiceRanges.length; i++) {
+      final range = _practiceRanges[i];
+      final start = int.tryParse(range.startController.text.trim());
+      final end = int.tryParse(range.endController.text.trim());
+      if (start == null || end == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('레퍼토리를 선택해주세요')),
+          SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')),
         );
         return;
       }
-      if (_isCreatingNewRepertoire && _newRepertoireNameController.text.trim().isEmpty) {
+      if (start > end) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('새 레퍼토리 이름을 입력해주세요')),
-        );
-        return;
-      }
-      if (_pieceNameController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('곡명을 입력해주세요')),
-        );
-        return;
-      }
-      // Validate all practice ranges
-      for (int i = 0; i < _practiceRanges.length; i++) {
-        final range = _practiceRanges[i];
-        final start = int.tryParse(range.startController.text.trim());
-        final end = int.tryParse(range.endController.text.trim());
-        if (start == null || end == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')),
-          );
-          return;
-        }
-        if (start > end) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('구간 ${i + 1}의 시작 번호가 끝 번호보다 클 수 없습니다')),
-          );
-          return;
-        }
-      }
-    } else {
-      final title = _titleController.text.trim();
-      if (title.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('제목을 입력해주세요')),
+          SnackBar(content: Text('구간 ${i + 1}의 시작 번호가 끝 번호보다 클 수 없습니다')),
         );
         return;
       }
@@ -675,57 +584,45 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
     try {
       final teacherId = ref.read(currentTeacherIdProvider);
+      final pieceName = _pieceNameController.text.trim();
 
-      String title;
-      String? repertoireId;
-      String? sectionId;
-
-      if (_selectedType == PracticeType.repertoire) {
-        // Handle repertoire type
-        final pieceName = _pieceNameController.text.trim();
-
-        // Create or get repertoire
-        PracticeRepertoire repertoire;
-        if (_isCreatingNewRepertoire) {
-          repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
-            studentId: widget.studentId,
-            name: _newRepertoireNameController.text.trim(),
-          );
-        } else {
-          repertoire = _selectedRepertoire!;
-        }
-        repertoireId = repertoire.id;
-
-        // Create section for first range (primary section)
-        final firstRange = _practiceRanges.first;
-        final startMeasure = int.parse(firstRange.startController.text.trim());
-        final endMeasure = int.parse(firstRange.endController.text.trim());
-
-        final section = await ref.read(sectionCrudProvider.notifier).createSection(
-          repertoireId: repertoireId,
-          pieceName: pieceName,
-          startMeasure: startMeasure,
-          endMeasure: endMeasure,
+      // Create or get repertoire
+      PracticeRepertoire repertoire;
+      if (_isCreatingNewRepertoire) {
+        repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
+          studentId: widget.studentId,
+          name: _newRepertoireNameController.text.trim(),
         );
-        sectionId = section.id;
-
-        // Build title: "곡명 시작~끝마디, 시작~끝줄, ..."
-        final rangeStrings = _practiceRanges.map((r) => r.toDisplayString()).join(', ');
-        title = '$pieceName $rangeStrings';
       } else {
-        title = _titleController.text.trim();
+        repertoire = _selectedRepertoire!;
       }
+      final repertoireId = repertoire.id;
 
-      // Create practice item
+      // Create section for first range (primary section)
+      final firstRange = _practiceRanges.first;
+      final startMeasure = int.parse(firstRange.startController.text.trim());
+      final endMeasure = int.parse(firstRange.endController.text.trim());
+
+      final section = await ref.read(sectionCrudProvider.notifier).createSection(
+        repertoireId: repertoireId,
+        pieceName: pieceName,
+        startMeasure: startMeasure,
+        endMeasure: endMeasure,
+      );
+      final sectionId = section.id;
+
+      // Build title: "곡명 시작~끝마디, 시작~끝줄, ..."
+      final rangeStrings = _practiceRanges.map((r) => r.toDisplayString()).join(', ');
+      final title = '$pieceName $rangeStrings';
+
+      // Create practice item (always repertoire type)
       await ref.read(practiceItemsNotifierProvider(widget.lessonId).notifier).addItem(
         studentId: widget.studentId,
         teacherId: teacherId,
-        type: _selectedType,
         title: title,
         description: _descriptionController.text.trim().isNotEmpty
             ? _descriptionController.text.trim()
             : null,
-        priority: _selectedPriority,
         repertoireId: repertoireId,
         sectionId: sectionId,
       );
@@ -733,11 +630,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_selectedType == PracticeType.repertoire
-                ? '연습이 추가되고 학생 연습장에 등록되었습니다'
-                : '연습이 추가되었습니다'),
-          ),
+          const SnackBar(content: Text('연습이 추가되었습니다')),
         );
       }
     } catch (e) {
