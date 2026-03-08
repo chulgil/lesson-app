@@ -90,6 +90,32 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               ),
               const SizedBox(height: AppSpacing.space4),
 
+              // Completed item warning
+              if (widget.item.isCompleted) ...[
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, size: 18, color: AppColors.info),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          '학생이 이미 연습한 과제입니다',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.info,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+              ],
+
               // Title
               Text('제목', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: AppSpacing.space2),
