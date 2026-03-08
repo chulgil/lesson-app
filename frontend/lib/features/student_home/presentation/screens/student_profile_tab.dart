@@ -13,6 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/parent.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
 
 /// Student profile tab with settings and account info
 class StudentProfileTab extends ConsumerWidget {
@@ -249,6 +250,12 @@ class StudentProfileTab extends ConsumerWidget {
   }
 
   Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
+    final studentId = ref.watch(currentUserIdProvider);
+    final repertoiresAsync = ref.watch(studentRepertoiresProvider(studentId));
+    final repertoireCount = repertoiresAsync.whenOrNull(
+      data: (list) => list.where((r) => !r.isArchived).length,
+    );
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -279,8 +286,12 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.library_music_outlined,
             title: '레퍼토리',
-            subtitle: '3곡 진행 중',
-            onTap: () {},
+            subtitle: repertoireCount != null
+                ? '$repertoireCount곡 진행 중'
+                : null,
+            onTap: () => context.push(
+              '${AppRoutes.practiceRepertoire}?studentId=$studentId',
+            ),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
