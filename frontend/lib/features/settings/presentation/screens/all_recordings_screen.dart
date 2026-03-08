@@ -16,6 +16,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../models/recording.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
@@ -161,30 +162,10 @@ class AllRecordingsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        const SizedBox(height: 200),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.mic_none,
-                size: 64,
-                color: AppColors.textTertiaryLight,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              Text(
-                '녹음 파일이 없습니다',
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+    return const EmptyStateWidget(
+      icon: Icons.mic_none,
+      title: '녹음 파일이 없습니다',
+      scrollable: true,
     );
   }
 }

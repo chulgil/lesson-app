@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import 'booking_cancel_screen.dart';
@@ -177,31 +178,10 @@ class MyBookingsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.event_available,
-            size: 64,
-            color: AppColors.textTertiaryLight,
-          ),
-          const SizedBox(height: AppSpacing.space4),
-          Text(
-            '예약된 레슨이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Text(
-            '새로운 레슨을 예약해보세요',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
-            ),
-          ),
-        ],
-      ),
+    return const EmptyStateWidget(
+      icon: Icons.event_available,
+      title: '예약된 레슨이 없습니다',
+      subtitle: '새로운 레슨을 예약해보세요',
     );
   }
 

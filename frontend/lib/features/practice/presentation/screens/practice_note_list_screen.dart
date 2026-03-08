@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../domain/entities/entities.dart';
 import '../providers/practice_note_provider.dart';
 import '../providers/practice_repertoire_crud_provider.dart';
@@ -227,41 +228,13 @@ class PracticeNoteListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmpty(BuildContext context, WidgetRef ref) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.edit_note,
-              size: 64,
-              color: AppColors.textTertiaryLight,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              '연습노트가 없습니다',
-              style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '연습하면서 느낀 점을 기록해보세요',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            FilledButton.icon(
-              onPressed: () => _showAddDialog(context, ref),
-              icon: const Icon(Icons.add),
-              label: const Text('노트 추가'),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.edit_note,
+      title: '연습노트가 없습니다',
+      subtitle: '연습하면서 느낀 점을 기록해보세요',
+      actionLabel: '노트 추가',
+      actionIcon: Icons.add,
+      onAction: () => _showAddDialog(context, ref),
     );
   }
 

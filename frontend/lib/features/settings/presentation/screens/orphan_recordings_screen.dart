@@ -10,6 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/screens/section_picker_screen.dart';
 import '../providers/orphan_recording_provider.dart';
@@ -85,38 +86,10 @@ class _EmptyStateWithDiagnostic extends StatelessWidget {
         // Diagnostic card at top
         _DiagnosticCard(diagnostic: diagnostic),
         SizedBox(height: MediaQuery.of(context).size.height * 0.15),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                size: 64,
-                color: AppColors.success.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              Text(
-                '연결되지 않은 녹음이 없습니다',
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '모든 녹음이 섹션에 연결되어 있습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space6),
-              Text(
-                '아래로 당겨서 새로고침 (경로 복구 포함)',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-              ),
-            ],
-          ),
+        const EmptyStateWidget(
+          icon: Icons.check_circle_outline,
+          title: '연결되지 않은 녹음이 없습니다',
+          subtitle: '모든 녹음이 섹션에 연결되어 있습니다',
         ),
       ],
     );

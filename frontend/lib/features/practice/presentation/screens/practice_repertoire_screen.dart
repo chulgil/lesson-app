@@ -6,6 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../providers/repertoire_archive_provider.dart';
@@ -68,40 +69,13 @@ class PracticeRepertoireScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.library_music_outlined,
-              size: 80,
-              color: AppColors.textTertiaryLight,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              '아직 연습할 레퍼토리가 없습니다',
-              style: AppTypography.headingSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            FilledButton.icon(
-              onPressed: () => context.push('/practice/repertoire/add?studentId=$studentId'),
-              icon: const Icon(Icons.add),
-              label: const Text('레퍼토리 추가'),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateWidget(
+      icon: Icons.library_music_outlined,
+      title: '아직 연습할 레퍼토리가 없습니다',
+      subtitle: '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요',
+      actionLabel: '레퍼토리 추가',
+      actionIcon: Icons.add,
+      onAction: () => context.push('/practice/repertoire/add?studentId=$studentId'),
     );
   }
 
