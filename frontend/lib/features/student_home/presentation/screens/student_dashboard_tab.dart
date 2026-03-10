@@ -114,7 +114,7 @@ class StudentDashboardTab extends ConsumerWidget {
           // ═══════════════════════════════════════════════════════════
           // 섹션 7: 선생님 피드백 (최근 1개만)
           // ═══════════════════════════════════════════════════════════
-          _buildTeacherFeedbackSection(context),
+          _buildTeacherFeedbackSection(context, currentStudentId),
         ],
       ),
     );
@@ -281,7 +281,7 @@ class StudentDashboardTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildTeacherFeedbackSection(BuildContext context) {
+  Widget _buildTeacherFeedbackSection(BuildContext context, String currentStudentId) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -291,7 +291,7 @@ class StudentDashboardTab extends ConsumerWidget {
             Text('최근 피드백', style: AppTypography.headingMedium),
             TextButton(
               onPressed: () {
-                // TODO: Navigate to all feedback
+                context.push('${AppRoutes.repertoireHistory}?studentId=$currentStudentId');
               },
               child: const Text('더보기'),
             ),
@@ -416,7 +416,7 @@ class StudentDashboardTab extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to lesson detail
+        context.push('/schedule/booking/${booking.id}');
       },
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),

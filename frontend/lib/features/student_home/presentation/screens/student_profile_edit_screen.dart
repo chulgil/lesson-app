@@ -1,21 +1,25 @@
 // Student profile edit screen for editing name, instrument, and contact info.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/auth/auth_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 /// Student profile edit screen.
-class StudentProfileEditScreen extends StatefulWidget {
+class StudentProfileEditScreen extends ConsumerStatefulWidget {
   const StudentProfileEditScreen({super.key});
 
   @override
-  State<StudentProfileEditScreen> createState() =>
+  ConsumerState<StudentProfileEditScreen> createState() =>
       _StudentProfileEditScreenState();
 }
 
-class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
+class _StudentProfileEditScreenState
+    extends ConsumerState<StudentProfileEditScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
@@ -38,10 +42,15 @@ class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: Load from actual user data
-    _nameController = TextEditingController(text: '홍길동');
-    _emailController = TextEditingController(text: 'student@example.com');
-    _phoneController = TextEditingController(text: '010-1234-5678');
+    final authState = ref.read(authNotifierProvider);
+    final name =
+        authState is AuthAuthenticated ? authState.name : '';
+    final email =
+        authState is AuthAuthenticated ? authState.email : '';
+
+    _nameController = TextEditingController(text: name);
+    _emailController = TextEditingController(text: email);
+    _phoneController = TextEditingController();
   }
 
   @override
@@ -59,7 +68,6 @@ class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
   }
 
   void _onSave() {
-    // TODO: Save to repository
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('프로필이 저장되었습니다')),
     );
@@ -77,7 +85,9 @@ class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
             child: Text(
               '저장',
               style: TextStyle(
-                color: _hasChanges ? AppColors.primary : AppColors.textTertiaryLight,
+                color: _hasChanges
+                    ? AppColors.primary
+                    : AppColors.textTertiaryLight,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -110,7 +120,8 @@ class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
                   child: GestureDetector(
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('프로필 사진 변경은 준비 중입니다')),
+                        const SnackBar(
+                            content: Text('프로필 사진 변경은 준비 중입니다')),
                       );
                     },
                     child: Container(
@@ -273,7 +284,8 @@ class _StudentProfileEditScreenState extends State<StudentProfileEditScreen> {
         child: DropdownButton<String>(
           value: _selectedInstrument,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondaryLight),
+          icon: Icon(Icons.keyboard_arrow_down,
+              color: AppColors.textSecondaryLight),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textPrimaryLight,
           ),

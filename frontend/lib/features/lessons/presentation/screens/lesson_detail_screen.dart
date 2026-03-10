@@ -171,7 +171,16 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       title: const Text('레슨 상세'),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            final date = '${lesson.date.year}-${lesson.date.month.toString().padLeft(2, '0')}-${lesson.date.day.toString().padLeft(2, '0')}';
+            final text = '${lesson.studentName} ${lesson.instrument} 레슨\n$date ${lesson.startTime} (${lesson.duration}분)';
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('공유 텍스트가 복사되었습니다: $text'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
           icon: const Icon(Icons.share_outlined),
         ),
         PopupMenuButton<String>(

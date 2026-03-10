@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../student_home/presentation/widgets/language_select_sheet.dart';
 import '../providers/child_profile_provider.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import '../widgets/profile_header.dart';
@@ -61,16 +62,6 @@ class ParentProfileTab extends ConsumerWidget {
               title: '설정',
               items: [
                 ProfileMenuItem(
-                  icon: Icons.dark_mode_outlined,
-                  label: '다크 모드',
-                  trailing: Switch(
-                    value: false,
-                    onChanged: (_) {},
-                    activeColor: AppColors.primary,
-                  ),
-                  onTap: () {},
-                ),
-                ProfileMenuItem(
                   icon: Icons.language,
                   label: '언어',
                   trailing: Text(
@@ -79,7 +70,7 @@ class ParentProfileTab extends ConsumerWidget {
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
-                  onTap: () {},
+                  onTap: () => LanguageSelectSheet.show(context),
                 ),
                 ProfileMenuItem(
                   icon: Icons.backup_outlined,
@@ -98,12 +89,7 @@ class ParentProfileTab extends ConsumerWidget {
                 ProfileMenuItem(
                   icon: Icons.help_outline,
                   label: '도움말',
-                  onTap: () {},
-                ),
-                ProfileMenuItem(
-                  icon: Icons.feedback_outlined,
-                  label: '피드백 보내기',
-                  onTap: () {},
+                  onTap: () => context.push(AppRoutes.help),
                 ),
                 ProfileMenuItem(
                   icon: Icons.info_outline,
@@ -114,7 +100,7 @@ class ParentProfileTab extends ConsumerWidget {
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
-                  onTap: () {},
+                  onTap: () => context.push(AppRoutes.appInfo),
                 ),
               ],
             ),
@@ -128,12 +114,12 @@ class ParentProfileTab extends ConsumerWidget {
                 ProfileMenuItem(
                   icon: Icons.description_outlined,
                   label: '이용약관',
-                  onTap: () {},
+                  onTap: () => context.push(AppRoutes.termsOfService),
                 ),
                 ProfileMenuItem(
                   icon: Icons.privacy_tip_outlined,
                   label: '개인정보처리방침',
-                  onTap: () {},
+                  onTap: () => context.push(AppRoutes.privacyPolicy),
                 ),
                 ProfileMenuItem(
                   icon: Icons.logout,

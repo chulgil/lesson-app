@@ -368,7 +368,11 @@ class StudentProfileTab extends ConsumerWidget {
               },
               activeColor: AppColors.primary,
             ),
-            onTap: () {},
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('다크 모드는 준비 중입니다')),
+              );
+            },
           ),
           _buildMenuDivider(),
           _buildMenuItem(
