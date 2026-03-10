@@ -1,7 +1,9 @@
 // App info screen showing version, licenses, and legal links.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -88,7 +90,7 @@ class AppInfoScreen extends StatelessWidget {
                   context,
                   icon: Icons.description_outlined,
                   title: '이용약관',
-                  onTap: () => _showComingSoon(context),
+                  onTap: () => context.push(AppRoutes.termsOfService),
                 ),
                 Divider(
                   height: 1,
@@ -99,7 +101,7 @@ class AppInfoScreen extends StatelessWidget {
                   context,
                   icon: Icons.privacy_tip_outlined,
                   title: '개인정보처리방침',
-                  onTap: () => _showComingSoon(context),
+                  onTap: () => context.push(AppRoutes.privacyPolicy),
                 ),
                 Divider(
                   height: 1,
@@ -200,9 +202,4 @@ class AppInfoScreen extends StatelessWidget {
     );
   }
 
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('준비 중입니다')),
-    );
-  }
 }

@@ -14,6 +14,9 @@ import '../../../../models/parent.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../providers/practice_reminder_provider.dart';
+import '../widgets/language_select_sheet.dart';
+import '../widgets/practice_reminder_sheet.dart';
 
 /// Student profile tab with settings and account info
 class StudentProfileTab extends ConsumerWidget {
@@ -51,7 +54,7 @@ class StudentProfileTab extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding),
-            child: _buildSettingsSection(context),
+            child: _buildSettingsSection(context, ref),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -273,7 +276,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.person_outline,
             title: '프로필 수정',
-            onTap: () {},
+            onTap: () => context.push(AppRoutes.profileEdit),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -297,7 +300,9 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.history,
             title: '연습 기록 내역',
-            onTap: () {},
+            onTap: () => context.push(
+              '${AppRoutes.repertoireHistory}?studentId=$studentId',
+            ),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -319,7 +324,8 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildSettingsSection(BuildContext context) {
+  Widget _buildSettingsSection(BuildContext context, WidgetRef ref) {
+    final reminderSettings = ref.watch(practiceReminderProvider);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -344,8 +350,10 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.alarm_outlined,
             title: '연습 리마인더',
-            subtitle: '매일 오후 5시',
-            onTap: () {},
+            subtitle: reminderSettings.isEnabled
+                ? reminderSettings.formattedTime
+                : '꺼짐',
+            onTap: () => PracticeReminderSheet.show(context),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -367,13 +375,7 @@ class StudentProfileTab extends ConsumerWidget {
             icon: Icons.language_outlined,
             title: '언어',
             subtitle: '한국어',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('현재 한국어만 지원됩니다. 다른 언어는 준비 중입니다.'),
-                ),
-              );
-            },
+            onTap: () => LanguageSelectSheet.show(context),
           ),
           _buildMenuDivider(),
           _buildMenuItem(

@@ -79,6 +79,9 @@ class AppRoutes {
   static const help = '/settings/help';
   static const appInfo = '/settings/app-info';
   static const notificationSettings = '/settings/notifications';
+  static const profileEdit = '/settings/profile-edit';
+  static const termsOfService = '/settings/terms';
+  static const privacyPolicy = '/settings/privacy';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
