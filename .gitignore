@@ -124,3 +124,4 @@ frontend/logs/
 # Claude local settings
 .claude/settings.local.json
 backend/test.db
+.serena/project.yml
