@@ -10,6 +10,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/dev_login_section.dart';
+import '../widgets/login_bottom_sheets.dart';
+import '../widgets/social_login_button.dart';
 
 /// Login screen with social login options (mock mode) or dev-login accounts (remote mode).
 class LoginScreen extends ConsumerStatefulWidget {
@@ -37,7 +40,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.space6),
                 _buildSocialButtons(context),
                 const SizedBox(height: AppSpacing.space6),
-                _buildDevLoginAccounts(),
+                DevLoginSection(
+                  isLoading: _isLoading,
+                  onDevLogin: ({
+                    required String email,
+                    required String role,
+                    String? name,
+                  }) => _handleDevLogin(email: email, role: role, name: name),
+                ),
                 const SizedBox(height: AppSpacing.space6),
                 _buildTermsText(context),
                 const SizedBox(height: AppSpacing.space4),
@@ -70,117 +80,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   // ── Dev Login (Remote mode) ──────────────────────────────────────
-
-  Widget _buildDevLoginAccounts() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space1,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
-            child: Text(
-              'DEV MODE — 테스트 계정 선택',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space4),
-
-        // ── Teacher accounts ──
-        _DevSectionHeader(label: '선생님', color: AppColors.primary),
-        const SizedBox(height: AppSpacing.space2),
-        _DevAccountCard(
-          emoji: '👩‍🏫',
-          name: '박미연',
-          description: '학생 3명, 레슨/구독 관리',
-          color: AppColors.primary,
-          isLoading: _isLoading,
-          onTap:
-              () => _handleDevLogin(
-                email: 'minyeon@example.com',
-                role: 'teacher',
-                name: '박미연',
-              ),
-        ),
-
-        const SizedBox(height: AppSpacing.space4),
-
-        // ── Student accounts ──
-        _DevSectionHeader(label: '학생', color: AppColors.secondary),
-        const SizedBox(height: AppSpacing.space2),
-        _DevAccountCard(
-          emoji: '🎻',
-          name: '김소연',
-          description: '레슨 6개, 연습 기록, 수강권 보유',
-          color: AppColors.secondary,
-          isLoading: _isLoading,
-          onTap:
-              () => _handleDevLogin(
-                email: 'soyeon@example.com',
-                role: 'student',
-                name: '김소연',
-              ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        _DevAccountCard(
-          emoji: '🎻',
-          name: '이준호',
-          description: '레슨 2개, 초급 학생',
-          color: AppColors.secondary,
-          isLoading: _isLoading,
-          onTap:
-              () => _handleDevLogin(
-                email: 'junho@example.com',
-                role: 'student',
-                name: '이준호',
-              ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        _DevAccountCard(
-          emoji: '🎵',
-          name: '최유진',
-          description: '체험 레슨 1개 (플루트)',
-          color: AppColors.secondary.withValues(alpha: 0.7),
-          isLoading: _isLoading,
-          onTap:
-              () => _handleDevLogin(
-                email: 'yujin@example.com',
-                role: 'student',
-                name: '최유진',
-              ),
-        ),
-
-        const SizedBox(height: AppSpacing.space4),
-
-        // ── Parent accounts ──
-        _DevSectionHeader(label: '학부모', color: AppColors.info),
-        const SizedBox(height: AppSpacing.space2),
-        _DevAccountCard(
-          emoji: '👨‍👩‍👧',
-          name: '김정수',
-          description: '자녀: 김소연 (레슨/연습 확인)',
-          color: AppColors.info,
-          isLoading: _isLoading,
-          onTap:
-              () => _handleDevLogin(
-                email: 'parent@example.com',
-                role: 'parent',
-                name: '김정수',
-              ),
-        ),
-      ],
-    );
-  }
 
   Future<void> _handleDevLogin({
     required String email,
@@ -219,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  // ── Mock mode (existing social login UI) ─────────────────────────
+  // ── Common UI builders ────────────────────────────────────────────
 
   Widget _buildHeader() {
     return Column(
@@ -264,7 +163,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Column(
       children: [
         // Google Login
-        _SocialLoginButton(
+        SocialLoginButton(
           icon: Icons.g_mobiledata_rounded,
           label: 'Google로 계속하기',
           backgroundColor: AppColors.googleBackground,
@@ -275,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.space3),
 
         // Kakao Login
-        _SocialLoginButton(
+        SocialLoginButton(
           icon: Icons.chat_bubble_rounded,
           label: '카카오로 계속하기',
           backgroundColor: AppColors.kakaoBackground,
@@ -285,7 +184,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: AppSpacing.space3),
 
         // Apple Login (iOS only)
-        _SocialLoginButton(
+        SocialLoginButton(
           icon: Icons.apple_rounded,
           label: 'Apple로 계속하기',
           backgroundColor: AppColors.appleBackground,
@@ -297,7 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // Parent login link
         GestureDetector(
-          onTap: () => _handleParentLogin(context),
+          onTap: () => showParentLoginSheet(context),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space4,
@@ -356,10 +255,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  // ── Login handlers ────────────────────────────────────────────────
+
   Future<void> _handleGoogleLogin(BuildContext context) async {
     // Mock mode: show role select dialog
     if (EnvironmentConfig.useMockData) {
-      _showRoleSelectDialog(context, authProvider: 'google');
+      showRoleSelectSheet(
+        context,
+        authProvider: 'google',
+        onRoleSelected: (role) => _handleRoleLogin(context, role, 'google'),
+      );
       return;
     }
 
@@ -436,7 +341,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       return;
     }
-    _showRoleSelectDialog(context, authProvider: 'kakao');
+    showRoleSelectSheet(
+      context,
+      authProvider: 'kakao',
+      onRoleSelected: (role) => _handleRoleLogin(context, role, 'kakao'),
+    );
   }
 
   void _handleAppleLogin(BuildContext context) {
@@ -449,206 +358,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       return;
     }
-    _showRoleSelectDialog(context, authProvider: 'apple');
-  }
-
-  void _handleParentLogin(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
-      ),
-      isScrollControlled: true,
-      builder:
-          (sheetContext) => SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Handle
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderLight,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-
-                  // Parent icon
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: AppColors.info.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusLarge,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 28)),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-
-                  Text('학부모 로그인', style: AppTypography.headingMedium),
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    '자녀의 레슨과 연습을 확인하세요',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-
-                  const SizedBox(height: AppSpacing.space3),
-
-                  // Social login buttons for parent with test scenarios
-                  _ParentLoginOption(
-                    icon: Icons.g_mobiledata_rounded,
-                    label: 'Google로 계속하기',
-                    description: '기존 학부모 (자녀 등록됨)',
-                    backgroundColor: AppColors.googleBackground,
-                    textColor: AppColors.textPrimaryLight,
-                    borderColor: AppColors.borderLight,
-                    onPressed: () {
-                      Navigator.pop(sheetContext);
-                      context.go(AppRoutes.parentHome);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-
-                  _ParentLoginOption(
-                    icon: Icons.chat_bubble_rounded,
-                    label: '카카오로 계속하기',
-                    description: '기존 학부모 (자녀 없음)',
-                    backgroundColor: AppColors.kakaoBackground,
-                    textColor: AppColors.textPrimaryLight,
-                    onPressed: () {
-                      Navigator.pop(sheetContext);
-                      context.go(AppRoutes.parentHome);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-
-                  _ParentLoginOption(
-                    icon: Icons.apple_rounded,
-                    label: 'Apple로 계속하기',
-                    description: '신규 가입 → 초대코드 입력',
-                    backgroundColor: AppColors.appleBackground,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.pop(sheetContext);
-                      context.go(AppRoutes.parentInviteCode);
-                    },
-                  ),
-
-                  const SizedBox(height: AppSpacing.space3),
-                ],
-              ),
-            ),
-          ),
+    showRoleSelectSheet(
+      context,
+      authProvider: 'apple',
+      onRoleSelected: (role) => _handleRoleLogin(context, role, 'apple'),
     );
   }
 
-  void _showRoleSelectDialog(
-    BuildContext context, {
-    String authProvider = 'google',
-  }) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppSpacing.radiusXLarge),
-        ),
-      ),
-      builder:
-          (dialogContext) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Handle
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderLight,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-
-                  Text('역할을 선택하세요', style: AppTypography.headingMedium),
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    '레슨 앱에서 어떤 역할로 사용하시나요?',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-
-                  const SizedBox(height: AppSpacing.space4),
-
-                  // Teacher option
-                  _RoleOptionCard(
-                    icon: Icons.school,
-                    title: '선생님',
-                    description: _getTeacherDescription(authProvider),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      _handleTeacherLogin(context, authProvider);
-                    },
-                  ),
-
-                  const SizedBox(height: AppSpacing.space3),
-
-                  // Student option
-                  _RoleOptionCard(
-                    icon: Icons.person,
-                    title: '학생',
-                    description: _getStudentDescription(authProvider),
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      _handleStudentLogin(context, authProvider);
-                    },
-                  ),
-
-                  const SizedBox(height: AppSpacing.space4),
-                ],
-              ),
-            ),
-          ),
-    );
-  }
-
-  String _getTeacherDescription(String authProvider) {
-    switch (authProvider) {
-      case 'google':
-        return '기존 선생님 (학생 있음)';
-      case 'kakao':
-        return '기존 선생님 (학생 없음)';
-      case 'apple':
-        return '신규 가입 → SMS 인증';
-      default:
-        return '학생 관리, 레슨 일정, 피드백 작성';
-    }
-  }
-
-  String _getStudentDescription(String authProvider) {
-    switch (authProvider) {
-      case 'google':
-        return '기존 학생 (레슨 있음)';
-      case 'kakao':
-        return '기존 학생 (레슨 없음)';
-      case 'apple':
-        return '신규 학생 → 초대코드 입력';
-      default:
-        return '레슨 일정, 연습 기록, 피드백 확인';
+  void _handleRoleLogin(BuildContext context, String role, String authProvider) {
+    if (role == 'teacher') {
+      _handleTeacherLogin(context, authProvider);
+    } else {
+      _handleStudentLogin(context, authProvider);
     }
   }
 
@@ -682,281 +403,5 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       default:
         context.go(AppRoutes.home);
     }
-  }
-}
-
-/// Section header for grouping dev accounts by role
-class _DevSectionHeader extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _DevSectionHeader({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space2),
-        Text(
-          label,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Dev account card for remote mode login
-class _DevAccountCard extends StatelessWidget {
-  final String emoji;
-  final String name;
-  final String description;
-  final Color color;
-  final bool isLoading;
-  final VoidCallback onTap;
-
-  const _DevAccountCard({
-    required this.emoji,
-    required this.name,
-    required this.description,
-    required this.color,
-    required this.isLoading,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: isLoading ? null : onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(color: color.withValues(alpha: 0.2)),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          color: color.withValues(alpha: 0.04),
-        ),
-        child: Row(
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: color),
-              )
-            else
-              Icon(Icons.chevron_right, color: color, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RoleOptionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  final VoidCallback onTap;
-
-  const _RoleOptionCard({
-    required this.icon,
-    required this.title,
-    required this.description,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Icon(icon, color: AppColors.primary),
-            ),
-            const SizedBox(width: AppSpacing.space4),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Social login button widget
-class _SocialLoginButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-  final Color? borderColor;
-  final VoidCallback onPressed;
-
-  const _SocialLoginButton({
-    required this.icon,
-    required this.label,
-    required this.backgroundColor,
-    required this.textColor,
-    this.borderColor,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: AppSpacing.buttonHeight,
-      child: OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          side: BorderSide(color: borderColor ?? backgroundColor, width: 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: textColor, size: 24),
-            const SizedBox(width: AppSpacing.space2),
-            Text(label, style: AppTypography.button.copyWith(color: textColor)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Parent login option button with description (for test scenarios)
-class _ParentLoginOption extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String description;
-  final Color backgroundColor;
-  final Color textColor;
-  final Color? borderColor;
-  final VoidCallback onPressed;
-
-  const _ParentLoginOption({
-    required this.icon,
-    required this.label,
-    required this.description,
-    required this.backgroundColor,
-    required this.textColor,
-    this.borderColor,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space4,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          border: Border.all(color: borderColor ?? backgroundColor, width: 1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: textColor, size: 24),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: AppTypography.button.copyWith(color: textColor),
-                  ),
-                  Text(
-                    description,
-                    style: AppTypography.caption.copyWith(
-                      color: textColor.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: textColor.withValues(alpha: 0.5)),
-          ],
-        ),
-      ),
-    );
   }
 }

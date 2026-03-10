@@ -6,13 +6,13 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/child_profile.dart';
-import '../../../../models/parent_notification_settings.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../providers/child_profile_provider.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
-import '../widgets/notification_settings_sheet.dart';
-import 'child_profile_form_screen.dart';
+import '../widgets/profile_header.dart';
+import '../widgets/profile_menu_section.dart';
+import '../widgets/profile_notification_section.dart';
+import '../widgets/profile_children_section.dart';
 
 /// Parent profile tab with settings and child management
 class ParentProfileTab extends ConsumerWidget {
@@ -36,33 +36,41 @@ class ParentProfileTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space4),
 
             // Profile header
-            _buildProfileHeader(context),
+            const ProfileHeader(),
 
             const SizedBox(height: AppSpacing.space6),
 
             // Connected children section
-            _buildChildrenSection(context, ref, childProfilesAsync, parentId),
+            ProfileChildrenSection(
+              childProfilesAsync: childProfilesAsync,
+              parentId: parentId,
+            ),
 
             const SizedBox(height: AppSpacing.space4),
 
             // Notification settings
-            _buildNotificationSection(
-                context, ref, notificationSettingsAsync, parentId),
+            ProfileNotificationSection(
+              settingsAsync: notificationSettingsAsync,
+              parentId: parentId,
+            ),
 
             const SizedBox(height: AppSpacing.space4),
 
             // General settings
-            _buildMenuSection(
-              context,
+            ProfileMenuSection(
               title: '설정',
               items: [
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.dark_mode_outlined,
                   label: '다크 모드',
-                  trailing: _buildSwitch(false),
+                  trailing: Switch(
+                    value: false,
+                    onChanged: (_) {},
+                    activeColor: AppColors.primary,
+                  ),
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.language,
                   label: '언어',
                   trailing: Text(
@@ -73,7 +81,7 @@ class ParentProfileTab extends ConsumerWidget {
                   ),
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.backup_outlined,
                   label: '녹음 백업',
                   onTap: () => context.push(AppRoutes.backupSettings),
@@ -84,21 +92,20 @@ class ParentProfileTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space4),
 
             // Support section
-            _buildMenuSection(
-              context,
+            ProfileMenuSection(
               title: '지원',
               items: [
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.help_outline,
                   label: '도움말',
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.feedback_outlined,
                   label: '피드백 보내기',
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.info_outline,
                   label: '앱 정보',
                   trailing: Text(
@@ -115,21 +122,20 @@ class ParentProfileTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space4),
 
             // Account section
-            _buildMenuSection(
-              context,
+            ProfileMenuSection(
               title: '계정',
               items: [
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.description_outlined,
                   label: '이용약관',
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.privacy_tip_outlined,
                   label: '개인정보처리방침',
                   onTap: () {},
                 ),
-                _MenuItem(
+                ProfileMenuItem(
                   icon: Icons.logout,
                   label: '로그아웃',
                   labelColor: AppColors.error,
@@ -140,714 +146,6 @@ class ParentProfileTab extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space8),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Row(
-        children: [
-          // Profile avatar
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: AppColors.secondary,
-                child: Text(
-                  '박',
-                  style: AppTypography.headingLarge.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    size: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(width: AppSpacing.space4),
-
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      '박부모',
-                      style: AppTypography.headingLarge,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.secondary.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '학부모',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.space1),
-                Text(
-                  'parent@example.com',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Edit button
-          IconButton(
-            onPressed: () {
-              // TODO: Navigate to edit profile
-            },
-            icon: const Icon(Icons.edit_outlined),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.surfaceSecondaryLight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuSection(
-    BuildContext context, {
-    required String title,
-    required List<_MenuItem> items,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isLast = index == items.length - 1;
-
-                return Column(
-                  children: [
-                    _buildMenuItem(item),
-                    if (!isLast)
-                      Divider(
-                        height: 1,
-                        indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                        color: AppColors.borderLight,
-                      ),
-                  ],
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuItem(_MenuItem item) {
-    return InkWell(
-      onTap: item.onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Row(
-          children: [
-            Icon(
-              item.icon,
-              size: 24,
-              color: item.labelColor ?? AppColors.textSecondaryLight,
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.label,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: item.labelColor ?? AppColors.textPrimaryLight,
-                    ),
-                  ),
-                  if (item.subtitle != null)
-                    Text(
-                      item.subtitle!,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            if (item.trailing != null) item.trailing!,
-            if (item.trailing == null)
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSwitch(bool value, {ValueChanged<bool>? onChanged}) {
-    return Switch(
-      value: value,
-      onChanged: onChanged ?? (_) {},
-      activeColor: AppColors.primary,
-    );
-  }
-
-  Widget _buildNotificationSection(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<ParentNotificationSettings?> settingsAsync,
-    String parentId,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '알림 설정',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextButton(
-                onPressed: () =>
-                    _showNotificationSettingsSheet(context, ref, parentId),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: const Text('상세 설정'),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: settingsAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(AppSpacing.space4),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text('오류: $error'),
-              ),
-              data: (settings) {
-                // Use default settings if none exist
-                final s = settings ??
-                    ParentNotificationSettings.defaultSettings(
-                      id: 'default',
-                      parentId: parentId,
-                    );
-
-                return Column(
-                  children: [
-                    _buildNotificationItem(
-                      icon: Icons.assignment_outlined,
-                      label: '과제 알림',
-                      subtitle: '새 과제 등록, 미완료 알림',
-                      value: s.newAssignment || s.assignmentIncomplete,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        assignmentEnabled: value,
-                      ),
-                    ),
-                    _buildDivider(),
-                    _buildNotificationItem(
-                      icon: Icons.schedule,
-                      label: '레슨 알림',
-                      subtitle: '일정 변경, 취소 알림',
-                      value: s.lessonChange || s.lessonCancel,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        lessonEnabled: value,
-                      ),
-                    ),
-                    _buildDivider(),
-                    _buildNotificationItem(
-                      icon: Icons.music_note,
-                      label: '연습 알림',
-                      subtitle: '연습 완료, 스트릭 달성',
-                      value: s.practiceComplete || s.streakAchievement,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        practiceEnabled: value,
-                      ),
-                    ),
-                    _buildDivider(),
-                    _buildNotificationItem(
-                      icon: Icons.payment,
-                      label: '결제 알림',
-                      subtitle: '결제 요청, 완료 확인 (필수)',
-                      value: true,
-                      isRequired: true,
-                      onChanged: null,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationItem({
-    required IconData icon,
-    required String label,
-    required String subtitle,
-    required bool value,
-    bool isRequired = false,
-    ValueChanged<bool>? onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.space4,
-        vertical: AppSpacing.space3,
-      ),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: AppColors.textSecondaryLight,
-          ),
-          const SizedBox(width: AppSpacing.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(label, style: AppTypography.bodyLarge),
-                    if (isRequired) ...[
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 1,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '필수',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _buildSwitch(
-            value,
-            onChanged: isRequired ? null : onChanged,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-      color: AppColors.borderLight,
-    );
-  }
-
-  void _toggleNotificationGroup(
-    WidgetRef ref,
-    ParentNotificationSettings settings,
-    String parentId, {
-    bool? assignmentEnabled,
-    bool? lessonEnabled,
-    bool? practiceEnabled,
-  }) {
-    ParentNotificationSettings updated = settings;
-
-    if (assignmentEnabled != null) {
-      updated = updated.copyWith(
-        newAssignment: assignmentEnabled,
-        assignmentIncomplete: assignmentEnabled,
-      );
-    }
-    if (lessonEnabled != null) {
-      updated = updated.copyWith(
-        lessonChange: lessonEnabled,
-        lessonCancel: lessonEnabled,
-      );
-    }
-    if (practiceEnabled != null) {
-      updated = updated.copyWith(
-        practiceComplete: practiceEnabled,
-        streakAchievement: practiceEnabled,
-      );
-    }
-
-    ref
-        .read(notificationSettingsNotifierProvider(parentId).notifier)
-        .saveSettings(updated);
-  }
-
-  void _showNotificationSettingsSheet(
-      BuildContext context, WidgetRef ref, String parentId) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) {
-          final settingsAsync =
-              ref.watch(notificationSettingsNotifierProvider(parentId));
-
-          return settingsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('오류: $e')),
-            data: (settings) {
-              final s = settings ??
-                  ParentNotificationSettings.defaultSettings(
-                    id: 'default',
-                    parentId: parentId,
-                  );
-
-              return NotificationSettingsSheet(
-                settings: s,
-                scrollController: scrollController,
-                onSettingsChanged: (newSettings) {
-                  ref
-                      .read(
-                          notificationSettingsNotifierProvider(parentId).notifier)
-                      .saveSettings(newSettings);
-                },
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildChildrenSection(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<ChildProfile>> childProfilesAsync,
-    String parentId,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '연결된 자녀',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () =>
-                    context.push('${AppRoutes.childProfiles}?parentId=$parentId'),
-                icon: const Icon(Icons.settings, size: 16),
-                label: const Text('관리'),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space2),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: childProfilesAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(AppSpacing.space4),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text('오류: $error'),
-              ),
-              data: (profiles) => Column(
-                children: [
-                  ...profiles
-                      .map((profile) => _buildChildItem(context, profile, parentId)),
-                  if (profiles.isNotEmpty)
-                    Divider(
-                      height: 1,
-                      indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                      color: AppColors.borderLight,
-                    ),
-                  _buildMenuItem(_MenuItem(
-                    icon: Icons.add_circle_outline,
-                    label: '자녀 추가하기',
-                    labelColor: AppColors.primary,
-                    onTap: () => _showAddChildDialog(context, parentId),
-                  )),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChildItem(
-      BuildContext context, ChildProfile profile, String parentId) {
-    return InkWell(
-      onTap: () {
-        // Navigate to child profile edit
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                _buildChildProfileFormScreen(profile, parentId),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: profile.profileColor,
-              child: Text(
-                profile.initial,
-                style: AppTypography.bodySmall.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(profile.name, style: AppTypography.bodyLarge),
-                      const SizedBox(width: 4),
-                      Text(
-                        '(만 ${profile.age}세)',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '${profile.instrumentLabel} • ${profile.teacherName ?? "선생님 미연결"}',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: profile.isActive
-                    ? AppColors.successLight
-                    : AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                profile.status.label,
-                style: AppTypography.caption.copyWith(
-                  color: profile.isActive
-                      ? AppColors.success
-                      : AppColors.textTertiaryLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Helper to build child profile form screen with existing profile
-  Widget _buildChildProfileFormScreen(ChildProfile profile, String parentId) {
-    return ChildProfileFormScreen(
-      parentId: parentId,
-      existingProfile: profile,
-    );
-  }
-
-  void _showAddChildDialog(BuildContext context, String parentId) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space6),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('자녀 추가 방법', style: AppTypography.headingSmall),
-              const SizedBox(height: AppSpacing.space2),
-              Text(
-                '자녀를 추가할 방법을 선택하세요',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space6),
-
-              // Option 1: Add child profile (under 14)
-              _AddChildOption(
-                icon: Icons.child_care,
-                iconColor: AppColors.primary,
-                title: '만 14세 미만 자녀 등록',
-                description: '별도 계정 없이 학부모 계정에서 관리',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push('${AppRoutes.addChildProfile}?parentId=$parentId');
-                },
-              ),
-
-              const SizedBox(height: AppSpacing.space3),
-
-              // Option 2: Connect existing student
-              _AddChildOption(
-                icon: Icons.link,
-                iconColor: AppColors.secondary,
-                title: '기존 학생 연결',
-                description: '초대 코드로 만 14세 이상 학생 계정 연결',
-                onTap: () {
-                  Navigator.pop(context);
-                  context.push(AppRoutes.parentInviteCode);
-                },
-              ),
-
-              const SizedBox(height: AppSpacing.space4),
-            ],
-          ),
         ),
       ),
     );
@@ -875,93 +173,6 @@ class ParentProfileTab extends ConsumerWidget {
             child: const Text('로그아웃'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _MenuItem {
-  final IconData icon;
-  final String label;
-  final String? subtitle;
-  final Color? labelColor;
-  final Widget? trailing;
-  final VoidCallback onTap;
-
-  _MenuItem({
-    required this.icon,
-    required this.label,
-    // ignore: unused_element_parameter
-    this.subtitle,
-    this.labelColor,
-    this.trailing,
-    required this.onTap,
-  });
-}
-
-class _AddChildOption extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String description;
-  final VoidCallback onTap;
-
-  const _AddChildOption({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.description,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: iconColor, size: 24),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    description,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,21 +7,14 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
-import '../../../../models/recording.dart';
-import '../../../../models/smart_recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
-import '../../../../providers/recording/recording_provider.dart';
-import '../../../../providers/smart_recording/smart_recording_provider.dart';
-import '../../../../services/audio_trimmer_service.dart';
 import '../../domain/entities/recording_filter_type.dart';
 import '../widgets/metronome/metronome.dart';
-import '../widgets/section_detail/recording_filter_dropdown.dart';
 import '../widgets/notes/note_preview_card.dart';
 import '../widgets/practice_tools_modal.dart';
-import '../widgets/recording_player_sheet.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
-import '../widgets/smart_recording/smart_recording_indicator.dart';
+import 'section_detail_recording_mixin.dart';
 
 /// Section detail screen showing section info and recordings
 class SectionDetailScreen extends ConsumerStatefulWidget {
@@ -42,15 +32,22 @@ class SectionDetailScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<SectionDetailScreen> createState() => _SectionDetailScreenState();
+  ConsumerState<SectionDetailScreen> createState() =>
+      _SectionDetailScreenState();
 }
 
-class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
-  bool _isRecording = false;
-  bool _isPaused = false;
-  int _recordingSeconds = 0;
-  bool _usedMetronome = false; // Track if metronome was used during recording
-  RecordingFilterType _recordingFilter = RecordingFilterType.all; // Default to all
+class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
+    with SectionDetailRecordingMixin {
+  RecordingFilterType _recordingFilter = RecordingFilterType.all;
+
+  @override
+  String get sectionId => widget.sectionId;
+
+  @override
+  String get repertoireId => widget.repertoireId;
+
+  @override
+  String get studentId => widget.studentId;
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +55,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
     // Listen for metronome state changes during recording
     ref.listen<MetronomeState>(metronomeProvider, (previous, next) {
-      if (_isRecording && next.isPlaying && !_usedMetronome) {
+      if (isRecording && next.isPlaying && !usedMetronome) {
         setState(() {
-          _usedMetronome = true;
+          usedMetronome = true;
         });
       }
     });
@@ -129,7 +126,8 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
               Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
               const SizedBox(height: AppSpacing.space2),
               TextButton(
-                onPressed: () => ref.invalidate(sectionProvider(widget.sectionId)),
+                onPressed: () =>
+                    ref.invalidate(sectionProvider(widget.sectionId)),
                 child: const Text('다시 시도'),
               ),
             ],
@@ -150,7 +148,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     // Apply recording filter based on selected filter type and date
-    final filteredRecordings = _filterRecordings(
+    final filteredRecordings = filterRecordings(
       recordings: sortedRecordings,
       filter: _recordingFilter,
       selectedDate: widget.selectedDate,
@@ -179,7 +177,8 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           const SizedBox(height: AppSpacing.space2),
           PracticeStatsEditor(
             section: section,
-            onUpdate: (count, seconds) => _updatePracticeStats(section, count, seconds),
+            onUpdate: (count, seconds) =>
+                _updatePracticeStats(section, count, seconds),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -201,109 +200,33 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
 
           // Recording button
           RecordingControl(
-            isRecording: _isRecording,
-            isPaused: _isPaused,
-            recordingSeconds: _recordingSeconds,
-            onStartRecording: _startRecording,
-            onPauseRecording: _pauseRecording,
-            onResumeRecording: _resumeRecording,
-            onStopRecording: () => _stopRecording(section),
-            onResetRecording: _resetRecording,
+            isRecording: isRecording,
+            isPaused: isPaused,
+            recordingSeconds: recordingSeconds,
+            onStartRecording: startRecording,
+            onPauseRecording: pauseRecording,
+            onResumeRecording: resumeRecording,
+            onStopRecording: () => stopRecording(section),
+            onResetRecording: resetRecording,
           ),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Recordings list
-          if (section.recordings.isNotEmpty) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '녹음 기록 (${filteredRecordings.length})',
-                  style: AppTypography.headingSmall,
-                ),
-                // Recording filter dropdown (replaces "대표 녹음 있음" badge)
-                RecordingFilterDropdown(
-                  selectedFilter: _recordingFilter,
-                  onFilterChanged: (filter) {
-                    setState(() {
-                      _recordingFilter = filter;
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space3),
-
-            // Recordings list or empty filter message
-            if (filteredRecordings.isNotEmpty)
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: filteredRecordings.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: AppSpacing.space2),
-                itemBuilder: (context, index) {
-                  final recording = filteredRecordings[index];
-                  return SectionRecordingListItem(
-                    recording: recording,
-                    sectionId: section.id,
-                    repertoireId: widget.repertoireId,
-                    onSetRepresentative: () => _setRepresentative(recording.id),
-                    onDelete: () => _deleteRecording(recording.id),
-                    onPlay: () => _playRecording(recording),
-                  );
-                },
-              )
-            else
-              // Empty filtered result (but recordings exist)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                child: Text(
-                  '${_recordingFilter.displayLabel} 녹음이 없습니다',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-          ] else
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSpacing.space6),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.mic_none,
-                    size: 48,
-                    color: AppColors.textTertiaryLight,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Text(
-                    '아직 녹음이 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space1),
-                  Text(
-                    '위의 녹음 버튼을 눌러 연습을 기록해보세요',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textTertiaryLight,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          SectionRecordingsSection(
+            section: section,
+            repertoireId: widget.repertoireId,
+            recordingFilter: _recordingFilter,
+            filteredRecordings: filteredRecordings,
+            onFilterChanged: (filter) {
+              setState(() {
+                _recordingFilter = filter;
+              });
+            },
+            onSetRepresentative: setRepresentative,
+            onDelete: deleteRecording,
+            onPlay: playRecording,
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -315,459 +238,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  /// Filter recordings based on filter type and selected date
-  List<PracticeRecording> _filterRecordings({
-    required List<PracticeRecording> recordings,
-    required RecordingFilterType filter,
-    required DateTime? selectedDate,
-  }) {
-    final referenceDate = selectedDate ?? DateTime.now();
-
-    switch (filter) {
-      case RecordingFilterType.all:
-        // Show all recordings up to selected date (if set)
-        if (selectedDate != null) {
-          final selectedDateOnly = DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-          );
-          return recordings.where((r) {
-            final localCreatedAt = r.createdAt.toLocal();
-            final recordingDate = DateTime(
-              localCreatedAt.year,
-              localCreatedAt.month,
-              localCreatedAt.day,
-            );
-            return !recordingDate.isAfter(selectedDateOnly);
-          }).toList();
-        }
-        return recordings;
-
-      case RecordingFilterType.weekly:
-        // Show recordings from the week containing the reference date (Mon-Sun)
-        // Use local time for comparison
-        final weekday = referenceDate.weekday; // 1=Mon, 7=Sun
-        final monday = referenceDate.subtract(Duration(days: weekday - 1));
-        final sunday = monday.add(const Duration(days: 6));
-        final weekStart = DateTime(monday.year, monday.month, monday.day);
-        final weekEnd = DateTime(sunday.year, sunday.month, sunday.day);
-
-        return recordings.where((r) {
-          final localCreatedAt = r.createdAt.toLocal();
-          final recordingDate = DateTime(
-            localCreatedAt.year,
-            localCreatedAt.month,
-            localCreatedAt.day,
-          );
-          return !recordingDate.isBefore(weekStart) && !recordingDate.isAfter(weekEnd);
-        }).toList();
-
-      case RecordingFilterType.daily:
-        // Show recordings from the reference date only
-        // Use local time for comparison to handle timezone issues
-        final referenceDateOnly = DateTime(
-          referenceDate.year,
-          referenceDate.month,
-          referenceDate.day,
-        );
-        return recordings.where((r) {
-          final localCreatedAt = r.createdAt.toLocal();
-          final recordingDateOnly = DateTime(
-            localCreatedAt.year,
-            localCreatedAt.month,
-            localCreatedAt.day,
-          );
-          return recordingDateOnly == referenceDateOnly;
-        }).toList();
-    }
-  }
-
-  Future<void> _startRecording() async {
-    final recorder = ref.read(audioRecorderServiceProvider);
-
-    // Check permission first
-    if (!await recorder.hasPermission()) {
-      final granted = await recorder.requestPermission();
-      if (!granted) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('마이크 권한이 필요합니다'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-        return;
-      }
-    }
-
-    // Start actual recording FIRST (this resets amplitude stream cache)
-    final path = await recorder.startRecording(repertoireId: widget.repertoireId);
-    if (path != null) {
-      // Start smart recording monitoring AFTER recording started
-      // (must be after startRecording to get fresh amplitude stream)
-      ref.read(smartRecordingNotifierProvider.notifier).startMonitoring();
-
-      // Track if metronome was playing when recording started
-      final metronomeState = ref.read(metronomeProvider);
-
-      setState(() {
-        _isRecording = true;
-        _isPaused = false;
-        _recordingSeconds = 0;
-        _usedMetronome = metronomeState.isPlaying;
-      });
-      _startTimer();
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('녹음을 시작할 수 없습니다'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _pauseRecording() async {
-    final recorder = ref.read(audioRecorderServiceProvider);
-    await recorder.pauseRecording();
-    setState(() {
-      _isPaused = true;
-    });
-  }
-
-  /// Reset recording - cancel current and restart from now
-  Future<void> _resetRecording() async {
-    final recorder = ref.read(audioRecorderServiceProvider);
-
-    // Cancel current recording
-    await recorder.cancelRecording();
-
-    // Reset smart recording state
-    ref.read(smartRecordingNotifierProvider.notifier).reset();
-
-    // Reset UI state
-    setState(() {
-      _isRecording = false;
-      _isPaused = false;
-      _recordingSeconds = 0;
-      _usedMetronome = false;
-    });
-
-    // Wait a moment then start new recording
-    await Future.delayed(const Duration(milliseconds: 100));
-    await _startRecording();
-  }
-
-  Future<void> _resumeRecording() async {
-    final recorder = ref.read(audioRecorderServiceProvider);
-    await recorder.resumeRecording();
-    setState(() {
-      _isPaused = false;
-    });
-    _startTimer();
-  }
-
-  void _startTimer() {
-    Future.doWhile(() async {
-      if (!_isRecording || _isPaused) return false;
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted && _isRecording && !_isPaused) {
-        setState(() {
-          _recordingSeconds++;
-        });
-        return true;
-      }
-      return false;
-    });
-  }
-
-  /// Get actual audio file duration using just_audio
-  /// Returns null if file cannot be read
-  Future<Duration?> _getActualFileDuration(String filePath) async {
-    try {
-      final player = AudioPlayer();
-      await player.setFilePath(filePath);
-      final duration = player.duration;
-      await player.dispose();
-      return duration;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<void> _stopRecording(PracticeSection section) async {
-    final recorder = ref.read(audioRecorderServiceProvider);
-
-    // Stop smart recording monitoring and get trim info
-    final smartRecordingState = ref.read(smartRecordingNotifierProvider.notifier).stopMonitoring();
-
-    if (_recordingSeconds < 3) {
-      // Cancel recording if too short
-      await recorder.cancelRecording();
-      ref.read(smartRecordingNotifierProvider.notifier).reset();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('녹음 시간이 너무 짧습니다 (최소 3초)'),
-          backgroundColor: AppColors.warning,
-        ),
-      );
-      setState(() {
-        _isRecording = false;
-        _isPaused = false;
-        _recordingSeconds = 0;
-        _usedMetronome = false;
-      });
-      return;
-    }
-
-    // Stop actual recording and get file path
-    final filePath = await recorder.stopRecording();
-
-    setState(() {
-      _isRecording = false;
-      _isPaused = false;
-    });
-
-    if (filePath == null) {
-      ref.read(smartRecordingNotifierProvider.notifier).reset();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('녹음 저장에 실패했습니다'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-      setState(() {
-        _recordingSeconds = 0;
-        _usedMetronome = false;
-      });
-      return;
-    }
-
-    // Capture metronome BPM only if metronome was used during recording
-    final metronomeBpm = _usedMetronome
-        ? ref.read(metronomeProvider).settings.bpm
-        : null;
-
-    // Get actual file duration (Android UI timer can be inaccurate)
-    final audioDuration = await _getActualFileDuration(filePath);
-    final totalDuration = audioDuration ?? Duration(seconds: _recordingSeconds);
-
-    // Apply smart recording trimming if enabled (including middle silence)
-    TrimResult? trimResult;
-    final needsTrimming = smartRecordingState.isEnabled &&
-        (smartRecordingState.hasTrimming || smartRecordingState.hasMiddleSilence);
-    if (needsTrimming) {
-      trimResult = await AudioTrimmerService.instance.trimAudio(
-        inputPath: filePath,
-        trimStart: smartRecordingState.trimmedStart,
-        trimEnd: smartRecordingState.trimmedEnd,
-        totalDuration: totalDuration,
-        silencePeriods: smartRecordingState.silencePeriods,
-      );
-    }
-
-    // Calculate actual duration after trimming using milliseconds for accuracy
-    int actualDurationMs = totalDuration.inMilliseconds;
-    if (trimResult?.hasTrimming == true) {
-      actualDurationMs -= trimResult!.trimmedStart.inMilliseconds;
-      actualDurationMs -= trimResult.trimmedEnd.inMilliseconds;
-    }
-    // Also subtract middle silence periods
-    if (smartRecordingState.silencePeriods.isNotEmpty) {
-      final middleSilenceMs = smartRecordingState.silencePeriods
-          .fold<int>(0, (sum, period) => sum + period.duration.inMilliseconds);
-      actualDurationMs -= middleSilenceMs;
-    }
-    // Convert to seconds with rounding, ensure at least 1 second
-    int actualDuration = (actualDurationMs / 1000).round();
-    if (actualDuration < 1) actualDuration = 1;
-
-    try {
-      await ref.read(recordingCrudProvider.notifier).createRecording(
-            sectionId: widget.sectionId,
-            filePath: filePath, // Use actual file path from recorder
-            durationSeconds: actualDuration,
-            bpm: metronomeBpm, // Save metronome BPM
-            isRepresentative: section.recordings.isEmpty, // First recording is representative
-          );
-
-      // Also increment practice count
-      await ref.read(sectionCrudProvider.notifier).incrementPractice(
-            widget.sectionId,
-            widget.repertoireId,
-            actualDuration,
-          );
-
-      ref.invalidate(sectionProvider(widget.sectionId));
-      ref.invalidate(studentRepertoiresProvider(widget.studentId));
-
-      // Show smart recording result dialog if trimming or middle silence was applied
-      final hasTrimOrSilence = trimResult?.hasTrimming == true ||
-          smartRecordingState.silencePeriods.isNotEmpty;
-      if (mounted && hasTrimOrSilence) {
-        // Calculate middle silence total duration
-        final middleSilenceDuration = smartRecordingState.silencePeriods.fold(
-          Duration.zero,
-          (sum, period) => sum + period.duration,
-        );
-        await showSmartRecordingResult(
-          context,
-          trimmedStart: trimResult?.trimmedStart ?? Duration.zero,
-          trimmedEnd: trimResult?.trimmedEnd ?? Duration.zero,
-          totalDuration: totalDuration,
-          middleSilenceCount: smartRecordingState.silencePeriods.length,
-          middleSilenceDuration: middleSilenceDuration,
-          onRestore: trimResult?.originalFilePath != null
-              ? () async {
-                  await AudioTrimmerService.instance.restoreOriginal(
-                    originalPath: trimResult!.originalFilePath!,
-                    trimmedPath: filePath,
-                  );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('원본 파일이 복구되었습니다'),
-                        backgroundColor: AppColors.success,
-                      ),
-                    );
-                  }
-                }
-              : null,
-        );
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('녹음이 저장되었습니다'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('녹음 저장 실패: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
-
-    ref.read(smartRecordingNotifierProvider.notifier).reset();
-    setState(() {
-      _recordingSeconds = 0;
-      _usedMetronome = false;
-    });
-  }
-
-  Future<void> _setRepresentative(String recordingId) async {
-    try {
-      await ref.read(recordingCrudProvider.notifier).setRepresentative(
-            widget.sectionId,
-            recordingId,
-            widget.repertoireId,
-          );
-      ref.invalidate(sectionProvider(widget.sectionId));
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('대표 녹음으로 설정되었습니다'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('설정 실패: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _deleteRecording(String recordingId) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('녹음 삭제'),
-        content: const Text('이 녹음을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    try {
-      await ref.read(recordingCrudProvider.notifier).deleteRecording(
-            recordingId,
-            widget.sectionId,
-          );
-      ref.invalidate(sectionProvider(widget.sectionId));
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('녹음이 삭제되었습니다'),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('삭제 실패: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    }
-  }
-
-  void _playRecording(PracticeRecording practiceRecording) {
-    // Convert PracticeRecording to Recording model for the player sheet
-    final recording = Recording(
-      id: practiceRecording.id,
-      repertoireId: widget.repertoireId,
-      studentId: widget.studentId,
-      type: RecordingType.student,
-      localPath: practiceRecording.filePath,
-      durationSeconds: practiceRecording.durationSeconds,
-      recordedAt: practiceRecording.createdAt,
-      isRepresentative: practiceRecording.isRepresentative,
-    );
-
-    // Show the recording player bottom sheet
-    RecordingPlayerSheet.show(
-      context,
-      recording: recording,
-      repertoireId: widget.repertoireId,
-      studentId: widget.studentId,
     );
   }
 

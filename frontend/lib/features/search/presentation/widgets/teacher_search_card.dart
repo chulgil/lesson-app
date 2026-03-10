@@ -1,0 +1,270 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../models/teacher_profile.dart';
+import '../../../../models/teacher_search.dart';
+
+/// Card widget displaying a teacher's profile in search results
+class TeacherSearchCard extends StatelessWidget {
+  const TeacherSearchCard({
+    super.key,
+    required this.teacher,
+    this.isPreviousTeacher = false,
+  });
+
+  final TeacherProfile teacher;
+  final bool isPreviousTeacher;
+
+  @override
+  Widget build(BuildContext context) {
+    final publicProfile = TeacherPublicProfile.fromProfile(teacher);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space3),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        // Highlight previous teacher with a subtle border
+        side: isPreviousTeacher
+            ? BorderSide(color: AppColors.info.withValues(alpha: 0.5), width: 1.5)
+            : BorderSide.none,
+      ),
+      child: InkWell(
+        onTap: () => context.push('/teachers/${teacher.id}'),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Profile image
+              CircleAvatar(
+                radius: 35,
+                backgroundColor: AppColors.surfaceSecondaryLight,
+                backgroundImage: publicProfile.profileImage != null
+                    ? NetworkImage(publicProfile.profileImage!)
+                    : null,
+                child: publicProfile.profileImage == null
+                    ? Icon(Icons.person,
+                        size: 35, color: AppColors.textSecondaryLight)
+                    : null,
+              ),
+              const SizedBox(width: AppSpacing.space3),
+
+              // Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Previous teacher badge
+                    if (isPreviousTeacher) ...[
+                      _buildPreviousTeacherBadge(),
+                      const SizedBox(height: 4),
+                    ],
+
+                    // Academy badge (if applicable)
+                    if (publicProfile.isAcademy &&
+                        publicProfile.organizationName != null) ...[
+                      _buildAcademyBadge(publicProfile.organizationName!),
+                      const SizedBox(height: 4),
+                    ],
+
+                    // Name and badges
+                    _buildNameRow(publicProfile),
+
+                    const SizedBox(height: 4),
+
+                    // Instruments
+                    Text(
+                      publicProfile.instruments.join(' · '),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.primary,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // Experience and fee
+                    _buildExperienceAndFee(publicProfile),
+
+                    const SizedBox(height: 8),
+
+                    // Introduction
+                    Text(
+                      publicProfile.introduction,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.bodySmall,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // Lesson areas
+                    if (publicProfile.lessonAreas != null &&
+                        publicProfile.lessonAreas!.isNotEmpty)
+                      _buildLessonAreas(publicProfile.lessonAreas!),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreviousTeacherBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.history,
+            size: 12,
+            color: AppColors.info,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            '이전에 레슨했어요',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.info,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAcademyBadge(String organizationName) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.school,
+            size: 12,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            organizationName,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameRow(TeacherPublicProfile publicProfile) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            publicProfile.name ?? '선생님',
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ...publicProfile.badges.take(2).map((badge) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Icon(
+              _getBadgeIcon(badge),
+              size: 18,
+              color: AppColors.primary,
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildExperienceAndFee(TeacherPublicProfile publicProfile) {
+    return Row(
+      children: [
+        if (publicProfile.experienceYears != null) ...[
+          Icon(Icons.work_outline,
+              size: 14, color: AppColors.textSecondaryLight),
+          const SizedBox(width: 4),
+          Text(
+            '${publicProfile.experienceYears}년',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        if (publicProfile.feeRange != null) ...[
+          Icon(Icons.payments_outlined,
+              size: 14, color: AppColors.textSecondaryLight),
+          const SizedBox(width: 4),
+          Text(
+            publicProfile.feeRange!.formatted,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildLessonAreas(List<String> lessonAreas) {
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: lessonAreas.take(3).map((area) {
+        return Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 2,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            area,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  IconData _getBadgeIcon(VerificationBadge badge) {
+    switch (badge) {
+      case VerificationBadge.phoneVerified:
+        return Icons.phone_android;
+      case VerificationBadge.certified:
+        return Icons.verified;
+      case VerificationBadge.premium:
+        return Icons.star;
+    }
+  }
+}

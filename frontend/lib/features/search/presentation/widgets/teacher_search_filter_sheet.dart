@@ -1,0 +1,300 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../models/teacher_search.dart';
+import '../../../../providers/search/teacher_search_provider.dart';
+import '../../../profile/domain/entities/teacher_profile.dart';
+
+/// Filter bottom sheet for teacher search
+class TeacherSearchFilterSheet extends ConsumerStatefulWidget {
+  const TeacherSearchFilterSheet({super.key});
+
+  @override
+  ConsumerState<TeacherSearchFilterSheet> createState() =>
+      _TeacherSearchFilterSheetState();
+}
+
+class _TeacherSearchFilterSheetState
+    extends ConsumerState<TeacherSearchFilterSheet> {
+  late TeacherSearchFilter _filter;
+
+  @override
+  void initState() {
+    super.initState();
+    _filter = ref.read(teacherSearchFilterStateProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final instrumentsAsync = ref.watch(availableInstrumentsProvider);
+    final areasAsync = ref.watch(availableAreasProvider);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      maxChildSize: 0.95,
+      minChildSize: 0.5,
+      builder: (context, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('필터', style: AppTypography.headingSmall),
+                  TextButton(
+                    onPressed: () {
+                      setState(() => _filter = TeacherSearchFilter.empty);
+                    },
+                    child: const Text('초기화'),
+                  ),
+                ],
+              ),
+            ),
+
+            const Divider(),
+
+            // Filter options
+            Expanded(
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Instruments
+                  _buildSectionTitle('악기'),
+                  const SizedBox(height: 8),
+                  instrumentsAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+                    error: (e, _) => Text('오류: $e'),
+                    data: (instruments) => _buildChipSelection(
+                      instruments,
+                      _filter.instruments ?? [],
+                      (selected) {
+                        setState(() {
+                          _filter = _filter.copyWith(
+                            instruments: selected.isEmpty ? null : selected,
+                          );
+                        });
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Areas
+                  _buildSectionTitle('지역'),
+                  const SizedBox(height: 8),
+                  areasAsync.when(
+                    loading: () => const CircularProgressIndicator(),
+                    error: (e, _) => Text('오류: $e'),
+                    data: (areas) => _buildChipSelection(
+                      areas,
+                      _filter.areas ?? [],
+                      (selected) {
+                        setState(() {
+                          _filter = _filter.copyWith(
+                            areas: selected.isEmpty ? null : selected,
+                          );
+                        });
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Lesson types
+                  _buildSectionTitle('레슨 방식'),
+                  const SizedBox(height: 8),
+                  _buildLessonTypeOptionSelection(),
+
+                  const SizedBox(height: 24),
+
+                  // Experience
+                  _buildSectionTitle('최소 경력'),
+                  const SizedBox(height: 8),
+                  _buildExperienceSelection(),
+
+                  const SizedBox(height: 24),
+
+                  // Certificate
+                  SwitchListTile(
+                    title: const Text('자격증 인증 선생님만'),
+                    subtitle: const Text('검증된 자격증을 보유한 선생님'),
+                    value: _filter.hasVerifiedCertificate ?? false,
+                    onChanged: (value) {
+                      setState(() {
+                        _filter = _filter.copyWith(
+                          hasVerifiedCertificate: value ? true : null,
+                        );
+                      });
+                    },
+                    activeColor: AppColors.primary,
+                  ),
+                ],
+              ),
+            ),
+
+            // Apply button
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: SizedBox(
+                  width: double.infinity,
+                  height: AppSpacing.buttonHeight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Apply filters
+                      final notifier =
+                          ref.read(teacherSearchFilterStateProvider.notifier);
+                      notifier.updateInstruments(_filter.instruments);
+                      notifier.updateAreas(_filter.areas);
+                      notifier.updateLessonTypes(_filter.lessonTypes);
+                      notifier.updateMinExperience(_filter.minExperience);
+                      notifier
+                          .updateHasVerifiedCertificate(_filter.hasVerifiedCertificate);
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusLarge),
+                      ),
+                    ),
+                    child: const Text('필터 적용'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildChipSelection(
+    List<String> options,
+    List<String> selected,
+    ValueChanged<List<String>> onChanged,
+  ) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: options.map((option) {
+        final isSelected = selected.contains(option);
+        return FilterChip(
+          label: Text(option),
+          selected: isSelected,
+          onSelected: (value) {
+            final newList = List<String>.from(selected);
+            if (value) {
+              newList.add(option);
+            } else {
+              newList.remove(option);
+            }
+            onChanged(newList);
+          },
+          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+          checkmarkColor: AppColors.primary,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildLessonTypeOptionSelection() {
+    final selected = _filter.lessonTypes ?? [];
+    final types = [
+      (LessonTypeOption.inPerson, '대면 레슨'),
+      (LessonTypeOption.online, '온라인 레슨'),
+      (LessonTypeOption.visit, '방문 레슨'),
+    ];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: types.map((tuple) {
+        final (type, label) = tuple;
+        final isSelected = selected.contains(type);
+        return FilterChip(
+          label: Text(label),
+          selected: isSelected,
+          onSelected: (value) {
+            final newList = List<LessonTypeOption>.from(selected);
+            if (value) {
+              newList.add(type);
+            } else {
+              newList.remove(type);
+            }
+            setState(() {
+              _filter = _filter.copyWith(
+                lessonTypes: newList.isEmpty ? null : newList,
+              );
+            });
+          },
+          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+          checkmarkColor: AppColors.primary,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildExperienceSelection() {
+    final options = [null, 3, 5, 10];
+    final labels = ['상관없음', '3년 이상', '5년 이상', '10년 이상'];
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: List.generate(options.length, (index) {
+        final isSelected = _filter.minExperience == options[index];
+        return ChoiceChip(
+          label: Text(labels[index]),
+          selected: isSelected,
+          onSelected: (value) {
+            setState(() {
+              _filter = _filter.copyWith(minExperience: options[index]);
+            });
+          },
+          selectedColor: AppColors.primary.withValues(alpha: 0.2),
+        );
+      }),
+    );
+  }
+}
