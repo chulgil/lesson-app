@@ -1,5 +1,6 @@
 # Practice System Master Spec
 
+> 구현 상태: ⚠️ 부분 구현 (56%) — 뱃지, 보고서, 백업, A/B 비교 미구현
 > Last updated: 2026-03-07
 > Status: Single Source of Truth for practice domain
 > 원본 문서 18개 통합

@@ -1,5 +1,6 @@
 # Subscription & Payment Master Spec
 
+> 구현 상태: ✅ 구현 완료 (Phase 1)
 > Last updated: 2026-03-07
 > 상태: 통합 스펙 (기존 9개 문서 통합)
 > 관련 엔티티: [subscription.md](../../schema/entities/subscription.md), [payment.md](../../schema/entities/payment.md)

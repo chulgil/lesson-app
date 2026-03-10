@@ -1,5 +1,6 @@
 # Onboarding System Master Spec
 
+> 구현 상태: ✅ 구현 완료 (Mock 모드)
 > Last updated: 2026-03-07
 
 ## 1. 개요

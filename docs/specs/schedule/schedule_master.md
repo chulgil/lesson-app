@@ -1,5 +1,6 @@
 # Schedule System Master Spec
 
+> 구현 상태: ✅ 구현 완료
 > 최종 업데이트: 2026-03-07
 > 통합 문서: `teacher_availability_spec.md`, `schedule_confirmation_card_spec.md`
 > 관련 문서: [lesson_master.md](../lesson/lesson_master.md), [subscription_system_spec.md](../subscription/subscription_system_spec.md), [subscription_proposal_spec.md](../subscription/subscription_proposal_spec.md), [group_lesson_spec.md](../lesson/group_lesson_spec.md), [ux_guidelines.md](../design/ux_guidelines.md)

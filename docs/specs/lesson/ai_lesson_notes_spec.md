@@ -1,5 +1,6 @@
 # AI 레슨 노트 스펙
 
+> 구현 상태: ❌ 미구현 — 데이터 모델만 존재
 > 작성일: 2026-03-08
 > 상태: Draft (사용자 승인 대기)
 > 관련: [lesson_note_spec.md](lesson_note_spec.md), [teaching_resources_spec.md](teaching_resources_spec.md)

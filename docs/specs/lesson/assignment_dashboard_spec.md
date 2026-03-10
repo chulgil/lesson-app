@@ -1,5 +1,6 @@
 # 과제 현황 대시보드 스펙
 
+> 구현 상태: ❌ 미구현
 > 작성일: 2026-03-07
 > 상태: 스펙 작성 완료
 > 이슈: [#67](https://github.com/chulgil/lesson-app/issues/67)

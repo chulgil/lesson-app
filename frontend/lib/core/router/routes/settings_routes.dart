@@ -2,6 +2,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/follow/presentation/screens/follow_list_screen.dart';
 import '../../../features/settings/presentation/screens/all_recordings_screen.dart';
 import '../../../features/settings/presentation/screens/backup_settings_screen.dart';
 import '../../../features/student_home/presentation/screens/app_info_screen.dart';
@@ -73,5 +74,11 @@ List<GoRoute> settingsRoutes = [
       title: '개인정보처리방침',
       content: privacyPolicyContent,
     ),
+  ),
+  // Follow List
+  GoRoute(
+    path: AppRoutes.followList,
+    name: 'followList',
+    builder: (context, state) => const FollowListScreen(),
   ),
 ];

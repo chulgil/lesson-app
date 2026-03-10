@@ -7,14 +7,20 @@ import '../../domain/entities/lesson.dart';
 
 /// Reason for lesson not being conducted
 enum LessonNonCompletionReason {
+  noShow, // 무단 결석 (횟수 차감)
   studentAbsent, // 학생 사정으로 불참 (횟수 차감)
-  teacherCancelled, // 선생님 사정으로 취소 (횟수 유지, 날짜 변경)
-  mutualCancelled; // 상호 합의로 취소 (횟수 유지, 날짜 변경)
+  cancelledByStudentLate, // 당일 취소 (횟수 차감)
+  teacherCancelled, // 선생님 사정으로 취소 (횟수 유지)
+  mutualCancelled; // 상호 합의로 취소 (횟수 유지)
 
   String get label {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
+        return '무단 결석';
       case LessonNonCompletionReason.studentAbsent:
         return '학생 사정으로 불참';
+      case LessonNonCompletionReason.cancelledByStudentLate:
+        return '당일 취소 (24시간 이내)';
       case LessonNonCompletionReason.teacherCancelled:
         return '선생님 사정으로 취소';
       case LessonNonCompletionReason.mutualCancelled:
@@ -24,7 +30,11 @@ enum LessonNonCompletionReason {
 
   String get description {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
+        return '횟수 1회 차감';
       case LessonNonCompletionReason.studentAbsent:
+        return '횟수 1회 차감';
+      case LessonNonCompletionReason.cancelledByStudentLate:
         return '횟수 1회 차감';
       case LessonNonCompletionReason.teacherCancelled:
         return '다른 날짜로 변경 (횟수 유지)';
@@ -35,8 +45,12 @@ enum LessonNonCompletionReason {
 
   IconData get icon {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
+        return Icons.do_not_disturb;
       case LessonNonCompletionReason.studentAbsent:
         return Icons.warning_amber;
+      case LessonNonCompletionReason.cancelledByStudentLate:
+        return Icons.schedule;
       case LessonNonCompletionReason.teacherCancelled:
         return Icons.calendar_today;
       case LessonNonCompletionReason.mutualCancelled:
@@ -46,7 +60,11 @@ enum LessonNonCompletionReason {
 
   Color get color {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
+        return AppColors.error;
       case LessonNonCompletionReason.studentAbsent:
+        return AppColors.warning;
+      case LessonNonCompletionReason.cancelledByStudentLate:
         return AppColors.warning;
       case LessonNonCompletionReason.teacherCancelled:
         return AppColors.info;
@@ -58,8 +76,12 @@ enum LessonNonCompletionReason {
   /// Maps to LessonStatus
   LessonStatus get lessonStatus {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
+        return LessonStatus.noShow;
       case LessonNonCompletionReason.studentAbsent:
         return LessonStatus.studentAbsent;
+      case LessonNonCompletionReason.cancelledByStudentLate:
+        return LessonStatus.cancelledByStudentLate;
       case LessonNonCompletionReason.teacherCancelled:
         return LessonStatus.cancelledByTeacher;
       case LessonNonCompletionReason.mutualCancelled:
@@ -70,7 +92,9 @@ enum LessonNonCompletionReason {
   /// Whether this results in subscription deduction
   bool get isDeducted {
     switch (this) {
+      case LessonNonCompletionReason.noShow:
       case LessonNonCompletionReason.studentAbsent:
+      case LessonNonCompletionReason.cancelledByStudentLate:
         return true;
       case LessonNonCompletionReason.teacherCancelled:
       case LessonNonCompletionReason.mutualCancelled:

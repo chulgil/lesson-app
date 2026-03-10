@@ -1,5 +1,6 @@
 # User System Master Spec
 
+> 구현 상태: ⚠️ 부분 구현 — 멀티 소속 전환, 학부모 서브롤 미구현
 > Last updated: 2026-03-07
 > 통합 대상: parent_system, parent_dashboard_spec, parent_login_flow, teacher_registration, student_class_system, invite_system_v2, subscription_based_relationship, review_system, trial_lesson_system, google_sso_setup_guide
 

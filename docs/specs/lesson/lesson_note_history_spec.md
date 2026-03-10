@@ -1,5 +1,6 @@
 # 레슨 노트 히스토리 스펙
 
+> 구현 상태: ✅ 구현 완료
 > 작성일: 2026-03-07
 > 상태: 스펙 작성 완료
 > 이슈: [#68](https://github.com/chulgil/lesson-app/issues/68)

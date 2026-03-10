@@ -1,5 +1,6 @@
 # 팔로우 시스템 Master Spec
 
+> 구현 상태: ⚠️ 부분 구현 — Provider만 존재, 화면 전무
 > Last updated: 2026-03-07
 
 ## 1. 개요

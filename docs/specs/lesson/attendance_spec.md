@@ -1,5 +1,6 @@
 # 출석 관리 스펙
 
+> 구현 상태: ⚠️ 부분 구현 — LessonStatus enum만 구현, UI 전무
 > 작성일: 2026-03-07
 > 상태: 스펙 작성 완료, 구현 대기
 > 이슈: [#73](https://github.com/chulgil/lesson-app/issues/73)

@@ -83,6 +83,9 @@ class AppRoutes {
   static const termsOfService = '/settings/terms';
   static const privacyPolicy = '/settings/privacy';
 
+  // Follow routes
+  static const followList = '/profile/following';
+
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
   static const lessonTypeSelect = '/schedule/lesson/type';

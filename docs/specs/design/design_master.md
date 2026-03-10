@@ -1,5 +1,6 @@
 # Design System Master Spec
 
+> 구현 상태: ⚠️ 부분 구현 — 토큰 시스템 구현, UX 법칙 적용 미검증
 > Last updated: 2026-03-07
 > 통합 출처: ux_guidelines.md, figma/design_system.md, role_based_screens.md, teacher_app_screens.md, booking_system_comparison.md, competitor_ux_analysis.md
 

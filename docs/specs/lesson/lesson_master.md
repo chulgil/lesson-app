@@ -1,5 +1,6 @@
 # Lesson System Master Spec
 
+> 구현 상태: ⚠️ 부분 구현 — 레슨 타입 enum 미모델링, 통합 플로우 미완성
 > Last updated: 2026-03-07
 > 이 문서는 레슨 도메인의 **단일 진실 공급원(Single Source of Truth)**입니다.
 > 기존 개별 스펙 문서(flow_*.md, lesson_schedule.md 등)의 내용을 통합합니다.

@@ -1,5 +1,6 @@
 # 게이미피케이션 스펙
 
+> 구현 상태: ❌ 미구현
 > 작성일: 2026-03-07
 > 상태: 스펙 작성 완료, 구현 대기
 > 관련: practice_streak_spec.md, practice_goal_spec.md

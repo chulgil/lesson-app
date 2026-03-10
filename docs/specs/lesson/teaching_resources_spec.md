@@ -1,5 +1,6 @@
 # 학습 자료 공유 시스템 스펙
 
+> 구현 상태: ⚠️ 부분 구현 (Phase 1만) — Phase 2 녹음, Phase 3 외부링크 미구현
 > 작성일: 2026-03-08
 > 상태: Draft (사용자 승인 대기)
 > 관련: [ai_lesson_notes_spec.md](ai_lesson_notes_spec.md), [lesson_note_spec.md](lesson_note_spec.md)
