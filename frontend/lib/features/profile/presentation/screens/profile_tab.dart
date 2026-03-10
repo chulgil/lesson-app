@@ -71,14 +71,7 @@ class ProfileTab extends ConsumerWidget {
               _MenuItem(
                 icon: Icons.notifications_outlined,
                 label: '알림 설정',
-                trailing: _buildSwitch(true),
-                onTap: () {},
-              ),
-              _MenuItem(
-                icon: Icons.dark_mode_outlined,
-                label: '다크 모드',
-                trailing: _buildSwitch(false),
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.notificationSettings),
               ),
               _MenuItem(
                 icon: Icons.library_music_outlined,
@@ -93,11 +86,10 @@ class ProfileTab extends ConsumerWidget {
           _buildMenuSection(
             title: '지원',
             items: [
-              _MenuItem(icon: Icons.help_outline, label: '도움말', onTap: () {}),
               _MenuItem(
-                icon: Icons.feedback_outlined,
-                label: '피드백 보내기',
-                onTap: () {},
+                icon: Icons.help_outline,
+                label: '도움말',
+                onTap: () => context.push(AppRoutes.help),
               ),
               _MenuItem(
                 icon: Icons.info_outline,
@@ -108,7 +100,7 @@ class ProfileTab extends ConsumerWidget {
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.appInfo),
               ),
             ],
           ),
@@ -120,8 +112,13 @@ class ProfileTab extends ConsumerWidget {
             items: [
               _MenuItem(
                 icon: Icons.description_outlined,
-                label: '이용약관 / 개인정보처리방침',
-                onTap: () {},
+                label: '이용약관',
+                onTap: () => context.push(AppRoutes.termsOfService),
+              ),
+              _MenuItem(
+                icon: Icons.privacy_tip_outlined,
+                label: '개인정보처리방침',
+                onTap: () => context.push(AppRoutes.privacyPolicy),
               ),
               _MenuItem(
                 icon: Icons.logout,
@@ -388,14 +385,6 @@ class ProfileTab extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSwitch(bool value) {
-    return Switch(
-      value: value,
-      onChanged: (_) {},
-      activeColor: AppColors.primary,
     );
   }
 

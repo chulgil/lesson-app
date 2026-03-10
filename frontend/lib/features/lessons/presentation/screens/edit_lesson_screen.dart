@@ -1,12 +1,17 @@
+// Screen for editing an existing lesson with real data.
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../models/lesson.dart';
+import '../../../../providers/providers.dart';
 import '../widgets/lesson_form_widgets.dart';
 
 /// Screen for editing an existing lesson
-class EditLessonScreen extends StatefulWidget {
+class EditLessonScreen extends ConsumerStatefulWidget {
   final String lessonId;
 
   const EditLessonScreen({
@@ -15,10 +20,10 @@ class EditLessonScreen extends StatefulWidget {
   });
 
   @override
-  State<EditLessonScreen> createState() => _EditLessonScreenState();
+  ConsumerState<EditLessonScreen> createState() => _EditLessonScreenState();
 }
 
-class _EditLessonScreenState extends State<EditLessonScreen> {
+class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   final _formKey = GlobalKey<FormState>();
   final _pieceController = TextEditingController();
   final _notesController = TextEditingController();
@@ -32,6 +37,8 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
 
   bool _isLoading = true;
   bool _hasChanges = false;
+  bool _isSaving = false;
+  Lesson? _originalLesson;
 
   @override
   void initState() {
@@ -39,25 +46,38 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
     _loadLessonData();
   }
 
-  void _loadLessonData() {
-    // TODO: Load from database
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _selectedStudent = _mockStudents.firstWhere(
-            (s) => s.id == 'student_1',
-          );
-          _selectedDate = DateTime.now().add(const Duration(days: 2));
-          _selectedTime = const TimeOfDay(hour: 14, minute: 0);
-          _lessonDuration = 60;
-          _pieceController.text = '바흐 파르티타 2번 - Allemande';
-          _notesController.text = '보잉 연습에 집중';
-          _enableReminder = true;
-          _reminderMinutes = 30;
-          _isLoading = false;
-        });
-      }
-    });
+  Future<void> _loadLessonData() async {
+    final lesson = await ref.read(lessonProvider(widget.lessonId).future);
+    if (lesson == null || !mounted) return;
+
+    _originalLesson = lesson;
+
+    // Load student info for profile color
+    final student = await ref.read(studentProvider(lesson.studentId).future);
+    final profileColor = student?.profileColor ?? AppColors.textTertiaryLight;
+
+    // Parse startTime "HH:mm" to TimeOfDay
+    final timeParts = lesson.startTime.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 14;
+    final minute = timeParts.length > 1 ? (int.tryParse(timeParts[1]) ?? 0) : 0;
+
+    if (mounted) {
+      setState(() {
+        _selectedStudent = EditLessonStudentInfo(
+          id: lesson.studentId,
+          name: lesson.studentName,
+          instrument: lesson.instrument,
+          color: profileColor,
+        );
+        _selectedDate = lesson.date;
+        _selectedTime = TimeOfDay(hour: hour, minute: minute);
+        _lessonDuration = lesson.duration;
+        _pieceController.text =
+            lesson.pieces.isNotEmpty ? lesson.pieces.first.displayName : '';
+        _notesController.text = lesson.feedback ?? '';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -129,11 +149,13 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
             ],
           ),
           TextButton(
-            onPressed: _hasChanges ? _saveLesson : null,
+            onPressed: (_hasChanges && !_isSaving) ? _saveLesson : null,
             child: Text(
               '저장',
               style: TextStyle(
-                color: _hasChanges ? null : AppColors.textTertiaryLight,
+                color: (_hasChanges && !_isSaving)
+                    ? null
+                    : AppColors.textTertiaryLight,
               ),
             ),
           ),
@@ -222,8 +244,17 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
                 width: double.infinity,
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
-                  onPressed: _hasChanges ? _saveLesson : null,
-                  child: const Text('변경사항 저장'),
+                  onPressed: (_hasChanges && !_isSaving) ? _saveLesson : null,
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('변경사항 저장'),
                 ),
               ),
 
@@ -281,65 +312,111 @@ class _EditLessonScreenState extends State<EditLessonScreen> {
     );
   }
 
-  void _cancelLesson() {
-    // TODO: Update lesson status to cancelled
+  Future<void> _cancelLesson() async {
+    try {
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .cancelLesson(widget.lessonId);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.warning,
-      ),
-    );
-
-    context.pop();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                '${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.warning,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('레슨 취소에 실패했습니다: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  void _deleteLesson() {
-    // TODO: Delete lesson from database
+  Future<void> _deleteLesson() async {
+    try {
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .deleteLesson(widget.lessonId);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('레슨이 삭제되었습니다'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-
-    context.pop();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('레슨이 삭제되었습니다'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('레슨 삭제에 실패했습니다: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
-  void _saveLesson() {
-    // TODO: Update lesson in database
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('레슨 정보가 수정되었습니다'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.practiceGood,
-      ),
-    );
+  Future<void> _saveLesson() async {
+    if (_originalLesson == null) return;
 
-    context.pop();
+    setState(() => _isSaving = true);
+
+    try {
+      final timeStr =
+          '${_selectedTime.hour.toString().padLeft(2, '0')}:${_selectedTime.minute.toString().padLeft(2, '0')}';
+
+      final updatedLesson = _originalLesson!.copyWith(
+        date: _selectedDate,
+        startTime: timeStr,
+        duration: _lessonDuration,
+        feedback: _notesController.text.isNotEmpty
+            ? _notesController.text
+            : null,
+        updatedAt: DateTime.now(),
+      );
+
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .updateLesson(updatedLesson);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('레슨 정보가 수정되었습니다'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.practiceGood,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('레슨 수정에 실패했습니다: $e'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
   }
-
-  // Mock data
-  List<EditLessonStudentInfo> get _mockStudents => [
-        EditLessonStudentInfo(
-          id: 'student_1',
-          name: '홍길동',
-          instrument: '바이올린',
-          color: AppColors.profileBlue,
-        ),
-        EditLessonStudentInfo(
-          id: 'student_2',
-          name: '김철수',
-          instrument: '피아노',
-          color: AppColors.profileGreen,
-        ),
-        EditLessonStudentInfo(
-          id: 'student_3',
-          name: '이영희',
-          instrument: '첼로',
-          color: AppColors.profileOrange,
-        ),
-      ];
 }
