@@ -3,11 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/auth/auth_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../../models/student.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 
 /// Student profile edit screen.
 class StudentProfileEditScreen extends ConsumerStatefulWidget {
@@ -25,6 +26,9 @@ class _StudentProfileEditScreenState
   late final TextEditingController _phoneController;
   String _selectedInstrument = '바이올린';
   bool _hasChanges = false;
+  bool _isSaving = false;
+  bool _isLoading = true;
+  Student? _currentStudent;
 
   final List<String> _instruments = [
     '바이올린',
@@ -42,15 +46,35 @@ class _StudentProfileEditScreenState
   @override
   void initState() {
     super.initState();
-    final authState = ref.read(authNotifierProvider);
-    final name =
-        authState is AuthAuthenticated ? authState.name : '';
-    final email =
-        authState is AuthAuthenticated ? authState.email : '';
-
-    _nameController = TextEditingController(text: name);
-    _emailController = TextEditingController(text: email);
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
     _phoneController = TextEditingController();
+    _loadStudentData();
+  }
+
+  Future<void> _loadStudentData() async {
+    final studentId = ref.read(currentUserIdProvider);
+    try {
+      final student = await ref.read(studentProvider(studentId).future);
+      if (student != null && mounted) {
+        setState(() {
+          _currentStudent = student;
+          _nameController.text = student.name;
+          _emailController.text = student.email ?? '';
+          _phoneController.text = student.phone ?? '';
+          _selectedInstrument = _instruments.contains(student.instrument)
+              ? student.instrument
+              : '바이올린';
+          _isLoading = false;
+        });
+      } else if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -67,30 +91,67 @@ class _StudentProfileEditScreenState
     }
   }
 
-  void _onSave() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('프로필이 저장되었습니다')),
-    );
-    Navigator.pop(context);
+  Future<void> _onSave() async {
+    if (_currentStudent == null || _isSaving) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final updated = _currentStudent!.copyWith(
+        name: _nameController.text.trim(),
+        instrument: _selectedInstrument,
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+      );
+
+      await ref.read(studentsNotifierProvider.notifier).updateStudent(updated);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('프로필이 저장되었습니다')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('프로필 수정')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('프로필 수정'),
         actions: [
           TextButton(
-            onPressed: _hasChanges ? _onSave : null,
-            child: Text(
-              '저장',
-              style: TextStyle(
-                color: _hasChanges
-                    ? AppColors.primary
-                    : AppColors.textTertiaryLight,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            onPressed: _hasChanges && !_isSaving ? _onSave : null,
+            child: _isSaving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(
+                    '저장',
+                    style: TextStyle(
+                      color: _hasChanges
+                          ? AppColors.primary
+                          : AppColors.textTertiaryLight,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
           ),
         ],
       ),
