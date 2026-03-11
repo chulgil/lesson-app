@@ -220,7 +220,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('레슨 취소 실패: $e'),
+                content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -258,7 +258,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('레슨 완료 처리 실패: $e'),
+                content: const Text('레슨 완료 처리에 실패했습니다. 다시 시도해주세요.'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -280,7 +280,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('레슨 삭제 실패: $e'),
+                content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
                 backgroundColor: AppColors.error,
               ),
             );
@@ -566,7 +566,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('주요 포인트 추가 실패: $e'),
+            content: const Text('주요 포인트 추가에 실패했습니다.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -589,7 +589,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('주요 포인트 삭제 실패: $e'),
+            content: const Text('주요 포인트 삭제에 실패했습니다.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -610,7 +610,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('피드백 저장 실패: $e'),
+              content: const Text('피드백 저장에 실패했습니다.'),
               backgroundColor: AppColors.error,
             ),
           );
@@ -629,7 +629,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('메모 저장 실패: $e'),
+            content: const Text('메모 저장에 실패했습니다.'),
             backgroundColor: AppColors.error,
           ),
         );

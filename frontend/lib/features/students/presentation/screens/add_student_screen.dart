@@ -327,7 +327,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('학생 추가 실패: $e'),
+          content: const Text('학생 추가에 실패했습니다. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),

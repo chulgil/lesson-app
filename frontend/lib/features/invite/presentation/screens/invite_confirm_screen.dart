@@ -436,6 +436,9 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
     // Check if student connected to teacher - offer booking option
     final isStudentConnectingToTeacher =
         userRole == UserRole.student && invite.creatorRole == InviteUserRole.teacher;
+    // Check if teacher received student invite - offer going to student list
+    final isTeacherConnectingToStudent =
+        userRole == UserRole.teacher;
 
     showDialog(
       context: context,
@@ -544,6 +547,40 @@ class _InviteConfirmScreenState extends ConsumerState<InviteConfirmScreen> {
                       foregroundColor: Colors.white,
                     ),
                     child: const Text('레슨 예약'),
+                  ),
+                ),
+              ],
+            ),
+          ] else if (isTeacherConnectingToStudent) ...[
+            // Teacher: offer going to student list
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      context.go(homeRoute);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textSecondaryLight,
+                    ),
+                    child: const Text('홈으로'),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(dialogContext).pop();
+                      context.go(homeRoute);
+                      // Navigate to students tab
+                      context.push(AppRoutes.students);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('학생 목록'),
                   ),
                 ),
               ],

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -343,15 +344,29 @@ class _StudentDetailContent extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.phone),
               title: const Text('전화하기'),
+              enabled: student.phone != null && student.phone!.isNotEmpty,
+              subtitle: student.phone == null || student.phone!.isEmpty
+                  ? const Text('전화번호가 등록되지 않았습니다')
+                  : null,
               onTap: () {
                 Navigator.pop(context);
+                if (student.phone != null && student.phone!.isNotEmpty) {
+                  launchUrl(Uri.parse('tel:${student.phone}'));
+                }
               },
             ),
             ListTile(
               leading: const Icon(Icons.message),
               title: const Text('메시지 보내기'),
+              enabled: student.phone != null && student.phone!.isNotEmpty,
+              subtitle: student.phone == null || student.phone!.isEmpty
+                  ? const Text('전화번호가 등록되지 않았습니다')
+                  : null,
               onTap: () {
                 Navigator.pop(context);
+                if (student.phone != null && student.phone!.isNotEmpty) {
+                  launchUrl(Uri.parse('sms:${student.phone}'));
+                }
               },
             ),
             ListTile(
@@ -359,6 +374,9 @@ class _StudentDetailContent extends ConsumerWidget {
               title: const Text('레슨 기록 보기'),
               onTap: () {
                 Navigator.pop(context);
+                context.push(
+                  AppRoutes.studentNotes.replaceFirst(':id', student.id),
+                );
               },
             ),
             // Show status change options based on current status
@@ -461,7 +479,7 @@ class _StudentDetailContent extends ConsumerWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('학생 삭제 실패: $e'),
+                          content: const Text('학생 삭제에 실패했습니다. 다시 시도해주세요.'),
                           backgroundColor: AppColors.error,
                         ),
                       );

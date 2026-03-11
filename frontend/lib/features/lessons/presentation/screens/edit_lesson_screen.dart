@@ -334,7 +334,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('레슨 취소에 실패했습니다: $e'),
+            content: const Text('레슨 취소에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -362,7 +362,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('레슨 삭제에 실패했습니다: $e'),
+            content: const Text('레슨 삭제에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -491,7 +491,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('레슨 수정에 실패했습니다: $e'),
+            content: const Text('레슨 수정에 실패했습니다. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
