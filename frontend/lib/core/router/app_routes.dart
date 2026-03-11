@@ -143,4 +143,7 @@ class AppRoutes {
 
   // Analytics routes
   static const analytics = '/analytics';
+
+  // Gamification routes
+  static const badgeCollection = '/gamification/badges';
 }

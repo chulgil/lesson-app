@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../features/students/presentation/screens/add_student_screen.dart';
 import '../../../features/students/presentation/screens/add_student_method_screen.dart';
 import '../../../features/lessons/presentation/screens/lesson_note_history_screen.dart';
+import '../../../features/gamification/presentation/screens/badge_collection_screen.dart';
 import '../../../features/students/presentation/screens/edit_student_screen.dart';
 import '../../../features/students/presentation/screens/student_detail_screen.dart';
 import '../app_routes.dart';
@@ -50,5 +51,15 @@ List<GoRoute> studentRoutes = [
     builder: (context, state) => EditStudentScreen(
       studentId: state.pathParameters['id'] ?? '',
     ),
+  ),
+
+  // Badge Collection
+  GoRoute(
+    path: AppRoutes.badgeCollection,
+    name: 'badgeCollection',
+    builder: (context, state) {
+      final studentId = state.uri.queryParameters['studentId'] ?? '';
+      return BadgeCollectionScreen(studentId: studentId);
+    },
   ),
 ];

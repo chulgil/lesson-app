@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../gamification/presentation/widgets/gamification_header.dart';
 import '../widgets/dashboard/dashboard_widgets.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
@@ -58,6 +59,16 @@ class StudentDashboardTab extends ConsumerWidget {
                 ],
               ),
             ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // Gamification header
+          GamificationHeader(
+            studentId: currentStudentId,
+            onTap: () => context.push(
+              '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space4),

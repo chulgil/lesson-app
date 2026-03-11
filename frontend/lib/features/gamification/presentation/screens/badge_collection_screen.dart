@@ -1,0 +1,388 @@
+// Badge collection and point history screen.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../domain/entities/gamification.dart';
+import '../providers/gamification_provider.dart';
+
+/// Badge collection and gamification detail screen.
+class BadgeCollectionScreen extends ConsumerWidget {
+  final String studentId;
+
+  const BadgeCollectionScreen({super.key, required this.studentId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final gamificationAsync =
+        ref.watch(studentGamificationProvider(studentId));
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: const Text('내 성장'),
+      ),
+      body: gamificationAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const Center(child: Text('데이터를 불러올 수 없습니다')),
+        data: (data) => _buildContent(context, data),
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, StudentGamification data) {
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      children: [
+        // Level info card
+        _buildLevelCard(data),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // Badges section
+        Text('획득한 뱃지', style: AppTypography.headingSmall),
+        const SizedBox(height: AppSpacing.space3),
+        _buildBadgeGrid(data.earnedBadges),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // Point history
+        Text('포인트 히스토리', style: AppTypography.headingSmall),
+        const SizedBox(height: AppSpacing.space3),
+        _buildPointHistory(data.recentHistory),
+
+        const SizedBox(height: AppSpacing.space8),
+      ],
+    );
+  }
+
+  Widget _buildLevelCard(StudentGamification data) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space5),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        children: [
+          // Level circle
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              'Lv.${data.level}',
+              style: AppTypography.headingMedium.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Text(
+            data.levelTitle,
+            style: AppTypography.headingSmall.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '총 ${data.totalPoints}P',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: data.levelProgress,
+              minHeight: 8,
+              backgroundColor: AppColors.surfaceSecondaryLight,
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.primary),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '다음 레벨까지 ${data.pointsToNextLevel}P',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBadgeGrid(List<PracticeBadge> badges) {
+    final earned = badges.where((b) => b.isEarned).toList();
+    final locked = badges.where((b) => !b.isEarned).toList();
+
+    return Column(
+      children: [
+        // Earned badges
+        ...earned.map((badge) => _buildBadgeTile(badge)),
+
+        if (locked.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space3),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '미획득',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          ...locked.map((badge) => _buildBadgeTile(badge)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildBadgeTile(PracticeBadge badge) {
+    final rarityColor = _getRarityColor(badge.rarity);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: badge.isEarned
+            ? AppColors.surfaceLight
+            : AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: badge.isEarned ? rarityColor.withValues(alpha: 0.3) : AppColors.borderLight,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Badge icon
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: badge.isEarned
+                  ? rarityColor.withValues(alpha: 0.15)
+                  : AppColors.surfaceSecondaryLight,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              _getIconData(badge.icon),
+              size: 20,
+              color: badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+
+          // Name + description
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  badge.name,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: badge.isEarned
+                        ? AppColors.textPrimaryLight
+                        : AppColors.textTertiaryLight,
+                  ),
+                ),
+                Text(
+                  badge.description,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Rarity label
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: rarityColor.withValues(alpha: badge.isEarned ? 0.15 : 0.05),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              _getRarityLabel(badge.rarity),
+              style: AppTypography.caption.copyWith(
+                color: badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
+                fontWeight: FontWeight.w600,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPointHistory(List<PointHistory> history) {
+    if (history.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceSecondaryLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        child: Center(
+          child: Text(
+            '포인트 기록이 없습니다',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        children: history.asMap().entries.map((entry) {
+          final item = entry.value;
+          final isLast = entry.key == history.length - 1;
+          final timeFormat = DateFormat('M/d HH:mm');
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space4,
+                  vertical: AppSpacing.space3,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _getPointTypeIcon(item.type),
+                      size: 18,
+                      color: AppColors.textSecondaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space3),
+                    Expanded(
+                      child: Text(
+                        item.description,
+                        style: AppTypography.bodyMedium,
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '+${item.points}P',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          timeFormat.format(item.earnedAt),
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.textTertiaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (!isLast)
+                Divider(
+                  height: 1,
+                  indent: AppSpacing.space4,
+                  endIndent: AppSpacing.space4,
+                  color: AppColors.borderLight,
+                ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Color _getRarityColor(BadgeRarity rarity) {
+    switch (rarity) {
+      case BadgeRarity.common:
+        return AppColors.info;
+      case BadgeRarity.rare:
+        return AppColors.primary;
+      case BadgeRarity.epic:
+        return const Color(0xFF9333EA);
+      case BadgeRarity.legendary:
+        return AppColors.warning;
+    }
+  }
+
+  String _getRarityLabel(BadgeRarity rarity) {
+    switch (rarity) {
+      case BadgeRarity.common:
+        return '일반';
+      case BadgeRarity.rare:
+        return '희귀';
+      case BadgeRarity.epic:
+        return '영웅';
+      case BadgeRarity.legendary:
+        return '전설';
+    }
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'music_note':
+        return Icons.music_note;
+      case 'local_fire_department':
+        return Icons.local_fire_department;
+      case 'emoji_events':
+        return Icons.emoji_events;
+      case 'whatshot':
+        return Icons.whatshot;
+      case 'star':
+        return Icons.star;
+      default:
+        return Icons.emoji_events;
+    }
+  }
+
+  IconData _getPointTypeIcon(PointType type) {
+    switch (type) {
+      case PointType.practiceComplete:
+        return Icons.music_note;
+      case PointType.streakBonus:
+        return Icons.local_fire_department;
+      case PointType.lessonAttendance:
+        return Icons.school;
+      case PointType.goalAchieved:
+        return Icons.flag;
+      case PointType.badgeEarned:
+        return Icons.emoji_events;
+    }
+  }
+}
