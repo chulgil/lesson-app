@@ -264,6 +264,8 @@ TODO.md로 Phase 기반 관리 → Issue 참조, 세션별 Phase 진행, 완료 
 - 연습완료 날짜별 완료 상태 동기화 (Issue #8)
 
 ### 최근 완료
+- 학생 UX 점검 10차 (#140) — 62파일 에러메시지·NO-OP 버튼·하드코딩 라우트 수정
+- 선생님 UX 점검 9차 (#139) — NO-OP 버튼, 빈 핸들러, 에러메시지, 초대 네비게이션 수정
 - 선생님 UX 점검 6차 (#136) — 레슨 완료 UI, 날짜 포맷 통일, 에러 처리, 경로 정리
 - 학생 UX 점검 5차 (#135) — 대시보드 동적화, 수기선생님 go_router 전환, 코드 품질 개선
 - 선생님 UX 점검 5차 (#133) — 시작 가이드 경로, teacherName 동적화, 프리셋 통합, 날짜 포맷
@@ -320,10 +322,10 @@ cd frontend && dart run build_runner build --delete-conflicting-outputs
 - **교훈**: `flutter run --release`로 iPhone 배포 시 provisioning profile 에러 빈번. CLI에서 `--allowProvisioningUpdates` 플래그가 flutter에서 지원되지 않음.
 - **조치**: 배포 전 Xcode에서 Signing & Capabilities 확인. 문제 시 Xcode에서 직접 빌드하거나 `xcodebuild -allowProvisioningUpdates` 사용.
 
-## 4. UX 반복 점검 8회의 교훈 — 전수 검사 필수 - automation-pattern
+## 4. UX 반복 점검 10회의 교훈 — 전수 검사 필수 - automation-pattern
 - **날짜**: 2026-03-11
 - **분류**: automation-pattern
-- **교훈**: 선생님/학생 UX 점검을 8회 반복하며 발견된 9개 반복 패턴. 7차까지 특정 feature만 점검→8차에서 다른 feature에서 같은 이슈 27건 재발견. **전체 코드베이스 grep이 필수**.
+- **교훈**: 선생님/학생 UX 점검 10회 반복. 9차 선생님(#139) + 10차 학생(#140)에서도 62파일 ~100건의 `$e` 노출·NO-OP 버튼·하드코딩 라우트 재발견. **기능 단위가 아닌 패턴 단위 grep이 핵심**.
 - **조치**: 새 화면 구현 시 반드시 아래 순서 준수:
   1. 엔티티 + Provider 먼저 구현 (데이터 계층)
   2. UI에서 Provider.watch로 바인딩 (하드코딩 문자열 금지)
