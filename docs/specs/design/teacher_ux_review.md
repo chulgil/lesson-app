@@ -418,6 +418,18 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 | 하드코딩 경로 → AppRoutes 상수 통일 | [#136](https://github.com/chulgil/lesson-app/issues/136) | MEDIUM | 구현 완료 |
 | parentName 엔티티 추가 | — | CRITICAL | 설계 검토 필요 |
 
+### Phase 8: 선생님/학생 UX 종합 점검 7차 (2026-03-11)
+
+코드베이스 전체 하드코딩 라우트 일소, 에러 처리 누락 수정, 날짜 포맷 유틸 공통화
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| _saveStudentMemo/_addKeyPoint/_removeKeyPoint try-catch | [#137](https://github.com/chulgil/lesson-app/issues/137) | CRITICAL | 구현 완료 |
+| StudentMemoCard 자동 저장 에러 상태 처리 | [#137](https://github.com/chulgil/lesson-app/issues/137) | CRITICAL | 구현 완료 |
+| 12개 파일 ~20건 하드코딩 라우트 → AppRoutes | [#137](https://github.com/chulgil/lesson-app/issues/137) | HIGH | 구현 완료 |
+| formatDateYMD() 공통 유틸 생성 + 5개 파일 적용 | [#137](https://github.com/chulgil/lesson-app/issues/137) | HIGH | 구현 완료 |
+| validator trim() 수정 | [#137](https://github.com/chulgil/lesson-app/issues/137) | MEDIUM | 구현 완료 |
+
 ---
 
 ## 관련 문서

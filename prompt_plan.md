@@ -1,33 +1,34 @@
-# 선생님 UX 종합 점검 6차
+# 선생님/학생 UX 종합 점검 7차
 
 > 확정일: 2026-03-11
 
-## 현재 세션: 선생님 UX 점검 6차 (Phase 1~3) - 완료
+## 현재 세션: UX 점검 7차 (Phase 1~3) - 완료
 
 ### 배경
 
-선생님 앱 전체 플로우 6차 점검: 레슨 완료 UI 부재, 날짜 포맷 불일치, 경로 하드코딩 발견 및 해결.
+선생님/학생 앱 전체 코드베이스 7차 점검: 에러 처리 누락 3건(CRITICAL), 하드코딩 라우트 ~20건(HIGH), 날짜 포맷 중복 5건(HIGH), validator trim 1건(MEDIUM) 발견 및 해결.
 
-### Phase 1: 날짜 포맷 + 텍스트 처리 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | quick_feedback 날짜 YYYY.MM.DD 통일 | #136 | done |
-| 1-2 | feedback 저장 trim() + try-catch | #136 | done |
-| 1-3 | 과제 설명 입력 maxLines 2→5 | #136 | done |
-
-### Phase 2: 레슨 완료 처리 UI (MEDIUM) - 완료
+### Phase 1: 에러 처리 수정 (CRITICAL) - 완료
 
 | # | 작업 | 이슈 | 상태 |
 |---|------|------|:----:|
-| 2-1 | scheduled 레슨에 '완료 처리' 메뉴 + 확인 다이얼로그 | #136 | done |
+| 1-1 | _saveStudentMemo try-catch 추가 | #137 | done |
+| 1-2 | _addKeyPoint/_removeKeyPoint try-catch 추가 | #137 | done |
+| 1-3 | StudentMemoCard 자동 저장 에러 상태 처리 | #137 | done |
 
-### Phase 3: 경로 정리 (MEDIUM) - 완료
+### Phase 2: 하드코딩 라우트 → AppRoutes (HIGH) - 완료
 
 | # | 작업 | 이슈 | 상태 |
 |---|------|------|:----:|
-| 3-1 | dashboard_tab 하드코딩 경로 → AppRoutes | #136 | done |
-| 3-2 | getting_started_card 하드코딩 경로 → AppRoutes | #136 | done |
+| 2-1 | 12개 파일 ~20건 하드코딩 경로 → AppRoutes 상수 | #137 | done |
+
+### Phase 3: 날짜 유틸 + 코드 품질 (MEDIUM) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 3-1 | formatDateYMD() 공통 유틸 생성 + 5개 파일 적용 | #137 | done |
+| 3-2 | validator trim() 수정 | #137 | done |
+| 3-3 | next_lesson_card 날짜 포맷 YYYY.MM.DD 통일 | #137 | done |
 
 ### 별도 이슈 (설계 검토 필요)
 
@@ -37,6 +38,8 @@
 | — | 정기 레슨 저장 로직 미구현 | #134 | todo |
 
 ---
+
+## 이전 계획: 선생님 UX 종합 점검 6차
 
 ## 이전 계획: 학생 UX 종합 점검 5차
 

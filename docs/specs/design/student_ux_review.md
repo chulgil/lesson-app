@@ -150,10 +150,33 @@
 
 ---
 
+## 9. Phase 7: 선생님/학생 UX 종합 점검 7차 (#137)
+
+### 7.1 에러 처리 수정 (CRITICAL)
+- _saveStudentMemo: try-catch + error SnackBar 추가
+- _addKeyPoint / _removeKeyPoint: try-catch 추가
+- StudentMemoCard 자동 저장: 실패 시 idle 상태로 복원 (기존: 실패해도 "저장됨" 표시)
+
+### 7.2 하드코딩 라우트 → AppRoutes (HIGH)
+- 12개 파일 ~20건 하드코딩 경로를 AppRoutes 상수로 교체
+- 영향 파일: students_tab, add_student_method_screen, student_detail_screen, student_notes_section, student_lesson_card, next_lesson_card 등
+
+### 7.3 날짜 포맷 공통 유틸 (HIGH)
+- `core/utils/date_format_utils.dart` 신규 생성
+- formatDateYMD(), formatDateYMDWithDay() 공통 함수
+- 5개 파일의 인라인 날짜 포맷 코드를 유틸 함수로 교체
+
+### 7.4 코드 품질 (MEDIUM)
+- basic_info_fields validator: value.trim().isEmpty 적용
+- next_lesson_card 날짜: M월 D일 → YYYY.MM.DD 통일
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-03-11 | Phase 7 (7차 점검): 에러 처리, 하드코딩 라우트, 날짜 유틸, validator |
 | 2026-03-11 | Phase 6 (5차 점검): 대시보드 동적화, 수기선생님 네비게이션, 코드 품질 |
 | 2026-03-11 | Phase 5 (4차 점검): 프로필 동적 데이터, 온보딩 저장, 스케줄 확인 |
 | 2026-03-11 | 초기 작성 + Phase 1~4 구현 완료 |
