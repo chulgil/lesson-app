@@ -45,7 +45,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       ),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('오류: $e')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
         data: (proposals) {
           if (proposals.isEmpty) {
             return _buildEmptyState();
@@ -169,7 +169,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           // Template info
           templateAsync.when(
             loading: () => const LinearProgressIndicator(),
-            error: (e, st) => Text('템플릿 오류: $e'),
+            error: (_, __) => const Text('오류가 발생했습니다.'),
             data: (template) {
               if (template == null) return const Text('템플릿을 찾을 수 없습니다');
               return _buildTemplateInfo(template, proposal);
@@ -349,7 +349,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

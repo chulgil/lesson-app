@@ -74,8 +74,8 @@ class _FollowTab extends ConsumerWidget {
 
     return followsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Text('오류가 발생했습니다: $error'),
+      error: (_, __) => const Center(
+        child: Text('오류가 발생했습니다.'),
       ),
       data: (follows) {
         if (follows.isEmpty) {

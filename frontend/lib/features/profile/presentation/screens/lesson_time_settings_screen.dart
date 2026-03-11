@@ -29,13 +29,13 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
       body: settingsAsync.when(
         data: (settings) => _LessonTimeSettingsContent(settings: settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
+        error: (_, __) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: AppSpacing.space4),
-              Text('오류가 발생했습니다: $error'),
+              const Text('오류가 발생했습니다.'),
               const SizedBox(height: AppSpacing.space4),
               FilledButton(
                 onPressed: () =>

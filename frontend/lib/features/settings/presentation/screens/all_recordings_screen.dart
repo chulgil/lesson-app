@@ -63,13 +63,13 @@ class AllRecordingsScreen extends ConsumerWidget {
               ? _buildEmptyState()
               : _RecordingsList(recordings: recordings),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
+          error: (_, __) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                 const SizedBox(height: AppSpacing.space4),
-                Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+                const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
                 const SizedBox(height: AppSpacing.space4),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(allRecordingsWithSectionInfoProvider),
@@ -153,7 +153,7 @@ class AllRecordingsScreen extends ConsumerWidget {
         Navigator.pop(context); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

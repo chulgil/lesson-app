@@ -304,7 +304,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('녹음 저장 실패: $e'),
+            content: const Text('녹음 저장에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -339,7 +339,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('설정 실패: $e'),
+            content: const Text('설정에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -389,7 +389,7 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('삭제 실패: $e'),
+            content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

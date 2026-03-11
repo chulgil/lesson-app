@@ -636,7 +636,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('오류가 발생했습니다: $e')),
+          const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
         );
       }
     } finally {

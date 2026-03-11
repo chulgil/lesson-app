@@ -104,7 +104,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('저장 중 오류가 발생했습니다: $e')),
+          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
         );
       }
     } finally {
@@ -148,7 +148,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('삭제 중 오류가 발생했습니다: $e')),
+            const SnackBar(content: Text('삭제 중 오류가 발생했습니다. 다시 시도해주세요.')),
           );
           setState(() => _isLoading = false);
         }

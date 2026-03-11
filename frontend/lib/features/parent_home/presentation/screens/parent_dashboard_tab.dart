@@ -54,7 +54,7 @@ class ParentDashboardTab extends ConsumerWidget {
       ),
       body: childrenAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('오류: $e')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
         data: (profiles) {
           if (profiles.isEmpty) {
             return _buildEmptyState(context, parentId);
@@ -219,9 +219,9 @@ class ParentDashboardTab extends ConsumerWidget {
                     padding: EdgeInsets.all(AppSpacing.space4),
                     child: CircularProgressIndicator(),
                   ),
-                  error: (e, _) => Padding(
-                    padding: const EdgeInsets.all(AppSpacing.space4),
-                    child: Text('오류: $e'),
+                  error: (_, __) => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: Text('오류가 발생했습니다.'),
                   ),
                   data: (profiles) {
                     if (profiles.isEmpty) {

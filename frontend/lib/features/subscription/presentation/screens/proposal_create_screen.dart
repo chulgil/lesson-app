@@ -62,7 +62,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       ),
       body: studentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('오류: $e')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
         data: (students) {
           if (students.isEmpty) {
             return _buildNoStudentsState();
@@ -70,7 +70,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
           return templatesAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, st) => Center(child: Text('오류: $e')),
+            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
             data: (templates) {
               if (templates.isEmpty) {
                 return _buildNoTemplatesState();
@@ -537,7 +537,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('제안 실패: $e'),
+            content: const Text('제안 실패. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

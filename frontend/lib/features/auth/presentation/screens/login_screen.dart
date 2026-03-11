@@ -105,7 +105,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('로그인 실패: $e'),
+            content: const Text('로그인 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),
@@ -320,7 +320,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Google 로그인 실패: $e'),
+            content: const Text('Google 로그인 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),

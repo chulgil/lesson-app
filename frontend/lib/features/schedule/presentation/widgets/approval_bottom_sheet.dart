@@ -405,7 +405,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('승인 처리 중 오류가 발생했습니다: $e'),
+          content: const Text('승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -452,7 +452,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('처리 중 오류가 발생했습니다: $e'),
+          content: const Text('처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
           backgroundColor: AppColors.error,
         ),
       );

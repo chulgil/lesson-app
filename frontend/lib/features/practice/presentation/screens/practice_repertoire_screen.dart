@@ -151,7 +151,7 @@ class _RepertoireCard extends ConsumerWidget {
                   icon: const Icon(Icons.add_circle_outline),
                   color: AppColors.primary,
                   onPressed: () => context.push(
-                    '/practice/section/add?repertoireId=${repertoire.id}&studentId=$studentId',
+                    '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
                   ),
                   tooltip: '섹션 추가',
                 ),
@@ -159,7 +159,10 @@ class _RepertoireCard extends ConsumerWidget {
                 PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'edit') {
-                      // TODO: Edit repertoire
+                      context.push(
+                        '${AppRoutes.editRepertoire.replaceFirst(':id', repertoire.id)}'
+                        '?studentId=$studentId',
+                      );
                     } else if (value == 'archive') {
                       _showArchiveConfirmation(context, ref);
                     } else if (value == 'delete') {
@@ -225,7 +228,7 @@ class _RepertoireCard extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.space2),
                     TextButton.icon(
                       onPressed: () => context.push(
-                        '/practice/section/add?repertoireId=${repertoire.id}&studentId=$studentId',
+                        '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
                       ),
                       icon: const Icon(Icons.add, size: 18),
                       label: const Text('섹션 추가'),
@@ -368,7 +371,7 @@ class _SectionListItem extends ConsumerWidget {
 
     return InkWell(
       onTap: () => context.push(
-        '/practice/section/${section.id}?repertoireId=$repertoireId&studentId=$studentId',
+        '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -427,7 +430,9 @@ class _SectionListItem extends ConsumerWidget {
                     color: AppColors.primary,
                   ),
                   onPressed: () {
-                    // TODO: Play representative recording
+                    context.push(
+                      '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
+                    );
                   },
                   tooltip: '녹음 재생',
                   constraints: const BoxConstraints(),
@@ -443,7 +448,9 @@ class _SectionListItem extends ConsumerWidget {
                     color: AppColors.textTertiaryLight,
                   ),
                   onPressed: () {
-                    // TODO: Start recording
+                    context.push(
+                      '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
+                    );
                   },
                   tooltip: '녹음',
                   constraints: const BoxConstraints(),

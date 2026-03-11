@@ -29,13 +29,13 @@ class BackupSettingsScreen extends ConsumerWidget {
       body: backupState.when(
         data: (state) => _BackupContent(state: state),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
+        error: (_, __) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Icon(Icons.error_outline, size: 48, color: AppColors.error),
               const SizedBox(height: 16),
-              Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+              const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.invalidate(backupStateProvider),

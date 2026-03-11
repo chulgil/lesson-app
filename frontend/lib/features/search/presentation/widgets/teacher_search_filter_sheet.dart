@@ -84,7 +84,7 @@ class _TeacherSearchFilterSheetState
                   const SizedBox(height: 8),
                   instrumentsAsync.when(
                     loading: () => const CircularProgressIndicator(),
-                    error: (e, _) => Text('오류: $e'),
+                    error: (_, __) => const Text('오류가 발생했습니다.'),
                     data: (instruments) => _buildChipSelection(
                       instruments,
                       _filter.instruments ?? [],
@@ -105,7 +105,7 @@ class _TeacherSearchFilterSheetState
                   const SizedBox(height: 8),
                   areasAsync.when(
                     loading: () => const CircularProgressIndicator(),
-                    error: (e, _) => Text('오류: $e'),
+                    error: (_, __) => const Text('오류가 발생했습니다.'),
                     data: (areas) => _buildChipSelection(
                       areas,
                       _filter.areas ?? [],

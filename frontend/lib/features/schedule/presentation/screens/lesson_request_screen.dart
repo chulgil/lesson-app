@@ -436,7 +436,7 @@ class _LessonRequestScreenState extends ConsumerState<LessonRequestScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('요청 전송에 실패했습니다: $e'),
+            content: const Text('요청 전송에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

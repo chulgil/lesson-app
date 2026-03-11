@@ -207,7 +207,7 @@ class _ProposalSettingsScreenState
         const SizedBox(height: 12),
         templatesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Text('오류: $e'),
+          error: (_, __) => const Text('오류가 발생했습니다.'),
           data: (templates) {
             if (templates.isEmpty) {
               return Container(
@@ -630,7 +630,7 @@ class _ProposalSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('저장 실패: $e'),
+            content: const Text('저장 실패. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

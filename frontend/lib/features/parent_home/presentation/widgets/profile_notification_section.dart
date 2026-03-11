@@ -66,9 +66,9 @@ class ProfileNotificationSection extends ConsumerWidget {
                 padding: EdgeInsets.all(AppSpacing.space4),
                 child: Center(child: CircularProgressIndicator()),
               ),
-              error: (error, _) => Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text('오류: $error'),
+              error: (_, __) => const Padding(
+                padding: EdgeInsets.all(AppSpacing.space4),
+                child: Text('오류가 발생했습니다.'),
               ),
               data: (settings) {
                 // Use default settings if none exist
@@ -268,7 +268,7 @@ class ProfileNotificationSection extends ConsumerWidget {
 
           return settingsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('오류: $e')),
+            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
             data: (settings) {
               final s = settings ??
                   ParentNotificationSettings.defaultSettings(

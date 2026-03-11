@@ -82,7 +82,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('레퍼토리 수정에 실패했습니다: $e'),
+            content: const Text('레퍼토리 수정에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -139,7 +139,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('아카이브에 실패했습니다: $e'),
+            content: const Text('아카이브에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -193,7 +193,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('삭제에 실패했습니다: $e'),
+            content: const Text('삭제에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -251,7 +251,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
       ),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, st) => Center(child: Text('오류: $e')),
+        error: (e, st) => const Center(child: Text('오류가 발생했습니다.')),
         data: (repertoire) {
           if (repertoire == null) {
             return const Center(child: Text('레퍼토리를 찾을 수 없습니다'));

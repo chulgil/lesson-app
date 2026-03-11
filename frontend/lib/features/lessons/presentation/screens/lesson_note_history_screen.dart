@@ -139,7 +139,7 @@ class _LessonNoteHistoryScreenState
               },
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('오류: $e')),
+              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
             ),
           ),
         ],

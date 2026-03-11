@@ -81,7 +81,7 @@ class _StudentProfileSetupScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('프로필 저장 실패: $e'),
+          content: const Text('프로필 저장 실패. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.error,
         ),

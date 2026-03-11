@@ -164,7 +164,7 @@ class _AddSectionScreenState extends ConsumerState<AddSectionScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('섹션 추가에 실패했습니다: $e');
+        _showErrorSnackBar('섹션 추가에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       if (mounted) {

@@ -51,13 +51,13 @@ class OrphanRecordingsScreen extends ConsumerWidget {
               ? _EmptyStateWithDiagnostic(diagnostic: diagnostic)
               : _RecordingsListWithDiagnostic(diagnostic: diagnostic),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(
+          error: (_, __) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                 const SizedBox(height: AppSpacing.space4),
-                Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+                const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
                 const SizedBox(height: AppSpacing.space4),
                 ElevatedButton(
                   onPressed: () => ref.invalidate(orphanedRecordingsWithDiagnosticProvider),

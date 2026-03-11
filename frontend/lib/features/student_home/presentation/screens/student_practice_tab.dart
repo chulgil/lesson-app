@@ -211,7 +211,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error:
-                    (error, stack) => Center(child: Text('오류가 발생했습니다: $error')),
+                    (_, __) => const Center(child: Text('오류가 발생했습니다.')),
               ),
             ),
           ],

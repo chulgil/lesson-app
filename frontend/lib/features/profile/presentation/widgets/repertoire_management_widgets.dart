@@ -812,7 +812,7 @@ void showAssignToStudentDialog({
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Text('오류: $error'),
+        error: (_, __) => const Text('오류가 발생했습니다.'),
       ),
       actions: [
         TextButton(

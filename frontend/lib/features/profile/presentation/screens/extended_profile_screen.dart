@@ -37,7 +37,7 @@ class ExtendedProfileScreen extends ConsumerWidget {
       ),
       body: profileState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
         data: (profile) {
           if (profile == null) {
             return const Center(child: Text('프로필을 찾을 수 없습니다'));

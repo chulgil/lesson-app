@@ -421,7 +421,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('스케줄 확정 중 오류가 발생했습니다: $e'),
+            content: const Text('스케줄 확정 중 오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

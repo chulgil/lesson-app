@@ -164,7 +164,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('발급 실패: $e'),
+            content: const Text('발급 실패. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -404,7 +404,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('발급 실패: $e'),
+            content: const Text('발급 실패. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

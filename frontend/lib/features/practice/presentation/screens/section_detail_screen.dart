@@ -264,7 +264,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('상태 변경 실패: $e'),
+            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -305,7 +305,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('수정 실패: $e'),
+            content: const Text('수정에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

@@ -42,7 +42,7 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('역할 설정 실패: $e'),
+            content: const Text('역할 설정 실패. 다시 시도해주세요.'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.error,
           ),

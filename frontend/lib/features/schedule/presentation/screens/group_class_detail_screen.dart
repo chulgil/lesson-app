@@ -70,12 +70,12 @@ class _GroupClassDetailScreenState
             // Capacity status
             confirmedCountAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('오류: $e'),
+              error: (_, __) => const Text('오류가 발생했습니다.'),
               data: (confirmedCount) {
                 return waitlistCountAsync.when(
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Text('오류: $e'),
+                  error: (_, __) => const Text('오류가 발생했습니다.'),
                   data: (waitlistCount) {
                     return _buildCapacityStatus(confirmedCount, waitlistCount);
                   },
@@ -88,7 +88,7 @@ class _GroupClassDetailScreenState
             // Current booking status or action buttons
             bookingAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('오류: $e'),
+              error: (_, __) => const Text('오류가 발생했습니다.'),
               data: (booking) {
                 if (booking != null) {
                   return _buildCurrentBookingStatus(booking);
@@ -584,7 +584,7 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -645,7 +645,7 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

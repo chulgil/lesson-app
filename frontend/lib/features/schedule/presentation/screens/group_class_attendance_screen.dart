@@ -76,7 +76,7 @@ class _GroupClassAttendanceScreenState
           Expanded(
             child: bookingsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('오류: $e')),
+              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
               data: (bookings) {
                 // Filter only confirmed bookings
                 final confirmedBookings = bookings
@@ -247,7 +247,7 @@ class _GroupClassAttendanceScreenState
         title: Text('로딩중...'),
       ),
       error: (e, _) => ListTile(
-        title: Text('오류: $e'),
+        title: const Text('오류가 발생했습니다.'),
       ),
       data: (student) {
         final studentName = student?.name ?? '알 수 없음';
@@ -408,7 +408,7 @@ class _GroupClassAttendanceScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -495,7 +495,7 @@ class _GroupClassAttendanceScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('오류: $e'),
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

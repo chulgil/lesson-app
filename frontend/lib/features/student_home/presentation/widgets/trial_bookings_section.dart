@@ -61,8 +61,12 @@ class TrialBookingsSection extends ConsumerWidget {
               Center(
                 child: TextButton(
                   onPressed: () {
-                    // Switch to lessons tab - this is a workaround
-                    // In a real app, we'd use a callback or state management
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('모든 체험 레슨은 스케줄 탭에서 확인할 수 있습니다'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
                   },
                   child: Text('${trialBookings.length - 2}개 더보기'),
                 ),

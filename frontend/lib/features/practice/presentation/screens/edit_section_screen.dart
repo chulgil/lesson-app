@@ -172,7 +172,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('섹션 수정에 실패했습니다: $e'),
+            content: const Text('섹션 수정에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

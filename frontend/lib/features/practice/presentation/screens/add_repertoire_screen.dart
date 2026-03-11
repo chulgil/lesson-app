@@ -98,7 +98,7 @@ class _AddRepertoireScreenState extends ConsumerState<AddRepertoireScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('레퍼토리 추가에 실패했습니다: $e'),
+            content: const Text('레퍼토리 추가에 실패했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

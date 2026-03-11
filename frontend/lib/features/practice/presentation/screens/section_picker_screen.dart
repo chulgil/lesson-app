@@ -173,7 +173,7 @@ class _SectionPickerScreenState extends ConsumerState<SectionPickerScreen> {
                   children: [
                     const Icon(Icons.error_outline, size: 48, color: AppColors.error),
                     const SizedBox(height: AppSpacing.space4),
-                    Text('오류: $e', style: const TextStyle(color: AppColors.error)),
+                    const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
                   ],
                 ),
               ),

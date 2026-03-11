@@ -29,7 +29,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           return _buildContent(context, ref, unpaidList, teacherId);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('오류가 발생했습니다: $e')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
       ),
     );
   }

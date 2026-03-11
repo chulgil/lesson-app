@@ -82,7 +82,7 @@ class _RepertoireDetailScreenState
           return _buildContent(repertoire);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('오류: $error')),
+        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
       ),
     );
   }

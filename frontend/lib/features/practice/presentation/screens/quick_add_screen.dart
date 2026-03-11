@@ -194,7 +194,7 @@ class _QuickAddScreenState extends ConsumerState<QuickAddScreen> {
       }
     } catch (e) {
       if (mounted) {
-        _showErrorSnackBar('저장에 실패했습니다: $e');
+        _showErrorSnackBar('저장에 실패했습니다. 다시 시도해주세요.');
       }
     } finally {
       if (mounted) {
