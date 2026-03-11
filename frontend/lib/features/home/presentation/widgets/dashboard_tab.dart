@@ -13,6 +13,7 @@ import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import 'assignment_summary_section.dart';
+import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'urgent_actions_section.dart';
 
@@ -70,6 +71,11 @@ class DashboardTab extends ConsumerWidget {
           children: [
             // Header
             _buildHeader(context, ref),
+
+            const SizedBox(height: AppSpacing.space5),
+
+            // Getting Started Guide (shown when 0 students)
+            const GettingStartedCard(),
 
             const SizedBox(height: AppSpacing.space5),
 
@@ -411,14 +417,31 @@ class DashboardTab extends ConsumerWidget {
           color: AppColors.surfaceSecondaryLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
-        child: Row(
+        child: Column(
           children: [
-            Icon(Icons.event_available, color: AppColors.textTertiaryLight),
-            const SizedBox(width: AppSpacing.space3),
-            Text(
-              '오늘 예정된 레슨이 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+            Row(
+              children: [
+                Icon(Icons.event_available, color: AppColors.textTertiaryLight),
+                const SizedBox(width: AppSpacing.space3),
+                Text(
+                  '오늘 예정된 레슨이 없습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => context.push('/lessons/add'),
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('레슨 추가'),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                  foregroundColor: AppColors.primary,
+                ),
               ),
             ),
           ],

@@ -354,6 +354,35 @@ Claude가 작업 시작 시 이 파일 하나만 읽으면:
 | 통계/리포트 스펙 작성 | [#72](https://github.com/chulgil/lesson-app/issues/72) | MEDIUM | 스펙 완료 |
 | 출석 관리 스펙 작성 | [#73](https://github.com/chulgil/lesson-app/issues/73) | MEDIUM | 스펙 완료 |
 
+### Phase 3: 선생님 UX 종합 점검 (2026-03-11)
+
+Phase 1~2 핵심 UX 개선 + 편의성 개선
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| 빈 상태 CTA 버튼 추가 (학생탭 + 홈) | [#104](https://github.com/chulgil/lesson-app/issues/104) | HIGH | 구현 완료 |
+| 레슨 카드 스와이프 Quick Action (완료/취소) | [#105](https://github.com/chulgil/lesson-app/issues/105) | HIGH | 구현 완료 |
+| QuickFeedback 확장 (포인트+팁) | [#106](https://github.com/chulgil/lesson-app/issues/106) | HIGH | 구현 완료 |
+| 학생 등록 후 수강권 발급 안내 | [#107](https://github.com/chulgil/lesson-app/issues/107) | HIGH | 구현 완료 |
+| 피드백 저장 확인 인디케이터 | [#108](https://github.com/chulgil/lesson-app/issues/108) | MEDIUM | 구현 완료 |
+| 학생 추가 폼 필수 필드 시각 구분 | [#109](https://github.com/chulgil/lesson-app/issues/109) | MEDIUM | 구현 완료 |
+| 학생 목록 정렬 기능 구현 | [#110](https://github.com/chulgil/lesson-app/issues/110) | MEDIUM | 구현 완료 |
+| 가용시간 블록 past/cancelled 시각 구분 | [#111](https://github.com/chulgil/lesson-app/issues/111) | MEDIUM | 구현 완료 |
+| 레슨 완료 시 피드백 작성 유도 배너 | [#112](https://github.com/chulgil/lesson-app/issues/112) | MEDIUM | 구현 완료 |
+
+### Phase 4: 선생님 UX 종합 점검 2차 (2026-03-11)
+
+선생님 입장 전체 플로우 점검: 로그인 → 학생 초대 → 스케줄 관리 → 학생 관리 → 레슨노트 작성
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| EditStudentScreen Provider 연동 (DB 저장/삭제) | [#118](https://github.com/chulgil/lesson-app/issues/118) | CRITICAL | 구현 완료 |
+| 신규 선생님 시작 가이드 카드 (0명 학생 시) | [#119](https://github.com/chulgil/lesson-app/issues/119) | HIGH | 구현 완료 |
+| 요일별 레슨 시간 개별 설정 | [#120](https://github.com/chulgil/lesson-app/issues/120) | MEDIUM | todo |
+| 초대 상태 추적 (최근 초대 목록) | [#121](https://github.com/chulgil/lesson-app/issues/121) | MEDIUM | todo |
+| 레슨노트 피드백 프리셋/음성 버튼 | [#122](https://github.com/chulgil/lesson-app/issues/122) | MEDIUM | todo |
+| 스케줄 레슨추가 학생 퀵셀렉트 | [#123](https://github.com/chulgil/lesson-app/issues/123) | LOW | todo |
+
 ---
 
 ## 관련 문서
