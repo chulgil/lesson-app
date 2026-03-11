@@ -1,26 +1,21 @@
 services:
-  # --- MySQL 8.0 ---
+  # --- PostgreSQL 17 ---
   db:
-    image: mysql:8.0
+    image: postgres:17-bookworm
     container_name: lessonaza-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-lessonaza}
-      MYSQL_USER: ${MYSQL_USER:-lessonaza}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-lessonaza}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --default-authentication-plugin=caching_sha2_password
+      POSTGRES_DB: ${POSTGRES_DB:-lessonaza}
+      POSTGRES_USER: ${POSTGRES_USER:-lessonaza}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lessonaza}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - pg-data:/var/lib/postgresql/data
     networks:
       - lessonaza-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lessonaza}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -40,7 +35,7 @@ services:
       - .env
     environment:
       # Override DATABASE_URL for Docker networking
-      DATABASE_URL: mysql+asyncmy://${MYSQL_USER:-lessonaza}:${MYSQL_PASSWORD:-lessonaza}@db:3306/${MYSQL_DATABASE:-lessonaza}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-lessonaza}:${POSTGRES_PASSWORD:-lessonaza}@db:5432/${POSTGRES_DB:-lessonaza}
     ports:
       - "8000:8000"
     volumes:
@@ -72,7 +67,7 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-data:
+  pg-data:
     driver: local
   app-logs:
     driver: local

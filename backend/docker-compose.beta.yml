@@ -2,9 +2,9 @@
 # Lessonaza Backend - Beta Docker Compose
 # ============================================================
 # For codenavi server (108.61.162.25)
-# - Uses existing MySQL container on data_internal network
+# - Uses existing PostgreSQL container on data_internal network
 # - Uses Traefik reverse proxy on traefiknet for HTTPS
-# - Separate DB schema (lessonaza_beta) from production
+# - Separate DB (lessonaza_beta) from production
 # - Host: beta-lesson.chulgil.me
 #
 # Usage:

@@ -2,7 +2,7 @@
 # Lessonaza Backend - Production Docker Compose
 # ============================================================
 # For codenavi server (108.61.162.25)
-# - Uses existing MySQL container on data_internal network
+# - Uses existing PostgreSQL container on data_internal network
 # - Uses Traefik reverse proxy on traefiknet for HTTPS
 # - No separate DB or Nginx needed
 #
@@ -22,8 +22,8 @@ services:
     env_file:
       - .env
     environment:
-      # Connect to existing MySQL on data_internal network
-      DATABASE_URL: mysql+asyncmy://${MYSQL_USER:-lessonaza}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE:-lessonaza}
+      # Connect to existing PostgreSQL on data_internal network
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-lessonaza}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-lessonaza}
       ENVIRONMENT: production
       DEBUG: "false"
     volumes:

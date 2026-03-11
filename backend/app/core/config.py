@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Database
-    DATABASE_URL: str = "mysql+asyncmy://lessonaza:lessonaza@localhost:3306/lessonaza"
+    DATABASE_URL: str = "postgresql+asyncpg://lessonaza:lessonaza@localhost:5432/lessonaza"
     DATABASE_ECHO: bool = False
 
     # JWT

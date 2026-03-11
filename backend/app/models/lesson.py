@@ -8,12 +8,12 @@ from sqlalchemy import (
     Enum,
     Index,
     Integer,
+    JSON,
     Numeric,
     String,
     Text,
     func,
 )
-from sqlalchemy.dialects.mysql import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
