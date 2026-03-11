@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,6 +43,12 @@ class AssignmentSummarySection extends ConsumerWidget {
             Icon(Icons.assignment_outlined, size: 20, color: color),
             const SizedBox(width: AppSpacing.space2),
             Text('이번 주 과제', style: AppTypography.headingSmall),
+            const Spacer(),
+            TextButton(
+              onPressed: () =>
+                  context.push(AppRoutes.assignmentDashboard),
+              child: const Text('전체보기'),
+            ),
           ],
         ),
 

@@ -2,6 +2,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/home/presentation/screens/assignment_dashboard_screen.dart';
 import '../../../features/home/presentation/screens/home_screen.dart';
 import '../../../features/student_home/presentation/screens/student_home_screen.dart';
 import '../../../features/parent_home/presentation/screens/parent_home_screen.dart';
@@ -28,5 +29,12 @@ List<GoRoute> homeRoutes = [
     path: AppRoutes.parentHome,
     name: 'parentHome',
     builder: (context, state) => const ParentHomeScreen(),
+  ),
+
+  // Assignment Dashboard
+  GoRoute(
+    path: AppRoutes.assignmentDashboard,
+    name: 'assignmentDashboard',
+    builder: (context, state) => const AssignmentDashboardScreen(),
   ),
 ];
