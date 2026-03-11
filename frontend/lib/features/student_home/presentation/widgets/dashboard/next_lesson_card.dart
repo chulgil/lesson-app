@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/router/app_routes.dart';
+import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -123,7 +124,7 @@ class NextLessonCard extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        context.push('/schedule/booking/${booking.id}');
+        context.push(AppRoutes.bookingDetail.replaceFirst(':id', booking.id));
       },
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -206,7 +207,7 @@ class NextLessonCard extends ConsumerWidget {
                     ),
                   ),
                   Text(
-                    '${booking.lessonDate.month}월 ${booking.lessonDate.day}일 ($weekdayText) '
+                    '${formatDateYMD(booking.lessonDate)} ($weekdayText) '
                     '${booking.startTime.hour.toString().padLeft(2, '0')}:${booking.startTime.minute.toString().padLeft(2, '0')} · '
                     '${booking.durationMinutes}분',
                     style: AppTypography.bodySmall.copyWith(

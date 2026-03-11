@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -41,7 +42,7 @@ class AddStudentMethodScreen extends StatelessWidget {
                 buttonText: '초대하기',
                 isPrimary: true,
                 onTap: () {
-                  context.push('/invite');
+                  context.push(AppRoutes.invite);
                 },
               ),
 
@@ -55,7 +56,7 @@ class AddStudentMethodScreen extends StatelessWidget {
                 buttonText: '작성하기',
                 isPrimary: false,
                 onTap: () {
-                  context.push('/students/add');
+                  context.push(AppRoutes.addStudent);
                 },
               ),
             ],

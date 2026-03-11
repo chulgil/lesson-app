@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -163,7 +164,7 @@ class _QuickFeedbackStudentListState
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
         onTap: () => context.push(
-          '/lessons/quick-feedback/${lesson.id}',
+          AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -208,7 +209,7 @@ class _QuickFeedbackStudentListState
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: ListTile(
         onTap: () => context.push(
-          '/lessons/quick-feedback/${lesson.id}',
+          AppRoutes.quickFeedback.replaceFirst(':id', lesson.id),
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

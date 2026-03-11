@@ -116,7 +116,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           Text('학생 관리', style: AppTypography.headingLarge),
           FilledButton.icon(
             onPressed: () {
-              context.push('/students/add-method');
+              context.push(AppRoutes.addStudentMethod);
             },
             icon: const Icon(Icons.person_add, size: 18),
             label: const Text('학생 추가'),
@@ -380,7 +380,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           : null,
       actionLabel: query.isEmpty ? '학생 추가' : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
-      onAction: query.isEmpty ? () => context.push('/students/add-method') : null,
+      onAction: query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
     );
   }
 
@@ -507,7 +507,7 @@ class _StudentCard extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push('/students/${swm.studentId}');
+          context.push(AppRoutes.studentDetail.replaceFirst(':id', swm.studentId));
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(

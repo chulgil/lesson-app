@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -221,13 +223,10 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
-    final dayName = dayNames[lesson.date.weekday];
-    final dateStr =
-        '${lesson.date.year}.${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')} ($dayName)';
+    final dateStr = formatDateYMDWithDay(lesson.date);
 
     return InkWell(
-      onTap: () => context.push('/lessons/${lesson.id}'),
+      onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),

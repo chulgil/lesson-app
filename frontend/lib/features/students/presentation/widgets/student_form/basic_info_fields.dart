@@ -30,7 +30,7 @@ class BasicInfoFields extends StatelessWidget {
             isRequired: true,
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.trim().isEmpty) {
               return '이름을 입력해주세요';
             }
             return null;

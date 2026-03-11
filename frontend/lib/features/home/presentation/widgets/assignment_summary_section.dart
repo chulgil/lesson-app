@@ -121,7 +121,7 @@ class AssignmentSummarySection extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: InkWell(
-        onTap: () => context.push('/students/${status.studentId}'),
+        onTap: () => context.push(AppRoutes.studentDetail.replaceFirst(':id', status.studentId)),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.symmetric(

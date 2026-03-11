@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -313,7 +314,7 @@ class ScheduleTab extends ConsumerWidget {
     final dateStr =
         '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
 
-    context.push('/lessons/add?date=$dateStr&hour=$nextHour');
+    context.push('${AppRoutes.addLesson}?date=$dateStr&hour=$nextHour');
   }
 
   Widget _buildErrorState(WidgetRef ref, Object error) {
@@ -467,7 +468,7 @@ class _LessonTimeCard extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push('/lessons/${lesson.id}');
+          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -163,7 +164,7 @@ class _StudentDetailContent extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          context.push('/lessons/add?studentId=${student.id}');
+          context.push('${AppRoutes.addLesson}?studentId=${student.id}');
         },
         icon: const Icon(Icons.add),
         label: const Text('레슨 예약'),
@@ -182,7 +183,7 @@ class _StudentDetailContent extends ConsumerWidget {
       actions: [
         IconButton(
           onPressed: () {
-            context.push('/students/${student.id}/edit');
+            context.push(AppRoutes.editStudent.replaceFirst(':id', student.id));
           },
           icon: const Icon(Icons.edit),
         ),

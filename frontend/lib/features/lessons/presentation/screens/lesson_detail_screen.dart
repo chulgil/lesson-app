@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -172,7 +174,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       actions: [
         IconButton(
           onPressed: () {
-            final date = '${lesson.date.year}.${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')}';
+            final date = formatDateYMD(lesson.date);
             final text = '${lesson.studentName} ${lesson.instrument} 레슨\n$date ${lesson.startTime} (${lesson.duration}분)';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -203,7 +205,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Future<void> _handleAppBarAction(String value, Lesson lesson) async {
     if (value == 'edit') {
-      context.push('/lessons/${widget.lessonId}/edit');
+      context.push(AppRoutes.editLesson.replaceFirst(':id', widget.lessonId));
     } else if (value == 'cancel') {
       final confirmed = await showCancelLessonConfirmation(context);
       if (confirmed == true) {
@@ -519,12 +521,23 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     currentPoints.add(content);
 
     final updatedLesson = lesson.copyWith(keyPoints: currentPoints);
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    try {
+      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('주요 포인트가 추가되었습니다')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('주요 포인트가 추가되었습니다')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('주요 포인트 추가 실패: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -537,7 +550,18 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     final updatedLesson = lesson.copyWith(
       keyPoints: currentPoints.isEmpty ? null : currentPoints,
     );
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    try {
+      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('주요 포인트 삭제 실패: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   void _saveFeedbackDebounced(Lesson lesson, String text) {
@@ -562,11 +586,22 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     });
   }
 
-  void _saveStudentMemo(Lesson lesson, String memo) {
+  Future<void> _saveStudentMemo(Lesson lesson, String memo) async {
     final updatedLesson = lesson.copyWith(
       studentNote: memo.trim().isEmpty ? null : memo.trim(),
     );
-    ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    try {
+      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('메모 저장 실패: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _setPracticeTip(Lesson lesson, String? content) async {

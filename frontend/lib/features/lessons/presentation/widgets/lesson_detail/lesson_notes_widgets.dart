@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -292,7 +293,7 @@ class TeacherFeedbackCard extends StatelessWidget {
           if (lesson.updatedAt != null) ...[
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '작성: ${lesson.updatedAt!.year}.${lesson.updatedAt!.month.toString().padLeft(2, '0')}.${lesson.updatedAt!.day.toString().padLeft(2, '0')}',
+              '작성: ${formatDateYMD(lesson.updatedAt!)}',
               style: AppTypography.caption.copyWith(
                 color: AppColors.textTertiaryLight,
               ),
@@ -676,9 +677,15 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
     _debounce?.cancel();
     setState(() => _status = _SaveStatus.saving);
     _debounce = Timer(const Duration(milliseconds: 800), () {
-      widget.onSave(value.trim());
-      if (mounted) {
-        setState(() => _status = _SaveStatus.saved);
+      try {
+        widget.onSave(value.trim());
+        if (mounted) {
+          setState(() => _status = _SaveStatus.saved);
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _status = _SaveStatus.idle);
+        }
       }
     });
   }
