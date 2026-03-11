@@ -130,9 +130,30 @@
 
 ---
 
+## 8. Phase 6: 학생 UX 종합 점검 5차 (#135)
+
+### 6.1 대시보드 동적 데이터
+- TeacherFeedbackSection: 하드코딩(김선생님, 12월18일) → lessonsByStudentProvider 동적 연동
+- PracticeSummarySection: 하드코딩(7일, 4시간30분, 75%) → practiceLogsProvider 동적 연동
+- StudentProfileTab 선생님 이름: '김선생님' → myConnectionsProvider 동적화
+
+### 6.2 수기 선생님 네비게이션 수정
+- MaterialPageRoute → go_router 전환 (AppRoutes.addManualTeacher)
+- student_routes에 AddManualTeacherScreen 라우트 정의 추가
+- 편집 시 profileColorValue 보존 (기존 색상 손실 방지)
+
+### 6.3 코드 품질 개선
+- StudentGettingStartedCard: loading 상태 처리 (깜빡임 방지)
+- 노트 히스토리 날짜 포맷: MM.DD → YYYY.MM.DD 통일
+- 예약 날짜 범위: 30일 → 60일 (스펙 준수)
+- ManualTeacher entities.dart barrel export 추가
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-03-11 | Phase 6 (5차 점검): 대시보드 동적화, 수기선생님 네비게이션, 코드 품질 |
 | 2026-03-11 | Phase 5 (4차 점검): 프로필 동적 데이터, 온보딩 저장, 스케줄 확인 |
 | 2026-03-11 | 초기 작성 + Phase 1~4 구현 완료 |

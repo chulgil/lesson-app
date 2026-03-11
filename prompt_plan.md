@@ -1,8 +1,43 @@
-# 선생님 UX 종합 점검 5차
+# 학생 UX 종합 점검 5차
 
 > 확정일: 2026-03-11
 
-## 현재 세션: 선생님 UX 점검 5차 (Phase 1~3)
+## 현재 세션: 학생 UX 점검 5차 (Phase 1~3) - 완료
+
+### 배경
+
+학생 앱 전체 플로우 5차 점검: 대시보드 하드코딩 3건(CRITICAL), 수기선생님 네비게이션 혼용(CRITICAL), 코드 품질 4건 발견 및 해결.
+
+### Phase 1: 대시보드 동적 데이터 (CRITICAL) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 1-1 | TeacherFeedbackSection Provider 동적 연동 | #135 | done |
+| 1-2 | PracticeSummarySection Provider 동적 연동 | #135 | done |
+| 1-3 | StudentProfileTab 선생님 이름 동적화 | #135 | done |
+
+### Phase 2: 수기선생님 네비게이션 수정 (CRITICAL/HIGH) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 2-1 | AppRoutes + go_router 라우트 정의 | #135 | done |
+| 2-2 | MaterialPageRoute → context.push 전환 | #135 | done |
+| 2-3 | 편집 시 profileColorValue 보존 | #135 | done |
+
+### Phase 3: 코드 품질 개선 (HIGH/MEDIUM) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 3-1 | GettingStartedCard loading 상태 처리 | #135 | done |
+| 3-2 | 노트 히스토리 날짜 YYYY.MM.DD 통일 | #135 | done |
+| 3-3 | 예약 범위 30일→60일 | #135 | done |
+| 3-4 | ManualTeacher barrel export | #135 | done |
+
+---
+
+## 이전 계획: 선생님 UX 종합 점검 5차
+
+> 확정일: 2026-03-11
 
 ### 배경
 

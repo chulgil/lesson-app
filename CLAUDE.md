@@ -264,6 +264,7 @@ TODO.md로 Phase 기반 관리 → Issue 참조, 세션별 Phase 진행, 완료 
 - 연습완료 날짜별 완료 상태 동기화 (Issue #8)
 
 ### 최근 완료
+- 학생 UX 점검 5차 (#135) — 대시보드 동적화, 수기선생님 go_router 전환, 코드 품질 개선
 - 선생님 UX 점검 5차 (#133) — 시작 가이드 경로, teacherName 동적화, 프리셋 통합, 날짜 포맷
 - 학생 UX 점검 4차 (#132) — 프로필 동적 데이터, 온보딩 저장, 스케줄 확인 완성
 - 선생님 UX 점검 4차 (#128~#131) — 레슨 충돌 방지, 삭제 버튼 정리, 대시보드 개선, 피드백 프리셋
@@ -317,3 +318,16 @@ cd frontend && dart run build_runner build --delete-conflicting-outputs
 - **분류**: error-pattern
 - **교훈**: `flutter run --release`로 iPhone 배포 시 provisioning profile 에러 빈번. CLI에서 `--allowProvisioningUpdates` 플래그가 flutter에서 지원되지 않음.
 - **조치**: 배포 전 Xcode에서 Signing & Capabilities 확인. 문제 시 Xcode에서 직접 빌드하거나 `xcodebuild -allowProvisioningUpdates` 사용.
+
+## 4. UI-first 개발이 반복 UX 점검의 근본 원인 - automation-pattern
+- **날짜**: 2026-03-11
+- **분류**: automation-pattern
+- **교훈**: 선생님/학생 UX 점검을 각 5회(총 10회) 반복하며 매번 동일 유형의 이슈 발견: (1) 하드코딩 플레이스홀더 데이터 (5/5회), (2) TODO stub 저장 로직 (3/5회), (3) 라우트 파라미터 누락 (2/5회), (4) 상수 중복 정의 (2/5회), (5) 날짜 포맷 불일치 (2/5회). 근본 원인은 UI를 먼저 완성하고 데이터 연동을 후순위로 미루는 개발 방식.
+- **조치**: 새 화면 구현 시 반드시 아래 순서 준수:
+  1. 엔티티 + Provider 먼저 구현 (데이터 계층)
+  2. UI에서 Provider.watch로 바인딩 (하드코딩 문자열 금지)
+  3. save/submit/confirm 콜백에 실제 Provider 호출 구현 (TODO stub 금지)
+  4. AppRoutes 상수 + 필수 query parameter 확인
+  5. 새 상수 정의 전 Grep으로 기존 정의 검색 (중복 방지)
+  6. 날짜는 YYYY.MM.DD 포맷 통일
+  - 상세: [memory/ux-review-lessons.md](../../.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/ux-review-lessons.md)
