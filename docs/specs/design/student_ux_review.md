@@ -114,8 +114,25 @@
 
 ---
 
+## 7. Phase 5: 학생 UX 종합 점검 4차 (#132)
+
+### 5.1 학생 프로필 탭 동적 데이터
+- 하드코딩('홍길동', '24회' 등) → studentProvider 실제 데이터 연동
+- 통계: completedLessons count, practiceLog totalMinutes, createdAt 경과 기간
+
+### 5.2 온보딩 프로필 저장
+- TODO stub → studentsNotifierProvider.addStudent() 실제 저장
+- Student 엔티티 생성 + try-catch 에러 처리
+
+### 5.3 스케줄 확인 카드 예약 완성
+- _onConfirm TODO → slotBookingNotifierProvider.bookSlot() 실제 예약
+- 제안된 요일/시간 파싱 → 다음 해당 요일 날짜 계산
+
+---
+
 ## 변경 이력
 
 | 날짜 | 변경 |
 |------|------|
+| 2026-03-11 | Phase 5 (4차 점검): 프로필 동적 데이터, 온보딩 저장, 스케줄 확인 |
 | 2026-03-11 | 초기 작성 + Phase 1~4 구현 완료 |
