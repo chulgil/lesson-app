@@ -405,6 +405,19 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 | 피드백 프리셋 중복 제거 + 날짜 포맷 통일 | [#133](https://github.com/chulgil/lesson-app/issues/133) | HIGH | 구현 완료 |
 | 정기 레슨 저장 로직 미구현 | [#134](https://github.com/chulgil/lesson-app/issues/134) | HIGH | 설계 검토 필요 |
 
+### Phase 7: 선생님 UX 종합 점검 6차 (2026-03-11)
+
+선생님 앱 전체 플로우 6차 점검: 레슨 완료 UI, 날짜 포맷, 에러 처리, 경로 정리
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| 레슨 완료 처리 메뉴 추가 (scheduled→completed) | [#136](https://github.com/chulgil/lesson-app/issues/136) | MEDIUM | 구현 완료 |
+| quick_feedback 날짜 포맷 YYYY.MM.DD 통일 | [#136](https://github.com/chulgil/lesson-app/issues/136) | HIGH | 구현 완료 |
+| feedback/memo 저장 trim() + 에러 처리 | [#136](https://github.com/chulgil/lesson-app/issues/136) | HIGH | 구현 완료 |
+| 과제 설명 입력 maxLines 2→5 | [#136](https://github.com/chulgil/lesson-app/issues/136) | MEDIUM | 구현 완료 |
+| 하드코딩 경로 → AppRoutes 상수 통일 | [#136](https://github.com/chulgil/lesson-app/issues/136) | MEDIUM | 구현 완료 |
+| parentName 엔티티 추가 | — | CRITICAL | 설계 검토 필요 |
+
 ---
 
 ## 관련 문서
