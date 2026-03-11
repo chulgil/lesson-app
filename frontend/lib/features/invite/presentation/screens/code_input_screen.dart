@@ -323,7 +323,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
 
       if (mounted) {
         // Navigate to confirmation screen
-        context.push('/invite/confirm', extra: invite);
+        context.push(AppRoutes.inviteConfirm, extra: invite);
       }
     } catch (e) {
       setState(() {

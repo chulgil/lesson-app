@@ -174,15 +174,6 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: _FeatureCard(
-                title: '메트로놈',
-                subtitle: '박자 연습',
-                icon: Icons.music_note,
-                color: AppColors.secondary,
-                onTap: () => _openMetronome(context),
-              ),
-            ),
           ],
         ),
       ],
@@ -387,11 +378,6 @@ class UnconnectedChildDashboard extends ConsumerWidget {
         backgroundColor: AppColors.primary,
       ),
     );
-  }
-
-  void _openMetronome(BuildContext context) {
-    // Navigate to metronome
-    context.push('/metronome');
   }
 
   void _showFindTeacherDialog(BuildContext context) {

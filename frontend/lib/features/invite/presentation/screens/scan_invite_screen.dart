@@ -265,7 +265,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
           if (invite != null && invite.isValid) {
             if (mounted) {
               // Navigate to confirmation screen
-              context.push('/invite/confirm', extra: invite);
+              context.push(AppRoutes.inviteConfirm, extra: invite);
             }
           } else {
             _showError('유효하지 않은 초대 코드입니다');
