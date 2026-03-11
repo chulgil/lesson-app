@@ -306,6 +306,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             TeacherFeedbackCard(lesson: lesson),
           ],
 
+          // Student memo section (shown after feedback for student view)
+          if (!widget.isTeacher) ...[
+            const SizedBox(height: AppSpacing.space6),
+            StudentMemoCard(
+              initialMemo: lesson.studentNote,
+              onSave: (memo) => _saveStudentMemo(lesson, memo),
+            ),
+          ],
+
           const SizedBox(height: AppSpacing.space6),
 
           // Key points
@@ -337,15 +346,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             isTeacher: widget.isTeacher,
             onEdit: () => _showEditPracticeTipDialog(lesson),
           ),
-
-          // Student memo section
-          if (!widget.isTeacher) ...[
-            const SizedBox(height: AppSpacing.space6),
-            StudentMemoCard(
-              initialMemo: lesson.studentNote,
-              onSave: (memo) => _saveStudentMemo(lesson, memo),
-            ),
-          ],
         ],
       ),
     );

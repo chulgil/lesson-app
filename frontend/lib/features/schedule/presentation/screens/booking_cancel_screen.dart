@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../search/presentation/providers/teacher_search_provider.dart';
 import '../providers/teacher_availability_providers.dart';
 
 /// Booking cancellation screen
@@ -13,6 +16,7 @@ import '../providers/teacher_availability_providers.dart';
 class BookingCancelScreen extends ConsumerStatefulWidget {
   final String bookingId;
   final String teacherName;
+  final String? teacherId;
   final DateTime bookingDate;
   final TimeOfDay startTime;
   final int remainingReschedules;
@@ -24,6 +28,7 @@ class BookingCancelScreen extends ConsumerStatefulWidget {
     super.key,
     required this.bookingId,
     required this.teacherName,
+    this.teacherId,
     required this.bookingDate,
     required this.startTime,
     required this.remainingReschedules,
@@ -521,12 +526,135 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
   }
 
   void _contactTeacher() {
-    // TODO: Implement contact teacher functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('메시지 기능은 준비 중입니다'),
+    final teacherId = widget.teacherId;
+    if (teacherId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')),
+      );
+      return;
+    }
+
+    final profileAsync = ref.read(teacherFullProfileProvider(teacherId));
+    final phone = profileAsync.valueOrNull?.verification.phoneNumber;
+
+    if (phone == null || phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('선생님 연락처가 등록되지 않았습니다')),
+      );
+      return;
+    }
+
+    _showContactBottomSheet(phone);
+  }
+
+  void _showContactBottomSheet(String phone) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusLarge),
+        ),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${widget.teacherName} 연락처',
+                style: AppTypography.headingSmall,
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                phone,
+                style: AppTypography.bodyLarge.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space4),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final uri = Uri(scheme: 'tel', path: phone);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
+                          _copyToClipboard(phone);
+                        }
+                      },
+                      icon: const Icon(Icons.phone, size: 18),
+                      label: const Text('전화하기'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.space3,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final uri = Uri(scheme: 'sms', path: phone);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        } else {
+                          _copyToClipboard(phone);
+                        }
+                      },
+                      icon: const Icon(Icons.message, size: 18),
+                      label: const Text('문자 보내기'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.info,
+                        side: const BorderSide(color: AppColors.info),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.space3,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _copyToClipboard(phone);
+                  },
+                  icon: const Icon(Icons.copy, size: 16),
+                  label: const Text('번호 복사'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  void _copyToClipboard(String phone) {
+    Clipboard.setData(ClipboardData(text: phone));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('연락처가 복사되었습니다'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
   }
 
   String _formatBookingDate() {

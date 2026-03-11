@@ -10,6 +10,9 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../relationship/domain/entities/relationship_status.dart';
 import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
+import '../../domain/entities/manual_teacher.dart';
+import '../providers/manual_teacher_provider.dart';
+import 'add_manual_teacher_screen.dart';
 
 /// Screen showing the student's connected teachers
 class MyTeachersScreen extends ConsumerWidget {
@@ -19,62 +22,120 @@ class MyTeachersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final studentId = ref.watch(currentUserIdProvider);
     final relationsAsync = ref.watch(studentRelationshipsProvider(studentId));
+    final manualTeachersAsync = ref.watch(manualTeacherNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('내 선생님'),
       ),
-      body: relationsAsync.when(
-        data: (relations) => _buildContent(context, relations),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Text(
-            '데이터를 불러올 수 없습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // App teachers section
+            _buildAppTeachersSection(context, ref, relationsAsync),
+
+            const SizedBox(height: AppSpacing.space8),
+
+            // Manual teachers section
+            _buildManualTeachersSection(context, manualTeachersAsync),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, List<TeacherStudentRelation> relations) {
-    if (relations.isEmpty) {
-      return _buildEmptyState(context);
-    }
-
-    // Sort: active first, then by last lesson date
-    final sorted = [...relations]..sort((a, b) {
-        final aActive = a.status == RelationshipStatus.active ? 0 : 1;
-        final bActive = b.status == RelationshipStatus.active ? 0 : 1;
-        if (aActive != bActive) return aActive.compareTo(bActive);
-        return (b.lastLessonAt ?? b.createdAt)
-            .compareTo(a.lastLessonAt ?? a.createdAt);
-      });
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      itemCount: sorted.length,
-      separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
-      itemBuilder: (context, index) => _TeacherCard(relation: sorted[index]),
+  Widget _buildAppTeachersSection(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<TeacherStudentRelation>> relationsAsync,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.verified, size: 18, color: AppColors.primary),
+            const SizedBox(width: AppSpacing.space2),
+            Text(
+              '앱 선생님',
+              style: AppTypography.headingSmall.copyWith(
+                color: AppColors.textPrimaryLight,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        Text(
+          '앱을 통해 연결된 선생님',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        relationsAsync.when(
+          data: (relations) {
+            if (relations.isEmpty) {
+              return _buildAppTeachersEmpty(context);
+            }
+            final sorted = [...relations]..sort((a, b) {
+                final aActive = a.status == RelationshipStatus.active ? 0 : 1;
+                final bActive = b.status == RelationshipStatus.active ? 0 : 1;
+                if (aActive != bActive) return aActive.compareTo(bActive);
+                return (b.lastLessonAt ?? b.createdAt)
+                    .compareTo(a.lastLessonAt ?? a.createdAt);
+              });
+            return Column(
+              children: sorted
+                  .map((r) => Padding(
+                        padding:
+                            const EdgeInsets.only(bottom: AppSpacing.space3),
+                        child: _AppTeacherCard(relation: r),
+                      ))
+                  .toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space8),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Text(
+              '데이터를 불러올 수 없습니다',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
+  Widget _buildAppTeachersEmpty(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space6),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.school_outlined,
-            size: 64,
+            size: 40,
             color: AppColors.textTertiaryLight,
           ),
-          const SizedBox(height: AppSpacing.space4),
+          const SizedBox(height: AppSpacing.space3),
           Text(
-            '연결된 선생님이 없습니다',
-            style: AppTypography.bodyLarge.copyWith(
+            '연결된 앱 선생님이 없습니다',
+            style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
             ),
           ),
@@ -85,7 +146,7 @@ class MyTeachersScreen extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
           ),
-          const SizedBox(height: AppSpacing.space4),
+          const SizedBox(height: AppSpacing.space3),
           FilledButton.icon(
             onPressed: () => context.push(AppRoutes.teacherSearch),
             icon: const Icon(Icons.search, size: 18),
@@ -95,7 +156,127 @@ class MyTeachersScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _buildManualTeachersSection(
+    BuildContext context,
+    AsyncValue<List<ManualTeacher>> manualTeachersAsync,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.person_add_outlined, size: 18, color: AppColors.secondary),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                '직접 등록한 선생님',
+                style: AppTypography.headingSmall.copyWith(
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space1),
+        Text(
+          '앱에 가입하지 않은 선생님을 직접 등록하세요',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        manualTeachersAsync.when(
+          data: (teachers) {
+            if (teachers.isEmpty) {
+              return _buildManualTeachersEmpty(context);
+            }
+            return Column(
+              children: [
+                ...teachers.map((t) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                      child: _ManualTeacherCard(teacher: t),
+                    )),
+                const SizedBox(height: AppSpacing.space2),
+                _buildAddManualTeacherButton(context),
+              ],
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space8),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (e, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Text(
+              '데이터를 불러올 수 없습니다',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildManualTeachersEmpty(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space6),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.person_add_outlined,
+            size: 40,
+            color: AppColors.textTertiaryLight,
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Text(
+            '직접 등록한 선생님이 없습니다',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          _buildAddManualTeacherButton(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddManualTeacherButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const AddManualTeacherScreen(),
+          ),
+        ),
+        icon: const Icon(Icons.add, size: 18),
+        label: const Text('선생님 직접 등록'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          side: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
+// ============================================================
+// App Teacher Card
+// ============================================================
 
 // TODO: Replace with actual teacher profile lookup when backend is ready
 String _teacherDisplayName(String teacherId) {
@@ -116,10 +297,10 @@ String _teacherInstrument(String teacherId) {
   return mockInstruments[teacherId] ?? '악기 미정';
 }
 
-class _TeacherCard extends StatelessWidget {
+class _AppTeacherCard extends StatelessWidget {
   final TeacherStudentRelation relation;
 
-  const _TeacherCard({required this.relation});
+  const _AppTeacherCard({required this.relation});
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +337,6 @@ class _TeacherCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    // Teacher avatar
                     CircleAvatar(
                       radius: 28,
                       backgroundColor: isActive
@@ -171,8 +351,6 @@ class _TeacherCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
-
-                    // Teacher info
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,19 +377,15 @@ class _TeacherCard extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     Icon(
                       Icons.chevron_right,
                       color: AppColors.textTertiaryLight,
                     ),
                   ],
                 ),
-
                 const SizedBox(height: AppSpacing.space3),
                 Divider(height: 1, color: AppColors.borderLight),
                 const SizedBox(height: AppSpacing.space3),
-
-                // Stats row
                 Row(
                   children: [
                     _buildStat(
@@ -313,5 +487,139 @@ class _TeacherCard extends StatelessWidget {
     final remainingMonths = months % 12;
     if (remainingMonths == 0) return '$years년';
     return '$years년 $remainingMonths개월';
+  }
+}
+
+// ============================================================
+// Manual Teacher Card
+// ============================================================
+
+class _ManualTeacherCard extends StatelessWidget {
+  final ManualTeacher teacher;
+
+  const _ManualTeacherCard({required this.teacher});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  AddManualTeacherScreen(existingTeacher: teacher),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Row(
+              children: [
+                // Avatar with profile color
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: teacher.profileColor.withValues(alpha: 0.15),
+                  child: Text(
+                    teacher.initial,
+                    style: AppTypography.headingMedium.copyWith(
+                      color: teacher.profileColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+
+                // Teacher info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        teacher.name,
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space1),
+                      Row(
+                        children: [
+                          if (teacher.instrument != null) ...[
+                            Icon(
+                              Icons.music_note,
+                              size: 14,
+                              color: AppColors.textTertiaryLight,
+                            ),
+                            const SizedBox(width: AppSpacing.space1),
+                            Text(
+                              teacher.instrument!,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ],
+                          if (teacher.instrument != null &&
+                              teacher.phone != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.space2,
+                              ),
+                              child: Text(
+                                '|',
+                                style: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.textTertiaryLight,
+                                ),
+                              ),
+                            ),
+                          if (teacher.phone != null) ...[
+                            Icon(
+                              Icons.phone_outlined,
+                              size: 14,
+                              color: AppColors.textTertiaryLight,
+                            ),
+                            const SizedBox(width: AppSpacing.space1),
+                            Text(
+                              teacher.phone!,
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ],
+                          if (teacher.instrument == null &&
+                              teacher.phone == null)
+                            Text(
+                              '직접 등록',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.textTertiaryLight,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textTertiaryLight,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

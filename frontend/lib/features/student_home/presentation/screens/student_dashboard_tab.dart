@@ -9,7 +9,10 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../gamification/presentation/widgets/gamification_header.dart';
+import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
+import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
 import '../widgets/dashboard/dashboard_widgets.dart';
+import '../widgets/student_getting_started_card.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
 
@@ -73,9 +76,17 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // Getting started guide
+          StudentGettingStartedCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // Action banners
           PendingProposalsBanner(studentId: currentStudentId),
           LessonRequestsBanner(studentId: currentStudentId),
+
+          // Schedule confirmation cards
+          _ScheduleConfirmationSection(studentId: currentStudentId),
 
           // Next lesson
           NextLessonCard(studentId: currentStudentId),
@@ -108,6 +119,37 @@ class StudentDashboardTab extends ConsumerWidget {
           TeacherFeedbackSection(studentId: currentStudentId),
         ],
       ),
+    );
+  }
+}
+
+/// Shows pending schedule confirmation cards if any exist.
+class _ScheduleConfirmationSection extends ConsumerWidget {
+  final String studentId;
+
+  const _ScheduleConfirmationSection({required this.studentId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cardsAsync = ref.watch(
+      pendingScheduleConfirmationCardsProvider(studentId),
+    );
+
+    return cardsAsync.when(
+      data: (cards) {
+        if (cards.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          children: [
+            for (final card in cards) ...[
+              ScheduleConfirmationCardWidget(card: card),
+              const SizedBox(height: AppSpacing.space3),
+            ],
+          ],
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 }

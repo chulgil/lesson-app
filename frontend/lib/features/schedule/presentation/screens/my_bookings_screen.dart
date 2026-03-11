@@ -37,9 +37,9 @@ class MyBookingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get upcoming bookings (next 30 days)
+    // Get upcoming bookings (next 60 days)
     final now = DateTime.now();
-    final endDate = now.add(const Duration(days: 30));
+    final endDate = now.add(const Duration(days: 60));
 
     final slotsAsync = ref.watch(
       availableSlotsForDateRangeProvider(
@@ -376,6 +376,7 @@ class MyBookingsScreen extends ConsumerWidget {
         builder: (context) => BookingCancelScreen(
           bookingId: booking.id,
           teacherName: teacherName,
+          teacherId: teacherId,
           bookingDate: booking.date,
           startTime: booking.startTime,
           remainingReschedules: remainingReschedules,

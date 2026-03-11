@@ -157,7 +157,8 @@ class _LessonNoteHistoryScreenState
           (lesson.keyPoints
                   ?.any((kp) => kp.toLowerCase().contains(q)) ??
               false) ||
-          (lesson.practiceTips?.toLowerCase().contains(q) ?? false);
+          (lesson.practiceTips?.toLowerCase().contains(q) ?? false) ||
+          (lesson.studentNote?.toLowerCase().contains(q) ?? false);
     }).toList();
   }
 
@@ -314,6 +315,32 @@ class _NoteCard extends StatelessWidget {
                         color: AppColors.textSecondaryLight,
                       ),
                       maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            // Student memo (collapsed)
+            if (lesson.studentNote != null &&
+                lesson.studentNote!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Row(
+                children: [
+                  Icon(
+                    Icons.sticky_note_2_outlined,
+                    size: 14,
+                    color: AppColors.secondary,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      lesson.studentNote!,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

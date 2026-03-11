@@ -304,7 +304,7 @@ class TeacherFeedbackCard extends StatelessWidget {
           if (lesson.updatedAt != null) ...[
             const SizedBox(height: AppSpacing.space3),
             Text(
-              '작성: ${lesson.updatedAt!.month}월 ${lesson.updatedAt!.day}일',
+              '작성: ${lesson.updatedAt!.year}.${lesson.updatedAt!.month.toString().padLeft(2, '0')}.${lesson.updatedAt!.day.toString().padLeft(2, '0')}',
               style: AppTypography.caption.copyWith(
                 color: AppColors.textTertiaryLight,
               ),

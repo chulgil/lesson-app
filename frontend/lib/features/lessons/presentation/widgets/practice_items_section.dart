@@ -228,7 +228,7 @@ class PracticeItemsSection extends ConsumerWidget {
                                 ? AppColors.textTertiaryLight
                                 : AppColors.textSecondaryLight,
                           ),
-                          maxLines: 2,
+                          maxLines: 5,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
