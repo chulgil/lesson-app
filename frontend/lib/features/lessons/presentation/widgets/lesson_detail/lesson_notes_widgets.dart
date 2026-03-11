@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
@@ -43,8 +45,8 @@ class LessonDetailSectionHeader extends StatelessWidget {
   }
 }
 
-/// Note editor widget for lesson feedback
-class LessonNoteEditor extends StatelessWidget {
+/// Note editor widget for lesson feedback with save status indicator
+class LessonNoteEditor extends StatefulWidget {
   final String? initialText;
   final ValueChanged<String>? onChanged;
 
@@ -55,29 +57,122 @@ class LessonNoteEditor extends StatelessWidget {
   });
 
   @override
+  State<LessonNoteEditor> createState() => _LessonNoteEditorState();
+}
+
+class _LessonNoteEditorState extends State<LessonNoteEditor> {
+  late TextEditingController _controller;
+  _SaveStatus _saveStatus = _SaveStatus.idle;
+  Timer? _statusResetTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialText ?? '');
+  }
+
+  @override
+  void dispose() {
+    _statusResetTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onChanged(String text) {
+    setState(() => _saveStatus = _SaveStatus.saving);
+    widget.onChanged?.call(text);
+
+    // Show "saved" after debounce delay (800ms) + small buffer
+    _statusResetTimer?.cancel();
+    _statusResetTimer = Timer(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        setState(() => _saveStatus = _SaveStatus.saved);
+        // Reset to idle after 2 seconds
+        _statusResetTimer = Timer(const Duration(seconds: 2), () {
+          if (mounted) setState(() => _saveStatus = _SaveStatus.idle);
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: TextField(
-        maxLines: 6,
-        controller: TextEditingController(text: initialText ?? ''),
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          hintText: '레슨 피드백을 작성하세요...',
-          hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            border: Border.all(color: AppColors.borderLight),
           ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(AppSpacing.space4),
+          child: TextField(
+            maxLines: 6,
+            controller: _controller,
+            onChanged: _onChanged,
+            decoration: InputDecoration(
+              hintText: '레슨 피드백을 작성하세요...',
+              hintStyle: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(AppSpacing.space4),
+            ),
+          ),
         ),
-      ),
+        if (_saveStatus != _SaveStatus.idle)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.space1),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: _saveStatus == _SaveStatus.saving
+                  ? Row(
+                      key: const ValueKey('saving'),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            color: AppColors.textTertiaryLight,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '저장 중...',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.textTertiaryLight,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      key: const ValueKey('saved'),
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 14,
+                          color: AppColors.success,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '저장됨',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+      ],
     );
   }
 }
+
+enum _SaveStatus { idle, saving, saved }
 
 /// Card displaying teacher feedback
 class TeacherFeedbackCard extends StatelessWidget {
@@ -476,6 +571,117 @@ Future<String?> showEditPracticeTipDialog({
       ],
     ),
   );
+}
+
+/// Student memo card - allows students to write their own notes about a lesson
+class StudentMemoCard extends StatefulWidget {
+  final String? initialMemo;
+  final ValueChanged<String> onSave;
+
+  const StudentMemoCard({
+    super.key,
+    this.initialMemo,
+    required this.onSave,
+  });
+
+  @override
+  State<StudentMemoCard> createState() => _StudentMemoCardState();
+}
+
+class _StudentMemoCardState extends State<StudentMemoCard> {
+  late final TextEditingController _controller;
+  Timer? _debounce;
+  _SaveStatus _status = _SaveStatus.idle;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialMemo);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onChanged(String value) {
+    _debounce?.cancel();
+    setState(() => _status = _SaveStatus.saving);
+    _debounce = Timer(const Duration(milliseconds: 800), () {
+      widget.onSave(value.trim());
+      if (mounted) {
+        setState(() => _status = _SaveStatus.saved);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LessonDetailSectionHeader(
+          title: '내 메모',
+          icon: Icons.sticky_note_2_outlined,
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.secondary.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(
+              color: AppColors.secondary.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextField(
+                controller: _controller,
+                onChanged: _onChanged,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: '오늘 배운 것, 어려웠던 점 등을 메모하세요...',
+                  hintStyle: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                ),
+                style: AppTypography.bodyMedium,
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              if (_status == _SaveStatus.saving)
+                Text(
+                  '저장 중...',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                )
+              else if (_status == _SaveStatus.saved)
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check, size: 12, color: AppColors.success),
+                    const SizedBox(width: 4),
+                    Text(
+                      '저장됨',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// Format recording duration

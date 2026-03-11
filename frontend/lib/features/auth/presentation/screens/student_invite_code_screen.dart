@@ -207,13 +207,40 @@ class _StudentInviteCodeScreenState
                             const SizedBox(width: AppSpacing.space3),
                             Expanded(
                               child: Text(
-                                '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 선생님께 문의하세요.',
+                                '초대 코드는 선생님이 학생 등록 후 제공합니다.\n아직 코드가 없다면 아래에서 바로 시작할 수 있어요.',
                                 style: AppTypography.bodySmall.copyWith(
                                   color: AppColors.info,
                                 ),
                               ),
                             ),
                           ],
+                        ),
+                      ),
+
+                      const SizedBox(height: AppSpacing.space4),
+
+                      // Skip invite code - start without teacher
+                      SizedBox(
+                        width: double.infinity,
+                        height: AppSpacing.buttonHeight,
+                        child: OutlinedButton(
+                          onPressed: _handleStartWithoutCode,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textSecondaryLight,
+                            side: BorderSide(
+                              color: AppColors.borderLight,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(AppSpacing.radiusLarge),
+                            ),
+                          ),
+                          child: Text(
+                            '코드 없이 시작하기',
+                            style: AppTypography.button.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -225,6 +252,12 @@ class _StudentInviteCodeScreenState
         ),
       ),
     );
+  }
+
+  void _handleStartWithoutCode() {
+    // Set role to student and go directly to profile setup
+    ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+    context.go(AppRoutes.studentProfileSetup);
   }
 
   Future<void> _handleSubmitCode() async {
@@ -248,7 +281,7 @@ class _StudentInviteCodeScreenState
         ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
 
         if (mounted) {
-          // Show success and navigate to student home
+          // Show success and navigate to student profile setup
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('선생님과 성공적으로 연결되었습니다!'),
@@ -256,7 +289,7 @@ class _StudentInviteCodeScreenState
               behavior: SnackBarBehavior.floating,
             ),
           );
-          context.go(AppRoutes.studentHome);
+          context.go(AppRoutes.studentProfileSetup);
         }
       } else {
         setState(() {

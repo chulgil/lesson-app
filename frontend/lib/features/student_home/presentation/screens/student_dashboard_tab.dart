@@ -50,7 +50,7 @@ class StudentDashboardTab extends ConsumerWidget {
                   IconButton(
                     onPressed: () => context.push(AppRoutes.invite),
                     icon: const Icon(Icons.person_add_outlined),
-                    tooltip: '선생님 초대',
+                    tooltip: '선생님 연결',
                   ),
                   IconButton(
                     onPressed: () => context.push(AppRoutes.notifications),

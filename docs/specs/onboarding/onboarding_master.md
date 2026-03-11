@@ -80,7 +80,38 @@
 - "건너뛰기" 버튼: 모든 페이지에서 사용 가능
 - 페이지 인디케이터: 활성 페이지는 넓은 pill 형태 (24px), 비활성은 원형 (8px)
 
-### 2.5 상태 관리 (TeacherOnboardingNotifier)
+### 2.5 학생 온보딩 (Student Onboarding)
+
+> 구현 상태: ✅ 구현 완료 (v2 — 2026-03-11)
+
+**플로우:**
+```
+역할 선택 → 초대 코드 입력 (선택) → 프로필 설정 → 튜토리얼 → 학생 홈
+```
+
+#### 2.5.1 초대 코드 입력 (StudentInviteCodeScreen)
+- 선생님으로부터 받은 6자리 초대 코드 입력
+- "코드 없이 시작하기" 버튼으로 독립 사용 가능
+- 코드 입력 성공 시 프로필 설정으로 이동
+- 코드 없이 시작 시에도 프로필 설정으로 이동
+
+#### 2.5.2 학생 프로필 설정 (StudentProfileSetupScreen)
+- **필수 입력**: 이름, 악기 (1개)
+- 악기 선택: ChoiceChip 그리드 (바이올린, 비올라, 첼로, 피아노, 플루트, 클라리넷, 기타, 드럼, 성악, 작곡)
+- 2단계 진행 표시: [1 프로필] → [2 튜토리얼]
+- 모든 필수 항목 입력 시 "다음" 버튼 활성화
+
+#### 2.5.3 학생 튜토리얼 (StudentTutorialScreen)
+| 페이지 | 아이콘 | 내용 |
+|--------|--------|------|
+| 환영 | waving_hand | 환영 메시지 |
+| 레슨 확인 | calendar_month | 레슨 일정 확인/관리 안내 |
+| 연습 기록 | fitness_center | 연습 기록 안내 |
+| 선생님 소통 | people | 피드백 확인 안내 |
+
+**네비게이션:** 선생님 튜토리얼과 동일 패턴 (이전/다음/건너뛰기)
+
+### 2.6 상태 관리 (TeacherOnboardingNotifier)
 
 `@Riverpod(keepAlive: true)` 어노테이션으로 앱 생명주기 동안 유지.
 
@@ -98,14 +129,14 @@
 | `skipTutorial()` | 튜토리얼 건너뛰기 |
 | `completeOnboarding()` | 온보딩 완료 처리 |
 
-### 2.6 프로필 생성 (CurrentTeacherProfileNotifier)
+### 2.7 프로필 생성 (CurrentTeacherProfileNotifier)
 
 온보딩 완료 시 `TeacherProfile` 엔티티 생성:
 - 온보딩 데이터(이름, 사진, 악기, 소개)를 프로필로 변환
 - 휴대폰 인증 정보를 `TeacherVerification`에 포함
 - `MockTeacherProfileRepository`를 통해 저장
 
-### 2.7 Teacher Profile Repository
+### 2.8 Teacher Profile Repository
 
 - `EnvironmentConfig.useMockData` 기반으로 Mock/Remote 전환
 - 현재 Remote API 미구현 -> mock 전용 (empty 옵션 지원)
@@ -137,6 +168,8 @@
 | 휴대폰 인증 | `AppRoutes.teacherPhoneVerification` |
 | 프로필 설정 | `AppRoutes.teacherProfileSetup` |
 | 튜토리얼 | `AppRoutes.teacherTutorial` |
+| 학생 프로필 설정 | `AppRoutes.studentProfileSetup` (`/student/onboarding/profile-setup`) |
+| 학생 튜토리얼 | `AppRoutes.studentTutorial` (`/student/onboarding/tutorial`) |
 
 ## 4. Enum 정의 (Dart)
 
@@ -225,6 +258,8 @@ enum TutorialStep {
 | **Screen** | `onboarding/presentation/screens/phone_verification_screen.dart` | 휴대폰 인증 화면 |
 | **Screen** | `onboarding/presentation/screens/profile_setup_screen.dart` | 프로필 설정 화면 |
 | **Screen** | `onboarding/presentation/screens/tutorial_screen.dart` | 튜토리얼 화면 |
+| **Screen** | `onboarding/presentation/screens/student_profile_setup_screen.dart` | 학생 프로필 설정 화면 |
+| **Screen** | `onboarding/presentation/screens/student_tutorial_screen.dart` | 학생 튜토리얼 화면 |
 | **Repository** | `repositories/teacher_profile_repository.dart` | TeacherProfileRepository 인터페이스 + Mock (레거시 위치) |
 | **Route** | `core/router/routes/auth_routes.dart` | 온보딩 라우트 정의 |
 
@@ -249,6 +284,7 @@ enum TutorialStep {
 | 실제 SMS 연동 | 미구현 (mock) |
 | 실제 이미지 업로드 | 미구현 (mock) |
 | Remote API Repository | 미구현 |
+| 학생 온보딩 (프로필 설정 + 튜토리얼) | 구현 완료 |
 
 ## 8. 관련 스펙
 
@@ -265,3 +301,4 @@ enum TutorialStep {
 |------|------|
 | 2026-03-06 | 기존 구현 기반 스펙 문서 생성 (역공학) |
 | 2026-03-07 | Dart enum 코드 블록 추가, 구현 파일 위치 섹션 추가, 관련 스펙 링크 보강 |
+| 2026-03-11 | 학생 온보딩 섹션 추가 (프로필 설정, 튜토리얼 화면) |

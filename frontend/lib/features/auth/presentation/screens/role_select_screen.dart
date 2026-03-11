@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -30,7 +31,12 @@ class _RoleSelectScreenState extends ConsumerState<RoleSelectScreen> {
       if (!mounted) return;
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
-        context.go(authState.role.homeRoute);
+        // Students go through onboarding first (invite code → profile → tutorial)
+        if (role == UserRole.student) {
+          context.go(AppRoutes.studentInviteCode);
+        } else {
+          context.go(authState.role.homeRoute);
+        }
       }
     } catch (e) {
       if (mounted) {

@@ -9,6 +9,8 @@ import '../../../features/auth/presentation/screens/student_invite_code_screen.d
 import '../../../features/auth/presentation/screens/terms_agreement_screen.dart';
 import '../../../features/onboarding/presentation/screens/phone_verification_screen.dart';
 import '../../../features/onboarding/presentation/screens/profile_setup_screen.dart';
+import '../../../features/onboarding/presentation/screens/student_profile_setup_screen.dart';
+import '../../../features/onboarding/presentation/screens/student_tutorial_screen.dart';
 import '../../../features/onboarding/presentation/screens/tutorial_screen.dart';
 import '../app_routes.dart';
 
@@ -68,5 +70,19 @@ List<GoRoute> authRoutes = [
     path: AppRoutes.teacherTutorial,
     name: 'teacherTutorial',
     builder: (context, state) => const TutorialScreen(),
+  ),
+
+  // Student Onboarding - Profile Setup
+  GoRoute(
+    path: AppRoutes.studentProfileSetup,
+    name: 'studentProfileSetup',
+    builder: (context, state) => const StudentProfileSetupScreen(),
+  ),
+
+  // Student Onboarding - Tutorial
+  GoRoute(
+    path: AppRoutes.studentTutorial,
+    name: 'studentTutorial',
+    builder: (context, state) => const StudentTutorialScreen(),
   ),
 ];

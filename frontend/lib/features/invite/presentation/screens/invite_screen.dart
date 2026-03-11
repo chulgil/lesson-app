@@ -44,7 +44,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         title: Text(
-          userRole == InviteUserRole.teacher ? '학생 초대하기' : '선생님 초대하기',
+          userRole == InviteUserRole.teacher ? '학생 초대하기' : '선생님 연결하기',
         ),
         leading: IconButton(
           icon: const Icon(Icons.close),

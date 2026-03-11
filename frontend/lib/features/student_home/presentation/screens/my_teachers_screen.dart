@@ -41,7 +41,7 @@ class MyTeachersScreen extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, List<TeacherStudentRelation> relations) {
     if (relations.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
     // Sort: active first, then by last lesson date
@@ -61,7 +61,7 @@ class MyTeachersScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -85,10 +85,35 @@ class MyTeachersScreen extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
           ),
+          const SizedBox(height: AppSpacing.space4),
+          FilledButton.icon(
+            onPressed: () => context.push(AppRoutes.teacherSearch),
+            icon: const Icon(Icons.search, size: 18),
+            label: const Text('선생님 찾기'),
+          ),
         ],
       ),
     );
   }
+}
+
+// TODO: Replace with actual teacher profile lookup when backend is ready
+String _teacherDisplayName(String teacherId) {
+  const mockNames = {
+    'teacher_1': '김선생님',
+    'teacher_2': '이선생님',
+    'teacher_3': '박선생님',
+  };
+  return mockNames[teacherId] ?? '선생님';
+}
+
+String _teacherInstrument(String teacherId) {
+  const mockInstruments = {
+    'teacher_1': '바이올린',
+    'teacher_2': '피아노',
+    'teacher_3': '첼로',
+  };
+  return mockInstruments[teacherId] ?? '악기 미정';
 }
 
 class _TeacherCard extends StatelessWidget {
@@ -155,7 +180,7 @@ class _TeacherCard extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                '선생님', // Mock - will be teacher name
+                                _teacherDisplayName(relation.teacherId),
                                 style: AppTypography.bodyLarge.copyWith(
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -166,7 +191,7 @@ class _TeacherCard extends StatelessWidget {
                           ),
                           const SizedBox(height: AppSpacing.space1),
                           Text(
-                            '바이올린', // Mock - will be from teacher profile
+                            _teacherInstrument(relation.teacherId),
                             style: AppTypography.bodySmall.copyWith(
                               color: AppColors.textSecondaryLight,
                             ),

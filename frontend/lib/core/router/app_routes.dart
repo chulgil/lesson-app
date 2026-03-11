@@ -17,6 +17,10 @@ class AppRoutes {
   static const teacherProfileSetup = '/onboarding/profile-setup';
   static const teacherTutorial = '/onboarding/tutorial';
 
+  // Student onboarding routes
+  static const studentProfileSetup = '/student/onboarding/profile-setup';
+  static const studentTutorial = '/student/onboarding/tutorial';
+
   // Home routes
   static const home = '/home';
   static const studentHome = '/student-home';

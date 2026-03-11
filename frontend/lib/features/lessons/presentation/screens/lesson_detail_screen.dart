@@ -247,11 +247,45 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   Widget _buildNotesTab(Lesson lesson) {
+    final needsFeedback = widget.isTeacher &&
+        lesson.status == LessonStatus.completed &&
+        (lesson.feedback == null || lesson.feedback!.isEmpty);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Prompt to write feedback for completed lessons
+          if (needsFeedback) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.edit_note, color: AppColors.warning, size: 20),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      '레슨이 완료되었습니다. 피드백을 작성해주세요!',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.warning,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+          ],
+
           // Teacher notes section
           if (widget.isTeacher) ...[
             LessonDetailSectionHeader(
@@ -303,6 +337,15 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             isTeacher: widget.isTeacher,
             onEdit: () => _showEditPracticeTipDialog(lesson),
           ),
+
+          // Student memo section
+          if (!widget.isTeacher) ...[
+            const SizedBox(height: AppSpacing.space6),
+            StudentMemoCard(
+              initialMemo: lesson.studentNote,
+              onSave: (memo) => _saveStudentMemo(lesson, memo),
+            ),
+          ],
         ],
       ),
     );
@@ -476,6 +519,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       );
       ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
     });
+  }
+
+  void _saveStudentMemo(Lesson lesson, String memo) {
+    final updatedLesson = lesson.copyWith(
+      studentNote: memo.isEmpty ? null : memo,
+    );
+    ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
   }
 
   Future<void> _setPracticeTip(Lesson lesson, String? content) async {

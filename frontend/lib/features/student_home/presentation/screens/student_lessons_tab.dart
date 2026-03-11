@@ -195,7 +195,7 @@ class StudentLessonsTab extends ConsumerWidget {
           const Spacer(),
           FilledButton.icon(
             onPressed: () {
-              context.push(AppRoutes.teacherSearch);
+              context.push(AppRoutes.selectTeacher);
             },
             icon: const Icon(Icons.add, size: 18),
             label: const Text('예약'),
