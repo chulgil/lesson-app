@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../lessons/domain/entities/lesson.dart';
+import '../../../../lessons/presentation/providers/lesson_crud_provider.dart';
 
 /// Section showing the most recent teacher feedback.
-class TeacherFeedbackSection extends StatelessWidget {
+class TeacherFeedbackSection extends ConsumerWidget {
   final String studentId;
 
   const TeacherFeedbackSection({super.key, required this.studentId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,12 +36,52 @@ class TeacherFeedbackSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
-        _buildTeacherFeedback(),
+        lessonsAsync.when(
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+          data: (lessons) {
+            final feedbackLessons = lessons
+                .where((l) =>
+                    l.status == LessonStatus.completed && l.hasFeedback)
+                .toList()
+              ..sort((a, b) => b.date.compareTo(a.date));
+
+            if (feedbackLessons.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            return _buildTeacherFeedback(feedbackLessons.first);
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildTeacherFeedback() {
+  Widget _buildEmptyState() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Center(
+        child: Text(
+          '아직 피드백이 없습니다',
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherFeedback(Lesson lesson) {
+    final teacherName = lesson.teacherName ?? '선생님';
+    final teacherInitial = teacherName.isNotEmpty ? teacherName[0] : '?';
+    final dateStr =
+        '${lesson.date.year}.${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')}';
+
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -53,7 +98,7 @@ class TeacherFeedbackSection extends StatelessWidget {
                 radius: 16,
                 backgroundColor: AppColors.primaryLight,
                 child: Text(
-                  '김',
+                  teacherInitial,
                   style: AppTypography.caption.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -62,60 +107,29 @@ class TeacherFeedbackSection extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
-                '김선생님',
+                teacherName,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
               Text(
-                '12월 18일',
+                dateStr,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.textTertiaryLight,
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: AppSpacing.space3),
-
           Text(
-            '이번 주 바흐 파르티타 연습 잘 하고 있어요! '
-            'Allemande 부분에서 보잉이 많이 좋아졌습니다. '
-            '다음 레슨까지 Sarabande 첫 페이지 천천히 읽어오세요.',
+            lesson.feedback ?? '',
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
               height: 1.5,
             ),
           ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          Wrap(
-            spacing: AppSpacing.space2,
-            children: [
-              _buildTag('보잉 개선', AppColors.practiceGood),
-              _buildTag('Sarabande 예습', AppColors.info),
-            ],
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTag(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: AppTypography.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w500,
-        ),
       ),
     );
   }

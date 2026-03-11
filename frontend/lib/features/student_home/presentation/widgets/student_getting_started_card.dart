@@ -24,6 +24,11 @@ class StudentGettingStartedCard extends ConsumerWidget {
     final connectionsAsync = ref.watch(myConnectionsProvider);
     final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
 
+    // 로딩 중이면 숨김 (깜빡임 방지)
+    if (connectionsAsync.isLoading || bookingsAsync.isLoading) {
+      return const SizedBox.shrink();
+    }
+
     final hasConnections =
         connectionsAsync.valueOrNull?.isNotEmpty ?? false;
     final hasLessons = bookingsAsync.valueOrNull?.isNotEmpty ?? false;

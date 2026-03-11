@@ -76,6 +76,7 @@ class AppRoutes {
 
   // Student routes
   static const myTeachers = '/student/my-teachers';
+  static const addManualTeacher = '/student/my-teachers/add';
 
   // Settings routes
   static const backupSettings = '/settings/backup';

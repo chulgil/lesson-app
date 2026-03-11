@@ -12,7 +12,6 @@ import '../../../relationship/domain/entities/teacher_student_relation.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
 import '../../domain/entities/manual_teacher.dart';
 import '../providers/manual_teacher_provider.dart';
-import 'add_manual_teacher_screen.dart';
 
 /// Screen showing the student's connected teachers
 class MyTeachersScreen extends ConsumerWidget {
@@ -256,11 +255,7 @@ class MyTeachersScreen extends ConsumerWidget {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const AddManualTeacherScreen(),
-          ),
-        ),
+        onPressed: () => context.push(AppRoutes.addManualTeacher),
         icon: const Icon(Icons.add, size: 18),
         label: const Text('선생님 직접 등록'),
         style: OutlinedButton.styleFrom(
@@ -518,11 +513,9 @@ class _ManualTeacherCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) =>
-                  AddManualTeacherScreen(existingTeacher: teacher),
-            ),
+          onTap: () => context.push(
+            AppRoutes.addManualTeacher,
+            extra: teacher,
           ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),

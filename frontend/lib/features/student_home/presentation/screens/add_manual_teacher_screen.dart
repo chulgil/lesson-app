@@ -274,6 +274,7 @@ class _AddManualTeacherScreenState
           notes: _notesController.text.trim().isNotEmpty
               ? _notesController.text.trim()
               : null,
+          profileColorValue: widget.existingTeacher!.profileColorValue,
         );
         await notifier.updateTeacher(updated);
       } else {

@@ -8,7 +8,9 @@ import '../../../features/settings/presentation/screens/backup_settings_screen.d
 import '../../../features/student_home/presentation/screens/app_info_screen.dart';
 import '../../../features/student_home/presentation/screens/help_screen.dart';
 import '../../../features/student_home/presentation/screens/legal_document_screen.dart';
+import '../../../features/student_home/presentation/screens/add_manual_teacher_screen.dart';
 import '../../../features/student_home/presentation/screens/my_teachers_screen.dart';
+import '../../../features/student_home/domain/entities/manual_teacher.dart';
 import '../../../features/student_home/presentation/screens/notification_settings_screen.dart';
 import '../../../features/student_home/presentation/screens/student_profile_edit_screen.dart';
 import '../app_routes.dart';
@@ -20,6 +22,15 @@ List<GoRoute> settingsRoutes = [
     path: AppRoutes.myTeachers,
     name: 'myTeachers',
     builder: (context, state) => const MyTeachersScreen(),
+  ),
+  // Add/Edit Manual Teacher
+  GoRoute(
+    path: AppRoutes.addManualTeacher,
+    name: 'addManualTeacher',
+    builder: (context, state) {
+      final teacher = state.extra as ManualTeacher?;
+      return AddManualTeacherScreen(existingTeacher: teacher);
+    },
   ),
   // Backup Settings
   GoRoute(

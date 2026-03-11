@@ -224,7 +224,7 @@ class _NoteCard extends StatelessWidget {
     final dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
     final dayName = dayNames[lesson.date.weekday];
     final dateStr =
-        '${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')} ($dayName)';
+        '${lesson.date.year}.${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')} ($dayName)';
 
     return InkWell(
       onTap: () => context.push('/lessons/${lesson.id}'),

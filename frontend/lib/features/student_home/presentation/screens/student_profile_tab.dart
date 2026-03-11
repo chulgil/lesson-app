@@ -17,6 +17,7 @@ import '../../../../models/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../../../profile/presentation/providers/invite_provider.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../providers/practice_reminder_provider.dart';
 import '../widgets/language_select_sheet.dart';
@@ -314,6 +315,15 @@ class StudentProfileTab extends ConsumerWidget {
     final repertoireCount = repertoiresAsync.whenOrNull(
       data: (list) => list.where((r) => !r.isArchived).length,
     );
+    final connectionsAsync = ref.watch(myConnectionsProvider);
+    final teacherSubtitle = connectionsAsync.whenOrNull(
+      data: (connections) {
+        final active = connections.where((c) => c.isActive).toList();
+        if (active.isEmpty) return null;
+        if (active.length == 1) return active.first.teacherName;
+        return '선생님 ${active.length}명';
+      },
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -338,7 +348,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.school_outlined,
             title: '내 선생님',
-            subtitle: '김선생님',
+            subtitle: teacherSubtitle,
             onTap: () => context.push(AppRoutes.myTeachers),
           ),
           _buildMenuDivider(),

@@ -222,7 +222,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   Widget _buildWeekCalendar() {
     // Get available dates for the current month range
     final startDate = DateTime.now();
-    final endDate = startDate.add(const Duration(days: 30));
+    final endDate = startDate.add(const Duration(days: 60));
 
     final availableDatesAsync = ref.watch(
       availableSlotsForDateRangeProvider(
