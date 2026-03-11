@@ -378,10 +378,10 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 |------|------|:--------:|:----:|
 | EditStudentScreen Provider 연동 (DB 저장/삭제) | [#118](https://github.com/chulgil/lesson-app/issues/118) | CRITICAL | 구현 완료 |
 | 신규 선생님 시작 가이드 카드 (0명 학생 시) | [#119](https://github.com/chulgil/lesson-app/issues/119) | HIGH | 구현 완료 |
-| 요일별 레슨 시간 개별 설정 | [#120](https://github.com/chulgil/lesson-app/issues/120) | MEDIUM | todo |
-| 초대 상태 추적 (최근 초대 목록) | [#121](https://github.com/chulgil/lesson-app/issues/121) | MEDIUM | todo |
-| 레슨노트 피드백 프리셋/음성 버튼 | [#122](https://github.com/chulgil/lesson-app/issues/122) | MEDIUM | todo |
-| 스케줄 레슨추가 학생 퀵셀렉트 | [#123](https://github.com/chulgil/lesson-app/issues/123) | LOW | todo |
+| 요일별 레슨 시간 개별 설정 | [#120](https://github.com/chulgil/lesson-app/issues/120) | MEDIUM | 구현 완료 |
+| 초대 상태 추적 (최근 초대 목록) | [#121](https://github.com/chulgil/lesson-app/issues/121) | MEDIUM | 이미 구현됨 |
+| 레슨노트 피드백 프리셋/음성 버튼 | [#122](https://github.com/chulgil/lesson-app/issues/122) | MEDIUM | 구현 완료 (프리셋만) |
+| 스케줄 레슨추가 학생 퀵셀렉트 | [#123](https://github.com/chulgil/lesson-app/issues/123) | LOW | 구현 완료 |
 
 ---
 
