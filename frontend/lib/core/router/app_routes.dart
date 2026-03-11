@@ -140,4 +140,7 @@ class AppRoutes {
 
   // Lesson request routes
   static const myLessonRequests = '/lesson-requests';
+
+  // Analytics routes
+  static const analytics = '/analytics';
 }
