@@ -383,6 +383,17 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 | 레슨노트 피드백 프리셋/음성 버튼 | [#122](https://github.com/chulgil/lesson-app/issues/122) | MEDIUM | 구현 완료 (프리셋만) |
 | 스케줄 레슨추가 학생 퀵셀렉트 | [#123](https://github.com/chulgil/lesson-app/issues/123) | LOW | 구현 완료 |
 
+### Phase 5: 선생님 UX 종합 점검 4차 (2026-03-11)
+
+선생님 입장 전체 플로우 재점검: 로그인 → 학생 초대 → 스케줄 관리 → 학생 관리 → 레슨노트 작성
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| 레슨 스케줄 충돌 검증 (추가/수정 시) | [#128](https://github.com/chulgil/lesson-app/issues/128) | CRITICAL | 구현 완료 |
+| 학생 편집 삭제 버튼 중복 제거 | [#129](https://github.com/chulgil/lesson-app/issues/129) | MEDIUM | 구현 완료 |
+| 대시보드 레이아웃 개선 + 시작 가이드 수정 | [#130](https://github.com/chulgil/lesson-app/issues/130) | MEDIUM | 구현 완료 |
+| 퀵피드백 프리셋 칩 + 저장 피드백 | [#131](https://github.com/chulgil/lesson-app/issues/131) | HIGH | 구현 완료 |
+
 ---
 
 ## 관련 문서
