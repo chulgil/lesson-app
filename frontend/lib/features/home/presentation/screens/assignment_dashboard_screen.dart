@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -307,7 +308,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: InkWell(
-          onTap: () => context.push('/students/${status.studentId}'),
+          onTap: () => context.push(AppRoutes.studentDetail.replaceFirst(':id', status.studentId)),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),

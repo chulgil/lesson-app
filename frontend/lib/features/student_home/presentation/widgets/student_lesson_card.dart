@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -46,7 +47,7 @@ class StudentLessonCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: () {
-          context.push('/lessons/${lesson.id}');
+          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Column(

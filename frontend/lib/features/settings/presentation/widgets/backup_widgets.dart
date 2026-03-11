@@ -330,7 +330,18 @@ class ActionsSection extends ConsumerWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      await ref.read(backupStateProvider.notifier).createAndShareBackup();
+      try {
+        await ref.read(backupStateProvider.notifier).createAndShareBackup();
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('백업 생성에 실패했습니다: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -358,11 +369,22 @@ class ActionsSection extends ConsumerWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      final result =
-          await ref.read(backupStateProvider.notifier).pickAndRestore();
+      try {
+        final result =
+            await ref.read(backupStateProvider.notifier).pickAndRestore();
 
-      if (result != null && context.mounted) {
-        _showRestoreResult(context, result);
+        if (result != null && context.mounted) {
+          _showRestoreResult(context, result);
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('백업 복원에 실패했습니다: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     }
   }

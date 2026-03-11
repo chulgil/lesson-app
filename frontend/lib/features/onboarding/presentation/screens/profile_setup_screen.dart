@@ -58,22 +58,35 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
     setState(() => _isLoading = true);
 
-    final profile = TeacherOnboardingProfile(
-      name: _nameController.text,
-      profileImage: _profileImage,
-      instruments: _selectedInstruments,
-      introduction: _introController.text,
-    );
+    try {
+      final profile = TeacherOnboardingProfile(
+        name: _nameController.text,
+        profileImage: _profileImage,
+        instruments: _selectedInstruments,
+        introduction: _introController.text,
+      );
 
-    ref.read(teacherOnboardingNotifierProvider.notifier).updateProfile(profile);
-    ref.read(teacherOnboardingNotifierProvider.notifier).submitProfile();
+      ref.read(teacherOnboardingNotifierProvider.notifier).updateProfile(profile);
+      ref.read(teacherOnboardingNotifierProvider.notifier).submitProfile();
 
-    await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
 
-    setState(() => _isLoading = false);
-
-    if (mounted) {
-      context.go(AppRoutes.teacherTutorial);
+      if (mounted) {
+        context.go(AppRoutes.teacherTutorial);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('프로필 저장 중 오류가 발생했습니다: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

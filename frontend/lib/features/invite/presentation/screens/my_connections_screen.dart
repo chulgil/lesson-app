@@ -47,7 +47,7 @@ class MyConnectionsScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/invite'),
+        onPressed: () => context.push(AppRoutes.invite),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add),

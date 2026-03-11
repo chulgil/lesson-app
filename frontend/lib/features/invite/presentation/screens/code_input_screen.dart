@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -184,7 +185,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
               TextButton.icon(
                 onPressed: () {
                   context.pop();
-                  context.push('/invite/scan');
+                  context.push(AppRoutes.inviteScan);
                 },
                 icon: const Icon(Icons.qr_code_scanner),
                 label: const Text('QR 코드 스캔하기'),

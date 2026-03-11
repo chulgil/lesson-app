@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../models/lesson.dart';
@@ -176,7 +177,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 EditLessonStudentCard(
                   student: _selectedStudent!,
                   onViewProfile: () {
-                    context.push('/students/${_selectedStudent!.id}');
+                    context.push(AppRoutes.studentDetail.replaceFirst(':id', _selectedStudent!.id));
                   },
                 ),
 

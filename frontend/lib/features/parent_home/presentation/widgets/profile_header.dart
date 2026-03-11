@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../providers/user_profile_provider.dart';
 
 /// Profile header with avatar, name, email, and edit button
-class ProfileHeader extends StatelessWidget {
+class ProfileHeader extends ConsumerWidget {
   const ProfileHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userProfile = ref.watch(currentUserProfileProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
@@ -21,7 +24,9 @@ class ProfileHeader extends StatelessWidget {
                 radius: 40,
                 backgroundColor: AppColors.secondary,
                 child: Text(
-                  '박',
+                  userProfile.userName.isNotEmpty
+                      ? userProfile.userName.characters.first
+                      : '학',
                   style: AppTypography.headingLarge.copyWith(
                     color: Colors.white,
                   ),
@@ -57,7 +62,9 @@ class ProfileHeader extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      '박부모',
+                      userProfile.userName.isNotEmpty
+                          ? userProfile.userName
+                          : '학부모',
                       style: AppTypography.headingLarge,
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -82,7 +89,7 @@ class ProfileHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
-                  'parent@example.com',
+                  userProfile.userId,
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),

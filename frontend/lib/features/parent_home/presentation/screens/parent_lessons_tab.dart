@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -39,7 +40,7 @@ class ParentLessonsTab extends ConsumerWidget {
             endTime: '15:00',
             teacherName: '김선생님',
             status: LessonStatus.confirmed,
-            onTap: () => context.push('/lessons/lesson_upcoming_1'),
+            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_upcoming_1')),
           ),
 
           const SizedBox(height: AppSpacing.space3),
@@ -51,7 +52,7 @@ class ParentLessonsTab extends ConsumerWidget {
             endTime: '15:00',
             teacherName: '김선생님',
             status: LessonStatus.confirmed,
-            onTap: () => context.push('/lessons/lesson_upcoming_2'),
+            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_upcoming_2')),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -71,7 +72,7 @@ class ParentLessonsTab extends ConsumerWidget {
             teacherName: '김선생님',
             status: LessonStatus.completed,
             hasNote: true,
-            onTap: () => context.push('/lessons/lesson_1'),
+            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1')),
             onViewNote: () => _showLessonNoteSheet(context, 'lesson_1'),
           ),
 
@@ -85,7 +86,7 @@ class ParentLessonsTab extends ConsumerWidget {
             teacherName: '김선생님',
             status: LessonStatus.completed,
             hasNote: true,
-            onTap: () => context.push('/lessons/lesson_2'),
+            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2')),
             onViewNote: () => _showLessonNoteSheet(context, 'lesson_2'),
           ),
         ],
@@ -130,7 +131,7 @@ class ParentLessonsTab extends ConsumerWidget {
                   TextButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      context.push('/lessons/$lessonId');
+                      context.push(AppRoutes.lessonDetail.replaceFirst(':id', lessonId));
                     },
                     icon: const Icon(Icons.open_in_new, size: 16),
                     label: const Text('상세보기'),

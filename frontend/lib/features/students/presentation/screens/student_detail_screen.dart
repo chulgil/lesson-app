@@ -452,9 +452,20 @@ class _StudentDetailContent extends ConsumerWidget {
                 Navigator.pop(context);
                 final confirmed = await _showDeleteConfirmation(context);
                 if (confirmed == true) {
-                  await ref.read(studentsNotifierProvider.notifier).deleteStudent(student.id);
-                  if (context.mounted) {
-                    context.pop();
+                  try {
+                    await ref.read(studentsNotifierProvider.notifier).deleteStudent(student.id);
+                    if (context.mounted) {
+                      context.pop();
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('학생 삭제 실패: $e'),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
                   }
                 }
               },

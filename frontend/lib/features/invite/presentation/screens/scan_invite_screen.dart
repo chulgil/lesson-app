@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -184,7 +185,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
             child: TextButton.icon(
               onPressed: () {
                 context.pop();
-                context.push('/invite/code');
+                context.push(AppRoutes.inviteCode);
               },
               icon: const Icon(Icons.dialpad, color: Colors.white),
               label: Text(
@@ -254,7 +255,7 @@ class _ScanInviteScreenState extends ConsumerState<ScanInviteScreen> {
         if (parsed.type == _QrType.academy) {
           // Navigate to academy detail screen
           if (mounted) {
-            context.push('/academy/${parsed.value}');
+            context.push(AppRoutes.academyDetail.replaceFirst(':id', parsed.value));
           }
         } else if (parsed.type == _QrType.invite) {
           // Look up the invite

@@ -39,7 +39,7 @@ class PracticeRepertoireScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () =>
-                context.push('/practice/repertoire/add?studentId=$studentId'),
+                context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
             tooltip: '레퍼토리 추가',
           ),
         ],
@@ -75,7 +75,7 @@ class PracticeRepertoireScreen extends ConsumerWidget {
       subtitle: '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요',
       actionLabel: '레퍼토리 추가',
       actionIcon: Icons.add,
-      onAction: () => context.push('/practice/repertoire/add?studentId=$studentId'),
+      onAction: () => context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
     );
   }
 

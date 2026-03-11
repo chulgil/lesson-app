@@ -209,11 +209,22 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     } else if (value == 'cancel') {
       final confirmed = await showCancelLessonConfirmation(context);
       if (confirmed == true) {
-        await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('레슨이 취소되었습니다')),
-          );
+        try {
+          await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('레슨이 취소되었습니다')),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('레슨 취소 실패: $e'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
         }
       }
     } else if (value == 'complete') {
@@ -235,23 +246,45 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ),
       );
       if (confirmed == true) {
-        final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
-        await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('레슨이 완료 처리되었습니다')),
-          );
+        try {
+          final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
+          await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('레슨이 완료 처리되었습니다')),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('레슨 완료 처리 실패: $e'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
         }
       }
     } else if (value == 'delete') {
       final confirmed = await showDeleteLessonConfirmation(context);
       if (confirmed == true) {
-        await ref.read(lessonsNotifierProvider.notifier).deleteLesson(lesson.id);
-        if (mounted) {
-          context.pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('레슨이 삭제되었습니다')),
-          );
+        try {
+          await ref.read(lessonsNotifierProvider.notifier).deleteLesson(lesson.id);
+          if (mounted) {
+            context.pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('레슨이 삭제되었습니다')),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('레슨 삭제 실패: $e'),
+                backgroundColor: AppColors.error,
+              ),
+            );
+          }
         }
       }
     }

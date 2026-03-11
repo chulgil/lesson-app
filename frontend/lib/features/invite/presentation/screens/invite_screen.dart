@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart' show ShareParams, SharePlus;
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -53,7 +54,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
-            onPressed: () => context.push('/invite/history'),
+            onPressed: () => context.push(AppRoutes.inviteHistory),
             tooltip: '초대 내역',
           ),
         ],
@@ -370,7 +371,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 : '선생님의 QR 코드 스캔하기',
           ),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push('/invite/scan'),
+          onTap: () => context.push(AppRoutes.inviteScan),
         ),
         ListTile(
           leading: Container(
@@ -384,7 +385,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
           title: const Text('초대 코드 입력'),
           subtitle: const Text('6자리 코드로 연결하기'),
           trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.push('/invite/code'),
+          onTap: () => context.push(AppRoutes.inviteCode),
         ),
         if (userRole == InviteUserRole.student)
           ListTile(
@@ -399,7 +400,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             title: const Text('선생님 검색'),
             subtitle: const Text('앱에서 선생님 찾기'),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/search'),
+            onTap: () => context.push(AppRoutes.teacherSearch),
           ),
       ],
     );

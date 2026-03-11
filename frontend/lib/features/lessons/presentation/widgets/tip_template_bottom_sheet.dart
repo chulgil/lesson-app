@@ -462,8 +462,19 @@ class _TipTemplateBottomSheetState
   }
 
   void _selectTemplate(TipTemplate template) async {
-    // Increment usage count
-    await ref.read(tipTemplatesNotifierProvider.notifier).useTemplate(template.id);
+    try {
+      // Increment usage count
+      await ref.read(tipTemplatesNotifierProvider.notifier).useTemplate(template.id);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('템플릿 사용 기록에 실패했습니다: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
 
     widget.onSelect(template.content);
     if (mounted) {
