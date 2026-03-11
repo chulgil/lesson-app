@@ -9,19 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
-
-/// Preset phrases for quick feedback input.
-const _feedbackPresets = [
-  '음정 주의',
-  '리듬 좋음',
-  '활 주법 연습',
-  '자세 교정',
-  '진도 우수',
-  '많이 향상됨',
-  '복습 필요',
-  '천천히 연습',
-  '메트로놈 사용',
-];
+import '../../domain/constants/feedback_constants.dart';
 
 /// Quick feedback writing screen for a specific lesson.
 /// Supports feedback text, key points, and practice tips.
@@ -291,12 +279,12 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       height: 34,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _feedbackPresets.length,
+        itemCount: feedbackPresets.length,
         separatorBuilder: (_, __) => const SizedBox(width: 6),
         itemBuilder: (context, index) {
           return ActionChip(
             label: Text(
-              _feedbackPresets[index],
+              feedbackPresets[index],
               style: AppTypography.caption.copyWith(
                 color: AppColors.primary,
               ),
@@ -307,7 +295,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onPressed: () => _insertPreset(_feedbackPresets[index]),
+            onPressed: () => _insertPreset(feedbackPresets[index]),
           );
         },
       ),

@@ -13,9 +13,7 @@ import '../../../../providers/student/student_crud_provider.dart';
 /// Getting Started checklist card for new teachers with 0 students.
 /// Shows actionable steps to help them get started.
 class GettingStartedCard extends ConsumerWidget {
-  final VoidCallback? onNavigateToSchedule;
-
-  const GettingStartedCard({super.key, this.onNavigateToSchedule});
+  const GettingStartedCard({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -97,7 +95,7 @@ class GettingStartedCard extends ConsumerWidget {
                 isCompleted: hasLessons,
                 onTap: students.isEmpty
                     ? null
-                    : () => context.push('/lessons/add'),
+                    : () => context.push('${AppRoutes.addLesson}?studentId=${students.first.id}'),
               ),
 
               const SizedBox(height: AppSpacing.space2),
@@ -106,9 +104,14 @@ class GettingStartedCard extends ConsumerWidget {
               _StepItem(
                 step: 3,
                 title: '첫 레슨 완료하기',
-                subtitle: '레슨을 진행하고 완료 처리하세요',
+                subtitle: '레슨을 탭해 완료 처리하세요',
                 isCompleted: hasCompletedLesson,
-                onTap: hasLessons ? onNavigateToSchedule : null,
+                onTap: hasLessons
+                    ? () {
+                        final firstLesson = lessonsAsync.valueOrNull!.first;
+                        context.push('/lessons/${firstLesson.id}');
+                      }
+                    : null,
               ),
             ],
           ),

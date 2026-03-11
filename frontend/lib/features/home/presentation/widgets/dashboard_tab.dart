@@ -20,12 +20,10 @@ import 'urgent_actions_section.dart';
 /// Dashboard Tab - core stats + urgent actions + today's lessons.
 class DashboardTab extends ConsumerWidget {
   final VoidCallback onViewAllLessons;
-  final VoidCallback onNavigateToSchedule;
 
   const DashboardTab({
     super.key,
     required this.onViewAllLessons,
-    required this.onNavigateToSchedule,
   });
 
   @override
@@ -80,9 +78,7 @@ class DashboardTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space5),
 
             // Getting Started Guide (shown when 0 students)
-            GettingStartedCard(
-              onNavigateToSchedule: onNavigateToSchedule,
-            ),
+            const GettingStartedCard(),
 
             const SizedBox(height: AppSpacing.space5),
 

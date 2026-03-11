@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
+import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../../providers/providers.dart';
 import '../widgets/lesson_form_widgets.dart';
 
@@ -468,7 +469,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       id: '', // Will be set by repository
       studentId: _selectedStudent!.id,
       studentName: _selectedStudent!.name,
-      teacherName: '김선생님', // TODO: Get from auth
+      teacherName: ref.read(teacherExtendedProfileProvider).valueOrNull?.name ?? '선생님',
       instrument: _selectedStudent!.instrument,
       date: _selectedDate,
       startTime: formatLessonTime(_selectedTime),
