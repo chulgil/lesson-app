@@ -37,6 +37,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
   int _lessonDuration = 60;
   final Set<int> _selectedDays = {};
   TimeOfDay _lessonTime = const TimeOfDay(hour: 14, minute: 0);
+  final Map<int, TimeOfDay> _dayTimeMap = {};
 
   bool _isInitialized = false;
   bool _hasChanges = false;
@@ -78,14 +79,45 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       }
     }
 
-    // Parse lesson time
+    // Parse lesson time (supports "14:00" or "월14:00,수15:30" format)
+    _dayTimeMap.clear();
     if (student.lessonTime != null) {
-      final parts = student.lessonTime!.split(':');
-      if (parts.length == 2) {
-        final hour = int.tryParse(parts[0]);
-        final minute = int.tryParse(parts[1]);
-        if (hour != null && minute != null) {
-          _lessonTime = TimeOfDay(hour: hour, minute: minute);
+      final timeStr = student.lessonTime!;
+      if (timeStr.contains(',') || RegExp(r'^[가-힣]').hasMatch(timeStr)) {
+        // Per-day format: "월14:00,수15:30"
+        for (final entry in timeStr.split(',')) {
+          final trimmed = entry.trim();
+          if (trimmed.length >= 6) {
+            final dayChar = trimmed[0];
+            final dayIndex = _dayNames.indexOf(dayChar);
+            final timePart = trimmed.substring(1);
+            final parts = timePart.split(':');
+            if (dayIndex >= 0 && parts.length == 2) {
+              final hour = int.tryParse(parts[0]);
+              final minute = int.tryParse(parts[1]);
+              if (hour != null && minute != null) {
+                _dayTimeMap[dayIndex] = TimeOfDay(hour: hour, minute: minute);
+              }
+            }
+          }
+        }
+        // Set default lessonTime from first entry
+        if (_dayTimeMap.isNotEmpty) {
+          _lessonTime = _dayTimeMap.values.first;
+        }
+      } else {
+        // Simple format: "14:00"
+        final parts = timeStr.split(':');
+        if (parts.length == 2) {
+          final hour = int.tryParse(parts[0]);
+          final minute = int.tryParse(parts[1]);
+          if (hour != null && minute != null) {
+            _lessonTime = TimeOfDay(hour: hour, minute: minute);
+          }
+        }
+        // Populate dayTimeMap with same time for all selected days
+        for (final day in _selectedDays) {
+          _dayTimeMap[day] = _lessonTime;
         }
       }
     }
@@ -272,8 +304,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                       setState(() {
                         if (_selectedDays.contains(index)) {
                           _selectedDays.remove(index);
+                          _dayTimeMap.remove(index);
                         } else {
                           _selectedDays.add(index);
+                          _dayTimeMap[index] = _lessonTime;
                         }
                         _hasChanges = true;
                       });
@@ -292,6 +326,13 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                     onDurationChanged: (value) {
                       setState(() {
                         _lessonDuration = value;
+                        _hasChanges = true;
+                      });
+                    },
+                    dayTimeMap: _dayTimeMap,
+                    onDayTimeChanged: (dayIndex, time) {
+                      setState(() {
+                        _dayTimeMap[dayIndex] = time;
                         _hasChanges = true;
                       });
                     },
@@ -406,7 +447,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
     setState(() => _isSaving = true);
 
-    final lessonDays = _selectedDays.map((i) => _dayNames[i]).join(', ');
+    final sortedDays = _selectedDays.toList()..sort();
+    final lessonDays = sortedDays.map((i) => _dayNames[i]).join(', ');
+    final lessonTimeStr = _buildLessonTimeString(sortedDays);
     final monthlyFee =
         int.tryParse(_monthlyFeeController.text) ?? original.monthlyFee;
 
@@ -426,7 +469,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           ? _emailController.text.trim()
           : null,
       lessonDay: lessonDays.isNotEmpty ? lessonDays : null,
-      lessonTime: formatTime(_lessonTime),
+      lessonTime: lessonTimeStr,
       lessonDuration: _lessonDuration,
       notes: _notesController.text.isNotEmpty
           ? _notesController.text.trim()
@@ -461,5 +504,22 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  /// Build lessonTime string: "14:00" if all same, "월14:00,수15:30" if different.
+  String _buildLessonTimeString(List<int> sortedDays) {
+    if (sortedDays.isEmpty) return formatTime(_lessonTime);
+
+    final times = sortedDays.map((d) => _dayTimeMap[d] ?? _lessonTime).toList();
+    final allSame = times.every(
+      (t) => t.hour == times.first.hour && t.minute == times.first.minute,
+    );
+
+    if (allSame) return formatTime(times.first);
+
+    return sortedDays.map((d) {
+      final time = _dayTimeMap[d] ?? _lessonTime;
+      return '${_dayNames[d]}${formatTime(time)}';
+    }).join(',');
   }
 }

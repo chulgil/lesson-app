@@ -45,7 +45,21 @@ class LessonDetailSectionHeader extends StatelessWidget {
   }
 }
 
+/// Preset feedback phrases for quick insertion.
+const _feedbackPresets = [
+  '음정 주의',
+  '리듬 좋음',
+  '활 주법 연습',
+  '자세 교정',
+  '진도 우수',
+  '많이 향상됨',
+  '복습 필요',
+  '천천히 연습',
+  '메트로놈 사용',
+];
+
 /// Note editor widget for lesson feedback with save status indicator
+/// and preset phrase chips for quick input.
 class LessonNoteEditor extends StatefulWidget {
   final String? initialText;
   final ValueChanged<String>? onChanged;
@@ -95,11 +109,70 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
     });
   }
 
+  void _insertPreset(String preset) {
+    final currentText = _controller.text;
+    final selection = _controller.selection;
+
+    String newText;
+    int newCursorPos;
+
+    if (currentText.isEmpty) {
+      newText = preset;
+      newCursorPos = preset.length;
+    } else if (selection.isValid && selection.baseOffset == selection.extentOffset) {
+      // Insert at cursor position
+      final before = currentText.substring(0, selection.baseOffset);
+      final after = currentText.substring(selection.baseOffset);
+      final separator = before.isNotEmpty && !before.endsWith('\n') ? '\n' : '';
+      newText = '$before$separator$preset$after';
+      newCursorPos = before.length + separator.length + preset.length;
+    } else {
+      // Append at end
+      newText = '$currentText\n$preset';
+      newCursorPos = newText.length;
+    }
+
+    _controller.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursorPos),
+    );
+    _onChanged(newText);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Preset chips
+        SizedBox(
+          height: 36,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _feedbackPresets.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 6),
+            itemBuilder: (context, index) {
+              return ActionChip(
+                label: Text(
+                  _feedbackPresets[index],
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                side: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                onPressed: () => _insertPreset(_feedbackPresets[index]),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+
+        // Text editor
         Container(
           decoration: BoxDecoration(
             color: AppColors.surfaceLight,
@@ -120,51 +193,56 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
             ),
           ),
         ),
+
+        // Save status
         if (_saveStatus != _SaveStatus.idle)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.space1),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              child: _saveStatus == _SaveStatus.saving
-                  ? Row(
-                      key: const ValueKey('saving'),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            color: AppColors.textTertiaryLight,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: _saveStatus == _SaveStatus.saving
+                    ? Row(
+                        key: const ValueKey('saving'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              color: AppColors.textTertiaryLight,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '저장 중...',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                          const SizedBox(width: 4),
+                          Text(
+                            '저장 중...',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textTertiaryLight,
+                            ),
                           ),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      key: const ValueKey('saved'),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.check_circle_outline,
-                          size: 14,
-                          color: AppColors.success,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '저장됨',
-                          style: AppTypography.caption.copyWith(
+                        ],
+                      )
+                    : Row(
+                        key: const ValueKey('saved'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.check_circle_outline,
+                            size: 14,
                             color: AppColors.success,
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '저장됨',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.success,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
       ],

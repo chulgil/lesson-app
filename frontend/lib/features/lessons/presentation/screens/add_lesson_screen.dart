@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
@@ -120,6 +121,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               // Student selection
               const LessonFormSectionTitle('학생 선택'),
               const SizedBox(height: AppSpacing.space3),
+
+              // Quick select chips for recent students
+              _buildRecentStudentChips(),
+
               LessonStudentSelector(
                 selectedStudent: _selectedStudent,
                 onTap: _showStudentPicker,
@@ -213,6 +218,83 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               const SizedBox(height: AppSpacing.space6),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Build recent student quick-select chips (top 5 by recent lesson).
+  Widget _buildRecentStudentChips() {
+    final studentsAsync = ref.watch(studentsProvider);
+    final lessonsAsync = ref.watch(lessonsProvider);
+
+    final students = studentsAsync.valueOrNull ?? [];
+    final lessons = lessonsAsync.valueOrNull ?? [];
+
+    if (students.isEmpty) return const SizedBox.shrink();
+
+    // Sort students by most recent lesson date
+    final studentLastLesson = <String, DateTime>{};
+    for (final lesson in lessons) {
+      final existing = studentLastLesson[lesson.studentId];
+      if (existing == null || lesson.date.isAfter(existing)) {
+        studentLastLesson[lesson.studentId] = lesson.date;
+      }
+    }
+
+    final recentStudents = List<Student>.from(students)
+      ..sort((a, b) {
+        final aDate = studentLastLesson[a.id] ?? DateTime(2000);
+        final bDate = studentLastLesson[b.id] ?? DateTime(2000);
+        return bDate.compareTo(aDate);
+      });
+
+    final topStudents = recentStudents.take(5).toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+      child: SizedBox(
+        height: 40,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: topStudents.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (context, index) {
+            final student = topStudents[index];
+            final isSelected = _selectedStudent?.id == student.id;
+            return ActionChip(
+              avatar: CircleAvatar(
+                radius: 12,
+                backgroundColor: student.profileColor.withValues(alpha: 0.3),
+                child: Text(
+                  student.initial,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: student.profileColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              label: Text(
+                student.name,
+                style: AppTypography.caption.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected ? Colors.white : null,
+                ),
+              ),
+              backgroundColor: isSelected
+                  ? student.profileColor
+                  : student.profileColor.withValues(alpha: 0.08),
+              side: BorderSide(
+                color: student.profileColor.withValues(alpha: isSelected ? 1 : 0.3),
+              ),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () {
+                setState(() => _selectedStudent = _studentToInfo(student));
+                _autoFillFromStudent(student);
+              },
+            );
+          },
         ),
       ),
     );
