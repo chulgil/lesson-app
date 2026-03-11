@@ -320,15 +320,16 @@ cd frontend && dart run build_runner build --delete-conflicting-outputs
 - **교훈**: `flutter run --release`로 iPhone 배포 시 provisioning profile 에러 빈번. CLI에서 `--allowProvisioningUpdates` 플래그가 flutter에서 지원되지 않음.
 - **조치**: 배포 전 Xcode에서 Signing & Capabilities 확인. 문제 시 Xcode에서 직접 빌드하거나 `xcodebuild -allowProvisioningUpdates` 사용.
 
-## 4. UI-first 개발이 반복 UX 점검의 근본 원인 - automation-pattern
+## 4. UX 반복 점검 8회의 교훈 — 전수 검사 필수 - automation-pattern
 - **날짜**: 2026-03-11
 - **분류**: automation-pattern
-- **교훈**: 선생님/학생 UX 점검을 각 5회(총 10회) 반복하며 매번 동일 유형의 이슈 발견: (1) 하드코딩 플레이스홀더 데이터 (5/5회), (2) TODO stub 저장 로직 (3/5회), (3) 라우트 파라미터 누락 (2/5회), (4) 상수 중복 정의 (2/5회), (5) 날짜 포맷 불일치 (2/5회). 근본 원인은 UI를 먼저 완성하고 데이터 연동을 후순위로 미루는 개발 방식.
+- **교훈**: 선생님/학생 UX 점검을 8회 반복하며 발견된 9개 반복 패턴. 7차까지 특정 feature만 점검→8차에서 다른 feature에서 같은 이슈 27건 재발견. **전체 코드베이스 grep이 필수**.
 - **조치**: 새 화면 구현 시 반드시 아래 순서 준수:
   1. 엔티티 + Provider 먼저 구현 (데이터 계층)
   2. UI에서 Provider.watch로 바인딩 (하드코딩 문자열 금지)
   3. save/submit/confirm 콜백에 실제 Provider 호출 구현 (TODO stub 금지)
-  4. AppRoutes 상수 + 필수 query parameter 확인
-  5. 새 상수 정의 전 Grep으로 기존 정의 검색 (중복 방지)
-  6. 날짜는 YYYY.MM.DD 포맷 통일
+  4. **모든** Provider.notifier 호출에 try-catch (특히 delete/cancel 파괴적 작업)
+  5. AppRoutes 상수 사용 (`context.push('/')` 문자열 리터럴 zero)
+  6. 날짜는 `formatDateYMD()` 공통 유틸 사용 (인라인 포맷 금지)
+  7. 점검 시 **전체 코드베이스** grep (`context.push('/'`, `ref.read(.*notifier)` 등)
   - 상세: [memory/ux-review-lessons.md](../../.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/ux-review-lessons.md)
