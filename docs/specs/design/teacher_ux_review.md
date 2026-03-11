@@ -430,6 +430,17 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 | formatDateYMD() 공통 유틸 생성 + 5개 파일 적용 | [#137](https://github.com/chulgil/lesson-app/issues/137) | HIGH | 구현 완료 |
 | validator trim() 수정 | [#137](https://github.com/chulgil/lesson-app/issues/137) | MEDIUM | 구현 완료 |
 
+### Phase 9: 선생님 UX 종합 점검 (2026-03-11)
+
+**범위**: 학생 초대, 스케줄 관리, 수기 학생 관리, 레슨노트 작성 전 영역 심층 분석
+
+| 이슈 | Issue | 심각도 | 상태 |
+|------|-------|--------|------|
+| 학생 상세 전화/메시지/레슨기록 NO-OP 버튼 | [#139](https://github.com/chulgil/lesson-app/issues/139) | HIGH | 구현 완료 |
+| 레슨 기록 "전체 보기" 빈 핸들러 | [#139](https://github.com/chulgil/lesson-app/issues/139) | HIGH | 구현 완료 |
+| 핵심 화면 에러 메시지 raw exception 노출 (15건) | [#139](https://github.com/chulgil/lesson-app/issues/139) | MEDIUM | 구현 완료 |
+| 초대 확인 후 선생님 네비게이션 개선 | [#139](https://github.com/chulgil/lesson-app/issues/139) | MEDIUM | 구현 완료 |
+
 ---
 
 ## 관련 문서
