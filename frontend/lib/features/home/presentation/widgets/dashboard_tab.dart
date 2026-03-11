@@ -20,8 +20,13 @@ import 'urgent_actions_section.dart';
 /// Dashboard Tab - core stats + urgent actions + today's lessons.
 class DashboardTab extends ConsumerWidget {
   final VoidCallback onViewAllLessons;
+  final VoidCallback onNavigateToSchedule;
 
-  const DashboardTab({super.key, required this.onViewAllLessons});
+  const DashboardTab({
+    super.key,
+    required this.onViewAllLessons,
+    required this.onNavigateToSchedule,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,11 +80,29 @@ class DashboardTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space5),
 
             // Getting Started Guide (shown when 0 students)
-            const GettingStartedCard(),
+            GettingStartedCard(
+              onNavigateToSchedule: onNavigateToSchedule,
+            ),
 
             const SizedBox(height: AppSpacing.space5),
 
             // Stats Row (3 key numbers)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('주요 통계', style: AppTypography.headingMedium),
+                TextButton(
+                  onPressed: () => context.push(AppRoutes.analytics),
+                  child: Text(
+                    '통계 더보기',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space2),
             _buildStatsRow(
               context,
               todayLessons,
@@ -119,35 +142,6 @@ class DashboardTab extends ConsumerWidget {
                     ),
                   ),
               error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
-            ),
-
-            const SizedBox(height: AppSpacing.space4),
-
-            // Quick action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => context.push(AppRoutes.quickFeedbackList),
-                    icon: const Icon(Icons.edit_note, size: 20),
-                    label: const Text('피드백'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => context.push(AppRoutes.analytics),
-                    icon: const Icon(Icons.bar_chart, size: 20),
-                    label: const Text('통계'),
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                    ),
-                  ),
-                ),
-              ],
             ),
 
             const SizedBox(height: AppSpacing.space8),
@@ -285,12 +279,26 @@ class DashboardTab extends ConsumerWidget {
             ),
           ],
         ),
-        if (lessonCount > 3)
-          TextButton.icon(
-            onPressed: onViewAllLessons,
-            icon: const Icon(Icons.calendar_today, size: 16),
-            label: const Text('전체보기'),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              onPressed: () => context.push(AppRoutes.quickFeedbackList),
+              child: Text(
+                '피드백',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            if (lessonCount > 3)
+              TextButton.icon(
+                onPressed: onViewAllLessons,
+                icon: const Icon(Icons.calendar_today, size: 16),
+                label: const Text('전체보기'),
+              ),
+          ],
+        ),
       ],
     );
   }

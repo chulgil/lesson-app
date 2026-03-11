@@ -182,17 +182,6 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               icon: const Icon(Icons.close),
             ),
             actions: [
-              IconButton(
-                onPressed: _isSaving
-                    ? null
-                    : () => showDeleteStudentConfirmation(
-                          context,
-                          studentName: _nameController.text,
-                          onDelete: () => _deleteStudent(student),
-                        ),
-                icon: Icon(Icons.delete_outline, color: AppColors.error),
-                tooltip: '학생 삭제',
-              ),
               TextButton(
                 onPressed: _hasChanges && !_isSaving
                     ? () => _saveStudent(student)

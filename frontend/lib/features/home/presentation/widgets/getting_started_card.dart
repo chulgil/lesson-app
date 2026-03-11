@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../models/lesson.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/providers.dart';
@@ -12,7 +13,9 @@ import '../../../../providers/student/student_crud_provider.dart';
 /// Getting Started checklist card for new teachers with 0 students.
 /// Shows actionable steps to help them get started.
 class GettingStartedCard extends ConsumerWidget {
-  const GettingStartedCard({super.key});
+  final VoidCallback? onNavigateToSchedule;
+
+  const GettingStartedCard({super.key, this.onNavigateToSchedule});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,6 +29,10 @@ class GettingStartedCard extends ConsumerWidget {
 
         final hasLessons =
             lessonsAsync.valueOrNull?.isNotEmpty ?? false;
+        final hasCompletedLesson = lessonsAsync.valueOrNull?.any(
+              (l) => l.status == LessonStatus.completed,
+            ) ??
+            false;
 
         return Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -95,13 +102,13 @@ class GettingStartedCard extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.space2),
 
-              // Step 3: Write feedback
+              // Step 3: Complete first lesson
               _StepItem(
                 step: 3,
-                title: '피드백 작성하기',
-                subtitle: '레슨 후 피드백을 남겨보세요',
-                isCompleted: false,
-                onTap: null,
+                title: '첫 레슨 완료하기',
+                subtitle: '레슨을 진행하고 완료 처리하세요',
+                isCompleted: hasCompletedLesson,
+                onTap: hasLessons ? onNavigateToSchedule : null,
               ),
             ],
           ),

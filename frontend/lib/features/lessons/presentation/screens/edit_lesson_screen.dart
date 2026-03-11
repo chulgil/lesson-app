@@ -370,8 +370,91 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
     }
   }
 
+  /// Check if the edited lesson conflicts with existing lessons on the same day.
+  /// Excludes the lesson being edited (by lessonId).
+  /// Returns the conflicting lesson's student name, or null if no conflict.
+  String? _findConflict(
+    DateTime date,
+    TimeOfDay time,
+    int duration,
+    List<Lesson> existingLessons,
+    String excludeLessonId,
+  ) {
+    final newStart = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    final newEnd = newStart.add(Duration(minutes: duration));
+
+    for (final lesson in existingLessons) {
+      if (lesson.id == excludeLessonId) continue;
+
+      if (lesson.date.year == date.year &&
+          lesson.date.month == date.month &&
+          lesson.date.day == date.day) {
+        final parts = lesson.startTime.split(':');
+        if (parts.length < 2) continue;
+        final lessonStart = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+        );
+        final lessonEnd = lessonStart.add(Duration(minutes: lesson.duration));
+
+        if (newStart.isBefore(lessonEnd) && newEnd.isAfter(lessonStart)) {
+          return lesson.studentName;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Show a confirmation dialog when a time conflict is detected.
+  /// Returns true if the user chooses to proceed.
+  Future<bool> _showConflictDialog(String conflictStudentName) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('시간 충돌'),
+        content: Text(
+          "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('계속'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   Future<void> _saveLesson() async {
     if (_originalLesson == null) return;
+
+    // Check for time conflicts with existing lessons (excluding self)
+    final existingLessons = ref.read(lessonsProvider).valueOrNull ?? [];
+    final conflictName = _findConflict(
+      _selectedDate,
+      _selectedTime,
+      _lessonDuration,
+      existingLessons,
+      widget.lessonId,
+    );
+    if (conflictName != null) {
+      final shouldProceed = await _showConflictDialog(conflictName);
+      if (!shouldProceed) return;
+    }
 
     setState(() => _isSaving = true);
 

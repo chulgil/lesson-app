@@ -10,6 +10,19 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
 
+/// Preset phrases for quick feedback input.
+const _feedbackPresets = [
+  '음정 주의',
+  '리듬 좋음',
+  '활 주법 연습',
+  '자세 교정',
+  '진도 우수',
+  '많이 향상됨',
+  '복습 필요',
+  '천천히 연습',
+  '메트로놈 사용',
+];
+
 /// Quick feedback writing screen for a specific lesson.
 /// Supports feedback text, key points, and practice tips.
 class QuickFeedbackScreen extends ConsumerStatefulWidget {
@@ -144,11 +157,24 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: _hasChanges ? () => _saveFeedback(lesson) : null,
-                    child: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: AppSpacing.space3),
-                      child: Text('저장하기'),
+                    onPressed:
+                        _hasChanges && !_isSaving
+                            ? () => _saveFeedback(lesson)
+                            : null,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.space3,
+                      ),
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('저장하기'),
                     ),
                   ),
                 ),
@@ -228,26 +254,93 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     );
   }
 
+  void _insertPreset(String preset) {
+    final currentText = _feedbackController.text;
+    final selection = _feedbackController.selection;
+
+    String newText;
+    int newCursorPos;
+
+    if (currentText.isEmpty) {
+      newText = preset;
+      newCursorPos = preset.length;
+    } else if (selection.isValid &&
+        selection.baseOffset == selection.extentOffset) {
+      // Insert at cursor position
+      final before = currentText.substring(0, selection.baseOffset);
+      final after = currentText.substring(selection.baseOffset);
+      final separator =
+          before.isNotEmpty && !before.endsWith('\n') ? '\n' : '';
+      newText = '$before$separator$preset$after';
+      newCursorPos = before.length + separator.length + preset.length;
+    } else {
+      // Append at end
+      newText = '$currentText\n$preset';
+      newCursorPos = newText.length;
+    }
+
+    _feedbackController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newCursorPos),
+    );
+    setState(() => _hasChanges = true);
+  }
+
+  Widget _buildPresetChips() {
+    return SizedBox(
+      height: 34,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _feedbackPresets.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, index) {
+          return ActionChip(
+            label: Text(
+              _feedbackPresets[index],
+              style: AppTypography.caption.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+            side: BorderSide(
+              color: AppColors.primary.withValues(alpha: 0.2),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onPressed: () => _insertPreset(_feedbackPresets[index]),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildFeedbackField() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: TextField(
-        controller: _feedbackController,
-        maxLines: 6,
-        onChanged: (_) => setState(() => _hasChanges = true),
-        decoration: InputDecoration(
-          hintText: '레슨 피드백을 작성하세요...',
-          hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildPresetChips(),
+        const SizedBox(height: AppSpacing.space2),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            border: Border.all(color: AppColors.borderLight),
           ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(AppSpacing.space4),
+          child: TextField(
+            controller: _feedbackController,
+            maxLines: 6,
+            onChanged: (_) => setState(() => _hasChanges = true),
+            decoration: InputDecoration(
+              hintText: '레슨 피드백을 작성하세요...',
+              hintStyle: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(AppSpacing.space4),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -397,27 +490,41 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   Future<void> _saveFeedback(Lesson lesson) async {
     setState(() => _isSaving = true);
 
-    final feedbackText = _feedbackController.text.trim();
-    final tipText = _tipController.text.trim();
-    final updatedLesson = lesson.copyWith(
-      feedback: feedbackText.isEmpty ? null : feedbackText,
-      keyPoints: _keyPoints.isEmpty ? null : _keyPoints,
-      practiceTips: tipText.isEmpty ? null : tipText,
-    );
-
-    await ref
-        .read(lessonsNotifierProvider.notifier)
-        .updateLesson(updatedLesson);
-
-    if (mounted) {
-      setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('피드백이 저장되었습니다'),
-          behavior: SnackBarBehavior.floating,
-        ),
+    try {
+      final feedbackText = _feedbackController.text.trim();
+      final tipText = _tipController.text.trim();
+      final updatedLesson = lesson.copyWith(
+        feedback: feedbackText.isEmpty ? null : feedbackText,
+        keyPoints: _keyPoints.isEmpty ? null : _keyPoints,
+        practiceTips: tipText.isEmpty ? null : tipText,
       );
-      context.pop();
+
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .updateLesson(updatedLesson);
+
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('✅ 피드백이 저장되었습니다'),
+            backgroundColor: AppColors.practiceGood,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('피드백 저장 실패'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 }

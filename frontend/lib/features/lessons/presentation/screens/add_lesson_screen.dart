@@ -351,6 +351,71 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
   }
 
+  /// Check if a new lesson conflicts with existing lessons on the same day.
+  /// Returns the conflicting lesson's student name, or null if no conflict.
+  String? _findConflict(
+    DateTime date,
+    TimeOfDay time,
+    int duration,
+    List<Lesson> existingLessons,
+  ) {
+    final newStart = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    final newEnd = newStart.add(Duration(minutes: duration));
+
+    for (final lesson in existingLessons) {
+      if (lesson.date.year == date.year &&
+          lesson.date.month == date.month &&
+          lesson.date.day == date.day) {
+        final parts = lesson.startTime.split(':');
+        if (parts.length < 2) continue;
+        final lessonStart = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          int.parse(parts[0]),
+          int.parse(parts[1]),
+        );
+        final lessonEnd = lessonStart.add(Duration(minutes: lesson.duration));
+
+        if (newStart.isBefore(lessonEnd) && newEnd.isAfter(lessonStart)) {
+          return lesson.studentName;
+        }
+      }
+    }
+    return null;
+  }
+
+  /// Show a confirmation dialog when a time conflict is detected.
+  /// Returns true if the user chooses to proceed.
+  Future<bool> _showConflictDialog(String conflictStudentName) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('시간 충돌'),
+        content: Text(
+          "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('계속'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   Future<void> _saveLesson() async {
     if (_selectedStudent == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -370,6 +435,19 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ),
       );
       return;
+    }
+
+    // Check for time conflicts with existing lessons
+    final existingLessons = ref.read(lessonsProvider).valueOrNull ?? [];
+    final conflictName = _findConflict(
+      _selectedDate,
+      _selectedTime,
+      _lessonDuration,
+      existingLessons,
+    );
+    if (conflictName != null) {
+      final shouldProceed = await _showConflictDialog(conflictName);
+      if (!shouldProceed) return;
     }
 
     // Create lesson pieces from input

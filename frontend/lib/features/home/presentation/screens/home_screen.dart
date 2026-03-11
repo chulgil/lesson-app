@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               DashboardTab(
                 onViewAllLessons: () => setState(() => _currentIndex = 1),
+                onNavigateToSchedule: () => setState(() => _currentIndex = 1),
               ),
               const ScheduleTab(),
               const StudentsTab(),
