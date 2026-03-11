@@ -134,7 +134,7 @@ class UrgentActionsSection extends StatelessWidget {
               icon: Icons.card_membership,
               iconColor: AppColors.warning,
               title: '수강권 임박 $expiringSoonStudentCount명',
-              onTap: () => context.push(AppRoutes.subscriptions),
+              onTap: () => context.push(AppRoutes.expiringSubscriptions),
               showDivider: pendingRequests > 0 ||
                   pendingBookings > 0 ||
                   awaitingConfirmCount > 0,

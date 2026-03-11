@@ -111,6 +111,7 @@ class AppRoutes {
   // Subscription routes
   static const subscriptions = '/subscriptions';
   static const subscriptionDetail = '/subscriptions/:id';
+  static const expiringSubscriptions = '/subscriptions/expiring';
   static const issueSubscription = '/subscriptions/issue';
   static const lessonPolicy = '/subscriptions/policy';
   static const subscriptionTemplates = '/subscriptions/templates';

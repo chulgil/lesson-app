@@ -1,0 +1,234 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../domain/entities/subscription.dart';
+import '../providers/subscription_providers.dart';
+import '../widgets/subscription_card.dart';
+
+/// Teacher-facing screen showing students with expiring subscriptions.
+///
+/// Navigated from the dashboard "수강권 임박 N명" urgent action.
+/// Groups subscriptions by student and shows renewal actions.
+class ExpiringSubscriptionsScreen extends ConsumerWidget {
+  const ExpiringSubscriptionsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
+    final studentsAsync = ref.watch(studentsProvider);
+
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      appBar: AppBar(
+        backgroundColor: AppColors.backgroundLight,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back),
+        ),
+        title: expiringSoonAsync.when(
+          loading: () => const Text('수강권 임박'),
+          error: (_, __) => const Text('수강권 임박'),
+          data: (subscriptions) {
+            final studentCount =
+                subscriptions.map((s) => s.studentId).toSet().length;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('수강권 임박'),
+                if (studentCount > 0)
+                  Text(
+                    '$studentCount명의 학생',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+      body: expiringSoonAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            const Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+        data: (subscriptions) {
+          if (subscriptions.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          // Group subscriptions by studentId
+          final grouped = <String, List<Subscription>>{};
+          for (final sub in subscriptions) {
+            grouped.putIfAbsent(sub.studentId, () => []).add(sub);
+          }
+
+          // Sort by most urgent first (least remaining lessons or days)
+          final sortedEntries = grouped.entries.toList()
+            ..sort((a, b) {
+              final aMin = _getUrgency(a.value);
+              final bMin = _getUrgency(b.value);
+              return aMin.compareTo(bMin);
+            });
+
+          return studentsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => _buildSubscriptionList(sortedEntries, {}),
+            data: (students) {
+              final studentMap = {for (final s in students) s.id: s.name};
+              return _buildSubscriptionList(sortedEntries, studentMap);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  /// Returns urgency score (lower = more urgent).
+  int _getUrgency(List<Subscription> subs) {
+    int minUrgency = 999;
+    for (final sub in subs) {
+      final remaining = sub.remainingLessons ?? 999;
+      final days = sub.daysUntilExpiration ?? 999;
+      final urgency = remaining < days ? remaining : days;
+      if (urgency < minUrgency) minUrgency = urgency;
+    }
+    return minUrgency;
+  }
+
+  Widget _buildSubscriptionList(
+    List<MapEntry<String, List<Subscription>>> sortedEntries,
+    Map<String, String> studentNames,
+  ) {
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      itemCount: sortedEntries.length,
+      itemBuilder: (context, index) {
+        final entry = sortedEntries[index];
+        final studentId = entry.key;
+        final subs = entry.value;
+        final studentName =
+            studentNames[studentId] ?? '학생 ${studentId.replaceAll('student_', '#')}';
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+          child: _buildStudentSection(context, studentId, studentName, subs),
+        );
+      },
+    );
+  }
+
+  Widget _buildStudentSection(
+    BuildContext context,
+    String studentId,
+    String studentName,
+    List<Subscription> subscriptions,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Student header
+        GestureDetector(
+          onTap: () => context.push(
+            AppRoutes.studentDetail.replaceFirst(':id', studentId),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    studentName.isNotEmpty ? studentName[0] : 'S',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+                Expanded(
+                  child: Text(
+                    studentName,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textSecondaryLight,
+                  size: 20,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+
+        // Subscription cards
+        ...subscriptions.map(
+          (sub) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+            child: SubscriptionCard(
+              subscription: sub,
+              className: sub.typeLabel,
+              onTap: () => context.push(
+                AppRoutes.subscriptionDetail.replaceFirst(':id', sub.id),
+              ),
+              onRenewalTap: () => context.push(
+                '${AppRoutes.issueSubscription}?studentId=$studentId',
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSecondaryLight,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.check_circle_outline,
+              size: 48,
+              color: AppColors.success,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          Text(
+            '만료 임박 수강권이 없습니다',
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '모든 학생의 수강권이 정상입니다',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
