@@ -150,7 +150,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               const SizedBox(height: AppSpacing.space2),
               TextField(
                 controller: _descriptionController,
-                maxLines: 2,
+                maxLines: 5,
                 decoration: InputDecoration(
                   hintText: '예: 메트로놈 60으로 정확하게!',
                   border: OutlineInputBorder(

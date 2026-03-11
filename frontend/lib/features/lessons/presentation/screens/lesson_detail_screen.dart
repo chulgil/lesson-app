@@ -188,6 +188,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           itemBuilder: (context) => [
             const PopupMenuItem(value: 'edit', child: Text('수정')),
             if (lesson.status == LessonStatus.scheduled)
+              const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
+            if (lesson.status == LessonStatus.scheduled)
               const PopupMenuItem(value: 'cancel', child: Text('취소')),
             PopupMenuItem(
               value: 'delete',
@@ -209,6 +211,33 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('레슨이 취소되었습니다')),
+          );
+        }
+      }
+    } else if (value == 'complete') {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('레슨 완료'),
+          content: const Text('이 레슨을 완료 처리하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('완료'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed == true) {
+        final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
+        await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('레슨이 완료 처리되었습니다')),
           );
         }
       }
@@ -513,17 +542,29 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   void _saveFeedbackDebounced(Lesson lesson, String text) {
     _feedbackDebounce?.cancel();
-    _feedbackDebounce = Timer(const Duration(milliseconds: 800), () {
+    _feedbackDebounce = Timer(const Duration(milliseconds: 800), () async {
+      final trimmed = text.trim();
       final updatedLesson = lesson.copyWith(
-        feedback: text.isEmpty ? null : text,
+        feedback: trimmed.isEmpty ? null : trimmed,
       );
-      ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      try {
+        await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('피드백 저장 실패: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
     });
   }
 
   void _saveStudentMemo(Lesson lesson, String memo) {
     final updatedLesson = lesson.copyWith(
-      studentNote: memo.isEmpty ? null : memo,
+      studentNote: memo.trim().isEmpty ? null : memo.trim(),
     );
     ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
   }

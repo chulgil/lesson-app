@@ -439,7 +439,7 @@ class DashboardTab extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => context.push('/lessons/add'),
+                onPressed: () => context.push(AppRoutes.addLesson),
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('레슨 추가'),
                 style: OutlinedButton.styleFrom(
@@ -463,7 +463,7 @@ class DashboardTab extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.space3),
             child: LessonCard(
               lesson: lesson,
-              onTap: () => context.push('/lessons/${lesson.id}'),
+              onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
             ),
           );
         }),

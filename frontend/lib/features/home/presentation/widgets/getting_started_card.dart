@@ -109,7 +109,7 @@ class GettingStartedCard extends ConsumerWidget {
                 onTap: hasLessons
                     ? () {
                         final firstLesson = lessonsAsync.valueOrNull!.first;
-                        context.push('/lessons/${firstLesson.id}');
+                        context.push(AppRoutes.lessonDetail.replaceFirst(':id', firstLesson.id));
                       }
                     : null,
               ),

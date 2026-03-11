@@ -205,7 +205,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${lesson.date.month}월 ${lesson.date.day}일 ${lesson.startTime} 레슨',
+                  '${lesson.date.year}.${lesson.date.month.toString().padLeft(2, '0')}.${lesson.date.day.toString().padLeft(2, '0')} ${lesson.startTime} 레슨',
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
