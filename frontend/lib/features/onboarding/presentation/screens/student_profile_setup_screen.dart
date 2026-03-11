@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../students/domain/entities/student.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 
 /// Available instruments for student selection
 const _instruments = [
@@ -58,13 +61,35 @@ class _StudentProfileSetupScreenState
 
     setState(() => _isLoading = true);
 
-    // TODO: Save student profile via provider
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      final student = Student(
+        id: const Uuid().v4(),
+        name: _nameController.text.trim(),
+        instrument: _selectedInstrument!,
+        level: StudentLevel.beginner,
+        status: StudentStatus.trial,
+        createdAt: DateTime.now(),
+      );
 
-    setState(() => _isLoading = false);
+      await ref.read(studentsNotifierProvider.notifier).addStudent(student);
 
-    if (mounted) {
+      if (!mounted) return;
+
       context.go(AppRoutes.studentTutorial);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('프로필 저장 실패: $e'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

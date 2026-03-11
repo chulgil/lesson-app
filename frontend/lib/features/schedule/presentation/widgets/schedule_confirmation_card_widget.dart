@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../models/lesson_booking.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
 import '../providers/schedule_confirmation_card_providers.dart';
+import '../providers/teacher_availability_providers.dart';
 
 /// Widget to display a schedule confirmation card to the student.
 ///
@@ -376,8 +378,33 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           .read(scheduleConfirmationCardNotifierProvider.notifier)
           .confirmSchedule(card.id, card.studentId);
 
-      // TODO: Actually book the lesson with the suggested schedule
-      // This should call the booking service to create the regular lesson schedule
+      // Book the lesson with the suggested schedule
+      if (card.hasSuggestedSchedule) {
+        final nextLessonDate = _getNextDateForDay(card.suggestedDay!);
+        final timeParts = card.suggestedTime!.split(':');
+        final startHour = int.parse(timeParts[0]);
+        final startMinute = int.parse(timeParts[1]);
+        final duration = card.lessonDuration ?? 50;
+        final endMinute = startMinute + duration;
+        final endHour = startHour + endMinute ~/ 60;
+        final endMin = endMinute % 60;
+
+        final slotId =
+            'confirmed_${card.id}_${DateTime.now().millisecondsSinceEpoch}';
+
+        await ref.read(slotBookingNotifierProvider.notifier).bookSlot(
+              slotId,
+              card.studentId,
+              card.teacherName,
+              teacherId: card.teacherId,
+              teacherName: card.teacherName,
+              slotDate: nextLessonDate,
+              slotStartTime: TimeOfDay(hour: startHour, minute: startMinute),
+              slotEndTime: TimeOfDay(hour: endHour, minute: endMin),
+              instrument: card.instrument,
+              lessonType: LessonType.regular,
+            );
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -399,6 +426,16 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         );
       }
     }
+  }
+
+  /// Get the next occurrence of the given weekday (1=Mon, 7=Sun).
+  DateTime _getNextDateForDay(int day) {
+    final now = DateTime.now();
+    // DateTime.weekday: 1=Mon, 7=Sun (matches our format)
+    final daysUntil = (day - now.weekday + 7) % 7;
+    // If today is the target day, schedule for next week
+    final offset = daysUntil == 0 ? 7 : daysUntil;
+    return DateTime(now.year, now.month, now.day + offset);
   }
 
   void _onSelectDifferentTime(BuildContext context, WidgetRef ref) {

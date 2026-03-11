@@ -13,7 +13,11 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/parent.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../../models/lesson.dart';
+import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../providers/practice_reminder_provider.dart';
 import '../widgets/language_select_sheet.dart';
 import '../widgets/practice_reminder_sheet.dart';
@@ -24,11 +28,41 @@ class StudentProfileTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final studentId = ref.watch(currentUserIdProvider);
+    final studentAsync = ref.watch(studentProvider(studentId));
+    final lessonsAsync = ref.watch(lessonsByStudentProvider(studentId));
+    final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
+
+    final student = studentAsync.valueOrNull;
+    final studentName = student?.name ?? '-';
+    final studentInitial = student?.initial ?? '-';
+    final studentEmail = student?.email ?? '-';
+    final studentInstrument = student?.instrument ?? '-';
+
+    // Stats calculations
+    final completedLessonCount = lessonsAsync.valueOrNull
+            ?.where((l) => l.status == LessonStatus.completed)
+            .length ??
+        0;
+    final totalPracticeMinutes = practiceLogsAsync.valueOrNull
+            ?.fold<int>(0, (sum, log) => sum + log.totalMinutes) ??
+        0;
+    final totalPracticeHours = totalPracticeMinutes ~/ 60;
+    final lessonPeriodMonths = student != null
+        ? DateTime.now().difference(student.createdAt).inDays ~/ 30
+        : 0;
+
     return SingleChildScrollView(
       child: Column(
         children: [
           // Profile header
-          _buildProfileHeader(context),
+          _buildProfileHeader(
+            context,
+            name: studentName,
+            initial: studentInitial,
+            email: studentEmail,
+            instrument: studentInstrument,
+          ),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -36,7 +70,19 @@ class StudentProfileTab extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.screenPadding),
-            child: _buildStatsSummary(),
+            child: _buildStatsSummary(
+              lessonCount: lessonsAsync.isLoading
+                  ? null
+                  : '$completedLessonCount회',
+              practiceTime: practiceLogsAsync.isLoading
+                  ? null
+                  : '$totalPracticeHours시간',
+              period: studentAsync.isLoading
+                  ? null
+                  : lessonPeriodMonths < 1
+                      ? '1개월 미만'
+                      : '$lessonPeriodMonths개월',
+            ),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -82,7 +128,13 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(
+    BuildContext context, {
+    required String name,
+    required String initial,
+    required String email,
+    required String instrument,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
@@ -106,7 +158,7 @@ class StudentProfileTab extends ConsumerWidget {
                   radius: 48,
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
                   child: Text(
-                    '홍',
+                    initial,
                     style: AppTypography.displayMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -142,7 +194,7 @@ class StudentProfileTab extends ConsumerWidget {
 
             // Name
             Text(
-              '홍길동',
+              name,
               style: AppTypography.headingLarge.copyWith(
                 color: Colors.white,
               ),
@@ -152,7 +204,7 @@ class StudentProfileTab extends ConsumerWidget {
 
             // Email
             Text(
-              'student@example.com',
+              email,
               style: AppTypography.bodyMedium.copyWith(
                 color: Colors.white70,
               ),
@@ -180,7 +232,7 @@ class StudentProfileTab extends ConsumerWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '바이올린',
+                    instrument,
                     style: AppTypography.bodySmall.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -195,7 +247,11 @@ class StudentProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsSummary() {
+  Widget _buildStatsSummary({
+    String? lessonCount,
+    String? practiceTime,
+    String? period,
+  }) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -211,11 +267,11 @@ class StudentProfileTab extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          _buildStatItem('레슨 받은 횟수', '24회'),
+          _buildStatItem('레슨 받은 횟수', lessonCount ?? '-'),
           _buildDivider(),
-          _buildStatItem('총 연습 시간', '86시간'),
+          _buildStatItem('총 연습 시간', practiceTime ?? '-'),
           _buildDivider(),
-          _buildStatItem('레슨 기간', '6개월'),
+          _buildStatItem('레슨 기간', period ?? '-'),
         ],
       ),
     );
