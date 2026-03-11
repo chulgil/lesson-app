@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -7,10 +6,12 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/lesson_request.dart';
 import 'lesson_request_card.dart';
 
-/// List widget for date-filtered lesson requests
+/// List widget for lesson requests grouped by status.
+///
+/// Shows pending requests sorted by expiration (urgent first),
+/// followed by past requests (most recent first).
 class LessonRequestList extends StatelessWidget {
   final List<LessonRequest> requests;
-  final DateTime selectedDate;
   final bool isSelectionMode;
   final Set<String> selectedIds;
   final void Function(String) onToggleSelection;
@@ -18,7 +19,6 @@ class LessonRequestList extends StatelessWidget {
   const LessonRequestList({
     super.key,
     required this.requests,
-    required this.selectedDate,
     required this.isSelectionMode,
     required this.selectedIds,
     required this.onToggleSelection,
@@ -26,66 +26,29 @@ class LessonRequestList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
+    // Split into pending vs past
+    final pendingRequests = requests
+        .where((r) => r.status == LessonRequestStatus.pending && !r.isExpired)
+        .toList()
+      ..sort((a, b) => a.expiresAt.compareTo(b.expiresAt)); // Urgent first
 
-    // Filter requests for selected date
-    final dayRequests =
-        requests
-            .where(
-              (r) =>
-                  r.createdAt.year == selectedDate.year &&
-                  r.createdAt.month == selectedDate.month &&
-                  r.createdAt.day == selectedDate.day,
-            )
-            .toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final pastRequests = requests
+        .where((r) =>
+            r.status != LessonRequestStatus.pending || r.isExpired)
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt)); // Recent first
 
-    final isToday = _isToday(selectedDate);
+    if (requests.isEmpty) {
+      return _buildEmptyState();
+    }
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       children: [
-        // Date title
-        Row(
-          children: [
-            Text(
-              dateFormat.format(selectedDate),
-              style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            if (isToday) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Text(
-                  '오늘',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-            const Spacer(),
-            Text(
-              '${dayRequests.length}건',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // Requests for selected date
-        if (dayRequests.isNotEmpty)
-          ...dayRequests.map(
+        // Pending requests
+        if (pendingRequests.isNotEmpty) ...[
+          ...pendingRequests.map(
             (request) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space3),
               child: LessonRequestCard(
@@ -96,58 +59,129 @@ class LessonRequestList extends StatelessWidget {
               ),
             ),
           ),
+        ],
 
-        // Empty state
-        if (dayRequests.isEmpty) _buildEmptyState(context),
+        // Empty pending state (only when there are past requests)
+        if (pendingRequests.isEmpty && pastRequests.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+            child: Center(
+              child: Text(
+                '대기 중인 요청이 없습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
+              ),
+            ),
+          ),
+
+        // Past requests section
+        if (pastRequests.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          _buildSectionHeader('지난 요청', pastRequests.length),
+          const SizedBox(height: AppSpacing.space3),
+          ...pastRequests.map(
+            (request) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: LessonRequestCard(
+                request: request,
+                isSelectionMode: isSelectionMode,
+                isSelected: selectedIds.contains(request.id),
+                onToggleSelection: () => onToggleSelection(request.id),
+              ),
+            ),
+          ),
+        ],
 
         const SizedBox(height: AppSpacing.space6),
       ],
     );
   }
 
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
-  }
-
-  Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space6),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.inbox_outlined,
-                size: 48,
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              '이 날짜에 레슨 요청이 없습니다',
-              style: AppTypography.bodyLarge.copyWith(
+  Widget _buildSectionHeader(String title, int count) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space3,
+            vertical: AppSpacing.space1,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.textSecondaryLight.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.history,
+                size: 16,
                 color: AppColors.textSecondaryLight,
               ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '이전 학생이 레슨을 요청하면\n여기에 표시됩니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+              const SizedBox(width: AppSpacing.space1),
+              Text(
+                title,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(width: AppSpacing.space1),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondaryLight,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: AppTypography.caption.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSecondaryLight,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.inbox_outlined,
+              size: 48,
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          Text(
+            '대기 중인 레슨 요청이 없습니다',
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '이전 학생이 레슨을 요청하면\n여기에 표시됩니다',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
