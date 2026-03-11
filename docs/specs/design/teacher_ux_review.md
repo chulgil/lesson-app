@@ -394,6 +394,17 @@ Phase 1~2 핵심 UX 개선 + 편의성 개선
 | 대시보드 레이아웃 개선 + 시작 가이드 수정 | [#130](https://github.com/chulgil/lesson-app/issues/130) | MEDIUM | 구현 완료 |
 | 퀵피드백 프리셋 칩 + 저장 피드백 | [#131](https://github.com/chulgil/lesson-app/issues/131) | HIGH | 구현 완료 |
 
+### Phase 6: 선생님 UX 종합 점검 5차 (2026-03-11)
+
+선생님 앱 전체 플로우 5차 점검: 시작 가이드 경로, 하드코딩, 코드 품질
+
+| 작업 | 이슈 | 우선순위 | 상태 |
+|------|------|:--------:|:----:|
+| GettingStartedCard Step 2-3 경로 수정 | [#133](https://github.com/chulgil/lesson-app/issues/133) | CRITICAL | 구현 완료 |
+| teacherName 하드코딩 제거 | [#133](https://github.com/chulgil/lesson-app/issues/133) | HIGH | 구현 완료 |
+| 피드백 프리셋 중복 제거 + 날짜 포맷 통일 | [#133](https://github.com/chulgil/lesson-app/issues/133) | HIGH | 구현 완료 |
+| 정기 레슨 저장 로직 미구현 | [#134](https://github.com/chulgil/lesson-app/issues/134) | HIGH | 설계 검토 필요 |
+
 ---
 
 ## 관련 문서
