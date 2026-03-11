@@ -334,6 +334,124 @@ class _LessonTimeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isScheduled = lesson.status == LessonStatus.scheduled ||
+        lesson.status == LessonStatus.reschedulePending;
+
+    final card = _buildCard(context, ref);
+
+    if (!isScheduled) return card;
+
+    return Dismissible(
+      key: ValueKey('lesson-swipe-${lesson.id}'),
+      confirmDismiss: (direction) async {
+        if (direction == DismissDirection.startToEnd) {
+          // Right swipe → Complete
+          return await _showConfirmDialog(
+            context,
+            ref,
+            title: '레슨 완료',
+            message: '${lesson.studentName} 레슨을 완료 처리하시겠습니까?',
+            confirmLabel: '완료',
+            confirmColor: AppColors.success,
+            onConfirm: () async {
+              final updated = lesson.copyWith(status: LessonStatus.completed);
+              await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
+            },
+          );
+        } else {
+          // Left swipe → Cancel
+          return await _showConfirmDialog(
+            context,
+            ref,
+            title: '레슨 취소',
+            message: '${lesson.studentName} 레슨을 취소하시겠습니까?',
+            confirmLabel: '취소',
+            confirmColor: AppColors.error,
+            onConfirm: () async {
+              await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
+            },
+          );
+        }
+      },
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.only(left: AppSpacing.space5),
+        decoration: BoxDecoration(
+          color: AppColors.success,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Text('완료', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: AppSpacing.space5),
+        decoration: BoxDecoration(
+          color: AppColors.error,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text('취소', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            SizedBox(width: 8),
+            Icon(Icons.cancel, color: Colors.white),
+          ],
+        ),
+      ),
+      child: card,
+    );
+  }
+
+  Future<bool> _showConfirmDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required Color confirmColor,
+    required Future<void> Function() onConfirm,
+  }) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('돌아가기'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: confirmColor),
+            child: Text(confirmLabel),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await onConfirm();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${lesson.studentName} 레슨이 ${confirmLabel}되었습니다'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return false; // Don't dismiss the widget, let the state change handle it
+    }
+    return false;
+  }
+
+  Widget _buildCard(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,

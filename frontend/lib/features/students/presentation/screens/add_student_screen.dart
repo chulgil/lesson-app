@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../models/student.dart';
@@ -279,17 +280,37 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
 
       if (!mounted) return;
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${_nameController.text} 학생이 추가되었습니다'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.practiceGood,
+      // Ask about subscription
+      final issueSubscription = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('학생 추가 완료'),
+          content: Text(
+            '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('나중에'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('발급하기'),
+            ),
+          ],
         ),
       );
 
-      // Go back
-      context.pop();
+      if (!mounted) return;
+
+      if (issueSubscription == true) {
+        context.pop();
+        context.push(
+          '${AppRoutes.issueSubscription}?studentId=${student.id}',
+        );
+      } else {
+        context.pop();
+      }
     } catch (e) {
       if (!mounted) return;
 

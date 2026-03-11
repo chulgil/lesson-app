@@ -1,9 +1,10 @@
 # 과제 현황 대시보드 스펙
 
-> 구현 상태: ❌ 미구현
+> 구현 상태: ✅ 구현 완료
 > 작성일: 2026-03-07
-> 상태: 스펙 작성 완료
-> 이슈: [#67](https://github.com/chulgil/lesson-app/issues/67)
+> 마지막 업데이트: 2026-03-11
+> 상태: Phase 1-3 구현 완료
+> 이슈: [#67](https://github.com/chulgil/lesson-app/issues/67), [#101](https://github.com/chulgil/lesson-app/issues/101) (closed)
 > 관련 문서: [teacher_ux_review.md](../design/teacher_ux_review.md), [lesson_note_spec.md](lesson_note_spec.md)
 > 엔티티: [practice_item.dart](../../../frontend/lib/features/practice/domain/entities/practice_item.dart)
 
@@ -58,7 +59,7 @@
 |------|------|
 | 진행률 바 | LinearProgressIndicator - 전체 완료율 |
 | 미완료 리스트 | 미완료 과제가 있는 학생 (최대 3명, 긴급도순) |
-| 전체보기 버튼 | 향후 과제 관리 전용 화면으로 이동 (MVP: 학생 탭으로) |
+| 전체보기 버튼 | `AssignmentDashboardScreen`으로 이동 (✅ 전용 화면 구현 완료) |
 
 ### 2.3 색상 규칙
 
@@ -134,12 +135,15 @@ class StudentAssignmentStatus {
 
 ## 5. 관련 파일
 
-| 파일 | 역할 |
-|------|------|
-| `practice/domain/entities/practice_item.dart` | PracticeItem 엔티티 |
-| `practice/presentation/providers/practice_item_providers.dart` | 기존 Provider |
-| `home/presentation/screens/home_screen.dart` | 홈 대시보드 (삽입 위치) |
-| `lessons/presentation/widgets/practice_items_section.dart` | 레슨별 과제 UI |
+| 파일 | 역할 | 상태 |
+|------|------|:----:|
+| `practice/domain/entities/practice_item.dart` | PracticeItem 엔티티 | ✅ |
+| `practice/presentation/providers/practice_item_providers.dart` | 기존 Provider | ✅ |
+| `home/presentation/providers/assignment_summary_provider.dart` | WeeklyAssignmentSummary 모델 + Provider | ✅ |
+| `home/presentation/widgets/assignment_summary_section.dart` | 홈 탭 과제 요약 위젯 (전체보기 버튼 포함) | ✅ |
+| `home/presentation/screens/assignment_dashboard_screen.dart` | 과제 전용 대시보드 화면 | ✅ |
+| `lessons/presentation/widgets/practice_items_section.dart` | 레슨별 과제 UI | ✅ |
+| 라우트: `AppRoutes.assignmentDashboard = '/assignments'` | home_routes.dart에 등록 | ✅ |
 
 ---
 
@@ -147,4 +151,5 @@ class StudentAssignmentStatus {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-11 | 구현 완료 반영 (#101). 전용 대시보드 화면 추가, 전체보기 버튼 연결, 관련 파일 업데이트 |
 | 2026-03-07 | 초기 스펙 작성 |

@@ -76,26 +76,28 @@ class AvailabilityBlock extends StatelessWidget {
     }
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return AppColors.successLight; // Light green
+        return AppColors.successLight;
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return AppColors.infoLight; // Light blue
+        return AppColors.infoLight;
       case AvailabilitySlotStatus.cancelled:
+        return AppColors.error.withValues(alpha: 0.08);
       case AvailabilitySlotStatus.past:
-        return AppColors.surfaceSecondaryLight; // Light gray
+        return AppColors.surfaceSecondaryLight;
     }
   }
 
   Color get _borderColor {
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return AppColors.successBorder; // Green border
+        return AppColors.successBorder;
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return AppColors.infoBorder; // Blue border
+        return AppColors.infoBorder;
       case AvailabilitySlotStatus.cancelled:
+        return AppColors.error.withValues(alpha: 0.3);
       case AvailabilitySlotStatus.past:
-        return AppColors.borderLight; // Gray border
+        return AppColors.borderLight;
     }
   }
 
@@ -107,8 +109,9 @@ class AvailabilityBlock extends StatelessWidget {
       case AvailabilitySlotStatus.myBooking:
         return '🔵';
       case AvailabilitySlotStatus.cancelled:
-      case AvailabilitySlotStatus.past:
         return '⛔';
+      case AvailabilitySlotStatus.past:
+        return '⏹️';
     }
   }
 }

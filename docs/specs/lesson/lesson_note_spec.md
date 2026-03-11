@@ -58,7 +58,7 @@ final List<LessonRecording>? recordings;  // Lesson recordings
 | 파일 | 위젯 | 역할 | 줄 수 |
 |------|------|------|:-----:|
 | `lesson_notes_widgets.dart` | `LessonDetailSectionHeader` | 섹션 제목 + 추가 버튼 | L1-45 |
-| | `LessonNoteEditor` | 피드백 텍스트 입력 (6줄 multiline) | L47-80 |
+| | `LessonNoteEditor` | 피드백 텍스트 입력 + 저장 상태 인디케이터 | L47-140 |
 | | `TeacherFeedbackCard` | 피드백 읽기 전용 표시 | L83-144 |
 | | `KeyPointsList` | 포인트 목록 + 삭제 (선생님만) | L147-225 |
 | | `PracticeTipsCard` | 연습 팁 카드 + 편집 (선생님만) | L228-305 |
@@ -79,11 +79,15 @@ final List<LessonRecording>? recordings;  // Lesson recordings
 │                                         │
 │                                         │
 └─────────────────────────────────────────┘
+                            저장 중... ⏳  ← 입력 중
+                            ✅ 저장됨      ← 저장 완료 (2초 후 사라짐)
 ```
 
 - 6줄 multiline TextField
 - 보더 스타일 컨테이너, light surface 배경
-- 부모 위젯에서 저장 처리 (자체 저장 버튼 없음)
+- StatefulWidget (자체 저장 상태 관리)
+- 저장 상태 인디케이터: idle → saving (spinner) → saved (체크 아이콘, 2초 후 idle)
+- 부모의 debounce(800ms) + 인디케이터 buffer(1200ms) = 저장 완료 시 "저장됨" 표시
 
 #### TeacherFeedbackCard (학생 전용)
 
@@ -232,6 +236,7 @@ LessonDetailScreen (노트 탭)
 
 | 상태 | 선생님 뷰 | 학생 뷰 |
 |------|----------|---------|
+| 완료+피드백 없음 | ⚠️ 피드백 작성 유도 배너 + LessonNoteEditor | "아직 피드백이 없습니다" |
 | 피드백 없음 | LessonNoteEditor (빈 placeholder) | "아직 피드백이 없습니다" |
 | 피드백 있음 | LessonNoteEditor (기존 텍스트) | TeacherFeedbackCard + 날짜 |
 | 포인트 없음 | [+] 버튼만 표시 | "아직 등록된 포인트가 없습니다" |
@@ -403,3 +408,4 @@ Future<List<LessonNoteTimeline>> lessonNoteTimeline(
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
 | 1.0 | 2026-03-02 | 초안 — 기존 구현 코드 기반 문서화 |
+| 1.1 | 2026-03-11 | LessonNoteEditor 저장 상태 인디케이터 추가 (#108), 레슨 완료 시 피드백 유도 배너 (#112) |

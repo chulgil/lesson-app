@@ -8,9 +8,10 @@ InputDecoration studentInputDecoration({
   required String label,
   required String hint,
   required IconData prefixIcon,
+  bool isRequired = false,
 }) {
   return InputDecoration(
-    labelText: label,
+    labelText: isRequired ? '$label *' : label,
     hintText: hint,
     prefixIcon: Icon(prefixIcon),
     border: OutlineInputBorder(

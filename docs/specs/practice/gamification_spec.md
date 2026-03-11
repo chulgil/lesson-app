@@ -1,8 +1,10 @@
 # 게이미피케이션 스펙
 
-> 구현 상태: ❌ 미구현
+> 구현 상태: ⚠️ Phase 1 부분 구현 (UI + Mock 완료, 연습 시스템 연동 미완)
 > 작성일: 2026-03-07
-> 상태: 스펙 작성 완료, 구현 대기
+> 마지막 업데이트: 2026-03-11
+> 상태: Phase 1 UI/Mock 구현 완료, 포인트 자동 부여 트리거 미연동
+> 이슈: [#98](https://github.com/chulgil/lesson-app/issues/98) (closed)
 > 관련: practice_streak_spec.md, practice_goal_spec.md
 
 ---
@@ -378,26 +380,26 @@ StudentGamification(
 ```
 features/gamification/
 ├── domain/entities/
-│   ├── student_gamification.dart    # StudentGamification 엔티티
-│   ├── point_history.dart           # PointHistory, PointSource
-│   └── badge.dart                   # Badge, BadgeType
-├── domain/repositories/
-│   └── gamification_repository.dart # Repository 인터페이스
+│   └── gamification.dart                  # StudentGamification, PracticeBadge,
+│                                          # PointHistory, PointType, BadgeRarity,
+│                                          # LevelDefinition (✅ 구현 완료)
 ├── data/repositories/
-│   └── mock_gamification_repository.dart  # Mock 구현
+│   └── mock_gamification_repository.dart  # Mock 데이터 (✅ 구현 완료)
 └── presentation/
     ├── screens/
-    │   ├── badge_list_screen.dart    # 뱃지 전체 목록
-    │   └── point_history_screen.dart # 포인트 이력
+    │   └── badge_collection_screen.dart   # 뱃지 컬렉션 + 포인트 히스토리 (✅)
     ├── widgets/
-    │   ├── gamification_header.dart  # 포인트+레벨 헤더 (대시보드용)
-    │   ├── level_up_dialog.dart      # 레벨업 연출 다이얼로그
-    │   ├── badge_grid.dart           # 뱃지 그리드 위젯
-    │   ├── badge_award_sheet.dart    # 선생님 뱃지 수여 BottomSheet
-    │   ├── point_earned_toast.dart   # 포인트 획득 토스트
-    │   └── weekly_ranking_card.dart  # 주간 랭킹 카드
+    │   ├── gamification_header.dart        # 포인트+레벨 헤더 (✅ 학생 대시보드 통합)
+    │   └── level_up_dialog.dart            # 레벨업 축하 다이얼로그 (✅)
     └── providers/
-        └── gamification_providers.dart  # @riverpod providers
+        └── gamification_provider.dart     # @riverpod: studentGamification (✅)
+
+# 구현 차이점 (스펙 vs 실제):
+# - 엔티티: 단일 파일(gamification.dart)에 통합 (Badge → PracticeBadge로 rename, Flutter 충돌 방지)
+# - 레벨 체계: 6단계 (스펙 10단계 → 간소화: 초보연습생/열정연습생/꾸준한연주자/실력파연주자/음악마스터/전설의연주자)
+# - 뱃지: Phase 1에 포함 (스펙은 Phase 2), BadgeRarity(common/rare/epic/legendary) 추가
+# - 미구현: PointEarnedToast, BadgeAwardSheet, WeeklyRankingCard, 포인트 자동 부여 트리거 연동
+# - 라우트: AppRoutes.badgeCollection = '/gamification/badges' (student_routes.dart에 등록)
 ```
 
 ### 파일-위젯 매핑
@@ -497,4 +499,5 @@ Future<void> completePractice(String studentId) async {
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-11 | Phase 1 UI/Mock 구현 완료 반영 (#98). 레벨 6단계 간소화, Badge→PracticeBadge rename, 구현 파일 위치 업데이트 |
 | 2026-03-07 | 초안 작성 — 포인트/레벨/뱃지/리더보드/학부모 연동 |

@@ -37,6 +37,10 @@ class AvailabilityLegend extends StatelessWidget {
           icon: '⛔',
           label: '휴무',
         ),
+        const _LegendItem(
+          icon: '⏹️',
+          label: '지난 시간',
+        ),
       ],
     );
   }

@@ -7,9 +7,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
 
-/// Quick feedback writing screen for a specific lesson
+/// Quick feedback writing screen for a specific lesson.
+/// Supports feedback text, key points, and practice tips.
 class QuickFeedbackScreen extends ConsumerStatefulWidget {
   final String lessonId;
 
@@ -25,20 +27,37 @@ class QuickFeedbackScreen extends ConsumerStatefulWidget {
 
 class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   late TextEditingController _feedbackController;
-  Timer? _debounce;
+  late TextEditingController _tipController;
+  final List<String> _keyPoints = [];
   bool _hasChanges = false;
+  bool _isSaving = false;
+  bool _showKeyPoints = false;
+  bool _showTips = false;
 
   @override
   void initState() {
     super.initState();
     _feedbackController = TextEditingController();
+    _tipController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _debounce?.cancel();
     _feedbackController.dispose();
+    _tipController.dispose();
     super.dispose();
+  }
+
+  void _initFromLesson(Lesson lesson) {
+    if (!_hasChanges && _feedbackController.text.isEmpty) {
+      _feedbackController.text = lesson.feedback ?? '';
+    }
+    if (!_hasChanges && _keyPoints.isEmpty && lesson.keyPoints != null) {
+      _keyPoints.addAll(lesson.keyPoints!);
+    }
+    if (!_hasChanges && _tipController.text.isEmpty) {
+      _tipController.text = lesson.practiceTips ?? '';
+    }
   }
 
   @override
@@ -54,14 +73,27 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
           );
         }
 
-        // Initialize controller text on first build
-        if (!_hasChanges && _feedbackController.text.isEmpty) {
-          _feedbackController.text = lesson.feedback ?? '';
-        }
+        _initFromLesson(lesson);
 
         return Scaffold(
           appBar: AppBar(
             title: Text('${lesson.studentName} 피드백'),
+            actions: [
+              if (_isSaving)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              else
+                TextButton(
+                  onPressed: _hasChanges ? () => _saveFeedback(lesson) : null,
+                  child: const Text('저장'),
+                ),
+            ],
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -69,72 +101,41 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Lesson info header
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.music_note,
-                          color: AppColors.primary, size: 20),
-                      const SizedBox(width: AppSpacing.space3),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${lesson.date.month}월 ${lesson.date.day}일 ${lesson.startTime} 레슨',
-                              style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              '${lesson.instrument} · ${lesson.duration}분',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildLessonHeader(lesson),
 
                 const SizedBox(height: AppSpacing.space6),
 
                 // Feedback text field
-                Text(
-                  '피드백',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                _buildSectionHeader(
+                  icon: Icons.edit_note,
+                  title: '레슨 피드백',
                 ),
                 const SizedBox(height: AppSpacing.space3),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
-                    border: Border.all(color: AppColors.borderLight),
-                  ),
-                  child: TextField(
-                    controller: _feedbackController,
-                    maxLines: 8,
-                    onChanged: (_) => setState(() => _hasChanges = true),
-                    decoration: InputDecoration(
-                      hintText: '피드백을 작성하세요...',
-                      hintStyle: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textTertiaryLight,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding:
-                          const EdgeInsets.all(AppSpacing.space4),
-                    ),
-                  ),
+                _buildFeedbackField(),
+
+                const SizedBox(height: AppSpacing.space5),
+
+                // Key Points (collapsible)
+                _buildExpandableSection(
+                  icon: Icons.lightbulb_outline,
+                  title: '주요 포인트',
+                  count: _keyPoints.length,
+                  isExpanded: _showKeyPoints,
+                  onToggle: () =>
+                      setState(() => _showKeyPoints = !_showKeyPoints),
+                  child: _buildKeyPointsSection(),
+                ),
+
+                const SizedBox(height: AppSpacing.space4),
+
+                // Practice Tips (collapsible)
+                _buildExpandableSection(
+                  icon: Icons.tips_and_updates_outlined,
+                  title: '연습 팁',
+                  count: _tipController.text.isNotEmpty ? 1 : 0,
+                  isExpanded: _showTips,
+                  onToggle: () => setState(() => _showTips = !_showTips),
+                  child: _buildTipsField(),
                 ),
 
                 const SizedBox(height: AppSpacing.space6),
@@ -143,7 +144,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: _hasChanges ? () => _saveFeedback() : null,
+                    onPressed: _hasChanges ? () => _saveFeedback(lesson) : null,
                     child: const Padding(
                       padding:
                           EdgeInsets.symmetric(vertical: AppSpacing.space3),
@@ -174,14 +175,234 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     );
   }
 
-  Future<void> _saveFeedback() async {
-    final lessonAsync = ref.read(lessonProvider(widget.lessonId));
-    final lesson = lessonAsync.valueOrNull;
-    if (lesson == null) return;
+  Widget _buildLessonHeader(Lesson lesson) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSecondaryLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.music_note, color: AppColors.primary, size: 20),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${lesson.date.month}월 ${lesson.date.day}일 ${lesson.startTime} 레슨',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '${lesson.instrument} · ${lesson.duration}분',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    final text = _feedbackController.text.trim();
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: AppColors.primary),
+        const SizedBox(width: AppSpacing.space2),
+        Text(
+          title,
+          style: AppTypography.bodyLarge.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeedbackField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: TextField(
+        controller: _feedbackController,
+        maxLines: 6,
+        onChanged: (_) => setState(() => _hasChanges = true),
+        decoration: InputDecoration(
+          hintText: '레슨 피드백을 작성하세요...',
+          hintStyle: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(AppSpacing.space4),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandableSection({
+    required IconData icon,
+    required String title,
+    required int count,
+    required bool isExpanded,
+    required VoidCallback onToggle,
+    required Widget child,
+  }) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+            child: Row(
+              children: [
+                Icon(icon, size: 20, color: AppColors.primary),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  title,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (count > 0) ...[
+                  const SizedBox(width: AppSpacing.space2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+                const Spacer(),
+                Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: AppColors.textTertiaryLight,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (isExpanded) ...[
+          const SizedBox(height: AppSpacing.space2),
+          child,
+        ],
+      ],
+    );
+  }
+
+  Widget _buildKeyPointsSection() {
+    return Column(
+      children: [
+        // Existing points
+        ..._keyPoints.asMap().entries.map((entry) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space4,
+                vertical: AppSpacing.space3,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSecondaryLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle_outline,
+                      size: 18, color: AppColors.success),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(
+                    child: Text(
+                      entry.value,
+                      style: AppTypography.bodyMedium,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _keyPoints.removeAt(entry.key);
+                        _hasChanges = true;
+                      });
+                    },
+                    icon: Icon(Icons.close,
+                        size: 18, color: AppColors.textTertiaryLight),
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+
+        // Add new point
+        _KeyPointInput(
+          onAdd: (text) {
+            setState(() {
+              _keyPoints.add(text);
+              _hasChanges = true;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTipsField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: TextField(
+        controller: _tipController,
+        maxLines: 3,
+        onChanged: (_) => setState(() => _hasChanges = true),
+        decoration: InputDecoration(
+          hintText: '연습할 때 주의할 점을 적어주세요...',
+          hintStyle: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(AppSpacing.space4),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveFeedback(Lesson lesson) async {
+    setState(() => _isSaving = true);
+
+    final feedbackText = _feedbackController.text.trim();
+    final tipText = _tipController.text.trim();
     final updatedLesson = lesson.copyWith(
-      feedback: text.isEmpty ? null : text,
+      feedback: feedbackText.isEmpty ? null : feedbackText,
+      keyPoints: _keyPoints.isEmpty ? null : _keyPoints,
+      practiceTips: tipText.isEmpty ? null : tipText,
     );
 
     await ref
@@ -189,10 +410,84 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
         .updateLesson(updatedLesson);
 
     if (mounted) {
+      setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('피드백이 저장되었습니다')),
+        const SnackBar(
+          content: Text('피드백이 저장되었습니다'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
       context.pop();
     }
+  }
+}
+
+/// Inline input for adding key points
+class _KeyPointInput extends StatefulWidget {
+  final ValueChanged<String> onAdd;
+
+  const _KeyPointInput({required this.onAdd});
+
+  @override
+  State<_KeyPointInput> createState() => _KeyPointInputState();
+}
+
+class _KeyPointInputState extends State<_KeyPointInput> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    widget.onAdd(text);
+    _controller.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _controller,
+            onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(
+              hintText: '포인트 추가...',
+              hintStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              filled: true,
+              fillColor: AppColors.surfaceLight,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              isDense: true,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        IconButton(
+          onPressed: _submit,
+          icon: const Icon(Icons.add_circle),
+          color: AppColors.primary,
+          constraints: const BoxConstraints(),
+          padding: EdgeInsets.zero,
+        ),
+      ],
+    );
   }
 }

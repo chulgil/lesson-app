@@ -24,9 +24,18 @@ class StudentsTab extends ConsumerStatefulWidget {
   ConsumerState<StudentsTab> createState() => _StudentsTabState();
 }
 
+enum StudentSortOption {
+  name('이름순'),
+  instrument('악기순');
+
+  final String label;
+  const StudentSortOption(this.label);
+}
+
 class _StudentsTabState extends ConsumerState<StudentsTab> {
   final _searchController = TextEditingController();
   StudentFilter _currentFilter = StudentFilter.all;
+  StudentSortOption _sortOption = StudentSortOption.name;
 
   @override
   void dispose() {
@@ -271,11 +280,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             ),
           ),
           TextButton.icon(
-            onPressed: () {
-              // TODO: Sort options
-            },
+            onPressed: _showSortOptions,
             icon: const Icon(Icons.sort, size: 18),
-            label: const Text('정렬'),
+            label: Text(_sortOption.label),
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,
@@ -287,8 +294,59 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              child: Text('정렬 기준', style: AppTypography.headingSmall),
+            ),
+            ...StudentSortOption.values.map((option) {
+              final isSelected = _sortOption == option;
+              return ListTile(
+                leading: Icon(
+                  isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                  color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                ),
+                title: Text(option.label),
+                onTap: () {
+                  setState(() => _sortOption = option);
+                  Navigator.pop(context);
+                },
+              );
+            }),
+            const SizedBox(height: AppSpacing.space2),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<StudentGroup> _applySortToGroups(List<StudentGroup> groups) {
+    return groups.map((group) {
+      final sorted = List<StudentWithMembership>.from(group.students);
+      switch (_sortOption) {
+        case StudentSortOption.name:
+          sorted.sort((a, b) => a.name.compareTo(b.name));
+        case StudentSortOption.instrument:
+          sorted.sort((a, b) => a.instrument.compareTo(b.instrument));
+      }
+      return StudentGroup(
+        lessonClass: group.lessonClass,
+        students: sorted,
+      );
+    }).toList();
+  }
+
   Widget _buildGroupedStudentList(List<StudentGroup> groups) {
-    final filtered = _applyPracticeFilter(groups);
+    final filtered = _applySortToGroups(_applyPracticeFilter(groups));
 
     if (filtered.isEmpty) {
       return _buildEmptyState();
@@ -320,6 +378,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       subtitle: query.isEmpty
           ? '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요'
           : null,
+      actionLabel: query.isEmpty ? '학생 추가' : null,
+      actionIcon: query.isEmpty ? Icons.person_add : null,
+      onAction: query.isEmpty ? () => context.push('/students/add-method') : null,
     );
   }
 

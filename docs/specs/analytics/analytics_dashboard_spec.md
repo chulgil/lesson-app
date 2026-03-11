@@ -1,9 +1,10 @@
 # 통계/리포트 화면 스펙
 
-> 구현 상태: ❌ 미구현
+> 구현 상태: ✅ Phase 1+2 구현 완료 (Phase 3 미구현)
 > 작성일: 2026-03-07
-> 상태: 스펙 작성 완료, 구현 대기
-> 이슈: [#72](https://github.com/chulgil/lesson-app/issues/72)
+> 마지막 업데이트: 2026-03-11
+> 상태: Phase 1+2 구현 완료
+> 이슈: [#72](https://github.com/chulgil/lesson-app/issues/72), [#97](https://github.com/chulgil/lesson-app/issues/97) (closed)
 
 ---
 
@@ -234,7 +235,7 @@ enum ReportPeriod { oneMonth, threeMonths, sixMonths, oneYear }
 
 | 항목 | 설명 |
 |------|------|
-| 레슨 추이 차트 | fl_chart 라인 차트 (6개월) |
+| 레슨 추이 차트 | CustomPaint 커스텀 차트 (6개월, 베지어 곡선) |
 | 수익 현황 | 월간 수익 + 전월 대비 |
 
 ### Phase 3: 학생별 리포트 + 학부모 공유
@@ -279,7 +280,7 @@ TeacherDashboardScreen
 |------|-------|----------------------|----------|
 | `StatCardGrid` | `stats: TeacherMonthlyStats` | `teacherMonthlyStatsProvider(month)` | 2×2 그리드, 각 카드에 아이콘 + 수치 + 라벨 |
 | `StatCard` | `icon: IconData`, `label: String`, `value: String`, `subtitle: String?`, `onTap: VoidCallback?` | 부모에서 전달 | 라운드 카드, 아이콘 좌측, 수치 크게, 라벨 작게 |
-| `MonthlyTrendChart` | `trendData: List<MonthlyTrend>` | `teacherMonthlyStatsProvider(month)` → `.lessonTrend` | `fl_chart` LineChart, X축: 월(6개), Y축: 레슨 수, 터치 시 툴팁 |
+| `MonthlyTrendChart` | `trendData: List<MonthlyTrend>` | `teacherMonthlyStatsProvider(month)` → `.lessonTrend` | CustomPaint 베지어 곡선 차트, X축: 월(6개), Y축: 레슨 수, 값 라벨 표시 |
 | `RevenueBreakdownCard` | `revenue: int`, `changePercent: double` | `teacherMonthlyStatsProvider(month)` | 카드 내 금액(원 단위, 콤마 포맷) + 변화율(▲/▼ 색상 구분) |
 | `PracticeRankingList` | `rankings: List<StudentPracticeRank>` | `practiceRankingProvider(month)` | ListView, 순위 + 이름 + LinearProgressIndicator + % |
 | `PracticeRankingTile` | `rank: int`, `studentName: String`, `rate: double` | 부모에서 전달 | ListTile, leading: 순위 뱃지, trailing: % 텍스트 |
@@ -511,30 +512,31 @@ StudentReport(
 ```
 features/analytics/
 ├── domain/entities/
-│   ├── teacher_stats.dart              # TeacherMonthlyStats, MonthlyTrend
-│   ├── student_report.dart             # StudentReport, WeeklyPracticeRate,
-│   │                                   # RepertoireProgress, ProgressStatus,
-│   │                                   # LessonNoteSummary, ReportPeriod
-│   └── practice_ranking.dart           # StudentPracticeRank
+│   └── teacher_stats.dart              # TeacherMonthlyStats, MonthlyTrend,
+│                                       # StudentPracticeRank (✅ 구현 완료)
 ├── data/repositories/
-│   └── mock_analytics_repository.dart  # AnalyticsRepository 인터페이스 + Mock 구현
+│   └── mock_analytics_repository.dart  # Mock 데이터 (✅ 구현 완료)
 └── presentation/
     ├── screens/
-    │   ├── teacher_dashboard_screen.dart   # 선생님 통계 대시보드 메인 화면
-    │   └── student_report_screen.dart      # 학생별 상세 리포트 화면
+    │   ├── teacher_dashboard_screen.dart   # 선생님 통계 대시보드 (✅ 구현 완료)
+    │   └── student_report_screen.dart      # 학생별 상세 리포트 (❌ Phase 3)
     ├── widgets/
-    │   ├── stat_card_grid.dart             # 2×2 핵심 지표 그리드 (StatCard 4개)
-    │   ├── monthly_trend_chart.dart        # 6개월 레슨 추이 라인 차트 (fl_chart)
-    │   ├── revenue_breakdown_card.dart     # 수익 현황 + 전월 대비 카드
-    │   ├── practice_ranking_list.dart      # 연습률 TOP 5 리스트
-    │   ├── attendance_rate_card.dart       # 원형 출석률 카드
-    │   ├── practice_heatmap.dart           # GitHub 스타일 연습 히트맵 캘린더
-    │   ├── practice_weekly_trend_chart.dart # 주간 연습률 라인 차트
-    │   ├── repertoire_progress_list.dart   # 레퍼토리 진도 목록
-    │   └── recent_lesson_notes_list.dart   # 최근 레슨 노트 요약 목록
+    │   ├── monthly_trend_chart.dart        # 6개월 레슨 추이 (CustomPaint) (✅)
+    │   ├── practice_ranking_list.dart      # 연습률 TOP 5 리스트 (✅)
+    │   ├── attendance_rate_card.dart       # 원형 출석률 카드 (❌ Phase 3)
+    │   ├── practice_heatmap.dart           # GitHub 스타일 히트맵 (❌ Phase 3)
+    │   ├── practice_weekly_trend_chart.dart # 주간 연습률 차트 (❌ Phase 3)
+    │   ├── repertoire_progress_list.dart   # 레퍼토리 진도 (❌ Phase 3)
+    │   └── recent_lesson_notes_list.dart   # 레슨 노트 요약 (❌ Phase 3)
     └── providers/
-        └── analytics_providers.dart        # @riverpod: teacherMonthlyStats,
-                                            # studentReport, practiceRanking
+        └── analytics_providers.dart        # @riverpod: teacherMonthlyStats (✅)
+
+# 구현 노트:
+# - StatCard는 core/widgets/stat_card.dart 재사용 (별도 파일 불필요)
+# - 수익 카드는 teacher_dashboard_screen.dart 내 _buildRevenueCard() 메서드
+# - fl_chart 대신 CustomPaint + _TrendChartPainter 사용 (외부 패키지 없음)
+# - 라우트: AppRoutes.analytics = '/analytics' (profile_routes.dart에 등록)
+# - 진입점: 홈 대시보드 "통계" 버튼 (dashboard_tab.dart)
 ```
 
 ### 파일-위젯 매핑
@@ -567,5 +569,6 @@ features/analytics/
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-11 | Phase 1+2 구현 완료 반영 (#97). fl_chart → CustomPaint 변경, 구현 파일 위치 업데이트 |
 | 2026-03-07 | 위젯 구조, 화면 플로우, 경쟁사 상세 분석, Mock 데이터 설계, 구현 파일 위치 섹션 추가 |
 | 2026-03-07 | 초안 작성 (이슈 #72) |

@@ -27,6 +27,7 @@ class BasicInfoFields extends StatelessWidget {
             label: '이름',
             hint: '학생 이름을 입력하세요',
             prefixIcon: Icons.person_outline,
+            isRequired: true,
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {

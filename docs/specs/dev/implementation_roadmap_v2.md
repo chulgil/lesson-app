@@ -30,9 +30,9 @@
 
 | 기능 | 스펙 | 경쟁사 대비 | 우선순위 |
 |------|------|-----------|:--------:|
-| 통계/리포트 대시보드 | analytics_dashboard_spec.md | StudioMate, Modacity | HIGH |
+| ~~통계/리포트 대시보드~~ | analytics_dashboard_spec.md | StudioMate, Modacity | ✅ Phase 1+2 done |
 | 출석 관리 | attendance_spec.md | StudioMate | HIGH |
-| 게이미피케이션 | gamification_spec.md | Tonara (+68%), Practice Space | HIGH |
+| ~~게이미피케이션~~ | gamification_spec.md | Tonara (+68%), Practice Space | ⚠️ Phase 1 UI done |
 | 팔로우 피드 | follow_master.md | 인스타그램형 | LOW |
 
 ### 1.3 경쟁사 대비 강점/약점
@@ -73,9 +73,9 @@
 
 | # | 작업 | 스펙 | 예상 규모 | 우선순위 |
 |---|------|------|:---------:|:--------:|
-| 2-1 | **통계/리포트 대시보드** | analytics_dashboard_spec.md | L | CRITICAL |
+| 2-1 | **통계/리포트 대시보드** | analytics_dashboard_spec.md | L | ✅ done |
 | 2-2 | **출석 관리 (Quick Action)** | attendance_spec.md Phase 1 | M | CRITICAL |
-| 2-3 | **게이미피케이션 Phase 1** (포인트+레벨) | gamification_spec.md Phase 1 | L | HIGH |
+| 2-3 | **게이미피케이션 Phase 1** (포인트+레벨) | gamification_spec.md Phase 1 | L | ✅ done |
 | 2-4 | 대시보드 정보 계층화 | design_master.md 5.3 | M | HIGH |
 | 2-5 | 수강권 카드 UI 개선 (프로그레스 바) | subscription_master.md | S | MEDIUM |
 | 2-6 | 예약 색상 체계 적용 | design_master.md 5.3 | S | MEDIUM |
@@ -204,4 +204,5 @@
 
 | 날짜 | 변경 내용 |
 |------|----------|
+| 2026-03-11 | Phase 2-1(통계), 2-3(게이미피케이션) 구현 완료 반영 |
 | 2026-03-07 | v2 작성 — 전체 스펙 검토 기반, 4 Phase 로드맵, 경쟁사 분석 반영 |
