@@ -1,8 +1,52 @@
-# 선생님/학생 UX 종합 점검 7차
+# 선생님/학생 UX 종합 점검 8차
 
 > 확정일: 2026-03-11
 
-## 현재 세션: UX 점검 7차 (Phase 1~3) - 완료
+## 현재 세션: UX 점검 8차 (Phase 1~3) - 완료
+
+### 배경
+
+7차 수정 후 재검증: profile_header 하드코딩(CRITICAL), lesson/student cancel/delete 에러 처리(CRITICAL), 잔존 하드코딩 라우트 27건(HIGH), onboarding/backup 에러 처리(MEDIUM) 발견 및 해결.
+
+### Phase 1: CRITICAL 수정 - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 1-1 | profile_header 하드코딩 → Provider 연동 | #138 | done |
+| 1-2 | lesson cancel/complete/delete try-catch | #138 | done |
+| 1-3 | student deleteStudent try-catch | #138 | done |
+
+### Phase 2: 하드코딩 라우트 + 에러 처리 (HIGH) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 2-1 | invite 관련 5개 파일 라우트 수정 | #138 | done |
+| 2-2 | search 관련 2개 파일 라우트 수정 | #138 | done |
+| 2-3 | onboarding profile_setup try-catch | #138 | done |
+| 2-4 | practice_repertoire 라우트 수정 | #138 | done |
+
+### Phase 3: parent_home + 기타 (MEDIUM) - 완료
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| 3-1 | parent_lessons_tab 라우트 수정 | #138 | done |
+| 3-2 | unconnected_child_dashboard 라우트 수정 | #138 | done |
+| 3-3 | assignment_dashboard + edit_lesson 라우트 수정 | #138 | done |
+| 3-4 | backup try-catch + tip_template try-catch | #138 | done |
+
+### 별도 이슈 (설계 검토 필요)
+
+| # | 작업 | 이슈 | 상태 |
+|---|------|------|:----:|
+| — | parentName 엔티티 추가 | — | todo (Ask First) |
+| — | 정기 레슨 저장 로직 미구현 | #134 | todo |
+| — | metronome AppRoutes 상수 추가 | — | todo |
+
+---
+
+## 이전 계획: 선생님/학생 UX 종합 점검 7차
+
+> 확정일: 2026-03-11
 
 ### 배경
 
