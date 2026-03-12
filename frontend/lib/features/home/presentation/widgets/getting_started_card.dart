@@ -82,7 +82,7 @@ class GettingStartedCard extends ConsumerWidget {
                 title: '학생 등록하기',
                 subtitle: '첫 학생을 추가해보세요',
                 isCompleted: false,
-                onTap: () => context.push(AppRoutes.addStudent),
+                onTap: () => context.push(AppRoutes.addStudentMethod),
               ),
 
               const SizedBox(height: AppSpacing.space2),

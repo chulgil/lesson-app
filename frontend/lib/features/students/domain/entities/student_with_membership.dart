@@ -29,4 +29,7 @@ class StudentWithMembership {
     }
     return student.lessonSchedule;
   }
+
+  /// Whether student is connected via the app.
+  bool get isAppConnected => student.isAppConnected;
 }

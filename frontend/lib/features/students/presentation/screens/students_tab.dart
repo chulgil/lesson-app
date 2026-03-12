@@ -537,14 +537,28 @@ class _StudentCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1: Name · Instrument
-                    Text(
-                      '${swm.name} · ${swm.instrument}',
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    // Row 1: Name · Instrument + connection badge
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${swm.name} · ${swm.instrument}',
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          swm.isAppConnected ? Icons.link : Icons.edit_note,
+                          size: 14,
+                          color: swm.isAppConnected
+                              ? AppColors.success
+                              : AppColors.textTertiaryLight,
+                        ),
+                      ],
                     ),
                     // Row 2: Schedule
                     Text(

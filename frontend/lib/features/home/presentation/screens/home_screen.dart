@@ -56,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today),
+            icon: Icon(Icons.calendar_today_outlined, size: 22),
+            activeIcon: Icon(Icons.calendar_today, size: 22),
             label: '스케줄',
           ),
           BottomNavigationBarItem(

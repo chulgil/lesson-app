@@ -7,7 +7,7 @@ import '../../../../core/utils/instrument_colors.dart';
 import '../../../../models/lesson.dart';
 
 /// Height per 30-minute unit in timeline view.
-const double kTimelineUnitHeight = 60.0;
+const double kTimelineUnitHeight = 30.0;
 
 /// A lesson block in the timeline view.
 /// Height is proportional to lesson duration.
@@ -68,7 +68,7 @@ class TimelineLessonBlock extends StatelessWidget {
               // Content
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   child: _buildContent(colors),
                 ),
               ),
@@ -83,18 +83,25 @@ class TimelineLessonBlock extends StatelessWidget {
     );
   }
 
-  /// Progressive Disclosure: content density adapts to block height.
+  /// Progressive Disclosure: horizontal-first layout.
+  /// Uses full block width for info density (phone screens are wide).
   Widget _buildContent(InstrumentColorPair colors) {
+    final assignment = lesson.assignments?.isNotEmpty == true
+        ? lesson.assignments!.first
+        : lesson.pieces.isNotEmpty
+            ? lesson.pieces.first.displayName
+            : null;
+
     if (lesson.duration <= 30) {
-      // 1-line: name + instrument
+      // 1-line: maximize horizontal info — name · instrument · duration
       return Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          '${lesson.studentName} · ${lesson.instrument}',
-          style: AppTypography.bodySmall.copyWith(
+          '${lesson.studentName} · ${lesson.instrument} · ${lesson.duration}분',
+          style: AppTypography.caption.copyWith(
             color: colors.accent,
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: 12,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -103,27 +110,28 @@ class TimelineLessonBlock extends StatelessWidget {
     }
 
     if (lesson.duration <= 45) {
-      // 2-line: name / instrument + duration
+      // 2-row horizontal: Row1 name·instrument, Row2 duration·assignment
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            lesson.studentName,
-            style: AppTypography.bodySmall.copyWith(
+            '${lesson.studentName} · ${lesson.instrument}',
+            style: AppTypography.caption.copyWith(
               color: colors.accent,
               fontWeight: FontWeight.w600,
-              fontSize: 13,
+              fontSize: 12,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 2),
           Text(
-            '${lesson.instrument} · ${lesson.duration}분',
+            assignment != null
+                ? '${lesson.duration}분 · $assignment'
+                : '${lesson.duration}분',
             style: AppTypography.caption.copyWith(
-              color: colors.accent.withValues(alpha: 0.7),
-              fontSize: 12,
+              color: colors.accent.withValues(alpha: 0.6),
+              fontSize: 10,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -132,13 +140,7 @@ class TimelineLessonBlock extends StatelessWidget {
       );
     }
 
-    // 3-line: name / instrument + duration / last assignment preview
-    final assignment = lesson.assignments?.isNotEmpty == true
-        ? lesson.assignments!.first
-        : lesson.pieces.isNotEmpty
-            ? lesson.pieces.first.displayName
-            : null;
-
+    // 60min+: 3-row — name(bold) / instrument · duration / assignment
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -153,23 +155,23 @@ class TimelineLessonBlock extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
         Text(
           '${lesson.instrument} · ${lesson.duration}분',
           style: AppTypography.caption.copyWith(
             color: colors.accent.withValues(alpha: 0.7),
-            fontSize: 12,
+            fontSize: 11,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         if (assignment != null) ...[
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             assignment,
             style: AppTypography.caption.copyWith(
               color: colors.accent.withValues(alpha: 0.5),
-              fontSize: 11,
+              fontSize: 10,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

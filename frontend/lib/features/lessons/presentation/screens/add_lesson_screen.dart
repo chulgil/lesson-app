@@ -353,7 +353,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   }
 
   /// Check if a new lesson conflicts with existing lessons on the same day.
-  /// Returns the conflicting lesson's student name, or null if no conflict.
+  /// Returns all conflicting lesson student names, or null if no conflict.
   String? _findConflict(
     DateTime date,
     TimeOfDay time,
@@ -368,6 +368,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       time.minute,
     );
     final newEnd = newStart.add(Duration(minutes: duration));
+    final conflicts = <String>[];
 
     for (final lesson in existingLessons) {
       if (lesson.date.year == date.year &&
@@ -385,22 +386,22 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         final lessonEnd = lessonStart.add(Duration(minutes: lesson.duration));
 
         if (newStart.isBefore(lessonEnd) && newEnd.isAfter(lessonStart)) {
-          return lesson.studentName;
+          conflicts.add('${lesson.studentName} (${lesson.startTime})');
         }
       }
     }
-    return null;
+    return conflicts.isEmpty ? null : conflicts.join(', ');
   }
 
   /// Show a confirmation dialog when a time conflict is detected.
   /// Returns true if the user chooses to proceed.
-  Future<bool> _showConflictDialog(String conflictStudentName) async {
+  Future<bool> _showConflictDialog(String conflictInfo) async {
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('시간 충돌'),
         content: Text(
-          "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
+          '해당 시간에 기존 레슨이 있습니다:\n$conflictInfo\n\n그래도 계속 진행하시겠습니까?',
         ),
         actions: [
           TextButton(
@@ -440,15 +441,43 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
     // Check for time conflicts with existing lessons
     final existingLessons = ref.read(lessonsProvider).valueOrNull ?? [];
-    final conflictName = _findConflict(
-      _selectedDate,
-      _selectedTime,
-      _lessonDuration,
-      existingLessons,
-    );
-    if (conflictName != null) {
-      final shouldProceed = await _showConflictDialog(conflictName);
-      if (!shouldProceed) return;
+
+    if (_isRecurring && _recurringDays.isNotEmpty) {
+      // Check conflicts for each recurring day (int: 0=Mon...6=Sun)
+      const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
+      final conflictDays = <String>[];
+      for (final dayIndex in _recurringDays) {
+        final weekday = dayIndex + 1; // Convert 0-based to DateTime.weekday (1=Mon)
+        final now = DateTime.now();
+        var daysUntil = weekday - now.weekday;
+        if (daysUntil <= 0) daysUntil += 7;
+        final targetDate = DateTime(now.year, now.month, now.day + daysUntil);
+        final conflict = _findConflict(
+          targetDate,
+          _selectedTime,
+          _lessonDuration,
+          existingLessons,
+        );
+        if (conflict != null) {
+          final dayLabel = dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
+          conflictDays.add('${dayLabel}요일 ($conflict)');
+        }
+      }
+      if (conflictDays.isNotEmpty) {
+        final shouldProceed = await _showRecurringConflictDialog(conflictDays);
+        if (!shouldProceed) return;
+      }
+    } else {
+      final conflictName = _findConflict(
+        _selectedDate,
+        _selectedTime,
+        _lessonDuration,
+        existingLessons,
+      );
+      if (conflictName != null) {
+        final shouldProceed = await _showConflictDialog(conflictName);
+        if (!shouldProceed) return;
+      }
     }
 
     // Create lesson pieces from input
@@ -543,6 +572,41 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         _lessonDuration = student.lessonDuration;
       }
     });
+  }
+
+  /// Show conflict dialog for recurring lessons with multiple days.
+  Future<bool> _showRecurringConflictDialog(List<String> conflictDays) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('반복 레슨 시간 충돌'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('다음 요일에 기존 레슨과 시간이 겹칩니다:'),
+            const SizedBox(height: 8),
+            ...conflictDays.map((d) => Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 4),
+              child: Text('• $d', style: const TextStyle(fontWeight: FontWeight.w600)),
+            )),
+            const SizedBox(height: 8),
+            const Text('그래도 계속 진행하시겠습니까?'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('계속'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 
   /// Calculate the next occurrence of a given day name

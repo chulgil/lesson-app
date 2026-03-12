@@ -291,19 +291,35 @@ class _ScheduleWeeklyGridViewState
     final lesson = lessonMap[dayIndex]?[slotMinutes];
     if (lesson == null) return SizedBox(width: width, height: height);
 
+    final colors = InstrumentColors.getColor(lesson.instrument);
+
     // Check if this is the start slot of a lesson
     final parts = lesson.startTime.split(':');
     final lessonStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-    if (slotMinutes != lessonStartMinutes) {
-      // This is a continuation slot — rendered as part of merged cell above
-      return SizedBox(width: width, height: height);
+    final isStartSlot = slotMinutes == lessonStartMinutes;
+
+    if (!isStartSlot) {
+      // Continuation slot — show colored background only (no overflow)
+      return GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
+        },
+        child: Container(
+          width: width - 2,
+          height: height,
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          decoration: BoxDecoration(
+            color: colors.background,
+            border: Border(
+              left: BorderSide(color: colors.accent, width: 2),
+            ),
+          ),
+        ),
+      );
     }
 
-    final colors = InstrumentColors.getColor(lesson.instrument);
-    final cellCount = (lesson.duration / 30.0).ceil();
-    final mergedHeight = height * cellCount;
-
-    // Truncate student name to 2 characters
+    // Start slot — show name with colored background
     final shortName = lesson.studentName.length > 2
         ? lesson.studentName.substring(0, 2)
         : lesson.studentName;
@@ -315,11 +331,14 @@ class _ScheduleWeeklyGridViewState
       },
       child: Container(
         width: width - 2,
-        height: mergedHeight,
-        margin: const EdgeInsets.all(1),
+        height: height,
+        margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
           color: colors.background,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(4),
+            topRight: Radius.circular(4),
+          ),
           border: Border(
             left: BorderSide(color: colors.accent, width: 2),
           ),
@@ -386,15 +405,12 @@ class _ScheduleWeeklyGridViewState
           top: BorderSide(color: const Color(0xFFE8E8E8), width: 0.5),
         ),
       ),
-      child: SafeArea(
-        top: false,
-        child: Text(
-          '이번 주: ${lessons.length}레슨 · 총 $timeStr',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
-          ),
-          textAlign: TextAlign.center,
+      child: Text(
+        '이번 주: ${lessons.length}레슨 · 총 $timeStr',
+        style: AppTypography.caption.copyWith(
+          color: AppColors.textTertiaryLight,
         ),
+        textAlign: TextAlign.center,
       ),
     );
   }

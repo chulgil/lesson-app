@@ -114,19 +114,21 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     // We only render from first available hour to last
     final (startHour, endHour) = _getVisibleRange(sortedLessons);
 
+    const topPadding = 16.0;
+
     return SingleChildScrollView(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: SizedBox(
-        height: ((endHour - startHour + 1) * 2) * _unitHeight,
+        height: ((endHour - startHour + 1) * 2) * _unitHeight + topPadding,
         child: Stack(
           children: [
             // Hour grid lines and labels
-            ..._buildHourGrid(startHour, endHour),
+            ..._buildHourGrid(startHour, endHour, topPadding),
             // Lesson blocks
-            ..._buildLessonBlocks(sortedLessons, startHour),
+            ..._buildLessonBlocks(sortedLessons, startHour, topPadding),
             // "Now" indicator
-            if (_isToday) _buildNowIndicator(startHour),
+            if (_isToday) _buildNowIndicator(startHour, topPadding),
           ],
         ),
       ),
@@ -152,11 +154,11 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     return ((earliest - 1).clamp(0, 23), (latest + 1).clamp(0, 23));
   }
 
-  List<Widget> _buildHourGrid(int startHour, int endHour) {
+  List<Widget> _buildHourGrid(int startHour, int endHour, double topPadding) {
     final widgets = <Widget>[];
 
     for (int hour = startHour; hour <= endHour; hour++) {
-      final top = ((hour - startHour) * 2) * _unitHeight;
+      final top = ((hour - startHour) * 2) * _unitHeight + topPadding;
       // Hour label
       widgets.add(
         Positioned(
@@ -189,7 +191,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     return widgets;
   }
 
-  List<Widget> _buildLessonBlocks(List<Lesson> lessons, int startHour) {
+  List<Widget> _buildLessonBlocks(List<Lesson> lessons, int startHour, double topPadding) {
     final nowMinutes = _now.hour * 60 + _now.minute;
 
     // Find the next upcoming lesson
@@ -211,7 +213,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final parts = lesson.startTime.split(':');
       final lessonMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final endMinutes = lessonMinutes + lesson.duration;
-      final top = ((lessonMinutes - startHour * 60) / 30.0) * _unitHeight;
+      final top = ((lessonMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
 
       final isPast = _isToday && endMinutes <= nowMinutes;
       final isNow = _isToday &&
@@ -240,9 +242,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     }).toList();
   }
 
-  Widget _buildNowIndicator(int startHour) {
+  Widget _buildNowIndicator(int startHour, double topPadding) {
     final nowMinutes = _now.hour * 60 + _now.minute;
-    final top = ((nowMinutes - startHour * 60) / 30.0) * _unitHeight;
+    final top = ((nowMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
 
     return Positioned(
       top: top,
@@ -304,33 +306,30 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           top: BorderSide(color: const Color(0xFFE8E8E8), width: 0.5),
         ),
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Context line (today only)
-            if (_isToday) ...[
-              Text(
-                _getContextLine(),
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 2),
-            ],
-            // Stats line
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Context line (today only)
+          if (_isToday) ...[
             Text(
-              '${_isToday ? "오늘" : ""} ${widget.lessons.length}레슨 · $timeStr',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+              _getContextLine(),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
+            const SizedBox(height: 2),
           ],
-        ),
+          // Stats line
+          Text(
+            '${_isToday ? "오늘" : ""} ${widget.lessons.length}레슨 · $timeStr',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -386,12 +385,12 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.schedule, color: AppColors.info),
+              leading: const Icon(Icons.edit_calendar, color: AppColors.info),
               title: const Text('일정 변경'),
               onTap: () {
                 Navigator.of(ctx).pop();
                 context.push(
-                  AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                  AppRoutes.editLesson.replaceFirst(':id', lesson.id),
                 );
               },
             ),

@@ -8,7 +8,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
 import '../../../student_home/presentation/screens/student_lessons_tab.dart';
@@ -18,6 +17,7 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../providers/schedule_view_mode_provider.dart';
+import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
 
@@ -60,11 +60,11 @@ class ScheduleTab extends ConsumerWidget {
         // Header: title + view toggle + add button
         _buildHeader(context, ref),
 
-        // WeekCalendarWidget (shared by list & timeline)
+        // Compact week strip (simple style matching weekly grid)
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
-            AppSpacing.space3,
+            AppSpacing.space2,
             AppSpacing.screenPadding,
             0,
           ),
@@ -76,7 +76,7 @@ class ScheduleTab extends ConsumerWidget {
                         (l) => DateTime(l.date.year, l.date.month, l.date.day),
                       )
                       .toSet();
-              return WeekCalendarWidget(
+              return CompactWeekStrip(
                 selectedDate: selectedDate,
                 onDateSelected: (date) {
                   ref.read(teacherSelectedDateProvider.notifier).state = date;
@@ -85,14 +85,14 @@ class ScheduleTab extends ConsumerWidget {
               );
             },
             loading:
-                () => WeekCalendarWidget(
+                () => CompactWeekStrip(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
             error:
-                (_, __) => WeekCalendarWidget(
+                (_, __) => CompactWeekStrip(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
@@ -101,7 +101,7 @@ class ScheduleTab extends ConsumerWidget {
           ),
         ),
 
-        const SizedBox(height: AppSpacing.space3),
+        const SizedBox(height: AppSpacing.space2),
 
         // Content: switches between list view and timeline view
         Expanded(

@@ -36,6 +36,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   bool _isRecording = false;
   int _recordingSeconds = 0;
   Timer? _feedbackDebounce;
+  String? _pendingFeedbackText;
 
   @override
   void initState() {
@@ -136,8 +137,35 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
+  /// Flush any pending debounced feedback save immediately.
+  Future<void> _flushPendingFeedback() async {
+    if (_feedbackDebounce?.isActive == true && _pendingFeedbackText != null) {
+      _feedbackDebounce!.cancel();
+      final lesson = ref.read(lessonProvider(widget.lessonId)).valueOrNull;
+      if (lesson != null) {
+        final trimmed = _pendingFeedbackText!.trim();
+        final updatedLesson = lesson.copyWith(
+          feedback: trimmed.isEmpty ? null : trimmed,
+        );
+        try {
+          await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+        } catch (_) {
+          // Silent fail on exit — data already in debounce
+        }
+      }
+      _pendingFeedbackText = null;
+    }
+  }
+
   Widget _buildContent(BuildContext context, Lesson lesson) {
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) {
+          await _flushPendingFeedback();
+        }
+      },
+      child: Scaffold(
       appBar: _buildAppBar(lesson),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -161,6 +189,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ),
       ),
       floatingActionButton: _buildRecordingFAB(),
+    ),
     );
   }
 
@@ -599,6 +628,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   void _saveFeedbackDebounced(Lesson lesson, String text) {
     _feedbackDebounce?.cancel();
+    _pendingFeedbackText = text;
     _feedbackDebounce = Timer(const Duration(milliseconds: 800), () async {
       final trimmed = text.trim();
       final updatedLesson = lesson.copyWith(
@@ -606,6 +636,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       );
       try {
         await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+        _pendingFeedbackText = null;
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
