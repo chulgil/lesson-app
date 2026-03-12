@@ -46,9 +46,7 @@ dependencies:
   flutter_audio_capture: ^1.1.6  # Real-time audio capture for tuner
   audio_session: ^0.1.21    # Audio session configuration for iOS/Android
 
-  # Push Notifications
-  firebase_core: ^3.9.0
-  firebase_messaging: ^15.2.0
+  # Push Notifications (firebase_core, firebase_messaging: 백엔드 구축 시 재추가)
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
 
