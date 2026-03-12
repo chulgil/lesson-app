@@ -16,12 +16,14 @@ class AddLessonScreen extends ConsumerStatefulWidget {
   final String? preselectedStudentId;
   final String? preselectedDate; // Format: YYYY-MM-DD
   final int? preselectedHour; // 0-23
+  final int? preselectedMinute; // 0-59
 
   const AddLessonScreen({
     super.key,
     this.preselectedStudentId,
     this.preselectedDate,
     this.preselectedHour,
+    this.preselectedMinute,
   });
 
   @override
@@ -62,10 +64,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       }
     }
 
-    // Handle preselected hour (0-23)
+    // Handle preselected hour (0-23) and minute (0-59)
     if (widget.preselectedHour != null) {
       final hour = widget.preselectedHour!.clamp(0, 23);
-      _selectedTime = TimeOfDay(hour: hour, minute: 0);
+      final minute = (widget.preselectedMinute ?? 0).clamp(0, 59);
+      _selectedTime = TimeOfDay(hour: hour, minute: minute);
     }
 
     // Handle preselected student after first frame (ref not available in initState)

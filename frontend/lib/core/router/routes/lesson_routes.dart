@@ -16,16 +16,15 @@ List<GoRoute> lessonRoutes = [
     path: AppRoutes.addLesson,
     name: 'addLesson',
     builder: (context, state) {
-      int? hour;
-      final hourStr = state.uri.queryParameters['hour'];
-      if (hourStr != null) {
-        hour = int.tryParse(hourStr);
-      }
+      final params = state.uri.queryParameters;
+      final hour = params['hour'] != null ? int.tryParse(params['hour']!) : null;
+      final minute = params['minute'] != null ? int.tryParse(params['minute']!) : null;
 
       return AddLessonScreen(
-        preselectedStudentId: state.uri.queryParameters['studentId'],
-        preselectedDate: state.uri.queryParameters['date'],
+        preselectedStudentId: params['studentId'],
+        preselectedDate: params['date'],
         preselectedHour: hour,
+        preselectedMinute: minute,
       );
     },
   ),

@@ -76,6 +76,13 @@ class AppColors {
   static const bubbleWarningBackground = Color(0xFFFFF3E0);
   static const bubbleWarningText = Color(0xFFE65100);
 
+  // Schedule: muted colors for non-today lessons
+  static const scheduleMutedBackground = Color(0xFFF5F5F5);
+  static const scheduleMutedAccent = Color(0xFFBDBDBD);
+
+  // Schedule: rest day (no lessons scheduled) background
+  static const scheduleRestDayBackground = Color(0xFFE8E8E8);
+
   // Light mode
   static const backgroundLight = Color(0xFFFFFAF5);
   static const surfaceLight = Color(0xFFFFFFFF);

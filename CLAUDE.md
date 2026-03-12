@@ -121,15 +121,29 @@ flutter run -d <device_id> --release
 3. [ ] Mock Repository에 테스트 데이터 존재 확인
 4. [ ] 관련 `docs/specs/` 문서 업데이트
 5. [ ] 커밋 메시지 한글 (Conventional Commits)
+6. [ ] **하드코딩 색상 검사**: 변경 파일에 `Color(0x` 패턴 없음 → 있으면 `AppColors` 상수로 교체
+7. [ ] **공통 유틸 사용 확인**: 이름 표시 = `NameUtils.givenName()`, 날짜 = `formatDateYMD()`, 라우트 = `AppRoutes.*`
 
 ### 🎨 UI 필수 규칙
 
 **UI 일관성**: 동일 기능은 동일 UI 패턴 사용 → 기존 패턴과 다르게 구현하려면 **반드시 사용자 동의**
 
+**⚠️ 코딩 시작 전 필수 조회 (HARD-GATE)**:
+새 UI 코드 작성 전 반드시 아래를 먼저 확인하라. 확인 없이 코드 작성 금지.
+1. `AppColors` 클래스 읽기 → 필요한 색상이 이미 있는지 확인. 없으면 상수 추가 후 사용
+2. `core/utils/` 목록 확인 → `NameUtils`, `date_format_utils`, `instrument_colors` 등 기존 유틸 사용
+3. `core/widgets/` 목록 확인 → 기존 공통 위젯이 있으면 그것을 사용
+
 **공통 위젯 우선 사용** (`core/widgets/`):
 - `selectors/`: LessonCount, LessonDuration, ValidityPeriod, DiscountPercent, BonusCount
 - `WeekCalendarWidget`, `StatCard`, `QuickToolButton`, `PracticeCenterButton`
 - 새 위젯 작성 전 반드시 기존 공통 위젯 확인 → 있으면 사용 (직접 구현 금지)
+
+**공통 유틸 필수 사용** (`core/utils/`):
+- 이름 표시: `NameUtils.givenName()` (성 제외, CJK/Western 자동 분리)
+- 날짜 포맷: `formatDateYMD()` (인라인 포맷 금지)
+- 악기 색상: `InstrumentColors.getColor()` → `InstrumentColorPair`
+- 스케줄 뮤트 색상: `AppColors.scheduleMutedBackground`, `AppColors.scheduleMutedAccent`
 
 **원샷 UX 원칙**: 한 번 탭으로 모든 연관 작업 완료 (알림, 상태, 스케줄 자동 처리)
 
@@ -188,6 +202,9 @@ class LessonNotifier extends _$LessonNotifier {
 - 레거시 위치(`lib/models/`, `lib/providers/`)에 새 코드 작성
 - 외부 메트로놈 패키지 사용
 - 사용자 확인 전 이슈 닫기
+- `Color(0x...)` 하드코딩 — 반드시 `AppColors.xxx` 상수 사용
+- `lesson.studentName` 직접 표시 — `NameUtils.givenName(lesson.studentName)` 사용
+- 인라인 날짜 포맷 — `formatDateYMD()` 또는 `DateFormat` 공통 패턴 사용
 
 ---
 
@@ -203,6 +220,7 @@ class LessonNotifier extends _$LessonNotifier {
 | Mock 데이터 변경 후 크래시 | Hive 캐시된 이전 데이터와 새 enum/타입 충돌 | 앱 삭제 후 재설치 또는 Hive box 초기화 |
 | 튜너 음 끊김 | stream + callback 이중 경로로 상태 충돌 | 단일 경로(stream)만 사용, callback 제거 |
 | 튜너 불안정 감지 | StabilityFilter에서 낮은 확률 시 smoothedFrequency 미리셋 | probability 미달 시 `_smoothedFrequency = 0` 리셋 필수 |
+| 0.5px BOTTOM OVERFLOW | BoxDecoration border가 content 영역 침범 | border를 별도 Container로 분리, children은 Expanded 사용 |
 
 ---
 
@@ -340,3 +358,21 @@ cd frontend && dart run build_runner build --delete-conflicting-outputs
   6. 날짜는 `formatDateYMD()` 공통 유틸 사용 (인라인 포맷 금지)
   7. 점검 시 **전체 코드베이스** grep (`context.push('/'`, `ref.read(.*notifier)` 등)
   - 상세: [memory/ux-review-lessons.md](../../.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/ux-review-lessons.md)
+
+## 5. BoxDecoration border가 0.5px BOTTOM OVERFLOW 유발 - error-pattern
+- **날짜**: 2026-03-12
+- **분류**: error-pattern
+- **교훈**: `Container(height: H, decoration: BoxDecoration(border: Border(top: BorderSide(width: 0.5))))` 구조에서, border가 내부 공간을 차지하므로 Column children 합계가 H를 초과하여 0.5px BOTTOM OVERFLOW 발생. Flutter의 BoxDecoration border는 content 영역을 침범한다.
+- **조치**: border를 별도 `Container(height: 0.5)` 위젯으로 분리하고, 나머지 children을 `Expanded`로 감싸 남은 공간을 균등 분배. 또는 `clipBehavior: Clip.hardEdge` 적용.
+
+## 6. 하드코딩 색상 대신 AppColors 상수 사용 강제 - error-pattern
+- **날짜**: 2026-03-12
+- **분류**: error-pattern
+- **교훈**: 스케줄 뷰에서 `Color(0xFFF5F5F5)`, `Color(0xFFBDBDBD)` 등 하드코딩 색상을 사용하면, 테마 변경이나 다크모드 대응이 불가능하고, 동일 색상이 여러 파일에 분산되어 일관성 유지가 어려움.
+- **조치**: 새 색상이 필요하면 반드시 `AppColors`에 상수 추가 후 참조. 코드 리뷰 시 `Color(0x` 패턴 grep으로 하드코딩 검출.
+
+## 7. CJK 이름에서 성/이름 분리 필수 (글로벌 대응) - automation-pattern
+- **날짜**: 2026-03-12
+- **분류**: automation-pattern
+- **교훈**: 한국어 이름 "박지선"에서 "박"은 성, "지선"은 이름. 스케줄·알림 등 공간 제한 UI에서 이름(given name)만 표시하면 가독성이 크게 향상. 서양식 "John Smith"에서는 "John"이 given name. 향후 글로벌 진출 대비 `NameUtils.givenName()` 유틸을 사용하여 일관된 이름 표시.
+- **조치**: `core/utils/name_utils.dart`의 `NameUtils.givenName()` 사용. Student/Lesson 엔티티에 `firstName`/`lastName` 필드 추가는 백엔드 연동 시 진행 (현재는 유틸 함수로 파싱).

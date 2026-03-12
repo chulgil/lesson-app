@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
+import '../../../../core/utils/name_utils.dart';
 import '../../../../models/lesson.dart';
 
 /// Height per 30-minute unit in timeline view.
@@ -17,6 +18,7 @@ class TimelineLessonBlock extends StatelessWidget {
   final bool isNow;
   final bool isPast;
   final bool isNext;
+  final bool isToday; // Whether viewing today's schedule
   final int minutesUntilNext;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -27,6 +29,7 @@ class TimelineLessonBlock extends StatelessWidget {
     this.isNow = false,
     this.isPast = false,
     this.isNext = false,
+    this.isToday = true,
     this.minutesUntilNext = 0,
     this.onTap,
     this.onLongPress,
@@ -36,8 +39,28 @@ class TimelineLessonBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = InstrumentColors.getColor(lesson.instrument);
-    final opacity = isPast ? 0.5 : 1.0;
+    final baseColors = InstrumentColors.getColor(lesson.instrument);
+
+    // Color logic:
+    // - Today view: full instrument colors (past lessons slightly faded)
+    // - Other dates: grey/muted (past/future days)
+    final Color bgColor;
+    final Color accentColor;
+
+    if (!isToday) {
+      // Non-today: grey muted
+      bgColor = AppColors.scheduleMutedBackground;
+      accentColor = AppColors.scheduleMutedAccent;
+    } else if (isPast) {
+      // Today, past: slightly faded instrument colors
+      bgColor = baseColors.background.withValues(alpha: 0.5);
+      accentColor = baseColors.accent.withValues(alpha: 0.4);
+    } else {
+      // Today, current/upcoming: full vivid colors
+      bgColor = baseColors.background;
+      accentColor = baseColors.accent;
+    }
+    final colors = InstrumentColorPair(bgColor, accentColor);
 
     return GestureDetector(
       onTap: () {
@@ -48,43 +71,40 @@ class TimelineLessonBlock extends StatelessWidget {
         HapticFeedback.mediumImpact();
         onLongPress?.call();
       },
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 200),
-        opacity: opacity,
-        child: Container(
-          height: blockHeight,
-          margin: const EdgeInsets.symmetric(vertical: 1),
-          decoration: BoxDecoration(
-            color: colors.background,
-            borderRadius: BorderRadius.circular(8),
-            border: isNow
-                ? Border.all(color: colors.accent.withValues(alpha: 0.5), width: 1)
-                : null,
-          ),
-          child: Row(
-            children: [
-              // Left accent bar
-              _AccentBar(color: colors.accent, isNow: isNow),
-              // Content
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  child: _buildContent(colors),
-                ),
+      child: Container(
+        height: blockHeight,
+        margin: const EdgeInsets.symmetric(vertical: 1),
+        decoration: BoxDecoration(
+          color: colors.background,
+          borderRadius: BorderRadius.circular(8),
+          border: isNow
+              ? Border.all(color: baseColors.accent, width: 1.5)
+              : null,
+        ),
+        child: Row(
+          children: [
+            // Left accent bar
+            _AccentBar(color: colors.accent, isNow: isNow),
+            // Content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: _buildContent(colors),
               ),
-              // Badges
-              if (isPast) _buildPastBadge(),
-              if (isNext && minutesUntilNext > 0) _buildNextBadge(),
-              const SizedBox(width: 8),
-            ],
-          ),
+            ),
+            // Badges
+            if (isPast) _buildPastBadge(),
+            if (isNext && minutesUntilNext > 0) _buildNextBadge(),
+            const SizedBox(width: 8),
+          ],
         ),
       ),
     );
   }
 
-  /// Progressive Disclosure: horizontal-first layout.
-  /// Uses full block width for info density (phone screens are wide).
+  /// Consistent 2-line layout:
+  /// Line 1: 이름  악기  시간분
+  /// Line 2: 곡명 (if available)
   Widget _buildContent(InstrumentColorPair colors) {
     final assignment = lesson.assignments?.isNotEmpty == true
         ? lesson.assignments!.first
@@ -92,85 +112,30 @@ class TimelineLessonBlock extends StatelessWidget {
             ? lesson.pieces.first.displayName
             : null;
 
-    if (lesson.duration <= 30) {
-      // 1-line: maximize horizontal info — name · instrument · duration
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          '${lesson.studentName} · ${lesson.instrument} · ${lesson.duration}분',
-          style: AppTypography.caption.copyWith(
-            color: colors.accent,
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      );
-    }
+    final bool compact = lesson.duration <= 30;
 
-    if (lesson.duration <= 45) {
-      // 2-row horizontal: Row1 name·instrument, Row2 duration·assignment
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '${lesson.studentName} · ${lesson.instrument}',
-            style: AppTypography.caption.copyWith(
-              color: colors.accent,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Text(
-            assignment != null
-                ? '${lesson.duration}분 · $assignment'
-                : '${lesson.duration}분',
-            style: AppTypography.caption.copyWith(
-              color: colors.accent.withValues(alpha: 0.6),
-              fontSize: 10,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      );
-    }
-
-    // 60min+: 3-row — name(bold) / instrument · duration / assignment
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // Line 1: given name · instrument · duration
         Text(
-          lesson.studentName,
-          style: AppTypography.bodySmall.copyWith(
+          '${NameUtils.givenName(lesson.studentName)}  ${lesson.instrument}  ${lesson.duration}분',
+          style: AppTypography.caption.copyWith(
             color: colors.accent,
             fontWeight: FontWeight.w600,
-            fontSize: 13,
+            fontSize: compact ? 11 : 12,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 1),
-        Text(
-          '${lesson.instrument} · ${lesson.duration}분',
-          style: AppTypography.caption.copyWith(
-            color: colors.accent.withValues(alpha: 0.7),
-            fontSize: 11,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        if (assignment != null) ...[
+        // Line 2: piece/assignment (if available and space allows)
+        if (assignment != null && !compact) ...[
           const SizedBox(height: 1),
           Text(
             assignment,
             style: AppTypography.caption.copyWith(
-              color: colors.accent.withValues(alpha: 0.5),
+              color: colors.accent.withValues(alpha: 0.6),
               fontSize: 10,
             ),
             maxLines: 1,

@@ -9,7 +9,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
-import '../../../../providers/providers.dart';
+import '../../../../providers/providers.dart'
+    hide teacherAvailabilityProvider;
+import '../../domain/entities/teacher_availability.dart';
+import '../providers/teacher_availability_providers.dart';
 import 'timeline_lesson_block.dart';
 
 /// Height per 30-minute unit.
@@ -78,11 +81,16 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final offset = _minutesToOffset(nowMinutes) - 80;
       _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
     } else if (widget.lessons.isNotEmpty) {
-      // Scroll to first lesson
-      final firstLesson = widget.lessons.first;
-      final parts = firstLesson.startTime.split(':');
+      // Scroll to first lesson with 40px top margin
+      final sortedLessons = List<Lesson>.from(widget.lessons)
+        ..sort((a, b) => a.startTime.compareTo(b.startTime));
+      final parts = sortedLessons.first.startTime.split(':');
       final minutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final offset = _minutesToOffset(minutes) - 40;
+      _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
+    } else {
+      // No lessons: scroll to 9am
+      final offset = _minutesToOffset(9 * 60) - 40;
       _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
     }
   }
@@ -94,11 +102,15 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
   @override
   Widget build(BuildContext context) {
+    final availabilityAsync =
+        ref.watch(teacherAvailabilityProvider('teacher_1'));
+    final availability = availabilityAsync.valueOrNull;
+
     return Column(
       children: [
         // Timeline body
         Expanded(
-          child: _buildTimeline(),
+          child: _buildTimeline(availability),
         ),
         // Context-aware summary bar
         _buildSummaryBar(),
@@ -106,42 +118,99 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     );
   }
 
-  Widget _buildTimeline() {
+  Widget _buildTimeline(TeacherAvailability? availability) {
     final sortedLessons = List<Lesson>.from(widget.lessons)
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
-    // Build timeline items: hours 0-23, each has 2 x 30min slots
-    // We only render from first available hour to last
-    final (startHour, endHour) = _getVisibleRange(sortedLessons);
+    // Visible range based on teacher's available time for this day
+    final (startHour, endHour) =
+        _getVisibleRange(availability, sortedLessons);
 
     const topPadding = 16.0;
 
     return SingleChildScrollView(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: SizedBox(
-        height: ((endHour - startHour + 1) * 2) * _unitHeight + topPadding,
-        child: Stack(
-          children: [
-            // Hour grid lines and labels
-            ..._buildHourGrid(startHour, endHour, topPadding),
-            // Lesson blocks
-            ..._buildLessonBlocks(sortedLessons, startHour, topPadding),
-            // "Now" indicator
-            if (_isToday) _buildNowIndicator(startHour, topPadding),
-          ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTapUp: (details) {
+          _onTimelineTap(details.localPosition.dy, startHour, topPadding, sortedLessons);
+        },
+        child: SizedBox(
+          height: ((endHour - startHour + 1) * 2) * _unitHeight + topPadding,
+          child: Stack(
+            children: [
+              // Hour grid lines and labels
+              ..._buildHourGrid(startHour, endHour, topPadding),
+              // Lesson blocks
+              ..._buildLessonBlocks(sortedLessons, startHour, topPadding),
+              // "Now" indicator
+              if (_isToday) _buildNowIndicator(startHour, topPadding),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  (int, int) _getVisibleRange(List<Lesson> lessons) {
-    if (lessons.isEmpty) return (8, 18); // Default 8am-6pm
+  /// Convert tap Y position to time and navigate to add lesson.
+  void _onTimelineTap(double tapY, int startHour, double topPadding, List<Lesson> lessons) {
+    // Convert Y offset to minutes
+    final adjustedY = tapY - topPadding;
+    if (adjustedY < 0) return;
 
+    final totalMinutes = (adjustedY / _unitHeight) * 30 + startHour * 60;
+    final hour = (totalMinutes ~/ 60).clamp(0, 23);
+    final minute = ((totalMinutes % 60) ~/ 30) * 30; // Snap to 30-min
+
+    // Check if tap is on an existing lesson (lesson blocks handle their own tap)
+    for (final lesson in lessons) {
+      final parts = lesson.startTime.split(':');
+      final lessonStart = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final lessonEnd = lessonStart + lesson.duration;
+      final tappedMinutes = hour * 60 + minute;
+      if (tappedMinutes >= lessonStart && tappedMinutes < lessonEnd) {
+        return; // Lesson block's onTap will handle this
+      }
+    }
+
+    _navigateToAddLesson(widget.selectedDate, hour, minute);
+  }
+
+  void _navigateToAddLesson(DateTime date, int hour, int minute) {
+    final dateStr =
+        '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    context.push(
+      '${AppRoutes.addLesson}?date=$dateStr&hour=$hour&minute=$minute',
+    );
+  }
+
+  /// Determine visible hour range from teacher availability + lessons.
+  /// Shows from earliest available/lesson time - 1h to latest + 1h.
+  (int, int) _getVisibleRange(
+    TeacherAvailability? availability,
+    List<Lesson> sortedLessons,
+  ) {
     int earliest = 23;
     int latest = 0;
 
-    for (final lesson in lessons) {
+    // Consider teacher's availability for this day of week
+    final dayOfWeek = widget.selectedDate.weekday - 1; // 0=Mon
+    if (availability != null) {
+      for (final schedule in availability.weeklySchedules) {
+        if (schedule.isActive && schedule.dayOfWeek == dayOfWeek) {
+          final startParts = schedule.startTime.split(':');
+          final endParts = schedule.endTime.split(':');
+          final startH = int.parse(startParts[0]);
+          final endH = int.parse(endParts[0]);
+          if (startH < earliest) earliest = startH;
+          if (endH > latest) latest = endH;
+        }
+      }
+    }
+
+    // Consider lesson times (some lessons may be outside availability)
+    for (final lesson in sortedLessons) {
       final parts = lesson.startTime.split(':');
       final hour = int.parse(parts[0]);
       final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration;
@@ -150,9 +219,16 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       if (endHour > latest) latest = endHour;
     }
 
-    // Add 1 hour padding on each side
+    // Default range if nothing found
+    if (earliest > latest) {
+      return (8, 18);
+    }
+
+    // Add 1-hour margin on each side
     return ((earliest - 1).clamp(0, 23), (latest + 1).clamp(0, 23));
   }
+
+
 
   List<Widget> _buildHourGrid(int startHour, int endHour, double topPadding) {
     final widgets = <Widget>[];
@@ -227,6 +303,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         right: 0,
         child: TimelineLessonBlock(
           lesson: lesson,
+          isToday: _isToday,
           isNow: isNow,
           isPast: isPast,
           isNext: isNext,

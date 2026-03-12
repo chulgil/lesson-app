@@ -47,9 +47,10 @@ class CompactWeekStrip extends StatelessWidget {
 
         return Expanded(
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => onDateSelected(date),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: isSelected
                   ? BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.08),

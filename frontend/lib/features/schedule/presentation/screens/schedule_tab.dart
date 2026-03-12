@@ -17,6 +17,7 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../providers/schedule_view_mode_provider.dart';
+import '../../../../core/widgets/week_calendar_widget.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
@@ -43,32 +44,14 @@ class ScheduleTab extends ConsumerWidget {
     final viewMode = ref.watch(scheduleViewModeProvider);
     final lessonsAsync = ref.watch(lessonsProvider);
 
-    // Weekly grid view has its own layout (no day calendar)
-    if (viewMode == ScheduleViewMode.weeklyGrid) {
-      return Column(
-        children: [
-          _buildHeader(context, ref),
-          Expanded(
-            child: ScheduleWeeklyGridView(selectedDate: selectedDate),
-          ),
-        ],
-      );
-    }
-
     return Column(
       children: [
         // Header: title + view toggle + add button
         _buildHeader(context, ref),
 
-        // Compact week strip (simple style matching weekly grid)
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.screenPadding,
-            AppSpacing.space2,
-            AppSpacing.screenPadding,
-            0,
-          ),
-          child: lessonsAsync.when(
+        // Calendar: list mode → expandable month calendar, others → compact strip
+        if (viewMode == ScheduleViewMode.list)
+          lessonsAsync.when(
             data: (lessons) {
               final lessonDates =
                   lessons
@@ -76,7 +59,7 @@ class ScheduleTab extends ConsumerWidget {
                         (l) => DateTime(l.date.year, l.date.month, l.date.day),
                       )
                       .toSet();
-              return CompactWeekStrip(
+              return WeekCalendarWidget(
                 selectedDate: selectedDate,
                 onDateSelected: (date) {
                   ref.read(teacherSelectedDateProvider.notifier).state = date;
@@ -85,37 +68,81 @@ class ScheduleTab extends ConsumerWidget {
               );
             },
             loading:
-                () => CompactWeekStrip(
+                () => WeekCalendarWidget(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
             error:
-                (_, __) => CompactWeekStrip(
+                (_, __) => WeekCalendarWidget(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space2,
+              AppSpacing.screenPadding,
+              0,
+            ),
+            child: lessonsAsync.when(
+              data: (lessons) {
+                final lessonDates =
+                    lessons
+                        .map(
+                          (l) => DateTime(l.date.year, l.date.month, l.date.day),
+                        )
+                        .toSet();
+                return CompactWeekStrip(
+                  selectedDate: selectedDate,
+                  onDateSelected: (date) {
+                    ref.read(teacherSelectedDateProvider.notifier).state = date;
+                  },
+                  lessonDates: lessonDates,
+                );
+              },
+              loading:
+                  () => CompactWeekStrip(
+                    selectedDate: selectedDate,
+                    onDateSelected: (date) {
+                      ref.read(teacherSelectedDateProvider.notifier).state = date;
+                    },
+                  ),
+              error:
+                  (_, __) => CompactWeekStrip(
+                    selectedDate: selectedDate,
+                    onDateSelected: (date) {
+                      ref.read(teacherSelectedDateProvider.notifier).state = date;
+                    },
+                  ),
+            ),
           ),
-        ),
 
         const SizedBox(height: AppSpacing.space2),
 
-        // Content: switches between list view and timeline view
+        // Content: switches between list view, timeline view, and weekly grid
         Expanded(
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
-            child: _buildViewContent(
-              key: ValueKey(viewMode),
-              lessonsAsync: lessonsAsync,
-              selectedDate: selectedDate,
-              sortType: sortType,
-              viewMode: viewMode,
-              ref: ref,
-              context: context,
-            ),
+            child: viewMode == ScheduleViewMode.weeklyGrid
+                ? ScheduleWeeklyGridView(
+                    key: const ValueKey(ScheduleViewMode.weeklyGrid),
+                    selectedDate: selectedDate,
+                  )
+                : _buildViewContent(
+                    key: ValueKey(viewMode),
+                    lessonsAsync: lessonsAsync,
+                    selectedDate: selectedDate,
+                    sortType: sortType,
+                    viewMode: viewMode,
+                    ref: ref,
+                    context: context,
+                  ),
           ),
         ),
       ],
@@ -347,7 +374,10 @@ class ScheduleTab extends ConsumerWidget {
 
     return ListView.separated(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space3,
+      ),
       itemCount: dayLessons.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
       itemBuilder: (context, index) {
@@ -708,7 +738,7 @@ class _ViewModeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.scheduleMutedBackground,
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.all(2),
