@@ -1,6 +1,6 @@
 # Document Index
 
-> 최종 업데이트: 2026-03-11
+> 최종 업데이트: 2026-03-12
 > 목적: Claude가 작업 시작 시 이 파일을 읽고 필요한 문서를 빠르게 찾기 위한 인덱스
 
 ---
@@ -24,6 +24,22 @@
 | 팔로우/초대 | [follow_master.md](specs/follow/follow_master.md) | 선생님-학생 연결, 초대 시스템 |
 | 설정 | [settings_master.md](specs/settings/settings_master.md) | 앱 설정, 녹음 관리 |
 | 학생 홈 | [student_home_master.md](specs/student_home/student_home_master.md) | 학생 앱 홈 화면 |
+
+### 스펙 ↔ 코드 도메인 매핑
+
+> 스펙 디렉토리 이름(단수)과 코드 도메인 이름(복수)이 다른 경우가 있음
+
+| 스펙 디렉토리 | 코드 도메인 (`features/`) | 비고 |
+|:------------|:------------------------|:-----|
+| `specs/lesson/` | `features/lessons/` | 단수↔복수 |
+| `specs/student/` | `features/students/` | 단수↔복수 |
+| `specs/notification/` | `features/notifications/` | 단수↔복수 |
+| `specs/metronome/`, `specs/practice/` (tuner) | `features/practice/` | 메트로놈/튜너는 연습 도메인 하위 |
+| `specs/user/` (auth+invite+review+trial 통합) | `features/auth/`, `features/invite/`, `features/profile/` | 1 스펙 → 다수 도메인 |
+| (마스터 스펙 없음) | `features/gamification/` | practice_master #6에서 언급 |
+| (마스터 스펙 없음) | `features/analytics/` | lesson_master에서 언급 |
+| (마스터 스펙 없음) | `features/home/` | design_master에서 언급 |
+| (마스터 스펙 없음) | `features/relationship/` | follow_master에서 언급 |
 
 ---
 

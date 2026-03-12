@@ -1,14 +1,14 @@
 # 레슨 앱 아키텍처
 
-> 마지막 업데이트: 2026-03-11
+> 마지막 업데이트: 2026-03-12
 
 ## 개요
 
 레슨 앱은 **Clean Architecture** 원칙과 **Feature-based 구조**를 결합한 Flutter 앱입니다.
 
-- **20개 feature 도메인**, features/ 내 약 696개 파일
+- **20개 feature 도메인**, features/ 내 약 660개 파일
 - **10개 core 모듈**
-- 레거시 re-export: models/ 30개, providers/ 46개, repositories/ 22개
+- 레거시 re-export: models/ 30개, providers/ 46개, repositories/ 21개
 
 > ⚠️ **프로젝트 구조 변경 (2026-02-02)**
 > Flutter 코드는 `frontend/` 폴더 아래에 위치합니다.
@@ -83,7 +83,7 @@ frontend/lib/
 │
 ├── models/                  # 레거시 모델 (re-export, 30개 파일)
 ├── providers/               # 레거시 Provider (re-export, 46개 파일)
-├── repositories/            # 레거시 Repository (re-export, 22개 파일)
+├── repositories/            # 레거시 Repository (re-export, 21개 파일)
 └── services/                # 서비스 레이어
 ```
 
@@ -133,7 +133,9 @@ features/lessons/
 │   └── entities/
 │       ├── lesson.dart
 │       ├── payment.dart
-│       └── tip_template.dart
+│       ├── tip_template.dart
+│       ├── teaching_resource.dart  # 교재/자료 관리
+│       └── attendance_stats.dart   # 출석 통계
 ├── data/
 │   └── repositories/
 │       └── mock_lesson_repository.dart
@@ -192,6 +194,17 @@ features/practice/
 └── presentation/
     ├── screens/
     ├── widgets/
+    │   ├── goal/                # 연습 목표
+    │   ├── metronome/           # 메트로놈 UI
+    │   ├── notes/               # 연습 노트
+    │   ├── practice_tools/      # 연습 도구 모달
+    │   ├── section_detail/      # 구간 상세
+    │   ├── section_form/        # 구간 편집
+    │   ├── section_management/  # 구간 CRUD
+    │   ├── smart_recording/     # 스마트 녹음
+    │   ├── stats/               # 통계 위젯
+    │   ├── tuner/               # 튜너 UI
+    │   └── waveform/            # 파형 시각화
     └── providers/
         ├── practice_providers.dart
         ├── practice_crud_provider.dart

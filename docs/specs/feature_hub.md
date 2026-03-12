@@ -1,6 +1,6 @@
 # Feature Hub - 기능 x 역할 x 스펙 매트릭스
 
-> Last updated: 2026-03-06
+> Last updated: 2026-03-12
 > 상태: 관리 중
 > 목적: 전체 기능의 스펙/코드/상태를 한눈에 파악하는 중앙 허브
 
@@ -117,7 +117,7 @@
 | 수강권 상태 컬러 | O | O | - | 완료 |
 | 취소/변경 정책 | O | O | - | 완료 |
 | 레슨 정책 설정 | O | - | - | 설계 |
-| 레슨 요청 (재등록) | O | O | - | 진행중 |
+| 레슨 요청 (재등록) | O | O | - | 완료 |
 
 ### 3.5 스케줄 → [schedule_master.md](schedule/schedule_master.md)
 
@@ -153,6 +153,9 @@
 | 학생홈 대시보드 | [student_home_master.md](student_home/student_home_master.md) | 완료 |
 | 팔로우 시스템 | [follow_master.md](follow/follow_master.md) | 데이터만 |
 | 설정/백업/녹음관리 | [settings_master.md](settings/settings_master.md) | 완료 |
+| 게이미피케이션 (포인트/레벨/뱃지) | (practice_master #6 참조) | 완료 |
+| 분석 대시보드 (월별 통계/차트) | (lesson_master 참조) | 완료 |
+| 과제 대시보드 (전체 학생 현황) | (lesson_master 참조) | 완료 |
 
 ---
 
@@ -233,5 +236,6 @@ docs/specs/
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| 2.1 | 2026-03-12 | PR #135~#142 반영 — 레슨 요청 완료, 게이미피케이션/분석/과제 대시보드 추가, UX 점검 10회 성과 반영 |
 | 2.0 | 2026-03-06 | 전면 재작성 - 13개 도메인 마스터 스펙 기반으로 재구성. 누락 스펙 6개 신규 작성. old/ 참고자료 reference/research/ 분리. |
 | 1.0 | 2026-03-02 | 초안 작성 - 전체 매트릭스 + Pain Point 매핑 + 의존성 그래프 |
