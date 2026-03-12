@@ -17,6 +17,9 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
+import '../providers/schedule_view_mode_provider.dart';
+import '../widgets/schedule_timeline_view.dart';
+import '../widgets/schedule_weekly_grid_view.dart';
 
 /// State provider for teacher selected date
 final teacherSelectedDateProvider = StateProvider<DateTime>((ref) {
@@ -37,14 +40,27 @@ class ScheduleTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedDate = ref.watch(teacherSelectedDateProvider);
     final sortType = ref.watch(teacherLessonSortTypeProvider);
+    final viewMode = ref.watch(scheduleViewModeProvider);
     final lessonsAsync = ref.watch(lessonsProvider);
+
+    // Weekly grid view has its own layout (no day calendar)
+    if (viewMode == ScheduleViewMode.weeklyGrid) {
+      return Column(
+        children: [
+          _buildHeader(context, ref),
+          Expanded(
+            child: ScheduleWeeklyGridView(selectedDate: selectedDate),
+          ),
+        ],
+      );
+    }
 
     return Column(
       children: [
-        // Header: title + add button
+        // Header: title + view toggle + add button
         _buildHeader(context, ref),
 
-        // WeekCalendarWidget
+        // WeekCalendarWidget (shared by list & timeline)
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
@@ -87,68 +103,103 @@ class ScheduleTab extends ConsumerWidget {
 
         const SizedBox(height: AppSpacing.space3),
 
-        // Content: date header + lesson list
+        // Content: switches between list view and timeline view
         Expanded(
-          child: lessonsAsync.when(
-            data: (lessons) {
-              // Filter lessons for selected date
-              final dayLessons =
-                  lessons
-                      .where(
-                        (l) =>
-                            l.date.year == selectedDate.year &&
-                            l.date.month == selectedDate.month &&
-                            l.date.day == selectedDate.day,
-                      )
-                      .toList();
-
-              // Sort lessons
-              switch (sortType) {
-                case LessonSortType.timeAsc:
-                  dayLessons.sort((a, b) => a.startTime.compareTo(b.startTime));
-                case LessonSortType.nameAsc:
-                  dayLessons.sort(
-                    (a, b) => a.studentName.compareTo(b.studentName),
-                  );
-              }
-
-              return Column(
-                children: [
-                  // Date header with count and sort
-                  _buildDateHeader(
-                    ref,
-                    selectedDate,
-                    dayLessons.length,
-                    sortType,
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  Expanded(child: _buildLessonList(context, dayLessons)),
-                ],
-              );
-            },
-            loading:
-                () => Column(
-                  children: [
-                    _buildDateHeader(ref, selectedDate, 0, sortType),
-                    const Expanded(
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                  ],
-                ),
-            error:
-                (error, _) => Column(
-                  children: [
-                    _buildDateHeader(ref, selectedDate, 0, sortType),
-                    Expanded(child: _buildErrorState(ref, error)),
-                  ],
-                ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: _buildViewContent(
+              key: ValueKey(viewMode),
+              lessonsAsync: lessonsAsync,
+              selectedDate: selectedDate,
+              sortType: sortType,
+              viewMode: viewMode,
+              ref: ref,
+              context: context,
+            ),
           ),
         ),
       ],
     );
   }
 
+  Widget _buildViewContent({
+    Key? key,
+    required AsyncValue<List<Lesson>> lessonsAsync,
+    required DateTime selectedDate,
+    required LessonSortType sortType,
+    required ScheduleViewMode viewMode,
+    required WidgetRef ref,
+    required BuildContext context,
+  }) {
+    return lessonsAsync.when(
+      data: (lessons) {
+        // Filter lessons for selected date
+        final dayLessons =
+            lessons
+                .where(
+                  (l) =>
+                      l.date.year == selectedDate.year &&
+                      l.date.month == selectedDate.month &&
+                      l.date.day == selectedDate.day,
+                )
+                .toList();
+
+        // Sort lessons
+        switch (sortType) {
+          case LessonSortType.timeAsc:
+            dayLessons.sort((a, b) => a.startTime.compareTo(b.startTime));
+          case LessonSortType.nameAsc:
+            dayLessons.sort(
+              (a, b) => a.studentName.compareTo(b.studentName),
+            );
+        }
+
+        if (viewMode == ScheduleViewMode.timeline) {
+          return ScheduleTimelineView(
+            key: key,
+            lessons: dayLessons,
+            selectedDate: selectedDate,
+          );
+        }
+
+        // List view (default)
+        return Column(
+          key: key,
+          children: [
+            // Date header with count and sort
+            _buildDateHeader(
+              ref,
+              selectedDate,
+              dayLessons.length,
+              sortType,
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            Expanded(child: _buildLessonList(context, dayLessons)),
+          ],
+        );
+      },
+      loading:
+          () => Column(
+            children: [
+              _buildDateHeader(ref, selectedDate, 0, sortType),
+              const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ],
+          ),
+      error:
+          (error, _) => Column(
+            children: [
+              _buildDateHeader(ref, selectedDate, 0, sortType),
+              Expanded(child: _buildErrorState(ref, error)),
+            ],
+          ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context, WidgetRef ref) {
+    final viewMode = ref.watch(scheduleViewModeProvider);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenPadding,
@@ -165,6 +216,14 @@ class ScheduleTab extends ConsumerWidget {
             ),
           ),
           const Spacer(),
+          // 3-segment view mode toggle
+          _ViewModeToggle(
+            currentMode: viewMode,
+            onChanged: (mode) {
+              ref.read(scheduleViewModeProvider.notifier).setMode(mode);
+            },
+          ),
+          const SizedBox(width: 8),
           IconButton(
             onPressed: () => _navigateToAddLesson(context, ref),
             icon: const Icon(Icons.add),
@@ -635,5 +694,68 @@ class _LessonTimeCard extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// 3-segment toggle for switching between schedule view modes.
+class _ViewModeToggle extends StatelessWidget {
+  final ScheduleViewMode currentMode;
+  final ValueChanged<ScheduleViewMode> onChanged;
+
+  const _ViewModeToggle({required this.currentMode, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.all(2),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: ScheduleViewMode.values.map((mode) {
+          final isSelected = mode == currentMode;
+          return GestureDetector(
+            onTap: () => onChanged(mode),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.white : Colors.transparent,
+                borderRadius: BorderRadius.circular(6),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                _getIcon(mode),
+                size: 16,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textTertiaryLight,
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  IconData _getIcon(ScheduleViewMode mode) {
+    switch (mode) {
+      case ScheduleViewMode.list:
+        return Icons.format_list_bulleted;
+      case ScheduleViewMode.timeline:
+        return Icons.view_day;
+      case ScheduleViewMode.weeklyGrid:
+        return Icons.grid_view;
+    }
   }
 }
