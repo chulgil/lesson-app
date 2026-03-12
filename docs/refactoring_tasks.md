@@ -1,6 +1,6 @@
 # 레슨 앱 리팩토링 태스크
 
-> 마지막 업데이트: 2026-01-10
+> 마지막 업데이트: 2026-03-12
 > 분석 기준: 최신 Flutter 개발 트렌드 및 Clean Architecture 원칙
 
 ---
@@ -9,15 +9,14 @@
 
 | 항목 | 현재 상태 |
 |------|----------|
-| 파일 수 | 413개 Dart 파일 |
-| 코드량 | ~96,230줄 |
-| 대형 파일 (800줄+) | 24개 |
-| 최대 파일 | 1,510줄 (practice_items_section.dart) |
-| 아키텍처 | Feature-based + Clean Architecture (일부) |
+| 파일 수 | 760개 Dart 파일 (생성 파일 제외) |
+| 코드량 | ~159,000줄 |
+| Feature 도메인 | 20개 |
+| 아키텍처 | Feature-based + Clean Architecture (전면 적용) |
 | 상태관리 | Riverpod (@riverpod 코드생성) |
-| 라우팅 | go_router |
+| 라우팅 | go_router (도메인별 분할) |
 | 로컬 저장소 | Hive |
-| flutter analyze | ✅ 0 issues |
+| flutter analyze | ✅ 0 errors (info 145건 — deprecated warnings) |
 
 ---
 
