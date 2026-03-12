@@ -277,6 +277,16 @@ class RecordTunerEngine implements TunerEngine {
   @override
   bool get isStreamActive => _isStreamActive;
 
+  /// Check microphone permission without re-initializing.
+  /// Useful for re-checking after app resume.
+  Future<bool> checkPermission() async {
+    try {
+      return await _recorder.hasPermission();
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Check if processing is enabled.
   @override
   bool get isProcessingEnabled => _isProcessingEnabled;
@@ -291,8 +301,8 @@ class RecordTunerEngine implements TunerEngine {
   }
 
   @override
-  void dispose() {
-    stop();
+  Future<void> dispose() async {
+    await stop();
     _recorder.dispose();
     _streamController.close();
   }

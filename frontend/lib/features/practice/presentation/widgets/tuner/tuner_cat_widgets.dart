@@ -14,11 +14,13 @@ class StatusBubble extends StatelessWidget {
     required this.isListening,
     required this.hasNote,
     required this.isPerfect,
+    this.errorMessage,
   });
 
   final bool isListening;
   final bool hasNote;
   final bool isPerfect;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,11 @@ class StatusBubble extends StatelessWidget {
     Color backgroundColor;
     Color textColor;
 
-    if (!isListening) {
+    if (errorMessage != null) {
+      message = errorMessage!;
+      backgroundColor = AppColors.error.withValues(alpha: 0.1);
+      textColor = AppColors.error;
+    } else if (!isListening) {
       message = '마이크를 켜주세요';
       backgroundColor = AppColors.borderLight;
       textColor = AppColors.textSecondaryLight;
@@ -78,6 +84,7 @@ class CatSpeechBubble extends StatelessWidget {
     this.comboTier = ComboTier.none,
     this.scale = 1.0,
     this.centDeviation = 0.0,
+    this.errorMessage,
   });
 
   final bool isListening;
@@ -86,6 +93,7 @@ class CatSpeechBubble extends StatelessWidget {
   final ComboTier comboTier;
   final double scale;
   final double centDeviation;
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +101,11 @@ class CatSpeechBubble extends StatelessWidget {
     Color backgroundColor;
     Color textColor;
 
-    if (!isListening) {
+    if (errorMessage != null) {
+      message = errorMessage!;
+      backgroundColor = AppColors.error.withValues(alpha: 0.1);
+      textColor = AppColors.error;
+    } else if (!isListening) {
       message = '마이크를 켜주세요';
       backgroundColor = AppColors.borderLight;
       textColor = AppColors.textSecondaryLight;

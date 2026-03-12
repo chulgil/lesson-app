@@ -455,21 +455,35 @@ class Tuner extends _$Tuner {
   /// Called when app goes to background (paused).
   /// Disables processing but keeps stream active for quick resume.
   Future<void> onAppPaused() async {
-    if (state.isListening) {
-      _wasListeningBeforePause = true;
+    // Save current listening state BEFORE disabling
+    _wasListeningBeforePause = state.isListening;
+    if (_wasListeningBeforePause) {
       disableProcessing();
-    } else {
-      _wasListeningBeforePause = false;
     }
   }
 
   /// Called when app returns to foreground (resumed).
   /// Re-enables processing if it was active before pause.
+  /// Re-checks microphone permission in case it was revoked while backgrounded.
   Future<void> onAppResumed() async {
-    if (_wasListeningBeforePause) {
-      _wasListeningBeforePause = false;
-      enableProcessing();
+    if (!_wasListeningBeforePause) return;
+    _wasListeningBeforePause = false;
+
+    // Re-check microphone permission (may have been revoked in Settings)
+    if (_engine is RecordTunerEngine) {
+      final engine = _engine as RecordTunerEngine;
+      final hasPermission = await engine.checkPermission();
+      if (!hasPermission) {
+        state = state.copyWith(
+          error: '마이크 권한이 필요합니다. 설정에서 마이크를 허용해주세요.',
+          isListening: false,
+          status: TuningStatus.idle,
+        );
+        return;
+      }
     }
+
+    enableProcessing();
   }
 }
 

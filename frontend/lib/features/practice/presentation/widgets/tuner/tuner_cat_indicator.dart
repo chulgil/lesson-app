@@ -488,6 +488,7 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                   comboTier: tier,
                   scale: (widget.size / 120) * 1.1 / 1.4, // 1.1x size
                   centDeviation: tunerState.centDeviation,
+                  errorMessage: tunerState.error,
                 ),
               ),
             ),
@@ -615,6 +616,7 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                     isListening: tunerState.isListening,
                     hasNote: false,
                     isPerfect: isPerfect,
+                    errorMessage: tunerState.error,
                   ),
               ],
             ],
