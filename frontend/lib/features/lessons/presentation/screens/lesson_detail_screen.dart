@@ -46,7 +46,20 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   @override
   void dispose() {
-    _feedbackDebounce?.cancel();
+    // Flush any pending debounced feedback before disposing
+    if (_feedbackDebounce?.isActive == true && _pendingFeedbackText != null) {
+      _feedbackDebounce!.cancel();
+      final lesson = ref.read(lessonProvider(widget.lessonId)).valueOrNull;
+      if (lesson != null) {
+        final trimmed = _pendingFeedbackText!.trim();
+        final updatedLesson = lesson.copyWith(
+          feedback: trimmed.isEmpty ? null : trimmed,
+        );
+        ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      }
+    } else {
+      _feedbackDebounce?.cancel();
+    }
     _tabController.dispose();
     super.dispose();
   }

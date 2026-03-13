@@ -61,7 +61,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       ),
       body: inviteState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error.toString()),
+        error: (error, _) => _buildError('네트워크 연결을 확인하고 다시 시도해주세요.'),
         data: (invite) {
           if (invite == null) {
             return const Center(child: CircularProgressIndicator());

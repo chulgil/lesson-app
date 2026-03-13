@@ -542,7 +542,7 @@ class _StudentDetailContent extends ConsumerWidget {
     );
   }
 
-  void _showInviteCodeDialog(BuildContext context, String studentName, WidgetRef ref) {
+  Future<void> _showInviteCodeDialog(BuildContext context, String studentName, WidgetRef ref) async {
     // Generate a random 6-character alphanumeric invite code
     final random = Random();
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -561,9 +561,22 @@ class _StudentDetailContent extends ConsumerWidget {
       createdAt: DateTime.now(),
     );
 
-    // Save invitation asynchronously
-    ref.read(invitationsNotifierProvider(student.id).notifier).createInvitation(invitation);
+    // Save invitation with error handling
+    try {
+      await ref.read(invitationsNotifierProvider(student.id).notifier).createInvitation(invitation);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('초대 코드 생성에 실패했습니다. 다시 시도해주세요.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
 
+    if (!context.mounted) return;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
