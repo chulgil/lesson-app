@@ -279,6 +279,15 @@ class DashboardTab extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
+              onPressed: () => context.push(AppRoutes.bulkFeedback),
+              child: Text(
+                '일괄 피드백',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            TextButton(
               onPressed: () => context.push(AppRoutes.quickFeedbackList),
               child: Text(
                 '피드백',

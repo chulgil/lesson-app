@@ -41,6 +41,7 @@ class AppRoutes {
   static const editLesson = '/lessons/:id/edit';
   static const quickFeedbackList = '/lessons/quick-feedback';
   static const quickFeedback = '/lessons/quick-feedback/:id';
+  static const bulkFeedback = '/lessons/bulk-feedback';
 
   // Practice routes
   static const practice = '/practice';

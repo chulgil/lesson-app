@@ -10,7 +10,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../providers/providers.dart';
-import '../../domain/constants/feedback_constants.dart';
+import '../../domain/entities/feedback_preset.dart';
+import '../providers/feedback_preset_providers.dart';
 
 /// Quick feedback writing screen for a specific lesson.
 /// Supports feedback text, key points, and practice tips.
@@ -276,29 +277,135 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   }
 
   Widget _buildPresetChips() {
+    final presetsAsync = ref.watch(
+      feedbackPresetNotifierProvider(),
+    );
+
+    return presetsAsync.when(
+      data: (presets) => _buildPresetChipList(presets),
+      loading: () => const SizedBox(height: 34),
+      error: (_, __) => const SizedBox(height: 34),
+    );
+  }
+
+  Widget _buildPresetChipList(List<FeedbackPreset> presets) {
     return SizedBox(
       height: 34,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: feedbackPresets.length,
+        itemCount: presets.length + 1, // +1 for add button
         separatorBuilder: (_, __) => const SizedBox(width: 6),
         itemBuilder: (context, index) {
-          return ActionChip(
-            label: Text(
-              feedbackPresets[index],
-              style: AppTypography.caption.copyWith(
-                color: AppColors.primary,
+          // Last item: add button
+          if (index == presets.length) {
+            return ActionChip(
+              avatar: Icon(Icons.add, size: 16, color: AppColors.textSecondaryLight),
+              label: Text(
+                '추가',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
+              backgroundColor: AppColors.surfaceSecondaryLight,
+              side: BorderSide(
+                color: AppColors.borderLight,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: _showAddPresetDialog,
+            );
+          }
+
+          final preset = presets[index];
+          return GestureDetector(
+            onLongPress: () => _showPresetOptions(preset),
+            child: ActionChip(
+              label: Text(
+                preset.text,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+              side: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () => _insertPreset(preset.text),
             ),
-            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-            side: BorderSide(
-              color: AppColors.primary.withValues(alpha: 0.2),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onPressed: () => _insertPreset(feedbackPresets[index]),
           );
         },
+      ),
+    );
+  }
+
+  void _showAddPresetDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('프리셋 추가'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: '피드백 문구 입력',
+          ),
+          onSubmitted: (_) {
+            final text = controller.text.trim();
+            if (text.isNotEmpty) {
+              ref
+                  .read(feedbackPresetNotifierProvider().notifier)
+                  .addPreset(text);
+              Navigator.pop(ctx);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                ref
+                    .read(feedbackPresetNotifierProvider().notifier)
+                    .addPreset(text);
+                Navigator.pop(ctx);
+              }
+            },
+            child: const Text('추가'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPresetOptions(FeedbackPreset preset) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: Text(preset.isDefault ? '숨기기' : '삭제'),
+              subtitle: Text(preset.isDefault
+                  ? '기본 프리셋은 숨김 처리됩니다'
+                  : '이 프리셋을 삭제합니다'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ref
+                    .read(feedbackPresetNotifierProvider().notifier)
+                    .deletePreset(preset.id);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

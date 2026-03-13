@@ -489,13 +489,13 @@ class _AppTeacherCard extends StatelessWidget {
 // Manual Teacher Card
 // ============================================================
 
-class _ManualTeacherCard extends StatelessWidget {
+class _ManualTeacherCard extends ConsumerWidget {
   final ManualTeacher teacher;
 
   const _ManualTeacherCard({required this.teacher});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -604,14 +604,95 @@ class _ManualTeacherCard extends StatelessWidget {
                   ),
                 ),
 
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textTertiaryLight,
+                // Edit/Delete menu
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      context.push(AppRoutes.addManualTeacher, extra: teacher);
+                    } else if (value == 'delete') {
+                      _confirmDelete(context, ref);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined, size: 18),
+                          SizedBox(width: 8),
+                          Text('편집'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline,
+                              size: 18, color: AppColors.error),
+                          const SizedBox(width: 8),
+                          Text('삭제',
+                              style: TextStyle(color: AppColors.error)),
+                        ],
+                      ),
+                    ),
+                  ],
+                  icon: Icon(
+                    Icons.more_vert,
+                    color: AppColors.textTertiaryLight,
+                    size: 20,
+                  ),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('선생님 삭제'),
+        content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(manualTeacherNotifierProvider.notifier)
+                    .delete(teacher.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${teacher.name} 선생님이 삭제되었습니다'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('삭제 실패. 다시 시도해주세요.'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text('삭제', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
       ),
     );
   }

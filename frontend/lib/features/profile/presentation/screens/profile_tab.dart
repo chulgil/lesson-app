@@ -49,7 +49,7 @@ class ProfileTab extends ConsumerWidget {
               ),
               _MenuItem(
                 icon: Icons.calendar_month,
-                label: '가용 시간 관리',
+                label: '레슨 운영 시간',
                 onTap: () => context.push(AppRoutes.teacherAvailability),
               ),
               _MenuItem(

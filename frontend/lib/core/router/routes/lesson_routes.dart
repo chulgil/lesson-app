@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../features/lessons/presentation/screens/add_lesson_screen.dart';
 import '../../../features/lessons/presentation/screens/edit_lesson_screen.dart';
 import '../../../features/lessons/presentation/screens/lesson_detail_screen.dart';
+import '../../../features/lessons/presentation/screens/bulk_feedback_screen.dart';
 import '../../../features/lessons/presentation/screens/quick_feedback_screen.dart';
 import '../../../features/lessons/presentation/screens/quick_feedback_student_list.dart';
 import '../app_routes.dart';
@@ -27,6 +28,13 @@ List<GoRoute> lessonRoutes = [
         preselectedMinute: minute,
       );
     },
+  ),
+
+  // Bulk Feedback
+  GoRoute(
+    path: AppRoutes.bulkFeedback,
+    name: 'bulkFeedback',
+    builder: (context, state) => const BulkFeedbackScreen(),
   ),
 
   // Quick Feedback - Student List (before lessonDetail to avoid :id matching)
