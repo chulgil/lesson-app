@@ -51,7 +51,14 @@ class ScheduleTab extends ConsumerWidget {
 
         // Calendar: list mode → expandable month calendar, others → compact strip
         if (viewMode == ScheduleViewMode.list)
-          lessonsAsync.when(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenPadding,
+              AppSpacing.space3,
+              AppSpacing.screenPadding,
+              0,
+            ),
+            child: lessonsAsync.when(
             data: (lessons) {
               final lessonDates =
                   lessons
@@ -81,6 +88,7 @@ class ScheduleTab extends ConsumerWidget {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
+            ),
           )
         else
           Padding(
@@ -123,7 +131,7 @@ class ScheduleTab extends ConsumerWidget {
             ),
           ),
 
-        const SizedBox(height: AppSpacing.space2),
+        const SizedBox(height: AppSpacing.space3),
 
         // Content: switches between list view, timeline view, and weekly grid
         Expanded(
