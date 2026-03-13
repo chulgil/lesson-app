@@ -512,26 +512,65 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     );
 
     try {
-      // Add lesson using the notifier
-      await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
+      if (_isRecurring && _recurringDays.isNotEmpty) {
+        // Batch-create lessons for each recurring day, 4 weeks ahead
+        final recurrenceGroupId = 'recur_${DateTime.now().millisecondsSinceEpoch}';
+        const weeksAhead = 4;
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        int createdCount = 0;
 
-      // Invalidate the lessonsProvider to refresh calendar
-      ref.invalidate(lessonsProvider);
+        for (final dayIndex in _recurringDays) {
+          final weekday = dayIndex + 1; // 0-based → DateTime.weekday (1=Mon)
+          for (int week = 0; week < weeksAhead; week++) {
+            // Calculate target date for this weekday and week offset
+            var daysUntil = weekday - today.weekday;
+            if (daysUntil <= 0) daysUntil += 7;
+            final targetDate = today.add(Duration(days: daysUntil + (week * 7)));
 
-      if (!mounted) return;
+            final recurringLesson = lesson.copyWith(
+              id: '', // Will be set by repository
+              date: targetDate,
+              createdAt: DateTime.now(),
+            );
+            await ref.read(lessonsNotifierProvider.notifier).addLesson(recurringLesson);
+            createdCount++;
+          }
+        }
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _isRecurring
-                ? '${_selectedStudent!.name} 학생의 정기 레슨이 예약되었습니다'
-                : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다',
+        // Invalidate the lessonsProvider to refresh calendar
+        ref.invalidate(lessonsProvider);
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${_selectedStudent!.name} 학생의 정기 레슨 ${createdCount}개가 생성되었습니다 (4주간)',
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.practiceGood,
           ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.practiceGood,
-        ),
-      );
+        );
+      } else {
+        // Single lesson creation
+        await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
+
+        // Invalidate the lessonsProvider to refresh calendar
+        ref.invalidate(lessonsProvider);
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다',
+            ),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppColors.practiceGood,
+          ),
+        );
+      }
 
       // Go back
       context.pop();
