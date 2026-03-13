@@ -282,8 +282,10 @@ TODO.md로 Phase 기반 관리 → Issue 참조, 세션별 Phase 진행, 완료 
 - 연습완료 날짜별 완료 상태 동기화 (Issue #8)
 
 ### 최근 완료
+- 수강권 Template-First UX 구현 (#145) — SelectableCard + 제안/즉시발급 분기
+- 레슨 상태 자동 완료 displayStatus (#153) + 정기 레슨 배치 생성 (#134)
 - 선생님 스케줄 뷰 — 타임라인 + 주간 그리드 + Invisible Design (#144, PR #146)
-- 수강권 Template-First UX 통합 + 스케줄 Invisible Design 스펙
+- 선생님 UX 종합 점검 Phase 1+2 (#147) — 스케줄 UI 버그 + 학생관리 + 레슨노트
 - 수강권 임박 대시보드 빈 화면 → 선생님 전용 화면 생성 (#142)
 - 레슨 요청 화면 캘린더 제거 → 상태 기반 전체 리스트 통일 (#141)
 - 아키텍처·인덱스·스키마 문서 전체 점검 및 갱신 (docs PR)
