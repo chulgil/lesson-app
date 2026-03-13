@@ -156,7 +156,7 @@ class _QuickFeedbackStudentListState
   }
 
   Widget _buildTodayLessonTile(Lesson lesson) {
-    final isCompleted = lesson.status == LessonStatus.completed;
+    final isCompleted = lesson.displayStatus == LessonStatus.completed;
     final hasFeedback =
         lesson.feedback != null && lesson.feedback!.isNotEmpty;
 

@@ -79,7 +79,7 @@ class LessonHeaderCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         // Status badge
-                        _StatusBadge(status: lesson.status),
+                        _StatusBadge(status: lesson.displayStatus),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.space1),

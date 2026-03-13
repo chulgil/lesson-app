@@ -236,6 +236,25 @@ class Lesson {
   /// Check if lesson has feedback
   bool get hasFeedback => feedback != null && feedback!.isNotEmpty;
 
+  /// Display status — auto-completes past scheduled lessons based on time.
+  /// UI should use this instead of raw `status` for rendering.
+  LessonStatus get displayStatus {
+    if (status != LessonStatus.scheduled) return status;
+    final endTime = _calculateEndDateTime();
+    return endTime.isBefore(DateTime.now())
+        ? LessonStatus.completed
+        : LessonStatus.scheduled;
+  }
+
+  /// Calculate lesson end time from date + startTime + duration.
+  DateTime _calculateEndDateTime() {
+    final parts = startTime.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return DateTime(date.year, date.month, date.day, hour, minute)
+        .add(Duration(minutes: duration));
+  }
+
   /// Get days until/since lesson
   int get daysFromNow {
     final now = DateTime.now();

@@ -112,7 +112,7 @@ class LessonCard extends ConsumerWidget {
   }
 
   String _getStatusLabel() {
-    switch (lesson.status) {
+    switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
         return '예정';
@@ -131,7 +131,7 @@ class LessonCard extends ConsumerWidget {
   }
 
   Color _getStatusColor() {
-    switch (lesson.status) {
+    switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
         return AppColors.primary;

@@ -432,8 +432,8 @@ class _LessonTimeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isScheduled = lesson.status == LessonStatus.scheduled ||
-        lesson.status == LessonStatus.reschedulePending;
+    final isScheduled = lesson.displayStatus == LessonStatus.scheduled ||
+        lesson.displayStatus == LessonStatus.reschedulePending;
 
     final card = _buildCard(context, ref);
 
@@ -644,7 +644,7 @@ class _LessonTimeCard extends ConsumerWidget {
   }
 
   String _getStatusLabel() {
-    switch (lesson.status) {
+    switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
         return '예정';
@@ -663,7 +663,7 @@ class _LessonTimeCard extends ConsumerWidget {
   }
 
   Color _getStatusColor() {
-    switch (lesson.status) {
+    switch (lesson.displayStatus) {
       case LessonStatus.scheduled:
       case LessonStatus.reschedulePending:
         return AppColors.primary;

@@ -218,9 +218,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder: (context) => [
             const PopupMenuItem(value: 'edit', child: Text('수정')),
-            if (lesson.status == LessonStatus.scheduled)
+            if (lesson.displayStatus == LessonStatus.scheduled)
               const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
-            if (lesson.status == LessonStatus.scheduled)
+            if (lesson.displayStatus == LessonStatus.scheduled)
               const PopupMenuItem(value: 'cancel', child: Text('취소')),
             PopupMenuItem(
               value: 'delete',
@@ -341,7 +341,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   Widget _buildNotesTab(Lesson lesson) {
     final needsFeedback = widget.isTeacher &&
-        lesson.status == LessonStatus.completed &&
+        lesson.displayStatus == LessonStatus.completed &&
         (lesson.feedback == null || lesson.feedback!.isEmpty);
 
     return SingleChildScrollView(
