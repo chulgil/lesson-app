@@ -383,3 +383,27 @@ cd frontend && dart run build_runner build --delete-conflicting-outputs
 - **분류**: automation-pattern
 - **교훈**: 한국어 이름 "박지선"에서 "박"은 성, "지선"은 이름. 스케줄·알림 등 공간 제한 UI에서 이름(given name)만 표시하면 가독성이 크게 향상. 서양식 "John Smith"에서는 "John"이 given name. 향후 글로벌 진출 대비 `NameUtils.givenName()` 유틸을 사용하여 일관된 이름 표시.
 - **조치**: `core/utils/name_utils.dart`의 `NameUtils.givenName()` 사용. Student/Lesson 엔티티에 `firstName`/`lastName` 필드 추가는 백엔드 연동 시 진행 (현재는 유틸 함수로 파싱).
+
+## 8. 새 패키지 추가 시 iOS Info.plist 권한 문자열 필수 - error-pattern
+- **날짜**: 2026-03-13
+- **분류**: error-pattern
+- **교훈**: `image_picker`, `camera`, `photo_library` 등 하드웨어 접근 패키지 추가 시 iOS `Info.plist`에 `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription` 등 권한 문자열을 반드시 추가해야 한다. 누락하면 앱이 권한 요청 시 즉시 크래시(SIGABRT)하며, `flutter analyze`로는 감지 불가.
+- **조치**: pubspec.yaml에 새 패키지 추가 시 → iOS `Info.plist` + Android `AndroidManifest.xml` 권한 체크를 체크리스트에 포함. 특히 카메라(`NSCameraUsageDescription`), 사진(`NSPhotoLibraryUsageDescription`), 위치(`NSLocationWhenInUseUsageDescription`) 주의.
+
+## 9. 분산 설정 화면 → 단일 스크롤 통합이 UX 정답 - automation-pattern
+- **날짜**: 2026-03-13
+- **분류**: automation-pattern
+- **교훈**: 가용시간 관리(#152)에서 3개 화면(가용시간 관리, 주간 스케줄, 시간 예외)에 분산된 설정을 단일 스크롤 화면 4섹션으로 통합하니 진입 경로 3→2단계로 축소 + 사용자 인지 부하 감소. **설정 화면이 3개 이상 분산되면 통합 검토 필수**.
+- **조치**: 새 설정 기능 설계 시 "한 화면에 모든 관련 설정 + 미리보기"를 기본으로 한다. 섹션 헤더(제목 + 부제 + 도움말)로 구분하면 스크롤 길이가 길어도 가독성 유지.
+
+## 10. build_runner 새 Provider는 전체 빌드 필수 - error-pattern
+- **날짜**: 2026-03-13
+- **분류**: error-pattern
+- **교훈**: `dart run build_runner build --build-filter="특정파일"` 옵션은 기존 파일 수정 시에만 유효. **새 `@riverpod` Provider 파일**은 `--build-filter`로 0 output이 나오며, 전체 빌드(`--delete-conflicting-outputs`)가 필요하다.
+- **조치**: 새 Provider 파일 생성 시 반드시 `dart run build_runner build --delete-conflicting-outputs` (전체 빌드) 실행. 기존 파일 수정 시에만 `--build-filter` 사용 가능.
+
+## 11. 새 기능 구현 순서: Entity → Mock → Provider → UI 바인딩 - automation-pattern
+- **날짜**: 2026-03-13
+- **분류**: automation-pattern
+- **교훈**: FeedbackPreset(#148), BulkFeedback(#149) 구현에서 Entity(@HiveType) → MockRepository → @riverpod Provider → UI(ref.watch) 순서로 구현하면 각 단계에서 컴파일 에러 없이 안정적으로 쌓아갈 수 있다. 반대로 UI부터 만들면 Provider 미존재로 에러 폭발.
+- **조치**: 새 기능 구현 시 반드시 데이터 계층 먼저 완성 → build_runner → UI 바인딩. 이 순서를 지키면 `flutter analyze` 통과율 100%.
