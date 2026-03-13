@@ -1,9 +1,97 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/utils/image_utils.dart';
 
-/// Show image picker options bottom sheet.
+/// Show image picker options and return the cropped image path.
+///
+/// Returns the saved image file path, or null if cancelled.
+/// If [existingImage] is not null, shows delete option.
+Future<String?> showImagePickerFlow(
+  BuildContext context, {
+  String? existingImage,
+  required String fileNamePrefix,
+}) async {
+  final action = await showModalBottomSheet<_ImageAction>(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(AppSpacing.radiusXLarge),
+      ),
+    ),
+    builder: (context) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: AppSpacing.space2),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.borderLight,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          ListTile(
+            leading: const Icon(Icons.photo_library),
+            title: const Text('갤러리에서 선택'),
+            onTap: () =>
+                Navigator.pop(context, _ImageAction.gallery),
+          ),
+          ListTile(
+            leading: const Icon(Icons.camera_alt),
+            title: const Text('카메라로 촬영'),
+            onTap: () =>
+                Navigator.pop(context, _ImageAction.camera),
+          ),
+          if (existingImage != null)
+            ListTile(
+              leading: Icon(Icons.delete, color: AppColors.error),
+              title: Text('사진 삭제',
+                  style: TextStyle(color: AppColors.error)),
+              onTap: () =>
+                  Navigator.pop(context, _ImageAction.delete),
+            ),
+          const SizedBox(height: AppSpacing.space4),
+        ],
+      ),
+    ),
+  );
+
+  if (action == null || !context.mounted) return existingImage;
+
+  if (action == _ImageAction.delete) {
+    if (existingImage != null) {
+      await deleteProfileImage(existingImage);
+    }
+    return null;
+  }
+
+  final source = action == _ImageAction.camera
+      ? ImageSource.camera
+      : ImageSource.gallery;
+
+  final picked = await pickImage(source);
+  if (picked == null || !context.mounted) return existingImage;
+
+  final cropped = await cropProfileImage(picked.path, context);
+  if (cropped == null) return existingImage;
+
+  final saved = await saveProfileImage(
+    cropped,
+    '${fileNamePrefix}_${DateTime.now().millisecondsSinceEpoch}',
+  );
+  return saved;
+}
+
+enum _ImageAction { camera, gallery, delete }
+
+/// Show image picker options bottom sheet (legacy callback-based).
+///
+/// Prefer [showImagePickerFlow] for new code.
 void showImagePickerOptions(
   BuildContext context, {
   VoidCallback? onCamera,
@@ -47,14 +135,16 @@ void showImagePickerOptions(
               onGallery?.call();
             },
           ),
-          ListTile(
-            leading: Icon(Icons.delete, color: AppColors.error),
-            title: Text('사진 삭제', style: TextStyle(color: AppColors.error)),
-            onTap: () {
-              Navigator.pop(context);
-              onDelete?.call();
-            },
-          ),
+          if (onDelete != null)
+            ListTile(
+              leading: Icon(Icons.delete, color: AppColors.error),
+              title:
+                  Text('사진 삭제', style: TextStyle(color: AppColors.error)),
+              onTap: () {
+                Navigator.pop(context);
+                onDelete.call();
+              },
+            ),
           const SizedBox(height: AppSpacing.space4),
         ],
       ),

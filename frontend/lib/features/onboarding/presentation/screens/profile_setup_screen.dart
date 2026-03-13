@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/image_utils.dart';
 import '../../../../models/teacher_onboarding.dart';
 import '../../../../models/teacher_settings.dart';
 import '../../../../providers/onboarding/onboarding_providers.dart';
@@ -91,10 +95,59 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   }
 
   Future<void> _selectProfileImage() async {
-    // Mock image selection - in real app, use image_picker
-    setState(() {
-      _profileImage = 'https://example.com/profile.jpg';
-    });
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusXLarge),
+        ),
+      ),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('갤러리에서 선택'),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('카메라로 촬영'),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              if (_profileImage != null)
+                ListTile(
+                  leading: Icon(Icons.delete_outline, color: AppColors.error),
+                  title: Text('사진 삭제',
+                      style: TextStyle(color: AppColors.error)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    setState(() => _profileImage = null);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null || !mounted) return;
+
+    final picked = await pickImage(source);
+    if (picked == null || !mounted) return;
+
+    final croppedPath = await cropProfileImage(picked.path, context);
+    if (croppedPath == null || !mounted) return;
+
+    final savedPath = await saveProfileImage(
+      croppedPath,
+      'onboarding_${DateTime.now().millisecondsSinceEpoch}',
+    );
+
+    setState(() => _profileImage = savedPath);
   }
 
   void _showInstrumentSelector() {
@@ -289,7 +342,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     shape: BoxShape.circle,
                     image: _profileImage != null
                         ? DecorationImage(
-                            image: NetworkImage(_profileImage!),
+                            image: _profileImage!.startsWith('http')
+                                ? NetworkImage(_profileImage!) as ImageProvider
+                                : FileImage(File(_profileImage!)),
                             fit: BoxFit.cover,
                           )
                         : null,
