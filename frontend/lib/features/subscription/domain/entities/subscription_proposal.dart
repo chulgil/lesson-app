@@ -105,6 +105,32 @@ extension ProposalStatusExtension on ProposalStatus {
   }
 }
 
+/// Type of proposal action.
+@HiveType(typeId: 98)
+enum ProposalType {
+  /// Normal proposal — student receives and decides
+  @HiveField(0)
+  proposal,
+
+  /// Direct issue — teacher issues subscription immediately
+  @HiveField(1)
+  directIssue,
+}
+
+/// Extension methods for ProposalType.
+extension ProposalTypeExtension on ProposalType {
+  String get label {
+    switch (this) {
+      case ProposalType.proposal:
+        return '제안';
+      case ProposalType.directIssue:
+        return '즉시 발급';
+    }
+  }
+
+  bool get isDirectIssue => this == ProposalType.directIssue;
+}
+
 /// Subscription proposal - teacher proposes a subscription to a student.
 ///
 /// Flow:
@@ -217,6 +243,14 @@ class SubscriptionProposal extends HiveObject {
   @HiveField(22)
   final String? lessonRequestId;
 
+  // ============================================================
+  // v7 Fields - Template-First UX
+  // ============================================================
+
+  /// Type of proposal: normal proposal (student decides) or direct issue.
+  @HiveField(23)
+  final ProposalType proposalType;
+
   SubscriptionProposal({
     required this.id,
     required this.teacherId,
@@ -241,6 +275,7 @@ class SubscriptionProposal extends HiveObject {
     this.paymentStatus = ProposalPaymentStatus.pending,
     this.isAppTransition = false,
     this.lessonRequestId,
+    this.proposalType = ProposalType.proposal,
   });
 
   factory SubscriptionProposal.fromJson(Map<String, dynamic> json) =>
@@ -337,6 +372,9 @@ class SubscriptionProposal extends HiveObject {
   bool get canImmediateConfirm =>
       isAppTransition && paymentStatus == ProposalPaymentStatus.completed;
 
+  /// Whether this is a direct issue (no student confirmation needed)
+  bool get isDirectIssue => proposalType == ProposalType.directIssue;
+
   SubscriptionProposal copyWith({
     String? id,
     String? teacherId,
@@ -361,6 +399,7 @@ class SubscriptionProposal extends HiveObject {
     ProposalPaymentStatus? paymentStatus,
     bool? isAppTransition,
     String? lessonRequestId,
+    ProposalType? proposalType,
   }) {
     return SubscriptionProposal(
       id: id ?? this.id,
@@ -386,6 +425,7 @@ class SubscriptionProposal extends HiveObject {
       paymentStatus: paymentStatus ?? this.paymentStatus,
       isAppTransition: isAppTransition ?? this.isAppTransition,
       lessonRequestId: lessonRequestId ?? this.lessonRequestId,
+      proposalType: proposalType ?? this.proposalType,
     );
   }
 

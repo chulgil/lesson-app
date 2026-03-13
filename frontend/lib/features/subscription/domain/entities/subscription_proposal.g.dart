@@ -40,13 +40,14 @@ class SubscriptionProposalAdapter extends TypeAdapter<SubscriptionProposal> {
       paymentStatus: fields[20] as ProposalPaymentStatus,
       isAppTransition: fields[21] as bool,
       lessonRequestId: fields[22] as String?,
+      proposalType: fields[23] as ProposalType,
     );
   }
 
   @override
   void write(BinaryWriter writer, SubscriptionProposal obj) {
     writer
-      ..writeByte(23)
+      ..writeByte(24)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -92,7 +93,9 @@ class SubscriptionProposalAdapter extends TypeAdapter<SubscriptionProposal> {
       ..writeByte(21)
       ..write(obj.isAppTransition)
       ..writeByte(22)
-      ..write(obj.lessonRequestId);
+      ..write(obj.lessonRequestId)
+      ..writeByte(23)
+      ..write(obj.proposalType);
   }
 
   @override
@@ -204,6 +207,45 @@ class ProposalPaymentStatusAdapter extends TypeAdapter<ProposalPaymentStatus> {
           typeId == other.typeId;
 }
 
+class ProposalTypeAdapter extends TypeAdapter<ProposalType> {
+  @override
+  final int typeId = 98;
+
+  @override
+  ProposalType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ProposalType.proposal;
+      case 1:
+        return ProposalType.directIssue;
+      default:
+        return ProposalType.proposal;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ProposalType obj) {
+    switch (obj) {
+      case ProposalType.proposal:
+        writer.writeByte(0);
+        break;
+      case ProposalType.directIssue:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProposalTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
@@ -246,6 +288,9 @@ SubscriptionProposal _$SubscriptionProposalFromJson(
           ProposalPaymentStatus.pending,
       isAppTransition: json['is_app_transition'] as bool? ?? false,
       lessonRequestId: json['lesson_request_id'] as String?,
+      proposalType:
+          $enumDecodeNullable(_$ProposalTypeEnumMap, json['proposal_type']) ??
+              ProposalType.proposal,
     );
 
 Map<String, dynamic> _$SubscriptionProposalToJson(
@@ -274,6 +319,7 @@ Map<String, dynamic> _$SubscriptionProposalToJson(
       'payment_status': _$ProposalPaymentStatusEnumMap[instance.paymentStatus]!,
       'is_app_transition': instance.isAppTransition,
       'lesson_request_id': instance.lessonRequestId,
+      'proposal_type': _$ProposalTypeEnumMap[instance.proposalType]!,
     };
 
 const _$ProposalStatusEnumMap = {
@@ -288,4 +334,9 @@ const _$ProposalStatusEnumMap = {
 const _$ProposalPaymentStatusEnumMap = {
   ProposalPaymentStatus.pending: 'pending',
   ProposalPaymentStatus.completed: 'completed',
+};
+
+const _$ProposalTypeEnumMap = {
+  ProposalType.proposal: 'proposal',
+  ProposalType.directIssue: 'directIssue',
 };

@@ -2,24 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../domain/entities/subscription_proposal.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_template_providers.dart';
 import '../providers/subscription_proposal_providers.dart';
+import '../widgets/selectable_template_card.dart';
 
 /// Screen for teachers to create a subscription proposal.
+///
+/// Template-First 3-Step UX:
+/// 1. Student selection (dropdown)
+/// 2. Template selection (SelectableTemplateCard, max 3)
+/// 3. Action branch: propose (async) or direct issue (immediate)
 class ProposalCreateScreen extends ConsumerStatefulWidget {
   final String teacherId;
-  final String teacherName; // 🆕 For notification
+  final String teacherName;
   final String? preselectedStudentId;
 
   const ProposalCreateScreen({
     super.key,
     required this.teacherId,
-    this.teacherName = '선생님', // 🆕 Default value
+    this.teacherName = '선생님',
     this.preselectedStudentId,
   });
 
@@ -30,12 +38,10 @@ class ProposalCreateScreen extends ConsumerStatefulWidget {
 
 class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   String? _selectedStudentId;
-  // v4: Multi-select with checkboxes - default to all selected
   final Set<String> _selectedTemplateIds = {};
   String? _recommendedTemplateId;
   final _messageController = TextEditingController();
   bool _isSubmitting = false;
-  bool _hasInitializedTemplates = false;
 
   @override
   void initState() {
@@ -131,7 +137,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           ElevatedButton.icon(
             onPressed: () {
               context.push(
-                  '/subscriptions/templates?teacherId=${widget.teacherId}');
+                  '${AppRoutes.subscriptionTemplates}?teacherId=${widget.teacherId}');
             },
             icon: const Icon(Icons.add),
             label: const Text('템플릿 만들기'),
@@ -142,33 +148,22 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   }
 
   Widget _buildForm(List students, List<SubscriptionTemplate> templates) {
-    // Initialize all templates as selected by default (once)
-    if (!_hasInitializedTemplates && templates.isNotEmpty) {
-      _hasInitializedTemplates = true;
-      // Select all templates by default
-      for (final template in templates) {
-        _selectedTemplateIds.add(template.id);
-      }
-      // Set first template as recommended
-      _recommendedTemplateId = templates.first.id;
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Student Selection
-          _buildSectionTitle('학생 선택'),
+          // Step 1: Student Selection
+          _buildStepHeader('1', '학생 선택'),
           const SizedBox(height: AppSpacing.space2),
           _buildStudentSelector(students),
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Template Selection
-          _buildSectionTitle('수강권 선택'),
+          // Step 2: Template Selection (Selectable Cards)
+          _buildStepHeader('2', '수강권 선택 (최대 $kMaxTemplateSelections개)'),
           const SizedBox(height: AppSpacing.space2),
-          _buildTemplateSelector(templates),
+          _buildTemplateCards(templates),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -179,10 +174,40 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
           const SizedBox(height: AppSpacing.space8),
 
-          // Submit Button
-          _buildSubmitButton(),
+          // Step 3: Action Buttons
+          _buildActionButtons(),
         ],
       ),
+    );
+  }
+
+  Widget _buildStepHeader(String step, String title) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            step,
+            style: AppTypography.caption.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        Text(
+          title,
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 
@@ -253,190 +278,62 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     );
   }
 
-  Widget _buildTemplateSelector(List<SubscriptionTemplate> templates) {
+  Widget _buildTemplateCards(List<SubscriptionTemplate> templates) {
+    final atMax = _selectedTemplateIds.length >= kMaxTemplateSelections;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Help text for multi-select
-        Container(
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.info_outline, size: 16, color: AppColors.info),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '전체 선택됨. 제외할 수강권을 해제하세요. 학생이 하나를 선택합니다.',
-                  style: AppTypography.caption.copyWith(color: AppColors.info),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Help text
+        if (_selectedTemplateIds.isEmpty)
+          _buildInfoBanner('수강권을 선택하세요. 복수 선택 시 학생이 하나를 선택합니다.'),
 
-        // Template list with checkboxes
+        if (_selectedTemplateIds.length > 1)
+          _buildInfoBanner(
+            '${_selectedTemplateIds.length}개 선택됨 — 학생이 하나를 선택합니다. '
+            '추천 지정: 카드를 길게 누르세요.',
+          ),
+
+        // Template cards
         ...templates.map((template) {
           final isSelected = _selectedTemplateIds.contains(template.id);
           final isRecommended = _recommendedTemplateId == template.id;
+          final isDisabled = atMax && !isSelected;
 
           return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  if (isSelected) {
-                    _selectedTemplateIds.remove(template.id);
-                    // Remove recommended if unchecked
-                    if (_recommendedTemplateId == template.id) {
-                      _recommendedTemplateId = null;
+            padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+            child: GestureDetector(
+              onLongPress: isSelected && _selectedTemplateIds.length > 1
+                  ? () {
+                      setState(() {
+                        _recommendedTemplateId = template.id;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${template.name}을 추천으로 지정했습니다'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: AppColors.secondary,
+                        ),
+                      );
                     }
-                  } else {
-                    _selectedTemplateIds.add(template.id);
-                    // Auto-set first selection as recommended
-                    _recommendedTemplateId ??= template.id;
-                  }
-                });
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.05)
-                      : AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.borderLight,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Checkbox indicator
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.borderLight,
-                          width: 2,
-                        ),
-                        color: isSelected ? AppColors.primary : Colors.transparent,
-                      ),
-                      child: isSelected
-                          ? const Icon(
-                              Icons.check,
-                              size: 16,
-                              color: Colors.white,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: AppSpacing.space3),
-
-                    // Template info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                template.name,
-                                style: AppTypography.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              if (isRecommended) ...[
-                                const SizedBox(width: 4),
-                                const Text('⭐', style: TextStyle(fontSize: 14)),
-                              ],
-                            ],
-                          ),
-                          const SizedBox(height: AppSpacing.space1),
-                          Text(
-                            template.summaryText,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
-                            ),
-                          ),
-                          if (template.description != null) ...[
-                            const SizedBox(height: AppSpacing.space1),
-                            Text(
-                              template.description!,
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-
-                    // Price + recommend star button
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          template.formattedPrice,
-                          style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (isSelected && _selectedTemplateIds.length > 1) ...[
-                          const SizedBox(height: 4),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _recommendedTemplateId = template.id;
-                              });
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isRecommended
-                                    ? AppColors.warning.withValues(alpha: 0.2)
-                                    : AppColors.surfaceSecondaryLight,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                isRecommended ? '추천 ⭐' : '추천 지정',
-                                style: AppTypography.caption.copyWith(
-                                  color: isRecommended
-                                      ? AppColors.warning
-                                      : AppColors.textSecondaryLight,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
+                  : null,
+              child: SelectableTemplateCard(
+                template: template,
+                isSelected: isSelected,
+                isRecommended: isRecommended,
+                isDisabled: isDisabled,
+                onTap: () => _toggleTemplate(template.id),
               ),
             ),
           );
         }),
 
-        // Selected count indicator
+        // Selected count
         if (_selectedTemplateIds.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: AppSpacing.space1),
             child: Text(
-              '${_selectedTemplateIds.length}개 선택됨${_selectedTemplateIds.length > 1 ? ' (학생이 1개 선택)' : ''}',
+              '${_selectedTemplateIds.length}/$kMaxTemplateSelections개 선택',
               style: AppTypography.caption.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
@@ -444,6 +341,47 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           ),
       ],
     );
+  }
+
+  Widget _buildInfoBanner(String text) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, size: 16, color: AppColors.info),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTypography.caption.copyWith(color: AppColors.info),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _toggleTemplate(String templateId) {
+    setState(() {
+      if (_selectedTemplateIds.contains(templateId)) {
+        _selectedTemplateIds.remove(templateId);
+        if (_recommendedTemplateId == templateId) {
+          _recommendedTemplateId =
+              _selectedTemplateIds.isNotEmpty ? _selectedTemplateIds.first : null;
+        }
+      } else {
+        if (_selectedTemplateIds.length < kMaxTemplateSelections) {
+          _selectedTemplateIds.add(templateId);
+          // Auto-set first selection as recommended
+          _recommendedTemplateId ??= templateId;
+        }
+      }
+    });
   }
 
   Widget _buildMessageInput() {
@@ -465,35 +403,77 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     );
   }
 
-  Widget _buildSubmitButton() {
+  /// Action buttons with branching logic:
+  /// - 1 template: [제안 보내기] + [즉시 발급]
+  /// - 2-3 templates: [제안 보내기] only (student must choose)
+  Widget _buildActionButtons() {
     final canSubmit = _selectedStudentId != null &&
         _selectedTemplateIds.isNotEmpty &&
         !_isSubmitting;
+    final isSingleTemplate = _selectedTemplateIds.length == 1;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: canSubmit ? _submitProposal : null,
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+    return Column(
+      children: [
+        // Primary: Send proposal
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: canSubmit
+                ? () => _submit(ProposalType.proposal)
+                : null,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: _isSubmitting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : Text(_selectedTemplateIds.length > 1
+                    ? '${_selectedTemplateIds.length}개 수강권 제안 보내기'
+                    : '제안 보내기'),
           ),
         ),
-        child: _isSubmitting
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Text(_selectedTemplateIds.length > 1
-                ? '${_selectedTemplateIds.length}개 수강권 제안 보내기'
-                : '제안 보내기'),
-      ),
+
+        // Secondary: Direct issue (only for single template)
+        if (isSingleTemplate) ...[
+          const SizedBox(height: AppSpacing.space3),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: canSubmit
+                  ? () => _submit(ProposalType.directIssue)
+                  : null,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: BorderSide(
+                  color: canSubmit ? AppColors.primary : AppColors.borderLight,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('즉시 발급'),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ],
     );
   }
 
-  Future<void> _submitProposal() async {
+  Future<void> _submit(ProposalType proposalType) async {
     if (_selectedStudentId == null || _selectedTemplateIds.isEmpty) return;
 
     setState(() {
@@ -501,14 +481,24 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
     });
 
     try {
+      if (proposalType == ProposalType.directIssue) {
+        // Direct issue: navigate to issue subscription screen
+        final templateId = _selectedTemplateIds.first;
+        if (mounted) {
+          context.push(
+            '${AppRoutes.issueSubscription}?studentId=$_selectedStudentId&templateId=$templateId',
+          );
+        }
+        return;
+      }
+
+      // Proposal flow: create multi-choice proposal
       final notifier = ref.read(subscriptionProposalNotifierProvider.notifier);
 
-      // 🆕 Get template name for notification
       final templateId = _selectedTemplateIds.first;
       final templateAsync = ref.read(subscriptionTemplateProvider(templateId));
       final templateName = templateAsync.valueOrNull?.name ?? '수강권';
 
-      // v4: Use multi-choice proposal
       await notifier.createMultiChoiceProposal(
         teacherId: widget.teacherId,
         studentId: _selectedStudentId!,
@@ -517,7 +507,6 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
             _selectedTemplateIds.length > 1 ? _recommendedTemplateId : null,
         message:
             _messageController.text.isEmpty ? null : _messageController.text,
-        // 🆕 For notification
         teacherName: widget.teacherName,
         templateName: templateName,
       );

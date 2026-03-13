@@ -44,7 +44,7 @@ final tunerInfoDisplayProvider = AutoDisposeProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TunerInfoDisplayRef = AutoDisposeProviderRef<String>;
-String _$tunerHash() => r'a36379451c8d235d6360cd332cd1272191d13653';
+String _$tunerHash() => r'eab3d045f9b900e7c7ff01b6777cf2833c0e5917';
 
 /// Tuner state management with Riverpod.
 ///
