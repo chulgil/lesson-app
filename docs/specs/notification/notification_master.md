@@ -123,6 +123,13 @@
 | `proposalAccepted` | normal | X | O |
 | `proposalExpired` | normal | X | O |
 
+#### 수강권 만료 알림
+
+| 타입 | 우선순위 | DND 우회 | 푸시 |
+|------|---------|---------|------|
+| `subscriptionExpiringSoon` | high | X | O |
+| `subscriptionExpired` | high | X | O |
+
 #### 변경 허용 알림
 
 | 타입 | 우선순위 | DND 우회 | 푸시 |

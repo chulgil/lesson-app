@@ -127,7 +127,7 @@ final RenewalInitiator? renewalInitiator;  // system | teacher
 ### 5.2 ProposalSettings 확장
 
 ```dart
-@HiveField(20)
+@HiveField(9)
 final bool autoRenewalEnabled;  // 자동 갱신 제안 on/off (기본: false)
 ```
 

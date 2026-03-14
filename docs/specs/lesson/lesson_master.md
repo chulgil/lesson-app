@@ -1103,7 +1103,7 @@ enum LessonType {
 | 스펙 항목 | 코드 파일 |
 |----------|----------|
 | 레슨 추가 | `features/lessons/presentation/screens/add_lesson_screen.dart` |
-| 레슨 상세 (노트/녹음/과제) | `features/lessons/presentation/screens/lesson_detail_screen.dart` |
+| 레슨 상세 (노트/과제) | `features/lessons/presentation/screens/lesson_detail_screen.dart` |
 | 레슨 수정 | `features/lessons/presentation/screens/edit_lesson_screen.dart` |
 | 레슨 노트 히스토리 | `features/lessons/presentation/screens/lesson_note_history_screen.dart` |
 | 그룹 클래스 상세 | `features/schedule/presentation/screens/group_class_detail_screen.dart` |
@@ -1166,7 +1166,7 @@ frontend/lib/features/lessons/
 │   ├── providers/           # lesson CRUD, calendar, booking, payment providers
 │   ├── screens/
 │   │   ├── add_lesson_screen.dart
-│   │   ├── lesson_detail_screen.dart    # 3탭 (노트/녹음/과제)
+│   │   ├── lesson_detail_screen.dart    # 2탭 (노트/과제) — 녹음 탭 제거 (#171)
 │   │   └── edit_lesson_screen.dart
 │   └── widgets/
 │       ├── lesson_form/     # 폼 관련 위젯들

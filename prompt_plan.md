@@ -17,11 +17,11 @@
 
 | # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 1-1 | 스펙 문서 작성 | docs/specs/subscription/subscription_renewal_spec.md | todo |
-| 1-2 | SubscriptionProposal 확장 (isRenewal, previousSubscriptionId) | domain/entities/subscription_proposal.dart | todo |
-| 1-3 | ProposalSettings 확장 (autoRenewalEnabled) | domain/entities/proposal_settings.dart | todo |
-| 1-4 | SubscriptionRenewalService 생성 | domain/services/subscription_renewal_service.dart | todo |
-| 1-5 | SubscriptionExpiryMonitor 연결 | domain/services/subscription_expiry_monitor.dart | todo |
+| 1-1 | 스펙 문서 작성 | docs/specs/subscription/subscription_renewal_spec.md | done |
+| 1-2 | SubscriptionProposal 확장 (isRenewal, previousSubscriptionId) | domain/entities/subscription_proposal.dart | done |
+| 1-3 | ProposalSettings 확장 (autoRenewalEnabled) | domain/entities/proposal_settings.dart | done |
+| 1-4 | SubscriptionRenewalService 생성 | domain/services/subscription_renewal_service.dart | done |
+| 1-5 | SubscriptionExpiryMonitor 연결 | domain/services/subscription_expiry_monitor.dart | done |
 | 1-6 | Mock 데이터 추가 | mock_subscription_proposal_repository.dart | todo |
 
 ## Phase 2: 선생님 UX

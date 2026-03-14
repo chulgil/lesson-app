@@ -63,7 +63,7 @@ final List<LessonRecording>? recordings;  // Lesson recordings
 | | `KeyPointsList` | 포인트 목록 + 삭제 (선생님만) | L147-225 |
 | | `PracticeTipsCard` | 연습 팁 카드 + 편집 (선생님만) | L228-305 |
 | | `RecordingStatusIndicator` | 녹음 중 타이머 | L308-350 |
-| `lesson_detail_screen.dart` | `LessonDetailScreen` | 3탭 화면 (노트/녹음/과제) | 467줄 |
+| `lesson_detail_screen.dart` | `LessonDetailScreen` | 2탭 화면 (노트/과제) | 467줄 |
 | `add_tip_bottom_sheet.dart` | `AddTipBottomSheet` | 포인트/팁 추가 바텀시트 | 132줄 |
 
 ### 2.3 위젯 상세
@@ -182,7 +182,7 @@ LessonDetailScreen (노트 탭)
 ┌─────────────────────────────────────────┐
 │ ← 레슨 상세        김서연    2026.01.15 │
 ├─────────┬─────────┬─────────────────────┤
-│ [노트]  │  녹음   │  과제               │
+│ [노트]  │  과제                         │
 ├─────────┴─────────┴─────────────────────┤
 │                                         │
 │ 📝 레슨 피드백                          │
@@ -210,7 +210,7 @@ LessonDetailScreen (노트 탭)
 ┌─────────────────────────────────────────┐
 │ ← 레슨 상세                   2026.01.15│
 ├─────────┬─────────┬─────────────────────┤
-│ [노트]  │  녹음   │  과제               │
+│ [노트]  │  과제                         │
 ├─────────┴─────────┴─────────────────────┤
 │                                         │
 │ 📝 선생님 피드백                 1/15   │
@@ -302,7 +302,7 @@ frontend/lib/features/lessons/
 │   │   ├── lesson_crud_provider.dart            ← lessonsNotifierProvider (CRUD)
 │   │   └── lesson_repository_provider.dart      ← Repository 주입
 │   ├── screens/
-│   │   └── lesson_detail_screen.dart            ← 3탭 화면, _buildNotesTab() (L236-293)
+│   │   └── lesson_detail_screen.dart            ← 2탭 화면 (노트/과제), 녹음 탭 제거됨 (#171)
 │   └── widgets/
 │       └── lesson_detail/
 │           ├── lesson_notes_widgets.dart         ← 모든 노트 위젯 (487줄)
@@ -380,7 +380,7 @@ Future<List<LessonNoteTimeline>> lessonNoteTimeline(
 - [x] KeyPointsList 위젯 (추가/삭제)
 - [x] PracticeTipsCard 위젯 (추가/편집/삭제)
 - [x] AddTipBottomSheet (템플릿 지원)
-- [x] LessonDetailScreen 3탭 통합
+- [x] LessonDetailScreen 2탭 (노트/과제) — 녹음 탭 제거 (#171, 학습 자료 공유 기능으로 대체 예정 #172)
 - [x] Mock 데이터 (lesson_001, lesson_007)
 
 ### Phase 2: 타임라인 뷰 (예정)
