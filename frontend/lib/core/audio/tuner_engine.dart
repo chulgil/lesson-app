@@ -93,6 +93,14 @@ abstract class TunerEngine {
     // Default: no-op, override in implementations
   }
 
+  /// Stop audio completely for background transition.
+  ///
+  /// Unlike [stop], this always stops regardless of current [isListening] state.
+  /// Use when the app goes to background to ensure the mic is fully off.
+  Future<void> stopForBackground() async {
+    await stop();
+  }
+
   /// Whether the audio stream is active (warmed up or started).
   bool get isStreamActive => isListening;
 

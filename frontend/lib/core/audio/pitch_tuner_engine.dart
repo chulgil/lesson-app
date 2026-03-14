@@ -182,6 +182,18 @@ class PitchTunerEngine implements TunerEngine {
   }
 
   @override
+  Future<void> stopForBackground() async {
+    try {
+      await _audioCapture.stop();
+      _isListening = false;
+      _currentNote = null;
+      _streamController.add(null);
+    } catch (e) {
+      onError?.call('Failed to stop for background: $e');
+    }
+  }
+
+  @override
   Future<void> toggle() async {
     if (_isListening) {
       await stop();

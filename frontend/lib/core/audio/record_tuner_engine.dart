@@ -259,6 +259,23 @@ class RecordTunerEngine implements TunerEngine {
     }
   }
 
+  @override
+  Future<void> stopForBackground() async {
+    try {
+      _isListening = false;
+      _isProcessingEnabled = false;
+
+      await _stopStream();
+
+      _currentNote = null;
+      _sampleBuffer.clear();
+
+      _streamController.add(null);
+    } catch (e) {
+      onError?.call('Failed to stop for background: $e');
+    }
+  }
+
   /// Warm up the engine by starting the recorder stream without processing.
   ///
   /// This pre-configures the audio session and starts the microphone,

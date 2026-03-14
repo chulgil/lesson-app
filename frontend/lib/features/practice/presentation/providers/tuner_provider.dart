@@ -113,6 +113,7 @@ class Tuner extends _$Tuner {
   // App lifecycle tracking
   bool _wasListeningBeforePause = false;
   bool _isPaused = false; // Guard against inactive→paused double-call
+  int _lifecycleVersion = 0; // Invalidate stale resume operations
 
   @override
   TunerProviderState build() {
@@ -455,34 +456,47 @@ class Tuner extends _$Tuner {
   }
 
   /// Called when app goes to background (paused).
-  /// Disables processing but keeps stream active for quick resume.
+  /// Fully stops the microphone stream (not just processing).
   Future<void> onAppPaused() async {
     // Guard against inactive→paused double-call:
     // iOS sends inactive first, then paused. Without this guard,
-    // the second call would see isListening=false and set
-    // _wasListeningBeforePause=false, breaking resume.
+    // the second call would overwrite _wasListeningBeforePause.
     if (_isPaused) return;
     _isPaused = true;
+    _lifecycleVersion++;
 
-    _wasListeningBeforePause = state.isListening;
-    if (_wasListeningBeforePause) {
-      disableProcessing();
-    }
+    // Preserve listening intent: use || to keep true if a previous resume
+    // is still running (state.isListening may be false mid-async-resume).
+    _wasListeningBeforePause = state.isListening || _wasListeningBeforePause;
+
+    // Fully stop the mic (not just disable processing)
+    await _engine?.stopForBackground();
+
+    _lastDetectedNoteName = null;
+    _lastNoteTime = null;
+
+    state = state.copyWith(
+      isListening: false,
+      status: TuningStatus.idle,
+      clearNote: true,
+    );
   }
 
   /// Called when app returns to foreground (resumed).
-  /// Restarts the audio stream (iOS kills AVAudioEngine on background)
-  /// and re-enables processing if it was active before pause.
+  /// Restarts the microphone stream and re-enables processing.
   Future<void> onAppResumed() async {
     _isPaused = false;
     if (!_wasListeningBeforePause) return;
-    _wasListeningBeforePause = false;
+
+    final resumeVersion = _lifecycleVersion;
 
     // Re-check microphone permission (may have been revoked in Settings)
     if (_engine is RecordTunerEngine) {
       final engine = _engine as RecordTunerEngine;
       final hasPermission = await engine.checkPermission();
+      if (_lifecycleVersion != resumeVersion) return; // App paused again
       if (!hasPermission) {
+        _wasListeningBeforePause = false;
         state = state.copyWith(
           error: '마이크 권한이 필요합니다. 설정에서 마이크를 허용해주세요.',
           isListening: false,
@@ -490,16 +504,26 @@ class Tuner extends _$Tuner {
         );
         return;
       }
-
-      // Restart the audio stream — iOS deactivates AVAudioEngine on background,
-      // so the old stream is dead even though _isStreamActive is still true.
-      await engine.restartStream();
     }
 
     // Re-activate the audio session
     await AudioSessionManager.reactivate();
+    if (_lifecycleVersion != resumeVersion) return; // App paused again
 
-    enableProcessing();
+    // Start fresh (stream was fully stopped on pause)
+    await _engine?.start();
+    if (_lifecycleVersion != resumeVersion) {
+      // Stale resume — stop what we just started
+      await _engine?.stopForBackground();
+      return;
+    }
+
+    _wasListeningBeforePause = false;
+    state = state.copyWith(
+      isListening: true,
+      status: TuningStatus.listening,
+      clearError: true,
+    );
   }
 }
 

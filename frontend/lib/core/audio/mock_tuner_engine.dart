@@ -101,6 +101,11 @@ class MockTunerEngine implements TunerEngine {
   }
 
   @override
+  Future<void> stopForBackground() async {
+    await stop();
+  }
+
+  @override
   Future<void> toggle() async {
     if (_isListening) {
       await stop();
