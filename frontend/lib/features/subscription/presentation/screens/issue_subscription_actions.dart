@@ -38,6 +38,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   String? get effectiveBonusReason;
   DateTime? get startDate;
   int get finalAmount;
+  int get rescheduleAllowance;
 
   void issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
@@ -100,6 +101,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       discountAmount:
           discountPercent > 0 ? (originalAmount - finalAmount) : null,
       discountReason: discountPercent > 0 ? '$discountPercent% 할인' : null,
+      totalRescheduleAllowance: rescheduleAllowance,
     );
 
     try {
@@ -360,6 +362,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
                 discountPercent > 0 ? (originalAmount - finalAmount) : null,
             discountReason:
                 discountPercent > 0 ? '$discountPercent% 할인' : null,
+            totalRescheduleAllowance: rescheduleAllowance,
           );
           await repository.create(subscription);
 

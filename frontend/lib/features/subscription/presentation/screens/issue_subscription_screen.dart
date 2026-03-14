@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
@@ -61,6 +63,7 @@ class _IssueSubscriptionScreenState
   String? _bonusReason;
   String _customBonusReason = '';
   DateTime? _startDate;
+  int _rescheduleAllowance = 2;
 
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
@@ -106,6 +109,8 @@ class _IssueSubscriptionScreenState
   int get bonusLessons => _bonusLessons;
   @override
   DateTime? get startDate => _startDate;
+  @override
+  int get rescheduleAllowance => _rescheduleAllowance;
 
   @override
   String? get effectiveBonusReason {
@@ -287,6 +292,12 @@ class _IssueSubscriptionScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Reschedule allowance (not for trial)
+          if (_selectedType != SubscriptionType.trial) ...[
+            _buildRescheduleAllowanceSection(),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+
           // Payment status
           PaymentStatusSection(
             isPaymentConfirmed: _isPaymentConfirmed,
@@ -394,6 +405,12 @@ class _IssueSubscriptionScreenState
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Reschedule allowance (not for trial)
+          if (_selectedType != SubscriptionType.trial) ...[
+            _buildRescheduleAllowanceSection(),
+            const SizedBox(height: AppSpacing.space6),
+          ],
+
           PaymentStatusSection(
             isPaymentConfirmed: _isPaymentConfirmed,
             selectedPaymentMethod: _selectedPaymentMethod,
@@ -422,6 +439,57 @@ class _IssueSubscriptionScreenState
           const SizedBox(height: AppSpacing.space8),
         ],
       ),
+    );
+  }
+
+  Widget _buildRescheduleAllowanceSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('변경/취소 가능 횟수', style: AppTypography.headingSmall),
+        const SizedBox(height: 4),
+        Text(
+          '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        Row(
+          children: [
+            for (final count in [0, 1, 2, 3, 5])
+              Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.space2),
+                child: ChoiceChip(
+                  label: Text(count == 0 ? '불가' : '$count회'),
+                  selected: _rescheduleAllowance == count,
+                  onSelected: (_) =>
+                      setState(() => _rescheduleAllowance = count),
+                  selectedColor: AppColors.primary,
+                  backgroundColor: AppColors.surfaceLight,
+                  labelStyle: AppTypography.bodySmall.copyWith(
+                    color: _rescheduleAllowance == count
+                        ? Colors.white
+                        : AppColors.textPrimaryLight,
+                    fontWeight: _rescheduleAllowance == count
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                  side: BorderSide(
+                    color: _rescheduleAllowance == count
+                        ? AppColors.primary
+                        : AppColors.borderLight,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 

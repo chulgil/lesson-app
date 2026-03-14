@@ -382,6 +382,8 @@ class MyBookingsScreen extends ConsumerWidget {
           remainingReschedules: remainingReschedules,
           totalReschedules: totalReschedules,
           instrument: instrument,
+          subscriptionId: subscriptionId,
+          studentId: studentId,
         ),
       ),
     );

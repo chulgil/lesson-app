@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../search/presentation/providers/teacher_search_provider.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../providers/teacher_availability_providers.dart';
 
 /// Booking cancellation screen
@@ -23,6 +24,8 @@ class BookingCancelScreen extends ConsumerStatefulWidget {
   final int totalReschedules;
   final String? instrument;
   final bool isTeacherCancel;
+  final String? subscriptionId;
+  final String? studentId;
 
   const BookingCancelScreen({
     super.key,
@@ -35,6 +38,8 @@ class BookingCancelScreen extends ConsumerStatefulWidget {
     required this.totalReschedules,
     this.instrument,
     this.isTeacherCancel = false,
+    this.subscriptionId,
+    this.studentId,
   });
 
   @override
@@ -499,6 +504,15 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       await ref
           .read(slotBookingNotifierProvider.notifier)
           .cancelBooking(widget.bookingId);
+
+      // Deduct reschedule allowance for student cancellations
+      if (!widget.isTeacherCancel &&
+          widget.subscriptionId != null &&
+          widget.studentId != null) {
+        await ref
+            .read(subscriptionNotifierProvider(widget.studentId!).notifier)
+            .useReschedule(widget.subscriptionId!);
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
