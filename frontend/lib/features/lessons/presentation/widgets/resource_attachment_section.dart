@@ -375,48 +375,50 @@ class _AddResourceButton extends ConsumerWidget {
   }
 
   void _showLibraryPicker(BuildContext context, WidgetRef ref) {
-    final resourcesAsync = ref.read(teachingResourceNotifierProvider);
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppSpacing.radiusXLarge),
-          ),
-        ),
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                children: [
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  Text('내 학습 자료', style: AppTypography.headingSmall),
-                ],
+      builder: (ctx) => Consumer(
+        builder: (ctx, modalRef, _) {
+          final resourcesAsync = modalRef.watch(teachingResourceNotifierProvider);
+
+          return Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.radiusXLarge),
               ),
             ),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                  child: Column(
+                    children: [
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.borderLight,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Text('내 학습 자료', style: AppTypography.headingSmall),
+                    ],
+                  ),
+                ),
 
-            Expanded(
-              child: resourcesAsync.when(
+                Expanded(
+                  child: resourcesAsync.when(
                 data: (resources) {
                   if (resources.isEmpty) {
                     return Center(
@@ -479,6 +481,8 @@ class _AddResourceButton extends ConsumerWidget {
             ),
           ],
         ),
+      );
+        },
       ),
     );
   }
