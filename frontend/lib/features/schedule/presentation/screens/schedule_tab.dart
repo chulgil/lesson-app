@@ -134,23 +134,40 @@ class ScheduleTab extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space3),
 
         // Content: switches between list view, timeline view, and weekly grid
+        // Timeline/weekly grid support horizontal swipe for day/week navigation
         Expanded(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: viewMode == ScheduleViewMode.weeklyGrid
-                ? ScheduleWeeklyGridView(
-                    key: const ValueKey(ScheduleViewMode.weeklyGrid),
-                    selectedDate: selectedDate,
-                  )
-                : _buildViewContent(
-                    key: ValueKey(viewMode),
-                    lessonsAsync: lessonsAsync,
-                    selectedDate: selectedDate,
-                    sortType: sortType,
-                    viewMode: viewMode,
-                    ref: ref,
-                    context: context,
-                  ),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragEnd: (viewMode == ScheduleViewMode.list)
+                ? null
+                : (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+                    if (velocity.abs() < 100) return;
+                    final delta = viewMode == ScheduleViewMode.timeline
+                        ? const Duration(days: 1)  // day-by-day for timeline
+                        : const Duration(days: 7); // week-by-week for grid
+                    final newDate = velocity > 0
+                        ? selectedDate.subtract(delta)
+                        : selectedDate.add(delta);
+                    ref.read(teacherSelectedDateProvider.notifier).state = newDate;
+                  },
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: viewMode == ScheduleViewMode.weeklyGrid
+                  ? ScheduleWeeklyGridView(
+                      key: const ValueKey(ScheduleViewMode.weeklyGrid),
+                      selectedDate: selectedDate,
+                    )
+                  : _buildViewContent(
+                      key: ValueKey(viewMode),
+                      lessonsAsync: lessonsAsync,
+                      selectedDate: selectedDate,
+                      sortType: sortType,
+                      viewMode: viewMode,
+                      ref: ref,
+                      context: context,
+                    ),
+            ),
           ),
         ),
       ],

@@ -269,6 +269,11 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
   List<Widget> _buildLessonBlocks(List<Lesson> lessons, int startHour, double topPadding) {
     final nowMinutes = _now.hour * 60 + _now.minute;
+    final todayDate = DateTime(_now.year, _now.month, _now.day);
+    final selectedDateOnly = DateTime(
+      widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day,
+    );
+    final isFutureDate = selectedDateOnly.isAfter(todayDate);
 
     // Find the next upcoming lesson
     Lesson? nextLesson;
@@ -304,6 +309,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         child: TimelineLessonBlock(
           lesson: lesson,
           isToday: _isToday,
+          isFuture: isFutureDate,
           isNow: isNow,
           isPast: isPast,
           isNext: isNext,

@@ -19,6 +19,7 @@ class TimelineLessonBlock extends StatelessWidget {
   final bool isPast;
   final bool isNext;
   final bool isToday; // Whether viewing today's schedule
+  final bool isFuture; // Whether viewing a future date (not today)
   final int minutesUntilNext;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
@@ -30,6 +31,7 @@ class TimelineLessonBlock extends StatelessWidget {
     this.isPast = false,
     this.isNext = false,
     this.isToday = true,
+    this.isFuture = false,
     this.minutesUntilNext = 0,
     this.onTap,
     this.onLongPress,
@@ -47,8 +49,12 @@ class TimelineLessonBlock extends StatelessWidget {
     final Color bgColor;
     final Color accentColor;
 
-    if (!isToday) {
-      // Non-today: grey muted
+    if (!isToday && isFuture) {
+      // Future date: softened instrument colors
+      bgColor = baseColors.background.withValues(alpha: 0.6);
+      accentColor = baseColors.accent.withValues(alpha: 0.5);
+    } else if (!isToday) {
+      // Past date: grey muted
       bgColor = AppColors.scheduleMutedBackground;
       accentColor = AppColors.scheduleMutedAccent;
     } else if (isPast) {
