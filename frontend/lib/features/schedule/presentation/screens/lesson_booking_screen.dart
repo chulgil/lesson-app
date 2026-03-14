@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson_booking.dart';
+import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -15,6 +16,7 @@ import '../widgets/availability/empty_slots_suggestion.dart';
 import '../widgets/availability/booking_confirm_dialog.dart';
 import '../widgets/availability/guest_student_input_dialog.dart';
 import '../widgets/availability/no_subscription_view.dart';
+import '../widgets/availability/trial_lesson_info_section.dart';
 
 /// New lesson booking screen using week calendar + chip selector
 ///
@@ -60,10 +62,21 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   AvailabilitySlot? _selectedSlot;
   bool _isBooking = false;
 
+  // Trial lesson fields
+  LessonGoal _trialGoal = LessonGoal.hobby;
+  ExperienceLevel _trialExperience = ExperienceLevel.none;
+  final _trialMessageController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _trialMessageController.dispose();
+    super.dispose();
   }
 
   String get _appBarTitle {
@@ -195,17 +208,55 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${widget.teacherName} · ${widget.instrument}',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        '${widget.teacherName} · ${widget.instrument}',
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (widget.isTrialLesson) ...[
+                      const SizedBox(width: AppSpacing.space2),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.secondary,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
+                        ),
+                        child: Text(
+                          '체험',
+                          style: AppTypography.caption.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 if (widget.remainingLessons != null &&
                     widget.totalLessons != null) ...[
                   const SizedBox(height: 2),
                   Text(
                     '수강권: ${widget.remainingLessons}/${widget.totalLessons}회',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+                if (widget.isTrialLesson) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '원하시는 날짜와 시간을 선택해주세요',
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
@@ -381,6 +432,7 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
                 widget.isReschedule ? widget.totalReschedules : null,
             onBook: () => _onBook(lessonFee),
             isLoading: _isBooking,
+            isTrialLesson: widget.isTrialLesson,
           ),
       ],
     );
@@ -420,6 +472,19 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
           ] else if (!shouldGroup) ...[
             // No grouping - flat list
             _buildChipGrid(slots),
+          ],
+
+          // Trial lesson info section (shown after time selection)
+          if (widget.isTrialLesson && _selectedSlot != null) ...[
+            const SizedBox(height: AppSpacing.space4),
+            TrialLessonInfoSection(
+              selectedGoal: _trialGoal,
+              selectedExperience: _trialExperience,
+              messageController: _trialMessageController,
+              onGoalChanged: (goal) => setState(() => _trialGoal = goal),
+              onExperienceChanged: (exp) =>
+                  setState(() => _trialExperience = exp),
+            ),
           ],
         ],
       ),
@@ -518,17 +583,19 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
   }
 
   Future<void> _onBook(int lessonFee) async {
-    debugPrint('[BookingScreen] _onBook called, selectedSlot: ${_selectedSlot?.id}');
     if (_selectedSlot == null) return;
+
+    // Trial lesson: use dedicated trial flow
+    if (widget.isTrialLesson && widget.studentId != null) {
+      await _onBookTrialLesson(lessonFee);
+      return;
+    }
 
     String effectiveStudentId = widget.studentId ?? '';
     String effectiveStudentName = widget.studentName ?? '학생';
 
-    debugPrint('[BookingScreen] studentId: $effectiveStudentId, studentName: $effectiveStudentName');
-
     // Case 1: Logged-in student booking (has studentId) - show confirmation dialog only
     if (widget.studentId != null) {
-      debugPrint('[BookingScreen] Showing confirmation dialog...');
       final confirmed = await BookingConfirmDialog.show(
         context,
         teacherName: widget.teacherName,
@@ -540,26 +607,20 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         isReschedule: widget.isReschedule,
         isTrialLesson: widget.isTrialLesson,
       );
-      debugPrint('[BookingScreen] Confirmation result: $confirmed');
-      if (!confirmed) return; // User cancelled
+      if (!confirmed) return;
     }
     // Case 2: Teacher booking on behalf of guest student - show guest input dialog
     else {
-      debugPrint('[BookingScreen] Showing guest input dialog...');
       final guestInfo = await GuestStudentInputDialog.show(context);
-      if (guestInfo == null) return; // User cancelled
+      if (guestInfo == null) return;
 
       effectiveStudentId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
       effectiveStudentName = guestInfo.name;
     }
 
-    debugPrint('[BookingScreen] Starting booking process...');
     setState(() => _isBooking = true);
 
     try {
-      debugPrint('[BookingScreen] Calling slotBookingNotifier.bookSlot...');
-      debugPrint('[BookingScreen] slotId: ${_selectedSlot!.id}');
-      // Create actual lesson booking with slot info
       await ref.read(slotBookingNotifierProvider.notifier).bookSlot(
             _selectedSlot!.id,
             effectiveStudentId,
@@ -573,18 +634,14 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             lessonType: LessonType.oneTime,
             fee: lessonFee,
           );
-      debugPrint('[BookingScreen] Booking succeeded!');
 
       if (mounted) {
-        // Show success message and go back
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('예약이 완료되었습니다. 선생님 확인 후 확정됩니다.'),
             backgroundColor: AppColors.practiceGood,
           ),
         );
-
-        // Go back to previous screen
         context.pop();
       }
     } catch (e) {
@@ -592,6 +649,56 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('예약 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isBooking = false);
+      }
+    }
+  }
+
+  /// Trial lesson booking — collects goal/experience/message and calls requestTrialLesson
+  Future<void> _onBookTrialLesson(int lessonFee) async {
+    setState(() => _isBooking = true);
+
+    try {
+      final request = TrialLessonRequest(
+        studentId: widget.studentId,
+        studentName: widget.studentName ?? '학생',
+        goal: _trialGoal,
+        experience: _trialExperience,
+        message: _trialMessageController.text.trim().isNotEmpty
+            ? _trialMessageController.text.trim()
+            : null,
+        preferredDate: _selectedSlot!.date,
+        preferredStartTime: _selectedSlot!.startTime,
+        preferredEndTime: _selectedSlot!.endTime,
+      );
+
+      await ref.read(bookingsNotifierProvider.notifier).requestTrialLesson(
+            teacherId: widget.teacherId,
+            teacherName: widget.teacherName,
+            request: request,
+            fee: lessonFee,
+          );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('체험 레슨을 신청했습니다. 선생님 확인 후 확정됩니다.'),
+            backgroundColor: AppColors.practiceGood,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('체험 레슨 신청 중 오류가 발생했습니다. 다시 시도해주세요.'),
             backgroundColor: AppColors.error,
           ),
         );

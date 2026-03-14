@@ -21,6 +21,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
   final int? totalReschedules;
   final VoidCallback? onBook;
   final bool isLoading;
+  final bool isTrialLesson;
 
   const AvailabilityBookingPreview({
     super.key,
@@ -34,6 +35,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
     this.totalReschedules,
     this.onBook,
     this.isLoading = false,
+    this.isTrialLesson = false,
   });
 
   @override
@@ -162,7 +164,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
                       ),
                     )
                   : Text(
-                      '예약하기',
+                      isTrialLesson ? '체험레슨 신청하기' : '예약하기',
                       style: AppTypography.bodyLarge.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
