@@ -1586,7 +1586,7 @@ final slotBookingNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SlotBookingNotifier
     = AutoDisposeNotifier<AsyncValue<AvailabilitySlot?>>;
 String _$teacherAvailabilityNotifierHash() =>
-    r'7fe8b3c811b4d31cae8695b03cac74162a7893a1';
+    r'2fe26d6c12dbdf7c7519054ff97827b9930d5e67';
 
 abstract class _$TeacherAvailabilityNotifier
     extends BuildlessAutoDisposeNotifier<AsyncValue<TeacherAvailability?>> {

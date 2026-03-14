@@ -29,6 +29,8 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
       lessonTime: fields[9] as String?,
       lessonDuration: fields[10] as int,
       notes: fields[11] as String?,
+      lessonLocationId: fields[14] as String?,
+      travelTimeMinutes: fields[15] as int,
       createdAt: fields[12] as DateTime,
       updatedAt: fields[13] as DateTime?,
     );
@@ -37,7 +39,7 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
   @override
   void write(BinaryWriter writer, ClassMembership obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,6 +64,10 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
       ..write(obj.lessonDuration)
       ..writeByte(11)
       ..write(obj.notes)
+      ..writeByte(14)
+      ..write(obj.lessonLocationId)
+      ..writeByte(15)
+      ..write(obj.travelTimeMinutes)
       ..writeByte(12)
       ..write(obj.createdAt)
       ..writeByte(13)
@@ -146,6 +152,8 @@ ClassMembership _$ClassMembershipFromJson(Map<String, dynamic> json) =>
       lessonTime: json['lesson_time'] as String?,
       lessonDuration: (json['lesson_duration'] as num?)?.toInt() ?? 60,
       notes: json['notes'] as String?,
+      lessonLocationId: json['lesson_location_id'] as String?,
+      travelTimeMinutes: (json['travel_time_minutes'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -166,6 +174,8 @@ Map<String, dynamic> _$ClassMembershipToJson(ClassMembership instance) =>
       'lesson_time': instance.lessonTime,
       'lesson_duration': instance.lessonDuration,
       'notes': instance.notes,
+      'lesson_location_id': instance.lessonLocationId,
+      'travel_time_minutes': instance.travelTimeMinutes,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

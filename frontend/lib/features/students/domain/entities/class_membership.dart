@@ -63,6 +63,13 @@ class ClassMembership extends HiveObject {
   @HiveField(11)
   final String? notes; // Special notes
 
+  // Location & travel
+  @HiveField(14)
+  final String? lessonLocationId; // Default lesson location for this membership
+
+  @HiveField(15)
+  final int travelTimeMinutes; // Teacher's travel time to this student (minutes)
+
   // Meta
   @HiveField(12)
   final DateTime createdAt;
@@ -83,6 +90,8 @@ class ClassMembership extends HiveObject {
     this.lessonTime,
     this.lessonDuration = 60,
     this.notes,
+    this.lessonLocationId,
+    this.travelTimeMinutes = 0,
     required this.createdAt,
     this.updatedAt,
   });
@@ -130,6 +139,8 @@ class ClassMembership extends HiveObject {
     String? lessonTime,
     int? lessonDuration,
     String? notes,
+    String? lessonLocationId,
+    int? travelTimeMinutes,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -146,6 +157,8 @@ class ClassMembership extends HiveObject {
       lessonTime: lessonTime ?? this.lessonTime,
       lessonDuration: lessonDuration ?? this.lessonDuration,
       notes: notes ?? this.notes,
+      lessonLocationId: lessonLocationId ?? this.lessonLocationId,
+      travelTimeMinutes: travelTimeMinutes ?? this.travelTimeMinutes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
