@@ -12,6 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
+import '../../../subscription/domain/services/auto_proposal_service.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
@@ -285,6 +286,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
               const SnackBar(content: Text('레슨이 완료 처리되었습니다')),
             );
           }
+
+          // Auto-propose regular lessons if student has no active subscription
+          if (widget.isTeacher && lesson.teacherId != null) {
+            _tryAutoProposal(lesson);
+          }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -452,6 +458,35 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ],
       ),
     );
+  }
+
+  /// Fire-and-forget auto-proposal trigger after lesson completion.
+  /// Only sends if the student has no active subscription (likely trial/ad-hoc).
+  void _tryAutoProposal(Lesson lesson) async {
+    if (lesson.teacherId == null) return;
+
+    try {
+      final subscription = await ref.read(
+        activeSubscriptionBetweenProvider(
+          studentId: lesson.studentId,
+          teacherId: lesson.teacherId!,
+        ).future,
+      );
+
+      // Student already has active subscription — skip
+      if (subscription != null && (subscription.remainingLessons ?? 0) > 0) {
+        return;
+      }
+
+      // No subscription → trigger auto proposal
+      await ref.read(autoProposalServiceProvider).triggerAfterTrialCompletion(
+            teacherId: lesson.teacherId!,
+            studentId: lesson.studentId,
+            trialCompletedAt: DateTime.now(),
+          );
+    } catch (_) {
+      // Silent fail — auto proposal is best-effort
+    }
   }
 
   /// Banner prompting teacher to propose regular lessons after a completed lesson.
