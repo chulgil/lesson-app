@@ -9,6 +9,7 @@ import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../../providers/providers.dart';
+import '../../../subscription/domain/entities/subscription_usage.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/lesson_form_widgets.dart';
 
@@ -100,11 +101,15 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     super.dispose();
   }
 
+  /// Whether the current date+time selection is in the past (record mode).
+  bool get _isRecordMode =>
+      !_isRecurring && isLessonDateTimeInPast(_selectedDate, _selectedTime);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('레슨 추가'),
+        title: Text(_isRecordMode ? '레슨 기록' : '레슨 추가'),
         leading: IconButton(
           onPressed:
               () => showLessonExitConfirmation(
@@ -164,8 +169,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Recurring lesson
-              LessonRecurringSection(
+              // Recurring lesson (hidden in record mode — past lessons can't recur)
+              if (!_isRecordMode) LessonRecurringSection(
                 isRecurring: _isRecurring,
                 onRecurringChanged: (value) {
                   setState(() {
@@ -199,17 +204,19 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Reminder settings
-              LessonReminderSection(
-                enableReminder: _enableReminder,
-                onReminderChanged: (value) {
-                  setState(() => _enableReminder = value);
-                },
-                reminderMinutes: _reminderMinutes,
-                onReminderTimeChanged: (value) {
-                  setState(() => _reminderMinutes = value);
-                },
-              ),
+              // Reminder settings (hidden in record mode — past lessons don't need reminders)
+              if (!_isRecordMode) ...[
+                LessonReminderSection(
+                  enableReminder: _enableReminder,
+                  onReminderChanged: (value) {
+                    setState(() => _enableReminder = value);
+                  },
+                  reminderMinutes: _reminderMinutes,
+                  onReminderTimeChanged: (value) {
+                    setState(() => _reminderMinutes = value);
+                  },
+                ),
+              ],
 
               const SizedBox(height: AppSpacing.space8),
 
@@ -219,7 +226,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: _saveLesson,
-                  child: Text(_isRecurring ? '정기 레슨 예약하기' : '레슨 추가하기'),
+                  child: Text(_isRecurring
+                      ? '정기 레슨 예약하기'
+                      : _isRecordMode
+                          ? '레슨 기록하기'
+                          : '레슨 추가하기'),
                 ),
               ),
 
@@ -401,6 +412,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   }
 
   /// Show confirmation dialog when saving a lesson with a past date/time.
+  /// Explains that past lessons are saved as "completed" with subscription deduction.
   Future<bool> _showPastDateConfirmDialog() async {
     final result = await showDialog<bool>(
       context: context,
@@ -412,8 +424,39 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             const Text('과거 레슨 기록'),
           ],
         ),
-        content: const Text(
-          '선택한 시간은 이미 지난 시간입니다.\n이미 진행한 레슨을 기록하시겠습니까?',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('선택한 시간은 이미 지난 시간입니다.'),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.infoLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '레슨 기록 시:',
+                    style: AppTypography.caption.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.info,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.info,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -580,6 +623,12 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       );
     }
 
+    // Past date → completed status (record mode), future → scheduled
+    final isPastLesson = isLessonDateTimeInPast(_selectedDate, _selectedTime);
+    final lessonStatus = isPastLesson && !_isRecurring
+        ? LessonStatus.completed
+        : LessonStatus.scheduled;
+
     // Create the lesson object
     final lesson = Lesson(
       id: '', // Will be set by repository
@@ -590,7 +639,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       date: _selectedDate,
       startTime: formatLessonTime(_selectedTime),
       duration: _lessonDuration,
-      status: LessonStatus.scheduled,
+      status: lessonStatus,
       pieces: pieces,
       createdAt: DateTime.now(),
     );
@@ -640,16 +689,23 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         // Single lesson creation
         await ref.read(lessonsNotifierProvider.notifier).addLesson(lesson);
 
+        // If past lesson (record mode), auto-deduct subscription
+        if (isPastLesson) {
+          await _recordSubscriptionUsage(lesson);
+        }
+
         // Invalidate the lessonsProvider to refresh calendar
         ref.invalidate(lessonsProvider);
 
         if (!mounted) return;
 
+        final message = isPastLesson
+            ? '${_selectedStudent!.name} 학생의 레슨이 기록되었습니다'
+            : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다';
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다',
-            ),
+            content: Text(message),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.practiceGood,
           ),
@@ -667,6 +723,37 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           backgroundColor: AppColors.error,
         ),
       );
+    }
+  }
+
+  /// Record subscription usage for a past lesson (auto-deduct).
+  /// Silently skips if no active subscription exists.
+  Future<void> _recordSubscriptionUsage(Lesson lesson) async {
+    try {
+      final subscriptions = await ref.read(
+        activeStudentSubscriptionsProvider(lesson.studentId).future,
+      );
+      if (subscriptions.isEmpty) return;
+
+      final subscription = subscriptions.first;
+      final usage = SubscriptionUsage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        subscriptionId: subscription.id,
+        lessonId: lesson.id,
+        usedAt: lesson.date,
+        teacherName: lesson.teacherName,
+        instrument: lesson.instrument,
+        note: '레슨 기록 (사후 등록)',
+        createdAt: DateTime.now(),
+        usageType: UsageType.normal,
+        deducted: true,
+      );
+
+      final subscriptionRepo = ref.read(subscriptionRepositoryProvider);
+      await subscriptionRepo.addUsage(usage);
+      ref.invalidate(activeStudentSubscriptionsProvider(lesson.studentId));
+    } catch (_) {
+      // Subscription deduction failure should not block lesson creation
     }
   }
 
