@@ -641,9 +641,17 @@ class _TeacherAvailabilityScreenState
     );
 
     if (result != null && mounted) {
-      await ref
-          .read(teacherAvailabilityNotifierProvider(widget.teacherId).notifier)
-          .addWeeklySchedule(result);
+      if (existing != null && result.id == existing.id) {
+        // Update existing schedule
+        await ref
+            .read(teacherAvailabilityNotifierProvider(widget.teacherId).notifier)
+            .updateWeeklySchedule(result);
+      } else {
+        // Add new schedule
+        await ref
+            .read(teacherAvailabilityNotifierProvider(widget.teacherId).notifier)
+            .addWeeklySchedule(result);
+      }
     }
   }
 

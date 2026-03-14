@@ -60,7 +60,7 @@ class _ScheduleWeeklyGridViewState
       return _buildEmptyWeek();
     }
 
-    final (startHour, endHour) = _getVisibleRange(lessons);
+    final (startHour, endHour) = _getVisibleRange(lessons, availability);
     final now = DateTime.now();
     final todayDate = DateTime(now.year, now.month, now.day);
 
@@ -411,12 +411,22 @@ class _ScheduleWeeklyGridViewState
     );
   }
 
-  (int, int) _getVisibleRange(List<Lesson> lessons) {
-    if (lessons.isEmpty) return (8, 18);
-
+  (int, int) _getVisibleRange(List<Lesson> lessons, TeacherAvailability? availability) {
     int earliest = 23;
     int latest = 0;
 
+    // Include availability hours
+    if (availability != null) {
+      for (final schedule in availability.weeklySchedules) {
+        if (!schedule.isActive) continue;
+        final startH = int.parse(schedule.startTime.split(':')[0]);
+        final endH = int.parse(schedule.endTime.split(':')[0]);
+        if (startH < earliest) earliest = startH;
+        if (endH > latest) latest = endH;
+      }
+    }
+
+    // Include actual lesson hours
     for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
       final hour = int.parse(parts[0]);
@@ -426,6 +436,7 @@ class _ScheduleWeeklyGridViewState
       if (endHour > latest) latest = endHour;
     }
 
+    if (earliest > latest) return (8, 18);
     return ((earliest - 1).clamp(0, 23), latest.clamp(0, 23));
   }
 

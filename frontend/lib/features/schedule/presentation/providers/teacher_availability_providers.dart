@@ -509,6 +509,18 @@ class TeacherAvailabilityNotifier extends _$TeacherAvailabilityNotifier {
     }
   }
 
+  Future<void> updateWeeklySchedule(WeeklySchedule schedule) async {
+    state = const AsyncValue.loading();
+
+    try {
+      final repository = ref.read(teacherAvailabilityRepositoryProvider);
+      final updated = await repository.updateWeeklySchedule(teacherId, schedule);
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> removeWeeklySchedule(String scheduleId) async {
     state = const AsyncValue.loading();
 

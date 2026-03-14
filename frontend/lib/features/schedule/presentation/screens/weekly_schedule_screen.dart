@@ -442,7 +442,12 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     if (result != null && mounted) {
       final teacherId = ref.read(currentUserIdProvider);
       if (result.id == schedule.id) {
-        // Update existing
+        // Update existing schedule
+        await ref
+            .read(teacherAvailabilityNotifierProvider(teacherId).notifier)
+            .updateWeeklySchedule(result);
+      } else {
+        // New schedule
         await ref
             .read(teacherAvailabilityNotifierProvider(teacherId).notifier)
             .addWeeklySchedule(result);
