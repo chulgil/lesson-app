@@ -35,8 +35,6 @@ class LessonDetailScreen extends ConsumerStatefulWidget {
 class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _isRecording = false;
-  int _recordingSeconds = 0;
   Timer? _feedbackDebounce;
   String? _pendingFeedbackText;
   bool _proposalBannerDismissed = false;
@@ -44,7 +42,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -183,7 +181,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                 controller: _tabController,
                 children: [
                   _buildNotesTab(lesson),
-                  _buildRecordingsTab(lesson),
                   _buildAssignmentsTab(lesson),
                 ],
               ),
@@ -191,7 +188,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           ],
         ),
       ),
-      floatingActionButton: _buildRecordingFAB(),
+      // Recording FAB removed — will be re-enabled with teaching resources feature (#172)
     ),
     );
   }
@@ -337,7 +334,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         controller: _tabController,
         tabs: const [
           Tab(text: '레슨 노트'),
-          Tab(text: '녹음'),
           Tab(text: '과제'),
         ],
         labelColor: AppColors.primary,
@@ -597,59 +593,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     );
   }
 
-  Widget _buildRecordingsTab(Lesson lesson) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_isRecording)
-            RecordingStatusIndicator(recordingSeconds: _recordingSeconds),
-
-          LessonDetailSectionHeader(title: '녹음 파일', icon: Icons.mic),
-          const SizedBox(height: AppSpacing.space3),
-
-          if (lesson.recordings == null || lesson.recordings!.isEmpty)
-            const RecordingsEmptyState()
-          else
-            ...lesson.recordings!.asMap().entries.map((entry) {
-              final idx = entry.key;
-              final recording = entry.value;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: LessonRecordingCard(
-                  title: '레슨 녹음 ${idx + 1}',
-                  duration: formatRecordingDuration(recording.duration),
-                  date:
-                      '${recording.recordedAt.month}월 ${recording.recordedAt.day}일 ${recording.recordedAt.hour}:${recording.recordedAt.minute.toString().padLeft(2, '0')}',
-                  hasTranscript: recording.transcription != null,
-                ),
-              );
-            }),
-
-          const SizedBox(height: AppSpacing.space6),
-
-          if (lesson.recordings?.any((r) => r.aiSummary != null) == true) ...[
-            LessonDetailSectionHeader(title: 'AI 요약', icon: Icons.auto_awesome),
-            const SizedBox(height: AppSpacing.space3),
-            Builder(
-              builder: (context) {
-                final aiSummary = lesson.recordings
-                    ?.firstWhere(
-                      (r) => r.aiSummary != null,
-                      orElse: () => lesson.recordings!.first,
-                    )
-                    .aiSummary;
-                if (aiSummary == null) return const SizedBox.shrink();
-                return AISummaryCard(summary: aiSummary);
-              },
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   Widget _buildAssignmentsTab(Lesson lesson) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -659,34 +602,6 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         isTeacher: widget.isTeacher,
       ),
     );
-  }
-
-  Widget _buildRecordingFAB() {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        setState(() {
-          _isRecording = !_isRecording;
-          if (_isRecording) {
-            _recordingSeconds = 0;
-            _startRecordingTimer();
-          }
-        });
-      },
-      backgroundColor: _isRecording ? AppColors.error : AppColors.primary,
-      icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-      label: Text(_isRecording ? '녹음 중지' : '녹음 시작'),
-    );
-  }
-
-  void _startRecordingTimer() {
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
-      if (_isRecording && mounted) {
-        setState(() => _recordingSeconds++);
-        return true;
-      }
-      return false;
-    });
   }
 
   void _showAddKeyPointDialog(Lesson lesson) {

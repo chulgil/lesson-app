@@ -226,7 +226,7 @@ class ScheduleTab extends ConsumerWidget {
               sortType,
             ),
             const SizedBox(height: AppSpacing.space3),
-            Expanded(child: _buildLessonList(context, dayLessons)),
+            Expanded(child: _buildLessonList(context, dayLessons, selectedDate)),
           ],
         );
       },
@@ -392,7 +392,7 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildLessonList(BuildContext context, List<Lesson> dayLessons) {
+  Widget _buildLessonList(BuildContext context, List<Lesson> dayLessons, DateTime selectedDate) {
     if (dayLessons.isEmpty) {
       return _buildEmptyState();
     }
@@ -406,7 +406,10 @@ class ScheduleTab extends ConsumerWidget {
       itemCount: dayLessons.length,
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
       itemBuilder: (context, index) {
-        return _LessonTimeCard(lesson: dayLessons[index]);
+        return _LessonTimeCard(
+          lesson: dayLessons[index],
+          selectedDate: selectedDate,
+        );
       },
     );
   }
@@ -444,8 +447,12 @@ class ScheduleTab extends ConsumerWidget {
 
 class _LessonTimeCard extends ConsumerWidget {
   final Lesson lesson;
+  final DateTime selectedDate;
 
-  const _LessonTimeCard({required this.lesson});
+  const _LessonTimeCard({
+    required this.lesson,
+    required this.selectedDate,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -567,11 +574,36 @@ class _LessonTimeCard extends ConsumerWidget {
   }
 
   Widget _buildCard(BuildContext context, WidgetRef ref) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final isPastDay = selDay.isBefore(today);
+    final isToday = selDay.isAtSameMomentAs(today);
+
+    // Past day → muted colors, completed → success border
+    final Color cardBgColor;
+    final Color borderColor;
+
+    if (lesson.displayStatus == LessonStatus.completed) {
+      cardBgColor = AppColors.scheduleMutedBackground;
+      borderColor = AppColors.scheduleMutedAccent;
+    } else if (isPastDay) {
+      cardBgColor = AppColors.scheduleMutedBackground;
+      borderColor = AppColors.scheduleMutedAccent;
+    } else if (isToday) {
+      cardBgColor = Theme.of(context).colorScheme.surface;
+      borderColor = _getStatusColor();
+    } else {
+      // Future day
+      cardBgColor = Theme.of(context).colorScheme.surface;
+      borderColor = _getStatusColor().withValues(alpha: 0.45);
+    }
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: cardBgColor,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border(left: BorderSide(color: _getStatusColor(), width: 4)),
+        border: Border(left: BorderSide(color: borderColor, width: 4)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -599,6 +631,9 @@ class _LessonTimeCard extends ConsumerWidget {
                   lesson.startTime,
                   style: AppTypography.headingSmall.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: (isPastDay || lesson.displayStatus == LessonStatus.completed)
+                        ? AppColors.textTertiaryLight
+                        : null,
                   ),
                 ),
               ),
@@ -614,6 +649,9 @@ class _LessonTimeCard extends ConsumerWidget {
                       '${lesson.studentName} · ${lesson.instrument}',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: (isPastDay || lesson.displayStatus == LessonStatus.completed)
+                            ? AppColors.textSecondaryLight
+                            : null,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
