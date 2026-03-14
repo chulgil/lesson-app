@@ -7,9 +7,11 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../subscription/domain/entities/subscription.dart';
+import '../../../../subscription/presentation/providers/subscription_proposal_providers.dart';
 import '../../../../subscription/presentation/providers/subscription_providers.dart';
 
 /// Banner showing subscription renewal CTA when subscriptions are expiring or expired.
+/// If a renewal proposal exists, navigates directly to it.
 class SubscriptionRenewalBanner extends ConsumerWidget {
   final String studentId;
 
@@ -19,6 +21,9 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final subscriptionsAsync = ref.watch(
       studentSubscriptionsProvider(studentId),
+    );
+    final renewalProposalAsync = ref.watch(
+      pendingRenewalProposalProvider(studentId),
     );
 
     return subscriptionsAsync.when(
@@ -37,21 +42,40 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
         }
 
         final hasExpired = expiredSubs.isNotEmpty;
-        final bannerColor = hasExpired ? AppColors.error : AppColors.warning;
-        final title = hasExpired ? '수강권이 만료되었습니다' : '수강권이 곧 만료됩니다';
+        final renewalProposal = renewalProposalAsync.valueOrNull;
+        final hasRenewalProposal = renewalProposal != null;
+
+        final bannerColor = hasRenewalProposal
+            ? AppColors.primary
+            : (hasExpired ? AppColors.error : AppColors.warning);
+
+        final title = hasRenewalProposal
+            ? '갱신 제안이 도착했어요!'
+            : (hasExpired ? '수강권이 만료되었습니다' : '수강권이 곧 만료됩니다');
 
         final targetSub = hasExpired ? expiredSubs.first : expiringSoonSubs.first;
-        final subtitle = hasExpired
-            ? '갱신 요청을 보내 레슨을 이어가세요'
-            : '남은 횟수 ${targetSub.remainingLessons ?? 0}회 · ${targetSub.daysUntilExpiration ?? 0}일 남음';
+        final subtitle = hasRenewalProposal
+            ? '선생님이 수강권 갱신을 제안했습니다'
+            : (hasExpired
+                ? '갱신 요청을 보내 레슨을 이어가세요'
+                : '남은 횟수 ${targetSub.remainingLessons ?? 0}회 · ${targetSub.daysUntilExpiration ?? 0}일 남음');
+
+        final ctaText = hasRenewalProposal ? '확인하기' : '갱신 요청';
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space3),
           child: GestureDetector(
             onTap: () {
-              context.push(
-                '${AppRoutes.lessonRequest}?studentId=$studentId',
-              );
+              if (hasRenewalProposal) {
+                context.push(
+                  AppRoutes.renewalDetail
+                      .replaceFirst(':id', renewalProposal.id),
+                );
+              } else {
+                context.push(
+                  '${AppRoutes.lessonRequest}?studentId=$studentId',
+                );
+              }
             },
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
@@ -71,7 +95,9 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.card_membership,
+                      hasRenewalProposal
+                          ? Icons.autorenew
+                          : Icons.card_membership,
                       color: bannerColor,
                       size: 20,
                     ),
@@ -108,7 +134,7 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                       ),
                     ),
                     child: Text(
-                      '갱신 요청',
+                      ctaText,
                       style: AppTypography.caption.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,

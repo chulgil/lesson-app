@@ -13,6 +13,7 @@ import '../../../../models/lesson.dart';
 import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
 import '../../../subscription/domain/services/auto_proposal_service.dart';
+import '../../../subscription/domain/services/subscription_renewal_service.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
@@ -457,7 +458,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   /// Fire-and-forget auto-proposal trigger after lesson completion.
-  /// Only sends if the student has no active subscription (likely trial/ad-hoc).
+  /// Handles both trial (no subscription) and renewal (low subscription) cases.
   void _tryAutoProposal(Lesson lesson) async {
     if (lesson.teacherId == null) return;
 
@@ -469,17 +470,20 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ).future,
       );
 
-      // Student already has active subscription — skip
-      if (subscription != null && (subscription.remainingLessons ?? 0) > 0) {
-        return;
+      if (subscription == null || (subscription.remainingLessons ?? 0) <= 0) {
+        // No subscription → trial auto proposal
+        await ref.read(autoProposalServiceProvider).triggerAfterTrialCompletion(
+              teacherId: lesson.teacherId!,
+              studentId: lesson.studentId,
+              trialCompletedAt: DateTime.now(),
+            );
+      } else if ((subscription.remainingLessons ?? 999) <= 2) {
+        // Low subscription → renewal trigger
+        await ref.read(subscriptionRenewalServiceProvider).triggerOnSubscriptionLow(
+              subscription: subscription,
+              teacherId: lesson.teacherId!,
+            );
       }
-
-      // No subscription → trigger auto proposal
-      await ref.read(autoProposalServiceProvider).triggerAfterTrialCompletion(
-            teacherId: lesson.teacherId!,
-            studentId: lesson.studentId,
-            trialCompletedAt: DateTime.now(),
-          );
     } catch (_) {
       // Silent fail — auto proposal is best-effort
     }
