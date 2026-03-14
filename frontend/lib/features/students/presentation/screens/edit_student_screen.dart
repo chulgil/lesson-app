@@ -217,10 +217,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile photo section
+                  // Profile photo section (read-only, no photo editing)
                   StudentProfileSection(
                     displayName: _nameController.text,
-                    onTapPhoto: () => showImagePickerOptions(context),
                   ),
 
                   const SizedBox(height: AppSpacing.space6),
