@@ -283,7 +283,17 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('평균 연습률', '-'),
+            _buildStatItem(
+              '완료율',
+              lessonStatsAsync.whenOrNull(
+                data: (stats) {
+                  final completed = stats['completed'] ?? 0;
+                  final total = stats['total'] ?? 0;
+                  if (total == 0) return '-';
+                  return '${(completed / total * 100).round()}%';
+                },
+              ) ?? '-',
+            ),
           ],
         ),
       ),
