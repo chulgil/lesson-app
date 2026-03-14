@@ -477,12 +477,13 @@ class _SectionListItem extends ConsumerWidget {
               Transform.scale(
                 scale: 1.2,
                 child: Checkbox(
-                  value: section.isCompleted,
+                  value: section.isCompletedForDate(today),
                   onChanged: (value) async {
                     await ref.read(sectionCrudProvider.notifier).toggleComplete(
                           section.id,
                           repertoireId,
                           studentId: studentId,
+                          date: today,
                         );
                     ref.invalidate(studentRepertoiresProvider(studentId));
                   },

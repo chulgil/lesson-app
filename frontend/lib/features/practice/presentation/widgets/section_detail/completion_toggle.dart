@@ -34,14 +34,17 @@ class CompletionToggle extends StatelessWidget {
     }
 
     // Standard toggle mode
-    return _buildStandardCard(context, hasRepresentativeRecording);
+    return _buildStandardCard(context, today, hasRepresentativeRecording);
   }
 
-  /// Standard mode: Simple toggle
+  /// Standard mode: Simple toggle (date-aware)
   Widget _buildStandardCard(
-      BuildContext context, bool hasRepresentativeRecording) {
+      BuildContext context, DateTime date, bool hasRepresentativeRecording) {
+    // Use date-specific completion status instead of global isCompleted
+    final isCompleted = section.isCompletedForDate(date);
+
     return Card(
-      color: section.isCompleted
+      color: isCompleted
           ? AppColors.success.withValues(alpha: 0.1)
           : null,
       child: InkWell(
@@ -52,10 +55,10 @@ class CompletionToggle extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                section.isCompleted
+                isCompleted
                     ? Icons.check_circle
                     : Icons.check_circle_outline,
-                color: section.isCompleted
+                color: isCompleted
                     ? AppColors.success
                     : AppColors.textTertiaryLight,
                 size: 32,
@@ -66,23 +69,23 @@ class CompletionToggle extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      section.isCompleted ? '연습 완료!' : '연습 완료로 표시',
+                      isCompleted ? '연습 완료!' : '연습 완료로 표시',
                       style: AppTypography.bodyLarge.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: section.isCompleted
+                        color: isCompleted
                             ? AppColors.success
                             : AppColors.textPrimaryLight,
                       ),
                     ),
                     Text(
-                      section.isCompleted
+                      isCompleted
                           ? '탭하여 완료 취소'
                           : '탭하여 이 섹션을 완료로 표시하세요',
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),
                     ),
-                    if (!section.isCompleted &&
+                    if (!isCompleted &&
                         hasRepresentativeRecording) ...[
                       const SizedBox(height: AppSpacing.space1),
                       _buildShareHint(),

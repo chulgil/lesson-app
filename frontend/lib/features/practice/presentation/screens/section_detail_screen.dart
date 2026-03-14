@@ -9,7 +9,6 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
-import '../../domain/entities/recording_filter_type.dart';
 import '../widgets/metronome/metronome.dart';
 import '../widgets/notes/note_preview_card.dart';
 import '../widgets/practice_tools_modal.dart';
@@ -38,7 +37,6 @@ class SectionDetailScreen extends ConsumerStatefulWidget {
 
 class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
     with SectionDetailRecordingMixin {
-  RecordingFilterType _recordingFilter = RecordingFilterType.all;
 
   @override
   String get sectionId => widget.sectionId;
@@ -147,13 +145,6 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
     final sortedRecordings = List.of(section.recordings)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-    // Apply recording filter based on selected filter type and date
-    final filteredRecordings = filterRecordings(
-      recordings: sortedRecordings,
-      filter: _recordingFilter,
-      selectedDate: widget.selectedDate,
-    );
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
@@ -216,13 +207,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           SectionRecordingsSection(
             section: section,
             repertoireId: widget.repertoireId,
-            recordingFilter: _recordingFilter,
-            filteredRecordings: filteredRecordings,
-            onFilterChanged: (filter) {
-              setState(() {
-                _recordingFilter = filter;
-              });
-            },
+            recordings: sortedRecordings,
             onSetRepresentative: setRepresentative,
             onDelete: deleteRecording,
             onPlay: playRecording,
@@ -257,6 +242,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
               section.id,
               widget.repertoireId,
               studentId: widget.studentId,
+              date: widget.selectedDate,
             );
       }
       ref.invalidate(sectionProvider(widget.sectionId));

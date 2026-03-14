@@ -6,10 +6,14 @@ import '../practice_repository_base.dart';
 mixin PracticeDailyCompletionMixin on PracticeRepositoryBase
     implements PracticeRepertoireRepository {
   @override
-  Future<PracticeSection> toggleSectionComplete(String sectionId) async {
+  Future<PracticeSection> toggleSectionComplete(String sectionId, {DateTime? date}) async {
     await Future.delayed(const Duration(milliseconds: 200));
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
+    final targetDate = date != null
+        ? DateTime(date.year, date.month, date.day)
+        : today;
+    final isToday = targetDate == today;
 
     for (final reps in repertoires.values) {
       for (int i = 0; i < reps.length; i++) {
@@ -18,15 +22,19 @@ mixin PracticeDailyCompletionMixin on PracticeRepositoryBase
             repertoire.sections.indexWhere((s) => s.id == sectionId);
         if (sectionIndex != -1) {
           final section = repertoire.sections[sectionIndex];
-          final newIsCompleted = !section.isCompleted;
 
-          // Also update today's dailyStatus to sync with isCompleted
-          List<DailyPracticeStatus> updatedStatuses;
+          // Determine current completion state for target date
           final existingIndex =
-              section.dailyStatuses.indexWhere((s) => s.dateOnly == today);
+              section.dailyStatuses.indexWhere((s) => s.dateOnly == targetDate);
+          final isCurrentlyCompleted = existingIndex != -1
+              ? section.dailyStatuses[existingIndex].isCompleted
+              : false;
+          final newIsCompleted = !isCurrentlyCompleted;
+
+          // Update dailyStatuses for the target date
+          List<DailyPracticeStatus> updatedStatuses;
 
           if (existingIndex != -1) {
-            // Update existing status for today
             updatedStatuses = List.from(section.dailyStatuses);
             updatedStatuses[existingIndex] =
                 section.dailyStatuses[existingIndex].copyWith(
@@ -34,25 +42,26 @@ mixin PracticeDailyCompletionMixin on PracticeRepositoryBase
               completedAt: newIsCompleted ? now : null,
             );
           } else if (newIsCompleted) {
-            // Create new completed status for today
             updatedStatuses = [
               ...section.dailyStatuses,
               DailyPracticeStatus(
                 id: uuid.v4(),
                 sectionId: sectionId,
-                date: today,
+                date: targetDate,
                 isCompleted: true,
                 completedAt: now,
               ),
             ];
           } else {
-            // Not completing and no existing status - keep as is
             updatedStatuses = section.dailyStatuses;
           }
 
+          // Only sync isCompleted global flag when toggling today
           final updatedSection = section.copyWith(
-            isCompleted: newIsCompleted,
-            completedAt: newIsCompleted ? now : null,
+            isCompleted: isToday ? newIsCompleted : section.isCompleted,
+            completedAt: isToday
+                ? (newIsCompleted ? now : null)
+                : section.completedAt,
             dailyStatuses: updatedStatuses,
             updatedAt: now,
           );

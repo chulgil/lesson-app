@@ -26,7 +26,7 @@ abstract class PracticeRepertoireRepository {
   Future<PracticeSection> createSection(PracticeSection section);
   Future<PracticeSection> updateSection(PracticeSection section);
   Future<void> deleteSection(String id);
-  Future<PracticeSection> toggleSectionComplete(String sectionId);
+  Future<PracticeSection> toggleSectionComplete(String sectionId, {DateTime? date});
   Future<PracticeSection> incrementPracticeCount(
       String sectionId, int practiceSeconds);
 
