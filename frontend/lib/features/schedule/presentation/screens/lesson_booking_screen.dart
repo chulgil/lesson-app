@@ -474,17 +474,38 @@ class _LessonBookingScreenState extends ConsumerState<LessonBookingScreen> {
             _buildChipGrid(slots),
           ],
 
-          // Trial lesson info section (shown after time selection)
-          if (widget.isTrialLesson && _selectedSlot != null) ...[
+          // Trial lesson info section
+          if (widget.isTrialLesson) ...[
             const SizedBox(height: AppSpacing.space4),
-            TrialLessonInfoSection(
-              selectedGoal: _trialGoal,
-              selectedExperience: _trialExperience,
-              messageController: _trialMessageController,
-              onGoalChanged: (goal) => setState(() => _trialGoal = goal),
-              onExperienceChanged: (exp) =>
-                  setState(() => _trialExperience = exp),
-            ),
+            if (_selectedSlot != null)
+              TrialLessonInfoSection(
+                selectedGoal: _trialGoal,
+                selectedExperience: _trialExperience,
+                messageController: _trialMessageController,
+                onGoalChanged: (goal) => setState(() => _trialGoal = goal),
+                onExperienceChanged: (exp) =>
+                    setState(() => _trialExperience = exp),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.touch_app_outlined,
+                      size: 16,
+                      color: AppColors.textTertiaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Text(
+                      '시간을 선택하면 추가 정보를 입력할 수 있습니다',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ],
       ),

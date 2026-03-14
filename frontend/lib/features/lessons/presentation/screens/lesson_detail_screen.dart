@@ -38,6 +38,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   int _recordingSeconds = 0;
   Timer? _feedbackDebounce;
   String? _pendingFeedbackText;
+  bool _proposalBannerDismissed = false;
 
   @override
   void initState() {
@@ -380,10 +381,12 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             const SizedBox(height: AppSpacing.space4),
           ],
 
-          // Regular lesson proposal banner (shown when teacher completes a lesson
-          // and there's no active subscription with this student)
+          // Regular lesson proposal banner (shown after feedback is written,
+          // when no active subscription exists with this student)
           if (widget.isTeacher &&
-              lesson.displayStatus == LessonStatus.completed)
+              lesson.displayStatus == LessonStatus.completed &&
+              !needsFeedback &&
+              !_proposalBannerDismissed)
             _buildRegularLessonProposalBanner(lesson),
 
           // Teacher notes section
@@ -498,11 +501,22 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.space2),
-                    Text(
-                      '정규 레슨을 제안해보세요',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        '정규 레슨을 제안해보세요',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () =>
+                          setState(() => _proposalBannerDismissed = true),
+                      child: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: AppColors.textTertiaryLight,
                       ),
                     ),
                   ],
