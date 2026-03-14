@@ -80,6 +80,10 @@ class AppColors {
   static const scheduleMutedBackground = Color(0xFFF5F5F5);
   static const scheduleMutedAccent = Color(0xFFBDBDBD);
 
+  // Schedule: travel time block colors
+  static const scheduleTravelBackground = Color(0xFFE8E0F0);
+  static const scheduleTravelAccent = Color(0xFF9E8BB8);
+
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
 

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,6 +20,9 @@ class MockTeacherAvailabilityRepository
 
   /// Recent lessons for recommendation (mock data)
   final Map<String, List<_MockLessonHistory>> _lessonHistory = {};
+
+  /// Student travel times (from ClassMembership, cached for slot computation)
+  final Map<String, int> _studentTravelTimes = {};
 
   MockTeacherAvailabilityRepository() {
     _initMockData();
@@ -94,6 +99,12 @@ class MockTeacherAvailabilityRepository
       ),
     ];
 
+    // Mock student travel times (from ClassMembership)
+    _studentTravelTimes['student_1'] = 20; // 홍길동 - 학생 집 방문 (20분)
+    _studentTravelTimes['student_2'] = 0;  // 학원 (이동 없음)
+    _studentTravelTimes['student_3'] = 0;  // 박민지 - 학원 (이동 없음)
+    _studentTravelTimes['student_4'] = 30; // 먼 거리 (30분)
+
     // Add pre-booked slots
     final nextTuesday = _getNextWeekday(now, DateTime.tuesday);
 
@@ -108,6 +119,7 @@ class MockTeacherAvailabilityRepository
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_1',
       bookedByStudentName: '홍길동',
+      travelTimeMinutes: 20,
     );
     _bookedSlots[student1Slot.id] = student1Slot;
 
@@ -123,6 +135,7 @@ class MockTeacherAvailabilityRepository
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_1',
       bookedByStudentName: '홍길동',
+      travelTimeMinutes: 20,
     );
     _bookedSlots[student1Slot2.id] = student1Slot2;
 
@@ -137,6 +150,7 @@ class MockTeacherAvailabilityRepository
       status: AvailabilitySlotStatus.booked,
       bookedByStudentId: 'student_3',
       bookedByStudentName: '박민지',
+      travelTimeMinutes: 0,
     );
     _bookedSlots[bookedSlot.id] = bookedSlot;
   }
@@ -502,14 +516,18 @@ class MockTeacherAvailabilityRepository
         }
 
         // Check if this slot conflicts with any booked slot
-        // Include breakTime buffer around booked slots
+        // Include breakTime + travelTime buffer around booked slots
         final breakTime = availability.breakTimeBetweenLessons;
+        final incomingTravelTime = currentStudentId != null
+            ? (_studentTravelTimes[currentStudentId] ?? 0)
+            : 0;
         final conflictingSlot = _findConflictingSlot(
           availability.teacherId,
           date,
           currentMinutes,
           currentMinutes + lessonDuration,
           breakTimeMinutes: breakTime,
+          incomingTravelTimeMinutes: incomingTravelTime,
         );
 
         AvailabilitySlotStatus status;
@@ -561,14 +579,16 @@ class MockTeacherAvailabilityRepository
   }
 
   /// Find any booked slot that conflicts with the given time range.
-  /// When breakTimeMinutes > 0, adds buffer around booked slots to prevent
-  /// back-to-back lessons without rest.
+  /// Uses asymmetric buffering:
+  /// - After booked slot: max(breakTime, incomingTravelTime) — teacher travels to new student
+  /// - Before booked slot: max(breakTime, bookedStudentTravelTime) — teacher travels to booked student
   AvailabilitySlot? _findConflictingSlot(
     String teacherId,
     DateTime date,
     int startMinutes,
     int endMinutes, {
     int breakTimeMinutes = 0,
+    int incomingTravelTimeMinutes = 0,
   }) {
     for (final slot in _bookedSlots.values) {
       if (slot.teacherId != teacherId) {
@@ -583,15 +603,24 @@ class MockTeacherAvailabilityRepository
       final bookedStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
       final bookedEndMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
 
-      // Expand booked range by breakTime to enforce rest between lessons
-      final effectiveBookedStart = bookedStartMinutes - breakTimeMinutes;
-      final effectiveBookedEnd = bookedEndMinutes + breakTimeMinutes;
+      // Buffer before booked slot: teacher needs to travel TO the booked student
+      final bufferBefore = math.max(breakTimeMinutes, slot.travelTimeMinutes);
+      // Buffer after booked slot: teacher needs to travel TO the incoming student
+      final bufferAfter = math.max(breakTimeMinutes, incomingTravelTimeMinutes);
+
+      final effectiveBookedStart = bookedStartMinutes - bufferBefore;
+      final effectiveBookedEnd = bookedEndMinutes + bufferAfter;
 
       if (startMinutes < effectiveBookedEnd && endMinutes > effectiveBookedStart) {
         return slot;
       }
     }
     return null;
+  }
+
+  /// Look up a student's travel time (from cached ClassMembership data)
+  int getStudentTravelTime(String studentId) {
+    return _studentTravelTimes[studentId] ?? 0;
   }
 
   bool _isRecommendedSlot(String studentId, DateTime date, TimeOfDay time) {

@@ -55,7 +55,7 @@ class MockLessonRepository implements LessonRepository {
         createdAt: today.subtract(const Duration(days: 14)),
       ),
 
-      // lesson_002: student_2 이서연, scheduled, 14:00, 피아노
+      // lesson_002: student_2 이서연, scheduled, 14:00, 피아노 (방문 레슨 → 이동 25분)
       Lesson(
         id: 'lesson_002',
         studentId: 'student_2',
@@ -67,6 +67,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '14:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        travelTimeMinutes: 25,
         pieces: const [
           LessonPiece(
             id: 'piece_003',
@@ -168,7 +169,7 @@ class MockLessonRepository implements LessonRepository {
         createdAt: today.subtract(const Duration(days: 2)),
       ),
 
-      // lesson_006: student_1 김민준, scheduled, 15:00, 바이올린
+      // lesson_006: student_1 김민준, scheduled, 15:00, 바이올린 (이동 20분)
       Lesson(
         id: 'lesson_006',
         studentId: 'student_1',
@@ -180,6 +181,7 @@ class MockLessonRepository implements LessonRepository {
         startTime: '15:00',
         duration: 60,
         status: LessonStatus.scheduled,
+        travelTimeMinutes: 20,
         pieces: const [
           LessonPiece(
             id: 'piece_008',

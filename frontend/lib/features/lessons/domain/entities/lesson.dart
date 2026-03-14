@@ -188,6 +188,7 @@ class Lesson {
   final List<String>? assignments;
   final LessonLocationInfo? location; // Lesson location
   final String? studentNote; // Student's own memo about the lesson
+  final int travelTimeMinutes; // Teacher's travel time after this lesson
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -210,6 +211,7 @@ class Lesson {
     this.assignments,
     this.location,
     this.studentNote,
+    this.travelTimeMinutes = 0,
     required this.createdAt,
     this.updatedAt,
   });
@@ -283,6 +285,7 @@ class Lesson {
     List<String>? assignments,
     LessonLocationInfo? location,
     String? studentNote,
+    int? travelTimeMinutes,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -305,6 +308,7 @@ class Lesson {
       assignments: assignments ?? this.assignments,
       location: location ?? this.location,
       studentNote: studentNote ?? this.studentNote,
+      travelTimeMinutes: travelTimeMinutes ?? this.travelTimeMinutes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

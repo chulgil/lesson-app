@@ -10,6 +10,7 @@ import '../../../features/profile/presentation/screens/tip_template_management_s
 import '../../../features/profile/presentation/screens/extended_profile_screen.dart';
 import '../../../features/profile/presentation/screens/education_edit_screen.dart';
 import '../../../features/profile/presentation/screens/career_edit_screen.dart';
+import '../../../features/profile/presentation/screens/basic_info_edit_screen.dart';
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/analytics/presentation/screens/teacher_dashboard_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
@@ -58,6 +59,13 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.extendedProfile,
     name: 'extendedProfile',
     builder: (context, state) => const ExtendedProfileScreen(),
+  ),
+
+  // Basic Info Edit
+  GoRoute(
+    path: AppRoutes.basicInfoEdit,
+    name: 'basicInfoEdit',
+    builder: (context, state) => const BasicInfoEditScreen(),
   ),
 
   // Education Edit

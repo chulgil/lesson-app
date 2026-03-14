@@ -299,6 +299,25 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     }
   }
 
+  /// Update basic info (name and/or introduction)
+  Future<void> updateBasicInfo({String? name, String? introduction}) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      final updated = await repo.updateProfile(
+        current.copyWith(
+          name: name ?? current.name,
+          introduction: introduction ?? current.introduction,
+        ),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   /// Update searchable setting
   Future<void> updateSearchable(bool isSearchable) async {
     final current = state.valueOrNull;

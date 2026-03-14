@@ -72,6 +72,7 @@ class AppRoutes {
   static const educationEdit = '/profile/education/edit';
   static const careerEdit = '/profile/career/edit';
   static const certificateEdit = '/profile/certificate/edit';
+  static const basicInfoEdit = '/profile/basic-info/edit';
   static const profileVisibility = '/profile/visibility';
   static const outstandingPayments = '/profile/outstanding-payments';
 

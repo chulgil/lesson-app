@@ -87,21 +87,29 @@ class TimelineLessonBlock extends StatelessWidget {
               ? Border.all(color: baseColors.accent, width: 1.5)
               : null,
         ),
-        child: Row(
+        child: Column(
           children: [
-            // Left accent bar
-            _AccentBar(color: colors.accent, isNow: isNow),
-            // Content
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                child: _buildContent(colors),
+              child: Row(
+                children: [
+                  // Left accent bar
+                  _AccentBar(color: colors.accent, isNow: isNow),
+                  // Content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      child: _buildContent(colors),
+                    ),
+                  ),
+                  // Badges
+                  if (isPast) _buildPastBadge(),
+                  if (isNext && minutesUntilNext > 0) _buildNextBadge(),
+                  const SizedBox(width: 8),
+                ],
               ),
             ),
-            // Badges
-            if (isPast) _buildPastBadge(),
-            if (isNext && minutesUntilNext > 0) _buildNextBadge(),
-            const SizedBox(width: 8),
+            // Travel time indicator at bottom of block
+            if (lesson.travelTimeMinutes > 0) _buildTravelIndicator(),
           ],
         ),
       ),
@@ -162,6 +170,23 @@ class TimelineLessonBlock extends StatelessWidget {
         color: isCompleted
             ? AppColors.success.withValues(alpha: 0.7)
             : AppColors.warning.withValues(alpha: 0.7),
+      ),
+    );
+  }
+
+  Widget _buildTravelIndicator() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 12, right: 8, bottom: 2),
+      child: Text(
+        '\u{1F697} ${lesson.travelTimeMinutes}min',
+        style: AppTypography.caption.copyWith(
+          color: AppColors.scheduleTravelAccent,
+          fontSize: 9,
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

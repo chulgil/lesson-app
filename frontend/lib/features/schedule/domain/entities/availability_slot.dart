@@ -25,6 +25,9 @@ class AvailabilitySlot {
   /// Whether this is a recommended time (student's usual time)
   final bool isRecommended;
 
+  /// Travel time for the booked student (copied from ClassMembership)
+  final int travelTimeMinutes;
+
   const AvailabilitySlot({
     required this.id,
     required this.teacherId,
@@ -37,6 +40,7 @@ class AvailabilitySlot {
     this.bookedByStudentName,
     this.lessonId,
     this.isRecommended = false,
+    this.travelTimeMinutes = 0,
   });
 
   AvailabilitySlot copyWith({
@@ -51,6 +55,7 @@ class AvailabilitySlot {
     String? bookedByStudentName,
     String? lessonId,
     bool? isRecommended,
+    int? travelTimeMinutes,
   }) {
     return AvailabilitySlot(
       id: id ?? this.id,
@@ -64,6 +69,7 @@ class AvailabilitySlot {
       bookedByStudentName: bookedByStudentName ?? this.bookedByStudentName,
       lessonId: lessonId ?? this.lessonId,
       isRecommended: isRecommended ?? this.isRecommended,
+      travelTimeMinutes: travelTimeMinutes ?? this.travelTimeMinutes,
     );
   }
 

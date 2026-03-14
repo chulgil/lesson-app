@@ -163,14 +163,20 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     final hour = (totalMinutes ~/ 60).clamp(0, 23);
     final minute = ((totalMinutes % 60) ~/ 30) * 30; // Snap to 30-min
 
-    // Check if tap is on an existing lesson (lesson blocks handle their own tap)
+    // Check if tap is on an existing lesson or travel time block
     for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
       final lessonStart = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final lessonEnd = lessonStart + lesson.duration;
+      final travelEnd = lessonEnd + lesson.travelTimeMinutes;
       final tappedMinutes = hour * 60 + minute;
       if (tappedMinutes >= lessonStart && tappedMinutes < lessonEnd) {
         return; // Lesson block's onTap will handle this
+      }
+      if (lesson.travelTimeMinutes > 0 &&
+          tappedMinutes >= lessonEnd &&
+          tappedMinutes < travelEnd) {
+        return; // Travel time block — ignore tap
       }
     }
 
@@ -209,11 +215,11 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       }
     }
 
-    // Consider lesson times (some lessons may be outside availability)
+    // Consider lesson times + travel time (some lessons may be outside availability)
     for (final lesson in sortedLessons) {
       final parts = lesson.startTime.split(':');
       final hour = int.parse(parts[0]);
-      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration;
+      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration + lesson.travelTimeMinutes;
       final endHour = (endMinutes / 60).ceil();
       if (hour < earliest) earliest = hour;
       if (endHour > latest) latest = endHour;
@@ -290,7 +296,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       }
     }
 
-    return lessons.map((lesson) {
+    final widgets = <Widget>[];
+
+    for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
       final lessonMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final endMinutes = lessonMinutes + lesson.duration;
@@ -302,27 +310,50 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           endMinutes > nowMinutes;
       final isNext = nextLesson?.id == lesson.id && nextMinutesUntil <= 60;
 
-      return Positioned(
-        top: top,
-        left: 52,
-        right: 0,
-        child: TimelineLessonBlock(
-          lesson: lesson,
-          isToday: _isToday,
-          isFuture: isFutureDate,
-          isNow: isNow,
-          isPast: isPast,
-          isNext: isNext,
-          minutesUntilNext: isNext ? nextMinutesUntil : 0,
-          onTap: () {
-            context.push(
-              AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
-            );
-          },
-          onLongPress: () => _showLessonActions(lesson),
+      // Lesson block
+      widgets.add(
+        Positioned(
+          top: top,
+          left: 52,
+          right: 0,
+          child: TimelineLessonBlock(
+            lesson: lesson,
+            isToday: _isToday,
+            isFuture: isFutureDate,
+            isNow: isNow,
+            isPast: isPast,
+            isNext: isNext,
+            minutesUntilNext: isNext ? nextMinutesUntil : 0,
+            onTap: () {
+              context.push(
+                AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+              );
+            },
+            onLongPress: () => _showLessonActions(lesson),
+          ),
         ),
       );
-    }).toList();
+
+      // Travel time block after lesson
+      if (lesson.travelTimeMinutes > 0) {
+        final travelTop = ((endMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+        final travelHeight = (lesson.travelTimeMinutes / 30.0) * _unitHeight;
+
+        widgets.add(
+          Positioned(
+            top: travelTop + 2, // 2px gap from lesson block
+            left: 52,
+            right: 0,
+            child: _TravelTimeBlock(
+              travelMinutes: lesson.travelTimeMinutes,
+              height: travelHeight,
+            ),
+          ),
+        );
+      }
+    }
+
+    return widgets;
   }
 
   Widget _buildNowIndicator(int startHour, double topPadding) {
@@ -514,5 +545,45 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         );
       }
     }
+  }
+}
+
+/// Travel time block displayed after a lesson in the timeline.
+class _TravelTimeBlock extends StatelessWidget {
+  final int travelMinutes;
+  final double height;
+
+  const _TravelTimeBlock({
+    required this.travelMinutes,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height.clamp(18.0, double.infinity),
+      decoration: BoxDecoration(
+        color: AppColors.scheduleTravelBackground,
+        borderRadius: BorderRadius.circular(6),
+        border: Border(
+          left: BorderSide(
+            color: AppColors.scheduleTravelAccent,
+            width: 3,
+          ),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        '이동 ${travelMinutes}min',
+        style: AppTypography.caption.copyWith(
+          color: AppColors.scheduleTravelAccent,
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 }

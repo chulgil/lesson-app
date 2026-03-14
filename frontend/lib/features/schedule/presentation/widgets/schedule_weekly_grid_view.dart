@@ -67,6 +67,9 @@ class _ScheduleWeeklyGridViewState
     // Group lessons by day and time
     final lessonMap = _buildLessonMap(lessons);
 
+    // Build travel time slot map
+    final travelSlotMap = _buildTravelSlotMap(lessons);
+
     // Count unique lessons per day (not slots)
     final uniqueLessonCounts = _countUniqueLessons(lessons);
 
@@ -98,6 +101,7 @@ class _ScheduleWeeklyGridViewState
                       endHour,
                       todayDate,
                       restDays,
+                      travelSlotMap: travelSlotMap,
                       todayIndex: todayIndex,
                       now: now,
                     ),
@@ -120,6 +124,7 @@ class _ScheduleWeeklyGridViewState
     int endHour,
     DateTime todayDate,
     Set<int> restDays, {
+    Map<int, Set<int>> travelSlotMap = const {},
     int todayIndex = -1,
     DateTime? now,
   }) {
@@ -172,6 +177,7 @@ class _ScheduleWeeklyGridViewState
                           lessonMap, dayIndex, hour * 60,
                           cellWidth, cellHeight,
                           dayType: dayType,
+                          travelSlots: travelSlotMap,
                         ),
                       ),
                       Expanded(
@@ -179,6 +185,7 @@ class _ScheduleWeeklyGridViewState
                           lessonMap, dayIndex, hour * 60 + 30,
                           cellWidth, cellHeight,
                           dayType: dayType,
+                          travelSlots: travelSlotMap,
                         ),
                       ),
                     ],
@@ -259,9 +266,39 @@ class _ScheduleWeeklyGridViewState
     double width,
     double height, {
     _DayType dayType = _DayType.future,
+    Map<int, Set<int>> travelSlots = const {},
   }) {
     final lesson = lessonMap[dayIndex]?[slotMinutes];
     if (lesson == null) {
+      // Check if this is a travel time slot
+      final isTravelSlot = travelSlots[dayIndex]?.contains(slotMinutes) ?? false;
+      if (isTravelSlot) {
+        return Container(
+          width: width - 2,
+          height: height,
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          decoration: BoxDecoration(
+            color: AppColors.scheduleTravelBackground,
+            border: Border(
+              left: BorderSide(
+                color: AppColors.scheduleTravelAccent,
+                width: 2,
+              ),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            '이동',
+            style: TextStyle(
+              color: AppColors.scheduleTravelAccent,
+              fontSize: 8,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+          ),
+        );
+      }
+
       // Empty slot — tap to add lesson at this time
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -426,11 +463,11 @@ class _ScheduleWeeklyGridViewState
       }
     }
 
-    // Include actual lesson hours
+    // Include actual lesson hours (+ travel time)
     for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
       final hour = int.parse(parts[0]);
-      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration;
+      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration + lesson.travelTimeMinutes;
       final endHour = (endMinutes / 60).ceil();
       if (hour < earliest) earliest = hour;
       if (endHour > latest) latest = endHour;
@@ -455,6 +492,33 @@ class _ScheduleWeeklyGridViewState
       final slotCount = (lesson.duration / 30.0).ceil();
       for (int i = 0; i < slotCount; i++) {
         map[dayIndex]![startMinutes + i * 30] = lesson;
+      }
+    }
+
+    return map;
+  }
+
+  /// Build a map: dayIndex (0-6) → Set of slotMinutes that are travel time
+  Map<int, Set<int>> _buildTravelSlotMap(List<Lesson> lessons) {
+    final map = <int, Set<int>>{};
+
+    for (final lesson in lessons) {
+      if (lesson.travelTimeMinutes <= 0) continue;
+
+      final dayIndex = lesson.date.weekday - 1;
+      final parts = lesson.startTime.split(':');
+      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final endMinutes = startMinutes + lesson.duration;
+
+      map.putIfAbsent(dayIndex, () => {});
+
+      // Fill 30-min slots that travel time covers after lesson end
+      final travelSlotCount = (lesson.travelTimeMinutes / 30.0).ceil();
+      for (int i = 0; i < travelSlotCount; i++) {
+        final slotMinutes = endMinutes + i * 30;
+        // Snap to nearest 30-min boundary
+        final snapped = (slotMinutes ~/ 30) * 30;
+        map[dayIndex]!.add(snapped);
       }
     }
 

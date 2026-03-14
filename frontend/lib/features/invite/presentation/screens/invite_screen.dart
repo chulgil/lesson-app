@@ -61,7 +61,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       ),
       body: inviteState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error.toString()),
+        error: (_, __) => _buildError(),
         data: (invite) {
           if (invite == null) {
             return const Center(child: CircularProgressIndicator());
@@ -72,7 +72,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     );
   }
 
-  Widget _buildError(String error) {
+  Widget _buildError() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -89,7 +89,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              error,
+              '잠시 후 다시 시도해주세요',
               style: AppTypography.bodySmall
                   .copyWith(color: AppColors.textSecondaryLight),
               textAlign: TextAlign.center,

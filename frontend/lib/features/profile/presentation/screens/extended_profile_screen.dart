@@ -73,8 +73,10 @@ class _ProfileContent extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Experience & Fee section
+          // Basic info section (name + introduction)
           _buildSectionTitle('기본 정보'),
+          const SizedBox(height: AppSpacing.space3),
+          _buildBasicInfoCard(context),
           const SizedBox(height: AppSpacing.space3),
           _buildExperienceCard(context, ref),
           const SizedBox(height: AppSpacing.space3),
@@ -137,6 +139,63 @@ class _ProfileContent extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildBasicInfoCard(BuildContext context) {
+    final introductionPreview = profile.introduction.length > 50
+        ? '${profile.introduction.substring(0, 50)}...'
+        : profile.introduction;
+
+    return InkWell(
+      onTap: () => context.push(AppRoutes.basicInfoEdit),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.cardPadding),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.person_outline,
+              color: AppColors.primary,
+              size: AppSpacing.iconMD,
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    profile.name,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (profile.introduction.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      introductionPreview,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.textTertiaryLight,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
