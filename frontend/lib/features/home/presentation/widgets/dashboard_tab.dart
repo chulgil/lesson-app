@@ -99,10 +99,10 @@ class DashboardTab extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.space2),
+            _buildUnpaidBanner(context, unpaidSummaryAsync),
             _buildStatsRow(
               context,
               todayLessons,
-              unpaidSummaryAsync,
               lessonStatsAsync,
             ),
 
@@ -176,10 +176,9 @@ class DashboardTab extends ConsumerWidget {
   Widget _buildStatsRow(
     BuildContext context,
     AsyncValue<List<Lesson>> todayLessons,
-    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
-    // Today's lesson card (always shown)
+    // Today's lesson card — unified primary color
     final todayCard = todayLessons.when(
       data:
           (lessons) => StatCard(
@@ -200,55 +199,92 @@ class DashboardTab extends ConsumerWidget {
               StatCard(title: '오늘 레슨', value: '-', color: AppColors.primary),
     );
 
-    // This month card (always shown)
+    // This month card — unified primary color (was success green)
     final monthCard = lessonStatsAsync.when(
       data:
           (stats) => StatCard(
             title: '이번 달',
             value: '${stats['completed'] ?? 0}회',
             subtitle: '완료',
-            color: AppColors.success,
+            color: AppColors.primary,
             icon: Icons.check_circle_outline,
           ),
       loading:
           () => StatCard(
             title: '이번 달',
             value: '-',
-            color: AppColors.success,
+            color: AppColors.primary,
             icon: Icons.check_circle_outline,
           ),
       error:
           (_, __) =>
-              StatCard(title: '이번 달', value: '-', color: AppColors.success),
+              StatCard(title: '이번 달', value: '-', color: AppColors.primary),
     );
 
-    // Unpaid card (only shown when totalAmount > 0)
+    // Always 2 cards — 미수금 is shown as a separate banner above
+    return StatCardRow(cards: [todayCard, monthCard]);
+  }
+
+  /// Unpaid amount banner — shown above stats row when outstanding payments exist.
+  Widget _buildUnpaidBanner(
+    BuildContext context,
+    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
+  ) {
     return unpaidSummaryAsync.when(
       data: (summary) {
-        final cards = <StatCard>[
-          todayCard,
-          if (summary.totalAmount > 0) ...[
-            () {
-              final formattedAmount =
-                  summary.totalAmount >= 10000
-                      ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
-                      : '${summary.totalAmount}원';
-              return StatCard(
-                title: '미수금',
-                value: formattedAmount,
-                subtitle: '${summary.studentCount}명',
-                color: AppColors.warning,
-                icon: Icons.account_balance_wallet_outlined,
-                onTap: () => context.push(AppRoutes.outstandingPayments),
-              );
-            }(),
-          ],
-          monthCard,
-        ];
-        return StatCardRow(cards: cards);
+        if (summary.totalAmount <= 0) return const SizedBox.shrink();
+
+        final formattedAmount =
+            summary.totalAmount >= 10000
+                ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
+                : '${summary.totalAmount}원';
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+          child: GestureDetector(
+            onTap: () => context.push(AppRoutes.outstandingPayments),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space4,
+                vertical: AppSpacing.space3,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.warningLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet_outlined,
+                    color: AppColors.warning,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(
+                    child: Text(
+                      '미수금 $formattedAmount (${summary.studentCount}명)',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: AppColors.textTertiaryLight,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
       },
-      loading: () => StatCardRow(cards: [todayCard, monthCard]),
-      error: (_, __) => StatCardRow(cards: [todayCard, monthCard]),
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 
@@ -259,51 +295,38 @@ class DashboardTab extends ConsumerWidget {
     final lessonCount = todayLessons.valueOrNull?.length ?? 0;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Icon(Icons.schedule, size: 20, color: AppColors.textSecondaryLight),
-            const SizedBox(width: AppSpacing.space2),
-            Text('오늘의 레슨', style: AppTypography.headingMedium),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              '($lessonCount)',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ],
-        ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () => context.push(AppRoutes.bulkFeedback),
-              child: Text(
-                '일괄 피드백',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primary,
+        Expanded(
+          child: Row(
+            children: [
+              Icon(Icons.schedule, size: 20, color: AppColors.textSecondaryLight),
+              const SizedBox(width: AppSpacing.space2),
+              Text('오늘의 레슨', style: AppTypography.headingMedium),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '($lessonCount)',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
                 ),
               ),
-            ),
-            TextButton(
-              onPressed: () => context.push(AppRoutes.quickFeedbackList),
-              child: Text(
-                '피드백',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primary,
-                ),
-              ),
-            ),
-            if (lessonCount > 3)
-              TextButton.icon(
-                onPressed: onViewAllLessons,
-                icon: const Icon(Icons.calendar_today, size: 16),
-                label: const Text('전체보기'),
-              ),
-          ],
+            ],
+          ),
         ),
+        TextButton(
+          onPressed: () => context.push(AppRoutes.bulkFeedback),
+          child: Text(
+            '일괄 피드백',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+        if (lessonCount > 3)
+          TextButton.icon(
+            onPressed: onViewAllLessons,
+            icon: const Icon(Icons.calendar_today, size: 16),
+            label: const Text('전체보기'),
+          ),
       ],
     );
   }
