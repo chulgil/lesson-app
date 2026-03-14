@@ -50,9 +50,9 @@ class TimelineLessonBlock extends StatelessWidget {
     final Color accentColor;
 
     if (!isToday && isFuture) {
-      // Future date: softened instrument colors
-      bgColor = baseColors.background.withValues(alpha: 0.6);
-      accentColor = baseColors.accent.withValues(alpha: 0.5);
+      // Future date: visibly lightened instrument colors
+      bgColor = Color.lerp(baseColors.background, Colors.white, 0.5)!;
+      accentColor = baseColors.accent.withValues(alpha: 0.45);
     } else if (!isToday) {
       // Past date: grey muted
       bgColor = AppColors.scheduleMutedBackground;

@@ -293,8 +293,8 @@ class _ScheduleWeeklyGridViewState
         );
       case _DayType.future:
         colors = InstrumentColorPair(
-          baseColors.background.withValues(alpha: 0.7),
-          baseColors.accent.withValues(alpha: 0.7),
+          Color.lerp(baseColors.background, Colors.white, 0.5)!,
+          baseColors.accent.withValues(alpha: 0.45),
         );
     }
 
