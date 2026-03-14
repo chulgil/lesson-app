@@ -12,6 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 
@@ -379,6 +380,12 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             const SizedBox(height: AppSpacing.space4),
           ],
 
+          // Regular lesson proposal banner (shown when teacher completes a lesson
+          // and there's no active subscription with this student)
+          if (widget.isTeacher &&
+              lesson.displayStatus == LessonStatus.completed)
+            _buildRegularLessonProposalBanner(lesson),
+
           // Teacher notes section
           if (widget.isTeacher) ...[
             LessonDetailSectionHeader(
@@ -441,6 +448,103 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           ),
         ],
       ),
+    );
+  }
+
+  /// Banner prompting teacher to propose regular lessons after a completed lesson.
+  /// Only shows when no active subscription exists for this student.
+  Widget _buildRegularLessonProposalBanner(Lesson lesson) {
+    if (lesson.teacherId == null) return const SizedBox.shrink();
+
+    final subscriptionAsync = ref.watch(
+      activeSubscriptionBetweenProvider(
+        studentId: lesson.studentId,
+        teacherId: lesson.teacherId!,
+      ),
+    );
+
+    return subscriptionAsync.when(
+      data: (subscription) {
+        // Has active subscription — no need to propose
+        if (subscription != null &&
+            (subscription.remainingLessons ?? 0) > 0) {
+          return const SizedBox.shrink();
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.08),
+                  AppColors.secondary.withValues(alpha: 0.08),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.school_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Text(
+                      '정규 레슨을 제안해보세요',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '수강권을 발급하면 정기 레슨을 시작할 수 있습니다.',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      context.push(
+                        '${AppRoutes.issueSubscription}?studentId=${lesson.studentId}',
+                      );
+                    },
+                    icon: const Icon(Icons.card_membership, size: 18),
+                    label: const Text('수강권 발급하기'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.space3,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 
