@@ -44,17 +44,33 @@ class ProfileTab extends ConsumerWidget {
             items: [
               _MenuItem(
                 icon: Icons.person_outline,
-                label: '프로필 상세 수정',
+                label: '프로필 수정',
                 onTap: () => context.push(AppRoutes.extendedProfile),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          _buildMenuSection(
+            title: '레슨 관리',
+            items: [
+              _MenuItem(
+                icon: Icons.access_time,
+                label: '레슨 시간 설정',
+                subtitle: '시간 길이, 쉬는시간, 시작 간격',
+                onTap: () => context.push(AppRoutes.lessonTimeSettings),
               ),
               _MenuItem(
                 icon: Icons.calendar_month,
-                label: '레슨 운영 시간',
+                label: '가용 시간 관리',
+                subtitle: '주간 스케줄, 휴무, 예외 시간',
                 onTap: () => context.push(AppRoutes.teacherAvailability),
               ),
               _MenuItem(
-                icon: Icons.policy_outlined,
-                label: '레슨 정책 설정',
+                icon: Icons.shield_outlined,
+                label: '취소/노쇼 정책',
+                subtitle: '변경 횟수, 취소 기한, 노쇼 처리',
                 onTap:
                     () => context.push(
                       '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
@@ -372,11 +388,25 @@ class ProfileTab extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
-              child: Text(
-                item.label,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: item.labelColor ?? AppColors.textPrimaryLight,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.label,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: item.labelColor ?? AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  if (item.subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      item.subtitle!,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
             if (item.trailing != null) item.trailing!,
@@ -417,6 +447,7 @@ class ProfileTab extends ConsumerWidget {
 class _MenuItem {
   final IconData icon;
   final String label;
+  final String? subtitle;
   final Color? labelColor;
   final Widget? trailing;
   final VoidCallback onTap;
@@ -424,6 +455,7 @@ class _MenuItem {
   _MenuItem({
     required this.icon,
     required this.label,
+    this.subtitle,
     this.labelColor,
     this.trailing,
     required this.onTap,
