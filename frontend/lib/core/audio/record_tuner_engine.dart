@@ -59,9 +59,14 @@ class RecordTunerEngine implements TunerEngine {
   bool _isInitialized = false;
   bool _isProcessingEnabled = false; // Whether to process pitch data
   bool _isStreamActive = false; // Whether recorder stream is active
+  bool _isRestarting = false; // Prevent concurrent restart attempts
   TunerNote? _currentNote;
   double _referenceFrequency;
   double _sensitivity = 0.5;
+
+  // Heartbeat: track when last audio data arrived to detect dead streams
+  DateTime? _lastDataTime;
+  static const _streamDeadThreshold = Duration(seconds: 2);
 
   // Buffer for accumulating audio samples
   final List<double> _sampleBuffer = [];
@@ -170,19 +175,57 @@ class RecordTunerEngine implements TunerEngine {
     if (_isStreamActive) return;
 
     final stream = await _recorder.startStream(
-      RecordConfig(
+      const RecordConfig(
         encoder: AudioEncoder.pcm16bits,
-        sampleRate: _config.sampleRate,
+        sampleRate: 44100,
         numChannels: 1,
+        // Prevent record package from overriding our audio session config
+        autoGain: false,
+        echoCancel: false,
+        noiseSuppress: false,
       ),
     );
 
+    _lastDataTime = DateTime.now();
     _audioSubscription = stream.listen(
       _onAudioData,
       onError: _onAudioError,
     );
 
     _isStreamActive = true;
+  }
+
+  /// Restart the recorder stream (e.g., after app resume when iOS killed AVAudioEngine).
+  Future<void> restartStream() async {
+    if (_isRestarting) return;
+    _isRestarting = true;
+
+    try {
+      // Force stop the dead stream
+      await _audioSubscription?.cancel();
+      _audioSubscription = null;
+      try {
+        await _recorder.stop();
+      } catch (_) {
+        // Recorder may already be stopped
+      }
+      _isStreamActive = false;
+      _sampleBuffer.clear();
+
+      // Start a fresh stream
+      await _startStream();
+    } catch (e) {
+      onError?.call('Failed to restart stream: $e');
+    } finally {
+      _isRestarting = false;
+    }
+  }
+
+  /// Check if the stream appears to be dead (no data received recently).
+  bool get isStreamDead {
+    if (!_isStreamActive) return true;
+    if (_lastDataTime == null) return true;
+    return DateTime.now().difference(_lastDataTime!) > _streamDeadThreshold;
   }
 
   /// Stop the recorder stream (internal helper).
@@ -246,7 +289,7 @@ class RecordTunerEngine implements TunerEngine {
 
   /// Enable pitch processing (stream must be active from warmUp or start).
   ///
-  /// This is instantaneous and doesn't block the main thread.
+  /// If the stream is dead (e.g., after app resume), restarts it first.
   @override
   void enableProcessing() {
     if (!_isStreamActive) {
@@ -309,6 +352,9 @@ class RecordTunerEngine implements TunerEngine {
 
   /// Process incoming audio data (PCM16 format).
   Future<void> _onAudioData(Uint8List data) async {
+    // Update heartbeat timestamp
+    _lastDataTime = DateTime.now();
+
     // Skip processing if not enabled (keep-warm mode)
     if (!_isProcessingEnabled) return;
 

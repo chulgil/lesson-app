@@ -88,6 +88,20 @@ class AudioSessionManager {
     }
   }
 
+  /// Re-activate the audio session after app resume or interruption end.
+  ///
+  /// iOS deactivates the audio session when the app goes to background.
+  /// This must be called before restarting any audio streams.
+  static Future<void> reactivate() async {
+    if (_session == null) return;
+    try {
+      await _session!.setActive(true);
+      _isInterrupted = false;
+    } catch (_) {
+      // Re-activation failed — another app may hold the session
+    }
+  }
+
   /// Check if audio session is configured.
   static bool get isConfigured => _isConfigured;
 

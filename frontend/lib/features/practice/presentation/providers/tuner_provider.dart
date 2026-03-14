@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/audio/audio_session_manager.dart';
 import '../../../../core/audio/mock_tuner_engine.dart';
 import '../../../../core/audio/record_tuner_engine.dart';
 import '../../../../core/audio/tuner_engine.dart';
@@ -109,8 +110,9 @@ class Tuner extends _$Tuner {
   NoteName? _lastDetectedNoteName;
   DateTime? _lastNoteTime;
 
-  // App lifecycle tracking - was listening before app paused?
+  // App lifecycle tracking
   bool _wasListeningBeforePause = false;
+  bool _isPaused = false; // Guard against inactive→paused double-call
 
   @override
   TunerProviderState build() {
@@ -455,7 +457,13 @@ class Tuner extends _$Tuner {
   /// Called when app goes to background (paused).
   /// Disables processing but keeps stream active for quick resume.
   Future<void> onAppPaused() async {
-    // Save current listening state BEFORE disabling
+    // Guard against inactive→paused double-call:
+    // iOS sends inactive first, then paused. Without this guard,
+    // the second call would see isListening=false and set
+    // _wasListeningBeforePause=false, breaking resume.
+    if (_isPaused) return;
+    _isPaused = true;
+
     _wasListeningBeforePause = state.isListening;
     if (_wasListeningBeforePause) {
       disableProcessing();
@@ -463,9 +471,10 @@ class Tuner extends _$Tuner {
   }
 
   /// Called when app returns to foreground (resumed).
-  /// Re-enables processing if it was active before pause.
-  /// Re-checks microphone permission in case it was revoked while backgrounded.
+  /// Restarts the audio stream (iOS kills AVAudioEngine on background)
+  /// and re-enables processing if it was active before pause.
   Future<void> onAppResumed() async {
+    _isPaused = false;
     if (!_wasListeningBeforePause) return;
     _wasListeningBeforePause = false;
 
@@ -481,7 +490,14 @@ class Tuner extends _$Tuner {
         );
         return;
       }
+
+      // Restart the audio stream — iOS deactivates AVAudioEngine on background,
+      // so the old stream is dead even though _isStreamActive is still true.
+      await engine.restartStream();
     }
+
+    // Re-activate the audio session
+    await AudioSessionManager.reactivate();
 
     enableProcessing();
   }
