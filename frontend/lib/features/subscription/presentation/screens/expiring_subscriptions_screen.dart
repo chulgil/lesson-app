@@ -21,6 +21,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
+    final expiredAsync = ref.watch(expiredSubscriptionsProvider);
     final studentsAsync = ref.watch(studentsProvider);
 
     return Scaffold(
@@ -33,18 +34,21 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
         ),
         title: expiringSoonAsync.when(
-          loading: () => const Text('수강권 임박'),
-          error: (_, __) => const Text('수강권 임박'),
+          loading: () => const Text('수강권 확인'),
+          error: (_, __) => const Text('수강권 확인'),
           data: (subscriptions) {
-            final studentCount =
-                subscriptions.map((s) => s.studentId).toSet().length;
+            final expiredSubs = expiredAsync.valueOrNull ?? [];
+            final allStudents = {
+              ...subscriptions.map((s) => s.studentId),
+              ...expiredSubs.map((s) => s.studentId),
+            };
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('수강권 임박'),
-                if (studentCount > 0)
+                const Text('수강권 확인'),
+                if (allStudents.isNotEmpty)
                   Text(
-                    '$studentCount명의 학생',
+                    '${allStudents.length}명의 학생',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.warning,
                       fontWeight: FontWeight.w600,
@@ -60,13 +64,16 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
         error: (_, __) =>
             const Center(child: Text('오류가 발생했습니다. 다시 시도해주세요.')),
         data: (subscriptions) {
-          if (subscriptions.isEmpty) {
+          final expiredSubs = expiredAsync.valueOrNull ?? [];
+          final allSubscriptions = [...subscriptions, ...expiredSubs];
+
+          if (allSubscriptions.isEmpty) {
             return _buildEmptyState();
           }
 
           // Group subscriptions by studentId
           final grouped = <String, List<Subscription>>{};
-          for (final sub in subscriptions) {
+          for (final sub in allSubscriptions) {
             grouped.putIfAbsent(sub.studentId, () => []).add(sub);
           }
 
@@ -92,9 +99,11 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
   }
 
   /// Returns urgency score (lower = more urgent).
+  /// Expired subscriptions get score -1 (most urgent).
   int _getUrgency(List<Subscription> subs) {
     int minUrgency = 999;
     for (final sub in subs) {
+      if (sub.status == SubscriptionStatus.expired) return -1;
       final remaining = sub.remainingLessons ?? 999;
       final days = sub.daysUntilExpiration ?? 999;
       final urgency = remaining < days ? remaining : days;
@@ -214,7 +223,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
-            '만료 임박 수강권이 없습니다',
+            '확인이 필요한 수강권이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
               color: AppColors.textSecondaryLight,
             ),
