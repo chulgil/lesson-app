@@ -1,10 +1,10 @@
-# CLAUDE.md - Lessonaza {#overview}
+# CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-03-12
+> 마지막 업데이트: 2026-03-14
 
 음악 레슨/연습 관리 앱 (Monorepo: docs + backend + frontend)
 
-## 빠른 참조 {#quick-reference}
+## 빠른 참조
 
 | 항목 | 값 |
 |------|-----|
@@ -14,396 +14,135 @@
 | 플랫폼 | iOS, Android |
 | 아키텍처 | Clean Architecture + Feature-based |
 
-## 프로젝트 구조 {#project-structure}
+## 프로젝트 구조
 
 ```
 lesson-app/
-├── docs/                    # 📚 프로젝트 문서
-│   ├── architecture.md      # 아키텍처 가이드
-│   ├── requirement/         # 요구사항
-│   ├── proposal/            # 기획 제안서
-│   ├── specs/[domain]/      # 기능 명세
-│   ├── schema/entities/     # 엔티티 스키마 (@HiveType, @JsonSerializable)
-│   ├── _components/         # UI 컴포넌트 가이드
-│   ├── _patterns/           # 디자인 패턴 가이드
-│   └── _tokens/             # 디자인 토큰 (색상, 타이포 등)
-│
-├── backend/                 # 🐍 FastAPI (개발 예정)
-│
+├── docs/                    # 요구사항, 스펙, 스키마, 아키텍처
+├── backend/                 # FastAPI (개발 예정)
 ├── frontend/lib/
-│   ├── core/                # 공통 (audio/, router/, widgets/, theme/, models/)
-│   ├── features/            # 🔑 기능별 모듈 (Clean Architecture)
-│   │   ├── [domain]/
-│   │   │   ├── domain/entities/          # 엔티티, Repository 인터페이스
-│   │   │   ├── data/repositories/        # Repository 구현체 (Mock)
-│   │   │   └── presentation/             # screens/, widgets/, providers/
-│   │   ├── lessons/         # 레슨 관리
-│   │   ├── practice/        # 연습 관리
-│   │   ├── students/        # 학생 관리
-│   │   ├── parent_home/     # 학부모 홈
-│   │   ├── profile/         # 프로필
-│   │   ├── notifications/   # 알림
-│   │   ├── onboarding/      # 온보딩
-│   │   └── search/          # 선생님 검색
-│   ├── models/              # ⚠️ 레거시 (re-export only)
-│   ├── providers/           # ⚠️ 레거시 (re-export only)
-│   └── repositories/        # ⚠️ 레거시 (re-export only)
+│   ├── core/                # 공통 (audio/, router/, widgets/, theme/, utils/)
+│   └── features/[domain]/   # 🔑 기능별 모듈
+│       ├── domain/entities/
+│       ├── data/repositories/
+│       └── presentation/    # screens/, widgets/, providers/
 └── frontend/ios/Runner/     # iOS 네이티브 (MetronomePlugin 등)
 ```
 
-> **⚠️ 새 코드는 반드시 `frontend/lib/features/[domain]/` 아래에 작성** (레거시 위치 X)
+> **⚠️ 새 코드는 반드시 `features/[domain]/` 아래에 작성** (레거시 `lib/models/`, `lib/providers/` 금지)
 
-→ [상세 아키텍처 가이드](docs/architecture.md)
+→ [상세 아키텍처](docs/architecture.md)
 
-## 명령어 {#commands}
+## 명령어
 
 ```bash
-# Frontend
 cd frontend
 flutter pub get                                              # 의존성
 flutter run                                                  # 실행
 dart run build_runner build --delete-conflicting-outputs      # 코드 생성
 flutter analyze                                              # 분석
-
-# Backend
-cd backend && uv sync && uv run uvicorn app.main:app --reload
-
-# 기기 배포 (데이터 유지하며 배포 권장)
-flutter run -d <device_id> --release
-# ⚠️ flutter install은 앱 삭제 후 재설치 → 녹음 파일 삭제됨
+flutter run -d <device_id> --release                         # 기기 배포
 ```
 
 ---
 
-## Claude 작업 지침 {#claude-guidelines}
+## 작업 지침
 
-### 📋 작업 시작 전 체크리스트
+### 작업 시작 전
 
 ```
-1. docs/architecture.md      → 폴더 구조 파악
-2. docs/requirement/         → 요구사항 확인
-3. docs/specs/[domain]/      → 관련 스펙 확인
-4. docs/refactoring_tasks.md → 리팩토링 현황
+1. docs/architecture.md  → 구조 파악
+2. docs/specs/[domain]/  → 관련 스펙 확인
+3. docs/requirement/     → 요구사항 확인
 ```
 
-### 📝 스펙 우선 개발 (Spec-First Development)
+### 스펙 우선 개발
 
 > ⚠️ **필수**: 요구사항 → 스펙 문서 → 사용자 승인 → 코드 구현
 
 | 상황 | Claude 행동 |
 |------|------------|
-| 새 기능 요청 | `docs/specs/[domain]/`에 스펙 작성 → 사용자 확인 → 구현 |
-| 기존 기능 수정 | 기존 스펙 확인 → 변경사항 반영 → 사용자 확인 → 구현 |
-| 버그 수정 | 스펙과 실제 동작 비교 → 코드 수정 (스펙이 틀리면 함께 수정) |
-| 간단한 UI 조정 | 스펙 업데이트 불필요 (사용자 판단) |
+| 새 기능 | `docs/specs/[domain]/`에 스펙 작성 → 사용자 확인 → 구현 |
+| 기존 수정 | 기존 스펙 확인 → 변경 반영 → 사용자 확인 → 구현 |
+| 버그 수정 | 스펙과 동작 비교 → 코드 수정 |
 
-**스펙 문서 위치**:
-- 도메인 기능: `docs/specs/[domain]/`
-- 엔티티 스키마: `docs/schema/entities/` (@HiveType, @JsonSerializable 클래스)
-- UI/UX 설계: `docs/specs/design/`
-
-**스펙 필수 포함**: 개요, 상세 동작(플로우/조건/예외), UI 구조, 관련 엔티티/Provider, 변경 이력
-
-### 📁 새 코드 작성 위치
+### 새 코드 작성 위치
 
 | 항목 | 위치 |
 |------|------|
-| 모델/엔티티 | `features/[domain]/domain/entities/` |
-| Provider | `features/[domain]/presentation/providers/` (@riverpod 어노테이션) |
-| 화면 | `features/[domain]/presentation/screens/` |
-| 위젯 | `features/[domain]/presentation/widgets/` |
-| 라우트 | `core/router/routes/` + `core/router/app_routes.dart` 상수 추가 |
+| 엔티티 | `features/[domain]/domain/entities/` |
+| Provider | `features/[domain]/presentation/providers/` (@riverpod) |
+| 화면/위젯 | `features/[domain]/presentation/screens/`, `widgets/` |
+| 라우트 | `core/router/routes/` + `app_routes.dart` 상수 |
 
-### ✅ 작업 완료 체크리스트
+### 작업 완료 체크리스트
 
 1. [ ] `flutter analyze` 경고 없음
-2. [ ] `dart run build_runner build --delete-conflicting-outputs` 코드 생성
-3. [ ] Mock Repository에 테스트 데이터 존재 확인
-4. [ ] 관련 `docs/specs/` 문서 업데이트
+2. [ ] `build_runner build` 코드 생성
+3. [ ] Mock Repository 테스트 데이터 확인
+4. [ ] `docs/specs/` 문서 업데이트
 5. [ ] 커밋 메시지 한글 (Conventional Commits)
-6. [ ] **하드코딩 색상 검사**: 변경 파일에 `Color(0x` 패턴 없음 → 있으면 `AppColors` 상수로 교체
-7. [ ] **공통 유틸 사용 확인**: 이름 표시 = `NameUtils.givenName()`, 날짜 = `formatDateYMD()`, 라우트 = `AppRoutes.*`
-
-### 🎨 UI 필수 규칙
-
-**UI 일관성**: 동일 기능은 동일 UI 패턴 사용 → 기존 패턴과 다르게 구현하려면 **반드시 사용자 동의**
-
-**⚠️ 코딩 시작 전 필수 조회 (HARD-GATE)**:
-새 UI 코드 작성 전 반드시 아래를 먼저 확인하라. 확인 없이 코드 작성 금지.
-1. `AppColors` 클래스 읽기 → 필요한 색상이 이미 있는지 확인. 없으면 상수 추가 후 사용
-2. `core/utils/` 목록 확인 → `NameUtils`, `date_format_utils`, `instrument_colors` 등 기존 유틸 사용
-3. `core/widgets/` 목록 확인 → 기존 공통 위젯이 있으면 그것을 사용
-
-**공통 위젯 우선 사용** (`core/widgets/`):
-- `selectors/`: LessonCount, LessonDuration, ValidityPeriod, DiscountPercent, BonusCount
-- `WeekCalendarWidget`, `StatCard`, `QuickToolButton`, `PracticeCenterButton`
-- 새 위젯 작성 전 반드시 기존 공통 위젯 확인 → 있으면 사용 (직접 구현 금지)
-
-**공통 유틸 필수 사용** (`core/utils/`):
-- 이름 표시: `NameUtils.givenName()` (성 제외, CJK/Western 자동 분리)
-- 날짜 포맷: `formatDateYMD()` (인라인 포맷 금지)
-- 악기 색상: `InstrumentColors.getColor()` → `InstrumentColorPair`
-- 스케줄 뮤트 색상: `AppColors.scheduleMutedBackground`, `AppColors.scheduleMutedAccent`
-
-**원샷 UX 원칙**: 한 번 탭으로 모든 연관 작업 완료 (알림, 상태, 스케줄 자동 처리)
-
-→ [상세 UX 가이드라인](docs/specs/design/ux_guidelines.md)
 
 ---
 
-## 핵심 규칙 {#core-rules}
+## UI 필수 규칙
+
+**⚠️ 코딩 전 필수 조회 (HARD-GATE):**
+1. `AppColors` 클래스 → 색상 확인 (없으면 상수 추가)
+2. `core/utils/` → 기존 유틸 사용 (NameUtils, date_format_utils 등)
+3. `core/widgets/` → 기존 공통 위젯 확인
+
+**공통 유틸 필수 사용:**
+- 이름: `NameUtils.givenName()` | 날짜: `formatDateYMD()` | 악기색상: `InstrumentColors.getColor()`
+- 스케줄 뮤트: `AppColors.scheduleMutedBackground`, `AppColors.scheduleMutedAccent`
+
+**원샷 UX**: 한 번 탭으로 모든 연관 작업 완료 → [UX 가이드라인](docs/specs/design/ux_guidelines.md)
+
+---
+
+## 핵심 규칙
 
 | 항목 | 규칙 |
 |------|------|
 | 응답 언어 | 한글 (코드 주석은 영어) |
-| 커밋 메시지 | 한글, Conventional Commits (`feat: 기능 추가`) |
-| 색상 | `AppColors` 클래스만 사용 (Primary: #6B5B95, Secondary: #F4A460, BG: #FFFAF5) |
-| 위젯 크기 | 500줄 이상 지양 → 별도 파일 분리 |
+| 커밋 메시지 | 한글, Conventional Commits |
+| 색상 | `AppColors`만 사용 (Primary: #6B5B95, BG: #FFFAF5) |
+| 위젯 크기 | 500줄 이상 → 별도 파일 분리 |
 | Repository | 인터페이스 + Mock 분리, @riverpod 사용 |
-| 하위 호환 | 레거시 위치에 re-export 패턴 유지 |
 
-### 코드 스타일 예시 {#code-style}
-
-```dart
-// Provider pattern example
-@riverpod
-class LessonNotifier extends _$LessonNotifier {
-  @override
-  Future<List<Lesson>> build() async {
-    return ref.read(lessonRepositoryProvider).getAll();
-  }
-
-  Future<void> add(Lesson lesson) async {
-    await ref.read(lessonRepositoryProvider).add(lesson);
-    ref.invalidateSelf();
-  }
-}
-```
-
----
-
-## 경계 규칙 {#boundaries}
-
-### Always (항상)
+### Always
 - `@riverpod` 어노테이션 사용
 - 새 코드는 `features/[domain]/` 아래만 작성
 - `AppColors` 클래스만 사용 (하드코딩 금지)
 - 기존 공통 위젯 (`core/widgets/`) 우선 사용
-- 스펙 문서 → 사용자 승인 → 코드 구현 순서 준수
 
-### Ask First (먼저 물어볼 것)
-- 아키텍처 변경
-- 새 패키지 의존성 추가
-- 데이터 스키마 변경
-- 기존 UI 패턴과 다른 구현
+### Ask First
+- 아키텍처 변경, 새 패키지 추가, 데이터 스키마 변경, 기존 UI 패턴과 다른 구현
 
-### Never (절대 금지)
-- secrets 하드코딩
-- 레거시 위치(`lib/models/`, `lib/providers/`)에 새 코드 작성
-- 외부 메트로놈 패키지 사용
-- 사용자 확인 전 이슈 닫기
-- `Color(0x...)` 하드코딩 — 반드시 `AppColors.xxx` 상수 사용
-- `lesson.studentName` 직접 표시 — `NameUtils.givenName(lesson.studentName)` 사용
-- 인라인 날짜 포맷 — `formatDateYMD()` 또는 `DateFormat` 공통 패턴 사용
+### Never
+- `Color(0x...)` 하드코딩, `lesson.studentName` 직접 표시, 인라인 날짜 포맷
+- 레거시 위치에 새 코드 작성, 외부 메트로놈 패키지, 사용자 확인 전 이슈 닫기
 
 ---
 
-## Claude가 자주 틀리는 것 {#common-mistakes}
+## 자주 틀리는 것
 
 | 오류 | 원인 | 해결 |
 |------|------|------|
-| 빈 화면 | Repository AutoDispose | `@Riverpod(keepAlive: true)` 추가 |
-| mouse_tracker 에러 | Dropdown 내 Row + Expanded | `Flexible` + `isExpanded: true` |
-| Dropdown assertion | value가 items에 없음 | 유효성 검증 후 null 처리 |
+| 빈 화면 | Repository AutoDispose | `@Riverpod(keepAlive: true)` |
+| mouse_tracker | Dropdown 내 Row+Expanded | `Flexible` + `isExpanded: true` |
 | Provider not found | 코드 생성 미완료 | `build_runner build` 실행 |
-| go_router extra | ShellRoute에서 extra 전달 누락 | `GoRouterState.of(context)` 확인 |
-| Mock 데이터 변경 후 크래시 | Hive 캐시된 이전 데이터와 새 enum/타입 충돌 | 앱 삭제 후 재설치 또는 Hive box 초기화 |
-| 튜너 음 끊김 | stream + callback 이중 경로로 상태 충돌 | 단일 경로(stream)만 사용, callback 제거 |
-| 튜너 불안정 감지 | StabilityFilter에서 낮은 확률 시 smoothedFrequency 미리셋 | probability 미달 시 `_smoothedFrequency = 0` 리셋 필수 |
-| 0.5px BOTTOM OVERFLOW | BoxDecoration border가 content 영역 침범 | border를 별도 Container로 분리, children은 Expanded 사용 |
+| go_router extra 누락 | ShellRoute에서 extra 미전달 | `GoRouterState.of(context)` |
+| Mock 변경 후 크래시 | Hive 캐시 충돌 | 앱 삭제 후 재설치 |
+| 0.5px OVERFLOW | BoxDecoration border 침범 | border를 별도 Container로 분리 |
 
 ---
 
-## Issue 기반 작업 {#issue-workflow}
+## 분리된 규칙 파일 (`.claude/rules/`)
 
-### Claude 행동 지침
-
-사용자가 간단히 요청해도 다음을 수행:
-1. 관련 코드/스펙 파악
-2. 상세 본문 작성 (문제, 관련 파일, 예상 원인)
-3. 라벨 자동 선택 후 이슈 생성
-
-### 라벨 체계
-
-| 카테고리 | 라벨 |
-|----------|------|
-| 타입 | `bug`, `feature`, `enhancement`, `refactor`, `docs`, `test`, `claude` |
-| 우선순위 | `priority: critical/high/medium/low` |
-| 도메인 | `domain: lesson/student/parent/practice/payment/schedule/notification/auth/recording/metronome/profile` |
-| 상태 | `status: todo/in-progress/blocked/review/done` |
-
-### 워크플로우
-
-```
-1. 이슈 생성 + 라벨 지정
-2. 브랜치: fix/42-description, feat/15-description, refactor/28-description
-3. 커밋: "fix(도메인): 설명\n\nRefs #42"
-4. 구현 완료 → status: review (사용자 확인 대기)
-5. 사용자 확인 후 → status: done + 이슈 닫기
-```
-
-> ⚠️ 기능 구현 후 사용자가 테스트/확인하기 전까지 이슈를 닫지 않습니다.
-
-### 복잡한 작업 (3시간+)
-
-TODO.md로 Phase 기반 관리 → Issue 참조, 세션별 Phase 진행, 완료 시 Issue에 코멘트
-
----
-
-## 메트로놈 개발 지침 {#metronome-guidelines}
-
-> ⚠️ 반드시 커스텀 `MetronomePlugin`만 사용 (외부 패키지 금지)
-
-| 레이어 | 파일 |
-|--------|------|
-| Provider | `features/practice/presentation/providers/metronome_provider.dart` |
-| Dart Engine | `core/audio/native_metronome_engine.dart` (macOS: `soloud_metronome_engine.dart`) |
-| iOS Plugin | `ios/Runner/MetronomePlugin.swift` |
-| iOS Engine | `ios/Runner/Audio/MetronomeAudioEngine.swift` |
-
-핵심: `soundPattern: [Bool]` 배열로 쉼표(rest) 패턴 지원, `AppDelegate`에 플러그인 등록 필수
-
----
-
-## 구현 현황 {#implementation-status}
-
-### 진행중
-- 스마트 녹음 트림 후 실제 재생 시간 표시 (Issue #7)
-- 연습완료 날짜별 완료 상태 동기화 (Issue #8)
-
-### 최근 완료
-- 프로필 이미지 선택 (#150) — image_picker + image_cropper + 로컬 저장
-- 가용시간 → 레슨 운영 시간 설정 통합 UX 재설계 (#152) — 4섹션 통합 화면
-- 일괄 피드백 3단계 위저드 (#149) — 학생 선택·공통+개별 피드백·미리보기
-- 커스텀 피드백 프리셋 관리 (#148) — 엔티티+Mock+Provider+인라인 추가/삭제
-- 수기 선생님 편집/삭제 PopupMenu (#116)
-- 수강권 Template-First UX 구현 (#145) — SelectableCard + 제안/즉시발급 분기
-- 레슨 상태 자동 완료 displayStatus (#153) + 정기 레슨 배치 생성 (#134)
-- 선생님 스케줄 뷰 — 타임라인 + 주간 그리드 + Invisible Design (#144, PR #146)
-- 선생님 UX 종합 점검 Phase 1+2 (#147) — 스케줄 UI 버그 + 학생관리 + 레슨노트
-- 수강권 임박 대시보드 빈 화면 → 선생님 전용 화면 생성 (#142)
-- 레슨 요청 화면 캘린더 제거 → 상태 기반 전체 리스트 통일 (#141)
-- 아키텍처·인덱스·스키마 문서 전체 점검 및 갱신 (docs PR)
-- 학생 UX 점검 10차 (#140) — 62파일 에러메시지·NO-OP 버튼·하드코딩 라우트 수정
-- 선생님 UX 점검 9차 (#139) — NO-OP 버튼, 빈 핸들러, 에러메시지, 초대 네비게이션 수정
-- 선생님 UX 점검 6차 (#136) — 레슨 완료 UI, 날짜 포맷 통일, 에러 처리, 경로 정리
-- 학생 UX 점검 5차 (#135) — 대시보드 동적화, 수기선생님 go_router 전환, 코드 품질 개선
-- 선생님 UX 점검 5차 (#133) — 시작 가이드 경로, teacherName 동적화, 프리셋 통합, 날짜 포맷
-- 학생 UX 점검 4차 (#132) — 프로필 동적 데이터, 온보딩 저장, 스케줄 확인 완성
-- 선생님 UX 점검 4차 (#128~#131) — 레슨 충돌 방지, 삭제 버튼 정리, 대시보드 개선, 피드백 프리셋
-- 학생 UX 점검 3차 (#124~#127) — 시작 가이드, 레슨노트 UX, 스케줄 개선, 수기 선생님 관리
-- 선생님 UX 점검 2차 (#118~#123) — EditStudent DB 연동, 시작 가이드, 요일별 시간, 피드백 프리셋, 학생 퀵셀렉트
-- 선생님 UX 점검 1차 (#104~#112) — 빈 상태 CTA, 스와이프 액션, QuickFeedback 확장, 정렬, 색상 구분
-- 과제 대시보드 (Issue #101) — 전체 학생 주간 과제 현황
-- 게이미피케이션 Phase 1 (Issue #98) — 포인트/레벨/뱃지 시스템
-- 선생님 분석 대시보드 (Issue #97) — 월별 통계/차트/연습률 랭킹
-
-### 예정
-- 푸시 알림 (FCM) → 백엔드 API (FastAPI) → OAuth 연동
-
----
-
-## 문제 해결 {#troubleshooting}
-
-```bash
-# iOS 빌드 에러
-cd frontend/ios && pod install && cd .. && flutter clean && flutter pub get
-
-# Android 빌드 에러
-cd frontend/android && ./gradlew clean && cd .. && flutter clean && flutter pub get
-
-# Provider 코드 생성 에러
-cd frontend && dart run build_runner build --delete-conflicting-outputs
-
-# Mock 데이터 변경 후 앱 크래시 (Hive 캐시 충돌)
-# 1) 앱 삭제 후 재설치 또는
-# 2) flutter clean && flutter run (debug 모드로 먼저 확인)
-```
-
----
-
-# Lessons Learned
-
-## 1. Mock 데이터 대규모 변경 시 반드시 실행 검증 - error-pattern
-- **날짜**: 2026-03-06
-- **분류**: error-pattern
-- **교훈**: 병렬 에이전트로 4개 mock repository를 동시 변경(student 8→12, lesson 8→15, subscription 8→19, schedule card 1→5)한 후 앱이 즉시 크래시. `flutter analyze` 통과해도 런타임 크래시 가능. Hive에 캐시된 이전 데이터와 새 enum/타입 충돌이 원인일 수 있음.
-- **조치**: Mock 데이터 변경 후 반드시 `flutter run`으로 실행 검증. 대규모 변경은 단계적으로 진행하고 각 단계마다 실행 확인.
-
-## 2. 오디오 엔진 이벤트 경로는 반드시 단일화 - error-pattern
-- **날짜**: 2026-03-06
-- **분류**: error-pattern
-- **교훈**: TunerEngine에서 `noteStream`(stream)과 `onPitchDetected`(callback) 두 경로로 동시에 노트를 전달하면, provider에서 같은 노트를 2번 처리하여 상태 충돌 발생 (음 감지 → 즉시 사라짐 → 다시 감지 반복).
-- **조치**: stream만 사용하고 callback 제거. 오디오 파이프라인에서 데이터 흐름은 항상 단일 경로 유지.
-
-## 3. iPhone 배포 시 provisioning profile 사전 확인 - error-pattern
-- **날짜**: 2026-03-06
-- **분류**: error-pattern
-- **교훈**: `flutter run --release`로 iPhone 배포 시 provisioning profile 에러 빈번. CLI에서 `--allowProvisioningUpdates` 플래그가 flutter에서 지원되지 않음.
-- **조치**: 배포 전 Xcode에서 Signing & Capabilities 확인. 문제 시 Xcode에서 직접 빌드하거나 `xcodebuild -allowProvisioningUpdates` 사용.
-
-## 4. UX 반복 점검 10회의 교훈 — 전수 검사 필수 - automation-pattern
-- **날짜**: 2026-03-11
-- **분류**: automation-pattern
-- **교훈**: 선생님/학생 UX 점검 10회 반복. 9차 선생님(#139) + 10차 학생(#140)에서도 62파일 ~100건의 `$e` 노출·NO-OP 버튼·하드코딩 라우트 재발견. **기능 단위가 아닌 패턴 단위 grep이 핵심**.
-- **조치**: 새 화면 구현 시 반드시 아래 순서 준수:
-  1. 엔티티 + Provider 먼저 구현 (데이터 계층)
-  2. UI에서 Provider.watch로 바인딩 (하드코딩 문자열 금지)
-  3. save/submit/confirm 콜백에 실제 Provider 호출 구현 (TODO stub 금지)
-  4. **모든** Provider.notifier 호출에 try-catch (특히 delete/cancel 파괴적 작업)
-  5. AppRoutes 상수 사용 (`context.push('/')` 문자열 리터럴 zero)
-  6. 날짜는 `formatDateYMD()` 공통 유틸 사용 (인라인 포맷 금지)
-  7. 점검 시 **전체 코드베이스** grep (`context.push('/'`, `ref.read(.*notifier)` 등)
-  - 상세: [memory/ux-review-lessons.md](../../.claude/projects/-Users-r00360-Dev-personal-development-app-lesson-app/memory/ux-review-lessons.md)
-
-## 5. BoxDecoration border가 0.5px BOTTOM OVERFLOW 유발 - error-pattern
-- **날짜**: 2026-03-12
-- **분류**: error-pattern
-- **교훈**: `Container(height: H, decoration: BoxDecoration(border: Border(top: BorderSide(width: 0.5))))` 구조에서, border가 내부 공간을 차지하므로 Column children 합계가 H를 초과하여 0.5px BOTTOM OVERFLOW 발생. Flutter의 BoxDecoration border는 content 영역을 침범한다.
-- **조치**: border를 별도 `Container(height: 0.5)` 위젯으로 분리하고, 나머지 children을 `Expanded`로 감싸 남은 공간을 균등 분배. 또는 `clipBehavior: Clip.hardEdge` 적용.
-
-## 6. 하드코딩 색상 대신 AppColors 상수 사용 강제 - error-pattern
-- **날짜**: 2026-03-12
-- **분류**: error-pattern
-- **교훈**: 스케줄 뷰에서 `Color(0xFFF5F5F5)`, `Color(0xFFBDBDBD)` 등 하드코딩 색상을 사용하면, 테마 변경이나 다크모드 대응이 불가능하고, 동일 색상이 여러 파일에 분산되어 일관성 유지가 어려움.
-- **조치**: 새 색상이 필요하면 반드시 `AppColors`에 상수 추가 후 참조. 코드 리뷰 시 `Color(0x` 패턴 grep으로 하드코딩 검출.
-
-## 7. CJK 이름에서 성/이름 분리 필수 (글로벌 대응) - automation-pattern
-- **날짜**: 2026-03-12
-- **분류**: automation-pattern
-- **교훈**: 한국어 이름 "박지선"에서 "박"은 성, "지선"은 이름. 스케줄·알림 등 공간 제한 UI에서 이름(given name)만 표시하면 가독성이 크게 향상. 서양식 "John Smith"에서는 "John"이 given name. 향후 글로벌 진출 대비 `NameUtils.givenName()` 유틸을 사용하여 일관된 이름 표시.
-- **조치**: `core/utils/name_utils.dart`의 `NameUtils.givenName()` 사용. Student/Lesson 엔티티에 `firstName`/`lastName` 필드 추가는 백엔드 연동 시 진행 (현재는 유틸 함수로 파싱).
-
-## 8. 새 패키지 추가 시 iOS Info.plist 권한 문자열 필수 - error-pattern
-- **날짜**: 2026-03-13
-- **분류**: error-pattern
-- **교훈**: `image_picker`, `camera`, `photo_library` 등 하드웨어 접근 패키지 추가 시 iOS `Info.plist`에 `NSCameraUsageDescription`, `NSPhotoLibraryUsageDescription` 등 권한 문자열을 반드시 추가해야 한다. 누락하면 앱이 권한 요청 시 즉시 크래시(SIGABRT)하며, `flutter analyze`로는 감지 불가.
-- **조치**: pubspec.yaml에 새 패키지 추가 시 → iOS `Info.plist` + Android `AndroidManifest.xml` 권한 체크를 체크리스트에 포함. 특히 카메라(`NSCameraUsageDescription`), 사진(`NSPhotoLibraryUsageDescription`), 위치(`NSLocationWhenInUseUsageDescription`) 주의.
-
-## 9. 분산 설정 화면 → 단일 스크롤 통합이 UX 정답 - automation-pattern
-- **날짜**: 2026-03-13
-- **분류**: automation-pattern
-- **교훈**: 가용시간 관리(#152)에서 3개 화면(가용시간 관리, 주간 스케줄, 시간 예외)에 분산된 설정을 단일 스크롤 화면 4섹션으로 통합하니 진입 경로 3→2단계로 축소 + 사용자 인지 부하 감소. **설정 화면이 3개 이상 분산되면 통합 검토 필수**.
-- **조치**: 새 설정 기능 설계 시 "한 화면에 모든 관련 설정 + 미리보기"를 기본으로 한다. 섹션 헤더(제목 + 부제 + 도움말)로 구분하면 스크롤 길이가 길어도 가독성 유지.
-
-## 10. build_runner 새 Provider는 전체 빌드 필수 - error-pattern
-- **날짜**: 2026-03-13
-- **분류**: error-pattern
-- **교훈**: `dart run build_runner build --build-filter="특정파일"` 옵션은 기존 파일 수정 시에만 유효. **새 `@riverpod` Provider 파일**은 `--build-filter`로 0 output이 나오며, 전체 빌드(`--delete-conflicting-outputs`)가 필요하다.
-- **조치**: 새 Provider 파일 생성 시 반드시 `dart run build_runner build --delete-conflicting-outputs` (전체 빌드) 실행. 기존 파일 수정 시에만 `--build-filter` 사용 가능.
-
-## 11. 새 기능 구현 순서: Entity → Mock → Provider → UI 바인딩 - automation-pattern
-- **날짜**: 2026-03-13
-- **분류**: automation-pattern
-- **교훈**: FeedbackPreset(#148), BulkFeedback(#149) 구현에서 Entity(@HiveType) → MockRepository → @riverpod Provider → UI(ref.watch) 순서로 구현하면 각 단계에서 컴파일 에러 없이 안정적으로 쌓아갈 수 있다. 반대로 UI부터 만들면 Provider 미존재로 에러 폭발.
-- **조치**: 새 기능 구현 시 반드시 데이터 계층 먼저 완성 → build_runner → UI 바인딩. 이 순서를 지키면 `flutter analyze` 통과율 100%.
+| 파일 | 내용 |
+|------|------|
+| `lessons-learned.md` | 14개 교훈 (에러/자동화 패턴) |
+| `issue-workflow.md` | 이슈 생성·라벨·브랜치·커밋 워크플로우 |
+| `metronome-guide.md` | 메트로놈 커스텀 플러그인 개발 지침 |
+| `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
