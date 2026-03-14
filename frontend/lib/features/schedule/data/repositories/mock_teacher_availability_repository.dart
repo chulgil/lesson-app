@@ -502,11 +502,14 @@ class MockTeacherAvailabilityRepository
         }
 
         // Check if this slot conflicts with any booked slot
+        // Include breakTime buffer around booked slots
+        final breakTime = availability.breakTimeBetweenLessons;
         final conflictingSlot = _findConflictingSlot(
           availability.teacherId,
           date,
           currentMinutes,
           currentMinutes + lessonDuration,
+          breakTimeMinutes: breakTime,
         );
 
         AvailabilitySlotStatus status;
@@ -557,13 +560,16 @@ class MockTeacherAvailabilityRepository
     return slots;
   }
 
-  /// Find any booked slot that conflicts with the given time range
+  /// Find any booked slot that conflicts with the given time range.
+  /// When breakTimeMinutes > 0, adds buffer around booked slots to prevent
+  /// back-to-back lessons without rest.
   AvailabilitySlot? _findConflictingSlot(
     String teacherId,
     DateTime date,
     int startMinutes,
-    int endMinutes,
-  ) {
+    int endMinutes, {
+    int breakTimeMinutes = 0,
+  }) {
     for (final slot in _bookedSlots.values) {
       if (slot.teacherId != teacherId) {
         continue;
@@ -574,13 +580,14 @@ class MockTeacherAvailabilityRepository
         continue;
       }
 
-      // Calculate booked slot's time range in minutes
       final bookedStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
       final bookedEndMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
 
-      // Check for overlap: two ranges overlap if one starts before the other ends
-      // [startMinutes, endMinutes) overlaps with [bookedStartMinutes, bookedEndMinutes)
-      if (startMinutes < bookedEndMinutes && endMinutes > bookedStartMinutes) {
+      // Expand booked range by breakTime to enforce rest between lessons
+      final effectiveBookedStart = bookedStartMinutes - breakTimeMinutes;
+      final effectiveBookedEnd = bookedEndMinutes + breakTimeMinutes;
+
+      if (startMinutes < effectiveBookedEnd && endMinutes > effectiveBookedStart) {
         return slot;
       }
     }
