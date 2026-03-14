@@ -19,28 +19,22 @@ class StudentStatsCards extends StatelessWidget {
       children: [
         Expanded(
           child: StudentStatCard(
-            icon: Icons.calendar_month,
             value: '${student.totalLessons}',
             label: '총 레슨',
-            color: AppColors.primary,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: StudentStatCard(
-            icon: Icons.event_note,
             value: '${student.monthlyLessons}',
             label: '이번 달',
-            color: AppColors.secondary,
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: StudentStatCard(
-            icon: Icons.fitness_center,
             value: '${student.practiceRate}일',
             label: '주간 연습',
-            color: student.practiceStatus.color,
           ),
         ),
       ],
@@ -48,37 +42,38 @@ class StudentStatsCards extends StatelessWidget {
   }
 }
 
-/// Individual stat card widget
+/// Individual stat card widget — neutral tone, no icon
 class StudentStatCard extends StatelessWidget {
-  final IconData icon;
   final String value;
   final String label;
-  final Color color;
 
   const StudentStatCard({
     super.key,
-    required this.icon,
     required this.value,
     required this.label,
-    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space4,
+      ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: AppColors.surfaceSecondaryLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: AppSpacing.space2),
           Text(
             value,
-            style: AppTypography.headingMedium.copyWith(color: color),
+            style: AppTypography.headingMedium.copyWith(
+              color: AppColors.textPrimaryLight,
+            ),
           ),
+          const SizedBox(height: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(

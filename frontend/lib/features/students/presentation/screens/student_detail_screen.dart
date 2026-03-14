@@ -127,23 +127,18 @@ class _StudentDetailContent extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Stats cards
+                    // Stats cards (neutral tone, no icons)
                     StudentStatsCards(student: student),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Upcoming lessons — teacher's primary concern
+                    StudentUpcomingLessonsSection(studentId: student.id),
 
                     const SizedBox(height: AppSpacing.space6),
 
                     // Subscription status (수강권 현황)
                     StudentSubscriptionSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Practice progress this week
-                    StudentPracticeSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Upcoming lessons
-                    StudentUpcomingLessonsSection(studentId: student.id),
 
                     const SizedBox(height: AppSpacing.space6),
 
@@ -154,6 +149,11 @@ class _StudentDetailContent extends ConsumerWidget {
 
                     // Lesson notes history
                     StudentNotesSection(studentId: student.id),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Practice progress this week
+                    StudentPracticeSection(studentId: student.id),
 
                     const SizedBox(height: AppSpacing.space8),
                   ],
