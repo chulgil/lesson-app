@@ -153,6 +153,22 @@ class ScheduleConfirmationCard extends HiveObject {
   @HiveField(14)
   final String? lessonRequestId;
 
+  /// Alternative suggestion 2 (day 1=Mon..7=Sun)
+  @HiveField(15)
+  final int? suggestedDay2;
+
+  /// Alternative suggestion 2 time (e.g., "16:00")
+  @HiveField(16)
+  final String? suggestedTime2;
+
+  /// Alternative suggestion 3 (day 1=Mon..7=Sun)
+  @HiveField(17)
+  final int? suggestedDay3;
+
+  /// Alternative suggestion 3 time (e.g., "14:00")
+  @HiveField(18)
+  final String? suggestedTime3;
+
   ScheduleConfirmationCard({
     required this.id,
     required this.studentId,
@@ -169,6 +185,10 @@ class ScheduleConfirmationCard extends HiveObject {
     this.respondedAt,
     this.totalLessons,
     this.lessonRequestId,
+    this.suggestedDay2,
+    this.suggestedTime2,
+    this.suggestedDay3,
+    this.suggestedTime3,
   });
 
   factory ScheduleConfirmationCard.fromJson(Map<String, dynamic> json) =>
@@ -179,6 +199,54 @@ class ScheduleConfirmationCard extends HiveObject {
   /// Whether the card has a suggested schedule
   bool get hasSuggestedSchedule =>
       suggestedDay != null && suggestedTime != null;
+
+  /// Number of schedule options available (1-3)
+  int get optionCount {
+    if (suggestedDay3 != null && suggestedTime3 != null) return 3;
+    if (suggestedDay2 != null && suggestedTime2 != null) return 2;
+    if (hasSuggestedSchedule) return 1;
+    return 0;
+  }
+
+  /// Whether the card has multiple schedule options
+  bool get hasMultipleOptions => optionCount >= 2;
+
+  /// Get all suggested options as formatted strings
+  List<String> get formattedOptions {
+    final dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+    final duration = lessonDuration != null ? ' ($lessonDuration분)' : '';
+    final options = <String>[];
+
+    if (suggestedDay != null && suggestedTime != null) {
+      options.add('매주 ${dayNames[suggestedDay!]}요일 $suggestedTime$duration');
+    }
+    if (suggestedDay2 != null && suggestedTime2 != null) {
+      options.add('매주 ${dayNames[suggestedDay2!]}요일 $suggestedTime2$duration');
+    }
+    if (suggestedDay3 != null && suggestedTime3 != null) {
+      options.add('매주 ${dayNames[suggestedDay3!]}요일 $suggestedTime3$duration');
+    }
+    return options;
+  }
+
+  /// Get day/time pair for a specific option index (0-based)
+  ({int day, String time})? getOption(int index) {
+    switch (index) {
+      case 0:
+        if (suggestedDay != null && suggestedTime != null) {
+          return (day: suggestedDay!, time: suggestedTime!);
+        }
+      case 1:
+        if (suggestedDay2 != null && suggestedTime2 != null) {
+          return (day: suggestedDay2!, time: suggestedTime2!);
+        }
+      case 2:
+        if (suggestedDay3 != null && suggestedTime3 != null) {
+          return (day: suggestedDay3!, time: suggestedTime3!);
+        }
+    }
+    return null;
+  }
 
   /// Whether the card is still actionable
   bool get isActionable => status == ScheduleCardStatus.pending;
@@ -211,6 +279,10 @@ class ScheduleConfirmationCard extends HiveObject {
     DateTime? respondedAt,
     int? totalLessons,
     String? lessonRequestId,
+    int? suggestedDay2,
+    String? suggestedTime2,
+    int? suggestedDay3,
+    String? suggestedTime3,
   }) {
     return ScheduleConfirmationCard(
       id: id ?? this.id,
@@ -228,6 +300,10 @@ class ScheduleConfirmationCard extends HiveObject {
       respondedAt: respondedAt ?? this.respondedAt,
       totalLessons: totalLessons ?? this.totalLessons,
       lessonRequestId: lessonRequestId ?? this.lessonRequestId,
+      suggestedDay2: suggestedDay2 ?? this.suggestedDay2,
+      suggestedTime2: suggestedTime2 ?? this.suggestedTime2,
+      suggestedDay3: suggestedDay3 ?? this.suggestedDay3,
+      suggestedTime3: suggestedTime3 ?? this.suggestedTime3,
     );
   }
 

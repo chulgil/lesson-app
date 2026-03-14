@@ -13,6 +13,7 @@ import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
+import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 
@@ -241,6 +242,13 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     final suggestedTime = membership.lessonTime;
     final lessonDuration = membership.lessonDuration;
 
+    // Generate up to 2 alternative time slots from teacher's available schedule
+    final alternatives = await _getAlternativeSlots(
+      teacherId: lessonClassAsync?.teacherId ?? '',
+      primaryDay: suggestedDay,
+      primaryTime: suggestedTime,
+    );
+
     try {
       await ref
           .read(scheduleConfirmationCardNotifierProvider.notifier)
@@ -255,6 +263,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             suggestedDay: suggestedDay,
             suggestedTime: suggestedTime,
             lessonDuration: lessonDuration,
+            suggestedDay2: alternatives.isNotEmpty ? alternatives[0].day : null,
+            suggestedTime2: alternatives.isNotEmpty ? alternatives[0].time : null,
+            suggestedDay3: alternatives.length > 1 ? alternatives[1].day : null,
+            suggestedTime3: alternatives.length > 1 ? alternatives[1].time : null,
           );
     } catch (e) {
       debugPrint('Failed to create schedule confirmation card: $e');
@@ -295,6 +307,51 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     } catch (e) {
       debugPrint('Failed to detect schedule card type: $e');
       return ScheduleCardType.afterTrial;
+    }
+  }
+
+  /// Get up to 2 alternative time slots from teacher's weekly schedule.
+  /// Excludes the primary suggestion to avoid duplicates.
+  Future<List<({int day, String time})>> _getAlternativeSlots({
+    required String teacherId,
+    int? primaryDay,
+    String? primaryTime,
+  }) async {
+    try {
+      if (teacherId.isEmpty) return [];
+
+      // Use teacher's availability settings to find alternative slots
+      final settingsAsync = ref.read(teacherSettingsByIdProvider(teacherId));
+      final settings = settingsAsync.valueOrNull;
+      if (settings == null) return [];
+
+      final alternatives = <({int day, String time})>[];
+
+      // Collect unique day/time pairs from available slots
+      for (final slot in settings.availableSlots) {
+        if (!slot.isActive) continue;
+
+        final slotDay = slot.dayOfWeek;
+        final slotTimeStr =
+            '${slot.startTime.hour.toString().padLeft(2, '0')}:${slot.startTime.minute.toString().padLeft(2, '0')}';
+
+        // Skip the primary suggestion
+        if (slotDay == primaryDay && slotTimeStr == primaryTime) continue;
+
+        // Avoid duplicates
+        final isDuplicate = alternatives.any(
+          (a) => a.day == slotDay && a.time == slotTimeStr,
+        );
+        if (isDuplicate) continue;
+
+        alternatives.add((day: slotDay, time: slotTimeStr));
+        if (alternatives.length >= 2) break;
+      }
+
+      return alternatives;
+    } catch (e) {
+      debugPrint('Failed to get alternative slots: $e');
+      return [];
     }
   }
 

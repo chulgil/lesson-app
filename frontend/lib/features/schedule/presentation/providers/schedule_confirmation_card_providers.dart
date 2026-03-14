@@ -61,6 +61,10 @@ class ScheduleConfirmationCardNotifier
     required ScheduleCardType cardType,
     int? totalLessons,
     String? lessonRequestId,
+    int? suggestedDay2,
+    String? suggestedTime2,
+    int? suggestedDay3,
+    String? suggestedTime3,
   }) async {
     state = const AsyncLoading();
 
@@ -81,6 +85,10 @@ class ScheduleConfirmationCardNotifier
           createdAt: DateTime.now(),
           totalLessons: totalLessons,
           lessonRequestId: lessonRequestId,
+          suggestedDay2: suggestedDay2,
+          suggestedTime2: suggestedTime2,
+          suggestedDay3: suggestedDay3,
+          suggestedTime3: suggestedTime3,
         ),
       );
 

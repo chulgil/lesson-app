@@ -181,6 +181,8 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       return _buildNoSuggestionSection(context);
     }
 
+    final options = card.formattedOptions;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -193,7 +195,9 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
-              card.cardType.suggestionText,
+              card.hasMultipleOptions
+                  ? '원하시는 시간을 선택해주세요'
+                  : card.cardType.suggestionText,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
@@ -201,56 +205,91 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.3),
+
+        // Show all available options
+        for (int i = 0; i < options.length; i++) ...[
+          _buildScheduleOption(
+            context,
+            label: options[i],
+            isRecommended: i == 0,
+            optionIndex: i,
+          ),
+          if (i < options.length - 1)
+            const SizedBox(height: AppSpacing.space2),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildScheduleOption(
+    BuildContext context, {
+    required String label,
+    required bool isRecommended,
+    required int optionIndex,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: isRecommended
+            ? AppColors.primary.withValues(alpha: 0.08)
+            : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: isRecommended
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : AppColors.borderLight,
+        ),
+      ),
+      child: Row(
+        children: [
+          if (isRecommended)
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Icon(Icons.star, color: AppColors.primary, size: 16),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.textTertiaryLight.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Icon(
+                Icons.access_time,
+                color: AppColors.textSecondaryLight,
+                size: 16,
+              ),
+            ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (isRecommended)
+                  Text(
+                    _getScheduleTypeLabel(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight:
+                            isRecommended ? FontWeight.bold : FontWeight.w500,
+                      ),
+                ),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.space2),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Icon(
-                  Icons.star,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getScheduleTypeLabel(),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      card.formattedSuggestedSchedule ?? '',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

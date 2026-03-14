@@ -33,13 +33,17 @@ class ScheduleConfirmationCardAdapter
       respondedAt: fields[12] as DateTime?,
       totalLessons: fields[13] as int?,
       lessonRequestId: fields[14] as String?,
+      suggestedDay2: fields[15] as int?,
+      suggestedTime2: fields[16] as String?,
+      suggestedDay3: fields[17] as int?,
+      suggestedTime3: fields[18] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ScheduleConfirmationCard obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(19)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -69,7 +73,15 @@ class ScheduleConfirmationCardAdapter
       ..writeByte(13)
       ..write(obj.totalLessons)
       ..writeByte(14)
-      ..write(obj.lessonRequestId);
+      ..write(obj.lessonRequestId)
+      ..writeByte(15)
+      ..write(obj.suggestedDay2)
+      ..writeByte(16)
+      ..write(obj.suggestedTime2)
+      ..writeByte(17)
+      ..write(obj.suggestedDay3)
+      ..writeByte(18)
+      ..write(obj.suggestedTime3);
   }
 
   @override
@@ -202,6 +214,10 @@ ScheduleConfirmationCard _$ScheduleConfirmationCardFromJson(
           : DateTime.parse(json['responded_at'] as String),
       totalLessons: (json['total_lessons'] as num?)?.toInt(),
       lessonRequestId: json['lesson_request_id'] as String?,
+      suggestedDay2: (json['suggested_day2'] as num?)?.toInt(),
+      suggestedTime2: json['suggested_time2'] as String?,
+      suggestedDay3: (json['suggested_day3'] as num?)?.toInt(),
+      suggestedTime3: json['suggested_time3'] as String?,
     );
 
 Map<String, dynamic> _$ScheduleConfirmationCardToJson(
@@ -222,6 +238,10 @@ Map<String, dynamic> _$ScheduleConfirmationCardToJson(
       'responded_at': instance.respondedAt?.toIso8601String(),
       'total_lessons': instance.totalLessons,
       'lesson_request_id': instance.lessonRequestId,
+      'suggested_day2': instance.suggestedDay2,
+      'suggested_time2': instance.suggestedTime2,
+      'suggested_day3': instance.suggestedDay3,
+      'suggested_time3': instance.suggestedTime3,
     };
 
 const _$ScheduleCardTypeEnumMap = {
