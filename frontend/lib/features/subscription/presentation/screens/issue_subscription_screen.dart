@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/subscription.dart';
 import '../widgets/issue_form_discount_bonus.dart';
 import '../widgets/issue_form_membership_widgets.dart';
@@ -58,6 +59,7 @@ class _IssueSubscriptionScreenState
   int _validityDays = 90;
   int _monthsCount = 1;
   int _originalAmount = 0;
+  bool _hasPrefilledAmount = false;
   int _discountPercent = 0;
   int _bonusLessons = 0;
   String? _bonusReason;
@@ -157,6 +159,28 @@ class _IssueSubscriptionScreenState
         widget.isBatchMode
             ? const AsyncValue<List<ClassMembership>>.data([])
             : ref.watch(studentMembershipsProvider(widget.primaryStudentId));
+
+    // Pre-fill amount from student.monthlyFee (once only)
+    if (!_hasPrefilledAmount && !widget.isBatchMode) {
+      final studentAsync = ref.watch(studentProvider(widget.primaryStudentId));
+      studentAsync.whenData((student) {
+        if (student != null &&
+            student.monthlyFee > 0 &&
+            _originalAmount == 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _originalAmount = student.monthlyFee;
+                _amountController.text = student.monthlyFee.toString();
+                _hasPrefilledAmount = true;
+              });
+            }
+          });
+        } else {
+          _hasPrefilledAmount = true;
+        }
+      });
+    }
 
     return Scaffold(
       appBar: AppBar(

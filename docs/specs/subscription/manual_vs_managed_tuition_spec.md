@@ -1,7 +1,7 @@
 # 수기 관리 vs 연동 관리 수강료 분리 스펙
 
 > 작성일: 2026-03-14
-> 상태: 설계 검토
+> 상태: 구현 완료
 > 관련: subscription_master.md, edit_student_screen.dart
 
 ---
