@@ -89,6 +89,24 @@ Future<List<SubscriptionProposal>> pendingStudentProposals(
 }
 
 // ============================================================
+// Renewal Proposals
+// ============================================================
+
+@riverpod
+Future<SubscriptionProposal?> pendingRenewalProposal(
+  Ref ref,
+  String studentId,
+) async {
+  final repository = ref.watch(subscriptionProposalRepositoryProvider);
+  final proposals = await repository.getPendingByStudent(studentId);
+  try {
+    return proposals.firstWhere((p) => p.isRenewal);
+  } catch (_) {
+    return null;
+  }
+}
+
+// ============================================================
 // Single Proposal
 // ============================================================
 
@@ -398,6 +416,7 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
     ref.invalidate(studentProposalsProvider(proposal.studentId));
     ref.invalidate(activeStudentProposalsProvider(proposal.studentId));
     ref.invalidate(pendingStudentProposalsProvider(proposal.studentId));
+    ref.invalidate(pendingRenewalProposalProvider(proposal.studentId));
     ref.invalidate(subscriptionProposalProvider(proposal.id));
   }
 

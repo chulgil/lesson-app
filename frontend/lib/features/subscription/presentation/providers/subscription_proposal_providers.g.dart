@@ -851,6 +851,143 @@ class _PendingStudentProposalsProviderElement
   String get studentId => (origin as PendingStudentProposalsProvider).studentId;
 }
 
+String _$pendingRenewalProposalHash() =>
+    r'97ba62c5fd789f97047d19dabdaff47c787e51e9';
+
+/// See also [pendingRenewalProposal].
+@ProviderFor(pendingRenewalProposal)
+const pendingRenewalProposalProvider = PendingRenewalProposalFamily();
+
+/// See also [pendingRenewalProposal].
+class PendingRenewalProposalFamily
+    extends Family<AsyncValue<SubscriptionProposal?>> {
+  /// See also [pendingRenewalProposal].
+  const PendingRenewalProposalFamily();
+
+  /// See also [pendingRenewalProposal].
+  PendingRenewalProposalProvider call(
+    String studentId,
+  ) {
+    return PendingRenewalProposalProvider(
+      studentId,
+    );
+  }
+
+  @override
+  PendingRenewalProposalProvider getProviderOverride(
+    covariant PendingRenewalProposalProvider provider,
+  ) {
+    return call(
+      provider.studentId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'pendingRenewalProposalProvider';
+}
+
+/// See also [pendingRenewalProposal].
+class PendingRenewalProposalProvider
+    extends AutoDisposeFutureProvider<SubscriptionProposal?> {
+  /// See also [pendingRenewalProposal].
+  PendingRenewalProposalProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => pendingRenewalProposal(
+            ref as PendingRenewalProposalRef,
+            studentId,
+          ),
+          from: pendingRenewalProposalProvider,
+          name: r'pendingRenewalProposalProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingRenewalProposalHash,
+          dependencies: PendingRenewalProposalFamily._dependencies,
+          allTransitiveDependencies:
+              PendingRenewalProposalFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
+
+  PendingRenewalProposalProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<SubscriptionProposal?> Function(PendingRenewalProposalRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PendingRenewalProposalProvider._internal(
+        (ref) => create(ref as PendingRenewalProposalRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<SubscriptionProposal?> createElement() {
+    return _PendingRenewalProposalProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PendingRenewalProposalProvider &&
+        other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PendingRenewalProposalRef
+    on AutoDisposeFutureProviderRef<SubscriptionProposal?> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _PendingRenewalProposalProviderElement
+    extends AutoDisposeFutureProviderElement<SubscriptionProposal?>
+    with PendingRenewalProposalRef {
+  _PendingRenewalProposalProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as PendingRenewalProposalProvider).studentId;
+}
+
 String _$subscriptionProposalHash() =>
     r'254fb16b144f7fbfa64596e6f9d0cd2b6f063da8';
 
@@ -1142,7 +1279,7 @@ class _ActiveProposalBetweenProviderElement
 }
 
 String _$subscriptionProposalNotifierHash() =>
-    r'661906ccf2505eaaeaf5e584401d5c46af1ca8d5';
+    r'b8d00817f3ec279cbdcdec1eccfa24fa40cbd58b';
 
 /// See also [SubscriptionProposalNotifier].
 @ProviderFor(SubscriptionProposalNotifier)

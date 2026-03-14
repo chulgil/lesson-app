@@ -43,7 +43,7 @@ class MockSubscriptionProposalRepository
         discountReason: '체험레슨 후 72시간 골든타임 할인 (10%)',
       ),
 
-      // student_5: 골든타임 마감 임박 (긴급 알림 테스트용)
+      // student_5: 골든타임 만료됨 (히스토리)
       SubscriptionProposal(
         id: 'proposal_auto_2',
         teacherId: 'teacher_1',
@@ -52,12 +52,12 @@ class MockSubscriptionProposalRepository
         templateIds: ['template_t1_1', 'template_t1_2'],
         recommendedTemplateId: 'template_t1_2',
         message: null,
-        status: ProposalStatus.pending,
-        createdAt: now.subtract(const Duration(hours: 70)),
-        expiresAt: now.add(const Duration(hours: 2)), // 2시간 남음!
+        status: ProposalStatus.expired,
+        createdAt: now.subtract(const Duration(hours: 74)),
+        expiresAt: now.subtract(const Duration(hours: 2)), // 이미 만료
         isAutoProposal: true,
         discountAmount: 38000,
-        discountReason: '골든타임 할인 마감 임박!',
+        discountReason: '골든타임 할인 (만료됨)',
       ),
 
       // ============================================================
@@ -143,6 +143,44 @@ class MockSubscriptionProposalRepository
         rejectedAt: now.subtract(const Duration(days: 2)),
         rejectionReason: '일정이 맞지 않아서요',
         isAutoProposal: true,
+      ),
+
+      // ============================================================
+      // 🔄 갱신 제안 (Renewal Proposals)
+      // ============================================================
+
+      // student_5: 수강권 1회 남음 → 시스템 자동 갱신 제안
+      SubscriptionProposal(
+        id: 'proposal_renewal_1',
+        teacherId: 'teacher_1',
+        studentId: 'student_5',
+        templateId: 'template_t1_1',
+        templateIds: ['template_t1_1', 'template_t1_2'],
+        recommendedTemplateId: 'template_t1_1',
+        message: '수강권이 1회 남았습니다. 이전과 동일한 수강권으로 레슨을 이어가세요.',
+        status: ProposalStatus.pending,
+        createdAt: now.subtract(const Duration(hours: 6)),
+        expiresAt: now.add(const Duration(days: 7)),
+        isAutoProposal: true,
+        isRenewal: true,
+        previousSubscriptionId: 'sub_pkg_03',
+        renewalInitiator: RenewalInitiator.system,
+      ),
+
+      // student_9: 수강권 만료 → 선생님 수동 갱신 제안
+      SubscriptionProposal(
+        id: 'proposal_renewal_2',
+        teacherId: 'teacher_1',
+        studentId: 'student_9',
+        templateId: 'template_t1_2',
+        message: '지민아, 수강권이 만료되었네요!\n같은 조건으로 이어서 레슨하면 좋겠어요 😊',
+        status: ProposalStatus.pending,
+        createdAt: now.subtract(const Duration(days: 1)),
+        expiresAt: now.add(const Duration(days: 6)),
+        isAutoProposal: false,
+        isRenewal: true,
+        previousSubscriptionId: 'sub_exp_02',
+        renewalInitiator: RenewalInitiator.teacher,
       ),
     ];
 

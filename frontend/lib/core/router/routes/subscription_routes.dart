@@ -8,6 +8,7 @@ import '../../../features/subscription/presentation/screens/issue_subscription_s
 import '../../../features/subscription/presentation/screens/lesson_policy_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
+import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
 
 /// Subscription-related routes.
 /// NOTE: More specific routes (like /issue, /policy) must come BEFORE parameterized routes (like /:id)
@@ -87,6 +88,14 @@ List<RouteBase> subscriptionRoutes = [
     builder: (context, state) {
       final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
       return ProposalConfirmScreen(teacherId: teacherId);
+    },
+  ),
+  // Renewal detail route must come before parameterized proposal detail route
+  GoRoute(
+    path: AppRoutes.renewalDetail,
+    builder: (context, state) {
+      final id = state.pathParameters['id']!;
+      return RenewalDetailScreen(proposalId: id);
     },
   ),
   GoRoute(
