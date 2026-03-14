@@ -337,13 +337,15 @@ class _PracticeItemTile extends ConsumerWidget {
                           ),
                         ),
                       ),
-                      if (item.hasLike) ...[
+                      if (item.teacherReaction != null) ...[
                         const SizedBox(width: AppSpacing.space2),
-                        Icon(
-                          Icons.favorite,
-                          size: 14,
-                          color: AppColors.error,
+                        Text(
+                          item.teacherReaction!.emoji,
+                          style: const TextStyle(fontSize: 14),
                         ),
+                      ] else if (item.hasLike) ...[
+                        const SizedBox(width: AppSpacing.space2),
+                        const Text('👍', style: TextStyle(fontSize: 14)),
                       ],
                     ],
                   ),

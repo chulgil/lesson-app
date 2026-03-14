@@ -8,6 +8,59 @@ import '../../../../core/theme/app_colors.dart';
 // Re-export shared enum for backward compatibility
 export '../../../../core/models/shared_enums.dart' show AgeGroup;
 
+/// Quick Reaction from teacher (1-tap feedback)
+enum QuickReaction {
+  good, // 👍 잘했어요
+  excellent, // ⭐ 훌륭해요
+  tryHarder; // 💪 힘내자
+
+  String get emoji {
+    switch (this) {
+      case QuickReaction.good:
+        return '👍';
+      case QuickReaction.excellent:
+        return '⭐';
+      case QuickReaction.tryHarder:
+        return '💪';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case QuickReaction.good:
+        return '잘했어요';
+      case QuickReaction.excellent:
+        return '훌륭해요';
+      case QuickReaction.tryHarder:
+        return '힘내자';
+    }
+  }
+}
+
+/// Student response to teacher's feedback
+enum StudentResponse {
+  thanks, // 🙏 감사합니다
+  question; // ❓ 질문있어요
+
+  String get emoji {
+    switch (this) {
+      case StudentResponse.thanks:
+        return '🙏';
+      case StudentResponse.question:
+        return '❓';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case StudentResponse.thanks:
+        return '감사합니다';
+      case StudentResponse.question:
+        return '질문있어요';
+    }
+  }
+}
+
 /// Practice priority levels for "이번 주 연습"
 enum PracticePriority {
   must, // 🔴 필수 - 꼭 해오기
@@ -159,8 +212,14 @@ class PracticeItem {
   final DateTime? completedAt;
 
   // Teacher feedback
-  final bool hasLike; // 좋아요 여부
+  final bool hasLike; // 좋아요 여부 (deprecated: use teacherReaction)
   final DateTime? likedAt;
+
+  // Quick Reaction feedback
+  final QuickReaction? teacherReaction;
+  final DateTime? teacherReactionAt;
+  final StudentResponse? studentResponse;
+  final DateTime? studentResponseAt;
 
   // Timestamps
   final DateTime createdAt;
@@ -183,6 +242,10 @@ class PracticeItem {
     this.completedAt,
     this.hasLike = false,
     this.likedAt,
+    this.teacherReaction,
+    this.teacherReactionAt,
+    this.studentResponse,
+    this.studentResponseAt,
     required this.createdAt,
     this.updatedAt,
   });
@@ -222,6 +285,10 @@ class PracticeItem {
     DateTime? completedAt,
     bool? hasLike,
     DateTime? likedAt,
+    QuickReaction? teacherReaction,
+    DateTime? teacherReactionAt,
+    StudentResponse? studentResponse,
+    DateTime? studentResponseAt,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -242,6 +309,10 @@ class PracticeItem {
       completedAt: completedAt ?? this.completedAt,
       hasLike: hasLike ?? this.hasLike,
       likedAt: likedAt ?? this.likedAt,
+      teacherReaction: teacherReaction ?? this.teacherReaction,
+      teacherReactionAt: teacherReactionAt ?? this.teacherReactionAt,
+      studentResponse: studentResponse ?? this.studentResponse,
+      studentResponseAt: studentResponseAt ?? this.studentResponseAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -266,11 +337,34 @@ class PracticeItem {
     );
   }
 
-  /// Toggle like status
+  /// Whether teacher has reacted (Quick Reaction or legacy hasLike)
+  bool get hasReaction => teacherReaction != null || hasLike;
+
+  /// Toggle like status (legacy — prefer setReaction)
   PracticeItem toggleLike() {
     return copyWith(
       hasLike: !hasLike,
       likedAt: !hasLike ? DateTime.now() : null,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Set teacher Quick Reaction (replaces toggleLike)
+  PracticeItem setReaction(QuickReaction? reaction) {
+    return copyWith(
+      teacherReaction: reaction,
+      teacherReactionAt: reaction != null ? DateTime.now() : null,
+      hasLike: reaction != null,
+      likedAt: reaction != null ? DateTime.now() : null,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  /// Set student response to teacher's feedback
+  PracticeItem setStudentResponse(StudentResponse? response) {
+    return copyWith(
+      studentResponse: response,
+      studentResponseAt: response != null ? DateTime.now() : null,
       updatedAt: DateTime.now(),
     );
   }

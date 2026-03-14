@@ -181,6 +181,47 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
     }
   }
 
+  /// Set Quick Reaction (teacher feedback)
+  Future<PracticeItem> setReaction(
+    String id,
+    String studentId,
+    QuickReaction? reaction,
+  ) async {
+    try {
+      final items = state.valueOrNull ?? [];
+      final item = items.firstWhere((i) => i.id == id);
+      final updated = await _repository.update(item.setReaction(reaction));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      ref.invalidate(practiceItemsByStudentProvider(studentId));
+      ref.invalidate(weeklyPracticeItemsProvider(studentId));
+      ref.invalidate(awaitingFeedbackProvider);
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
+  /// Set student response
+  Future<PracticeItem> setStudentResponse(
+    String id,
+    String studentId,
+    StudentResponse? response,
+  ) async {
+    try {
+      final items = state.valueOrNull ?? [];
+      final item = items.firstWhere((i) => i.id == id);
+      final updated = await _repository.update(item.setStudentResponse(response));
+      state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
+      ref.invalidate(practiceItemsByStudentProvider(studentId));
+      ref.invalidate(weeklyPracticeItemsProvider(studentId));
+      return updated;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Increment practice count
   Future<PracticeItem> incrementCount(String id, String studentId) async {
     try {

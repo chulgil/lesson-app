@@ -252,27 +252,21 @@ class PracticeItemsSection extends ConsumerWidget {
                     ),
                   ),
 
-                // Like toggle (teacher: interactive, student: read-only)
+                // Quick Reaction (teacher: interactive, student: read-only)
                 if (isTeacher)
-                  IconButton(
-                    onPressed: () => _toggleLike(ref, item),
-                    icon: Icon(
-                      item.hasLike ? Icons.thumb_up : Icons.thumb_up_outlined,
+                  _buildQuickReactionButtons(ref, item)
+                else if (item.teacherReaction != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.space2),
+                    child: Text(
+                      item.teacherReaction!.emoji,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    iconSize: 20,
-                    color: item.hasLike
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
-                    tooltip: '좋아요',
                   )
                 else if (item.hasLike)
                   Padding(
                     padding: const EdgeInsets.only(right: AppSpacing.space2),
-                    child: Icon(
-                      Icons.thumb_up,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
+                    child: const Text('👍', style: TextStyle(fontSize: 18)),
                   ),
               ],
             ),
@@ -320,10 +314,45 @@ class PracticeItemsSection extends ConsumerWidget {
         .toggleComplete(item.id, studentId);
   }
 
-  Future<void> _toggleLike(WidgetRef ref, PracticeItem item) async {
+  Widget _buildQuickReactionButtons(WidgetRef ref, PracticeItem item) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: QuickReaction.values.map((reaction) {
+        final isSelected = item.teacherReaction == reaction;
+        return GestureDetector(
+          onTap: () => _setReaction(
+            ref,
+            item,
+            isSelected ? null : reaction,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: isSelected
+                ? BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  )
+                : null,
+            child: Text(
+              reaction.emoji,
+              style: TextStyle(
+                fontSize: isSelected ? 20 : 16,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Future<void> _setReaction(
+    WidgetRef ref,
+    PracticeItem item,
+    QuickReaction? reaction,
+  ) async {
     await ref
         .read(practiceItemsNotifierProvider(lessonId).notifier)
-        .toggleLike(item.id, studentId);
+        .setReaction(item.id, studentId, reaction);
   }
 
   void _showAddItemDialog(BuildContext context, WidgetRef ref) {
