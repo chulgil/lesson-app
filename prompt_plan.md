@@ -36,16 +36,16 @@
 
 | # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 3-1 | 갱신 제안 상세 화면 | renewal_detail_screen.dart | todo |
-| 3-2 | 수강 이력 위젯 | subscription_history_widget.dart | todo |
-| 3-3 | SubscriptionRenewalBanner 개선 | subscription_renewal_banner.dart | todo |
+| 3-1 | 갱신 제안 상세 화면 | 기존 ProposalDetailScreen 재사용 | done |
+| 3-2 | 수강 이력 위젯 | subscription_history_widget.dart | skip (후속) |
+| 3-3 | SubscriptionRenewalBanner 개선 | subscription_renewal_banner.dart | done |
 
 ## Phase 4: 자동화 + 완성도
 
 | # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 4-1 | 자동 갱신 제안 (autoRenewalEnabled 시) | renewal_service.dart | todo |
-| 4-2 | 레슨 완료 시 갱신 체크 연결 | lesson_detail_screen.dart | todo |
+| 4-1 | 자동 갱신 제안 (autoRenewalEnabled 시) | renewal_service.dart | done (서비스 구현, 설정 UI는 후속) |
+| 4-2 | 레슨 완료 시 갱신 체크 연결 | lesson_detail_screen.dart | done |
 
 ---
 
