@@ -28,9 +28,9 @@
 
 | # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 2-1 | 갱신 제안 카드 위젯 (원탭 발송) | widgets/renewal_suggestion_card.dart | todo |
-| 2-2 | 대시보드 통합 | 선생님 대시보드 | todo |
-| 2-3 | ExpiringSubscriptionsScreen 개선 | expiring_subscriptions_screen.dart | todo |
+| 2-1 | 갱신 제안 카드 위젯 (원탭 발송) | expiring_subscriptions_screen.dart | done |
+| 2-2 | 대시보드 통합 (expired 표시) | urgent_actions_section.dart | done |
+| 2-3 | ExpiringSubscriptionsScreen 개선 (expired 통합) | expiring_subscriptions_screen.dart | done |
 
 ## Phase 3: 학생 UX
 
