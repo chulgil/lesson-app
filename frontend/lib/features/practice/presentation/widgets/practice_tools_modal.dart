@@ -103,9 +103,12 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
         tuner.onAppPaused();
         break;
       case AppLifecycleState.resumed:
-        // App returning - only resume if on tuner tab
         if (_tabController.index == 1) {
+          // On tuner tab - full resume (permission check + stream restart + enable)
           tuner.onAppResumed();
+        } else {
+          // On other tab - re-warm stream so switching to tuner tab later works
+          tuner.warmUp();
         }
         break;
       case AppLifecycleState.detached:

@@ -415,11 +415,25 @@ class Tuner extends _$Tuner {
     await _engine?.warmUp();
   }
 
-  /// Enable pitch processing (instant, no audio session reconfiguration).
+  /// Enable pitch processing.
   ///
   /// Call this when switching to the tuner tab.
   /// Requires [warmUp] to have been called first.
-  void enableProcessing() {
+  /// If the stream died (e.g., app was backgrounded on a different tab),
+  /// automatically restarts it before enabling processing.
+  Future<void> enableProcessing() async {
+    if (_engine == null) {
+      await _initAsync();
+    }
+
+    // Check if stream needs restart (died during app background on different tab)
+    if (_engine is RecordTunerEngine) {
+      final engine = _engine as RecordTunerEngine;
+      if (!engine.isStreamActive || engine.isStreamDead) {
+        await engine.restartStream();
+      }
+    }
+
     _engine?.enableProcessing();
 
     state = state.copyWith(
