@@ -9,6 +9,7 @@ import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../../providers/providers.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../widgets/lesson_form_widgets.dart';
 
 /// Screen for adding a new lesson
@@ -133,6 +134,9 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 selectedStudent: _selectedStudent,
                 onTap: _showStudentPicker,
               ),
+
+              // Subscription status banner
+              if (_selectedStudent != null) _buildSubscriptionBanner(),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -355,6 +359,77 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
   }
 
+  /// Build subscription status banner for the selected student.
+  Widget _buildSubscriptionBanner() {
+    final studentId = _selectedStudent!.id;
+    final subscriptionsAsync = ref.watch(
+      activeStudentSubscriptionsProvider(studentId),
+    );
+
+    return subscriptionsAsync.when(
+      data: (subscriptions) {
+        if (subscriptions.isNotEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.space2),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.infoLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline,
+                    color: AppColors.info, size: 18),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    '이 학생은 현재 유효한 수강권이 없습니다. 레슨 기록은 가능하지만, 수강권을 먼저 발급하면 횟수가 자동 관리됩니다.',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.info,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  /// Show confirmation dialog when saving a lesson with a past date/time.
+  Future<bool> _showPastDateConfirmDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.history, color: AppColors.warning, size: 24),
+            const SizedBox(width: 8),
+            const Text('과거 레슨 기록'),
+          ],
+        ),
+        content: const Text(
+          '선택한 시간은 이미 지난 시간입니다.\n이미 진행한 레슨을 기록하시겠습니까?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('레슨 기록'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   /// Check if a new lesson conflicts with existing lessons on the same day.
   /// Returns all conflicting lesson student names, or null if no conflict.
   String? _findConflict(
@@ -440,6 +515,15 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ),
       );
       return;
+    }
+
+    // Check if selected date+time is in the past (single lesson only)
+    if (!_isRecurring) {
+      final isPast = isLessonDateTimeInPast(_selectedDate, _selectedTime);
+      if (isPast) {
+        final shouldProceed = await _showPastDateConfirmDialog();
+        if (!shouldProceed) return;
+      }
     }
 
     // Check for time conflicts with existing lessons

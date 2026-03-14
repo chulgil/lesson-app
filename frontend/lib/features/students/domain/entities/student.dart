@@ -259,11 +259,28 @@ class Student {
   int get lessonFee => (monthlyFee / monthlyLessonCount).round();
 
   /// Get formatted lesson frequency
-  String get lessonFrequency =>
-      lessonsPerWeek == 1 ? '주 1회 (월 4회)' : '주 2회 (월 8회)';
+  String get lessonFrequency {
+    switch (lessonsPerWeek) {
+      case 1:
+        return '주 1회 (월 4회)';
+      case 2:
+        return '주 2회 (월 8회)';
+      default:
+        return '주 $lessonsPerWeek회 (월 ${lessonsPerWeek * 4}회)';
+    }
+  }
 
   /// Get short lesson frequency label
-  String get lessonFrequencyShort => lessonsPerWeek == 1 ? '주1회' : '주2회';
+  String get lessonFrequencyShort {
+    switch (lessonsPerWeek) {
+      case 1:
+        return '주1회';
+      case 2:
+        return '주2회';
+      default:
+        return '주${lessonsPerWeek}회';
+    }
+  }
 
   /// Format monthly fee as Korean won
   String get formattedMonthlyFee {

@@ -12,11 +12,16 @@ Future<DateTime?> selectLessonDate(
   BuildContext context,
   DateTime initialDate,
 ) async {
+  final now = DateTime.now();
+  final firstDate = now.subtract(const Duration(days: 7));
+  // Clamp initialDate within the allowed range
+  final clampedInitial = initialDate.isBefore(firstDate) ? firstDate : initialDate;
+
   return showDatePicker(
     context: context,
-    initialDate: initialDate,
-    firstDate: DateTime.now(),
-    lastDate: DateTime.now().add(const Duration(days: 365)),
+    initialDate: clampedInitial,
+    firstDate: firstDate,
+    lastDate: now.add(const Duration(days: 365)),
     locale: const Locale('ko'),
   );
 }
@@ -36,6 +41,18 @@ Future<TimeOfDay?> selectLessonTime(
       );
     },
   );
+}
+
+/// Check if the selected date+time is in the past
+bool isLessonDateTimeInPast(DateTime date, TimeOfDay time) {
+  final lessonDateTime = DateTime(
+    date.year,
+    date.month,
+    date.day,
+    time.hour,
+    time.minute,
+  );
+  return lessonDateTime.isBefore(DateTime.now());
 }
 
 /// Select date helper for edit screen (allows past dates)
