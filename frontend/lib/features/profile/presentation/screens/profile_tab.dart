@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/router/app_routes.dart';
@@ -11,6 +14,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
+import '../providers/profile_image_provider.dart';
 
 /// Profile tab with user info and settings
 class ProfileTab extends ConsumerWidget {
@@ -29,7 +33,7 @@ class ProfileTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Profile header
-          _buildProfileHeader(context, name, email),
+          _buildProfileHeader(context, ref, name, email, teacherId),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -151,44 +155,60 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, String name, String email) {
+  Widget _buildProfileHeader(
+    BuildContext context,
+    WidgetRef ref,
+    String name,
+    String email,
+    String userId,
+  ) {
     final initial = name.isNotEmpty ? name[0] : '?';
+    final profileImageAsync = ref.watch(profileImageNotifierProvider(userId));
+    final imagePath = profileImageAsync.valueOrNull;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
         children: [
           // Profile avatar
-          Stack(
-            children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: AppColors.primaryLight,
-                child: Text(
-                  initial,
-                  style: AppTypography.headingLarge.copyWith(
-                    color: Colors.white,
+          GestureDetector(
+            onTap: () => _showImagePickerOptions(context, ref, userId),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.primaryLight,
+                  backgroundImage: imagePath != null
+                      ? FileImage(File(imagePath))
+                      : null,
+                  child: imagePath == null
+                      ? Text(
+                          initial,
+                          style: AppTypography.headingLarge.copyWith(
+                            color: Colors.white,
+                          ),
+                        )
+                      : null,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Icon(
-                    Icons.camera_alt,
-                    size: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(width: AppSpacing.space4),
@@ -422,6 +442,39 @@ class ProfileTab extends ConsumerWidget {
             if (item.trailing != null) item.trailing!,
             if (item.trailing == null)
               Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showImagePickerOptions(BuildContext context, WidgetRef ref, String userId) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('카메라로 촬영'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ref
+                    .read(profileImageNotifierProvider(userId).notifier)
+                    .pickAndSaveImage(ImageSource.camera, context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('갤러리에서 선택'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ref
+                    .read(profileImageNotifierProvider(userId).notifier)
+                    .pickAndSaveImage(ImageSource.gallery, context);
+              },
+            ),
           ],
         ),
       ),
