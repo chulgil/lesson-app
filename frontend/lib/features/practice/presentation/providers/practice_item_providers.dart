@@ -84,6 +84,7 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
     String? repertoireId,
     String? sectionId,
     PracticePriority priority = PracticePriority.should,
+    List<String> resourceIds = const [],
   }) async {
     final item = PracticeItem(
       id: '',
@@ -96,6 +97,7 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
       repertoireId: repertoireId,
       sectionId: sectionId,
       priority: priority,
+      resourceIds: resourceIds,
       createdAt: DateTime.now(),
     );
 

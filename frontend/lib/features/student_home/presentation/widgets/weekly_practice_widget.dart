@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_item.dart';
 import '../../../../providers/providers.dart';
+import '../../../lessons/presentation/widgets/resource_attachment_section.dart';
 
 /// Widget to display student's weekly practice items (from teacher assignments)
 class WeeklyPracticeWidget extends ConsumerWidget {
@@ -367,6 +368,10 @@ class _PracticeItemTile extends ConsumerWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                  if (item.resourceIds.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.space1),
+                    ResourceAttachmentList(resourceIds: item.resourceIds),
+                  ],
                 ],
               ),
             ),

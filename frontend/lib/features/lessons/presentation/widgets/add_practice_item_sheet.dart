@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/practice_item.dart';
 import '../../../../models/practice_repertoire.dart';
 import '../../../../providers/providers.dart';
+import 'resource_attachment_section.dart';
 
 /// Range type for practice sections
 enum RangeType {
@@ -78,6 +79,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   final List<PracticeRangeEntry> _practiceRanges = [];
 
   bool _isSubmitting = false;
+  List<String> _resourceIds = [];
 
   // Repertoire selection state
   PracticeRepertoire? _selectedRepertoire;
@@ -157,6 +159,13 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   ),
                 ),
+              ),
+              const SizedBox(height: AppSpacing.space4),
+
+              // Teaching resources attachment
+              ResourceAttachmentEditor(
+                resourceIds: _resourceIds,
+                onChanged: (ids) => setState(() => _resourceIds = ids),
               ),
               const SizedBox(height: AppSpacing.space6),
 
@@ -625,6 +634,7 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             : null,
         repertoireId: repertoireId,
         sectionId: sectionId,
+        resourceIds: _resourceIds,
       );
 
       if (mounted) {
