@@ -53,6 +53,11 @@ class ProposalSettings extends HiveObject {
   @HiveField(8)
   final DateTime? updatedAt;
 
+  /// Whether to automatically send renewal proposals when subscription is running low.
+  /// Default: false (teacher must manually approve renewal proposals)
+  @HiveField(9)
+  final bool autoRenewalEnabled;
+
   ProposalSettings({
     required this.teacherId,
     this.autoProposalEnabled = true,
@@ -63,6 +68,7 @@ class ProposalSettings extends HiveObject {
     this.autoReminderEnabled = true,
     this.reminderHours = const [24, 48, 72],
     this.updatedAt,
+    this.autoRenewalEnabled = false,
   });
 
   factory ProposalSettings.fromJson(Map<String, dynamic> json) =>
@@ -109,6 +115,7 @@ class ProposalSettings extends HiveObject {
     bool? autoReminderEnabled,
     List<int>? reminderHours,
     DateTime? updatedAt,
+    bool? autoRenewalEnabled,
   }) {
     return ProposalSettings(
       teacherId: teacherId ?? this.teacherId,
@@ -123,6 +130,7 @@ class ProposalSettings extends HiveObject {
       autoReminderEnabled: autoReminderEnabled ?? this.autoReminderEnabled,
       reminderHours: reminderHours ?? this.reminderHours,
       updatedAt: updatedAt ?? this.updatedAt,
+      autoRenewalEnabled: autoRenewalEnabled ?? this.autoRenewalEnabled,
     );
   }
 

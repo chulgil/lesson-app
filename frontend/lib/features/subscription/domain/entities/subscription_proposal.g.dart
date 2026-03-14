@@ -41,13 +41,16 @@ class SubscriptionProposalAdapter extends TypeAdapter<SubscriptionProposal> {
       isAppTransition: fields[21] as bool,
       lessonRequestId: fields[22] as String?,
       proposalType: fields[23] as ProposalType,
+      isRenewal: fields[24] as bool,
+      previousSubscriptionId: fields[25] as String?,
+      renewalInitiator: fields[26] as RenewalInitiator?,
     );
   }
 
   @override
   void write(BinaryWriter writer, SubscriptionProposal obj) {
     writer
-      ..writeByte(24)
+      ..writeByte(27)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -95,7 +98,13 @@ class SubscriptionProposalAdapter extends TypeAdapter<SubscriptionProposal> {
       ..writeByte(22)
       ..write(obj.lessonRequestId)
       ..writeByte(23)
-      ..write(obj.proposalType);
+      ..write(obj.proposalType)
+      ..writeByte(24)
+      ..write(obj.isRenewal)
+      ..writeByte(25)
+      ..write(obj.previousSubscriptionId)
+      ..writeByte(26)
+      ..write(obj.renewalInitiator);
   }
 
   @override
@@ -105,6 +114,45 @@ class SubscriptionProposalAdapter extends TypeAdapter<SubscriptionProposal> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SubscriptionProposalAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class RenewalInitiatorAdapter extends TypeAdapter<RenewalInitiator> {
+  @override
+  final int typeId = 100;
+
+  @override
+  RenewalInitiator read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return RenewalInitiator.system;
+      case 1:
+        return RenewalInitiator.teacher;
+      default:
+        return RenewalInitiator.system;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, RenewalInitiator obj) {
+    switch (obj) {
+      case RenewalInitiator.system:
+        writer.writeByte(0);
+        break;
+      case RenewalInitiator.teacher:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RenewalInitiatorAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -291,6 +339,10 @@ SubscriptionProposal _$SubscriptionProposalFromJson(
       proposalType:
           $enumDecodeNullable(_$ProposalTypeEnumMap, json['proposal_type']) ??
               ProposalType.proposal,
+      isRenewal: json['is_renewal'] as bool? ?? false,
+      previousSubscriptionId: json['previous_subscription_id'] as String?,
+      renewalInitiator: $enumDecodeNullable(
+          _$RenewalInitiatorEnumMap, json['renewal_initiator']),
     );
 
 Map<String, dynamic> _$SubscriptionProposalToJson(
@@ -320,6 +372,9 @@ Map<String, dynamic> _$SubscriptionProposalToJson(
       'is_app_transition': instance.isAppTransition,
       'lesson_request_id': instance.lessonRequestId,
       'proposal_type': _$ProposalTypeEnumMap[instance.proposalType]!,
+      'is_renewal': instance.isRenewal,
+      'previous_subscription_id': instance.previousSubscriptionId,
+      'renewal_initiator': _$RenewalInitiatorEnumMap[instance.renewalInitiator],
     };
 
 const _$ProposalStatusEnumMap = {
@@ -339,4 +394,9 @@ const _$ProposalPaymentStatusEnumMap = {
 const _$ProposalTypeEnumMap = {
   ProposalType.proposal: 'proposal',
   ProposalType.directIssue: 'directIssue',
+};
+
+const _$RenewalInitiatorEnumMap = {
+  RenewalInitiator.system: 'system',
+  RenewalInitiator.teacher: 'teacher',
 };

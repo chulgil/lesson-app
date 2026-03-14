@@ -154,11 +154,15 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
     int? discountAmount,
     String? discountReason,
     bool isAutoProposal = false,
-    // 🆕 For notification
+    // For notification
     String? teacherName,
     String? templateName,
-    // 🆕 For re-enrollment flow (lesson request → proposal link)
+    // For re-enrollment flow (lesson request → proposal link)
     String? lessonRequestId,
+    // For renewal proposals
+    bool isRenewal = false,
+    String? previousSubscriptionId,
+    RenewalInitiator? renewalInitiator,
   }) async {
     state = const AsyncValue.loading();
 
@@ -188,6 +192,9 @@ class SubscriptionProposalNotifier extends _$SubscriptionProposalNotifier {
         recommendedTemplateId: recommendedTemplateId,
         isAutoProposal: isAutoProposal,
         lessonRequestId: lessonRequestId,
+        isRenewal: isRenewal,
+        previousSubscriptionId: previousSubscriptionId,
+        renewalInitiator: renewalInitiator,
       );
 
       final created = await repository.create(proposal);

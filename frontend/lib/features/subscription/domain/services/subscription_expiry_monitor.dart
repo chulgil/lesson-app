@@ -4,7 +4,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../notifications/domain/entities/notification.dart';
 import '../entities/subscription.dart';
+import '../entities/subscription_proposal.dart';
 import '../../presentation/providers/subscription_providers.dart';
+import 'subscription_renewal_service.dart';
 
 part 'subscription_expiry_monitor.g.dart';
 
@@ -44,6 +46,12 @@ class SubscriptionExpiryMonitor {
           alerts.add(_createExpiringAlert(sub, days));
         } else if (remaining != null && remaining <= 1) {
           alerts.add(_createLowLessonsAlert(sub, remaining));
+        }
+
+        // Trigger renewal service for subscriptions needing renewal
+        if ((remaining != null && remaining <= 2) ||
+            (days != null && days <= 7)) {
+          _triggerRenewal(sub);
         }
       }
 
@@ -98,6 +106,24 @@ class SubscriptionExpiryMonitor {
         'studentId': sub.studentId,
       },
     );
+  }
+
+  /// Trigger renewal service for a subscription that is running low.
+  /// Best-effort: failures are silently logged (renewal is an enhancement, not critical).
+  void _triggerRenewal(Subscription sub) {
+    try {
+      final renewalService = _ref.read(subscriptionRenewalServiceProvider);
+      // TODO: resolve teacherId from membership/class relationship
+      // For now, this is a placeholder — actual teacherId resolution
+      // requires membership → lessonClass → teacherId lookup
+      renewalService.triggerOnSubscriptionLow(
+        subscription: sub,
+        teacherId: '', // Will be resolved in Phase 2
+        initiator: RenewalInitiator.system,
+      );
+    } catch (e) {
+      debugPrint('[ExpiryMonitor] Renewal trigger failed: $e');
+    }
   }
 
   AppNotification _createExpiredAlert(Subscription sub) {

@@ -3,6 +3,18 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'subscription_proposal.g.dart';
 
+/// Who initiated the renewal proposal.
+@HiveType(typeId: 100)
+enum RenewalInitiator {
+  /// System auto-detected low subscription and sent proposal
+  @HiveField(0)
+  system,
+
+  /// Teacher manually sent renewal proposal
+  @HiveField(1)
+  teacher,
+}
+
 /// Status of a subscription proposal.
 @HiveType(typeId: 81)
 enum ProposalStatus {
@@ -251,6 +263,22 @@ class SubscriptionProposal extends HiveObject {
   @HiveField(23)
   final ProposalType proposalType;
 
+  // ============================================================
+  // v8 Fields - Subscription Renewal
+  // ============================================================
+
+  /// Whether this is a renewal proposal (existing subscription re-enrollment).
+  @HiveField(24)
+  final bool isRenewal;
+
+  /// Previous subscription ID (for renewal proposals).
+  @HiveField(25)
+  final String? previousSubscriptionId;
+
+  /// Who initiated the renewal (system auto or teacher manual).
+  @HiveField(26)
+  final RenewalInitiator? renewalInitiator;
+
   SubscriptionProposal({
     required this.id,
     required this.teacherId,
@@ -276,6 +304,9 @@ class SubscriptionProposal extends HiveObject {
     this.isAppTransition = false,
     this.lessonRequestId,
     this.proposalType = ProposalType.proposal,
+    this.isRenewal = false,
+    this.previousSubscriptionId,
+    this.renewalInitiator,
   });
 
   factory SubscriptionProposal.fromJson(Map<String, dynamic> json) =>
@@ -400,6 +431,9 @@ class SubscriptionProposal extends HiveObject {
     bool? isAppTransition,
     String? lessonRequestId,
     ProposalType? proposalType,
+    bool? isRenewal,
+    String? previousSubscriptionId,
+    RenewalInitiator? renewalInitiator,
   }) {
     return SubscriptionProposal(
       id: id ?? this.id,
@@ -426,6 +460,9 @@ class SubscriptionProposal extends HiveObject {
       isAppTransition: isAppTransition ?? this.isAppTransition,
       lessonRequestId: lessonRequestId ?? this.lessonRequestId,
       proposalType: proposalType ?? this.proposalType,
+      isRenewal: isRenewal ?? this.isRenewal,
+      previousSubscriptionId: previousSubscriptionId ?? this.previousSubscriptionId,
+      renewalInitiator: renewalInitiator ?? this.renewalInitiator,
     );
   }
 

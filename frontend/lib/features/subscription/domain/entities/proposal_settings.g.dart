@@ -26,13 +26,14 @@ class ProposalSettingsAdapter extends TypeAdapter<ProposalSettings> {
       autoReminderEnabled: fields[6] as bool,
       reminderHours: (fields[7] as List).cast<int>(),
       updatedAt: fields[8] as DateTime?,
+      autoRenewalEnabled: fields[9] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProposalSettings obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.teacherId)
       ..writeByte(1)
@@ -50,7 +51,9 @@ class ProposalSettingsAdapter extends TypeAdapter<ProposalSettings> {
       ..writeByte(7)
       ..write(obj.reminderHours)
       ..writeByte(8)
-      ..write(obj.updatedAt);
+      ..write(obj.updatedAt)
+      ..writeByte(9)
+      ..write(obj.autoRenewalEnabled);
   }
 
   @override
@@ -89,6 +92,7 @@ ProposalSettings _$ProposalSettingsFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      autoRenewalEnabled: json['auto_renewal_enabled'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ProposalSettingsToJson(ProposalSettings instance) =>
@@ -102,4 +106,5 @@ Map<String, dynamic> _$ProposalSettingsToJson(ProposalSettings instance) =>
       'auto_reminder_enabled': instance.autoReminderEnabled,
       'reminder_hours': instance.reminderHours,
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'auto_renewal_enabled': instance.autoRenewalEnabled,
     };

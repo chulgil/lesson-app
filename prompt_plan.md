@@ -1,324 +1,54 @@
-# 선생님/학생 UX 종합 점검 8차
+# 수강권 자동 갱신 제안 시스템 (SubscriptionRenewalService)
 
-> 확정일: 2026-03-11
+> 확정일: 2026-03-15
 
-## 현재 세션: UX 점검 8차 (Phase 1~3) - 완료
+## 배경
 
-### 배경
+재등록 플로우 UX 검증 결과, 체험 후 자동 제안(AutoProposalService)은 구현되어 있으나 **정규 레슨 수강권 소진/만료 시 자동 갱신 제안이 미구현**(GAP-2). 별도 SubscriptionRenewal 엔티티 대신 기존 SubscriptionProposal을 확장하여 중복 최소화.
 
-7차 수정 후 재검증: profile_header 하드코딩(CRITICAL), lesson/student cancel/delete 에러 처리(CRITICAL), 잔존 하드코딩 라우트 27건(HIGH), onboarding/backup 에러 처리(MEDIUM) 발견 및 해결.
+## 핵심 UX 모델
 
-### Phase 1: CRITICAL 수정 - 완료
+**"선생님 원탭 + 학생 원탭" 하이브리드**
+```
+시스템 자동 감지 → 선생님 대시보드 카드 → 원탭 발송 → 학생 원탭 수락 → 입금 → 수강권 갱신
+```
 
-| # | 작업 | 이슈 | 상태 |
+## Phase 1: 데이터 모델 + 핵심 서비스 + 스펙 문서
+
+| # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 1-1 | profile_header 하드코딩 → Provider 연동 | #138 | done |
-| 1-2 | lesson cancel/complete/delete try-catch | #138 | done |
-| 1-3 | student deleteStudent try-catch | #138 | done |
+| 1-1 | 스펙 문서 작성 | docs/specs/subscription/subscription_renewal_spec.md | todo |
+| 1-2 | SubscriptionProposal 확장 (isRenewal, previousSubscriptionId) | domain/entities/subscription_proposal.dart | todo |
+| 1-3 | ProposalSettings 확장 (autoRenewalEnabled) | domain/entities/proposal_settings.dart | todo |
+| 1-4 | SubscriptionRenewalService 생성 | domain/services/subscription_renewal_service.dart | todo |
+| 1-5 | SubscriptionExpiryMonitor 연결 | domain/services/subscription_expiry_monitor.dart | todo |
+| 1-6 | Mock 데이터 추가 | mock_subscription_proposal_repository.dart | todo |
 
-### Phase 2: 하드코딩 라우트 + 에러 처리 (HIGH) - 완료
+## Phase 2: 선생님 UX
 
-| # | 작업 | 이슈 | 상태 |
+| # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 2-1 | invite 관련 5개 파일 라우트 수정 | #138 | done |
-| 2-2 | search 관련 2개 파일 라우트 수정 | #138 | done |
-| 2-3 | onboarding profile_setup try-catch | #138 | done |
-| 2-4 | practice_repertoire 라우트 수정 | #138 | done |
+| 2-1 | 갱신 제안 카드 위젯 (원탭 발송) | widgets/renewal_suggestion_card.dart | todo |
+| 2-2 | 대시보드 통합 | 선생님 대시보드 | todo |
+| 2-3 | ExpiringSubscriptionsScreen 개선 | expiring_subscriptions_screen.dart | todo |
 
-### Phase 3: parent_home + 기타 (MEDIUM) - 완료
+## Phase 3: 학생 UX
 
-| # | 작업 | 이슈 | 상태 |
+| # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| 3-1 | parent_lessons_tab 라우트 수정 | #138 | done |
-| 3-2 | unconnected_child_dashboard 라우트 수정 | #138 | done |
-| 3-3 | assignment_dashboard + edit_lesson 라우트 수정 | #138 | done |
-| 3-4 | backup try-catch + tip_template try-catch | #138 | done |
+| 3-1 | 갱신 제안 상세 화면 | renewal_detail_screen.dart | todo |
+| 3-2 | 수강 이력 위젯 | subscription_history_widget.dart | todo |
+| 3-3 | SubscriptionRenewalBanner 개선 | subscription_renewal_banner.dart | todo |
 
-### 별도 이슈 (설계 검토 필요)
+## Phase 4: 자동화 + 완성도
 
-| # | 작업 | 이슈 | 상태 |
+| # | 작업 | 파일 | 상태 |
 |---|------|------|:----:|
-| — | parentName 엔티티 추가 | — | todo (Ask First) |
-| — | 정기 레슨 저장 로직 미구현 | #134 | todo |
-| — | metronome AppRoutes 상수 추가 | — | todo |
+| 4-1 | 자동 갱신 제안 (autoRenewalEnabled 시) | renewal_service.dart | todo |
+| 4-2 | 레슨 완료 시 갱신 체크 연결 | lesson_detail_screen.dart | todo |
 
 ---
 
-## 이전 계획: 선생님/학생 UX 종합 점검 7차
+## 이전 계획
 
-> 확정일: 2026-03-11
-
-### 배경
-
-선생님/학생 앱 전체 코드베이스 7차 점검: 에러 처리 누락 3건(CRITICAL), 하드코딩 라우트 ~20건(HIGH), 날짜 포맷 중복 5건(HIGH), validator trim 1건(MEDIUM) 발견 및 해결.
-
-### Phase 1: 에러 처리 수정 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | _saveStudentMemo try-catch 추가 | #137 | done |
-| 1-2 | _addKeyPoint/_removeKeyPoint try-catch 추가 | #137 | done |
-| 1-3 | StudentMemoCard 자동 저장 에러 상태 처리 | #137 | done |
-
-### Phase 2: 하드코딩 라우트 → AppRoutes (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | 12개 파일 ~20건 하드코딩 경로 → AppRoutes 상수 | #137 | done |
-
-### Phase 3: 날짜 유틸 + 코드 품질 (MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | formatDateYMD() 공통 유틸 생성 + 5개 파일 적용 | #137 | done |
-| 3-2 | validator trim() 수정 | #137 | done |
-| 3-3 | next_lesson_card 날짜 포맷 YYYY.MM.DD 통일 | #137 | done |
-
-### 별도 이슈 (설계 검토 필요)
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| — | parentName 엔티티 추가 | — | todo (Ask First) |
-| — | 정기 레슨 저장 로직 미구현 | #134 | todo |
-
----
-
-## 이전 계획: 선생님 UX 종합 점검 6차
-
-## 이전 계획: 학생 UX 종합 점검 5차
-
-> 확정일: 2026-03-11
-
-### 배경: 학생 UX 점검 5차 (Phase 1~3) - 완료
-
-### 배경
-
-학생 앱 전체 플로우 5차 점검: 대시보드 하드코딩 3건(CRITICAL), 수기선생님 네비게이션 혼용(CRITICAL), 코드 품질 4건 발견 및 해결.
-
-### Phase 1: 대시보드 동적 데이터 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | TeacherFeedbackSection Provider 동적 연동 | #135 | done |
-| 1-2 | PracticeSummarySection Provider 동적 연동 | #135 | done |
-| 1-3 | StudentProfileTab 선생님 이름 동적화 | #135 | done |
-
-### Phase 2: 수기선생님 네비게이션 수정 (CRITICAL/HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | AppRoutes + go_router 라우트 정의 | #135 | done |
-| 2-2 | MaterialPageRoute → context.push 전환 | #135 | done |
-| 2-3 | 편집 시 profileColorValue 보존 | #135 | done |
-
-### Phase 3: 코드 품질 개선 (HIGH/MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | GettingStartedCard loading 상태 처리 | #135 | done |
-| 3-2 | 노트 히스토리 날짜 YYYY.MM.DD 통일 | #135 | done |
-| 3-3 | 예약 범위 30일→60일 | #135 | done |
-| 3-4 | ManualTeacher barrel export | #135 | done |
-
----
-
-## 이전 계획: 선생님 UX 종합 점검 5차
-
-> 확정일: 2026-03-11
-
-### 배경
-
-선생님 앱 전체 플로우 5차 점검: GettingStartedCard 경로 오류, teacherName 하드코딩, 프리셋 중복 등 발견 및 해결.
-
-### Phase 1: GettingStartedCard 경로 수정 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | Step 2: studentId 전달 | #133 | done |
-| 1-2 | Step 3: 첫 레슨 상세로 직접 이동 | #133 | done |
-
-### Phase 2: teacherName 하드코딩 제거 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | '김선생님' → teacherExtendedProfileProvider | #133 | done |
-
-### Phase 3: 코드 품질 개선 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | 피드백 프리셋 중복 제거 → feedback_constants.dart | #133 | done |
-| 3-2 | 날짜 포맷 YYYY.MM.DD 통일 | #133 | done |
-
-### 별도 이슈 (설계 검토 필요)
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| — | 정기 레슨 저장 로직 미구현 | #134 | todo |
-
----
-
-## 이전 계획: 학생 UX 종합 점검 4차
-
-> 확정일: 2026-03-11
-
-### 배경
-
-학생 앱 전체 플로우 재점검: 프로필 하드코딩, 온보딩 저장 미구현, 스케줄 확인 TODO 등 3개 CRITICAL 이슈 발견 및 해결.
-
-### Phase 1: 학생 프로필 탭 동적 데이터 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | 프로필 헤더 Provider 연동 (이름/이메일/악기) | #132 | done |
-| 1-2 | 통계 요약 동적 데이터 (레슨횟수/연습시간/기간) | #132 | done |
-
-### Phase 2: 온보딩 프로필 저장 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | TODO stub → studentsNotifierProvider 실제 저장 | #132 | done |
-
-### Phase 3: 스케줄 확인 카드 예약 완성 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | _onConfirm TODO → slotBooking 실제 예약 | #132 | done |
-
----
-
-## 이전 계획: 선생님 UX 종합 점검 4차
-
-> 확정일: 2026-03-11
-
-### 배경
-
-선생님 입장에서 로그인 → 학생 초대 → 레슨 스케줄 관리 → 학생 관리 → 레슨노트 작성의 전체 플로우를 점검.
-5개 영역 병렬 분석 후 8개 개선 항목 발견, 7개 구현 완료 (1개 SKIP — parentName 필드 미존재).
-
-### Phase 1: 레슨 스케줄 충돌 검증 (CRITICAL) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | 레슨 추가 시 시간 충돌 검사 + 경고 다이얼로그 | #128 | done |
-| 1-2 | 레슨 수정 시 시간 충돌 검사 (자기 자신 제외) | #128 | done |
-
-### Phase 2: 학생 관리 UI 정리 (MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | parentName 필드 추가 | — | skip (엔티티 변경 필요) |
-| 2-2 | 학생 편집 삭제 버튼 중복 제거 | #129 | done |
-
-### Phase 3: 대시보드 레이아웃 개선 (MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | 하단 버튼 → 섹션 헤더 "더보기"/"피드백" 링크 | #130 | done |
-| 3-2 | 시작 가이드 3단계: "첫 레슨 완료하기"로 변경 | #130 | done |
-
-### Phase 4: 퀵피드백 효율 개선 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 4-1 | 피드백 프리셋 ActionChip (9개 문구) | #131 | done |
-| 4-2 | 저장 성공/실패 SnackBar 피드백 | #131 | done |
-
----
-
-## 이전 계획: 학생 UX 종합 점검 3차
-
-> 확정일: 2026-03-11
-
-### 배경
-
-학생 입장에서 로그인 → 선생님 연결/초대 → 스케줄 확인/조절 → 수기 선생님 관리 → 레슨노트 작성의 전체 플로우를 점검.
-5개 영역 병렬 분석 후 14개 개선 항목 발견, 모두 구현 완료.
-
-### Phase 1: 학생 홈 가이드 + 선생님 연결 개선 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 1-1 | 학생용 GettingStartedCard (3단계 체크리스트) | #124 | done |
-| 1-2 | MyConnections 도움말 버튼 구현 | #124 | done |
-| 1-3 | 연결 상태 배지 (연결됨/해제됨) | #124 | done |
-| 1-4 | 이전 선생님 섹션 + 다시 연결 | #124 | done |
-
-### Phase 2: 레슨노트 UX 개선 (HIGH) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 2-1 | 학생 메모 위치 변경 (맨 아래→피드백 바로 아래) | #125 | done |
-| 2-2 | 노트 히스토리에 학생 메모 검색/표시 | #125 | done |
-| 2-3 | 과제 설명 maxLines 2→5 확장 | #125 | done |
-| 2-4 | 피드백 날짜 포맷 YYYY.MM.DD | #125 | done |
-
-### Phase 3: 스케줄 UX 개선 (MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 3-1 | MyBookings 기간 30일→60일 확장 | #126 | done |
-| 3-2 | 스케줄 확인 카드 대시보드 재활성화 | #126 | done |
-| 3-3 | 선생님 문의 기능 (전화/문자/복사) | #126 | done |
-
-### Phase 4: 수기 선생님 관리 (MEDIUM) - 완료
-
-| # | 작업 | 이슈 | 상태 |
-|---|------|------|:----:|
-| 4-1 | ManualTeacher 엔티티 (Hive typeId: 110) | #127 | done |
-| 4-2 | 수기 선생님 등록/편집 화면 | #127 | done |
-| 4-3 | MyTeachersScreen에 수기 섹션 추가 | #127 | done |
-
----
-
-## 이전 계획: 선생님 UX 종합 점검 2차
-
-> 확정일: 2026-03-11
-
-### 구현 완료
-
-| # | 작업 | 이슈 | 우선순위 | 상태 |
-|---|------|------|:--------:|:----:|
-| C | EditStudentScreen Provider 연동 (하드코딩→실제 DB) | #118 | CRITICAL | done |
-| B | 신규 선생님 시작 가이드 카드 | #119 | HIGH | done |
-| E | 요일별 레슨 시간 개별 설정 | #120 | MEDIUM | done |
-| F | 초대 상태 추적 (최근 초대 목록) | #121 | MEDIUM | done (이미 구현됨) |
-| D | 레슨노트 피드백 프리셋/음성 버튼 | #122 | MEDIUM | done |
-| G | 스케줄 레슨추가 학생 퀵셀렉트 | #123 | LOW | done |
-
----
-
-## 이전 계획: 학생 UX 종합 점검 (1~2차)
-
-> 확정일: 2026-03-11
-
-### Phase 1~2: 온보딩 + 선생님 연결 ✅ 완료
-### Phase 3: 스케줄 UX ✅ 완료 (3-2 레슨 변경 횟수는 백엔드 필요)
-### Phase 4: 수기 선생님 ✅ 완료
-### Phase 5: 학생 레슨 메모 ✅ 완료 (5-4 피드백 타임라인은 Phase 2 예정)
-
----
-
-## 남은 이슈 (백엔드 의존)
-
-| 이슈 | 제목 | 우선순위 | 비고 |
-|:----:|------|:--------:|------|
-| #100 | 교수자료 Phase 2-3 (녹음 업로드, 외부 링크) | LOW | 백엔드 의존 |
-| #102 | AI 레슨 노트 자동 생성 | LOW | 백엔드 의존 (Whisper+GPT) |
-
----
-
-## 이전 계획: 선생님 UX 종합 점검 1차
-
-> 확정일: 2026-03-11
-
-### Phase 1~2: 핵심 + 편의성 ✅ 완료 (#104~#112)
-
----
-
-## 이전 계획: 이슈 정리 및 리팩토링
-
-> 확정일: 2026-03-11
-
-### 완료: #77~#103 이슈 정리 + 리팩토링 ✅
-### 이전 세션: #97 분석대시보드, #98 게이미피케이션, #101 과제대시보드 ✅
+### 선생님/학생 UX 종합 점검 8차 (2026-03-11) - 완료
