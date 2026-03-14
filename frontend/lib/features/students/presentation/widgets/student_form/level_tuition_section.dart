@@ -9,6 +9,8 @@ import 'frequency_option.dart';
 import 'student_form_helpers.dart';
 
 /// Level and tuition section with fee input.
+/// When [isLinked] is true (student has class memberships),
+/// the fee field becomes read-only with a notice.
 class LevelAndTuitionSection extends StatelessWidget {
   final StudentLevel selectedLevel;
   final ValueChanged<StudentLevel> onLevelChanged;
@@ -16,6 +18,8 @@ class LevelAndTuitionSection extends StatelessWidget {
   final int lessonsPerWeek;
   final ValueChanged<int> onFrequencyChanged;
   final VoidCallback onFeeChanged;
+  final bool isLinked;
+  final VoidCallback? onManageSubscription;
 
   const LevelAndTuitionSection({
     super.key,
@@ -25,6 +29,8 @@ class LevelAndTuitionSection extends StatelessWidget {
     required this.lessonsPerWeek,
     required this.onFrequencyChanged,
     required this.onFeeChanged,
+    this.isLinked = false,
+    this.onManageSubscription,
   });
 
   @override
@@ -93,12 +99,20 @@ class LevelAndTuitionSection extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      '기본: ${formatCurrencyInMan(selectedLevel.defaultMonthlyFee)}',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                    if (isLinked)
+                      Text(
+                        '수강권으로 관리 중',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.info,
+                        ),
+                      )
+                    else
+                      Text(
+                        '기본: ${formatCurrencyInMan(selectedLevel.defaultMonthlyFee)}',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -109,8 +123,13 @@ class LevelAndTuitionSection extends StatelessWidget {
                     width: 140,
                     child: TextFormField(
                       controller: feeController,
+                      enabled: !isLinked,
                       decoration: InputDecoration(
                         suffixText: '원',
+                        filled: isLinked,
+                        fillColor: isLinked
+                            ? AppColors.surfaceSecondaryLight
+                            : null,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.space3,
                           vertical: AppSpacing.space2,
@@ -125,6 +144,12 @@ class LevelAndTuitionSection extends StatelessWidget {
                           borderSide:
                               const BorderSide(color: AppColors.borderLight),
                         ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderSide:
+                              const BorderSide(color: AppColors.borderLight),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       inputFormatters: [
@@ -133,12 +158,15 @@ class LevelAndTuitionSection extends StatelessWidget {
                       textAlign: TextAlign.end,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: isLinked
+                            ? AppColors.textTertiaryLight
+                            : null,
                       ),
                       onChanged: (_) => onFeeChanged(),
                     ),
                   ),
                   // Preview in 만원 units
-                  if (feeController.text.isNotEmpty)
+                  if (feeController.text.isNotEmpty && !isLinked)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
@@ -155,6 +183,24 @@ class LevelAndTuitionSection extends StatelessWidget {
               ),
             ],
           ),
+
+          // Linked student: show subscription management shortcut
+          if (isLinked && onManageSubscription != null) ...[
+            const SizedBox(height: AppSpacing.space3),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onManageSubscription,
+                icon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                label: const Text('수강권 관리'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.info,
+                  side: BorderSide(
+                      color: AppColors.info.withValues(alpha: 0.4)),
+                ),
+              ),
+            ),
+          ],
 
           const SizedBox(height: AppSpacing.space4),
           const Divider(),
@@ -205,7 +251,8 @@ class LevelAndTuitionSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.08),
+              color: (isLinked ? AppColors.info : AppColors.primary)
+                  .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
@@ -213,14 +260,16 @@ class LevelAndTuitionSection extends StatelessWidget {
                 Icon(
                   Icons.info_outline,
                   size: 16,
-                  color: AppColors.primary,
+                  color: isLinked ? AppColors.info : AppColors.primary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
-                    '수강료를 직접 수정하면 레벨 기본값과 다르게 설정됩니다',
+                    isLinked
+                        ? '수강권이 발급된 학생은 수강료가 수강권에서 관리됩니다'
+                        : '수강료를 직접 수정하면 레벨 기본값과 다르게 설정됩니다',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.primary,
+                      color: isLinked ? AppColors.info : AppColors.primary,
                     ),
                   ),
                 ),

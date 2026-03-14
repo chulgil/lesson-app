@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/student/student_crud_provider.dart';
+import '../providers/membership_providers.dart';
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for editing an existing student
@@ -134,6 +136,12 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
   @override
   Widget build(BuildContext context) {
     final studentAsync = ref.watch(studentProvider(widget.studentId));
+    final membershipsAsync =
+        ref.watch(studentMembershipsProvider(widget.studentId));
+    final isLinked = membershipsAsync.whenOrNull(
+          data: (memberships) => memberships.isNotEmpty,
+        ) ??
+        false;
 
     return studentAsync.when(
       loading: () => Scaffold(
@@ -256,15 +264,21 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
                   // Level and tuition section
                   const FormSectionTitle('레벨 및 수강료'),
-                  const FormSectionSubtitle('레벨에 따라 기본 수강료가 설정됩니다'),
+                  FormSectionSubtitle(
+                    isLinked
+                        ? '수강권이 발급된 학생입니다'
+                        : '레벨에 따라 기본 수강료가 설정됩니다',
+                  ),
                   const SizedBox(height: AppSpacing.space3),
                   LevelAndTuitionSection(
                     selectedLevel: _selectedLevel,
                     onLevelChanged: (level) {
                       setState(() {
                         _selectedLevel = level;
-                        _monthlyFeeController.text =
-                            level.defaultMonthlyFee.toString();
+                        if (!isLinked) {
+                          _monthlyFeeController.text =
+                              level.defaultMonthlyFee.toString();
+                        }
                         _hasChanges = true;
                       });
                     },
@@ -280,6 +294,12 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                       _markChanged();
                       setState(() {});
                     },
+                    isLinked: isLinked,
+                    onManageSubscription: isLinked
+                        ? () => context.push(
+                              '${AppRoutes.issueSubscription}?studentId=${widget.studentId}',
+                            )
+                        : null,
                   ),
 
                   const SizedBox(height: AppSpacing.space6),
