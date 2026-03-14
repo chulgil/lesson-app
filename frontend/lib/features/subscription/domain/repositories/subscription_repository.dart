@@ -38,6 +38,9 @@ abstract class SubscriptionRepository {
   /// Get subscriptions expiring soon (for notifications).
   Future<List<Subscription>> getExpiringSoon();
 
+  /// Get expired subscriptions (status = expired or date passed).
+  Future<List<Subscription>> getExpired();
+
   /// Get all active subscriptions for a teacher's students.
   Future<List<Subscription>> getByTeacherId(String teacherId);
 

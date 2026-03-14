@@ -82,6 +82,7 @@ class StudentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Action banners
+          SubscriptionRenewalBanner(studentId: currentStudentId),
           PendingProposalsBanner(studentId: currentStudentId),
           LessonRequestsBanner(studentId: currentStudentId),
 

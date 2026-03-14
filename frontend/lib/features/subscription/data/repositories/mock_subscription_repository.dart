@@ -566,6 +566,14 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
+  Future<List<Subscription>> getExpired() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    return _subscriptions
+        .where((s) => s.status == SubscriptionStatus.expired)
+        .toList();
+  }
+
+  @override
   Future<List<Subscription>> getByTeacherId(String teacherId) async {
     // In real implementation, this would join with memberships and classes
     // For mock, we return subscriptions for known memberships

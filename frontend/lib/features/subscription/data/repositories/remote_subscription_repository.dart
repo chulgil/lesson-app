@@ -108,6 +108,19 @@ class RemoteSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
+  Future<List<Subscription>> getExpired() async {
+    final response = await _apiClient.get(
+      '/subscriptions',
+      queryParameters: {'status': 'expired'},
+    );
+    final paginated = PaginatedResponse.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => Subscription.fromJson(json),
+    );
+    return paginated.items;
+  }
+
+  @override
   Future<List<Subscription>> getByTeacherId(String teacherId) async {
     final response = await _apiClient.get(
       '/subscriptions',

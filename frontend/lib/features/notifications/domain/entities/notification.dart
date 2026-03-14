@@ -65,7 +65,11 @@ enum NotificationType {
   proposalAccepted, // Student accepted proposal
   proposalExpired, // Proposal expired without action
 
-  // 🆕 Reschedule allowance notifications
+  // Subscription expiry notifications
+  subscriptionExpiringSoon, // D-7/D-3/D-1 before expiry
+  subscriptionExpired, // Subscription has expired
+
+  // Reschedule allowance notifications
   rescheduleAllowanceUsed, // Student used reschedule allowance
   rescheduleAllowanceDepleted, // All reschedule allowances used
 }
@@ -99,6 +103,8 @@ extension NotificationTypeExtension on NotificationType {
       case NotificationType.scheduleChangeRequested:
       case NotificationType.proposalReceived:
       case NotificationType.proposalReminder72h: // Golden time ending
+      case NotificationType.subscriptionExpiringSoon:
+      case NotificationType.subscriptionExpired:
         return NotificationPriority.high;
 
       case NotificationType.streakMilestone:

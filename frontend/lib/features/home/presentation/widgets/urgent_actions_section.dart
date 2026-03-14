@@ -15,6 +15,7 @@ class UrgentActionsSection extends StatelessWidget {
   final int pendingBookings;
   final List<SubscriptionProposal> awaitingConfirm;
   final List<Subscription> expiringSoon;
+  final List<Subscription> expired;
 
   const UrgentActionsSection({
     super.key,
@@ -23,6 +24,7 @@ class UrgentActionsSection extends StatelessWidget {
     required this.pendingBookings,
     required this.awaitingConfirm,
     required this.expiringSoon,
+    this.expired = const [],
   });
 
   @override
@@ -30,11 +32,14 @@ class UrgentActionsSection extends StatelessWidget {
     final awaitingConfirmCount = awaitingConfirm.length;
     final expiringSoonStudentCount =
         expiringSoon.map((s) => s.studentId).toSet().length;
+    final expiredStudentCount =
+        expired.map((s) => s.studentId).toSet().length;
 
     final totalUrgent = pendingRequests +
         pendingBookings +
         (awaitingConfirmCount > 0 ? 1 : 0) +
-        (expiringSoonStudentCount > 0 ? 1 : 0);
+        (expiringSoonStudentCount > 0 ? 1 : 0) +
+        (expiredStudentCount > 0 ? 1 : 0);
 
     if (totalUrgent == 0) {
       return const SizedBox.shrink();
@@ -49,6 +54,7 @@ class UrgentActionsSection extends StatelessWidget {
           context,
           awaitingConfirmCount: awaitingConfirmCount,
           expiringSoonStudentCount: expiringSoonStudentCount,
+          expiredStudentCount: expiredStudentCount,
         ),
       ],
     );
@@ -92,6 +98,7 @@ class UrgentActionsSection extends StatelessWidget {
     BuildContext context, {
     required int awaitingConfirmCount,
     required int expiringSoonStudentCount,
+    required int expiredStudentCount,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -138,6 +145,17 @@ class UrgentActionsSection extends StatelessWidget {
               showDivider: pendingRequests > 0 ||
                   pendingBookings > 0 ||
                   awaitingConfirmCount > 0,
+            ),
+          if (expiredStudentCount > 0)
+            _UrgentItem(
+              icon: Icons.card_membership,
+              iconColor: AppColors.error,
+              title: '수강권 만료 $expiredStudentCount명',
+              onTap: () => context.push(AppRoutes.expiringSubscriptions),
+              showDivider: pendingRequests > 0 ||
+                  pendingBookings > 0 ||
+                  awaitingConfirmCount > 0 ||
+                  expiringSoonStudentCount > 0,
             ),
         ],
       ),

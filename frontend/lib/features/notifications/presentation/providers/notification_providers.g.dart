@@ -115,7 +115,7 @@ final proposalNotificationServiceProvider =
 // ignore: unused_element
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
-String _$userNotificationsHash() => r'7458c3c54f429d3ec639c0951e4f0770de1cbb80';
+String _$userNotificationsHash() => r'9a3c21792285bb1e1431e907a22b1a6b4ac74ce8';
 
 /// Provider for user's notifications list
 ///

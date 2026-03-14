@@ -42,6 +42,7 @@ class DashboardTab extends ConsumerWidget {
       awaitingConfirmationProposalsProvider(teacherId),
     );
     final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
+    final expiredAsync = ref.watch(expiredSubscriptionsProvider);
 
     // Get today's lessons
     final now = DateTime.now();
@@ -65,6 +66,7 @@ class DashboardTab extends ConsumerWidget {
         ref.invalidate(pendingBookingsCountProvider(teacherId));
         ref.invalidate(awaitingConfirmationProposalsProvider(teacherId));
         ref.invalidate(expiringSoonSubscriptionsProvider);
+        ref.invalidate(expiredSubscriptionsProvider);
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -115,6 +117,7 @@ class DashboardTab extends ConsumerWidget {
               pendingBookings: pendingBookingsAsync.valueOrNull ?? 0,
               awaitingConfirm: awaitingConfirmAsync.valueOrNull ?? [],
               expiringSoon: expiringSoonAsync.valueOrNull ?? [],
+              expired: expiredAsync.valueOrNull ?? [],
             ),
 
             const SizedBox(height: AppSpacing.space6),

@@ -231,7 +231,13 @@ class NotificationItem extends StatelessWidget {
       case NotificationType.proposalExpired:
         return '⌛';
 
-      // 🆕 Reschedule allowance
+      // Subscription expiry
+      case NotificationType.subscriptionExpiringSoon:
+        return '⏳';
+      case NotificationType.subscriptionExpired:
+        return '🚫';
+
+      // Reschedule allowance
       case NotificationType.rescheduleAllowanceUsed:
         return '🔄';
       case NotificationType.rescheduleAllowanceDepleted:

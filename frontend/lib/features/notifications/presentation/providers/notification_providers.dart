@@ -204,6 +204,27 @@ Future<List<AppNotification>> userNotifications(Ref ref) async {
     ),
 
     // ============================================================
+    // 🔔 수강권 만료 임박 알림
+    // ============================================================
+    AppNotification(
+      id: 'n_sub_expiring_1',
+      userId: 'current_user',
+      type: NotificationType.subscriptionExpiringSoon,
+      priority: NotificationPriority.high,
+      title: '수강권이 3일 후 만료됩니다',
+      body: '남은 횟수 2회 · 갱신 요청을 보내보세요',
+      createdAt: now.subtract(const Duration(hours: 3)),
+      sentAt: now.subtract(const Duration(hours: 3)),
+      actionUrl: '/subscriptions/sub_1',
+      actionLabel: '수강권 확인',
+      data: {
+        'subscriptionId': 'sub_1',
+        'daysLeft': 3,
+        'studentId': 'student_1',
+      },
+    ),
+
+    // ============================================================
     // 기존 알림
     // ============================================================
     AppNotification(

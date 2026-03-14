@@ -72,6 +72,15 @@ Future<List<Subscription>> expiringSoonSubscriptions(
   return repository.getExpiringSoon();
 }
 
+/// Get expired subscriptions (for dashboard alerts).
+@riverpod
+Future<List<Subscription>> expiredSubscriptions(
+  ExpiredSubscriptionsRef ref,
+) async {
+  final repository = ref.watch(subscriptionRepositoryProvider);
+  return repository.getExpired();
+}
+
 /// Get usage history for a subscription.
 @riverpod
 Future<List<SubscriptionUsage>> subscriptionUsageHistory(

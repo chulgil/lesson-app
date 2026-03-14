@@ -352,7 +352,7 @@ class _ScheduleConfirmationCardProviderElement
 }
 
 String _$scheduleConfirmationCardNotifierHash() =>
-    r'e76b7ef8c4f5420a970bc51105e6520af70208cf';
+    r'acfa0549ad53b4aed6855d6cfb0af1301e792305';
 
 /// Notifier for managing schedule confirmation card actions.
 ///

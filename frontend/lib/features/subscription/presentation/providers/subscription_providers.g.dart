@@ -639,6 +639,28 @@ final expiringSoonSubscriptionsProvider =
 // ignore: unused_element
 typedef ExpiringSoonSubscriptionsRef
     = AutoDisposeFutureProviderRef<List<Subscription>>;
+String _$expiredSubscriptionsHash() =>
+    r'6535e899d0b3f1c56f7a6f0131011218aad42e2c';
+
+/// Get expired subscriptions (for dashboard alerts).
+///
+/// Copied from [expiredSubscriptions].
+@ProviderFor(expiredSubscriptions)
+final expiredSubscriptionsProvider =
+    AutoDisposeFutureProvider<List<Subscription>>.internal(
+  expiredSubscriptions,
+  name: r'expiredSubscriptionsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$expiredSubscriptionsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef ExpiredSubscriptionsRef
+    = AutoDisposeFutureProviderRef<List<Subscription>>;
 String _$subscriptionUsageHistoryHash() =>
     r'6a391a951c5487c9d05abe777cfdbb49a456a07c';
 
