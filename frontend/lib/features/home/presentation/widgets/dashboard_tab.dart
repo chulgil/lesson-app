@@ -161,16 +161,10 @@ class DashboardTab extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        Row(
-          children: [
-            _buildLessonRequestsButton(context, ref),
-            _buildPendingBookingsButton(context, ref),
-            IconButton(
-              onPressed: () => context.push(AppRoutes.notifications),
-              icon: const Icon(Icons.notifications_outlined),
-              tooltip: '알림',
-            ),
-          ],
+        IconButton(
+          onPressed: () => context.push(AppRoutes.notifications),
+          icon: const Icon(Icons.notifications_outlined),
+          tooltip: '알림',
         ),
       ],
     );
@@ -189,6 +183,7 @@ class DashboardTab extends ConsumerWidget {
             value: '${lessons.length}회',
             color: AppColors.primary,
             icon: Icons.today,
+            onTap: onViewAllLessons,
           ),
       loading:
           () => StatCard(
@@ -202,15 +197,15 @@ class DashboardTab extends ConsumerWidget {
               StatCard(title: '오늘 레슨', value: '-', color: AppColors.primary),
     );
 
-    // This month card — unified primary color (was success green)
+    // This month card — total lessons count
     final monthCard = lessonStatsAsync.when(
       data:
           (stats) => StatCard(
             title: '이번 달',
             value: '${stats['completed'] ?? 0}회',
-            subtitle: '완료',
             color: AppColors.primary,
             icon: Icons.check_circle_outline,
+            onTap: () => context.push(AppRoutes.analytics),
           ),
       loading:
           () => StatCard(
@@ -315,15 +310,16 @@ class DashboardTab extends ConsumerWidget {
             ],
           ),
         ),
-        TextButton(
-          onPressed: () => context.push(AppRoutes.bulkFeedback),
-          child: Text(
-            '일괄 피드백',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.primary,
+        if (lessonCount > 0)
+          TextButton(
+            onPressed: () => context.push(AppRoutes.bulkFeedback),
+            child: Text(
+              '일괄 피드백',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.primary,
+              ),
             ),
           ),
-        ),
         if (lessonCount > 3)
           TextButton.icon(
             onPressed: onViewAllLessons,
@@ -331,120 +327,6 @@ class DashboardTab extends ConsumerWidget {
             label: const Text('전체보기'),
           ),
       ],
-    );
-  }
-
-  Widget _buildLessonRequestsButton(BuildContext context, WidgetRef ref) {
-    final teacherId = ref.watch(currentUserIdProvider);
-    final pendingCountAsync = ref.watch(
-      pendingLessonRequestCountProvider(teacherId),
-    );
-
-    return pendingCountAsync.when(
-      data: (count) {
-        return Stack(
-          children: [
-            IconButton(
-              onPressed:
-                  () => context.push(
-                    AppRoutes.lessonRequests,
-                    extra: {'teacherId': teacherId},
-                  ),
-              icon: const Icon(Icons.person_add_outlined),
-              tooltip: '레슨 요청',
-            ),
-            if (count > 0)
-              Positioned(
-                right: 4,
-                top: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: AppColors.warning,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  child: Text(
-                    count > 9 ? '9+' : '$count',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-      loading:
-          () => IconButton(
-            onPressed:
-                () => context.push(
-                  AppRoutes.lessonRequests,
-                  extra: {'teacherId': teacherId},
-                ),
-            icon: const Icon(Icons.person_add_outlined),
-            tooltip: '레슨 요청',
-          ),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-
-  Widget _buildPendingBookingsButton(BuildContext context, WidgetRef ref) {
-    final teacherId = ref.watch(currentUserIdProvider);
-    final pendingCountAsync = ref.watch(
-      pendingBookingsCountProvider(teacherId),
-    );
-
-    return pendingCountAsync.when(
-      data: (count) {
-        return Stack(
-          children: [
-            IconButton(
-              onPressed: () => context.push(AppRoutes.pendingBookings),
-              icon: const Icon(Icons.event_note_outlined),
-              tooltip: '승인 대기',
-            ),
-            if (count > 0)
-              Positioned(
-                right: 4,
-                top: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppColors.error,
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  child: Text(
-                    count > 9 ? '9+' : '$count',
-                    style: AppTypography.caption.copyWith(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-      loading:
-          () => IconButton(
-            onPressed: () => context.push(AppRoutes.pendingBookings),
-            icon: const Icon(Icons.event_note_outlined),
-            tooltip: '승인 대기',
-          ),
-      error: (_, __) => const SizedBox.shrink(),
     );
   }
 

@@ -568,9 +568,18 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<List<Subscription>> getExpired() async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _subscriptions
-        .where((s) => s.status == SubscriptionStatus.expired)
-        .toList();
+    final now = DateTime.now();
+    return _subscriptions.where((s) {
+      if (s.status != SubscriptionStatus.expired) return false;
+      // Only include recently expired (within 14 days)
+      if (s.endDate != null && now.difference(s.endDate!).inDays > 14) {
+        return false;
+      }
+      // Only include subscriptions with unused lessons remaining
+      final remaining = s.remainingLessons;
+      if (remaining != null && remaining <= 0) return false;
+      return true;
+    }).toList();
   }
 
   @override
