@@ -61,6 +61,12 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           );
 
       if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('저장되었습니다'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
         context.pop();
       }
     } catch (e) {
@@ -215,7 +221,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         return Align(
           alignment: Alignment.centerRight,
           child: Text(
-            '$length / $_minIntroductionLength자',
+            isSufficient ? '$length자' : '$length자 (최소 $_minIntroductionLength자)',
             style: AppTypography.caption.copyWith(
               color: isSufficient
                   ? AppColors.textTertiaryLight

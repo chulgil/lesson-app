@@ -37,7 +37,6 @@ class AddressFields extends StatelessWidget {
                   prefixIcon: Icons.markunread_mailbox_outlined,
                 ),
                 keyboardType: TextInputType.number,
-                readOnly: true,
                 textInputAction: TextInputAction.next,
               ),
             ),
@@ -50,7 +49,7 @@ class AddressFields extends StatelessWidget {
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('우편번호 API 연동 예정입니다'),
+                        content: Text('주소 검색 기능이 곧 추가됩니다'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
@@ -72,15 +71,14 @@ class AddressFields extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space4),
 
-        // Address (read-only, auto-filled from postal code search)
+        // Address (manually editable)
         TextFormField(
           controller: addressController,
           decoration: studentInputDecoration(
             label: '주소',
-            hint: '주소 검색 시 자동으로 입력됩니다',
+            hint: '주소를 입력해주세요 (예: 서울시 강남구 역삼동)',
             prefixIcon: Icons.location_on_outlined,
           ),
-          readOnly: true,
           textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: AppSpacing.space4),

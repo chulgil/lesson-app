@@ -87,29 +87,21 @@ class TimelineLessonBlock extends StatelessWidget {
               ? Border.all(color: baseColors.accent, width: 1.5)
               : null,
         ),
-        child: Column(
+        child: Row(
           children: [
+            // Left accent bar
+            _AccentBar(color: colors.accent, isNow: isNow),
+            // Content
             Expanded(
-              child: Row(
-                children: [
-                  // Left accent bar
-                  _AccentBar(color: colors.accent, isNow: isNow),
-                  // Content
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      child: _buildContent(colors),
-                    ),
-                  ),
-                  // Badges
-                  if (isPast) _buildPastBadge(),
-                  if (isNext && minutesUntilNext > 0) _buildNextBadge(),
-                  const SizedBox(width: 8),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                child: _buildContent(colors),
               ),
             ),
-            // Travel time indicator at bottom of block
-            if (lesson.travelTimeMinutes > 0) _buildTravelIndicator(),
+            // Badges
+            if (isPast) _buildPastBadge(),
+            if (isNext && minutesUntilNext > 0) _buildNextBadge(),
+            const SizedBox(width: 8),
           ],
         ),
       ),
@@ -179,7 +171,7 @@ class TimelineLessonBlock extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.only(left: 12, right: 8, bottom: 2),
       child: Text(
-        '\u{1F697} ${lesson.travelTimeMinutes}min',
+        '\u{1F697} ${lesson.travelTimeMinutes}분',
         style: AppTypography.caption.copyWith(
           color: AppColors.scheduleTravelAccent,
           fontSize: 9,

@@ -69,7 +69,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     _nameController.text = student.name;
     _phoneController.text = student.phone ?? '';
     _emailController.text = student.email ?? '';
-    _parentNameController.text = '';
+    _parentNameController.text = student.parentName ?? '';
     _parentPhoneController.text = student.parentPhone ?? '';
     _selectedInstrument = student.instrument;
     _selectedLevel = student.level;
@@ -490,6 +490,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       lessonsPerWeek: _lessonsPerWeek,
       phone: _phoneController.text.isNotEmpty
           ? _phoneController.text.trim()
+          : null,
+      parentName: _parentNameController.text.isNotEmpty
+          ? _parentNameController.text.trim()
           : null,
       parentPhone: _parentPhoneController.text.isNotEmpty
           ? _parentPhoneController.text.trim()

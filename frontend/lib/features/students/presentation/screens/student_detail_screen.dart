@@ -396,10 +396,21 @@ class _StudentDetailContent extends ConsumerWidget {
                     '${student.name} 학생을 정규 학생으로 전환하시겠습니까?',
                   );
                   if (confirmed == true) {
-                    await ref
-                        .read(studentsNotifierProvider.notifier)
-                        .updateStudentStatus(student.id, StudentStatus.active);
-                    ref.invalidate(studentProvider(student.id));
+                    try {
+                      await ref
+                          .read(studentsNotifierProvider.notifier)
+                          .updateStudentStatus(student.id, StudentStatus.active);
+                      ref.invalidate(studentProvider(student.id));
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
               ),
@@ -417,10 +428,21 @@ class _StudentDetailContent extends ConsumerWidget {
                     '${student.name} 학생을 휴강 상태로 변경하시겠습니까?',
                   );
                   if (confirmed == true) {
-                    await ref
-                        .read(studentsNotifierProvider.notifier)
-                        .updateStudentStatus(student.id, StudentStatus.paused);
-                    ref.invalidate(studentProvider(student.id));
+                    try {
+                      await ref
+                          .read(studentsNotifierProvider.notifier)
+                          .updateStudentStatus(student.id, StudentStatus.paused);
+                      ref.invalidate(studentProvider(student.id));
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
               ),
@@ -441,10 +463,21 @@ class _StudentDetailContent extends ConsumerWidget {
                     '${student.name} 학생의 레슨을 재개하시겠습니까?',
                   );
                   if (confirmed == true) {
-                    await ref
-                        .read(studentsNotifierProvider.notifier)
-                        .updateStudentStatus(student.id, StudentStatus.active);
-                    ref.invalidate(studentProvider(student.id));
+                    try {
+                      await ref
+                          .read(studentsNotifierProvider.notifier)
+                          .updateStudentStatus(student.id, StudentStatus.active);
+                      ref.invalidate(studentProvider(student.id));
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('상태 변경에 실패했습니다. 다시 시도해주세요.'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
               ),

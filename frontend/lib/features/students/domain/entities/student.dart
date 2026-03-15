@@ -150,6 +150,7 @@ class Student {
   final int monthlyFee; // Custom monthly fee (can differ from level default)
   final int lessonsPerWeek; // 1 = 주 1회 (월 4회), 2 = 주 2회 (월 8회)
   final String? phone;
+  final String? parentName;
   final String? parentPhone;
   final String? email;
   final String? profileImageUrl;
@@ -198,6 +199,7 @@ class Student {
     this.monthlyFee = 200000,
     this.lessonsPerWeek = 1,
     this.phone,
+    this.parentName,
     this.parentPhone,
     this.email,
     this.profileImageUrl,
@@ -347,6 +349,7 @@ class Student {
     int? monthlyFee,
     int? lessonsPerWeek,
     String? phone,
+    String? parentName,
     String? parentPhone,
     String? email,
     String? profileImageUrl,
@@ -383,6 +386,7 @@ class Student {
       monthlyFee: monthlyFee ?? this.monthlyFee,
       lessonsPerWeek: lessonsPerWeek ?? this.lessonsPerWeek,
       phone: phone ?? this.phone,
+      parentName: parentName ?? this.parentName,
       parentPhone: parentPhone ?? this.parentPhone,
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,

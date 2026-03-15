@@ -578,7 +578,7 @@ class _TravelTimeBlock extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       alignment: Alignment.centerLeft,
       child: Text(
-        '이동 ${travelMinutes}min',
+        '이동 ${travelMinutes}분',
         style: AppTypography.caption.copyWith(
           color: AppColors.scheduleTravelAccent,
           fontSize: 10,

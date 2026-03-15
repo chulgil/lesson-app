@@ -292,6 +292,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       phone: _phoneController.text.isNotEmpty
           ? _phoneController.text.trim()
           : null,
+      parentName: _parentNameController.text.isNotEmpty
+          ? _parentNameController.text.trim()
+          : null,
       parentPhone: _parentPhoneController.text.isNotEmpty
           ? _parentPhoneController.text.trim()
           : null,
