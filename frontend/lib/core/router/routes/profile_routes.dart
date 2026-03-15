@@ -14,6 +14,7 @@ import '../../../features/profile/presentation/screens/basic_info_edit_screen.da
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/analytics/presentation/screens/teacher_dashboard_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
+import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
 import '../app_routes.dart';
 
@@ -98,6 +99,13 @@ List<GoRoute> profileRoutes = [
       final certificateId = state.uri.queryParameters['id'];
       return CertificateEditScreen(certificateId: certificateId);
     },
+  ),
+
+  // Profile Preview
+  GoRoute(
+    path: AppRoutes.profilePreview,
+    name: 'profilePreview',
+    builder: (context, state) => const ProfilePreviewScreen(),
   ),
 
   // Profile Visibility

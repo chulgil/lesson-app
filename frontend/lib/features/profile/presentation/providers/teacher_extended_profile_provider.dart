@@ -318,6 +318,38 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     }
   }
 
+  /// Update teaching style
+  Future<void> updateTeachingStyle(String style) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      final updated = await repo.updateProfile(
+        current.copyWith(teachingStyle: style),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Update specialties
+  Future<void> updateSpecialties(List<String> specialties) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      final updated = await repo.updateProfile(
+        current.copyWith(specialties: specialties),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   /// Update searchable setting
   Future<void> updateSearchable(bool isSearchable) async {
     final current = state.valueOrNull;

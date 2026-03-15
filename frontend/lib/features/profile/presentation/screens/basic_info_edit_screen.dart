@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 
-/// Screen for editing basic profile info (name and introduction)
+/// Screen for editing basic profile info (name, introduction, teaching style, specialties)
 class BasicInfoEditScreen extends ConsumerStatefulWidget {
   const BasicInfoEditScreen({super.key});
 
@@ -20,10 +20,27 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _introductionController = TextEditingController();
+  final _teachingStyleController = TextEditingController();
+
+  final Set<String> _selectedSpecialties = {};
 
   bool _isLoading = false;
 
   static const int _minIntroductionLength = 20;
+  static const int _maxSpecialties = 5;
+
+  static const List<String> _specialtyOptions = [
+    '클래식',
+    '재즈',
+    '팝',
+    '입시',
+    '취미',
+    '아동',
+    '성인',
+    '앙상블',
+    '오케스트라',
+    '실내악',
+  ];
 
   @override
   void initState() {
@@ -37,6 +54,10 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     if (profile != null) {
       _nameController.text = profile.name;
       _introductionController.text = profile.introduction;
+      _teachingStyleController.text = profile.teachingStyle ?? '';
+      if (profile.specialties != null) {
+        _selectedSpecialties.addAll(profile.specialties!);
+      }
     }
   }
 
@@ -44,6 +65,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   void dispose() {
     _nameController.dispose();
     _introductionController.dispose();
+    _teachingStyleController.dispose();
     super.dispose();
   }
 
@@ -53,12 +75,22 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref
-          .read(teacherExtendedProfileProvider.notifier)
-          .updateBasicInfo(
-            name: _nameController.text.trim(),
-            introduction: _introductionController.text.trim(),
-          );
+      final notifier = ref.read(teacherExtendedProfileProvider.notifier);
+
+      // Save basic info (name + introduction)
+      await notifier.updateBasicInfo(
+        name: _nameController.text.trim(),
+        introduction: _introductionController.text.trim(),
+      );
+
+      // Save teaching style
+      final teachingStyle = _teachingStyleController.text.trim();
+      if (teachingStyle.isNotEmpty) {
+        await notifier.updateTeachingStyle(teachingStyle);
+      }
+
+      // Save specialties
+      await notifier.updateSpecialties(_selectedSpecialties.toList());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +104,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.')),
+          const SnackBar(
+            content: Text('저장 중 오류가 발생했습니다. 다시 시도해주세요.'),
+          ),
         );
       }
     } finally {
@@ -156,38 +190,83 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
             const SizedBox(height: AppSpacing.space6),
 
-            // Save button
-            SizedBox(
-              width: double.infinity,
-              height: AppSpacing.buttonHeight,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
-                  ),
-                ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        '저장하기',
-                        style: AppTypography.button,
-                      ),
+            // Teaching style field
+            _buildLabel('교수 스타일'),
+            const SizedBox(height: AppSpacing.space2),
+            TextFormField(
+              controller: _teachingStyleController,
+              decoration: _inputDecoration(
+                hintText: '레슨 방식과 철학을 설명해주세요',
+              ),
+              maxLines: 4,
+              minLines: 3,
+              textInputAction: TextInputAction.newline,
+            ),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Specialties field
+            _buildLabel('전문 분야'),
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              '최대 ${_maxSpecialties}개까지 선택할 수 있습니다',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
               ),
             ),
+            const SizedBox(height: AppSpacing.space3),
+            _buildSpecialtyChips(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSpecialtyChips() {
+    return Wrap(
+      spacing: AppSpacing.space2,
+      runSpacing: AppSpacing.space2,
+      children: _specialtyOptions.map((specialty) {
+        final isSelected = _selectedSpecialties.contains(specialty);
+        return FilterChip(
+          label: Text(specialty),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              if (selected) {
+                if (_selectedSpecialties.length >= _maxSpecialties) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('최대 ${_maxSpecialties}개까지 선택할 수 있습니다'),
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
+                _selectedSpecialties.add(specialty);
+              } else {
+                _selectedSpecialties.remove(specialty);
+              }
+            });
+          },
+          selectedColor: AppColors.primary.withValues(alpha: 0.15),
+          checkmarkColor: AppColors.primary,
+          labelStyle: AppTypography.bodyMedium.copyWith(
+            color: isSelected
+                ? AppColors.primary
+                : AppColors.textPrimaryLight,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+            side: BorderSide(
+              color: isSelected ? AppColors.primary : AppColors.borderLight,
+            ),
+          ),
+          backgroundColor: AppColors.surfaceLight,
+        );
+      }).toList(),
     );
   }
 

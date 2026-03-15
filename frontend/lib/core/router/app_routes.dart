@@ -74,6 +74,7 @@ class AppRoutes {
   static const certificateEdit = '/profile/certificate/edit';
   static const basicInfoEdit = '/profile/basic-info/edit';
   static const profileVisibility = '/profile/visibility';
+  static const profilePreview = '/profile/preview';
   static const outstandingPayments = '/profile/outstanding-payments';
 
   // Student routes

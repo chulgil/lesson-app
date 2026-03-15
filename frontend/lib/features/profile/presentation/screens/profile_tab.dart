@@ -10,6 +10,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
@@ -165,101 +166,165 @@ class ProfileTab extends ConsumerWidget {
     final initial = name.isNotEmpty ? name[0] : '?';
     final profileImageAsync = ref.watch(profileImageNotifierProvider(userId));
     final imagePath = profileImageAsync.valueOrNull;
+    final profileState = ref.watch(teacherExtendedProfileProvider);
+    final introduction = profileState.valueOrNull?.introduction;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profile avatar
-          GestureDetector(
-            onTap: () => _showImagePickerOptions(context, ref, userId),
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primaryLight,
-                  backgroundImage: imagePath != null
-                      ? FileImage(File(imagePath))
-                      : null,
-                  child: imagePath == null
-                      ? Text(
-                          initial,
-                          style: AppTypography.headingLarge.copyWith(
-                            color: Colors.white,
-                          ),
-                        )
-                      : null,
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(width: AppSpacing.space4),
-
-          // User info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          Row(
+            children: [
+              // Profile avatar
+              GestureDetector(
+                onTap: () => _showImagePickerOptions(context, ref, userId),
+                child: Stack(
                   children: [
-                    Text(name, style: AppTypography.headingLarge),
-                    const SizedBox(width: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '선생님',
-                        style: AppTypography.caption.copyWith(
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: AppColors.primaryLight,
+                      backgroundImage: imagePath != null
+                          ? FileImage(File(imagePath))
+                          : null,
+                      child: imagePath == null
+                          ? Text(
+                              initial,
+                              style: AppTypography.headingLarge.copyWith(
+                                color: Colors.white,
+                              ),
+                            )
+                          : null,
+                    ),
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
                           color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 14,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.space1),
-                Text(
-                  email,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+              ),
+
+              const SizedBox(width: AppSpacing.space4),
+
+              // User info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(name, style: AppTypography.headingLarge),
+                        const SizedBox(width: AppSpacing.space2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '선생님',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.space1),
+                    Text(
+                      email,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Quick edit button → BasicInfoEdit
+              IconButton(
+                onPressed: () {
+                  context.push(AppRoutes.basicInfoEdit);
+                },
+                icon: const Icon(Icons.edit_outlined),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.surfaceSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+
+          // Introduction text
+          const SizedBox(height: AppSpacing.space3),
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.space1),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    (introduction != null && introduction.isNotEmpty)
+                        ? introduction
+                        : '소개글을 작성해주세요',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: (introduction != null && introduction.isNotEmpty)
+                          ? AppColors.textSecondaryLight
+                          : AppColors.textTertiaryLight,
+                      fontStyle: (introduction != null && introduction.isNotEmpty)
+                          ? FontStyle.normal
+                          : FontStyle.italic,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                // Preview button
+                InkWell(
+                  onTap: () => context.push(AppRoutes.profilePreview),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space2,
+                      vertical: AppSpacing.space1,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.visibility_outlined,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '미리보기',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
-            ),
-          ),
-
-          // Edit button
-          IconButton(
-            onPressed: () {
-              context.push(AppRoutes.extendedProfile);
-            },
-            icon: const Icon(Icons.edit_outlined),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.surfaceSecondaryLight,
             ),
           ),
         ],
