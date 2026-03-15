@@ -3,27 +3,27 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 
-/// Manages audio session configuration for simultaneous playback and recording.
+/// Manages audio session configuration for playback and recording.
 ///
-/// This ensures that:
-/// - Metronome playback continues uninterrupted when tuner starts
-/// - Tuner can record while metronome plays
-/// - Audio session is configured once at app start
+/// Default: `.playback` category (metronome, no "in call" indicator).
+/// Tuner: switches to `.playAndRecord` while recording, then back to `.playback`.
 class AudioSessionManager {
   AudioSessionManager._();
 
   static AudioSession? _session;
   static bool _isConfigured = false;
   static bool _isInterrupted = false;
+  static bool _isRecordingMode = false;
   static StreamSubscription? _interruptionSubscription;
 
   /// Callback when audio is interrupted (e.g., phone call).
   static void Function(bool isInterrupted)? onInterruption;
 
-  /// Configure audio session for simultaneous playback and recording.
+  /// Configure audio session for playback (default mode).
   ///
+  /// Uses `.playback` category to avoid iOS showing "in call" indicator
+  /// when Bluetooth earphones are connected.
   /// Should be called once at app startup (in main.dart).
-  /// This prevents audio interruption when switching between metronome and tuner.
   static Future<void> configureForPlayAndRecord() async {
     if (_isConfigured) {
       return;
@@ -33,21 +33,9 @@ class AudioSessionManager {
       _session = await AudioSession.instance;
 
       if (Platform.isIOS) {
-        // iOS: Configure for simultaneous playback and recording
-        await _session!.configure(AudioSessionConfiguration(
-          avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-          avAudioSessionCategoryOptions:
-              AVAudioSessionCategoryOptions.mixWithOthers |
-                  AVAudioSessionCategoryOptions.defaultToSpeaker |
-                  AVAudioSessionCategoryOptions.allowBluetooth |
-                  AVAudioSessionCategoryOptions.allowBluetoothA2dp,
-          avAudioSessionMode: AVAudioSessionMode.defaultMode, // measurement mode reduces speaker volume
-          avAudioSessionRouteSharingPolicy:
-              AVAudioSessionRouteSharingPolicy.defaultPolicy,
-          avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-        ));
+        await _configurePlayback();
       } else if (Platform.isAndroid) {
-        // Android: Configure for media playback with recording capability
+        // Android: Configure for media playback
         await _session!.configure(const AudioSessionConfiguration(
           androidAudioAttributes: AndroidAudioAttributes(
             contentType: AndroidAudioContentType.music,
@@ -102,11 +90,79 @@ class AudioSessionManager {
     }
   }
 
+  /// Switch to recording mode (tuner needs microphone).
+  ///
+  /// Changes category to `.playAndRecord` so tuner can access the mic.
+  /// Call [disableRecordingMode] when tuner stops.
+  static Future<void> enableRecordingMode() async {
+    if (_session == null || _isRecordingMode) return;
+    if (!Platform.isIOS) {
+      _isRecordingMode = true;
+      return;
+    }
+
+    try {
+      await _session!.configure(AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionCategoryOptions:
+            AVAudioSessionCategoryOptions.mixWithOthers |
+                AVAudioSessionCategoryOptions.defaultToSpeaker |
+                AVAudioSessionCategoryOptions.allowBluetooth |
+                AVAudioSessionCategoryOptions.allowBluetoothA2dp,
+        avAudioSessionMode: AVAudioSessionMode.defaultMode,
+        avAudioSessionRouteSharingPolicy:
+            AVAudioSessionRouteSharingPolicy.defaultPolicy,
+        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+      ));
+      await _session!.setActive(true);
+      _isRecordingMode = true;
+    } catch (_) {
+      // Fallback: stay in current mode
+    }
+  }
+
+  /// Switch back to playback-only mode (after tuner stops).
+  ///
+  /// Restores `.playback` category to prevent "in call" indicator
+  /// on Bluetooth headphones.
+  static Future<void> disableRecordingMode() async {
+    if (_session == null || !_isRecordingMode) return;
+    if (!Platform.isIOS) {
+      _isRecordingMode = false;
+      return;
+    }
+
+    try {
+      await _configurePlayback();
+      await _session!.setActive(true);
+      _isRecordingMode = false;
+    } catch (_) {
+      // Fallback: stay in current mode
+    }
+  }
+
+  /// Configure iOS for playback-only (no "in call" indicator).
+  static Future<void> _configurePlayback() async {
+    await _session!.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playback,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.mixWithOthers |
+              AVAudioSessionCategoryOptions.allowBluetoothA2dp,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionRouteSharingPolicy:
+          AVAudioSessionRouteSharingPolicy.defaultPolicy,
+      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+    ));
+  }
+
   /// Check if audio session is configured.
   static bool get isConfigured => _isConfigured;
 
   /// Check if audio is currently interrupted.
   static bool get isInterrupted => _isInterrupted;
+
+  /// Check if currently in recording mode.
+  static bool get isRecordingMode => _isRecordingMode;
 
   /// Get the current audio session instance.
   static AudioSession? get session => _session;

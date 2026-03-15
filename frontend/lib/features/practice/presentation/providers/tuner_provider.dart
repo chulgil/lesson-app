@@ -255,6 +255,9 @@ class Tuner extends _$Tuner {
   Future<void> start() async {
     if (state.isListening) return;
 
+    // Switch to recording mode (enables microphone on iOS)
+    await AudioSessionManager.enableRecordingMode();
+
     state = state.copyWith(
       isListening: true,
       status: TuningStatus.listening,
@@ -275,6 +278,9 @@ class Tuner extends _$Tuner {
     );
 
     await _engine?.stop();
+
+    // Switch back to playback mode (removes "in call" indicator)
+    await AudioSessionManager.disableRecordingMode();
   }
 
   /// Toggle listening state.
