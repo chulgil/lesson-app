@@ -9,6 +9,7 @@ export 'student_form/student_profile_section.dart';
 export 'student_form/form_section_title.dart';
 export 'student_form/basic_info_fields.dart';
 export 'student_form/parent_info_fields.dart';
+export 'student_form/address_fields.dart';
 export 'student_form/instrument_selector.dart';
 export 'student_form/level_tuition_section.dart';
 export 'student_form/frequency_option.dart';

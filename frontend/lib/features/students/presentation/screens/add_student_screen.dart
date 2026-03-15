@@ -26,6 +26,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   final _parentNameController = TextEditingController();
   final _parentPhoneController = TextEditingController();
   final _notesController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _addressDetailController = TextEditingController();
 
   String? _selectedInstrument;
   StudentLevel _selectedLevel = StudentLevel.intermediate;
@@ -55,6 +58,9 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     _parentPhoneController.dispose();
     _monthlyFeeController.dispose();
     _notesController.dispose();
+    _postalCodeController.dispose();
+    _addressController.dispose();
+    _addressDetailController.dispose();
     super.dispose();
   }
 
@@ -111,6 +117,18 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               ParentInfoFields(
                 parentNameController: _parentNameController,
                 parentPhoneController: _parentPhoneController,
+              ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Address section
+              const FormSectionTitle('주소'),
+              const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
+              const SizedBox(height: AppSpacing.space3),
+              AddressFields(
+                postalCodeController: _postalCodeController,
+                addressController: _addressController,
+                addressDetailController: _addressDetailController,
               ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -219,7 +237,10 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         _parentPhoneController.text.isNotEmpty ||
         _selectedInstrument != null ||
         _selectedDays.isNotEmpty ||
-        _notesController.text.isNotEmpty;
+        _notesController.text.isNotEmpty ||
+        _postalCodeController.text.isNotEmpty ||
+        _addressController.text.isNotEmpty ||
+        _addressDetailController.text.isNotEmpty;
   }
 
   Future<void> _saveStudent() async {
@@ -282,6 +303,18 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       lessonDuration: _lessonDuration,
       notes:
           _notesController.text.isNotEmpty ? _notesController.text.trim() : null,
+      postalCode: _postalCodeController.text.isNotEmpty
+          ? _postalCodeController.text.trim()
+          : null,
+      address: _addressController.text.isNotEmpty
+          ? _addressController.text.trim()
+          : null,
+      addressDetail: _addressDetailController.text.isNotEmpty
+          ? _addressDetailController.text.trim()
+          : null,
+      district: _addressController.text.isNotEmpty
+          ? _extractDistrict(_addressController.text.trim())
+          : null,
       createdAt: DateTime.now(),
     );
 
@@ -333,6 +366,20 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         ),
       );
     }
+  }
+
+  /// Extract district (구/동) from full address.
+  /// e.g. "서울시 강남구 역삼동" -> "강남구 역삼동"
+  String? _extractDistrict(String address) {
+    final parts = address.split(' ');
+    if (parts.length >= 3) {
+      // Skip city-level (시/도) and return gu + dong
+      return parts.sublist(1).join(' ');
+    }
+    if (parts.length == 2) {
+      return address;
+    }
+    return null;
   }
 
   /// Build lessonTime string: "14:00" if all same, "월14:00,수15:30" if different.

@@ -183,6 +183,12 @@ class Student {
   // V2: Practice level (calculated from practice records)
   final PracticeLevel? practiceLevel; // Calculated practice performance
 
+  // V3: Address fields (for lesson location auto-fill)
+  final String? postalCode; // 우편번호 (5자리)
+  final String? address; // 기본주소 (시/구/동)
+  final String? addressDetail; // 상세주소 (비공개, 연결된 선생님에게만)
+  final String? district; // 구/동 이름 (검색용, 우편번호에서 자동추출)
+
   Student({
     required this.id,
     required String name,
@@ -214,6 +220,10 @@ class Student {
     this.breakReason,
     this.expectedReturnDate,
     this.practiceLevel,
+    this.postalCode,
+    this.address,
+    this.addressDetail,
+    this.district,
   }) : name = name,
        profileColor = profileColor ?? _profileColorFromName(name);
 
@@ -309,6 +319,24 @@ class Student {
     return '$lessonDay $lessonTime';
   }
 
+  /// Check if student has a registered address
+  bool get hasAddress => postalCode != null && postalCode!.isNotEmpty;
+
+  /// Get display-friendly address (without detail for privacy)
+  String? get displayAddress {
+    if (address == null) return null;
+    return address;
+  }
+
+  /// Get full address including detail (for connected teacher only)
+  String? get fullAddress {
+    if (address == null) return null;
+    if (addressDetail != null && addressDetail!.isNotEmpty) {
+      return '$address $addressDetail';
+    }
+    return address;
+  }
+
   /// Copy with new values
   Student copyWith({
     String? id,
@@ -341,6 +369,10 @@ class Student {
     String? breakReason,
     DateTime? expectedReturnDate,
     PracticeLevel? practiceLevel,
+    String? postalCode,
+    String? address,
+    String? addressDetail,
+    String? district,
   }) {
     return Student(
       id: id ?? this.id,
@@ -373,6 +405,10 @@ class Student {
       breakReason: breakReason ?? this.breakReason,
       expectedReturnDate: expectedReturnDate ?? this.expectedReturnDate,
       practiceLevel: practiceLevel ?? this.practiceLevel,
+      postalCode: postalCode ?? this.postalCode,
+      address: address ?? this.address,
+      addressDetail: addressDetail ?? this.addressDetail,
+      district: district ?? this.district,
     );
   }
 

@@ -52,6 +52,10 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
           : DateTime.parse(json['expected_return_date'] as String),
       practiceLevel:
           $enumDecodeNullable(_$PracticeLevelEnumMap, json['practice_level']),
+      postalCode: json['postal_code'] as String?,
+      address: json['address'] as String?,
+      addressDetail: json['address_detail'] as String?,
+      district: json['district'] as String?,
     );
 
 Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
@@ -85,6 +89,10 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'break_reason': instance.breakReason,
       'expected_return_date': instance.expectedReturnDate?.toIso8601String(),
       'practice_level': _$PracticeLevelEnumMap[instance.practiceLevel],
+      'postal_code': instance.postalCode,
+      'address': instance.address,
+      'address_detail': instance.addressDetail,
+      'district': instance.district,
     };
 
 const _$StudentLevelEnumMap = {

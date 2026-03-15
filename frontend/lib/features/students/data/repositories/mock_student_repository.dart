@@ -44,6 +44,10 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 700)),
         birthDate: DateTime(2012, 3, 15),
         practiceLevel: PracticeLevel.excellent,
+        postalCode: '06141',
+        address: '서울시 강남구 역삼동',
+        addressDetail: '역삼아파트 101동 1201호',
+        district: '강남구 역삼동',
         notes: '장기 수강생 (2년). 수강권 14개 보유 이력. 콩쿠르 준비 중. '
             '주 2회 레슨으로 집중 훈련.',
       ),
@@ -73,6 +77,10 @@ class MockStudentRepository implements StudentRepository {
         connectedAt: now.subtract(const Duration(days: 58)),
         birthDate: DateTime(2015, 7, 22),
         practiceLevel: PracticeLevel.average,
+        postalCode: '06035',
+        address: '서울시 강남구 개포동',
+        addressDetail: '개포주공 3단지 205동',
+        district: '강남구 개포동',
         notes: '신규 수강생 (2개월). 체험 레슨 후 정규 등록. '
             '바이엘 진도 중. 집중력 좋음.',
       ),
@@ -130,6 +138,9 @@ class MockStudentRepository implements StudentRepository {
         connectionStatus: ConnectionStatus.inviteSent,
         birthDate: DateTime(2016, 5, 10),
         practiceLevel: PracticeLevel.newStudent,
+        postalCode: '06524',
+        address: '서울시 서초구 반포동',
+        district: '서초구 반포동',
         notes: '체험 레슨 1회 완료. 학부모와 정규 등록 상담 예정. '
             '30분 체험 레슨 진행.',
       ),
