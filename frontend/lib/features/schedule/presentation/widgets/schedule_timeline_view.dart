@@ -267,7 +267,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           right: 0,
           child: Container(
             height: 0.5,
-            color: const Color(0xFFE8E8E8),
+            color: AppColors.scheduleGridLine,
           ),
         ),
       );
@@ -375,7 +375,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             child: Text(
               '${_now.hour.toString().padLeft(2, '0')}:${_now.minute.toString().padLeft(2, '0')}',
               style: AppTypography.caption.copyWith(
-                color: const Color(0xFFE53935),
+                color: AppColors.scheduleNowIndicator,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
@@ -388,7 +388,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             width: 8,
             height: 8,
             decoration: const BoxDecoration(
-              color: Color(0xFFE53935),
+              color: AppColors.scheduleNowIndicator,
               shape: BoxShape.circle,
             ),
           ),
@@ -396,7 +396,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           Expanded(
             child: Container(
               height: 1,
-              color: const Color(0xFFE53935).withValues(alpha: 0.7),
+              color: AppColors.scheduleNowIndicator.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -420,7 +420,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(color: const Color(0xFFE8E8E8), width: 0.5),
+          top: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
         ),
       ),
       child: Column(

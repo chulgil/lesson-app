@@ -64,7 +64,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         error: (_, __) => _buildError(),
         data: (invite) {
           if (invite == null) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildError();
           }
           return _buildContent(invite, userRole);
         },

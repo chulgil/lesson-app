@@ -533,7 +533,7 @@ class _StudentDetailContent extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('학생 삭제'),
-        content: Text('${student.name} 학생을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+        content: Text('${student.name} 학생을 삭제하시겠습니까?\n\n관련된 모든 레슨 기록과 연습 기록이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -671,6 +671,7 @@ class _StudentDetailContent extends ConsumerWidget {
           TextButton.icon(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: inviteCode));
+              Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('초대 코드가 복사되었습니다'),

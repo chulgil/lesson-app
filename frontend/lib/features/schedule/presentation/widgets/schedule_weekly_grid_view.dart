@@ -170,7 +170,7 @@ class _ScheduleWeeklyGridViewState
                     children: [
                       Container(
                         height: 0.5,
-                        color: const Color(0xFFF0F0F0),
+                        color: AppColors.scheduleGridLine,
                       ),
                       Expanded(
                         child: _buildGridCell(
@@ -243,7 +243,7 @@ class _ScheduleWeeklyGridViewState
             width: 6,
             height: 6,
             decoration: const BoxDecoration(
-              color: Color(0xFFE53935),
+              color: AppColors.scheduleNowIndicator,
               shape: BoxShape.circle,
             ),
           ),
@@ -251,7 +251,7 @@ class _ScheduleWeeklyGridViewState
           Expanded(
             child: Container(
               height: 1,
-              color: const Color(0xFFE53935).withValues(alpha: 0.7),
+              color: AppColors.scheduleNowIndicator.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -435,7 +435,7 @@ class _ScheduleWeeklyGridViewState
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
-          top: BorderSide(color: const Color(0xFFE8E8E8), width: 0.5),
+          top: BorderSide(color: AppColors.scheduleGridLine, width: 0.5),
         ),
       ),
       child: Text(

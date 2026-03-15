@@ -94,7 +94,6 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               // Profile photo section
               StudentProfileSection(
                 displayName: _nameController.text,
-                onTapPhoto: () => showImagePickerOptions(context),
               ),
 
               const SizedBox(height: AppSpacing.space6),
