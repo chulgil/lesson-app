@@ -168,14 +168,14 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final parts = lesson.startTime.split(':');
       final lessonStart = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final lessonEnd = lessonStart + lesson.duration;
-      final travelEnd = lessonEnd + lesson.travelTimeMinutes;
+      final travelStart = lessonStart - lesson.travelTimeMinutes;
       final tappedMinutes = hour * 60 + minute;
       if (tappedMinutes >= lessonStart && tappedMinutes < lessonEnd) {
         return; // Lesson block's onTap will handle this
       }
       if (lesson.travelTimeMinutes > 0 &&
-          tappedMinutes >= lessonEnd &&
-          tappedMinutes < travelEnd) {
+          tappedMinutes >= travelStart &&
+          tappedMinutes < lessonStart) {
         return; // Travel time block — ignore tap
       }
     }
@@ -215,13 +215,15 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       }
     }
 
-    // Consider lesson times + travel time (some lessons may be outside availability)
+    // Consider lesson times + travel time BEFORE lesson (some lessons may be outside availability)
     for (final lesson in sortedLessons) {
       final parts = lesson.startTime.split(':');
-      final hour = int.parse(parts[0]);
-      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration + lesson.travelTimeMinutes;
+      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
+      final travelStartHour = (travelStartMinutes / 60).floor();
+      final endMinutes = startMinutes + lesson.duration;
       final endHour = (endMinutes / 60).ceil();
-      if (hour < earliest) earliest = hour;
+      if (travelStartHour < earliest) earliest = travelStartHour;
       if (endHour > latest) latest = endHour;
     }
 
@@ -334,14 +336,15 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
         ),
       );
 
-      // Travel time block after lesson
+      // Travel time block BEFORE lesson
       if (lesson.travelTimeMinutes > 0) {
-        final travelTop = ((endMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+        final travelStartMinutes = lessonMinutes - lesson.travelTimeMinutes;
+        final travelTop = ((travelStartMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
         final travelHeight = (lesson.travelTimeMinutes / 30.0) * _unitHeight;
 
         widgets.add(
           Positioned(
-            top: travelTop + 2, // 2px gap from lesson block
+            top: travelTop, // No gap — travel ends where lesson starts
             left: 52,
             right: 0,
             child: _TravelTimeBlock(
@@ -548,7 +551,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 }
 
-/// Travel time block displayed after a lesson in the timeline.
+/// Travel time block displayed before a lesson in the timeline.
 class _TravelTimeBlock extends StatelessWidget {
   final int travelMinutes;
   final double height;

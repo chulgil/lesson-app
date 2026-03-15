@@ -463,13 +463,15 @@ class _ScheduleWeeklyGridViewState
       }
     }
 
-    // Include actual lesson hours (+ travel time)
+    // Include actual lesson hours (+ travel time BEFORE lesson)
     for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
-      final hour = int.parse(parts[0]);
-      final endMinutes = hour * 60 + int.parse(parts[1]) + lesson.duration + lesson.travelTimeMinutes;
+      final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+      final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
+      final travelStartHour = (travelStartMinutes / 60).floor();
+      final endMinutes = startMinutes + lesson.duration;
       final endHour = (endMinutes / 60).ceil();
-      if (hour < earliest) earliest = hour;
+      if (travelStartHour < earliest) earliest = travelStartHour;
       if (endHour > latest) latest = endHour;
     }
 
@@ -508,14 +510,14 @@ class _ScheduleWeeklyGridViewState
       final dayIndex = lesson.date.weekday - 1;
       final parts = lesson.startTime.split(':');
       final startMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-      final endMinutes = startMinutes + lesson.duration;
+      final travelStartMinutes = startMinutes - lesson.travelTimeMinutes;
 
       map.putIfAbsent(dayIndex, () => {});
 
-      // Fill 30-min slots that travel time covers after lesson end
+      // Fill 30-min slots that travel time covers BEFORE lesson start
       final travelSlotCount = (lesson.travelTimeMinutes / 30.0).ceil();
       for (int i = 0; i < travelSlotCount; i++) {
-        final slotMinutes = endMinutes + i * 30;
+        final slotMinutes = travelStartMinutes + i * 30;
         // Snap to nearest 30-min boundary
         final snapped = (slotMinutes ~/ 30) * 30;
         map[dayIndex]!.add(snapped);

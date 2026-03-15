@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -579,9 +577,9 @@ class MockTeacherAvailabilityRepository
   }
 
   /// Find any booked slot that conflicts with the given time range.
-  /// Uses asymmetric buffering:
-  /// - After booked slot: max(breakTime, incomingTravelTime) — teacher travels to new student
-  /// - Before booked slot: max(breakTime, bookedStudentTravelTime) — teacher travels to booked student
+  /// Travel time is placed BEFORE each lesson (teacher arrives before lesson starts).
+  /// Each lesson occupies: [start - travelTime, start + duration]
+  /// Between lessons, breakTime gap is required.
   AvailabilitySlot? _findConflictingSlot(
     String teacherId,
     DateTime date,
@@ -603,15 +601,15 @@ class MockTeacherAvailabilityRepository
       final bookedStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute;
       final bookedEndMinutes = slot.endTime.hour * 60 + slot.endTime.minute;
 
-      // Buffer before booked slot: teacher needs to travel TO the booked student
-      final bufferBefore = math.max(breakTimeMinutes, slot.travelTimeMinutes);
-      // Buffer after booked slot: teacher needs to travel TO the incoming student
-      final bufferAfter = math.max(breakTimeMinutes, incomingTravelTimeMinutes);
+      // Each slot's occupied range includes travel BEFORE the lesson
+      final bookedEffectiveStart = bookedStartMinutes - slot.travelTimeMinutes;
+      final bookedEffectiveEnd = bookedEndMinutes;
+      final newEffectiveStart = startMinutes - incomingTravelTimeMinutes;
+      final newEffectiveEnd = endMinutes;
 
-      final effectiveBookedStart = bookedStartMinutes - bufferBefore;
-      final effectiveBookedEnd = bookedEndMinutes + bufferAfter;
-
-      if (startMinutes < effectiveBookedEnd && endMinutes > effectiveBookedStart) {
+      // Check overlap with breakTime gap between occupied ranges
+      if (newEffectiveStart < bookedEffectiveEnd + breakTimeMinutes &&
+          newEffectiveEnd + breakTimeMinutes > bookedEffectiveStart) {
         return slot;
       }
     }
