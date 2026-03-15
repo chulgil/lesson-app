@@ -13,6 +13,7 @@ import '../widgets/issue_form_membership_widgets.dart';
 import '../widgets/issue_form_sections.dart';
 import '../widgets/issue_form_summary_widgets.dart';
 import '../widgets/issue_form_type_options.dart';
+import '../widgets/location_travel_selector.dart';
 import 'issue_subscription_actions.dart';
 
 /// Screen for teachers to issue subscriptions to students.
@@ -66,6 +67,8 @@ class _IssueSubscriptionScreenState
   String _customBonusReason = '';
   DateTime? _startDate;
   int _rescheduleAllowance = 2;
+  String? _selectedLocationId;
+  int _travelTimeMinutes = 0;
 
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
@@ -113,6 +116,10 @@ class _IssueSubscriptionScreenState
   DateTime? get startDate => _startDate;
   @override
   int get rescheduleAllowance => _rescheduleAllowance;
+  @override
+  String? get selectedLocationId => _selectedLocationId;
+  @override
+  int get travelTimeMinutes => _travelTimeMinutes;
 
   @override
   String? get effectiveBonusReason {
@@ -244,6 +251,21 @@ class _IssueSubscriptionScreenState
               memberships: memberships,
               selectedMembershipId: _selectedMembershipId,
             ),
+
+          // Location & travel time selector
+          if (_selectedMembershipId != null) ...[
+            const SizedBox(height: AppSpacing.space6),
+            LocationTravelSelector(
+              membershipId: _selectedMembershipId!,
+              studentId: widget.primaryStudentId,
+              currentLocationId: _selectedLocationId,
+              currentTravelTime: _travelTimeMinutes,
+              onLocationChanged: (locationId) =>
+                  setState(() => _selectedLocationId = locationId),
+              onTravelTimeChanged: (minutes) =>
+                  setState(() => _travelTimeMinutes = minutes),
+            ),
+          ],
 
           const SizedBox(height: AppSpacing.space6),
 

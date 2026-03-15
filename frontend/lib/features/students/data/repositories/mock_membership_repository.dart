@@ -19,7 +19,7 @@ class MockMembershipRepository implements MembershipRepository {
     final now = DateTime.now();
 
     _memberships.addAll([
-      // Student 1 - Academy membership
+      // Student 1 - Academy membership (teacher visits student home)
       ClassMembership(
         id: 'cm_001',
         lessonClassId: 'lc_001', // 행복음악학원
@@ -32,9 +32,11 @@ class MockMembershipRepository implements MembershipRepository {
         lessonDay: '월',
         lessonTime: '16:00',
         lessonDuration: 60,
+        lessonLocationId: 'student_home_student_1',
+        travelTimeMinutes: 20,
         createdAt: now.subtract(const Duration(days: 60)),
       ),
-      // Student 2 - Academy membership
+      // Student 2 - Academy membership (teacher visits)
       ClassMembership(
         id: 'cm_002',
         lessonClassId: 'lc_001', // 행복음악학원
@@ -47,6 +49,8 @@ class MockMembershipRepository implements MembershipRepository {
         lessonDay: '화',
         lessonTime: '15:00',
         lessonDuration: 60,
+        lessonLocationId: 'student_home_student_2',
+        travelTimeMinutes: 15,
         createdAt: now.subtract(const Duration(days: 45)),
       ),
       // Student 3 - Private lesson membership

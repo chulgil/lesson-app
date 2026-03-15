@@ -40,6 +40,8 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   DateTime? get startDate;
   int get finalAmount;
   int get rescheduleAllowance;
+  String? get selectedLocationId;
+  int get travelTimeMinutes;
 
   void issueSubscription() async {
     if (formKey.currentState?.validate() != true) return;
@@ -108,6 +110,15 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
     try {
       final repository = ref.read(subscriptionRepositoryProvider);
       await repository.create(subscription);
+
+      // Update membership with location and travel time if set
+      if (selectedLocationId != null || travelTimeMinutes > 0) {
+        await _updateMembershipLocationTravel(
+          membershipId: selectedMembershipId!,
+          locationId: selectedLocationId,
+          travelTime: travelTimeMinutes,
+        );
+      }
 
       // Transition relationship to active (Issue #59)
       final teacherId = await _getTeacherIdFromMembership(
@@ -196,6 +207,34 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       studentProvider(primaryStudentId).future,
     );
     return student?.name ?? '';
+  }
+
+  /// Update the membership's lesson location and travel time.
+  Future<void> _updateMembershipLocationTravel({
+    required String membershipId,
+    String? locationId,
+    required int travelTime,
+  }) async {
+    try {
+      final memberships = ref.read(
+        studentMembershipsProvider(primaryStudentId),
+      );
+      final membership = memberships.valueOrNull?.firstWhere(
+        (m) => m.id == membershipId,
+        orElse: () => throw Exception('Membership not found'),
+      );
+      if (membership == null) return;
+
+      final updated = membership.copyWith(
+        lessonLocationId: locationId,
+        travelTimeMinutes: travelTime,
+      );
+
+      final membershipRepo = ref.read(membershipRepositoryProvider);
+      await membershipRepo.update(updated);
+    } catch (e) {
+      debugPrint('Failed to update membership location/travel: $e');
+    }
   }
 
   Future<void> _createScheduleConfirmationCard(
