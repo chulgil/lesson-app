@@ -99,3 +99,18 @@
 - **날짜**: 2026-03-15
 - **교훈**: 기존 운영시간을 편집할 때 `addWeeklySchedule()`을 호출하여 수정 대신 중복 추가가 발생. `updateWeeklySchedule()` 메서드가 존재하지만 어디서도 호출되지 않음.
 - **조치**: 편집 UI에서 저장 시 기존 ID 존재 여부 확인 → 있으면 update, 없으면 add. 새 CRUD 메서드 추가 시 "이 메서드를 호출하는 곳"이 반드시 존재하는지 grep 확인.
+
+## 21. 새 Provider 추가 시 _invalidateProviders에 등록 필수 - error-pattern
+- **날짜**: 2026-03-15
+- **교훈**: `pendingRenewalProposalProvider`를 추가했지만 `SubscriptionProposalNotifier._invalidateProviders()`에 등록하지 않아, 학생이 갱신 제안을 수락/거절해도 배너가 갱신되지 않는 버그 발생. Code Review에서 HIGH로 감지됨.
+- **조치**: 새 Provider를 추가할 때 관련 Notifier의 `_invalidateProviders()`에 반드시 등록. grep `invalidate.*Provider`로 누락 확인.
+
+## 22. Hick's Law — 선택지가 많으면 사용률이 떨어진다 - automation-pattern
+- **날짜**: 2026-03-15
+- **교훈**: 피드백 아이콘 👍⭐💪 3개 → 선생님이 매번 "어떤 것을 누를까" 2-3초 고민. 하루 40개 과제에 누적되면 피드백 포기. YouTube처럼 👍 1개가 사용률을 극대화. 학생 응답 🙏❓도 동일 — 🙏은 정보량=0, ❓는 메모 텍스트가 적합.
+- **조치**: 새 UI 요소 추가 시 "선택지 수 × 일일 사용 빈도"를 계산. 하루 10회 이상 반복되는 인터랙션은 선택지 1개가 원칙. 뉘앙스가 필요하면 텍스트 입력으로.
+
+## 23. 이미 구현된 기능은 이슈 상태 라벨로 추적 — "한 것 또 하기" 방지 - automation-pattern
+- **날짜**: 2026-03-15
+- **교훈**: #158 이슈를 진행하려 했으나 Step 1이 이미 완전 구현됨(edit_student_screen + level_tuition_section). 이슈에 `status: todo` 라벨이 남아있어 미착수로 오인. 이미 완료된 작업을 다시 분석하는 데 시간 낭비.
+- **조치**: 기능 구현 후 반드시 이슈 라벨을 `status: review` 또는 `status: done`으로 업데이트. 이슈 진행 전 `gh issue view`로 관련 커밋/PR 먼저 확인.

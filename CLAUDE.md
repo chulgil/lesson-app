@@ -142,7 +142,7 @@ flutter run -d <device_id> --release                         # 기기 배포
 
 | 파일 | 내용 |
 |------|------|
-| `lessons-learned.md` | 14개 교훈 (에러/자동화 패턴) |
+| `lessons-learned.md` | 23개 교훈 (에러/자동화 패턴) |
 | `issue-workflow.md` | 이슈 생성·라벨·브랜치·커밋 워크플로우 |
 | `metronome-guide.md` | 메트로놈 커스텀 플러그인 개발 지침 |
 | `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
