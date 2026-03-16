@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/auth/auth_state.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../providers/background_image_provider.dart';
+import '../providers/profile_image_provider.dart';
 
 /// Screen for editing basic profile info (name, introduction, teaching style, specialties)
 class BasicInfoEditScreen extends ConsumerStatefulWidget {
@@ -69,6 +76,67 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     super.dispose();
   }
 
+  String get _userId {
+    final authState = ref.read(authNotifierProvider);
+    return authState is AuthAuthenticated ? authState.userId : '';
+  }
+
+  Future<void> _onTapProfileImage() async {
+    final userId = _userId;
+    final currentPath =
+        ref.read(profileImageNotifierProvider(userId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: '프로필 사진',
+      showDelete: currentPath != null,
+    );
+    if (action == null || !mounted) return;
+
+    final notifier =
+        ref.read(profileImageNotifierProvider(userId).notifier);
+
+    if (action == ImagePickerAction.delete) {
+      await notifier.removeImage();
+      return;
+    }
+
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    if (!mounted) return;
+    await notifier.pickAndSaveImage(source, context);
+  }
+
+  Future<void> _onTapBackgroundImage() async {
+    final userId = _userId;
+    final currentPath =
+        ref.read(backgroundImageNotifierProvider(userId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: '배경 사진',
+      showDelete: currentPath != null,
+    );
+    if (action == null || !mounted) return;
+
+    final notifier =
+        ref.read(backgroundImageNotifierProvider(userId).notifier);
+
+    if (action == ImagePickerAction.delete) {
+      await notifier.removeImage();
+      return;
+    }
+
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    if (!mounted) return;
+    await notifier.pickAndSaveImage(source, context);
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -118,6 +186,14 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userId = _userId;
+    final profileImagePath =
+        ref.watch(profileImageNotifierProvider(userId)).valueOrNull;
+    final backgroundImagePath =
+        ref.watch(backgroundImageNotifierProvider(userId)).valueOrNull;
+    final name = _nameController.text;
+    final initial = name.isNotEmpty ? name[0] : '?';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('기본 정보 수정'),
@@ -145,6 +221,18 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           children: [
+            // Photo header (profile + background)
+            ProfilePhotoHeader(
+              profileImagePath: profileImagePath,
+              backgroundImagePath: backgroundImagePath,
+              initial: initial,
+              avatarColor: AppColors.primaryLight,
+              onTapProfile: _onTapProfileImage,
+              onTapBackground: _onTapBackgroundImage,
+            ),
+
+            const SizedBox(height: AppSpacing.space6),
+
             // Name field
             _buildLabel('이름', required: true),
             const SizedBox(height: AppSpacing.space2),

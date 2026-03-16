@@ -14,7 +14,49 @@ Future<String?> showImagePickerFlow(
   String? existingImage,
   required String fileNamePrefix,
 }) async {
-  final action = await showModalBottomSheet<_ImageAction>(
+  final action = await showImagePickerBottomSheet(
+    context,
+    title: '프로필 사진',
+    showDelete: existingImage != null,
+  );
+
+  if (action == null || !context.mounted) return existingImage;
+
+  if (action == ImagePickerAction.delete) {
+    if (existingImage != null) {
+      await deleteProfileImage(existingImage);
+    }
+    return null;
+  }
+
+  final source = action == ImagePickerAction.camera
+      ? ImageSource.camera
+      : ImageSource.gallery;
+
+  final picked = await pickImage(source);
+  if (picked == null || !context.mounted) return existingImage;
+
+  final cropped = await cropProfileImage(picked.path, context);
+  if (cropped == null) return existingImage;
+
+  final saved = await saveProfileImage(
+    cropped,
+    '${fileNamePrefix}_${DateTime.now().millisecondsSinceEpoch}',
+  );
+  return saved;
+}
+
+enum ImagePickerAction { camera, gallery, delete }
+
+/// Show image picker bottom sheet and return the selected action.
+///
+/// Returns null if cancelled.
+Future<ImagePickerAction?> showImagePickerBottomSheet(
+  BuildContext context, {
+  required String title,
+  bool showDelete = false,
+}) async {
+  return showModalBottomSheet<ImagePickerAction>(
     context: context,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(
@@ -34,60 +76,34 @@ Future<String?> showImagePickerFlow(
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(height: AppSpacing.space4),
+          const SizedBox(height: AppSpacing.space3),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+            child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          ),
+          const SizedBox(height: AppSpacing.space2),
           ListTile(
             leading: const Icon(Icons.photo_library),
             title: const Text('갤러리에서 선택'),
-            onTap: () =>
-                Navigator.pop(context, _ImageAction.gallery),
+            onTap: () => Navigator.pop(context, ImagePickerAction.gallery),
           ),
           ListTile(
             leading: const Icon(Icons.camera_alt),
             title: const Text('카메라로 촬영'),
-            onTap: () =>
-                Navigator.pop(context, _ImageAction.camera),
+            onTap: () => Navigator.pop(context, ImagePickerAction.camera),
           ),
-          if (existingImage != null)
+          if (showDelete)
             ListTile(
               leading: Icon(Icons.delete, color: AppColors.error),
-              title: Text('사진 삭제',
-                  style: TextStyle(color: AppColors.error)),
-              onTap: () =>
-                  Navigator.pop(context, _ImageAction.delete),
+              title: Text('사진 삭제', style: TextStyle(color: AppColors.error)),
+              onTap: () => Navigator.pop(context, ImagePickerAction.delete),
             ),
           const SizedBox(height: AppSpacing.space4),
         ],
       ),
     ),
   );
-
-  if (action == null || !context.mounted) return existingImage;
-
-  if (action == _ImageAction.delete) {
-    if (existingImage != null) {
-      await deleteProfileImage(existingImage);
-    }
-    return null;
-  }
-
-  final source = action == _ImageAction.camera
-      ? ImageSource.camera
-      : ImageSource.gallery;
-
-  final picked = await pickImage(source);
-  if (picked == null || !context.mounted) return existingImage;
-
-  final cropped = await cropProfileImage(picked.path, context);
-  if (cropped == null) return existingImage;
-
-  final saved = await saveProfileImage(
-    cropped,
-    '${fileNamePrefix}_${DateTime.now().millisecondsSinceEpoch}',
-  );
-  return saved;
 }
-
-enum _ImageAction { camera, gallery, delete }
 
 /// Show image picker options bottom sheet (legacy callback-based).
 ///

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/student/student_crud_provider.dart';
 import '../providers/membership_providers.dart';
+import '../providers/student_image_provider.dart';
+import '../widgets/student_form/student_form_dialogs.dart';
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for editing an existing student
@@ -226,10 +230,8 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile photo section (read-only, no photo editing)
-                  StudentProfileSection(
-                    displayName: _nameController.text,
-                  ),
+                  // Profile + background photo header
+                  _buildPhotoHeader(student),
 
                   const SizedBox(height: AppSpacing.space6),
 
@@ -432,6 +434,82 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         );
       },
     );
+  }
+
+  Widget _buildPhotoHeader(Student student) {
+    final profileImagePath =
+        ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
+    final backgroundImagePath =
+        ref.watch(studentBackgroundImageNotifierProvider(student.id)).valueOrNull;
+    final displayName = _nameController.text;
+    final initial = displayName.isNotEmpty ? displayName[0] : '?';
+
+    return ProfilePhotoHeader(
+      profileImagePath: profileImagePath,
+      backgroundImagePath: backgroundImagePath,
+      initial: initial,
+      avatarColor: student.profileColor,
+      onTapProfile: () => _onTapStudentProfileImage(student.id),
+      onTapBackground: () => _onTapStudentBackgroundImage(student.id),
+    );
+  }
+
+  Future<void> _onTapStudentProfileImage(String studentId) async {
+    final currentPath =
+        ref.read(studentProfileImageNotifierProvider(studentId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: '프로필 사진',
+      showDelete: currentPath != null,
+    );
+    if (action == null || !mounted) return;
+
+    final notifier =
+        ref.read(studentProfileImageNotifierProvider(studentId).notifier);
+
+    if (action == ImagePickerAction.delete) {
+      await notifier.removeImage();
+      _markChanged();
+      return;
+    }
+
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    if (!mounted) return;
+    final success = await notifier.pickAndSaveImage(source, context);
+    if (success) _markChanged();
+  }
+
+  Future<void> _onTapStudentBackgroundImage(String studentId) async {
+    final currentPath =
+        ref.read(studentBackgroundImageNotifierProvider(studentId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: '배경 사진',
+      showDelete: currentPath != null,
+    );
+    if (action == null || !mounted) return;
+
+    final notifier =
+        ref.read(studentBackgroundImageNotifierProvider(studentId).notifier);
+
+    if (action == ImagePickerAction.delete) {
+      await notifier.removeImage();
+      _markChanged();
+      return;
+    }
+
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    if (!mounted) return;
+    final success = await notifier.pickAndSaveImage(source, context);
+    if (success) _markChanged();
   }
 
   Future<void> _deleteStudent(Student student) async {

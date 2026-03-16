@@ -348,6 +348,7 @@ class TeacherProfile {
   // Basic info (required for minimum)
   final String name;
   final String? profileImage;
+  final String? backgroundImage;
   final List<String> instruments;
   final String introduction;
 
@@ -390,6 +391,7 @@ class TeacherProfile {
     this.organizationName,
     required this.name,
     this.profileImage,
+    this.backgroundImage,
     required this.instruments,
     required this.introduction,
     this.experienceYears,
@@ -521,6 +523,7 @@ class TeacherProfile {
     String? organizationName,
     String? name,
     String? profileImage,
+    String? backgroundImage,
     List<String>? instruments,
     String? introduction,
     int? experienceYears,
@@ -545,6 +548,7 @@ class TeacherProfile {
       organizationName: organizationName ?? this.organizationName,
       name: name ?? this.name,
       profileImage: profileImage ?? this.profileImage,
+      backgroundImage: backgroundImage ?? this.backgroundImage,
       instruments: instruments ?? this.instruments,
       introduction: introduction ?? this.introduction,
       experienceYears: experienceYears ?? this.experienceYears,

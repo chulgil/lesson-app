@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/parent.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/providers.dart';
+import '../providers/student_image_provider.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
 
 /// Student detail screen showing profile, lessons, and practice stats
@@ -174,6 +176,11 @@ class _StudentDetailContent extends ConsumerWidget {
   }
 
   Widget _buildSliverAppBar(BuildContext context, WidgetRef ref) {
+    final profileImagePath =
+        ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
+    final backgroundImagePath =
+        ref.watch(studentBackgroundImageNotifierProvider(student.id)).valueOrNull;
+
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
@@ -196,127 +203,189 @@ class _StudentDetailContent extends ConsumerWidget {
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
-        background: Container(
+        background: _buildAppBarBackground(
+          profileImagePath: profileImagePath,
+          backgroundImagePath: backgroundImagePath,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppBarBackground({
+    String? profileImagePath,
+    String? backgroundImagePath,
+  }) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Background: image or gradient
+        if (backgroundImagePath != null && backgroundImagePath.isNotEmpty)
+          _buildBackgroundImage(backgroundImagePath)
+        else
+          _buildDefaultGradientBackground(),
+
+        // Dark overlay for text readability
+        Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                student.profileColor,
-                student.profileColor.withValues(alpha: 0.7),
-              ],
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // Avatar
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    student.initial,
-                    style: AppTypography.displayMedium.copyWith(
-                      color: student.profileColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space3),
-
-                // Name
-                Text(
-                  student.name,
-                  style: AppTypography.headingLarge.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-
-                // Status, Instrument and Practice badges
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Enrollment status badge (체험/정규/휴강/종료)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: student.status.color.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        student.status.label,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    // Instrument badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        student.instrument,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    // Practice status badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: student.practiceStatus.color.withValues(alpha: 0.3),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: student.practiceStatus.color,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            student.practiceStatus.label,
-                            style: AppTypography.bodySmall.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.space4),
+                Colors.black.withValues(alpha: 0.1),
+                Colors.black.withValues(alpha: 0.5),
               ],
             ),
           ),
         ),
+
+        // Content
+        SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Avatar
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.white,
+                backgroundImage: _resolveStudentProfileImage(profileImagePath),
+                child: _resolveStudentProfileImage(profileImagePath) == null
+                    ? Text(
+                        student.initial,
+                        style: AppTypography.displayMedium.copyWith(
+                          color: student.profileColor,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(height: AppSpacing.space3),
+
+              // Name
+              Text(
+                student.name,
+                style: AppTypography.headingLarge.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+
+              // Status, Instrument and Practice badges
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: student.status.color.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      student.status.label,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      student.instrument,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: student.practiceStatus.color.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: student.practiceStatus.color,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          student.practiceStatus.label,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space4),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackgroundImage(String path) {
+    if (path.startsWith('http')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _buildDefaultGradientBackground(),
+      );
+    }
+    return Image.file(
+      File(path),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => _buildDefaultGradientBackground(),
+    );
+  }
+
+  Widget _buildDefaultGradientBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            student.profileColor,
+            student.profileColor.withValues(alpha: 0.7),
+          ],
+        ),
       ),
     );
+  }
+
+  ImageProvider? _resolveStudentProfileImage(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) return null;
+    if (imagePath.startsWith('http')) return NetworkImage(imagePath);
+    final file = File(imagePath);
+    if (file.existsSync()) return FileImage(file);
+    return null;
   }
 
   void _showMoreOptions(BuildContext context, WidgetRef ref) {
