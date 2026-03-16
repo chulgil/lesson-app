@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -269,41 +271,49 @@ class _StudentInviteCodeScreenState
     });
 
     try {
-      // TODO: Verify invite code with backend
       final code = _codeController.text.trim().toUpperCase();
 
-      // Mock verification - simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      // For demo, accept any 6-character code
-      if (code.length >= 6) {
-        // Set role to student
-        ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
-
-        if (mounted) {
-          // Show success and navigate to student profile setup
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('선생님과 성공적으로 연결되었습니다!'),
-              backgroundColor: AppColors.success,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-          context.go(AppRoutes.studentProfileSetup);
+      if (EnvironmentConfig.useMockData) {
+        // Mock: accept any 6+ character code
+        await Future.delayed(const Duration(seconds: 1));
+        if (code.length < 6) {
+          setState(() => _errorMessage = '올바르지 않은 초대 코드입니다');
+          return;
         }
       } else {
-        setState(() {
-          _errorMessage = '올바르지 않은 초대 코드입니다';
-        });
+        // Remote: send connection request via invite code
+        final apiClient = ref.read(apiClientProvider);
+        try {
+          await apiClient.post(
+            '/invites/connection-requests',
+            data: {
+              'target_id': '', // Will be resolved by invite_code on server
+              'method': 'inviteCode',
+              'invite_code': code,
+            },
+          );
+        } catch (e) {
+          setState(() => _errorMessage = '올바르지 않은 초대 코드입니다');
+          return;
+        }
+      }
+
+      ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('선생님과 성공적으로 연결되었습니다!'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.go(AppRoutes.studentProfileSetup);
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = '코드 확인 중 오류가 발생했습니다';
-      });
+      setState(() => _errorMessage = '코드 확인 중 오류가 발생했습니다');
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 }
