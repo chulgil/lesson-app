@@ -552,8 +552,8 @@ class MockSubscriptionRepository implements SubscriptionRepository {
           s.status == SubscriptionStatus.paused) {
         return false;
       }
-      // Check date expiration (within 7 days)
-      if (s.endDate != null && s.endDate!.difference(now).inDays <= 7) {
+      // Check date expiration (within 3 days — urgent threshold)
+      if (s.endDate != null && s.endDate!.difference(now).inDays <= 3) {
         return true;
       }
       // Check lesson count (2 or less remaining)
