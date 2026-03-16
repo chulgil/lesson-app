@@ -89,8 +89,7 @@ Lesson _$LessonFromJson(Map<String, dynamic> json) => Lesson(
           : LessonLocationInfo.fromJson(
               json['location'] as Map<String, dynamic>),
       studentNote: json['student_note'] as String?,
-      travelTimeMinutes:
-          (json['travel_time_minutes'] as num?)?.toInt() ?? 0,
+      travelTimeMinutes: (json['travel_time_minutes'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
