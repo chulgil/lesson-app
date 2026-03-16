@@ -1,0 +1,307 @@
+"""Settings endpoints (teacher, subscription, proposal, feedback, resources)."""
+
+from __future__ import annotations
+
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
+from app.models.user import User
+from app.schemas.common import PaginatedResponse, SuccessResponse
+from app.schemas.settings import (
+    FeedbackPresetCreate,
+    FeedbackPresetResponse,
+    FeedbackPresetUpdate,
+    NotificationSettingsResponse,
+    NotificationSettingsUpdate,
+    ProposalSettingsResponse,
+    ProposalSettingsUpdate,
+    SubscriptionSettingsResponse,
+    SubscriptionSettingsUpdate,
+    TeacherSettingsResponse,
+    TeacherSettingsUpdate,
+    TeachingResourceCreate,
+    TeachingResourceResponse,
+    TeachingResourceUpdate,
+)
+from app.services.settings_service import SettingsService
+
+router = APIRouter()
+
+
+# ---------------------------------------------------------------------------
+# Teacher Settings
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/teacher",
+    response_model=TeacherSettingsResponse,
+    summary="Get my teacher settings",
+)
+async def get_teacher_settings(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherSettingsResponse:
+    service = SettingsService(db)
+    return await service.get_teacher_settings(current_user.id)
+
+
+@router.put(
+    "/teacher",
+    response_model=TeacherSettingsResponse,
+    summary="Update teacher settings",
+)
+async def update_teacher_settings(
+    body: TeacherSettingsUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherSettingsResponse:
+    service = SettingsService(db)
+    return await service.update_teacher_settings(
+        current_user.id, body.model_dump(exclude_none=True)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Subscription Settings
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/subscription",
+    response_model=SubscriptionSettingsResponse,
+    summary="Get subscription settings",
+)
+async def get_subscription_settings(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionSettingsResponse:
+    service = SettingsService(db)
+    return await service.get_subscription_settings(current_user.id)
+
+
+@router.put(
+    "/subscription",
+    response_model=SubscriptionSettingsResponse,
+    summary="Update subscription settings",
+)
+async def update_subscription_settings(
+    body: SubscriptionSettingsUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionSettingsResponse:
+    service = SettingsService(db)
+    return await service.update_subscription_settings(
+        current_user.id, body.model_dump(exclude_none=True)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Proposal Settings
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/proposal",
+    response_model=ProposalSettingsResponse,
+    summary="Get proposal settings",
+)
+async def get_proposal_settings(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> ProposalSettingsResponse:
+    service = SettingsService(db)
+    return await service.get_proposal_settings(current_user.id)
+
+
+@router.put(
+    "/proposal",
+    response_model=ProposalSettingsResponse,
+    summary="Update proposal settings",
+)
+async def update_proposal_settings(
+    body: ProposalSettingsUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> ProposalSettingsResponse:
+    service = SettingsService(db)
+    return await service.update_proposal_settings(
+        current_user.id, body.model_dump(exclude_none=True)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Notification Settings
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/notification/{target_user_id}",
+    response_model=NotificationSettingsResponse,
+    summary="Get notification settings for a target",
+)
+async def get_notification_settings(
+    target_user_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationSettingsResponse:
+    service = SettingsService(db)
+    return await service.get_notification_settings(current_user.id, target_user_id)
+
+
+@router.put(
+    "/notification/{target_user_id}",
+    response_model=NotificationSettingsResponse,
+    summary="Update notification settings for a target",
+)
+async def update_notification_settings(
+    target_user_id: str,
+    body: NotificationSettingsUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> NotificationSettingsResponse:
+    service = SettingsService(db)
+    return await service.update_notification_settings(
+        current_user.id, target_user_id, body.model_dump(exclude_none=True)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Feedback Presets
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/feedback-presets",
+    response_model=list[FeedbackPresetResponse],
+    summary="List feedback presets",
+)
+async def list_feedback_presets(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> list[FeedbackPresetResponse]:
+    service = SettingsService(db)
+    return await service.get_feedback_presets(current_user.id)
+
+
+@router.post(
+    "/feedback-presets",
+    response_model=FeedbackPresetResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create feedback preset",
+)
+async def create_feedback_preset(
+    body: FeedbackPresetCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackPresetResponse:
+    service = SettingsService(db)
+    return await service.create_feedback_preset(
+        current_user.id, body.text, body.sort_order
+    )
+
+
+@router.put(
+    "/feedback-presets/{preset_id}",
+    response_model=FeedbackPresetResponse,
+    summary="Update feedback preset",
+)
+async def update_feedback_preset(
+    preset_id: str,
+    body: FeedbackPresetUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> FeedbackPresetResponse:
+    service = SettingsService(db)
+    return await service.update_feedback_preset(
+        preset_id, body.model_dump(exclude_none=True)
+    )
+
+
+@router.delete(
+    "/feedback-presets/{preset_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete feedback preset",
+)
+async def delete_feedback_preset(
+    preset_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    service = SettingsService(db)
+    await service.delete_feedback_preset(preset_id)
+
+
+# ---------------------------------------------------------------------------
+# Teaching Resources
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/teaching-resources",
+    response_model=PaginatedResponse[TeachingResourceResponse],
+    summary="List teaching resources",
+)
+async def list_teaching_resources(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+) -> PaginatedResponse[TeachingResourceResponse]:
+    service = SettingsService(db)
+    return await service.get_teaching_resources(
+        current_user.id,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+    )
+
+
+@router.post(
+    "/teaching-resources",
+    response_model=TeachingResourceResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create teaching resource",
+)
+async def create_teaching_resource(
+    body: TeachingResourceCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeachingResourceResponse:
+    service = SettingsService(db)
+    return await service.create_teaching_resource(
+        current_user.id, body.model_dump()
+    )
+
+
+@router.put(
+    "/teaching-resources/{resource_id}",
+    response_model=TeachingResourceResponse,
+    summary="Update teaching resource",
+)
+async def update_teaching_resource(
+    resource_id: str,
+    body: TeachingResourceUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeachingResourceResponse:
+    service = SettingsService(db)
+    return await service.update_teaching_resource(
+        resource_id, body.model_dump(exclude_none=True)
+    )
+
+
+@router.delete(
+    "/teaching-resources/{resource_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete teaching resource",
+)
+async def delete_teaching_resource(
+    resource_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> None:
+    service = SettingsService(db)
+    await service.delete_teaching_resource(resource_id)

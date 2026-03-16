@@ -46,3 +46,23 @@ from app.models.parent import Parent, ParentChildRelation, ParentTeacherConnecti
 from app.models.policy import LessonPolicy, MakeupLesson, ScheduleConfirmationCard  # noqa: F401
 from app.models.i18n import I18nTranslation, SupportedLocale  # noqa: F401
 from app.models.tip import TipTemplate  # noqa: F401
+from app.models.invite import Invite, ConnectionRequest, Connection  # noqa: F401
+from app.models.gamification import GamificationPoint, GamificationBadge  # noqa: F401
+from app.models.settings import (  # noqa: F401
+    TeacherSettings,
+    SubscriptionSettings,
+    ProposalSettings,
+    NotificationSettings,
+    ParentNotificationSettings,
+    FeedbackPreset,
+    TeachingResource,
+)
+from app.models.review import TeacherReview  # noqa: F401
+from app.models.schedule_ext import (  # noqa: F401
+    ScheduleException,
+    GroupClassSchedule,
+    GroupClassBooking,
+    NoShowRecord,
+    LessonScheduleChange,
+)
+from app.models.practice_log import PracticeLog  # noqa: F401

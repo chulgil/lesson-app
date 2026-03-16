@@ -1,54 +1,44 @@
-# 수강권 자동 갱신 제안 시스템 (SubscriptionRenewalService)
+# Backend 설계 및 구현
 
-> 확정일: 2026-03-15
+> 확정일: 2026-03-16
 
-## 배경
+## 완료된 작업
 
-재등록 플로우 UX 검증 결과, 체험 후 자동 제안(AutoProposalService)은 구현되어 있으나 **정규 레슨 수강권 소진/만료 시 자동 갱신 제안이 미구현**(GAP-2). 별도 SubscriptionRenewal 엔티티 대신 기존 SubscriptionProposal을 확장하여 중복 최소화.
+### Phase 1: 누락 테이블 추가 (완료)
+- [x] 프론트엔드 전체 분석 (20 도메인, 80+ 엔티티, 25+ Mock 레포)
+- [x] 기존 백엔드 분석 (43 테이블, 100+ 엔드포인트)
+- [x] 누락 21개 테이블 모델 작성 (6개 모델 파일)
+- [x] Pydantic v2 스키마 작성 (6개 스키마 파일)
+- [x] 서비스 레이어 작성 (6개 서비스 파일)
+- [x] API 라우터 작성 (6개 라우터 파일)
+- [x] Alembic 마이그레이션 0002 작성
+- [x] 전체 54개 테스트 통과 확인
+- [x] 스펙 문서 작성
 
-## 핵심 UX 모델
+### 결과
+- 총 64개 테이블, 154개 API 엔드포인트
+- 19개 라우터, 18개 서비스
 
-**"선생님 원탭 + 학생 원탭" 하이브리드**
-```
-시스템 자동 감지 → 선생님 대시보드 카드 → 원탭 발송 → 학생 원탭 수락 → 입금 → 수강권 갱신
-```
+## 다음 Phase
 
-## Phase 1: 데이터 모델 + 핵심 서비스 + 스펙 문서
+### Phase 2: 기존 스텁 연결
+- [ ] schedule 라우터의 exception 스텁 → ScheduleException 모델 연결
+- [ ] Analytics 라우터 추가
 
-| # | 작업 | 파일 | 상태 |
-|---|------|------|:----:|
-| 1-1 | 스펙 문서 작성 | docs/specs/subscription/subscription_renewal_spec.md | done |
-| 1-2 | SubscriptionProposal 확장 (isRenewal, previousSubscriptionId) | domain/entities/subscription_proposal.dart | done |
-| 1-3 | ProposalSettings 확장 (autoRenewalEnabled) | domain/entities/proposal_settings.dart | done |
-| 1-4 | SubscriptionRenewalService 생성 | domain/services/subscription_renewal_service.dart | done |
-| 1-5 | SubscriptionExpiryMonitor 연결 | domain/services/subscription_expiry_monitor.dart | done |
-| 1-6 | Mock 데이터 추가 | mock_subscription_proposal_repository.dart | done |
+### Phase 3: Frontend 연결
+- [ ] Mock → Remote 전환 가이드 작성
+- [ ] Flutter Remote Repository와 API 매핑 확인
+- [ ] 데이터 시딩 스크립트
 
-## Phase 2: 선생님 UX
-
-| # | 작업 | 파일 | 상태 |
-|---|------|------|:----:|
-| 2-1 | 갱신 제안 카드 위젯 (원탭 발송) | expiring_subscriptions_screen.dart | done |
-| 2-2 | 대시보드 통합 (expired 표시) | urgent_actions_section.dart | done |
-| 2-3 | ExpiringSubscriptionsScreen 개선 (expired 통합) | expiring_subscriptions_screen.dart | done |
-
-## Phase 3: 학생 UX
-
-| # | 작업 | 파일 | 상태 |
-|---|------|------|:----:|
-| 3-1 | 갱신 제안 상세 화면 | renewal_detail_screen.dart | done |
-| 3-2 | 수강 이력 위젯 | subscription_history_section.dart | done |
-| 3-3 | SubscriptionRenewalBanner 개선 | subscription_renewal_banner.dart | done |
-
-## Phase 4: 자동화 + 완성도
-
-| # | 작업 | 파일 | 상태 |
-|---|------|------|:----:|
-| 4-1 | 자동 갱신 제안 (autoRenewalEnabled 시) | renewal_service.dart | done (서비스 구현, 설정 UI는 후속) |
-| 4-2 | 레슨 완료 시 갱신 체크 연결 | lesson_detail_screen.dart | done |
+### Phase 4: 인프라
+- [ ] Supabase Auth 실제 연동
+- [ ] Redis 캐시
+- [ ] FCM Push
+- [ ] Docker 배포
 
 ---
 
 ## 이전 계획
 
-### 선생님/학생 UX 종합 점검 8차 (2026-03-11) - 완료
+### 수강권 자동 갱신 제안 시스템 (2026-03-15) - 완료
+Phase 1~4 모두 완료 (SubscriptionRenewalService, 선생님/학생 UX, 자동화)
