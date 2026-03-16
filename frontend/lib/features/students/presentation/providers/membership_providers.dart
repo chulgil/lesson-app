@@ -13,7 +13,7 @@ MembershipRepository membershipRepository(MembershipRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockMembershipRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
+  // Backend API 미구현 — 그룹 멤버십 엔드포인트 필요
   return MockMembershipRepository();
 }
 

@@ -14,7 +14,7 @@ LessonPolicyRepository lessonPolicyRepository(Ref ref) {
   if (EnvironmentConfig.useMockData) {
     return MockLessonPolicyRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
+  // Backend API 미구현 — 레슨 정책 엔드포인트 필요
   return MockLessonPolicyRepository();
 }
 

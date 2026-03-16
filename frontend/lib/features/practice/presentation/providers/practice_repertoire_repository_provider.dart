@@ -9,6 +9,6 @@ final practiceRepertoireRepositoryProvider =
       if (EnvironmentConfig.useMockData) {
         return MockPracticeRepertoireRepository();
       }
-      // TODO: Replace with Remote repository when API is ready
+      // Hive 로컬 저장소 의존 (녹음 파일 관리) — Remote 전환 시 파일 동기화 설계 필요
       return MockPracticeRepertoireRepository();
     });

@@ -13,7 +13,7 @@ LessonClassRepository lessonClassRepository(LessonClassRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockLessonClassRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
+  // Backend API 미구현 — 레슨 클래스 엔드포인트 필요
   return MockLessonClassRepository();
 }
 
