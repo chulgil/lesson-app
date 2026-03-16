@@ -154,6 +154,7 @@ class Student {
   final String? parentPhone;
   final String? email;
   final String? profileImageUrl;
+  final String? backgroundImageUrl;
   @JsonKey(includeFromJson: false, includeToJson: false)
   final Color profileColor;
   final String? lessonDay;
@@ -203,6 +204,7 @@ class Student {
     this.parentPhone,
     this.email,
     this.profileImageUrl,
+    this.backgroundImageUrl,
     Color? profileColor,
     this.lessonDay,
     this.lessonTime,
@@ -353,6 +355,7 @@ class Student {
     String? parentPhone,
     String? email,
     String? profileImageUrl,
+    String? backgroundImageUrl,
     Color? profileColor,
     String? lessonDay,
     String? lessonTime,
@@ -390,6 +393,7 @@ class Student {
       parentPhone: parentPhone ?? this.parentPhone,
       email: email ?? this.email,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      backgroundImageUrl: backgroundImageUrl ?? this.backgroundImageUrl,
       profileColor: profileColor ?? this.profileColor,
       lessonDay: lessonDay ?? this.lessonDay,
       lessonTime: lessonTime ?? this.lessonTime,

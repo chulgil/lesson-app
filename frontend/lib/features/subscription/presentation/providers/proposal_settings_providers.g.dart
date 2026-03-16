@@ -7,7 +7,7 @@ part of 'proposal_settings_providers.dart';
 // **************************************************************************
 
 String _$proposalSettingsRepositoryHash() =>
-    r'cd616b5431d82742c2cc547168706dedfa9d8cc6';
+    r'41dc7b1a3b2d8707a20295ac098ed0ea42dd5ef5';
 
 /// See also [proposalSettingsRepository].
 @ProviderFor(proposalSettingsRepository)

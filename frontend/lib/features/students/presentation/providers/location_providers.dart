@@ -13,7 +13,7 @@ LocationRepository locationRepository(LocationRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockLocationRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
+  // Backend API 미구현 — 레슨 장소 엔드포인트 필요
   return MockLocationRepository();
 }
 

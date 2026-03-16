@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,11 +8,14 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
+import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../providers/background_image_provider.dart';
 import '../providers/profile_image_provider.dart';
 
 /// Profile tab with user info and settings
@@ -166,6 +167,9 @@ class ProfileTab extends ConsumerWidget {
     final initial = name.isNotEmpty ? name[0] : '?';
     final profileImageAsync = ref.watch(profileImageNotifierProvider(userId));
     final imagePath = profileImageAsync.valueOrNull;
+    final backgroundImageAsync =
+        ref.watch(backgroundImageNotifierProvider(userId));
+    final backgroundPath = backgroundImageAsync.valueOrNull;
     final profileState = ref.watch(teacherExtendedProfileProvider);
     final introduction = profileState.valueOrNull?.introduction;
 
@@ -174,95 +178,52 @@ class ProfileTab extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Photo header with background + profile avatar
+          ProfilePhotoHeader(
+            profileImagePath: imagePath,
+            backgroundImagePath: backgroundPath,
+            initial: initial,
+            avatarColor: AppColors.primaryLight,
+            backgroundHeight: 140,
+            avatarRadius: 40,
+            onTapProfile: () =>
+                _showImagePickerOptions(context, ref, userId, isBackground: false),
+            onTapBackground: () =>
+                _showImagePickerOptions(context, ref, userId, isBackground: true),
+          ),
+
+          const SizedBox(height: AppSpacing.space3),
+
+          // Name + badge + edit button
           Row(
             children: [
-              // Profile avatar
-              GestureDetector(
-                onTap: () => _showImagePickerOptions(context, ref, userId),
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: AppColors.primaryLight,
-                      backgroundImage: imagePath != null
-                          ? FileImage(File(imagePath))
-                          : null,
-                      child: imagePath == null
-                          ? Text(
-                              initial,
-                              style: AppTypography.headingLarge.copyWith(
-                                color: Colors.white,
-                              ),
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(
-                          Icons.camera_alt,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.space4),
-
-              // User info
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        Text(name, style: AppTypography.headingLarge),
-                        const SizedBox(width: AppSpacing.space2),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            '선생님',
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                    Text(name, style: AppTypography.headingLarge),
+                    const SizedBox(width: AppSpacing.space2),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '선생님',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      email,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
                       ),
                     ),
                   ],
                 ),
               ),
-
-              // Quick edit button → BasicInfoEdit
               IconButton(
-                onPressed: () {
-                  context.push(AppRoutes.basicInfoEdit);
-                },
+                onPressed: () => context.push(AppRoutes.basicInfoEdit),
                 icon: const Icon(Icons.edit_outlined),
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.surfaceSecondaryLight,
@@ -271,61 +232,65 @@ class ProfileTab extends ConsumerWidget {
             ],
           ),
 
-          // Introduction text
-          const SizedBox(height: AppSpacing.space3),
-          Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.space1),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    (introduction != null && introduction.isNotEmpty)
-                        ? introduction
-                        : '소개글을 작성해주세요',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: (introduction != null && introduction.isNotEmpty)
-                          ? AppColors.textSecondaryLight
-                          : AppColors.textTertiaryLight,
-                      fontStyle: (introduction != null && introduction.isNotEmpty)
-                          ? FontStyle.normal
-                          : FontStyle.italic,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                // Preview button
-                InkWell(
-                  onTap: () => context.push(AppRoutes.profilePreview),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space2,
-                      vertical: AppSpacing.space1,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.visibility_outlined,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '미리보기',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          // Email
+          Text(
+            email,
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
             ),
+          ),
+
+          // Introduction text
+          const SizedBox(height: AppSpacing.space2),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  (introduction != null && introduction.isNotEmpty)
+                      ? introduction
+                      : '소개글을 작성해주세요',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: (introduction != null && introduction.isNotEmpty)
+                        ? AppColors.textSecondaryLight
+                        : AppColors.textTertiaryLight,
+                    fontStyle: (introduction != null && introduction.isNotEmpty)
+                        ? FontStyle.normal
+                        : FontStyle.italic,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              InkWell(
+                onTap: () => context.push(AppRoutes.profilePreview),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: AppSpacing.space1,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.visibility_outlined,
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '미리보기',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -513,37 +478,46 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  void _showImagePickerOptions(BuildContext context, WidgetRef ref, String userId) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('카메라로 촬영'),
-              onTap: () {
-                Navigator.pop(ctx);
-                ref
-                    .read(profileImageNotifierProvider(userId).notifier)
-                    .pickAndSaveImage(ImageSource.camera, context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('갤러리에서 선택'),
-              onTap: () {
-                Navigator.pop(ctx);
-                ref
-                    .read(profileImageNotifierProvider(userId).notifier)
-                    .pickAndSaveImage(ImageSource.gallery, context);
-              },
-            ),
-          ],
-        ),
-      ),
+  Future<void> _showImagePickerOptions(
+    BuildContext context,
+    WidgetRef ref,
+    String userId, {
+    required bool isBackground,
+  }) async {
+    final currentPath = isBackground
+        ? ref.read(backgroundImageNotifierProvider(userId)).valueOrNull
+        : ref.read(profileImageNotifierProvider(userId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: isBackground ? '배경 사진' : '프로필 사진',
+      showDelete: currentPath != null,
     );
+    if (action == null || !context.mounted) return;
+
+    if (isBackground) {
+      final notifier =
+          ref.read(backgroundImageNotifierProvider(userId).notifier);
+      if (action == ImagePickerAction.delete) {
+        await notifier.removeImage();
+        return;
+      }
+      final source = action == ImagePickerAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      await notifier.pickAndSaveImage(source, context);
+    } else {
+      final notifier =
+          ref.read(profileImageNotifierProvider(userId).notifier);
+      if (action == ImagePickerAction.delete) {
+        await notifier.removeImage();
+        return;
+      }
+      final source = action == ImagePickerAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      await notifier.pickAndSaveImage(source, context);
+    }
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {

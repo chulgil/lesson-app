@@ -15,7 +15,7 @@ ScheduleConfirmationCardRepository scheduleConfirmationCardRepository(
   if (EnvironmentConfig.useMockData) {
     return MockScheduleConfirmationCardRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
+  // Backend API 미구현 — 스케줄 확인 카드 엔드포인트 필요
   return MockScheduleConfirmationCardRepository();
 }
 

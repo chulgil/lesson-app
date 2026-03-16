@@ -7,7 +7,7 @@ part of 'teacher_search_provider.dart';
 // **************************************************************************
 
 String _$teacherSearchRepositoryHash() =>
-    r'3929fe80e1d77fe83067c94908a6f188693b4ca1';
+    r'd6dffb6c1160a4fc9c08b09a0d0e82d018390251';
 
 /// Provider for teacher search repository - switches between Mock and Remote.
 ///

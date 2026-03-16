@@ -3,7 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
 import '../../../../core/utils/time_format_utils.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
+import '../../data/repositories/remote_practice_stats_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_stats_repository.dart';
 
@@ -15,8 +17,7 @@ PracticeStatsRepository practiceReportRepository(Ref ref) {
   if (EnvironmentConfig.useMockData) {
     return MockPracticeStatsRepository();
   }
-  // No remote API yet — use empty mock to avoid dummy data
-  return MockPracticeStatsRepository(empty: true);
+  return RemotePracticeStatsRepository(ref.read(apiClientProvider));
 }
 
 /// Weekly report params

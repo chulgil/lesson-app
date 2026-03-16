@@ -2,6 +2,9 @@
 // Moved from lib/models/teacher_profile.dart for Clean Architecture
 
 import 'teacher_settings.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'teacher_profile.g.dart';
 
 /// Profile completion level based on filled information
 enum ProfileCompletionLevel {
@@ -54,6 +57,7 @@ enum ProfileVisibility {
 }
 
 /// Education record
+@JsonSerializable()
 class Education {
   final String school;
   final String major;
@@ -66,6 +70,10 @@ class Education {
     required this.degree,
     this.graduationYear,
   });
+
+  factory Education.fromJson(Map<String, dynamic> json) =>
+      _$EducationFromJson(json);
+  Map<String, dynamic> toJson() => _$EducationToJson(this);
 
   Education copyWith({
     String? school,
@@ -83,6 +91,7 @@ class Education {
 }
 
 /// Career record
+@JsonSerializable()
 class Career {
   final String organization;
   final String position;
@@ -97,6 +106,10 @@ class Career {
     this.endYear,
     this.description,
   });
+
+  factory Career.fromJson(Map<String, dynamic> json) =>
+      _$CareerFromJson(json);
+  Map<String, dynamic> toJson() => _$CareerToJson(this);
 
   bool get isCurrent => endYear == null;
 
@@ -125,6 +138,7 @@ class Career {
 }
 
 /// Bank account information for receiving payments
+@JsonSerializable()
 class BankAccount {
   final String bankName;
   final String accountNumber;
@@ -135,6 +149,10 @@ class BankAccount {
     required this.accountNumber,
     required this.accountHolder,
   });
+
+  factory BankAccount.fromJson(Map<String, dynamic> json) =>
+      _$BankAccountFromJson(json);
+  Map<String, dynamic> toJson() => _$BankAccountToJson(this);
 
   BankAccount copyWith({
     String? bankName,
@@ -150,6 +168,7 @@ class BankAccount {
 }
 
 /// Fee range for lessons
+@JsonSerializable()
 class FeeRange {
   final int minFee;
   final int maxFee;
@@ -160,6 +179,10 @@ class FeeRange {
     required this.maxFee,
     this.duration = 60,
   });
+
+  factory FeeRange.fromJson(Map<String, dynamic> json) =>
+      _$FeeRangeFromJson(json);
+  Map<String, dynamic> toJson() => _$FeeRangeToJson(this);
 
   String get formatted {
     final min = _formatCurrency(minFee);
@@ -193,6 +216,7 @@ class FeeRange {
 }
 
 /// Certificate model
+@JsonSerializable()
 class Certificate {
   final String id;
   final CertificateType type;
@@ -219,6 +243,10 @@ class Certificate {
     required this.submittedAt,
     this.reviewedAt,
   });
+
+  factory Certificate.fromJson(Map<String, dynamic> json) =>
+      _$CertificateFromJson(json);
+  Map<String, dynamic> toJson() => _$CertificateToJson(this);
 
   bool get isApproved => status == CertificateStatus.approved;
   bool get isPending => status == CertificateStatus.pending;
@@ -254,6 +282,7 @@ class Certificate {
 }
 
 /// Teacher verification status
+@JsonSerializable()
 class TeacherVerification {
   final bool isPhoneVerified;
   final String? phoneNumber;
@@ -266,6 +295,10 @@ class TeacherVerification {
     this.phoneVerifiedAt,
     this.certificates = const [],
   });
+
+  factory TeacherVerification.fromJson(Map<String, dynamic> json) =>
+      _$TeacherVerificationFromJson(json);
+  Map<String, dynamic> toJson() => _$TeacherVerificationToJson(this);
 
   bool get hasVerifiedCertificate =>
       certificates.any((c) => c.status == CertificateStatus.approved);
@@ -293,6 +326,7 @@ class TeacherVerification {
 }
 
 /// Profile visibility settings
+@JsonSerializable()
 class ProfileVisibilitySettings {
   final bool isSearchable;
   final ProfileVisibility nameVisibility;
@@ -311,6 +345,10 @@ class ProfileVisibilitySettings {
     this.careerVisibility = ProfileVisibility.public,
     this.certificateVisibility = ProfileVisibility.public,
   });
+
+  factory ProfileVisibilitySettings.fromJson(Map<String, dynamic> json) =>
+      _$ProfileVisibilitySettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$ProfileVisibilitySettingsToJson(this);
 
   static const defaults = ProfileVisibilitySettings();
 
@@ -337,6 +375,7 @@ class ProfileVisibilitySettings {
 }
 
 /// Extended teacher profile with all fields
+@JsonSerializable()
 class TeacherProfile {
   final String id;
   final String userId;
@@ -348,6 +387,7 @@ class TeacherProfile {
   // Basic info (required for minimum)
   final String name;
   final String? profileImage;
+  final String? backgroundImage;
   final List<String> instruments;
   final String introduction;
 
@@ -390,6 +430,7 @@ class TeacherProfile {
     this.organizationName,
     required this.name,
     this.profileImage,
+    this.backgroundImage,
     required this.instruments,
     required this.introduction,
     this.experienceYears,
@@ -407,6 +448,10 @@ class TeacherProfile {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory TeacherProfile.fromJson(Map<String, dynamic> json) =>
+      _$TeacherProfileFromJson(json);
+  Map<String, dynamic> toJson() => _$TeacherProfileToJson(this);
 
   /// Calculate profile completion level
   ProfileCompletionLevel get completionLevel {
@@ -521,6 +566,7 @@ class TeacherProfile {
     String? organizationName,
     String? name,
     String? profileImage,
+    String? backgroundImage,
     List<String>? instruments,
     String? introduction,
     int? experienceYears,
@@ -545,6 +591,7 @@ class TeacherProfile {
       organizationName: organizationName ?? this.organizationName,
       name: name ?? this.name,
       profileImage: profileImage ?? this.profileImage,
+      backgroundImage: backgroundImage ?? this.backgroundImage,
       instruments: instruments ?? this.instruments,
       introduction: introduction ?? this.introduction,
       experienceYears: experienceYears ?? this.experienceYears,

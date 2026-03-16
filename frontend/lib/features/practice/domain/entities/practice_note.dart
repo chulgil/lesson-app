@@ -1,9 +1,11 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'practice_note.g.dart';
 
 /// Practice note model for tracking practice observations
 @HiveType(typeId: 31)
+@JsonSerializable()
 class PracticeNote extends HiveObject {
   @HiveField(0)
   final String id;
@@ -27,6 +29,11 @@ class PracticeNote extends HiveObject {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory PracticeNote.fromJson(Map<String, dynamic> json) =>
+      _$PracticeNoteFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PracticeNoteToJson(this);
 
   /// Time format (e.g. "10:30")
   String get timeText {
