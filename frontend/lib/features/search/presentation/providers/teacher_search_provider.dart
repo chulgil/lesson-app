@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../models/teacher_search.dart';
 import '../../../../repositories/teacher_search_repository.dart';
+import '../../data/repositories/remote_teacher_search_repository.dart';
 
 part 'teacher_search_provider.g.dart';
 
@@ -14,8 +16,7 @@ TeacherSearchRepository teacherSearchRepository(Ref ref) {
   if (EnvironmentConfig.useMockData) {
     return MockTeacherSearchRepository();
   }
-  // No remote API yet — use empty mock to avoid dummy data
-  return MockTeacherSearchRepository(empty: true);
+  return RemoteTeacherSearchRepository(ref.read(apiClientProvider));
 }
 
 /// Current search tab state (academy vs individual)
