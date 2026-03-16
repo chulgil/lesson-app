@@ -115,6 +115,7 @@ class BatchAttendanceRequest(BaseModel):
 class NoShowRecordCreate(BaseModel):
     lesson_id: str
     student_id: str
+    lesson_date: _dt.date
     applied_policy: str  # deductCredit, halfCredit, noDeduction, reschedule
     deducted_credits: int = 0
     makeup_lesson_id: str | None = None

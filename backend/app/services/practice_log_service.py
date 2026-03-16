@@ -90,17 +90,20 @@ class PracticeLogService:
 
     async def toggle_task(self, log_id: str, task_id: str) -> Any:
         """Toggle task completion in a practice log."""
+        from sqlalchemy.orm.attributes import flag_modified
+
         from app.models.practice_log import PracticeLog
 
         log = await self.db.get(PracticeLog, log_id)
         if log is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Log not found")
-        tasks = log.tasks or []
+        tasks = list(log.tasks or [])
         for task in tasks:
             if task.get("id") == task_id:
                 task["is_completed"] = not task.get("is_completed", False)
                 break
         log.tasks = tasks
+        flag_modified(log, "tasks")
         await self.db.flush()
         await self.db.refresh(log)
         return log
