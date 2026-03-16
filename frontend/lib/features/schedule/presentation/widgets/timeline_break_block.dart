@@ -125,7 +125,7 @@ class TimelineBreakBlock extends StatelessWidget {
 
     // Show location info for travel time if available
     final locationInfo = isTravelTime && toLocation != null
-        ? '→ ${toStudentName != null ? NameUtils.givenName(toStudentName!) : ''} ($toLocation)'
+        ? '→ ${toStudentName != null ? NameUtils.givenName(toStudentName!) : ''} (${toLocation})'
         : null;
 
     return Column(

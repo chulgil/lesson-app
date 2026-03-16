@@ -233,7 +233,7 @@ class _TravelTimeEditSheetState extends State<TravelTimeEditSheet> {
           onChanged: (v) => setState(() => _applyGlobally = v!),
           title: const Text('이 레슨만 적용'),
           subtitle: Text(
-            '이 레슨 뒤에만 ${_minutes}분 이동시간을 설정합니다',
+            '이 레슨 뒤에만 ${_minutes == 0 ? "이동시간 없이" : "$_minutes분 이동시간을"} 설정합니다',
             style: AppTypography.caption.copyWith(
               color: AppColors.textTertiaryLight,
             ),
@@ -248,7 +248,7 @@ class _TravelTimeEditSheetState extends State<TravelTimeEditSheet> {
           onChanged: (v) => setState(() => _applyGlobally = v!),
           title: const Text('기본 쉬는시간으로 저장'),
           subtitle: Text(
-            '모든 레슨 사이에 ${_minutes}분을 기본값으로 적용합니다',
+            '모든 레슨 사이에 ${_minutes == 0 ? "쉬는시간 없이" : "$_minutes분을 기본값으로"} 적용합니다',
             style: AppTypography.caption.copyWith(
               color: AppColors.textTertiaryLight,
             ),

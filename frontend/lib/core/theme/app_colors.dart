@@ -83,6 +83,12 @@ class AppColors {
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
 
+  // Schedule: grid line color
+  static const scheduleGridLine = Color(0xFFE8E8E8);
+
+  // Schedule: now indicator (red line + circle)
+  static const scheduleNowIndicator = Color(0xFFE53935);
+
   // Schedule: break/travel time block
   static const scheduleBreakBackground = Color(0xFFF0EDE8);
   static const scheduleBreakBorder = Color(0xFFD4CFC8);
