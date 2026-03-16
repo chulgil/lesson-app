@@ -67,7 +67,7 @@ class ScheduleException(UUIDMixin, Base):
     end_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -84,8 +84,8 @@ class GroupClassSchedule(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "group_class_schedules"
 
     group_class_id: Mapped[str] = mapped_column(String(36), nullable=False)
-    start_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    end_time: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[GroupScheduleStatus] = mapped_column(
         Enum(GroupScheduleStatus, native_enum=True),
         nullable=False,
@@ -119,11 +119,11 @@ class GroupClassBooking(UUIDMixin, TimestampMixin, Base):
         default=GroupBookingStatus.confirmed,
     )
     waitlist_position: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    attended_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    attended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     subscription_deducted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     cancel_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    promoted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    promoted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("uk_gcb_schedule_student", "schedule_id", "student_id", unique=True),
@@ -150,7 +150,7 @@ class NoShowRecord(UUIDMixin, Base):
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
     processed_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -184,11 +184,11 @@ class LessonScheduleChange(UUIDMixin, Base):
         default=ScheduleChangeStatus.pending,
     )
     requested_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
-    processed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     request_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     response_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     requested_by: Mapped[str | None] = mapped_column(String(36), nullable=True)

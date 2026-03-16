@@ -130,12 +130,12 @@ class LessonRequest(UUIDMixin, Base):
         nullable=False,
         default=RequestStatus.pending,
     )
-    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     proposal_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     decline_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-    status_updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

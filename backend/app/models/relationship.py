@@ -32,10 +32,10 @@ class TeacherStudentRelation(UUIDMixin, Base):
         nullable=False,
         default=RelationStatus.pending,
     )
-    connected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    disconnected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    disconnected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -60,7 +60,7 @@ class Follow(UUIDMixin, Base):
     )
     notification_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

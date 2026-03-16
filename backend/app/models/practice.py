@@ -38,7 +38,7 @@ class PracticeRepertoire(UUIDMixin, TimestampMixin, Base):
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     sort_order: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
@@ -76,8 +76,8 @@ class PracticeSection(UUIDMixin, TimestampMixin, Base):
     total_practice_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     target_practice_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
     sort_order: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    last_practiced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_practiced_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_section_repertoire", "repertoire_id"),
@@ -93,7 +93,7 @@ class DailyPracticeStatus(UUIDMixin, Base):
     section_id: Mapped[str] = mapped_column(String(36), nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("uk_daily_section_date", "section_id", "date", unique=True),
@@ -113,7 +113,7 @@ class PracticeRecording(UUIDMixin, Base):
     bpm: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_representative: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -192,9 +192,9 @@ class PracticeItem(UUIDMixin, TimestampMixin, Base):
     )
     is_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     practice_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     has_like: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    liked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    liked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_item_lesson", "lesson_id"),

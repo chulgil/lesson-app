@@ -104,8 +104,8 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
         Enum(PaymentMethod, native_enum=True),
         nullable=True,
     )
-    paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    payment_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    payment_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Discount
     discount_amount: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -128,7 +128,7 @@ class SubscriptionUsage(UUIDMixin, Base):
     subscription_id: Mapped[str] = mapped_column(String(36), nullable=False)
     lesson_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     used_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -188,10 +188,10 @@ class SubscriptionProposal(UUIDMixin, Base):
         nullable=False,
         default=ProposalPaymentStatus.pending,
     )
-    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    payment_notified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    rejected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    payment_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     academy_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
@@ -204,7 +204,7 @@ class SubscriptionProposal(UUIDMixin, Base):
     is_app_transition: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     lesson_request_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

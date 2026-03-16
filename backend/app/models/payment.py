@@ -67,7 +67,7 @@ class Payment(UUIDMixin, TimestampMixin, Base):
 
     # Student confirmation
     student_confirmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    student_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    student_confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Billing target
     billing_target_type: Mapped[BillingTargetType] = mapped_column(
@@ -79,14 +79,14 @@ class Payment(UUIDMixin, TimestampMixin, Base):
     billing_target_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Payment tracking
-    paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     paid_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
-    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     confirmed_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
 
     # Parent notification
     parent_notified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    parent_notified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    parent_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_payment_student", "student_id"),

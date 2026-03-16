@@ -87,7 +87,7 @@ class Student(UUIDMixin, TimestampMixin, Base):
         nullable=False,
         default=ConnectionStatus.offline,
     )
-    connected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Practice
     practice_level: Mapped[PracticeLevel | None] = mapped_column(

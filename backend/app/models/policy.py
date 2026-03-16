@@ -86,10 +86,10 @@ class ScheduleConfirmationCard(UUIDMixin, Base):
     proposed_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     proposed_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)
     response_message: Mapped[str | None] = mapped_column(Text, nullable=True)
-    responded_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    responded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

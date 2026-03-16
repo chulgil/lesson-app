@@ -57,7 +57,7 @@ class ProposalSettings(UUIDMixin, Base):
     auto_reminder_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     reminder_hours: Mapped[dict | list | None] = mapped_column(JSON, nullable=True, default=lambda: [24, 48])
     auto_renewal_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("uk_proposal_settings_teacher", "teacher_id", unique=True),
@@ -119,7 +119,7 @@ class FeedbackPreset(UUIDMixin, Base):
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_hidden: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

@@ -29,15 +29,15 @@ class Notification(UUIDMixin, Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
     data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    scheduled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_push: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     is_in_app: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     action_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     action_label: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )

@@ -49,7 +49,7 @@ class Teacher(UUIDMixin, TimestampMixin, Base):
     # Phone verification
     is_phone_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     phone_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Settings
     visibility_settings: Mapped[dict | None] = mapped_column(JSON, nullable=True)
@@ -106,7 +106,7 @@ class TeacherCertificate(UUIDMixin, Base):
     )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     issuing_body: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    issue_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    issue_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     certificate_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
     image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[CertificateStatus] = mapped_column(
@@ -115,8 +115,8 @@ class TeacherCertificate(UUIDMixin, Base):
         default=CertificateStatus.pending,
     )
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
-    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         Index("idx_certificate_teacher", "teacher_id"),

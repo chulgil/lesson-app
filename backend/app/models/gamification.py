@@ -35,7 +35,7 @@ class GamificationPoint(UUIDMixin, Base):
     )
     description: Mapped[str] = mapped_column(Text, nullable=False)
     earned_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
@@ -60,7 +60,7 @@ class GamificationBadge(UUIDMixin, Base):
         nullable=False,
     )
     earned_at: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
