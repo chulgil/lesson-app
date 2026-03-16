@@ -1,7 +1,12 @@
 // Teacher domain entity
 // Moved from lib/models/teacher.dart for Clean Architecture
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'teacher.g.dart';
+
 /// Teacher model for lesson booking
+@JsonSerializable()
 class Teacher {
   final String id;
   final String name;
@@ -34,6 +39,11 @@ class Teacher {
     this.isAvailable = true,
     required this.createdAt,
   });
+
+  factory Teacher.fromJson(Map<String, dynamic> json) =>
+      _$TeacherFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeacherToJson(this);
 
   /// Get primary instrument (first in list)
   String get primaryInstrument =>

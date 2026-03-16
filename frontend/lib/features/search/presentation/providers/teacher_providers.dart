@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../models/teacher.dart';
 import '../../../../repositories/teacher_repository.dart';
+import '../../data/repositories/remote_teacher_repository.dart';
 
 // =============================================================================
 // Repository Provider
@@ -13,8 +15,7 @@ final teacherRepositoryProvider = Provider<TeacherRepository>((ref) {
   if (EnvironmentConfig.useMockData) {
     return MockTeacherRepository();
   }
-  // TODO: Replace with Remote repository when API is ready
-  return MockTeacherRepository();
+  return RemoteTeacherRepository(ref.read(apiClientProvider));
 });
 
 // =============================================================================
