@@ -280,7 +280,7 @@ class ScheduleService:
             scheduled_date=data.scheduled_date,
             scheduled_time=data.scheduled_time,
             status="approved",
-            reason=data.reason,
+            notes=data.reason,
         )
         self.db.add(booking)
         await self.db.flush()

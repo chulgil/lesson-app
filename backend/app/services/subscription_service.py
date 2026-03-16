@@ -292,7 +292,7 @@ class SubscriptionService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
         if data.action == "accept":
-            proposal.status = "accepted"
+            proposal.status = "paymentNotified"
             proposal.selected_template_id = data.selected_template_id
         elif data.action == "reject":
             proposal.status = "rejected"

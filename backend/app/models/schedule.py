@@ -11,6 +11,7 @@ class BookingLessonType(str, enum.Enum):
     trial = "trial"
     regular = "regular"
     oneTime = "oneTime"
+    makeup = "makeup"
 
 
 class BookingStatus(str, enum.Enum):
