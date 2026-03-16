@@ -6,6 +6,7 @@ import '../../../features/schedule/domain/entities/group_class.dart';
 import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_detail_screen.dart';
+import '../../../features/search/presentation/screens/teacher_search_screen.dart';
 import '../../../features/schedule/presentation/screens/lesson_booking_screen.dart';
 import '../../../features/schedule/presentation/screens/lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/lesson_requests_screen.dart';
@@ -21,6 +22,13 @@ List<GoRoute> scheduleRoutes = [
   // ============================================================
   // Student-facing routes (new chip-based booking system)
   // ============================================================
+
+  // Select Teacher (used by student getting-started card)
+  GoRoute(
+    path: AppRoutes.selectTeacher,
+    name: 'selectTeacher',
+    builder: (context, state) => const TeacherSearchScreen(),
+  ),
 
   // Lesson Booking (chip-based UI for trial/one-time lessons)
   GoRoute(
