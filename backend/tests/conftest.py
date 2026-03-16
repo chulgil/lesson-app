@@ -116,3 +116,44 @@ def student_auth_headers() -> dict[str, str]:
     """Authorization headers for a student (test-student-id)."""
     token = create_access_token(data={"sub": "test-student-id", "role": "student"})
     return {"Authorization": f"Bearer {token}"}
+
+
+# ---------------------------------------------------------------------------
+# Scenario helper fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+async def teacher(
+    client: AsyncClient, auth_headers: dict, create_test_user
+) -> "TeacherActions":
+    """Pre-seeded teacher with scenario helper methods.
+
+    Usage:
+        async def test_my_scenario(teacher):
+            sid = await teacher.create_student("김학생")
+            lid = await teacher.create_lesson(sid)
+    """
+    from tests.scenarios.helpers import TeacherActions
+
+    await create_test_user(user_id="test-user-id", role="teacher", name="Test Teacher")
+    return TeacherActions(client, auth_headers)
+
+
+@pytest.fixture
+async def student(
+    client: AsyncClient, student_auth_headers: dict, create_test_user
+) -> "StudentActions":
+    """Pre-seeded student with scenario helper methods.
+
+    Usage:
+        async def test_student_flow(student):
+            await student.book_trial("teacher-id")
+    """
+    from tests.scenarios.helpers import StudentActions
+
+    await create_test_user(
+        user_id="test-student-id", role="student",
+        name="Test Student", email="student@test.com",
+    )
+    return StudentActions(client, student_auth_headers)
