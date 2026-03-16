@@ -177,18 +177,26 @@ class AuthService:
         from app.core.config import settings
 
         async with httpx.AsyncClient() as client:
+            token_data = {
+                "code": request.code,
+                "client_id": settings.GOOGLE_CLIENT_ID,
+                "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                "grant_type": "authorization_code",
+            }
+            # Mobile apps (serverAuthCode) don't use redirect_uri;
+            # Web apps require it. Only include if explicitly provided.
+            if request.redirect_uri:
+                token_data["redirect_uri"] = request.redirect_uri
+
             token_resp = await client.post(
                 "https://oauth2.googleapis.com/token",
-                data={
-                    "code": request.code,
-                    "client_id": settings.GOOGLE_CLIENT_ID,
-                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
-                    "redirect_uri": request.redirect_uri or "",
-                    "grant_type": "authorization_code",
-                },
+                data=token_data,
             )
             if token_resp.status_code != 200:
-                raise HTTPException(status_code=401, detail="Google token exchange failed")
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"Google token exchange failed: {token_resp.text}",
+                )
 
             tokens = token_resp.json()
 
