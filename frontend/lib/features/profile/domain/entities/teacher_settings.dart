@@ -1,15 +1,21 @@
 // Teacher settings domain entity
 // Moved from lib/models/teacher_settings.dart for Clean Architecture
 
+import 'package:json_annotation/json_annotation.dart';
+
 import '../../../schedule/domain/entities/time_slot.dart';
 
+part 'teacher_settings.g.dart';
+
 /// Teacher settings for lesson management
+@JsonSerializable()
 class TeacherSettings {
   final String id;
   final List<String> instruments;
   final int defaultLessonDuration; // in minutes
   final List<int> customLessonDurations; // custom durations added by teacher
   final List<int> disabledDurations; // disabled durations (both default and custom)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   final List<TimeSlot> availableSlots;
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -26,12 +32,17 @@ class TeacherSettings {
     this.defaultLessonDuration = 60,
     this.customLessonDurations = const [],
     this.disabledDurations = const [],
-    required this.availableSlots,
+    this.availableSlots = const [],
     required this.createdAt,
     this.updatedAt,
     this.breakTimeBetweenLessons = 0,
     this.minBookingHours = 24,
   });
+
+  factory TeacherSettings.fromJson(Map<String, dynamic> json) =>
+      _$TeacherSettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeacherSettingsToJson(this);
 
   /// Get all configured durations (default + custom, sorted) - includes disabled
   List<int> get allConfiguredDurations {
