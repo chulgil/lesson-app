@@ -7,11 +7,11 @@ part of 'analytics_providers.dart';
 // **************************************************************************
 
 String _$analyticsRepositoryHash() =>
-    r'6494c163ad3cada54393559b420e08a12366a9c9';
+    r'13dea3e7338fdccd72059c92bc002b3217b07f52';
 
 /// See also [analyticsRepository].
 @ProviderFor(analyticsRepository)
-final analyticsRepositoryProvider = Provider<MockAnalyticsRepository>.internal(
+final analyticsRepositoryProvider = Provider<AnalyticsRepository>.internal(
   analyticsRepository,
   name: r'analyticsRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -23,7 +23,7 @@ final analyticsRepositoryProvider = Provider<MockAnalyticsRepository>.internal(
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef AnalyticsRepositoryRef = ProviderRef<MockAnalyticsRepository>;
+typedef AnalyticsRepositoryRef = ProviderRef<AnalyticsRepository>;
 String _$teacherMonthlyStatsHash() =>
     r'e0d655e931993af2b721344fc4225eba95aa2459';
 

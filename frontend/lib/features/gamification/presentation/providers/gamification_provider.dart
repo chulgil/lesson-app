@@ -4,11 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_gamification_repository.dart';
 import '../../domain/entities/gamification.dart';
+import '../../domain/repositories/gamification_repository.dart';
 
 part 'gamification_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-MockGamificationRepository gamificationRepository(
+GamificationRepository gamificationRepository(
     GamificationRepositoryRef ref) {
   return MockGamificationRepository();
 }

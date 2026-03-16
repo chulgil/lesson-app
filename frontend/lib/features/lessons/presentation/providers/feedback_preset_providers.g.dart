@@ -7,14 +7,14 @@ part of 'feedback_preset_providers.dart';
 // **************************************************************************
 
 String _$feedbackPresetRepositoryHash() =>
-    r'8267f06684687ec0bf884942771ac7d4ee8482cc';
+    r'903120dc65037718454b760ff3913c02e3eb60f2';
 
 /// Repository provider for feedback presets.
 ///
 /// Copied from [feedbackPresetRepository].
 @ProviderFor(feedbackPresetRepository)
 final feedbackPresetRepositoryProvider =
-    Provider<MockFeedbackPresetRepository>.internal(
+    Provider<FeedbackPresetRepository>.internal(
   feedbackPresetRepository,
   name: r'feedbackPresetRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -26,7 +26,7 @@ final feedbackPresetRepositoryProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef FeedbackPresetRepositoryRef = ProviderRef<MockFeedbackPresetRepository>;
+typedef FeedbackPresetRepositoryRef = ProviderRef<FeedbackPresetRepository>;
 String _$feedbackPresetNotifierHash() =>
     r'b86004973466cde8005e482a11eebd1e587fcc25';
 

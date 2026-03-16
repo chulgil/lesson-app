@@ -1,9 +1,10 @@
 import 'package:hive/hive.dart';
 
 import '../../domain/entities/manual_teacher.dart';
+import '../../domain/repositories/manual_teacher_repository.dart';
 
 /// Hive-based repository for manually registered teachers.
-class MockManualTeacherRepository {
+class MockManualTeacherRepository implements ManualTeacherRepository {
   static const _boxName = 'manual_teachers';
 
   Future<Box<ManualTeacher>> _openBox() async {
@@ -14,6 +15,7 @@ class MockManualTeacherRepository {
   }
 
   /// Get all manual teachers sorted by creation date (newest first).
+  @override
   Future<List<ManualTeacher>> getAll() async {
     final box = await _openBox();
     final teachers = box.values.toList()
@@ -22,6 +24,7 @@ class MockManualTeacherRepository {
   }
 
   /// Get a single manual teacher by ID.
+  @override
   Future<ManualTeacher?> getById(String id) async {
     final box = await _openBox();
     try {
@@ -32,18 +35,21 @@ class MockManualTeacherRepository {
   }
 
   /// Add a new manual teacher.
+  @override
   Future<void> add(ManualTeacher teacher) async {
     final box = await _openBox();
     await box.put(teacher.id, teacher);
   }
 
   /// Update an existing manual teacher.
+  @override
   Future<void> update(ManualTeacher teacher) async {
     final box = await _openBox();
     await box.put(teacher.id, teacher);
   }
 
   /// Delete a manual teacher by ID.
+  @override
   Future<void> delete(String id) async {
     final box = await _openBox();
     await box.delete(id);

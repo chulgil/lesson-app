@@ -7,12 +7,12 @@ part of 'gamification_provider.dart';
 // **************************************************************************
 
 String _$gamificationRepositoryHash() =>
-    r'1b0d257184a167e8f34ebe5272a9389510122050';
+    r'3f4eddf9fdfedfafa4c2e0865a1d0a6a296f9b1d';
 
 /// See also [gamificationRepository].
 @ProviderFor(gamificationRepository)
 final gamificationRepositoryProvider =
-    Provider<MockGamificationRepository>.internal(
+    Provider<GamificationRepository>.internal(
   gamificationRepository,
   name: r'gamificationRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -24,7 +24,7 @@ final gamificationRepositoryProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef GamificationRepositoryRef = ProviderRef<MockGamificationRepository>;
+typedef GamificationRepositoryRef = ProviderRef<GamificationRepository>;
 String _$studentGamificationHash() =>
     r'd11d27a1c9113a3aebeb0ec000cf792174ee491f';
 

@@ -1,6 +1,11 @@
 // Gamification entities: points, levels, and badges.
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'gamification.g.dart';
+
 /// Student gamification profile with points and level.
+@JsonSerializable()
 class StudentGamification {
   final String studentId;
   final int totalPoints;
@@ -24,6 +29,11 @@ class StudentGamification {
     this.recentHistory = const [],
   });
 
+  factory StudentGamification.fromJson(Map<String, dynamic> json) =>
+      _$StudentGamificationFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StudentGamificationToJson(this);
+
   /// Progress to next level (0.0 to 1.0).
   double get levelProgress {
     final range = nextLevelMinPoints - currentLevelMinPoints;
@@ -34,6 +44,7 @@ class StudentGamification {
 }
 
 /// Point history entry.
+@JsonSerializable()
 class PointHistory {
   final String id;
   final String studentId;
@@ -50,6 +61,11 @@ class PointHistory {
     required this.description,
     required this.earnedAt,
   });
+
+  factory PointHistory.fromJson(Map<String, dynamic> json) =>
+      _$PointHistoryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PointHistoryToJson(this);
 }
 
 /// Types of point-earning activities.
@@ -62,6 +78,7 @@ enum PointType {
 }
 
 /// PracticeBadge earned by a student.
+@JsonSerializable()
 class PracticeBadge {
   final String id;
   final String name;
@@ -80,6 +97,11 @@ class PracticeBadge {
     this.earnedAt,
     this.isEarned = false,
   });
+
+  factory PracticeBadge.fromJson(Map<String, dynamic> json) =>
+      _$PracticeBadgeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PracticeBadgeToJson(this);
 }
 
 /// PracticeBadge rarity levels.
@@ -91,6 +113,7 @@ enum BadgeRarity {
 }
 
 /// Level definition with title and required points.
+@JsonSerializable()
 class LevelDefinition {
   final int level;
   final String title;
@@ -101,6 +124,11 @@ class LevelDefinition {
     required this.title,
     required this.minPoints,
   });
+
+  factory LevelDefinition.fromJson(Map<String, dynamic> json) =>
+      _$LevelDefinitionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LevelDefinitionToJson(this);
 
   /// All level definitions.
   static const List<LevelDefinition> levels = [

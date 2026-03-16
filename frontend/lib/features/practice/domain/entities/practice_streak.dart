@@ -1,4 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+part 'practice_streak.g.dart';
+
 /// Practice streak tracking entity
+@JsonSerializable()
 class PracticeStreak {
   final String id;
   final String studentId;
@@ -15,6 +19,11 @@ class PracticeStreak {
     this.lastPracticeDate,
     required this.updatedAt,
   });
+
+  factory PracticeStreak.fromJson(Map<String, dynamic> json) =>
+      _$PracticeStreakFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PracticeStreakToJson(this);
 
   /// Check if streak is active (practiced today or yesterday)
   bool get isActive {

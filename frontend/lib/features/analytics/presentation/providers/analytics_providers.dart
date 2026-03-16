@@ -4,11 +4,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_analytics_repository.dart';
 import '../../domain/entities/teacher_stats.dart';
+import '../../domain/repositories/analytics_repository.dart';
 
 part 'analytics_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-MockAnalyticsRepository analyticsRepository(AnalyticsRepositoryRef ref) {
+AnalyticsRepository analyticsRepository(AnalyticsRepositoryRef ref) {
   return MockAnalyticsRepository();
 }
 

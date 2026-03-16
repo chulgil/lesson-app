@@ -7,14 +7,14 @@ part of 'manual_teacher_provider.dart';
 // **************************************************************************
 
 String _$manualTeacherRepositoryHash() =>
-    r'1377f25775bcb51e6cbca3a3d7e9774d001ec356';
+    r'9d3d4084365ff42d62f29baa4626ca12f02decf4';
 
 /// Repository provider for manual teachers.
 ///
 /// Copied from [manualTeacherRepository].
 @ProviderFor(manualTeacherRepository)
 final manualTeacherRepositoryProvider =
-    Provider<MockManualTeacherRepository>.internal(
+    Provider<ManualTeacherRepository>.internal(
   manualTeacherRepository,
   name: r'manualTeacherRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -26,7 +26,7 @@ final manualTeacherRepositoryProvider =
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef ManualTeacherRepositoryRef = ProviderRef<MockManualTeacherRepository>;
+typedef ManualTeacherRepositoryRef = ProviderRef<ManualTeacherRepository>;
 String _$manualTeacherNotifierHash() =>
     r'e7362e2d047cf27c87ec968fe1c786a02438e1b4';
 

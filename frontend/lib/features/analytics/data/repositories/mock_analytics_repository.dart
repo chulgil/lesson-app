@@ -1,8 +1,10 @@
 // Mock analytics repository with test data.
 
 import '../../domain/entities/teacher_stats.dart';
+import '../../domain/repositories/analytics_repository.dart';
 
-class MockAnalyticsRepository {
+class MockAnalyticsRepository implements AnalyticsRepository {
+  @override
   Future<TeacherMonthlyStats> getTeacherMonthlyStats(DateTime month) async {
     await Future.delayed(const Duration(milliseconds: 300));
 

@@ -1,8 +1,10 @@
 // Mock gamification repository with test data.
 
 import '../../domain/entities/gamification.dart';
+import '../../domain/repositories/gamification_repository.dart';
 
-class MockGamificationRepository {
+class MockGamificationRepository implements GamificationRepository {
+  @override
   Future<StudentGamification> getStudentGamification(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 200));
 

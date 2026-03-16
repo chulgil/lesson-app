@@ -2,12 +2,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_feedback_preset_repository.dart';
 import '../../domain/entities/feedback_preset.dart';
+import '../../domain/repositories/feedback_preset_repository.dart';
 
 part 'feedback_preset_providers.g.dart';
 
 /// Repository provider for feedback presets.
 @Riverpod(keepAlive: true)
-MockFeedbackPresetRepository feedbackPresetRepository(
+FeedbackPresetRepository feedbackPresetRepository(
   FeedbackPresetRepositoryRef ref,
 ) {
   return MockFeedbackPresetRepository();

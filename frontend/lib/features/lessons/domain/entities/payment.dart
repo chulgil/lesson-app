@@ -4,6 +4,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'payment.g.dart';
 
 /// Payment type enum (trial vs regular)
 enum PaymentType {
@@ -119,6 +122,7 @@ enum BillingTargetType {
 }
 
 /// Payment record model
+@JsonSerializable()
 class Payment {
   final String id;
   final String studentId;
@@ -185,6 +189,11 @@ class Payment {
     this.parentNotified = false,
     this.parentNotifiedAt,
   });
+
+  factory Payment.fromJson(Map<String, dynamic> json) =>
+      _$PaymentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PaymentToJson(this);
 
   /// Check if payment is overdue
   bool get isOverdue =>
@@ -347,6 +356,7 @@ class Payment {
 }
 
 /// Tuition settings for a student
+@JsonSerializable()
 class TuitionSettings {
   final String studentId;
   final int monthlyFee; // Monthly tuition fee
@@ -379,6 +389,11 @@ class TuitionSettings {
     this.defaultBillingTarget = BillingTargetType.parent, // Default to parent
     this.defaultBillingParentId,
   });
+
+  factory TuitionSettings.fromJson(Map<String, dynamic> json) =>
+      _$TuitionSettingsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TuitionSettingsToJson(this);
 
   /// Calculate effective per-lesson cost
   int get effectiveLessonFee {
@@ -440,6 +455,7 @@ class TuitionSettings {
 }
 
 /// Payment summary statistics
+@JsonSerializable()
 class PaymentSummary {
   final int totalReceived; // Total amount received this month
   final int totalPending; // Total pending amount
@@ -456,6 +472,11 @@ class PaymentSummary {
     this.unpaidStudents = 0,
     this.overdueStudents = 0,
   });
+
+  factory PaymentSummary.fromJson(Map<String, dynamic> json) =>
+      _$PaymentSummaryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PaymentSummaryToJson(this);
 
   /// Format total received
   String get formattedTotalReceived {

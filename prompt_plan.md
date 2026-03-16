@@ -1,44 +1,55 @@
-# Backend 설계 및 구현
+# Mock → Remote 전환 구현 계획
 
-> 확정일: 2026-03-16
+> 확정일: 2026-03-17
+> 상태: Phase 1 진행 중
 
-## 완료된 작업
+## 개요
 
-### Phase 1: 누락 테이블 추가 (완료)
-- [x] 프론트엔드 전체 분석 (20 도메인, 80+ 엔티티, 25+ Mock 레포)
-- [x] 기존 백엔드 분석 (43 테이블, 100+ 엔드포인트)
-- [x] 누락 21개 테이블 모델 작성 (6개 모델 파일)
-- [x] Pydantic v2 스키마 작성 (6개 스키마 파일)
-- [x] 서비스 레이어 작성 (6개 서비스 파일)
-- [x] API 라우터 작성 (6개 라우터 파일)
-- [x] Alembic 마이그레이션 0002 작성
-- [x] 전체 54개 테스트 통과 확인
-- [x] 스펙 문서 작성
+프론트엔드 Mock Repository를 Remote Repository로 전환하여 `USE_MOCK=false`로 전체 앱 동작 가능하게 함.
 
-### 결과
-- 총 64개 테이블, 154개 API 엔드포인트
-- 19개 라우터, 18개 서비스
+## Phase 1: 인프라 및 공통 준비 (현재 세션)
 
-## 다음 Phase
+### 1.1 Entity JSON 직렬화 완성
+- [ ] gamification entities (StudentGamification, PointHistory, PracticeBadge)
+- [ ] analytics entities (TeacherMonthlyStats, MonthlyTrend, StudentPracticeRank)
+- [ ] practice entities (PracticeStats, PracticeStreak, PracticeItem, Piece)
+- [ ] lesson entities (TeachingResource, FeedbackPreset, TipTemplate)
+- [ ] student_home entities (ManualTeacher)
 
-### Phase 2: 기존 스텁 연결
-- [ ] schedule 라우터의 exception 스텁 → ScheduleException 모델 연결
-- [ ] Analytics 라우터 추가
+### 1.2 Repository 인터페이스 정비
+- [ ] 레거시 lib/repositories/ → features/[domain]/domain/repositories/ 마이그레이션
+- [ ] 카테고리 C Mock에서 abstract 인터페이스 추출
 
-### Phase 3: Frontend 연결
-- [ ] Mock → Remote 전환 가이드 작성
-- [ ] Flutter Remote Repository와 API 매핑 확인
-- [ ] 데이터 시딩 스크립트
+## Phase 2: Remote Repository 작성
 
-### Phase 4: 인프라
-- [ ] Supabase Auth 실제 연동
-- [ ] Redis 캐시
-- [ ] FCM Push
-- [ ] Docker 배포
+### 2.1 높은 우선순위
+- [ ] SettingsRepository
+- [ ] TeacherRepository
+- [ ] TeacherSearchRepository
+- [ ] TeacherProfileRepository
+- [ ] LessonPolicyRepository
+- [ ] ProposalSettingsRepository
+- [ ] GamificationRepository
 
----
+### 2.2 중간 우선순위
+- [ ] PracticeGoalRepository
+- [ ] PracticeNoteRepository
+- [ ] PracticeStatsRepository
+- [ ] FeedbackPresetRepository
+- [ ] TeachingResourceRepository
+- [ ] ScheduleConfirmationCardRepository
 
-## 이전 계획
+### 2.3 낮은 우선순위 (백엔드 의존)
+- [ ] MembershipRepository, LocationRepository, LessonClassRepository
+- [ ] PieceRepository, PracticeItemRepository, PracticeRepertoireRepository
+- [ ] TipTemplateRepository, ManualTeacherRepository
+- [ ] PaymentRepository, AnalyticsRepository
 
-### 수강권 자동 갱신 제안 시스템 (2026-03-15) - 완료
-Phase 1~4 모두 완료 (SubscriptionRenewalService, 선생님/학생 UX, 자동화)
+## Phase 3: Provider 스위칭 로직 정비
+- [ ] 21개 provider 파일의 EnvironmentConfig 분기 통일
+
+## Phase 4: 통합 테스트 및 검증
+- [ ] USE_MOCK=false 전체 앱 실행 검증
+
+## Phase 5: 인터페이스 추출 정리 (선택적)
+- [ ] 카테고리 C Mock의 abstract 인터페이스 생성

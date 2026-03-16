@@ -1,5 +1,7 @@
 // Tip template domain entities
 // Moved from lib/models/tip_template.dart for Clean Architecture
+import 'package:json_annotation/json_annotation.dart';
+part 'tip_template.g.dart';
 
 /// Category for tip templates
 enum TipCategory {
@@ -43,6 +45,7 @@ extension TipCategoryExtension on TipCategory {
 }
 
 /// Template for frequently used tips
+@JsonSerializable()
 class TipTemplate {
   final String id;
   final String teacherId;
@@ -63,6 +66,11 @@ class TipTemplate {
     required this.createdAt,
     this.lastUsedAt,
   });
+
+  factory TipTemplate.fromJson(Map<String, dynamic> json) =>
+      _$TipTemplateFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TipTemplateToJson(this);
 
   TipTemplate copyWith({
     String? id,

@@ -1,6 +1,11 @@
 // Teacher analytics data models.
 
+import 'package:json_annotation/json_annotation.dart';
+
+part 'teacher_stats.g.dart';
+
 /// Monthly trend data point for charts.
+@JsonSerializable()
 class MonthlyTrend {
   final DateTime month;
   final int lessonCount;
@@ -11,9 +16,15 @@ class MonthlyTrend {
     required this.lessonCount,
     required this.revenue,
   });
+
+  factory MonthlyTrend.fromJson(Map<String, dynamic> json) =>
+      _$MonthlyTrendFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MonthlyTrendToJson(this);
 }
 
 /// Practice ranking entry for a student.
+@JsonSerializable()
 class StudentPracticeRank {
   final String studentId;
   final String studentName;
@@ -28,9 +39,15 @@ class StudentPracticeRank {
     required this.practiceRate,
     required this.practiceMinutes,
   });
+
+  factory StudentPracticeRank.fromJson(Map<String, dynamic> json) =>
+      _$StudentPracticeRankFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StudentPracticeRankToJson(this);
 }
 
 /// Teacher monthly statistics aggregate.
+@JsonSerializable()
 class TeacherMonthlyStats {
   final DateTime month;
   final int totalLessons;
@@ -61,4 +78,9 @@ class TeacherMonthlyStats {
     required this.lessonTrend,
     required this.practiceRanking,
   });
+
+  factory TeacherMonthlyStats.fromJson(Map<String, dynamic> json) =>
+      _$TeacherMonthlyStatsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeacherMonthlyStatsToJson(this);
 }

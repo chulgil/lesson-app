@@ -1,4 +1,6 @@
 // Teaching resource entity for sharing learning materials with students
+import 'package:json_annotation/json_annotation.dart';
+part 'teaching_resource.g.dart';
 
 /// Types of teaching resources
 enum TeachingResourceType {
@@ -30,6 +32,7 @@ enum TeachingResourceType {
 }
 
 /// Teaching resource model - learning materials shared by teachers
+@JsonSerializable()
 class TeachingResource {
   final String id;
   final String teacherId;
@@ -76,6 +79,11 @@ class TeachingResource {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory TeachingResource.fromJson(Map<String, dynamic> json) =>
+      _$TeachingResourceFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TeachingResourceToJson(this);
 
   /// Get the launch URL for this resource (with timestamp if applicable)
   String? get launchUrl {

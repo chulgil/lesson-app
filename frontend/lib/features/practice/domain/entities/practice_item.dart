@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 
+import 'package:json_annotation/json_annotation.dart';
+
 // Re-export shared enum for backward compatibility
 export '../../../../core/models/shared_enums.dart' show AgeGroup;
+
+part 'practice_item.g.dart';
 
 /// Quick Reaction from teacher (1-tap feedback)
 enum QuickReaction {
@@ -187,6 +191,7 @@ enum PracticeType {
 }
 
 /// Practice item model - 선생님이 레슨에서 할당하는 "이번 주 연습" 항목
+@JsonSerializable()
 class PracticeItem {
   final String id;
   final String lessonId; // 연결된 레슨 ID
@@ -249,6 +254,11 @@ class PracticeItem {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory PracticeItem.fromJson(Map<String, dynamic> json) =>
+      _$PracticeItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PracticeItemToJson(this);
 
   /// Check if this is from repertoire
   bool get isFromRepertoire =>

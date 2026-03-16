@@ -2,12 +2,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/mock_manual_teacher_repository.dart';
 import '../../domain/entities/manual_teacher.dart';
+import '../../domain/repositories/manual_teacher_repository.dart';
 
 part 'manual_teacher_provider.g.dart';
 
 /// Repository provider for manual teachers.
 @Riverpod(keepAlive: true)
-MockManualTeacherRepository manualTeacherRepository(
+ManualTeacherRepository manualTeacherRepository(
   ManualTeacherRepositoryRef ref,
 ) {
   return MockManualTeacherRepository();

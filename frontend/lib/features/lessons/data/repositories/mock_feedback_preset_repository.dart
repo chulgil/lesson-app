@@ -1,9 +1,10 @@
 import '../../domain/constants/feedback_constants.dart';
 import '../../domain/entities/feedback_preset.dart';
+import '../../domain/repositories/feedback_preset_repository.dart';
 
 /// Mock repository for feedback presets.
 /// Stores default presets and teacher-created custom presets.
-class MockFeedbackPresetRepository {
+class MockFeedbackPresetRepository implements FeedbackPresetRepository {
   final List<FeedbackPreset> _presets = [];
   bool _initialized = false;
 
@@ -24,6 +25,7 @@ class MockFeedbackPresetRepository {
   }
 
   /// Get all visible presets for a teacher, sorted by order.
+  @override
   Future<List<FeedbackPreset>> getPresets({String? teacherId}) async {
     _ensureInitialized();
     final result = _presets
@@ -35,6 +37,7 @@ class MockFeedbackPresetRepository {
   }
 
   /// Add a custom preset.
+  @override
   Future<FeedbackPreset> addPreset(FeedbackPreset preset) async {
     _ensureInitialized();
     final maxOrder = _presets.isEmpty
@@ -49,6 +52,7 @@ class MockFeedbackPresetRepository {
   }
 
   /// Update a preset (text or sort order).
+  @override
   Future<void> updatePreset(FeedbackPreset preset) async {
     _ensureInitialized();
     final index = _presets.indexWhere((p) => p.id == preset.id);
@@ -58,6 +62,7 @@ class MockFeedbackPresetRepository {
   }
 
   /// Delete a custom preset or hide a default preset.
+  @override
   Future<void> deletePreset(String id) async {
     _ensureInitialized();
     final index = _presets.indexWhere((p) => p.id == id);
@@ -72,6 +77,7 @@ class MockFeedbackPresetRepository {
   }
 
   /// Restore a hidden default preset.
+  @override
   Future<void> restorePreset(String id) async {
     _ensureInitialized();
     final index = _presets.indexWhere((p) => p.id == id);
