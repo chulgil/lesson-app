@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -62,16 +64,29 @@ class _StudentProfileSetupScreenState
     setState(() => _isLoading = true);
 
     try {
-      final student = Student(
-        id: const Uuid().v4(),
-        name: _nameController.text.trim(),
-        instrument: _selectedInstrument!,
-        level: StudentLevel.beginner,
-        status: StudentStatus.trial,
-        createdAt: DateTime.now(),
-      );
-
-      await ref.read(studentsNotifierProvider.notifier).addStudent(student);
+      if (EnvironmentConfig.useMockData) {
+        // Mock mode: use existing student provider
+        final student = Student(
+          id: const Uuid().v4(),
+          name: _nameController.text.trim(),
+          instrument: _selectedInstrument!,
+          level: StudentLevel.beginner,
+          status: StudentStatus.trial,
+          createdAt: DateTime.now(),
+        );
+        await ref.read(studentsNotifierProvider.notifier).addStudent(student);
+      } else {
+        // Remote mode: call student self-profile API
+        final apiClient = ref.read(apiClientProvider);
+        await apiClient.post(
+          '/students/me/profile',
+          data: {
+            'name': _nameController.text.trim(),
+            'instrument': _selectedInstrument!,
+            'level': 'beginner',
+          },
+        );
+      }
 
       if (!mounted) return;
 

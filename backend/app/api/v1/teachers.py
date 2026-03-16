@@ -116,3 +116,82 @@ async def get_teacher_dashboard(
     """Return aggregated dashboard data for the teacher."""
     service = TeacherService(db)
     return await service.get_dashboard(teacher_id, current_user)
+
+
+# ---------------------------------------------------------------------------
+# /teachers/me/* — Teacher-specific endpoints (선생님 전용)
+# ---------------------------------------------------------------------------
+
+
+@router.get(
+    "/me/dashboard",
+    response_model=TeacherDashboardResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get my dashboard (teacher only)",
+)
+async def get_my_dashboard(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherDashboardResponse:
+    """Return dashboard data for the authenticated teacher."""
+    service = TeacherService(db)
+    return await service.get_dashboard(current_user.id, current_user)
+
+
+@router.get(
+    "/me/students",
+    response_model=PaginatedResponse[StudentResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List my students (teacher only)",
+)
+async def list_my_students(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    pagination: Annotated[dict, Depends(get_pagination)],
+    student_status: Annotated[str | None, Query(alias="status")] = None,
+    class_id: str | None = None,
+) -> PaginatedResponse[StudentResponse]:
+    """Return students under the authenticated teacher."""
+    service = TeacherService(db)
+    return await service.get_students(
+        current_user.id,
+        page=pagination["page"],
+        size=pagination["size"],
+        offset=pagination["offset"],
+        status=student_status,
+        class_id=class_id,
+    )
+
+
+@router.post(
+    "/me/students",
+    response_model=StudentResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Register student (teacher only)",
+)
+async def create_my_student(
+    body: StudentCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentResponse:
+    """Register a new student under the authenticated teacher."""
+    from app.services.student_service import StudentService
+
+    service = StudentService(db)
+    return await service.create(body, current_user)
+
+
+@router.put(
+    "/me/profile",
+    response_model=TeacherResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update my profile (teacher only)",
+)
+async def update_my_profile(
+    body: TeacherUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherResponse:
+    """Update the authenticated teacher's profile."""
+    service = TeacherService(db)
+    return await service.update(current_user.id, body, current_user)

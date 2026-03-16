@@ -126,3 +126,69 @@ class StudentService:
             total_practice_minutes=0,
             repertoire_count=0,
         )
+
+    # ------------------------------------------------------------------
+    # Student self-service (학생 자기 프로필)
+    # ------------------------------------------------------------------
+
+    async def setup_student_profile(self, data: Any, current_user: Any) -> StudentResponse:
+        """Create student profile during onboarding (student self-service)."""
+        from app.models.student import Student
+
+        # Check if profile already exists
+        existing = await self.db.scalar(
+            select(Student).where(Student.user_id == current_user.id)
+        )
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Student profile already exists",
+            )
+
+        student = Student(
+            user_id=current_user.id,
+            teacher_id="",  # No teacher yet (will be set on connection)
+            name=data.name,
+            instrument=data.instrument,
+            level=data.level,
+            phone=getattr(data, "phone", None),
+        )
+        self.db.add(student)
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)
+
+    async def get_student_by_user_id(self, user_id: str) -> StudentResponse:
+        """Get student profile by user_id."""
+        from app.models.student import Student
+
+        student = await self.db.scalar(
+            select(Student).where(Student.user_id == user_id)
+        )
+        if student is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Student profile not found",
+            )
+        return StudentResponse.model_validate(student)
+
+    async def update_student_profile(self, data: Any, current_user: Any) -> StudentResponse:
+        """Update student's own profile."""
+        from app.models.student import Student
+
+        student = await self.db.scalar(
+            select(Student).where(Student.user_id == current_user.id)
+        )
+        if student is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Student profile not found",
+            )
+
+        update_data = data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            if value is not None:
+                setattr(student, key, value)
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)

@@ -83,6 +83,18 @@ async def get_current_teacher(
     return user
 
 
+async def get_current_student(
+    user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    """Ensure the current user has the 'student' role."""
+    if user.role is None or user.role.value != "student":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Student access required",
+        )
+    return user
+
+
 async def get_current_parent(
     user: Annotated[User, Depends(get_current_user)],
 ) -> User:
@@ -145,6 +157,7 @@ async def get_pagination(
 DbSession = Annotated[AsyncSession, Depends(get_db)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 CurrentTeacher = Annotated[User, Depends(get_current_teacher)]
+CurrentStudent = Annotated[User, Depends(get_current_student)]
 CurrentParent = Annotated[User, Depends(get_current_parent)]
 Pagination = Annotated[dict[str, int], Depends(get_pagination)]
 Locale = Annotated[str, Depends(get_locale)]

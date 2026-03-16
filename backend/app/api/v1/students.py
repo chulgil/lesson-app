@@ -7,11 +7,37 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
+from pydantic import BaseModel
+
+from app.core.deps import get_current_student, get_current_teacher, get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentUpdate
 from app.services.student_service import StudentService
+
+
+# ---------------------------------------------------------------------------
+# Student self-profile schema
+# ---------------------------------------------------------------------------
+
+
+class StudentProfileSetup(BaseModel):
+    """Student self-profile setup (onboarding)."""
+
+    name: str
+    instrument: str
+    level: str = "beginner"
+    phone: str | None = None
+
+
+class StudentProfileUpdate(BaseModel):
+    """Student self-profile update."""
+
+    name: str | None = None
+    instrument: str | None = None
+    level: str | None = None
+    phone: str | None = None
+    profile_image_url: str | None = None
 
 router = APIRouter()
 
@@ -121,3 +147,59 @@ async def get_student_stats(
     """Return aggregated statistics for a student."""
     service = StudentService(db)
     return await service.get_stats(student_id, current_user)
+
+
+# ---------------------------------------------------------------------------
+# /students/me/* — Student self-service endpoints (학생 자기 관리)
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/me/profile",
+    response_model=StudentResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Setup my student profile (student onboarding)",
+)
+async def setup_my_profile(
+    body: StudentProfileSetup,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_student)],
+) -> StudentResponse:
+    """Create the student's own profile during onboarding.
+
+    Unlike POST /students (teacher-only), this allows a student
+    to set up their own profile after OAuth signup.
+    """
+    service = StudentService(db)
+    return await service.setup_student_profile(body, current_user)
+
+
+@router.get(
+    "/me/profile",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get my student profile",
+)
+async def get_my_profile(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_student)],
+) -> StudentResponse:
+    """Return the authenticated student's own profile."""
+    service = StudentService(db)
+    return await service.get_student_by_user_id(current_user.id)
+
+
+@router.put(
+    "/me/profile",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update my student profile",
+)
+async def update_my_profile(
+    body: StudentProfileUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_student)],
+) -> StudentResponse:
+    """Update the authenticated student's own profile."""
+    service = StudentService(db)
+    return await service.update_student_profile(body, current_user)
