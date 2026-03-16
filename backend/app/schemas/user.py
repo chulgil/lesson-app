@@ -21,6 +21,7 @@ class UserResponse(BaseModel):
     country: str | None = None
     timezone: str | None = None
     currency: str | None = None
+    onboarding_completed: bool = False
     created_at: _dt.datetime | None = None
 
 

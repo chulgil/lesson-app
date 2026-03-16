@@ -24,6 +24,7 @@ AuthUser _$AuthUserFromJson(Map<String, dynamic> json) => AuthUser(
       name: json['name'] as String,
       profileImageUrl: json['profile_image_url'] as String?,
       role: $enumDecodeNullable(_$UserRoleEnumMap, json['role']),
+      onboardingCompleted: json['onboarding_completed'] as bool? ?? false,
       authProvider: json['auth_provider'] as String?,
       createdAt: json['created_at'] == null
           ? null
@@ -36,6 +37,7 @@ Map<String, dynamic> _$AuthUserToJson(AuthUser instance) => <String, dynamic>{
       'name': instance.name,
       'profile_image_url': instance.profileImageUrl,
       'role': _$UserRoleEnumMap[instance.role],
+      'onboarding_completed': instance.onboardingCompleted,
       'auth_provider': instance.authProvider,
       'created_at': instance.createdAt?.toIso8601String(),
     };

@@ -30,7 +30,24 @@ class AuthNeedsRole extends AuthState {
   });
 }
 
-/// User is authenticated.
+/// User has a role but hasn't completed onboarding (profile setup).
+class AuthNeedsOnboarding extends AuthState {
+  final String userId;
+  final String name;
+  final String email;
+  final UserRole role;
+  final String? profileImageUrl;
+
+  const AuthNeedsOnboarding({
+    required this.userId,
+    required this.name,
+    required this.email,
+    required this.role,
+    this.profileImageUrl,
+  });
+}
+
+/// User is fully authenticated and onboarding is complete.
 class AuthAuthenticated extends AuthState {
   final String userId;
   final String name;

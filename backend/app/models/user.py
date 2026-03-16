@@ -34,6 +34,7 @@ class User(UUIDMixin, TimestampMixin, Base):
     )
     profile_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    onboarding_completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     # i18n / localization
     locale: Mapped[str] = mapped_column(String(10), nullable=False, default="ko")

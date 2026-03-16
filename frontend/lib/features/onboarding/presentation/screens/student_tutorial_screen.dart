@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../providers/auth/user_role_provider.dart';
@@ -85,6 +87,9 @@ class _StudentTutorialScreenState
 
   void _navigateToHome() {
     ref.read(currentUserRoleProvider.notifier).state = UserRole.student;
+    if (!EnvironmentConfig.useMockData) {
+      ref.read(authNotifierProvider.notifier).completeOnboarding();
+    }
     context.go(AppRoutes.studentHome);
   }
 

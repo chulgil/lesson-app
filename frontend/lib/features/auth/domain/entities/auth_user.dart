@@ -33,6 +33,8 @@ class AuthUser {
   @JsonKey(name: 'profile_image_url')
   final String? profileImageUrl;
   final UserRole? role; // null for new OAuth signups before role selection
+  @JsonKey(name: 'onboarding_completed')
+  final bool onboardingCompleted;
   @JsonKey(name: 'auth_provider')
   final String? authProvider;
   @JsonKey(name: 'created_at')
@@ -44,6 +46,7 @@ class AuthUser {
     required this.name,
     this.profileImageUrl,
     this.role,
+    this.onboardingCompleted = false,
     this.authProvider,
     this.createdAt,
   });

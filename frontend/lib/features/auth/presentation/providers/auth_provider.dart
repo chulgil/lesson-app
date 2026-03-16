@@ -93,13 +93,22 @@ class AuthNotifier extends _$AuthNotifier {
     }
   }
 
-  /// Build the appropriate auth state based on whether user has a role.
+  /// Build the appropriate auth state based on user's role and onboarding status.
   AuthState _stateFromUser(AuthUser user) {
     if (user.role == null) {
       return AuthNeedsRole(
         userId: user.id,
         name: user.name,
         email: user.email,
+        profileImageUrl: user.profileImageUrl,
+      );
+    }
+    if (!user.onboardingCompleted) {
+      return AuthNeedsOnboarding(
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role!,
         profileImageUrl: user.profileImageUrl,
       );
     }
@@ -110,6 +119,16 @@ class AuthNotifier extends _$AuthNotifier {
       role: user.role!,
       profileImageUrl: user.profileImageUrl,
     );
+  }
+
+  /// Mark onboarding as completed on the server.
+  Future<void> completeOnboarding() async {
+    final apiClient = ref.read(apiClientProvider);
+    await apiClient.patch('/users/me/onboarding-complete');
+
+    // Refresh user state
+    final user = await _authRepository.getMe();
+    state = _stateFromUser(user);
   }
 
   /// Login with OAuth provider (google, kakao, apple).

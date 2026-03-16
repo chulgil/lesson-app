@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../models/teacher_onboarding.dart';
@@ -65,6 +67,10 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
 
   void _navigateToHome() {
     ref.read(teacherOnboardingCompletedProvider.notifier).state = true;
+    // Mark onboarding as completed on the server (remote mode)
+    if (!EnvironmentConfig.useMockData) {
+      ref.read(authNotifierProvider.notifier).completeOnboarding();
+    }
     context.go(AppRoutes.home);
   }
 

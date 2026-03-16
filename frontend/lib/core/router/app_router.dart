@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import '../auth/auth_state.dart';
 import '../config/environment.dart';
+import '../../features/auth/domain/entities/user_role.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import 'app_routes.dart';
 import 'routes/auth_routes.dart';
@@ -73,6 +74,16 @@ class AppRouter {
                   }
                   if (termsAgreed && !isRoleSelect) {
                     return AppRoutes.roleSelect;
+                  }
+                }
+
+                // Onboarding not completed: redirect to profile setup
+                if (authState is AuthNeedsOnboarding) {
+                  final isOnboarding = currentPath.contains('/onboarding/');
+                  if (!isOnboarding) {
+                    return authState.role == UserRole.teacher
+                        ? AppRoutes.teacherProfileSetup
+                        : AppRoutes.studentProfileSetup;
                   }
                 }
 

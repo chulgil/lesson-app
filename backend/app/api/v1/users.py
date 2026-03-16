@@ -85,6 +85,24 @@ async def update_my_locale(
     return UserResponse.model_validate(user)
 
 
+@router.patch(
+    "/me/onboarding-complete",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Mark onboarding as completed",
+)
+async def complete_onboarding(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> UserResponse:
+    """Mark the current user's onboarding as completed."""
+    current_user.onboarding_completed = True
+    db.add(current_user)
+    await db.flush()
+    await db.refresh(current_user)
+    return UserResponse.model_validate(current_user)
+
+
 @router.get(
     "/supported-locales",
     response_model=SupportedLocalesResponse,
