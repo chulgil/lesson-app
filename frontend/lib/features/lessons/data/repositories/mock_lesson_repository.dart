@@ -52,6 +52,7 @@ class MockLessonRepository implements LessonRepository {
         keyPoints: ['카덴차 음정 정확도', '보잉 방향 전환', '가보트 리듬 안정'],
         practiceTips: '메트로놈 72 템포에서 카덴차 구간 10회 반복 후, 템포를 4씩 올려보세요.',
         assignments: ['비발디 1악장 전체 암보', '가보트 p.12~14 반복'],
+        travelTimeAfter: 20, // 학생 자택 방문 레슨으로 이동
         createdAt: today.subtract(const Duration(days: 14)),
       ),
 
@@ -80,6 +81,7 @@ class MockLessonRepository implements LessonRepository {
           name: '학생 자택 방문',
           address: '서울시 서초구 반포동 45-7',
         ),
+        travelTimeAfter: 30, // 서초구 → 학원 복귀 이동시간
         createdAt: today.subtract(const Duration(days: 7)),
       ),
 

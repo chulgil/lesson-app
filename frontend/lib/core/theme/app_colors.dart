@@ -83,6 +83,14 @@ class AppColors {
   // Schedule: rest day (no lessons scheduled) background
   static const scheduleRestDayBackground = Color(0xFFE8E8E8);
 
+  // Schedule: break/travel time block
+  static const scheduleBreakBackground = Color(0xFFF0EDE8);
+  static const scheduleBreakBorder = Color(0xFFD4CFC8);
+  static const scheduleBreakIcon = Color(0xFF8C8478);
+  static const scheduleTravelBackground = Color(0xFFEDE8F0);
+  static const scheduleTravelBorder = Color(0xFFCFC8D4);
+  static const scheduleTravelIcon = Color(0xFF78848C);
+
   // Light mode
   static const backgroundLight = Color(0xFFFFFAF5);
   static const surfaceLight = Color(0xFFFFFFFF);

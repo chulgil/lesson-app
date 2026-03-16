@@ -188,6 +188,12 @@ class Lesson {
   final List<String>? assignments;
   final LessonLocationInfo? location; // Lesson location
   final String? studentNote; // Student's own memo about the lesson
+
+  /// Travel/break time after this lesson in minutes.
+  /// null = use global breakTimeBetweenLessons setting.
+  /// 0 = no break/travel time.
+  final int? travelTimeAfter;
+
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -210,6 +216,7 @@ class Lesson {
     this.assignments,
     this.location,
     this.studentNote,
+    this.travelTimeAfter,
     required this.createdAt,
     this.updatedAt,
   });
@@ -283,6 +290,7 @@ class Lesson {
     List<String>? assignments,
     LessonLocationInfo? location,
     String? studentNote,
+    int? travelTimeAfter,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -305,6 +313,7 @@ class Lesson {
       assignments: assignments ?? this.assignments,
       location: location ?? this.location,
       studentNote: studentNote ?? this.studentNote,
+      travelTimeAfter: travelTimeAfter ?? this.travelTimeAfter,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

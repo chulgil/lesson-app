@@ -13,7 +13,9 @@ import '../../../../providers/providers.dart'
     hide teacherAvailabilityProvider;
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
+import 'timeline_break_block.dart';
 import 'timeline_lesson_block.dart';
+import 'travel_time_edit_sheet.dart';
 
 /// Height per 30-minute unit.
 const double _unitHeight = kTimelineUnitHeight;
@@ -126,6 +128,8 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     final (startHour, endHour) =
         _getVisibleRange(availability, sortedLessons);
 
+    final globalBreakTime = availability?.breakTimeBetweenLessons ?? 0;
+
     const topPadding = 16.0;
 
     return SingleChildScrollView(
@@ -134,7 +138,13 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTapUp: (details) {
-          _onTimelineTap(details.localPosition.dy, startHour, topPadding, sortedLessons);
+          _onTimelineTap(
+            details.localPosition.dy,
+            startHour,
+            topPadding,
+            sortedLessons,
+            globalBreakTime,
+          );
         },
         child: SizedBox(
           height: ((endHour - startHour + 1) * 2) * _unitHeight + topPadding,
@@ -142,6 +152,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             children: [
               // Hour grid lines and labels
               ..._buildHourGrid(startHour, endHour, topPadding),
+              // Break/travel time blocks (rendered behind lesson blocks)
+              ..._buildBreakBlocks(
+                sortedLessons, startHour, topPadding, globalBreakTime,
+              ),
               // Lesson blocks
               ..._buildLessonBlocks(sortedLessons, startHour, topPadding),
               // "Now" indicator
@@ -154,7 +168,14 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
   /// Convert tap Y position to time and navigate to add lesson.
-  void _onTimelineTap(double tapY, int startHour, double topPadding, List<Lesson> lessons) {
+  /// Checks lesson blocks and break/travel blocks before navigating.
+  void _onTimelineTap(
+    double tapY,
+    int startHour,
+    double topPadding,
+    List<Lesson> lessons,
+    int globalBreakTime,
+  ) {
     // Convert Y offset to minutes
     final adjustedY = tapY - topPadding;
     if (adjustedY < 0) return;
@@ -162,15 +183,31 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     final totalMinutes = (adjustedY / _unitHeight) * 30 + startHour * 60;
     final hour = (totalMinutes ~/ 60).clamp(0, 23);
     final minute = ((totalMinutes % 60) ~/ 30) * 30; // Snap to 30-min
+    final tappedMinutes = hour * 60 + minute;
 
     // Check if tap is on an existing lesson (lesson blocks handle their own tap)
     for (final lesson in lessons) {
       final parts = lesson.startTime.split(':');
       final lessonStart = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final lessonEnd = lessonStart + lesson.duration;
-      final tappedMinutes = hour * 60 + minute;
       if (tappedMinutes >= lessonStart && tappedMinutes < lessonEnd) {
         return; // Lesson block's onTap will handle this
+      }
+    }
+
+    // Check if tap is on a break/travel time block.
+    // The break block's own GestureDetector handles the action;
+    // here we only return early to prevent "add lesson" navigation.
+    for (int i = 0; i < lessons.length - 1; i++) {
+      final current = lessons[i];
+
+      final currentParts = current.startTime.split(':');
+      final currentEnd =
+          int.parse(currentParts[0]) * 60 + int.parse(currentParts[1]) + current.duration;
+
+      final breakDuration = current.travelTimeAfter ?? globalBreakTime;
+      if (breakDuration > 0 && tappedMinutes >= currentEnd && tappedMinutes < currentEnd + breakDuration) {
+        return; // Break block's own onTap will handle this
       }
     }
 
@@ -229,6 +266,123 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
 
+
+  /// Build break/travel time blocks between consecutive lessons.
+  List<Widget> _buildBreakBlocks(
+    List<Lesson> lessons,
+    int startHour,
+    double topPadding,
+    int globalBreakTime,
+  ) {
+    if (lessons.length < 2) return [];
+
+    final widgets = <Widget>[];
+
+    for (int i = 0; i < lessons.length - 1; i++) {
+      final current = lessons[i];
+      final next = lessons[i + 1];
+
+      final currentParts = current.startTime.split(':');
+      final currentEndMinutes =
+          int.parse(currentParts[0]) * 60 + int.parse(currentParts[1]) + current.duration;
+
+      final nextParts = next.startTime.split(':');
+      final nextStartMinutes = int.parse(nextParts[0]) * 60 + int.parse(nextParts[1]);
+
+      // Determine break duration: per-lesson travel time or global break time
+      final breakDuration = current.travelTimeAfter ?? globalBreakTime;
+      if (breakDuration <= 0) continue;
+
+      // Clamp to actual gap between lessons
+      final actualGap = nextStartMinutes - currentEndMinutes;
+      if (actualGap <= 0) continue;
+      final displayDuration = breakDuration.clamp(0, actualGap);
+      if (displayDuration <= 0) continue;
+
+      final isTravelTime = current.travelTimeAfter != null;
+      final top = ((currentEndMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+
+      widgets.add(
+        Positioned(
+          top: top,
+          left: 52,
+          right: 0,
+          child: TimelineBreakBlock(
+            type: isTravelTime ? BreakBlockType.travelTime : BreakBlockType.breakTime,
+            durationMinutes: displayDuration,
+            fromStudentName: current.studentName,
+            toStudentName: next.studentName,
+            fromLocation: current.location?.name,
+            toLocation: next.location?.name,
+            onTap: () => _showTravelTimeEditSheet(current, next, globalBreakTime),
+          ),
+        ),
+      );
+    }
+
+    return widgets;
+  }
+
+  /// Show travel time edit bottom sheet.
+  void _showTravelTimeEditSheet(
+    Lesson fromLesson,
+    Lesson toLesson,
+    int globalBreakTime,
+  ) {
+    final currentMinutes = fromLesson.travelTimeAfter ?? globalBreakTime;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: TravelTimeEditSheet(
+          currentMinutes: currentMinutes,
+          globalBreakTime: globalBreakTime,
+          fromStudentName: fromLesson.studentName,
+          toStudentName: toLesson.studentName,
+          fromLocation: fromLesson.location?.name,
+          toLocation: toLesson.location?.name,
+          onSave: (minutes, applyGlobally) {
+            _saveTravelTime(fromLesson, minutes, applyGlobally);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveTravelTime(
+    Lesson lesson,
+    int minutes,
+    bool applyGlobally,
+  ) async {
+    try {
+      if (applyGlobally) {
+        // Update global break time — need current settings for other fields
+        final availability =
+            await ref.read(teacherAvailabilityProvider('teacher_1').future);
+        await ref
+            .read(teacherAvailabilityNotifierProvider('teacher_1').notifier)
+            .updateLessonSettings(
+              slotDurationMinutes: availability?.slotDurationMinutes ?? 60,
+              breakTimeBetweenLessons: minutes,
+              slotStartInterval: availability?.slotStartInterval ?? 30,
+            );
+      } else {
+        // Update per-lesson travel time
+        final updated = lesson.copyWith(travelTimeAfter: minutes);
+        await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')),
+        );
+      }
+    }
+  }
 
   List<Widget> _buildHourGrid(int startHour, int endHour, double topPadding) {
     final widgets = <Widget>[];
