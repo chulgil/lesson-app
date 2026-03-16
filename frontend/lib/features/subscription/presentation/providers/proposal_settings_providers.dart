@@ -3,6 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../data/repositories/mock_proposal_settings_repository.dart';
 import '../../domain/entities/proposal_settings.dart';
 import '../../domain/repositories/proposal_settings_repository.dart';
+import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
+import '../../data/repositories/remote_proposal_settings_repository.dart';
 
 part 'proposal_settings_providers.g.dart';
 
@@ -14,7 +17,10 @@ part 'proposal_settings_providers.g.dart';
 ProposalSettingsRepository proposalSettingsRepository(
   ProposalSettingsRepositoryRef ref,
 ) {
-  return MockProposalSettingsRepository();
+  if (EnvironmentConfig.useMockData) {
+    return MockProposalSettingsRepository();
+  }
+  return RemoteProposalSettingsRepository(ref.read(apiClientProvider));
 }
 
 // ============================================================

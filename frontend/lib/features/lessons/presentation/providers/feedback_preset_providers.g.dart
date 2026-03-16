@@ -7,7 +7,7 @@ part of 'feedback_preset_providers.dart';
 // **************************************************************************
 
 String _$feedbackPresetRepositoryHash() =>
-    r'903120dc65037718454b760ff3913c02e3eb60f2';
+    r'8be5135f996c9f7646f6e83d85759a815739a2af';
 
 /// Repository provider for feedback presets.
 ///
