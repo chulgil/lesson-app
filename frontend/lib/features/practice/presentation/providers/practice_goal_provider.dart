@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_practice_goal_repository.dart';
+import '../../data/repositories/remote_practice_goal_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_goal_repository.dart';
 
@@ -10,8 +12,7 @@ final practiceGoalRepositoryProvider = Provider<PracticeGoalRepository>((ref) {
   if (EnvironmentConfig.useMockData) {
     return MockPracticeGoalRepository();
   }
-  // Mock already starts empty — safe to use in remote mode
-  return MockPracticeGoalRepository();
+  return RemotePracticeGoalRepository(ref.read(apiClientProvider));
 });
 
 /// Student's current active goal

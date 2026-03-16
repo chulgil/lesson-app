@@ -1,9 +1,11 @@
 import 'package:hive/hive.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'practice_goal.g.dart';
 
 /// Practice goal model for tracking daily/weekly targets
 @HiveType(typeId: 32)
+@JsonSerializable()
 class PracticeGoal extends HiveObject {
   @HiveField(0)
   final String id;
@@ -46,6 +48,11 @@ class PracticeGoal extends HiveObject {
     required this.createdAt,
     this.updatedAt,
   });
+
+  factory PracticeGoal.fromJson(Map<String, dynamic> json) =>
+      _$PracticeGoalFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PracticeGoalToJson(this);
 
   /// Whether daily goal is set
   bool get hasDailyGoal =>
