@@ -67,6 +67,7 @@ tests/
 | T-08 | 수강권 제안 플로우 | `POST /subscriptions-templates` → `POST /subscriptions-proposals` → `PATCH respond(accept)` → `PATCH confirm` | pending→paymentNotified→confirmed |
 | T-09 | 노쇼 관리 | `POST /lessons` → `PATCH status(noShow)` → `POST /no-shows` → `POST /bookings/makeup` | 노쇼 기록 deducted_credits=1 |
 | T-10 | 하루 멀티 학생 | (`POST /students` → `POST /lessons`) ×3 → `PATCH status(completed)` ×2 → `PATCH status(cancelled)` ×1 → `PUT feedback` ×2 | 3개 레슨 생성, 2개 완료+피드백, 1개 취소 |
+| T-11 | 수강권 만료 후 재등록 | `POST /subscriptions(4회)` → (`POST /lessons` → `PATCH use-lesson`) ×4 → remaining=0 확인 → `POST /proposals` → `PATCH accept` → `PATCH confirm` → `POST /subscriptions(8회)` → 첫 차감 → remaining=7 | 만료→재제안→수락→새 수강권 발급→사용 시작 |
 
 ### 학생 시나리오 (StudentActions 사용)
 

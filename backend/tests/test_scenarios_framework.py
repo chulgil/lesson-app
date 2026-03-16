@@ -259,3 +259,59 @@ async def test_fw_multi_student_day(teacher: TeacherActions):
 
     # Cancel third
     await teacher.cancel_lesson(lessons[2])
+
+
+# ===========================================================================
+# Scenario K: 수강권 만료 후 재등록
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_subscription_renewal_after_expiry(
+    teacher: TeacherActions, student: StudentActions
+):
+    """수강권 4회 모두 사용 → 만료 확인 → 선생님 재제안 → 학생 수락 → 새 수강권."""
+    # Step 1: 학생 + 첫 수강권 발급 (4회)
+    sid = await teacher.create_student("재등록학생", instrument="violin")
+    sub_id = await teacher.create_subscription(sid, total_lessons=4, amount=160000)
+
+    sub = await teacher.get_subscription(sub_id)
+    assert_subscription_remaining(sub, 4)
+
+    # Step 2: 4회 레슨 모두 완료 + 차감
+    for i in range(4):
+        lid = await teacher.create_lesson(sid, date=f"2026-04-{i + 1:02d}", start_time="15:00")
+        await teacher.complete_lesson(lid)
+        await teacher.use_lesson(sub_id, lid)
+
+    # Step 3: 잔여 0 확인 (만료 상태)
+    sub = await teacher.get_subscription(sub_id)
+    assert_subscription_remaining(sub, 0)
+    assert sub["used_lessons"] == 4
+
+    # Step 4: 선생님이 재등록 제안 (새 템플릿)
+    tmpl_id = await teacher.create_template("재등록 8회", lessons_count=8, amount=300000)
+    proposal_id = await teacher.send_proposal(
+        sid, tmpl_id, message="수강권이 만료되었습니다. 재등록을 추천합니다!"
+    )
+
+    # Step 5: 학생이 수락
+    result = await student.accept_proposal(proposal_id, tmpl_id)
+    assert_status(result, "paymentNotified")
+
+    # Step 6: 선생님이 결제 확인
+    confirmed = await teacher.confirm_proposal(proposal_id)
+    assert_status(confirmed, "confirmed")
+
+    # Step 7: 새 수강권 발급 + 사용 시작
+    new_sub_id = await teacher.create_subscription(sid, total_lessons=8, amount=300000)
+    new_sub = await teacher.get_subscription(new_sub_id)
+    assert_subscription_remaining(new_sub, 8)
+
+    # Step 8: 새 수강권에서 첫 레슨 차감
+    lid = await teacher.create_lesson(sid, date="2026-04-10", start_time="15:00")
+    await teacher.complete_lesson(lid)
+    await teacher.use_lesson(new_sub_id, lid)
+
+    new_sub = await teacher.get_subscription(new_sub_id)
+    assert_subscription_remaining(new_sub, 7)
