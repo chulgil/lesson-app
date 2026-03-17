@@ -191,15 +191,19 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
           _populateFields(student);
         }
 
-        return Scaffold(
+        return PopScope(
+          canPop: !_isSaving,
+          child: Scaffold(
           appBar: AppBar(
             title: const Text('학생 수정'),
             leading: IconButton(
-              onPressed: () => showExitConfirmation(
-                context,
-                hasChanges: _hasChanges,
-                onExit: () => context.pop(),
-              ),
+              onPressed: _isSaving
+                  ? null
+                  : () => showExitConfirmation(
+                        context,
+                        hasChanges: _hasChanges,
+                        onExit: () => context.pop(),
+                      ),
               icon: const Icon(Icons.close),
             ),
             actions: [
@@ -431,6 +435,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               ),
             ),
           ),
+        ),
         );
       },
     );
@@ -603,6 +608,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       await ref.read(studentsNotifierProvider.notifier).updateStudent(updated);
 
       if (!mounted) return;
+
+      // Invalidate cached student data so detail screen shows updated info
+      ref.invalidate(studentProvider(widget.studentId));
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

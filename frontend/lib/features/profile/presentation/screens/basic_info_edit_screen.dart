@@ -144,21 +144,15 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
 
     try {
       final notifier = ref.read(teacherExtendedProfileProvider.notifier);
+      final teachingStyle = _teachingStyleController.text.trim();
 
-      // Save basic info (name + introduction)
-      await notifier.updateBasicInfo(
+      // Single atomic save: all fields in one API call
+      await notifier.updateBasicInfoAll(
         name: _nameController.text.trim(),
         introduction: _introductionController.text.trim(),
+        teachingStyle: teachingStyle.isNotEmpty ? teachingStyle : null,
+        specialties: _selectedSpecialties.toList(),
       );
-
-      // Save teaching style
-      final teachingStyle = _teachingStyleController.text.trim();
-      if (teachingStyle.isNotEmpty) {
-        await notifier.updateTeachingStyle(teachingStyle);
-      }
-
-      // Save specialties
-      await notifier.updateSpecialties(_selectedSpecialties.toList());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -194,7 +188,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     final name = _nameController.text;
     final initial = name.isNotEmpty ? name[0] : '?';
 
-    return Scaffold(
+    return PopScope(
+      canPop: !_isLoading,
+      child: Scaffold(
       appBar: AppBar(
         title: const Text('기본 정보 수정'),
         actions: [
@@ -307,6 +303,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 

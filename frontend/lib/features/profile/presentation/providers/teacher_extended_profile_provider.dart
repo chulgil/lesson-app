@@ -299,6 +299,34 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     }
   }
 
+  /// Update basic info, teaching style, and specialties in a single call.
+  /// Prevents partial save issues when saving from BasicInfoEditScreen.
+  Future<void> updateBasicInfoAll({
+    required String name,
+    required String introduction,
+    String? teachingStyle,
+    List<String>? specialties,
+  }) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      final updated = await repo.updateProfile(
+        current.copyWith(
+          name: name,
+          introduction: introduction,
+          teachingStyle: teachingStyle ?? current.teachingStyle,
+          specialties: specialties ?? current.specialties,
+        ),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Update basic info (name and/or introduction)
   Future<void> updateBasicInfo({String? name, String? introduction}) async {
     final current = state.valueOrNull;

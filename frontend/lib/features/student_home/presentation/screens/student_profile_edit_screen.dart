@@ -1,7 +1,10 @@
 // Student profile edit screen for editing name, instrument, and contact info.
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -9,6 +12,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../../students/presentation/providers/student_image_provider.dart';
+import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
 
 /// Student profile edit screen.
 class StudentProfileEditScreen extends ConsumerStatefulWidget {
@@ -160,53 +165,7 @@ class _StudentProfileEditScreenState
         children: [
           // Profile image section
           Center(
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 48,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    _nameController.text.isNotEmpty
-                        ? _nameController.text[0]
-                        : '?',
-                    style: AppTypography.displayMedium.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('프로필 사진 변경은 준비 중입니다')),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.1),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildProfileImageSection(),
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -367,5 +326,89 @@ class _StudentProfileEditScreenState
         ),
       ),
     );
+  }
+
+  Widget _buildProfileImageSection() {
+    final studentId = _currentStudent?.id;
+    final imagePath = studentId != null
+        ? ref.watch(studentProfileImageNotifierProvider(studentId)).valueOrNull
+        : null;
+
+    return Stack(
+      children: [
+        CircleAvatar(
+          radius: 48,
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          backgroundImage:
+              imagePath != null ? FileImage(File(imagePath)) : null,
+          child: imagePath == null
+              ? Text(
+                  _nameController.text.isNotEmpty
+                      ? _nameController.text[0]
+                      : '?',
+                  style: AppTypography.displayMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
+        ),
+        Positioned(
+          right: 0,
+          bottom: 0,
+          child: GestureDetector(
+            onTap: () => _onTapProfileImage(),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.camera_alt,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onTapProfileImage() async {
+    final studentId = _currentStudent?.id;
+    if (studentId == null) return;
+
+    final notifier =
+        ref.read(studentProfileImageNotifierProvider(studentId).notifier);
+    final currentPath =
+        ref.read(studentProfileImageNotifierProvider(studentId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: '프로필 사진',
+      showDelete: currentPath != null,
+    );
+
+    if (action == null || !mounted) return;
+
+    if (action == ImagePickerAction.delete) {
+      await notifier.removeImage();
+      return;
+    }
+
+    final source = action == ImagePickerAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery;
+
+    if (!mounted) return;
+    await notifier.pickAndSaveImage(source, context);
   }
 }
