@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '../../../../core/router/app_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
+import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
+import '../providers/background_image_provider.dart';
+import '../providers/profile_image_provider.dart';
 import '../widgets/extended_profile_dialogs.dart';
 import '../widgets/extended_profile_widgets.dart';
 
@@ -22,7 +27,7 @@ class ExtendedProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('상세 프로필'),
+        title: const Text('프로필 수정'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -56,11 +61,33 @@ class _ProfileContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.watch(currentUserIdProvider);
+    final profileImageAsync = ref.watch(profileImageNotifierProvider(userId));
+    final backgroundImageAsync =
+        ref.watch(backgroundImageNotifierProvider(userId));
+    final imagePath = profileImageAsync.valueOrNull;
+    final backgroundPath = backgroundImageAsync.valueOrNull;
+    final initial = profile.name.isNotEmpty ? profile.name[0] : '?';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Profile / background photo editing
+          ProfilePhotoHeader(
+            profileImagePath: imagePath,
+            backgroundImagePath: backgroundPath,
+            initial: initial,
+            avatarColor: AppColors.primaryLight,
+            onTapProfile: () =>
+                _showImagePickerOptions(context, ref, userId, isBackground: false),
+            onTapBackground: () =>
+                _showImagePickerOptions(context, ref, userId, isBackground: true),
+          ),
+
+          const SizedBox(height: AppSpacing.space6),
+
           // Profile completion card
           ProfileCompletionCard(profile: profile),
 
@@ -341,6 +368,48 @@ class _ProfileContent extends ConsumerWidget {
         ],
       ],
     );
+  }
+
+  Future<void> _showImagePickerOptions(
+    BuildContext context,
+    WidgetRef ref,
+    String userId, {
+    required bool isBackground,
+  }) async {
+    final currentPath = isBackground
+        ? ref.read(backgroundImageNotifierProvider(userId)).valueOrNull
+        : ref.read(profileImageNotifierProvider(userId)).valueOrNull;
+
+    final action = await showImagePickerBottomSheet(
+      context,
+      title: isBackground ? '배경 사진' : '프로필 사진',
+      showDelete: currentPath != null,
+    );
+    if (action == null || !context.mounted) return;
+
+    if (isBackground) {
+      final notifier =
+          ref.read(backgroundImageNotifierProvider(userId).notifier);
+      if (action == ImagePickerAction.delete) {
+        await notifier.removeImage();
+        return;
+      }
+      final source = action == ImagePickerAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      await notifier.pickAndSaveImage(source, context);
+    } else {
+      final notifier =
+          ref.read(profileImageNotifierProvider(userId).notifier);
+      if (action == ImagePickerAction.delete) {
+        await notifier.removeImage();
+        return;
+      }
+      final source = action == ImagePickerAction.camera
+          ? ImageSource.camera
+          : ImageSource.gallery;
+      await notifier.pickAndSaveImage(source, context);
+    }
   }
 }
 
