@@ -152,6 +152,73 @@ class SubscriptionService:
         await self.db.refresh(sub)
         return SubscriptionResponse.model_validate(sub)
 
+    async def use_reschedule(
+        self, subscription_id: str, current_user: Any
+    ) -> SubscriptionResponse:
+        """Use a reschedule credit from a subscription."""
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        sub = await self.db.get(Subscription, subscription_id)
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+
+        usage = SubscriptionUsage(
+            subscription_id=subscription_id,
+            type="reschedule",
+        )
+        self.db.add(usage)
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return SubscriptionResponse.model_validate(sub)
+
+    async def update_status(
+        self, subscription_id: str, new_status: str, current_user: Any
+    ) -> SubscriptionResponse:
+        """Update subscription status."""
+        from app.models.subscription import Subscription
+
+        sub = await self.db.get(Subscription, subscription_id)
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+
+        sub.status = new_status
+        await self.db.flush()
+        await self.db.refresh(sub)
+        return SubscriptionResponse.model_validate(sub)
+
+    async def get_usage_history(
+        self, subscription_id: str, current_user: Any
+    ) -> list:
+        """Get usage history for a subscription."""
+        from app.models.subscription import SubscriptionUsage
+
+        result = await self.db.scalars(
+            select(SubscriptionUsage)
+            .where(SubscriptionUsage.subscription_id == subscription_id)
+            .order_by(SubscriptionUsage.created_at.desc())
+        )
+        return list(result.all())
+
+    async def add_usage(
+        self, subscription_id: str, data: dict, current_user: Any
+    ) -> Any:
+        """Add a usage record to a subscription."""
+        from app.models.subscription import Subscription, SubscriptionUsage
+
+        sub = await self.db.get(Subscription, subscription_id)
+        if sub is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+
+        usage = SubscriptionUsage(
+            subscription_id=subscription_id,
+            lesson_id=data.get("lesson_id"),
+            type=data.get("type", "lesson"),
+        )
+        self.db.add(usage)
+        await self.db.flush()
+        await self.db.refresh(usage)
+        return usage
+
     async def confirm_payment(
         self, subscription_id: str, data: ConfirmPaymentRequest, current_user: Any
     ) -> SubscriptionResponse:

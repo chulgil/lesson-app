@@ -5,7 +5,6 @@ import datetime as _dt
 
 from pydantic import BaseModel, ConfigDict, computed_field
 
-
 # ---------------------------------------------------------------------------
 # Subscription
 # ---------------------------------------------------------------------------
@@ -65,6 +64,37 @@ class UseLessonRequest(BaseModel):
     """Deduct a lesson from a subscription."""
 
     lesson_id: str
+    type: str = "lesson"
+
+
+class UseRescheduleRequest(BaseModel):
+    """Use a reschedule credit from a subscription."""
+
+    lesson_id: str | None = None
+
+
+class UpdateStatusRequest(BaseModel):
+    """Update subscription status."""
+
+    status: str
+
+
+class SubscriptionUsageResponse(BaseModel):
+    """Subscription usage record."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    subscription_id: str
+    lesson_id: str | None = None
+    type: str | None = None
+    created_at: _dt.datetime | None = None
+
+
+class SubscriptionUsageCreate(BaseModel):
+    """Create a subscription usage record."""
+
+    lesson_id: str | None = None
     type: str = "lesson"
 
 

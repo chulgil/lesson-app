@@ -141,7 +141,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
               height: AppSpacing.buttonHeight,
               child: OutlinedButton.icon(
                 onPressed: () {
-                  context.push(AppRoutes.basicInfoEdit);
+                  context.push(AppRoutes.extendedProfile);
                 },
                 icon: const Icon(Icons.edit_outlined),
                 label: const Text('프로필 수정하기'),

@@ -1,0 +1,217 @@
+# 프론트엔드-백엔드 갭 분석 리포트
+
+> 작성일: 2026-03-19
+> 분석 범위: Frontend Remote Repository ↔ Backend API Router 정합성
+
+---
+
+## Executive Summary
+
+| 항목 | 값 |
+|------|-----|
+| 분석 대상 | lesson-app 프론트엔드-백엔드 구현 상태 |
+| 분석일 | 2026-03-19 |
+| 전체 Repository 수 | 40개 |
+| Remote 구현 완료 | 26개 (65%) |
+| Mock-only (Remote 미구현) | 14개 (35%) |
+| 백엔드 API 라우터 | 19개, 120+ 엔드포인트 |
+| API 경로 불일치 | 3건 (CRITICAL 1, HIGH 2) |
+
+### Value Delivered
+
+| 관점 | 내용 |
+|------|------|
+| **Problem** | 프론트엔드 Remote Repository가 백엔드 API와 실제로 연동 가능한지 불명확 |
+| **Solution** | 40개 Repository × 120 Backend Endpoint 전수 대조 |
+| **Function/UX Effect** | API 경로 불일치 3건 사전 발견, Mock-only 14개 영역 식별 |
+| **Core Value** | 베타 출시 전 Remote 전환 시 런타임 에러 사전 방지 |
+
+---
+
+## 1. 백엔드 인프라 상태
+
+| 항목 | 상태 | 상세 |
+|------|:----:|------|
+| FastAPI 앱 | ✅ | `main.py` + lifespan, CORS, 예외핸들러 |
+| Docker 배포 | ✅ | docker-compose (dev/beta/prod) 3벌 |
+| DB 모델 | ✅ | 65개 테이블, PostgreSQL 17 |
+| Alembic 마이그레이션 | ✅ | 4개 마이그레이션 (체인 정상) |
+| Pydantic 스키마 | ✅ | 133개 클래스 |
+| 서비스 레이어 | ✅ | 19개 서비스 (라우터 1:1 매핑) |
+| API 라우터 | ✅ | 19개, 120+ 엔드포인트 |
+| 테스트 | ✅ | 21개 테스트 파일 + 시나리오 프레임워크 |
+| 환경 설정 | ⚠️ | `.env.example`에 MySQL URL 잔존 (실제는 PostgreSQL) |
+
+**결론: 백엔드는 구조적으로 완성되어 있음. 실행 가능한 상태.**
+
+---
+
+## 2. Repository 구현 상태 매트릭스
+
+### 2-1. Remote 구현 완료 (26개) — `USE_MOCK=false` 시 Remote 동작
+
+| # | 도메인 | Repository | Mock | Remote | 비고 |
+|---|--------|-----------|:----:|:------:|------|
+| 1 | Auth | AuthRepository | — | ✅ | OAuth, JWT refresh |
+| 2 | Students | StudentRepository | ✅ | ✅ | CRUD + status |
+| 3 | Lessons | LessonRepository | ✅ | ✅ | CRUD + status |
+| 4 | Lessons | FeedbackPresetRepository | ✅ | ✅ | settings 경로 |
+| 5 | Lessons | TeachingResourceRepository | ✅ | ✅ | settings 경로 |
+| 6 | Practice | PracticeRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
+| 7 | Practice | PracticeGoalRepository | ✅ | ✅ | |
+| 8 | Practice | PracticeStatsRepository | ✅ | ✅ | |
+| 9 | Practice | RecordingRepository | ✅ | ✅ | multipart upload |
+| 10 | Subscription | SubscriptionRepository | ✅ | ✅ | |
+| 11 | Subscription | SubscriptionProposalRepository | ✅ | ✅ | |
+| 12 | Subscription | SubscriptionTemplateRepository | ✅ | ✅ | |
+| 13 | Subscription | ProposalSettingsRepository | ✅ | ✅ | |
+| 14 | Schedule | TeacherAvailabilityRepository | ✅ | ✅ | |
+| 15 | Schedule | BookingRepository | ✅ | ✅ | |
+| 16 | Schedule | LessonRequestRepository | ✅ | ✅ | |
+| 17 | Schedule | GroupClassBookingRepository | ✅ | ✅ | ⚠️ 경로 불일치 |
+| 18 | Notification | NotificationRepository | — | ✅ | mock시 null 반환 |
+| 19 | Relationship | TeacherStudentRelationRepository | ✅ | ✅ | |
+| 20 | Follow | FollowRepository | ✅ | ✅ | |
+| 21 | Parent | ParentRepository | ✅ | ✅ | |
+| 22 | Gamification | GamificationRepository | ✅ | ✅ | |
+| 23 | Onboarding | TeacherProfileRepository | ✅ | ✅ | |
+| 24 | Search | TeacherRepository | ✅ | ✅ | |
+| 25 | Search | TeacherSearchRepository | ✅ | ✅ | |
+| 26 | Settings | SettingsRepository | ✅ | ✅ | |
+
+### 2-2. Mock-only — Remote 미구현 (14개)
+
+| # | 도메인 | Repository | 백엔드 API | 긴급도 | 비고 |
+|---|--------|-----------|:----------:|:------:|------|
+| 27 | Payment | PaymentRepository | ❌ | LOW | "No remote API yet" |
+| 28 | Piece | PieceRepository | ❌ | LOW | "No remote API yet" |
+| 29 | Practice | PracticeRepertoireRepository | ✅ 있음 | **HIGH** | Hive 로컬 → 서버 동기화 설계 필요 |
+| 30 | Practice | PracticeNoteRepository | ❌ | MEDIUM | 섹션 노트 — practice/sections에 포함 가능 |
+| 31 | Practice | PracticeItemRepository | ❌ | LOW | Provider toggle 자체 없음 |
+| 32 | Invite | InviteRepository | ✅ 있음 | **HIGH** | 백엔드에 `/invites` 라우터 존재 |
+| 33 | Lesson | LessonPolicyRepository | ❌ | MEDIUM | 정책 엔드포인트 필요 |
+| 34 | Lesson | LessonClassRepository | ✅ 있음 | **HIGH** | 백엔드에 `/lessons-classes` 존재 |
+| 35 | Lesson | MembershipRepository | ✅ 있음 | **HIGH** | 백엔드에 memberships 존재 |
+| 36 | Student | LocationRepository | ❌ | LOW | 레슨 장소 |
+| 37 | Schedule | ScheduleConfirmationCardRepository | ❌ | MEDIUM | 확인 카드 |
+| 38 | Parent | ChildProfileRepository | ❌ | LOW | "No remote API yet" |
+| 39 | Tip | TipTemplateRepository | ❌ | LOW | Provider toggle 없음 |
+| 40 | Subscription | SubscriptionSettingsRepository | ❌ | LOW | **Orphan** — Provider 미연결 |
+
+---
+
+## 3. API 경로 불일치 (CRITICAL)
+
+### 3-1. Practice Logs 경로 불일치 🔴 CRITICAL
+
+| 항목 | 프론트엔드 | 백엔드 |
+|------|-----------|--------|
+| 연습 로그 목록 | `GET /practice/logs` | `GET /practice-logs/` |
+| 연습 로그 상세 | `GET /practice/logs/{id}` | `GET /practice-logs/{log_id}` |
+| 연습 로그 생성 | `POST /practice/logs` | `POST /practice-logs/` |
+| 연습 로그 수정 | `PUT /practice/logs/{id}` | `PUT /practice-logs/{log_id}` |
+| 연습 로그 삭제 | `DELETE /practice/logs/{id}` | `DELETE /practice-logs/{log_id}` |
+| 태스크 토글 | `PATCH /practice/logs/{logId}/tasks/{taskId}/toggle` | `PATCH /practice-logs/{log_id}/tasks/{task_id}/toggle` |
+
+**원인**: `remote_practice_repository.dart`가 `/practice/logs`를 호출하지만, 백엔드 `practice_logs.py`의 prefix는 `/practice-logs`
+**영향**: Remote 전환 시 모든 연습 로그 CRUD가 404 에러
+**해결**: 프론트엔드 경로를 `/practice-logs`로 수정하거나, 백엔드 prefix를 `/practice/logs`로 변경
+
+### 3-2. Group Booking 경로 불일치 🟠 HIGH
+
+| 항목 | 프론트엔드 | 백엔드 |
+|------|-----------|--------|
+| 그룹 예약 목록 | `GET /schedule/group-bookings` | `GET /groups/schedules/{id}/bookings` |
+| 그룹 예약 생성 | `POST /schedule/group-bookings` | `POST /groups/bookings` |
+| 그룹 예약 취소 | `PATCH /schedule/group-bookings/{id}/cancel` | `PATCH /groups/bookings/{id}/cancel` |
+| 출석 체크 | `PATCH /schedule/group-bookings/{id}/attendance` | `PATCH /groups/bookings/{id}/attendance` |
+
+**원인**: 프론트엔드는 `/schedule/group-bookings/` 경로, 백엔드는 `/groups/` 경로 사용
+**영향**: Remote 전환 시 그룹 수업 예약 기능 전체 404 에러
+
+### 3-3. Subscription 누락 엔드포인트 🟠 HIGH
+
+| 프론트엔드 호출 | 백엔드 존재 여부 |
+|----------------|:---------------:|
+| `PATCH /subscriptions/{id}/use-reschedule` | ❌ 미구현 |
+| `PATCH /subscriptions/{id}/status` | ❌ 미구현 |
+| `GET /subscriptions?status=expiringSoon` | ⚠️ 필터 지원 확인 필요 |
+| `GET /subscriptions?status=expired` | ⚠️ 필터 지원 확인 필요 |
+| `GET /subscriptions?payment_confirmed=false` | ⚠️ 필터 지원 확인 필요 |
+| `GET /subscriptions/{id}/usage` | ❌ 미구현 |
+| `POST /subscriptions/{id}/usage` | ❌ 미구현 |
+
+---
+
+## 4. 백엔드에만 존재하는 엔드포인트 (프론트 미사용)
+
+| 백엔드 라우터 | 엔드포인트 | 프론트엔드 Remote |
+|-------------|-----------|:---------------:|
+| users.py | `/users/me`, `/users/me/role`, `/users/me/locale`, `/users/me/onboarding-complete` | ❌ |
+| teachers.py | `/teachers/{id}/students`, `/teachers/{id}/dashboard`, `/teachers/me/dashboard` | ❌ |
+| students.py | `/students/{id}/stats`, `/students/me/profile` | ❌ |
+| lessons.py | `/lessons/upcoming`, `/lessons/recent`, `/lessons/{id}/feedback` | ❌ |
+| practice.py | `/practice/repertoires/*`, `/practice/sections/*` | ❌ (Mock-only) |
+| schedule.py | `/schedule/weekly` | ❌ |
+| bookings.py | `/bookings/makeup`, `/bookings/{id}/change-request` | ❌ |
+| reviews.py | 전체 (`/reviews/*`) | ❌ |
+| invites.py | 전체 (`/invites/*`) | ❌ (Mock-only) |
+| groups.py | 전체 (`/groups/*`) | ⚠️ 경로 불일치 |
+| settings.py | `/settings/subscription`, `/settings/notification/{target_user_id}` | ❌ |
+
+---
+
+## 5. 우선순위별 액션 플랜
+
+### P0: 즉시 수정 (Remote 전환 시 크래시) — ✅ 완료 (2026-03-19)
+
+| # | 작업 | 상태 | 수정 내용 |
+|---|------|:----:|----------|
+| 1 | Practice Logs 경로 통일 | ✅ | `/practice/logs` → `/practice-logs` (9곳), `/practice/weekly` → `/practice-logs/weekly` |
+| 2 | Group Booking 경로 통일 | ✅ | `/schedule/group-bookings` → `/groups/bookings` (13곳) + `getBookingsForSchedule` → `/groups/schedules/{id}/bookings` |
+| 3 | Subscription 누락 엔드포인트 | ✅ | `use-reschedule`, `status`, `usage` (GET/POST) 4개 엔드포인트 + 서비스 + 스키마 추가 |
+| 4 | Group Booking 누락 엔드포인트 | ✅ | `list`, `get`, `promote`, `auto-cancel-waitlist`, `batch-attendance`, `deduct` 6개 엔드포인트 추가 |
+
+### P1: 베타 출시 전 필수
+
+| # | 작업 | 비고 |
+|---|------|------|
+| 4 | InviteRepository Remote 구현 | 백엔드 `/invites` 라우터 이미 존재 |
+| 5 | LessonClassRepository Remote 구현 | 백엔드 `/lessons-classes` 이미 존재 |
+| 6 | MembershipRepository Remote 구현 | 백엔드 memberships 이미 존재 |
+| 7 | PracticeRepertoireRepository Remote 구현 | 백엔드 `/practice/repertoires` 이미 존재 |
+
+### P2: 베타 이후
+
+| # | 작업 | 비고 |
+|---|------|------|
+| 8 | PaymentRepository Remote 구현 | 결제 기능 별도 설계 필요 |
+| 9 | ScheduleConfirmationCardRepository Remote 구현 | 백엔드 엔드포인트 추가 필요 |
+| 10 | PracticeNoteRepository 통합 | practice/sections/notes로 통합 가능 |
+| 11 | LocationRepository Remote 구현 | 레슨 장소 관리 |
+| 12 | SubscriptionSettingsRepository Provider 연결 또는 삭제 | Orphan 상태 해소 |
+| 13 | `.env.example` MySQL→PostgreSQL 수정 | 혼동 방지 |
+
+---
+
+## 6. 검증 수치
+
+```
+총 Repository:            40개
+Remote 구현 완료:          26개 (65%)
+Mock-only:                14개 (35%)
+API 경로 일치:             23/26 Remote (88.5%)
+API 경로 불일치:            3건 (CRITICAL 1 + HIGH 2)
+백엔드 전용 엔드포인트:     ~30개 (프론트 미사용)
+Orphan Repository:         1개 (SubscriptionSettings)
+```
+
+---
+
+## 7. 결론
+
+**백엔드는 구조적으로 완성 (19 라우터, 120+ 엔드포인트, 65 DB 모델)**이며, 프론트엔드 26개 Remote Repository가 구현되어 있어 **65% 전환 완료** 상태입니다.
+
+그러나 **3건의 API 경로 불일치가 있어 Remote 전환(`USE_MOCK=false`) 시 Practice Logs와 Group Booking이 즉시 실패**합니다. P0 수정 없이는 Remote 모드 전환이 불가능합니다.
+
+P0 (경로 수정 ~6h) → P1 (Remote 구현 4개 ~2-3일) → 베타 출시 가능 상태 도달.

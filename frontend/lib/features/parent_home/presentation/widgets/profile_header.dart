@@ -98,16 +98,6 @@ class ProfileHeader extends ConsumerWidget {
             ),
           ),
 
-          // Edit button
-          IconButton(
-            onPressed: () {
-              // TODO: Navigate to edit profile
-            },
-            icon: const Icon(Icons.edit_outlined),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.surfaceSecondaryLight,
-            ),
-          ),
         ],
       ),
     );

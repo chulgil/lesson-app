@@ -194,39 +194,26 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space3),
 
-          // Name + badge + edit button
+          // Name + badge
           Row(
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(name, style: AppTypography.headingLarge),
-                    const SizedBox(width: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        '선생님',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+              Text(name, style: AppTypography.headingLarge),
+              const SizedBox(width: AppSpacing.space2),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
                 ),
-              ),
-              IconButton(
-                onPressed: () => context.push(AppRoutes.basicInfoEdit),
-                icon: const Icon(Icons.edit_outlined),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.surfaceSecondaryLight,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  '선생님',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

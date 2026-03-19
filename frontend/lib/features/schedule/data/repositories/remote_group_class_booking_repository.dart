@@ -18,14 +18,12 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String scheduleId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings',
-      queryParameters: {'schedule_id': scheduleId},
+      '/groups/schedules/$scheduleId/bookings',
     );
-    final paginated = PaginatedResponse.fromJson(
-      response.data as Map<String, dynamic>,
-      (json) => GroupClassBooking.fromJson(json),
-    );
-    return paginated.items;
+    final items = response.data as List<dynamic>;
+    return items
+        .map((e) => GroupClassBooking.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
@@ -33,7 +31,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String studentId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings',
+      '/groups/bookings',
       queryParameters: {'student_id': studentId},
     );
     final paginated = PaginatedResponse.fromJson(
@@ -46,7 +44,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
   @override
   Future<GroupClassBooking?> getBookingById(String bookingId) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings/$bookingId',
+      '/groups/bookings/$bookingId',
     );
     return GroupClassBooking.fromJson(response.data as Map<String, dynamic>);
   }
@@ -57,7 +55,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String studentId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings',
+      '/groups/bookings',
       queryParameters: {
         'schedule_id': scheduleId,
         'student_id': studentId,
@@ -82,7 +80,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String? subscriptionId,
   }) async {
     final response = await _apiClient.post(
-      '/schedule/group-bookings',
+      '/groups/bookings',
       data: {
         'schedule_id': scheduleId,
         'student_id': studentId,
@@ -98,7 +96,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String? reason,
   }) async {
     final response = await _apiClient.patch(
-      '/schedule/group-bookings/$bookingId/cancel',
+      '/groups/bookings/$bookingId/cancel',
       data: reason != null ? {'reason': reason} : null,
     );
     return GroupClassBooking.fromJson(response.data as Map<String, dynamic>);
@@ -111,7 +109,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
   @override
   Future<List<GroupClassBooking>> getWaitlist(String scheduleId) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings',
+      '/groups/bookings',
       queryParameters: {'schedule_id': scheduleId, 'status': 'waitlist'},
     );
     final paginated = PaginatedResponse.fromJson(
@@ -130,7 +128,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
   @override
   Future<GroupClassBooking?> promoteFromWaitlist(String scheduleId) async {
     final response = await _apiClient.post(
-      '/schedule/group-bookings/promote',
+      '/groups/bookings/promote',
       data: {'schedule_id': scheduleId},
     );
     if (response.data == null) return null;
@@ -140,7 +138,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
   @override
   Future<List<GroupClassBooking>> autoCancelWaitlist(String scheduleId) async {
     final response = await _apiClient.post(
-      '/schedule/group-bookings/auto-cancel-waitlist',
+      '/groups/bookings/auto-cancel-waitlist',
       data: {'schedule_id': scheduleId},
     );
     final items = response.data as List<dynamic>;
@@ -159,7 +157,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     required bool attended,
   }) async {
     final response = await _apiClient.patch(
-      '/schedule/group-bookings/$bookingId/attendance',
+      '/groups/bookings/$bookingId/attendance',
       data: {'attended': attended},
     );
     return GroupClassBooking.fromJson(response.data as Map<String, dynamic>);
@@ -170,7 +168,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     Map<String, bool> bookingAttendance,
   ) async {
     final response = await _apiClient.post(
-      '/schedule/group-bookings/batch-attendance',
+      '/groups/bookings/batch-attendance',
       data: {
         'attendance':
             bookingAttendance.entries
@@ -187,7 +185,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
   @override
   Future<GroupClassBooking> deductSubscription(String bookingId) async {
     final response = await _apiClient.patch(
-      '/schedule/group-bookings/$bookingId/deduct',
+      '/groups/bookings/$bookingId/deduct',
     );
     return GroupClassBooking.fromJson(response.data as Map<String, dynamic>);
   }
@@ -233,7 +231,7 @@ class RemoteGroupClassBookingRepository implements GroupClassBookingRepository {
     String studentId,
   ) async {
     final response = await _apiClient.get(
-      '/schedule/group-bookings',
+      '/groups/bookings',
       queryParameters: {'student_id': studentId, 'upcoming': 'true'},
     );
     final paginated = PaginatedResponse.fromJson(
