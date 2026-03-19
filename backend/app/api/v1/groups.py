@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
@@ -12,6 +12,7 @@ from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.schedule_ext import (
     AttendanceMarkRequest,
+    BatchAttendanceRequest,
     GroupClassBookingCreate,
     GroupClassBookingResponse,
     GroupClassScheduleCreate,
@@ -84,6 +85,44 @@ async def cancel_group_schedule(
 # ---------------------------------------------------------------------------
 
 
+@router.get(
+    "/bookings",
+    response_model=list[GroupClassBookingResponse],
+    summary="List group bookings with filters",
+)
+async def list_group_bookings(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    schedule_id: str | None = None,
+    student_id: str | None = None,
+    booking_status: str | None = Query(None, alias="status"),
+    active: str | None = None,
+    upcoming: str | None = None,
+) -> list[GroupClassBookingResponse]:
+    service = ScheduleExtService(db)
+    return await service.list_bookings(
+        schedule_id=schedule_id,
+        student_id=student_id,
+        status=booking_status,
+        active=active == "true" if active else None,
+        upcoming=upcoming == "true" if upcoming else None,
+    )
+
+
+@router.get(
+    "/bookings/{booking_id}",
+    response_model=GroupClassBookingResponse,
+    summary="Get a group booking by ID",
+)
+async def get_group_booking(
+    booking_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> GroupClassBookingResponse:
+    service = ScheduleExtService(db)
+    return await service.get_booking_by_id(booking_id)
+
+
 @router.post(
     "/bookings",
     response_model=GroupClassBookingResponse,
@@ -141,6 +180,62 @@ async def list_schedule_bookings(
 ) -> list[GroupClassBookingResponse]:
     service = ScheduleExtService(db)
     return await service.get_bookings_for_schedule(schedule_id)
+
+
+@router.post(
+    "/bookings/promote",
+    response_model=GroupClassBookingResponse | None,
+    summary="Promote next waitlisted booking",
+)
+async def promote_from_waitlist(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    schedule_id: str = Query(...),
+) -> GroupClassBookingResponse | None:
+    service = ScheduleExtService(db)
+    return await service.promote_from_waitlist_public(schedule_id)
+
+
+@router.post(
+    "/bookings/auto-cancel-waitlist",
+    response_model=list[GroupClassBookingResponse],
+    summary="Auto-cancel expired waitlist entries",
+)
+async def auto_cancel_waitlist(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+    schedule_id: str = Query(...),
+) -> list[GroupClassBookingResponse]:
+    service = ScheduleExtService(db)
+    return await service.auto_cancel_waitlist(schedule_id)
+
+
+@router.post(
+    "/bookings/batch-attendance",
+    response_model=list[GroupClassBookingResponse],
+    summary="Mark attendance for multiple bookings",
+)
+async def batch_attendance(
+    body: BatchAttendanceRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> list[GroupClassBookingResponse]:
+    service = ScheduleExtService(db)
+    return await service.batch_mark_attendance(body.bookings)
+
+
+@router.patch(
+    "/bookings/{booking_id}/deduct",
+    response_model=GroupClassBookingResponse,
+    summary="Deduct subscription credit for a booking",
+)
+async def deduct_subscription(
+    booking_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> GroupClassBookingResponse:
+    service = ScheduleExtService(db)
+    return await service.deduct_subscription(booking_id)
 
 
 # ---------------------------------------------------------------------------

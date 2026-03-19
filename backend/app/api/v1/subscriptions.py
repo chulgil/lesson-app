@@ -22,6 +22,9 @@ from app.schemas.subscription import (
     SubscriptionTemplateResponse,
     SubscriptionTemplateUpdate,
     SubscriptionUpdate,
+    SubscriptionUsageCreate,
+    SubscriptionUsageResponse,
+    UpdateStatusRequest,
     UseLessonRequest,
 )
 from app.services.subscription_service import SubscriptionService
@@ -129,6 +132,74 @@ async def use_lesson(
     """Deduct one lesson from the subscription."""
     service = SubscriptionService(db)
     return await service.deduct_lesson(subscription_id, body, current_user)
+
+
+@router.patch(
+    "/{subscription_id}/use-reschedule",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Use a reschedule credit (teacher only)",
+)
+async def use_reschedule(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """Use a reschedule credit from the subscription."""
+    service = SubscriptionService(db)
+    return await service.use_reschedule(subscription_id, current_user)
+
+
+@router.patch(
+    "/{subscription_id}/status",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update subscription status (teacher only)",
+)
+async def update_subscription_status(
+    subscription_id: str,
+    body: UpdateStatusRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionResponse:
+    """Update the status of a subscription."""
+    service = SubscriptionService(db)
+    return await service.update_status(subscription_id, body.status, current_user)
+
+
+@router.get(
+    "/{subscription_id}/usage",
+    response_model=list[SubscriptionUsageResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get subscription usage history",
+)
+async def get_usage_history(
+    subscription_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[SubscriptionUsageResponse]:
+    """Return usage history for a subscription."""
+    service = SubscriptionService(db)
+    items = await service.get_usage_history(subscription_id, current_user)
+    return [SubscriptionUsageResponse.model_validate(u) for u in items]
+
+
+@router.post(
+    "/{subscription_id}/usage",
+    response_model=SubscriptionUsageResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Add usage record (teacher only)",
+)
+async def add_usage(
+    subscription_id: str,
+    body: SubscriptionUsageCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> SubscriptionUsageResponse:
+    """Add a usage record to a subscription."""
+    service = SubscriptionService(db)
+    usage = await service.add_usage(subscription_id, body.model_dump(), current_user)
+    return SubscriptionUsageResponse.model_validate(usage)
 
 
 @router.patch(

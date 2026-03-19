@@ -17,7 +17,7 @@ class RemotePracticeRepository implements PracticeRepository {
   @override
   Future<List<PracticeLog>> getPracticeLogs(String studentId) async {
     final response = await _apiClient.get(
-      '/practice/logs',
+      '/practice-logs',
       queryParameters: {'student_id': studentId},
     );
     final items = response.data['items'] as List<dynamic>;
@@ -28,7 +28,7 @@ class RemotePracticeRepository implements PracticeRepository {
 
   @override
   Future<PracticeLog?> getPracticeLog(String id) async {
-    final response = await _apiClient.get('/practice/logs/$id');
+    final response = await _apiClient.get('/practice-logs/$id');
     return _practiceLogFromJson(response.data as Map<String, dynamic>);
   }
 
@@ -39,7 +39,7 @@ class RemotePracticeRepository implements PracticeRepository {
   ) async {
     final dateStr = _dateFormat.format(date);
     final response = await _apiClient.get(
-      '/practice/logs',
+      '/practice-logs',
       queryParameters: {'student_id': studentId, 'date': dateStr},
     );
     final items = response.data['items'] as List<dynamic>;
@@ -54,7 +54,7 @@ class RemotePracticeRepository implements PracticeRepository {
     int month,
   ) async {
     final response = await _apiClient.get(
-      '/practice/logs',
+      '/practice-logs',
       queryParameters: {'student_id': studentId, 'year': year, 'month': month},
     );
     final items = response.data['items'] as List<dynamic>;
@@ -69,7 +69,7 @@ class RemotePracticeRepository implements PracticeRepository {
   @override
   Future<PracticeLog> createPracticeLog(PracticeLog log) async {
     final response = await _apiClient.post(
-      '/practice/logs',
+      '/practice-logs',
       data: _practiceLogToJson(log),
     );
     return _practiceLogFromJson(response.data as Map<String, dynamic>);
@@ -78,7 +78,7 @@ class RemotePracticeRepository implements PracticeRepository {
   @override
   Future<PracticeLog> updatePracticeLog(PracticeLog log) async {
     final response = await _apiClient.put(
-      '/practice/logs/${log.id}',
+      '/practice-logs/${log.id}',
       data: _practiceLogToJson(log),
     );
     return _practiceLogFromJson(response.data as Map<String, dynamic>);
@@ -86,13 +86,13 @@ class RemotePracticeRepository implements PracticeRepository {
 
   @override
   Future<void> deletePracticeLog(String id) async {
-    await _apiClient.delete('/practice/logs/$id');
+    await _apiClient.delete('/practice-logs/$id');
   }
 
   @override
   Future<PracticeTask> toggleTask(String logId, String taskId) async {
     final response = await _apiClient.patch(
-      '/practice/logs/$logId/tasks/$taskId/toggle',
+      '/practice-logs/$logId/tasks/$taskId/toggle',
     );
     return _practiceTaskFromJson(response.data as Map<String, dynamic>);
   }
@@ -113,7 +113,7 @@ class RemotePracticeRepository implements PracticeRepository {
   @override
   Future<List<bool>> getWeeklyPractice(String studentId) async {
     final response = await _apiClient.get(
-      '/practice/weekly',
+      '/practice-logs/weekly',
       queryParameters: {'student_id': studentId},
     );
     return (response.data as List<dynamic>).cast<bool>();

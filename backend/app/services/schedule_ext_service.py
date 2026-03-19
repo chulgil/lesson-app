@@ -217,6 +217,129 @@ class ScheduleExtService:
         )
         return list(result.all())
 
+    async def list_bookings(
+        self,
+        *,
+        schedule_id: str | None = None,
+        student_id: str | None = None,
+        status: str | None = None,
+        active: bool | None = None,
+        upcoming: bool | None = None,
+    ) -> list[Any]:
+        """List group bookings with flexible filters."""
+        from app.models.schedule_ext import GroupClassBooking, GroupClassSchedule
+
+        query = select(GroupClassBooking)
+        if schedule_id:
+            query = query.where(GroupClassBooking.schedule_id == schedule_id)
+        if student_id:
+            query = query.where(GroupClassBooking.student_id == student_id)
+        if status:
+            query = query.where(GroupClassBooking.status == status)
+        if active:
+            query = query.where(
+                GroupClassBooking.status.in_(["confirmed", "attended"])
+            )
+        if upcoming:
+            query = (
+                query.join(
+                    GroupClassSchedule,
+                    GroupClassBooking.schedule_id == GroupClassSchedule.id,
+                )
+                .where(GroupClassSchedule.start_time > datetime.now(UTC))
+                .where(GroupClassBooking.status.in_(["confirmed", "waitlist"]))
+            )
+        result = await self.db.scalars(query.order_by(GroupClassBooking.created_at))
+        return list(result.all())
+
+    async def get_booking_by_id(self, booking_id: str) -> Any:
+        """Get a single group booking by ID."""
+        from app.models.schedule_ext import GroupClassBooking
+
+        booking = await self.db.get(GroupClassBooking, booking_id)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
+            )
+        return booking
+
+    async def promote_from_waitlist_public(self, schedule_id: str) -> Any | None:
+        """Promote next waitlisted booking (public API)."""
+        from app.models.schedule_ext import GroupClassBooking
+
+        waitlist = await self.db.scalars(
+            select(GroupClassBooking)
+            .where(
+                GroupClassBooking.schedule_id == schedule_id,
+                GroupClassBooking.status == "waitlist",
+            )
+            .order_by(GroupClassBooking.waitlist_position)
+            .limit(1)
+        )
+        first = waitlist.first()
+        if first is None:
+            return None
+        first.status = "confirmed"
+        first.waitlist_position = None
+        first.promoted_at = datetime.now(UTC)
+        await self.db.flush()
+        await self.db.refresh(first)
+        return first
+
+    async def auto_cancel_waitlist(self, schedule_id: str) -> list[Any]:
+        """Cancel all waitlisted bookings for a schedule."""
+        from app.models.schedule_ext import GroupClassBooking
+
+        result = await self.db.scalars(
+            select(GroupClassBooking).where(
+                GroupClassBooking.schedule_id == schedule_id,
+                GroupClassBooking.status == "waitlist",
+            )
+        )
+        cancelled = []
+        for booking in result.all():
+            booking.status = "cancelled"
+            booking.cancel_reason = "auto_cancel_waitlist"
+            booking.cancelled_at = datetime.now(UTC)
+            cancelled.append(booking)
+        await self.db.flush()
+        for b in cancelled:
+            await self.db.refresh(b)
+        return cancelled
+
+    async def batch_mark_attendance(self, attendance_list: list[dict]) -> list[Any]:
+        """Mark attendance for multiple bookings at once."""
+        from app.models.schedule_ext import GroupClassBooking
+
+        results = []
+        for item in attendance_list:
+            booking = await self.db.get(GroupClassBooking, item["booking_id"])
+            if booking is None:
+                continue
+            attended = item.get("attended", True)
+            booking.status = "attended" if attended else "noShow"
+            if attended:
+                booking.attended_at = datetime.now(UTC)
+            results.append(booking)
+        await self.db.flush()
+        for b in results:
+            await self.db.refresh(b)
+        return results
+
+    async def deduct_subscription(self, booking_id: str) -> Any:
+        """Mark a booking's subscription as deducted."""
+        from app.models.schedule_ext import GroupClassBooking
+
+        booking = await self.db.get(GroupClassBooking, booking_id)
+        if booking is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found"
+            )
+        booking.subscription_deducted = True
+        await self.db.flush()
+        await self.db.refresh(booking)
+        return booking
+
     # -----------------------------------------------------------------------
     # No-Show Records
     # -----------------------------------------------------------------------
