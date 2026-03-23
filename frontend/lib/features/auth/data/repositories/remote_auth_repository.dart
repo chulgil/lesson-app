@@ -1,3 +1,4 @@
+import '../../../../core/auth/token_storage.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -5,8 +6,9 @@ import '../../domain/repositories/auth_repository.dart';
 /// Remote implementation of [AuthRepository] using FastAPI backend.
 class RemoteAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
+  final TokenStorage _tokenStorage;
 
-  RemoteAuthRepository(this._apiClient);
+  RemoteAuthRepository(this._apiClient, this._tokenStorage);
 
   @override
   Future<TokenPair> loginWithOAuth({
@@ -62,6 +64,9 @@ class RemoteAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await _apiClient.post('/auth/logout');
+    final refreshToken = await _tokenStorage.getRefreshToken();
+    await _apiClient.post('/auth/logout', data: {
+      if (refreshToken != null) 'refresh_token': refreshToken,
+    });
   }
 }

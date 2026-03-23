@@ -27,8 +27,13 @@ class TeacherService:
         self.db = db
 
     async def _enrich_response(self, teacher: Any) -> TeacherResponse:
-        """Build TeacherResponse with education/career/certificates."""
+        """Build TeacherResponse with user, education, career, certificates."""
         from app.models.teacher import TeacherCareer, TeacherCertificate, TeacherEducation
+        from app.models.user import User
+        from app.schemas.user import UserResponse
+
+        # Load user info
+        user = await self.db.get(User, teacher.user_id)
 
         education = await self.db.scalars(
             select(TeacherEducation)
@@ -46,6 +51,8 @@ class TeacherService:
         )
 
         response = TeacherResponse.model_validate(teacher)
+        if user:
+            response.user = UserResponse.model_validate(user)
         response.education = [TeacherEducationResponse.model_validate(e) for e in education.all()]
         response.career = [TeacherCareerResponse.model_validate(c) for c in career.all()]
         response.certificates = [TeacherCertificateResponse.model_validate(c) for c in certificates.all()]

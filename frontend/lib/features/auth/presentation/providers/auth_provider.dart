@@ -17,7 +17,8 @@ part 'auth_provider.g.dart';
 @Riverpod(keepAlive: true)
 AuthRepository authRepository(AuthRepositoryRef ref) {
   final apiClient = ref.read(apiClientProvider);
-  return RemoteAuthRepository(apiClient);
+  final tokenStorage = ref.read(tokenStorageProvider);
+  return RemoteAuthRepository(apiClient, tokenStorage);
 }
 
 /// Auth state notifier that manages authentication lifecycle.
