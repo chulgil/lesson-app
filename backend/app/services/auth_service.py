@@ -137,7 +137,11 @@ class AuthService:
             )
 
         access_token = create_access_token(data={"sub": payload["sub"], "role": payload.get("role")})
-        return RefreshTokenResponse(access_token=access_token, token_type="bearer")
+        return RefreshTokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+        )
 
     async def logout(self, user_id: str, refresh_token: str) -> None:
         """Blacklist the given refresh token."""

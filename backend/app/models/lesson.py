@@ -112,12 +112,13 @@ class ClassMembership(UUIDMixin, TimestampMixin, Base):
     )
 
 
-class LessonLocation(UUIDMixin, Base):
+class LessonLocation(UUIDMixin, TimestampMixin, Base):
     """Physical or online location for lessons."""
 
     __tablename__ = "lesson_locations"
 
     lesson_class_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    owner_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     type: Mapped[LocationType] = mapped_column(
         Enum(LocationType, native_enum=True),
@@ -125,18 +126,18 @@ class LessonLocation(UUIDMixin, Base):
         default=LocationType.teacherStudio,
     )
     address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    address_detail: Mapped[str | None] = mapped_column(String(200), nullable=True)
     latitude: Mapped[float | None] = mapped_column(Numeric(10, 7), nullable=True)
     longitude: Mapped[float | None] = mapped_column(Numeric(10, 7), nullable=True)
     online_platform: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    online_link: Mapped[str | None] = mapped_column(Text, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     __table_args__ = (
         Index("idx_location_class", "lesson_class_id"),
+        Index("idx_location_owner", "owner_id"),
     )
 
 

@@ -77,13 +77,19 @@ async def refresh_token(
     summary="Logout (invalidate refresh token)",
 )
 async def logout(
-    body: LogoutRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
+    body: LogoutRequest | None = None,
 ) -> SuccessResponse:
-    """Invalidate the given refresh token."""
-    service = AuthService(db)
-    await service.logout(current_user.id, body.refresh_token)
+    """Invalidate the given refresh token.
+
+    Body is optional — if no refresh_token is provided,
+    only the client-side token clearing takes effect.
+    """
+    refresh_token = body.refresh_token if body and body.refresh_token else None
+    if refresh_token:
+        service = AuthService(db)
+        await service.logout(current_user.id, refresh_token)
     return SuccessResponse(message="Logged out successfully")
 
 

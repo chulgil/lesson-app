@@ -53,15 +53,13 @@ class StudentService:
         """Register a new student under the current teacher."""
         from app.models.student import Student
 
+        create_data = data.model_dump(exclude_unset=True)
         student = Student(
             teacher_id=current_user.id,
-            name=data.name,
-            instrument=data.instrument or "",
-            level=data.level,
-            phone=data.phone,
-            parent_phone=data.parent_phone,
-            monthly_fee=data.monthly_fee or 0,
-            lessons_per_week=data.lessons_per_week or 1,
+            name=create_data.pop("name"),
+            instrument=create_data.pop("instrument", "") or "",
+            level=create_data.pop("level", "beginner"),
+            **{k: v for k, v in create_data.items() if v is not None},
         )
         self.db.add(student)
         await self.db.flush()
@@ -88,6 +86,26 @@ class StudentService:
         update_data = data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(student, key, value)
+        await self.db.flush()
+        await self.db.refresh(student)
+        return StudentResponse.model_validate(student)
+
+    async def update_status(self, student_id: str, new_status: str, current_user: Any) -> StudentResponse:
+        """Update only the student's status field."""
+        from app.models.student import Student
+
+        valid_statuses = {"trial", "active", "paused", "inactive"}
+        if new_status not in valid_statuses:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid status: {new_status}. Must be one of {valid_statuses}",
+            )
+
+        student = await self.db.get(Student, student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+        student.status = new_status
         await self.db.flush()
         await self.db.refresh(student)
         return StudentResponse.model_validate(student)

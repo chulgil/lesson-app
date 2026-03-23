@@ -10,7 +10,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
 from app.schemas.student import StudentResponse
-from app.schemas.teacher import TeacherDashboardResponse, TeacherResponse, TeacherUpdate
+from app.schemas.teacher import (
+    TeacherCareerResponse,
+    TeacherCertificateResponse,
+    TeacherDashboardResponse,
+    TeacherEducationResponse,
+    TeacherResponse,
+    TeacherUpdate,
+)
 
 
 class TeacherService:
@@ -18,6 +25,31 @@ class TeacherService:
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    async def _enrich_response(self, teacher: Any) -> TeacherResponse:
+        """Build TeacherResponse with education/career/certificates."""
+        from app.models.teacher import TeacherCareer, TeacherCertificate, TeacherEducation
+
+        education = await self.db.scalars(
+            select(TeacherEducation)
+            .where(TeacherEducation.teacher_id == teacher.id)
+            .order_by(TeacherEducation.sort_order)
+        )
+        career = await self.db.scalars(
+            select(TeacherCareer)
+            .where(TeacherCareer.teacher_id == teacher.id)
+            .order_by(TeacherCareer.sort_order)
+        )
+        certificates = await self.db.scalars(
+            select(TeacherCertificate)
+            .where(TeacherCertificate.teacher_id == teacher.id)
+        )
+
+        response = TeacherResponse.model_validate(teacher)
+        response.education = [TeacherEducationResponse.model_validate(e) for e in education.all()]
+        response.career = [TeacherCareerResponse.model_validate(c) for c in career.all()]
+        response.certificates = [TeacherCertificateResponse.model_validate(c) for c in certificates.all()]
+        return response
 
     async def get_all(
         self,
@@ -52,7 +84,18 @@ class TeacherService:
         teacher = await self.db.get(Teacher, teacher_id)
         if teacher is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
-        return TeacherResponse.model_validate(teacher)
+        return await self._enrich_response(teacher)
+
+    async def get_by_user_id(self, user_id: str) -> TeacherResponse:
+        """Return a teacher profile by the owning user ID."""
+        from app.models.teacher import Teacher
+
+        teacher = await self.db.scalar(
+            select(Teacher).where(Teacher.user_id == user_id)
+        )
+        if teacher is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher profile not found")
+        return await self._enrich_response(teacher)
 
     async def update(self, teacher_id: str, data: TeacherUpdate, current_user: Any) -> TeacherResponse:
         """Update teacher profile (owner only)."""
@@ -69,7 +112,7 @@ class TeacherService:
             setattr(teacher, key, value)
         await self.db.flush()
         await self.db.refresh(teacher)
-        return TeacherResponse.model_validate(teacher)
+        return await self._enrich_response(teacher)
 
     async def get_students(
         self,

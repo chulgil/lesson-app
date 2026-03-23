@@ -20,10 +20,25 @@ class StudentResponse(BaseModel):
     status: str | None = None
     phone: str | None = None
     parent_phone: str | None = None
+    parent_name: str | None = None
+    email: str | None = None
     lesson_class_id: str | None = None
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
+    lesson_day: str | None = None
+    lesson_time: str | None = None
+    lesson_duration: int = 60
     profile_image_url: str | None = None
+    profile_color: str | None = None
+    birth_date: _dt.date | None = None
+    age_group: str | None = None
+    connection_status: str | None = None
+    connected_at: _dt.datetime | None = None
+    practice_level: str | None = None
+    break_reason: str | None = None
+    expected_return_date: _dt.date | None = None
+    notes: str | None = None
+    is_active: bool = True
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
@@ -36,9 +51,18 @@ class StudentCreate(BaseModel):
     level: str = "beginner"
     phone: str | None = None
     parent_phone: str | None = None
+    parent_name: str | None = None
+    email: str | None = None
     lesson_class_id: str | None = None
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
+    lesson_day: str | None = None
+    lesson_time: str | None = None
+    lesson_duration: int = 60
+    profile_image_url: str | None = None
+    birth_date: _dt.date | None = None
+    age_group: str | None = None
+    notes: str | None = None
 
 
 class StudentUpdate(BaseModel):
@@ -50,10 +74,23 @@ class StudentUpdate(BaseModel):
     status: str | None = None
     phone: str | None = None
     parent_phone: str | None = None
+    parent_name: str | None = None
+    email: str | None = None
     lesson_class_id: str | None = None
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
+    lesson_day: str | None = None
+    lesson_time: str | None = None
+    lesson_duration: int | None = None
     profile_image_url: str | None = None
+    birth_date: _dt.date | None = None
+    age_group: str | None = None
+    connection_status: str | None = None
+    practice_level: str | None = None
+    break_reason: str | None = None
+    expected_return_date: _dt.date | None = None
+    notes: str | None = None
+    is_active: bool | None = None
 
 
 class StudentStatsResponse(BaseModel):

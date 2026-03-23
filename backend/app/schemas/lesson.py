@@ -22,7 +22,8 @@ class LessonClassResponse(BaseModel):
     contact_person: str | None = None
     contact_phone: str | None = None
     address: str | None = None
-    is_active: bool = True
+    sort_order: int = 0
+    is_archived: bool = False
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 
@@ -54,20 +55,28 @@ class MembershipCreate(BaseModel):
 
     student_id: str
     instrument: str | None = None
+    level: str | None = None
+    status: str = "active"
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_duration: int = 60
+    notes: str | None = None
 
 
 class MembershipUpdate(BaseModel):
     """Update a membership."""
 
     instrument: str | None = None
+    level: str | None = None
+    status: str | None = None
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_duration: int | None = None
+    notes: str | None = None
 
 
 class MembershipResponse(BaseModel):
@@ -76,14 +85,19 @@ class MembershipResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
-    class_id: str
+    lesson_class_id: str
     student_id: str
     instrument: str | None = None
+    level: str | None = None
+    status: str | None = None
     monthly_fee: int | None = None
     lessons_per_week: int | None = None
     lesson_day: str | None = None
     lesson_time: str | None = None
+    lesson_duration: int = 60
+    notes: str | None = None
     created_at: _dt.datetime | None = None
+    updated_at: _dt.datetime | None = None
 
 
 # ---------------------------------------------------------------------------

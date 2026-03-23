@@ -124,6 +124,21 @@ async def get_teacher_dashboard(
 
 
 @router.get(
+    "/me/profile",
+    response_model=TeacherResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get my teacher profile",
+)
+async def get_my_profile(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> TeacherResponse:
+    """Return the authenticated teacher's own profile."""
+    service = TeacherService(db)
+    return await service.get_by_user_id(current_user.id)
+
+
+@router.get(
     "/me/dashboard",
     response_model=TeacherDashboardResponse,
     status_code=status.HTTP_200_OK,

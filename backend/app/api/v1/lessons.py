@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_current_teacher, get_current_user, get_db, get_pagination
@@ -269,9 +270,79 @@ async def delete_lesson_class(
     await service.delete_class(class_id, current_user)
 
 
+@router.patch(
+    "-classes/{class_id}/restore",
+    response_model=LessonClassResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Restore an archived lesson class",
+)
+async def restore_lesson_class(
+    class_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> LessonClassResponse:
+    """Restore a previously archived lesson class."""
+    service = LessonService(db)
+    return await service.restore_class(class_id, current_user)
+
+
+class ReorderRequest(BaseModel):
+    """List of ordered class IDs."""
+    ordered_ids: list[str]
+
+
+@router.put(
+    "-classes/reorder",
+    status_code=status.HTTP_200_OK,
+    summary="Reorder lesson classes",
+)
+async def reorder_lesson_classes(
+    body: ReorderRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> dict:
+    """Set the display order of lesson classes."""
+    service = LessonService(db)
+    await service.reorder_classes(body.ordered_ids, current_user)
+    return {"message": "Reorder successful"}
+
+
 # ---------------------------------------------------------------------------
 # Memberships
 # ---------------------------------------------------------------------------
+
+
+@router.get(
+    "-classes/{class_id}/memberships",
+    response_model=list[MembershipResponse],
+    status_code=status.HTTP_200_OK,
+    summary="List memberships for a class",
+)
+async def list_memberships(
+    class_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> list[MembershipResponse]:
+    """List all student memberships in a lesson class."""
+    service = LessonService(db)
+    return await service.get_memberships_by_class(class_id, current_user)
+
+
+@router.get(
+    "-classes/{class_id}/memberships/{membership_id}",
+    response_model=MembershipResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get membership detail",
+)
+async def get_membership(
+    class_id: str,
+    membership_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> MembershipResponse:
+    """Return a single membership by ID."""
+    service = LessonService(db)
+    return await service.get_membership_by_id(membership_id, current_user)
 
 
 @router.post(

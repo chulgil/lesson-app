@@ -55,8 +55,11 @@ async def list_students(
     student_status: Annotated[str | None, Query(alias="status")] = None,
     class_id: str | None = None,
     q: str | None = None,
+    search: str | None = None,
 ) -> PaginatedResponse[StudentResponse]:
     """List students visible to the current user (teacher or parent)."""
+    # Accept both 'q' and 'search' query params (frontend sends 'search')
+    search_query = q or search
     service = StudentService(db)
     return await service.get_all(
         user=current_user,
@@ -65,7 +68,7 @@ async def list_students(
         offset=pagination["offset"],
         status=student_status,
         class_id=class_id,
-        q=q,
+        q=search_query,
     )
 
 
@@ -116,6 +119,29 @@ async def update_student(
     """Update student fields."""
     service = StudentService(db)
     return await service.update(student_id, body, current_user)
+
+
+class StudentStatusUpdate(BaseModel):
+    """Payload to update only the student status."""
+
+    status: str
+
+
+@router.patch(
+    "/{student_id}/status",
+    response_model=StudentResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Update student status (teacher only)",
+)
+async def update_student_status(
+    student_id: str,
+    body: StudentStatusUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_teacher)],
+) -> StudentResponse:
+    """Update only the status field of a student."""
+    service = StudentService(db)
+    return await service.update_status(student_id, body.status, current_user)
 
 
 @router.delete(

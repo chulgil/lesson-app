@@ -9,6 +9,7 @@ from app.api.v1 import (
     groups,
     invites,
     lessons,
+    locations,
     notifications,
     parents,
     practice,
@@ -45,3 +46,4 @@ api_router.include_router(gamification.router, prefix="/gamification", tags=["ga
 api_router.include_router(settings_api.router, prefix="/settings", tags=["settings"])
 api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(groups.router, prefix="/groups", tags=["groups"])
+api_router.include_router(locations.router, prefix="/locations", tags=["locations"])

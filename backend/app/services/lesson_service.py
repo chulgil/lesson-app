@@ -243,9 +243,51 @@ class LessonService:
         lc.is_archived = True
         await self.db.flush()
 
+    async def restore_class(self, class_id: str, current_user: Any) -> LessonClassResponse:
+        """Restore an archived lesson class."""
+        from app.models.lesson import LessonClass
+
+        lc = await self.db.get(LessonClass, class_id)
+        if lc is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson class not found")
+        lc.is_archived = False
+        await self.db.flush()
+        await self.db.refresh(lc)
+        return LessonClassResponse.model_validate(lc)
+
+    async def reorder_classes(self, ordered_ids: list[str], current_user: Any) -> None:
+        """Set display order for lesson classes."""
+        from app.models.lesson import LessonClass
+
+        for idx, class_id in enumerate(ordered_ids):
+            lc = await self.db.get(LessonClass, class_id)
+            if lc and lc.teacher_id == current_user.id:
+                lc.sort_order = idx
+        await self.db.flush()
+
     # ------------------------------------------------------------------
     # Memberships
     # ------------------------------------------------------------------
+
+    async def get_memberships_by_class(
+        self, class_id: str, current_user: Any
+    ) -> list[MembershipResponse]:
+        """List all memberships in a class."""
+        from app.models.lesson import ClassMembership
+
+        result = await self.db.scalars(
+            select(ClassMembership).where(ClassMembership.lesson_class_id == class_id)
+        )
+        return [MembershipResponse.model_validate(m) for m in result.all()]
+
+    async def get_membership_by_id(self, membership_id: str, current_user: Any) -> MembershipResponse:
+        """Return a single membership."""
+        from app.models.lesson import ClassMembership
+
+        m = await self.db.get(ClassMembership, membership_id)
+        if m is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Membership not found")
+        return MembershipResponse.model_validate(m)
 
     async def add_membership(
         self, class_id: str, data: MembershipCreate, current_user: Any

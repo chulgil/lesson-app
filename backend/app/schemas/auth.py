@@ -40,9 +40,10 @@ class RefreshTokenRequest(BaseModel):
 
 
 class RefreshTokenResponse(BaseModel):
-    """Response for a token refresh – only a new access token."""
+    """Response for a token refresh — includes both tokens for frontend compatibility."""
 
     access_token: str
+    refresh_token: str | None = None
     token_type: str = "bearer"
 
 
@@ -57,4 +58,4 @@ class DevLoginRequest(BaseModel):
 class LogoutRequest(BaseModel):
     """Request body for logout."""
 
-    refresh_token: str
+    refresh_token: str | None = None
