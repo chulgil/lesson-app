@@ -78,10 +78,27 @@ class RelationshipService:
 
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
+    async def get_by_id(self, relationship_id: str, current_user: Any) -> Any:
+        """Return a single relationship by ID."""
+        from app.models.relationship import TeacherStudentRelation
+
+        relation = await self.db.get(TeacherStudentRelation, relationship_id)
+        if relation is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Relationship not found",
+            )
+        return relation
+
     async def update_status(
-        self, relationship_id: str, new_status: str, current_user: Any
+        self, relationship_id: str, new_status: str, current_user: Any,
+        *, subscription_id: str | None = None, booking_id: str | None = None,
+        last_lesson_day: str | None = None, last_lesson_time: str | None = None,
+        last_lesson_duration: int | None = None,
     ) -> Any:
-        """Change the status of a relationship."""
+        """Change the status of a relationship with optional metadata."""
+        from datetime import datetime, timezone
+
         from app.models.relationship import TeacherStudentRelation
 
         relation = await self.db.get(TeacherStudentRelation, relationship_id)
@@ -91,6 +108,18 @@ class RelationshipService:
                 detail="Relationship not found",
             )
         relation.status = new_status
+
+        # Update optional metadata
+        if subscription_id:
+            relation.active_subscription_id = subscription_id
+        if booking_id:
+            relation.trial_booking_id = booking_id
+        if last_lesson_day:
+            relation.last_lesson_day = last_lesson_day
+            relation.last_lesson_time = last_lesson_time
+            relation.last_lesson_duration = last_lesson_duration
+            relation.schedule_recorded_at = datetime.now(timezone.utc)
+
         await self.db.flush()
         await self.db.refresh(relation)
         return relation

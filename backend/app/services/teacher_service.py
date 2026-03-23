@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import String, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
@@ -66,6 +66,11 @@ class TeacherService:
 
         query = select(Teacher)
 
+        if instrument:
+            # JSON array contains check (SQLite: use LIKE, PostgreSQL: use @>)
+            query = query.where(Teacher.instruments.cast(String).ilike(f"%{instrument}%"))
+        if area:
+            query = query.where(Teacher.lesson_areas.cast(String).ilike(f"%{area}%"))
         if q:
             query = query.where(Teacher.introduction.ilike(f"%{q}%"))
 

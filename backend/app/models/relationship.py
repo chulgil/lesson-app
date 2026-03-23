@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, Index, String, func
+from sqlalchemy import Boolean, DateTime, Enum, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, UUIDMixin
@@ -9,8 +9,11 @@ from app.models.base import Base, UUIDMixin
 
 class RelationStatus(str, enum.Enum):
     pending = "pending"
+    trialBooked = "trialBooked"
     active = "active"
     inactive = "inactive"
+    expired = "expired"
+    past = "past"
     disconnected = "disconnected"
 
 
@@ -34,6 +37,34 @@ class TeacherStudentRelation(UUIDMixin, Base):
     )
     connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     disconnected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Subscription tracking
+    active_subscription_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    last_subscription_expired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expired_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Trial tracking
+    trial_booking_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+    # Lesson tracking
+    total_lesson_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_lesson_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Registration type
+    is_manually_registered: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    is_app_connected: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    app_connected_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Schedule restoration
+    last_lesson_day: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    last_lesson_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
+    last_lesson_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    schedule_recorded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Termination
+    terminated_by: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    termination_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

@@ -38,13 +38,25 @@ class ScheduleService:
     async def get_availability(self, current_user: Any) -> AvailabilityResponse:
         """Return the teacher's weekly availability."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
+        from app.schemas.schedule import DayAvailability, TimeSlotSchema
 
-        availabilities = await self.db.scalars(
+        avail_rows = await self.db.scalars(
             select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
         )
+        day_list = []
+        for avail in avail_rows.all():
+            slots_rows = await self.db.scalars(
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
+            )
+            time_slots = [
+                TimeSlotSchema(start_time=s.start_time, end_time=s.end_time)
+                for s in slots_rows.all()
+            ]
+            day_list.append(DayAvailability(day_of_week=avail.day_of_week, time_slots=time_slots))
+
         return AvailabilityResponse(
             teacher_id=current_user.id,
-            availabilities=[],  # TODO: build from DB rows
+            availabilities=day_list,
         )
 
     async def set_availability(
@@ -109,24 +121,55 @@ class ScheduleService:
         self, data: ScheduleExceptionCreate, current_user: Any
     ) -> ScheduleExceptionResponse:
         """Add a schedule exception."""
-        # TODO: create ScheduleException model and persist
-        return ScheduleExceptionResponse(
-            id="",
-            teacher_id=current_user.id,
-            date=data.date,
+        from app.models.schedule_ext import ScheduleException
+
+        # Find teacher's first availability to link to (or use empty string)
+        from app.models.schedule import TeacherAvailability
+        avail = await self.db.scalar(
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
+        )
+        avail_id = avail.id if avail else ""
+
+        exception = ScheduleException(
+            teacher_availability_id=avail_id,
             type=data.type,
+            start_date=data.start_date,
+            end_date=data.end_date,
+            start_time=data.start_time,
+            end_time=data.end_time,
             reason=data.reason,
         )
+        self.db.add(exception)
+        await self.db.flush()
+        await self.db.refresh(exception)
+        return ScheduleExceptionResponse.model_validate(exception)
 
     async def update_exception(
         self, exception_id: str, data: ScheduleExceptionUpdate, current_user: Any
     ) -> ScheduleExceptionResponse:
         """Update a schedule exception."""
-        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+        from app.models.schedule_ext import ScheduleException
+
+        exception = await self.db.get(ScheduleException, exception_id)
+        if exception is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+
+        update_data = data.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(exception, key, value)
+        await self.db.flush()
+        await self.db.refresh(exception)
+        return ScheduleExceptionResponse.model_validate(exception)
 
     async def delete_exception(self, exception_id: str, current_user: Any) -> None:
         """Delete a schedule exception."""
-        raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not yet implemented")
+        from app.models.schedule_ext import ScheduleException
+
+        exception = await self.db.get(ScheduleException, exception_id)
+        if exception is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exception not found")
+        await self.db.delete(exception)
+        await self.db.flush()
 
     # ------------------------------------------------------------------
     # Bookings

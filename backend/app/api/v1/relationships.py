@@ -36,9 +36,16 @@ class ConnectRequest(BaseModel):
 
 
 class RelationshipStatusUpdate(BaseModel):
-    """Change relationship status."""
+    """Change relationship status with optional metadata."""
 
     status: str
+    # Optional fields for subscription/booking tracking
+    subscription_id: str | None = None
+    booking_id: str | None = None
+    # Optional fields for schedule recording
+    last_lesson_day: str | None = None
+    last_lesson_time: str | None = None
+    last_lesson_duration: int | None = None
 
 
 class RelationshipResponse(BaseModel):
@@ -51,6 +58,36 @@ class RelationshipResponse(BaseModel):
     student_id: str | None = None
     status: str | None = None
     invite_code: str | None = None
+    connected_at: datetime | None = None
+    disconnected_at: datetime | None = None
+
+    # Subscription tracking
+    active_subscription_id: str | None = None
+    last_subscription_expired_at: datetime | None = None
+    expired_until: datetime | None = None
+
+    # Trial tracking
+    trial_booking_id: str | None = None
+
+    # Lesson tracking
+    total_lesson_count: int = 0
+    last_lesson_at: datetime | None = None
+
+    # Registration type
+    is_manually_registered: bool = False
+    is_app_connected: bool = False
+    app_connected_at: datetime | None = None
+
+    # Schedule restoration
+    last_lesson_day: str | None = None
+    last_lesson_time: str | None = None
+    last_lesson_duration: int | None = None
+    schedule_recorded_at: datetime | None = None
+
+    # Termination
+    terminated_by: str | None = None
+    termination_reason: str | None = None
+
     created_at: datetime | None = None
 
 
@@ -111,6 +148,22 @@ async def connect_with_teacher(
 
 
 @router.get(
+    "/relationships/{relationship_id}",
+    response_model=RelationshipResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get relationship by ID",
+)
+async def get_relationship(
+    relationship_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> RelationshipResponse:
+    """Return a single relationship by ID."""
+    service = RelationshipService(db)
+    return await service.get_by_id(relationship_id, current_user)
+
+
+@router.get(
     "/relationships",
     response_model=PaginatedResponse[RelationshipResponse],
     status_code=status.HTTP_200_OK,
@@ -145,7 +198,14 @@ async def update_relationship_status(
 ) -> RelationshipResponse:
     """Change the status of a relationship (e.g. disconnect)."""
     service = RelationshipService(db)
-    return await service.update_status(relationship_id, body.status, current_user)
+    return await service.update_status(
+        relationship_id, body.status, current_user,
+        subscription_id=body.subscription_id,
+        booking_id=body.booking_id,
+        last_lesson_day=body.last_lesson_day,
+        last_lesson_time=body.last_lesson_time,
+        last_lesson_duration=body.last_lesson_duration,
+    )
 
 
 # ---------------------------------------------------------------------------
