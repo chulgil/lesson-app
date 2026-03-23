@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../domain/entities/invite.dart';
 import '../../../../repositories/invite_repository.dart';
 import '../../../../providers/auth/user_role_provider.dart';
+import '../../../invite/data/repositories/remote_invite_repository.dart';
 import '../../../notifications/domain/services/connection_notification_service.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
 
@@ -16,8 +18,8 @@ InviteRepository inviteRepository(Ref ref) {
   if (EnvironmentConfig.useMockData) {
     return MockInviteRepository();
   }
-  // No remote API yet — use empty mock to avoid dummy data
-  return MockInviteRepository(empty: true);
+  final apiClient = ref.read(apiClientProvider);
+  return RemoteInviteRepository(apiClient);
 }
 
 /// Current user role - synced with app's role system

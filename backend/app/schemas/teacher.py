@@ -75,14 +75,14 @@ class TeacherResponse(BaseModel):
     instruments: list[str] = []
     introduction: str | None = None
     experience_years: int | None = None
-    lesson_areas: list[str] = []
-    lesson_types: list[str] = []
+    lesson_areas: list[str] | None = []
+    lesson_types: list[str] | None = []
     fee_min: int | None = None
     fee_max: int | None = None
     fee_duration: int | None = 60
     teaching_style: str | None = None
-    specialties: list[str] = []
-    portfolio_video_urls: list[str] = []
+    specialties: list[str] | None = []
+    portfolio_video_urls: list[str] | None = []
 
     # Banking info
     bank_name: str | None = None
