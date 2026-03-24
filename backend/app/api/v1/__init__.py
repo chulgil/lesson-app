@@ -12,6 +12,7 @@ from app.api.v1 import (
     lessons,
     locations,
     notifications,
+    profile_images,
     parents,
     practice,
     practice_logs,
@@ -49,3 +50,4 @@ api_router.include_router(reviews.router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(groups.router, prefix="/groups", tags=["groups"])
 api_router.include_router(locations.router, prefix="/locations", tags=["locations"])
 api_router.include_router(lesson_requests.router, prefix="/schedule/lesson-requests", tags=["lesson-requests"])
+api_router.include_router(profile_images.router, prefix="/profile-images", tags=["profile-images"])

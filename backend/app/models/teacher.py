@@ -51,6 +51,9 @@ class Teacher(UUIDMixin, TimestampMixin, Base):
     phone_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
     phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # Images
+    background_image: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     # Settings
     visibility_settings: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 

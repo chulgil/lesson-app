@@ -84,6 +84,9 @@ class TeacherResponse(BaseModel):
     specialties: list[str] | None = []
     portfolio_video_urls: list[str] | None = []
 
+    # Images
+    background_image: str | None = None
+
     # Banking info
     bank_name: str | None = None
     account_number: str | None = None

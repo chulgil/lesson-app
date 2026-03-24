@@ -29,6 +29,7 @@ class StudentResponse(BaseModel):
     lesson_time: str | None = None
     lesson_duration: int = 60
     profile_image_url: str | None = None
+    background_image_url: str | None = None
     profile_color: str | None = None
     birth_date: _dt.date | None = None
     age_group: str | None = None

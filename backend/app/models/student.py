@@ -72,6 +72,7 @@ class Student(UUIDMixin, TimestampMixin, Base):
         nullable=True,
     )
     profile_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    background_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     profile_color: Mapped[str | None] = mapped_column(String(7), nullable=True, default="#6B5B95")
 
     # Lesson defaults
