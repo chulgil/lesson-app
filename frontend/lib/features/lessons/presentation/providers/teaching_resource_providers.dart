@@ -85,6 +85,42 @@ class TeachingResourceNotifier extends AsyncNotifier<List<TeachingResource>> {
     }
   }
 
+  /// Create a resource of any type (recording, external link, etc.)
+  Future<TeachingResource> createResource({
+    required TeachingResourceType type,
+    required String title,
+    String? description,
+    String? audioUrl,
+    int? audioDurationSeconds,
+    String? externalUrl,
+    String? instrument,
+    List<String> tags = const [],
+  }) async {
+    final resource = TeachingResource(
+      id: '',
+      teacherId: _teacherId,
+      type: type,
+      title: title,
+      description: description,
+      audioUrl: audioUrl,
+      audioDurationSeconds: audioDurationSeconds,
+      externalUrl: externalUrl,
+      instrument: instrument,
+      tags: tags,
+      createdAt: DateTime.now(),
+    );
+
+    state = const AsyncValue.loading();
+    try {
+      final created = await _repository.create(resource);
+      state = await AsyncValue.guard(() => _repository.getByTeacherId(_teacherId));
+      return created;
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Delete a resource
   Future<void> deleteResource(String id) async {
     state = const AsyncValue.loading();
