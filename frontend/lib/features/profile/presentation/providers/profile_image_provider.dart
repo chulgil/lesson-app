@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
 part 'profile_image_provider.g.dart';
@@ -16,7 +18,7 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
     return file?.path;
   }
 
-  /// Pick image from source, crop, save, and update state.
+  /// Pick image from source, crop, save locally, and upload to server.
   Future<bool> pickAndSaveImage(
     ImageSource source,
     BuildContext context,
@@ -30,11 +32,21 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
     final croppedPath = await cropProfileImage(picked.path, context);
     if (croppedPath == null) return false;
 
-    // 3. Save
+    // 3. Save locally
     final savedPath = await saveProfileImage(croppedPath, userId);
 
-    // 4. Update state
+    // 4. Update state (immediate — local-first)
     state = AsyncData(savedPath);
+
+    // 5. Upload to server (non-blocking)
+    final apiClient = ref.read(apiClientProvider);
+    final uploadService = ImageUploadService(apiClient);
+    await uploadService.uploadImage(
+      filePath: savedPath,
+      imageType: 'profile',
+      entityType: 'teacher',
+    );
+
     return true;
   }
 
@@ -45,5 +57,13 @@ class ProfileImageNotifier extends _$ProfileImageNotifier {
       await deleteProfileImage(currentPath);
     }
     state = const AsyncData(null);
+
+    // Delete from server
+    final apiClient = ref.read(apiClientProvider);
+    final uploadService = ImageUploadService(apiClient);
+    await uploadService.deleteImage(
+      imageType: 'profile',
+      entityType: 'teacher',
+    );
   }
 }

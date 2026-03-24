@@ -7,7 +7,7 @@ part of 'profile_image_provider.dart';
 // **************************************************************************
 
 String _$profileImageNotifierHash() =>
-    r'bf2e834efe62b2cb3a1284670479477b1e92d085';
+    r'06aa25ce2f23872c9fdf2502308d8fc988acea76';
 
 /// Copied from Dart SDK
 class _SystemHash {

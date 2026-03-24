@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
 part 'background_image_provider.g.dart';
@@ -15,7 +17,7 @@ class BackgroundImageNotifier extends _$BackgroundImageNotifier {
     return file?.path;
   }
 
-  /// Pick image from source, crop to 16:9, save, and update state.
+  /// Pick image from source, crop to 16:9, save locally, and upload to server.
   Future<bool> pickAndSaveImage(
     ImageSource source,
     BuildContext context,
@@ -31,6 +33,16 @@ class BackgroundImageNotifier extends _$BackgroundImageNotifier {
       final savedPath = await saveBackgroundImage(croppedPath, userId);
 
       state = AsyncData(savedPath);
+
+      // Upload to server (non-blocking)
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.uploadImage(
+        filePath: savedPath,
+        imageType: 'background',
+        entityType: 'teacher',
+      );
+
       return true;
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -46,6 +58,13 @@ class BackgroundImageNotifier extends _$BackgroundImageNotifier {
         await deleteProfileImage(currentPath);
       }
       state = const AsyncData(null);
+
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.deleteImage(
+        imageType: 'background',
+        entityType: 'teacher',
+      );
     } catch (e, st) {
       state = AsyncError(e, st);
     }

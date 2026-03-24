@@ -7,7 +7,7 @@ part of 'background_image_provider.dart';
 // **************************************************************************
 
 String _$backgroundImageNotifierHash() =>
-    r'6fe018029d61aa28cc62acdca18cb1b1102fb1c3';
+    r'aa6d493d3070dc33c4a1fddfdcc8eb511cf4b729';
 
 /// Copied from Dart SDK
 class _SystemHash {

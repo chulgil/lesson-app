@@ -7,7 +7,7 @@ part of 'student_image_provider.dart';
 // **************************************************************************
 
 String _$studentProfileImageNotifierHash() =>
-    r'1dd3c00ffd947dadb5fc04f0366fbd158f2ed29e';
+    r'befedb7d3add005679672d70d56658ea0cad11ce';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -191,7 +191,7 @@ class _StudentProfileImageNotifierProviderElement
 }
 
 String _$studentBackgroundImageNotifierHash() =>
-    r'b889c0aa297cf7c65e1caf0bb13fd9589e8ecee4';
+    r'ffb72dba4e0de50e1393d0910b759bc3d567848a';
 
 abstract class _$StudentBackgroundImageNotifier
     extends BuildlessAutoDisposeAsyncNotifier<String?> {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/utils/image_utils.dart';
 
 part 'student_image_provider.g.dart';
@@ -17,7 +19,7 @@ class StudentProfileImageNotifier extends _$StudentProfileImageNotifier {
     return file?.path;
   }
 
-  /// Pick, crop (circle), save, and update state.
+  /// Pick, crop (circle), save locally, and upload to server.
   Future<bool> pickAndSaveImage(
     ImageSource source,
     BuildContext context,
@@ -33,6 +35,17 @@ class StudentProfileImageNotifier extends _$StudentProfileImageNotifier {
       final savedPath = await saveProfileImage(croppedPath, _fileName);
 
       state = AsyncData(savedPath);
+
+      // Upload to server
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.uploadImage(
+        filePath: savedPath,
+        imageType: 'profile',
+        entityType: 'student',
+        entityId: studentId,
+      );
+
       return true;
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -48,6 +61,14 @@ class StudentProfileImageNotifier extends _$StudentProfileImageNotifier {
         await deleteProfileImage(currentPath);
       }
       state = const AsyncData(null);
+
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.deleteImage(
+        imageType: 'profile',
+        entityType: 'student',
+        entityId: studentId,
+      );
     } catch (e, st) {
       state = AsyncError(e, st);
     }
@@ -65,7 +86,7 @@ class StudentBackgroundImageNotifier extends _$StudentBackgroundImageNotifier {
     return file?.path;
   }
 
-  /// Pick, crop (16:9), save, and update state.
+  /// Pick, crop (16:9), save locally, and upload to server.
   Future<bool> pickAndSaveImage(
     ImageSource source,
     BuildContext context,
@@ -81,6 +102,17 @@ class StudentBackgroundImageNotifier extends _$StudentBackgroundImageNotifier {
       final savedPath = await saveBackgroundImage(croppedPath, _fileName);
 
       state = AsyncData(savedPath);
+
+      // Upload to server
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.uploadImage(
+        filePath: savedPath,
+        imageType: 'background',
+        entityType: 'student',
+        entityId: studentId,
+      );
+
       return true;
     } catch (e, st) {
       state = AsyncError(e, st);
@@ -96,6 +128,14 @@ class StudentBackgroundImageNotifier extends _$StudentBackgroundImageNotifier {
         await deleteProfileImage(currentPath);
       }
       state = const AsyncData(null);
+
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      await uploadService.deleteImage(
+        imageType: 'background',
+        entityType: 'student',
+        entityId: studentId,
+      );
     } catch (e, st) {
       state = AsyncError(e, st);
     }
