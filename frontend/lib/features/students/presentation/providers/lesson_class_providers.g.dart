@@ -7,7 +7,7 @@ part of 'lesson_class_providers.dart';
 // **************************************************************************
 
 String _$lessonClassRepositoryHash() =>
-    r'95606cb8068ef29b8b7836cf8745da759e402ff8';
+    r'bda3e53d966da13bcd33e50a0ee19711e4a5d724';
 
 /// Repository provider for LessonClass.
 ///

@@ -1,7 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_location_repository.dart';
+import '../../data/repositories/remote_location_repository.dart';
 import '../../domain/entities/lesson_location.dart';
 import '../../domain/repositories/location_repository.dart';
 
@@ -13,8 +15,8 @@ LocationRepository locationRepository(LocationRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockLocationRepository();
   }
-  // Backend API 미구현 — 레슨 장소 엔드포인트 필요
-  return MockLocationRepository();
+  final apiClient = ref.read(apiClientProvider);
+  return RemoteLocationRepository(apiClient);
 }
 
 /// Get all locations for a class.

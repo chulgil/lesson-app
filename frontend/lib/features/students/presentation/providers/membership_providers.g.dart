@@ -7,7 +7,7 @@ part of 'membership_providers.dart';
 // **************************************************************************
 
 String _$membershipRepositoryHash() =>
-    r'8c8f4d87c9f1bf55a45cc9fdc9a943553f9eceff';
+    r'8fb66b81e49ea2372eb3a2a2f427a49aa5242fce';
 
 /// Repository provider for ClassMembership.
 ///

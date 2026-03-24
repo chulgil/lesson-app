@@ -1,7 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_membership_repository.dart';
+import '../../data/repositories/remote_membership_repository.dart';
 import '../../domain/entities/class_membership.dart';
 import '../../domain/repositories/membership_repository.dart';
 
@@ -13,8 +15,8 @@ MembershipRepository membershipRepository(MembershipRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockMembershipRepository();
   }
-  // Backend API 미구현 — 그룹 멤버십 엔드포인트 필요
-  return MockMembershipRepository();
+  final apiClient = ref.read(apiClientProvider);
+  return RemoteMembershipRepository(apiClient);
 }
 
 /// Get all memberships for a class.

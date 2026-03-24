@@ -1,7 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
+import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_lesson_class_repository.dart';
+import '../../data/repositories/remote_lesson_class_repository.dart';
 import '../../domain/entities/lesson_class.dart';
 import '../../domain/repositories/lesson_class_repository.dart';
 
@@ -13,8 +15,8 @@ LessonClassRepository lessonClassRepository(LessonClassRepositoryRef ref) {
   if (EnvironmentConfig.useMockData) {
     return MockLessonClassRepository();
   }
-  // Backend API 미구현 — 레슨 클래스 엔드포인트 필요
-  return MockLessonClassRepository();
+  final apiClient = ref.read(apiClientProvider);
+  return RemoteLessonClassRepository(apiClient);
 }
 
 /// Get all classes for the current teacher.
