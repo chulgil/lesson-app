@@ -29,7 +29,7 @@ class PendingRequestsScreen extends ConsumerWidget {
       ),
       body: pendingRequests.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error.toString()),
+        error: (_, __) => _buildError('요청 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
         data: (requests) {
           if (requests.isEmpty) {
             return _buildEmpty(userRole);

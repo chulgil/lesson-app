@@ -28,7 +28,7 @@ class InviteHistoryScreen extends ConsumerWidget {
       ),
       body: myInvites.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error.toString()),
+        error: (_, __) => _buildError('초대 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
         data: (invites) {
           if (invites.isEmpty) {
             return _buildEmpty();

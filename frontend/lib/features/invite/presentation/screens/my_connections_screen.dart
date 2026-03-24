@@ -29,7 +29,7 @@ class MyConnectionsScreen extends ConsumerWidget {
       ),
       body: connections.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildError(error.toString()),
+        error: (_, __) => _buildError('연결 목록을 불러올 수 없습니다. 다시 시도해주세요.'),
         data: (activeList) {
           final inactiveAsync = ref.watch(myDisconnectedConnectionsProvider);
           final inactiveList = inactiveAsync.valueOrNull ?? [];

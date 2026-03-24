@@ -48,6 +48,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
   @override
   void dispose() {
+    // Flush pending feedback before cancel
+    if (_feedbackDebounce?.isActive == true && _pendingFeedbackText != null) {
+      _feedbackDebounce!.cancel();
+      _flushPendingFeedback();
+    }
     _feedbackDebounce?.cancel();
     _tabController.dispose();
     super.dispose();
