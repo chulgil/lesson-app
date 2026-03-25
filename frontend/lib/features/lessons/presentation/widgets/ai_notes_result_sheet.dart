@@ -1,0 +1,229 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../data/services/ai_notes_service.dart';
+
+/// Bottom sheet showing AI-generated lesson notes with edit/save capability.
+class AiNotesResultSheet extends StatefulWidget {
+  final AiNoteResult result;
+  final VoidCallback? onSave;
+
+  const AiNotesResultSheet({
+    super.key,
+    required this.result,
+    this.onSave,
+  });
+
+  @override
+  State<AiNotesResultSheet> createState() => _AiNotesResultSheetState();
+}
+
+class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
+  late TextEditingController _feedbackController;
+  late TextEditingController _tipsController;
+
+  @override
+  void initState() {
+    super.initState();
+    _feedbackController = TextEditingController(text: widget.result.feedback ?? '');
+    _tipsController = TextEditingController(text: widget.result.practiceTips ?? '');
+  }
+
+  @override
+  void dispose() {
+    _feedbackController.dispose();
+    _tipsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.auto_awesome, color: AppColors.primary, size: 24),
+                        const SizedBox(width: 8),
+                        Text('AI 레슨 노트', style: AppTypography.headingSmall),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        widget.onSave?.call();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('저장'),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 1),
+
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                  children: [
+                    // Feedback section
+                    _buildSectionHeader('피드백', Icons.chat_bubble_outline),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _feedbackController,
+                      maxLines: null,
+                      decoration: _inputDecoration(),
+                      style: AppTypography.bodyMedium,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Key points section
+                    _buildSectionHeader('핵심 포인트', Icons.flag_outlined),
+                    const SizedBox(height: 8),
+                    ...widget.result.keyPoints.asMap().entries.map(
+                      (entry) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 6),
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                entry.value,
+                                style: AppTypography.bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Practice tips section
+                    _buildSectionHeader('연습 팁', Icons.lightbulb_outline),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: _tipsController,
+                      maxLines: null,
+                      decoration: _inputDecoration(),
+                      style: AppTypography.bodyMedium,
+                    ),
+
+                    if (widget.result.suggestedAssignments.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.space6),
+
+                      // Suggested assignments
+                      _buildSectionHeader('과제 제안', Icons.assignment_outlined),
+                      const SizedBox(height: 8),
+                      ...widget.result.suggestedAssignments.map(
+                        (a) => Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          elevation: 0,
+                          color: AppColors.surfaceSecondaryLight,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  a.title,
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  a.description,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: AppSpacing.space8),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.primary),
+        const SizedBox(width: 6),
+        Text(
+          title,
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.primary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  InputDecoration _inputDecoration() {
+    return InputDecoration(
+      filled: true,
+      fillColor: AppColors.surfaceSecondaryLight,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.all(12),
+    );
+  }
+}
