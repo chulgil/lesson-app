@@ -14,7 +14,7 @@ import '../../../student_home/presentation/screens/student_lessons_tab.dart';
 import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../providers/schedule_view_mode_provider.dart';
 import '../../../../core/widgets/week_calendar_widget.dart';

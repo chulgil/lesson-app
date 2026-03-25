@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../providers/lesson_class_providers.dart';
 import '../providers/membership_providers.dart';
 

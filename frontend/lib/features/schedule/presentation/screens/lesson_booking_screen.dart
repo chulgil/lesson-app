@@ -8,7 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/week_calendar_widget.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';
 import '../providers/teacher_availability_providers.dart';
 import '../widgets/availability/availability_booking_preview.dart';

@@ -13,7 +13,7 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management

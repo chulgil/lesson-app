@@ -8,7 +8,7 @@ import '../../../../models/lesson.dart';
 import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
 
 /// A card displaying a single lesson with time, student info, and status.

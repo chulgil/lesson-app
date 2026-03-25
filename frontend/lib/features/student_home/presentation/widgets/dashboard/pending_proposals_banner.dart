@@ -6,7 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../subscription/presentation/providers/subscription_proposal_providers.dart';
+import '../../../../subscription/subscription_facade.dart';
 
 /// Banner showing pending subscription proposals for a student.
 class PendingProposalsBanner extends ConsumerWidget {

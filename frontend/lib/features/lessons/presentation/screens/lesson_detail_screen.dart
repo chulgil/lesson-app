@@ -12,9 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../models/lesson.dart';
 import '../../../../models/tip_template.dart';
 import '../../../../providers/providers.dart';
-import '../../../subscription/domain/services/auto_proposal_service.dart';
-import '../../../subscription/domain/services/subscription_renewal_service.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_detail/lesson_detail_widgets.dart';
 import '../widgets/practice_items_section.dart';
 

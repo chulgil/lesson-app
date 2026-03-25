@@ -6,7 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../subscription/presentation/providers/subscription_proposal_providers.dart';
+import '../../../../subscription/subscription_facade.dart';
 
 /// View shown when a student tries to book a regular lesson without an active subscription.
 ///

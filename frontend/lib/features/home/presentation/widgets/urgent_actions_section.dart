@@ -5,8 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/domain/entities/subscription_proposal.dart';
+import '../../../subscription/subscription_facade.dart';
 
 /// Displays urgent action items requiring immediate teacher attention.
 class UrgentActionsSection extends StatelessWidget {

@@ -6,9 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../subscription/domain/entities/subscription.dart';
-import '../../../../subscription/presentation/providers/subscription_proposal_providers.dart';
-import '../../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../../subscription/subscription_facade.dart';
 
 /// Banner showing subscription renewal CTA when subscriptions are expiring or expired.
 /// If a renewal proposal exists, navigates directly to it.

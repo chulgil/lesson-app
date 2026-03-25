@@ -10,8 +10,7 @@ import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 
 /// Widget showing student's subscription summary on dashboard.
 class StudentSubscriptionSummary extends ConsumerWidget {

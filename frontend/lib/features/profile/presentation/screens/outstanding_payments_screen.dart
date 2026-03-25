@@ -7,8 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
-import '../../../subscription/domain/entities/subscription.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 
 /// Outstanding payments management screen
 class OutstandingPaymentsScreen extends ConsumerWidget {

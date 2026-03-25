@@ -9,8 +9,7 @@ import '../../../../models/lesson.dart';
 import '../../../../models/student.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../../../../providers/providers.dart';
-import '../../../subscription/domain/entities/subscription_usage.dart';
-import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 
 /// Screen for adding a new lesson
