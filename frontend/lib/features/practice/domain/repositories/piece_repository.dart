@@ -1,4 +1,4 @@
-import '../features/practice/domain/entities/piece.dart';
+import '../entities/piece.dart';
 
 /// Repository interface for piece/repertoire management
 abstract class PieceRepository {

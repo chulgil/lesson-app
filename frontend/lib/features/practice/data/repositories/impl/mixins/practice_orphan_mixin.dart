@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-import '../../practice_repertoire_repository.dart';
-import '../../../features/practice/domain/entities/practice_repertoire.dart';
+import '../../../../domain/repositories/practice_repertoire_repository.dart';
+import '../../../../domain/entities/practice_repertoire.dart';
 import '../practice_repository_base.dart';
 
 /// Mixin for orphan recording operations

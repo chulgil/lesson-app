@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../../repositories/settings_repository.dart';
+import '../../domain/repositories/settings_repository.dart';
 import 'settings_repository_provider.dart';
 
 /// Teacher settings provider (for current logged-in teacher)

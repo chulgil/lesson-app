@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../repositories/teacher_search_repository.dart';
+import '../../domain/repositories/teacher_search_repository.dart';
 import '../../data/repositories/remote_teacher_search_repository.dart';
 
 part 'teacher_search_provider.g.dart';

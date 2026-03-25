@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import '../features/practice/domain/entities/recording.dart';
+import '../entities/recording.dart';
 
 /// Repository for managing recording data with local storage.
 abstract class RecordingRepository {

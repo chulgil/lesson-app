@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../features/practice/domain/entities/practice_repertoire.dart';
+import '../../../domain/entities/practice_repertoire.dart';
 
 /// Base class for practice repository with shared state and Hive helpers
 abstract class PracticeRepositoryBase {

@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/remote_recording_repository.dart';
 import '../../domain/entities/recording.dart';
-import '../../../../repositories/recording_repository.dart';
+import '../../domain/repositories/recording_repository.dart';
 import '../../../../services/audio_recorder_service.dart';
 import '../../../../services/audio_player_service.dart';
 

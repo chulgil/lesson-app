@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
 import '../../domain/entities/child_profile.dart';
-import '../../../../repositories/child_profile_repository.dart';
+import '../../domain/repositories/child_profile_repository.dart';
 
 part 'child_profile_provider.g.dart';
 

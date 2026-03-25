@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/config/environment.dart';
-import '../../../../repositories/piece_repository.dart';
+import '../../domain/repositories/piece_repository.dart';
 
 /// Piece repository provider - switches between Mock and Remote.
 final pieceRepositoryProvider = Provider<PieceRepository>((ref) {

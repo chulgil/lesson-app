@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../repositories/teacher_search_repository.dart';
+import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../parent_home/presentation/providers/user_profile_provider.dart';
 import '../providers/teacher_search_provider.dart';
 

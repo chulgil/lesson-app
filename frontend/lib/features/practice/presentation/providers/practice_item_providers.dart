@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../../repositories/practice_item_repository.dart';
+import '../../domain/repositories/practice_item_repository.dart';
 
 import '../../../lessons/presentation/providers/tip_template_providers.dart' show currentTeacherIdProvider;
 

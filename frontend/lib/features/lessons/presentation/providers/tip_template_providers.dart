@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/tip_template.dart';
-import '../../../../repositories/tip_template_repository.dart';
+import '../../domain/repositories/tip_template_repository.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 
 /// Repository provider

@@ -1,4 +1,4 @@
-import '../features/lessons/domain/entities/payment.dart';
+import '../entities/payment.dart';
 
 /// Repository interface for payment management
 abstract class PaymentRepository {

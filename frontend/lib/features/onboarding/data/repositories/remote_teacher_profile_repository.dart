@@ -1,5 +1,5 @@
 import '../../../../core/network/api_client.dart';
-import '../../../../repositories/teacher_profile_repository.dart';
+import '../../../profile/domain/repositories/teacher_profile_repository.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 
 /// Remote implementation of [TeacherProfileRepository] using FastAPI backend.

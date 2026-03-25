@@ -4,7 +4,7 @@ import '../../domain/entities/parent.dart';
 import '../../domain/entities/parent_child_relation.dart';
 import '../../domain/entities/parent_visibility_settings.dart';
 import '../../domain/entities/parent_notification_settings.dart';
-import '../../../../repositories/parent_repository.dart';
+import '../../domain/repositories/parent_repository.dart';
 import 'parent_repository_provider.dart';
 
 // ============================================================================

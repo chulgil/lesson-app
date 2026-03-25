@@ -1,5 +1,5 @@
 import '../../../../core/network/api_client.dart';
-import '../../../../repositories/teacher_search_repository.dart';
+import '../../domain/repositories/teacher_search_repository.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../../profile/domain/entities/teacher_search.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/payment.dart';
 import '../../../students/domain/entities/student.dart';
-import '../../../../repositories/payment_repository.dart';
+import '../../domain/repositories/payment_repository.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import 'payment_repository_provider.dart';
 

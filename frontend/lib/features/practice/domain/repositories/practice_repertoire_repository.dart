@@ -1,7 +1,7 @@
-import '../features/practice/domain/entities/practice_repertoire.dart';
+import '../entities/practice_repertoire.dart';
 
-// Re-export implementation for backward compatibility
-export 'impl/mock_practice_repertoire_impl.dart';
+// Re-export implementation for consumers that need the mock
+export '../../data/repositories/impl/mock_practice_repertoire_impl.dart';
 
 /// Repository for managing practice repertoire data
 abstract class PracticeRepertoireRepository {

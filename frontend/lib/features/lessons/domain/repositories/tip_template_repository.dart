@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
 
-import '../features/lessons/domain/entities/tip_template.dart';
+import '../entities/tip_template.dart';
 
 /// Repository interface for tip templates
 abstract class TipTemplateRepository {

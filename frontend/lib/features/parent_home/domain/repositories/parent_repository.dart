@@ -1,9 +1,9 @@
 import 'package:uuid/uuid.dart';
 
-import '../features/parent_home/domain/entities/parent.dart';
-import '../features/parent_home/domain/entities/parent_child_relation.dart';
-import '../features/parent_home/domain/entities/parent_visibility_settings.dart';
-import '../features/parent_home/domain/entities/parent_notification_settings.dart';
+import '../entities/parent.dart';
+import '../entities/parent_child_relation.dart';
+import '../entities/parent_visibility_settings.dart';
+import '../entities/parent_notification_settings.dart';
 
 /// Repository for managing parent data and relationships
 abstract class ParentRepository {

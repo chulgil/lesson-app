@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../repositories/parent_repository.dart';
+import '../../domain/repositories/parent_repository.dart';
 import '../../domain/entities/parent.dart';
 import '../../domain/entities/parent_child_relation.dart';
 import '../../domain/entities/parent_notification_settings.dart';

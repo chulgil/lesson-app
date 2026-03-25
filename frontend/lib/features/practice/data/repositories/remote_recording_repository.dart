@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/recording.dart';
-import '../../../../repositories/recording_repository.dart';
+import '../../domain/repositories/recording_repository.dart';
 
 /// Remote implementation of [RecordingRepository] using FastAPI backend.
 ///

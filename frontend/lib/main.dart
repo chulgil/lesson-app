@@ -17,7 +17,7 @@ import 'features/student_home/domain/entities/manual_teacher.dart';
 import 'features/practice/domain/entities/recording.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
 import 'features/practice/presentation/providers/metronome_provider.dart';
-import 'repositories/recording_repository.dart';
+import 'features/practice/domain/repositories/recording_repository.dart';
 
 /// Startup recovery result for UI display.
 ({int recovered, int cleanedUp, int total})? _startupRecoveryResult;

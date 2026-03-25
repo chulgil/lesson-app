@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
 import '../../domain/entities/invite.dart';
-import '../../../../repositories/invite_repository.dart';
+import '../../domain/repositories/invite_repository.dart';
 import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 import '../../../invite/data/repositories/remote_invite_repository.dart';
 import '../../../notifications/domain/services/connection_notification_service.dart';

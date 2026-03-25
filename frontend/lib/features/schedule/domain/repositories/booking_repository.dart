@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../features/schedule/domain/entities/lesson_booking.dart';
-import '../features/schedule/domain/entities/time_slot.dart';
+import '../entities/lesson_booking.dart';
+import '../entities/time_slot.dart';
 
 /// Repository interface for lesson booking management
 abstract class BookingRepository {

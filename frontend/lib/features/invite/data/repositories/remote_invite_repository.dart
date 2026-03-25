@@ -1,6 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
-import '../../../../repositories/invite_repository.dart';
+import '../../../profile/domain/repositories/invite_repository.dart';
 
 /// Remote implementation of [InviteRepository] using FastAPI backend.
 class RemoteInviteRepository implements InviteRepository {

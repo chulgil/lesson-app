@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/schedule/domain/entities/lesson_booking.dart';
 import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../../repositories/booking_repository.dart';
+import '../../../schedule/domain/repositories/booking_repository.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'booking_repository_provider.dart';
 

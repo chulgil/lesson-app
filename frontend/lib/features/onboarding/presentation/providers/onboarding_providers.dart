@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../repositories/teacher_profile_repository.dart';
+import '../../../profile/domain/repositories/teacher_profile_repository.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import 'teacher_profile_repository_provider.dart';
 

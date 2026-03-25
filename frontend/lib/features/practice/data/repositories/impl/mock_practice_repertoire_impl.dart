@@ -1,4 +1,4 @@
-import '../practice_repertoire_repository.dart';
+import '../../../domain/repositories/practice_repertoire_repository.dart';
 import 'practice_repository_base.dart';
 import 'mixins/practice_repertoire_crud_mixin.dart';
 import 'mixins/practice_section_mixin.dart';
