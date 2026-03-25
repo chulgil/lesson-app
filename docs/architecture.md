@@ -1,14 +1,14 @@
 # 레슨 앱 아키텍처
 
-> 마지막 업데이트: 2026-03-12
+> 마지막 업데이트: 2026-03-25
 
 ## 개요
 
 레슨 앱은 **Clean Architecture** 원칙과 **Feature-based 구조**를 결합한 Flutter 앱입니다.
 
 - **20개 feature 도메인**, features/ 내 약 660개 파일
-- **10개 core 모듈**
-- 레거시 re-export: models/ 30개, providers/ 46개, repositories/ 21개
+- **11개 core 모듈** (booking Shared Kernel 포함)
+- 레거시 디렉토리 0개 (models/, providers/, repositories/, services/, shared/ 모두 제거 완료)
 
 > ⚠️ **프로젝트 구조 변경 (2026-02-02)**
 > Flutter 코드는 `frontend/` 폴더 아래에 위치합니다.
@@ -35,8 +35,13 @@ feature/
     └── providers/ # Riverpod Provider
 ```
 
-### 3. Re-export 패턴
-하위 호환성 유지를 위해 기존 위치에서 새 위치로 re-export 합니다.
+### 3. Shared Kernel (core/booking/)
+schedule ↔ lessons 간 공유 타입(LessonBooking, TimeSlot, BookingRepository)은
+`core/booking/`에 위치하여 순환 의존을 방지합니다.
+
+### 4. Facade 패턴
+- `features/booking/booking_facade.dart` — Booking API 단일 진입점
+- `features/subscription/subscription_facade.dart` — Subscription API 단일 진입점
 
 ---
 
@@ -44,8 +49,9 @@ feature/
 
 ```
 frontend/lib/
-├── core/                    # 공통 유틸리티 (10개 모듈)
-│   ├── audio/               # 오디오 엔진 (메트로놈, 녹음, 튜너)
+├── core/                    # 공통 유틸리티 (11개 모듈)
+│   ├── audio/               # 오디오 엔진 (메트로놈, 녹음, 튜너, 스토리지)
+│   ├── booking/             # Shared Kernel (LessonBooking, TimeSlot)
 │   ├── auth/                # 인증 공통 로직
 │   ├── config/              # 앱 설정/환경 구성
 │   ├── constants/           # 앱 전역 상수
