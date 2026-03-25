@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../models/teacher_profile.dart';
 import '../../../../models/teacher_search.dart';
 import '../../../../repositories/teacher_search_repository.dart';
@@ -12,12 +11,12 @@ part 'teacher_search_provider.g.dart';
 
 /// Provider for teacher search repository - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
-TeacherSearchRepository teacherSearchRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockTeacherSearchRepository();
-  }
-  return RemoteTeacherSearchRepository(ref.read(apiClientProvider));
-}
+TeacherSearchRepository teacherSearchRepository(Ref ref) =>
+    createRepository<TeacherSearchRepository>(
+      ref: ref,
+      mock: () => MockTeacherSearchRepository(),
+      remote: (api) => RemoteTeacherSearchRepository(api),
+    );
 
 /// Current search tab state (academy vs individual)
 @riverpod

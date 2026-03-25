@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_feedback_preset_repository.dart';
 import '../../data/repositories/remote_feedback_preset_repository.dart';
 import '../../domain/entities/feedback_preset.dart';
@@ -13,12 +12,12 @@ part 'feedback_preset_providers.g.dart';
 @Riverpod(keepAlive: true)
 FeedbackPresetRepository feedbackPresetRepository(
   FeedbackPresetRepositoryRef ref,
-) {
-  if (EnvironmentConfig.useMockData) {
-    return MockFeedbackPresetRepository();
-  }
-  return RemoteFeedbackPresetRepository(ref.read(apiClientProvider));
-}
+) =>
+    createRepository<FeedbackPresetRepository>(
+      ref: ref,
+      mock: () => MockFeedbackPresetRepository(),
+      remote: (api) => RemoteFeedbackPresetRepository(api),
+    );
 
 /// Provider for active feedback presets (visible, sorted).
 @riverpod

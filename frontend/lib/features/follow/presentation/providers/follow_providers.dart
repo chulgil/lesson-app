@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_follow_repository.dart';
 import '../../data/repositories/remote_follow_repository.dart';
 import '../../domain/entities/follow.dart';
@@ -12,12 +11,12 @@ part 'follow_providers.g.dart';
 
 /// Repository provider - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
-FollowRepository followRepository(FollowRepositoryRef ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockFollowRepository();
-  }
-  return RemoteFollowRepository(ref.read(apiClientProvider));
-}
+FollowRepository followRepository(FollowRepositoryRef ref) =>
+    createRepository<FollowRepository>(
+      ref: ref,
+      mock: () => MockFollowRepository(),
+      remote: (api) => RemoteFollowRepository(api),
+    );
 
 /// Get follow by ID
 @riverpod

@@ -1,8 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
@@ -12,12 +10,12 @@ import '../../domain/repositories/subscription_repository.dart';
 part 'subscription_providers.g.dart';
 
 /// Repository provider for Subscription - switches between Mock and Remote.
-final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockSubscriptionRepository();
-  }
-  return RemoteSubscriptionRepository(ref.read(apiClientProvider));
-});
+final subscriptionRepositoryProvider = Provider<SubscriptionRepository>((ref) =>
+    createRepository<SubscriptionRepository>(
+      ref: ref,
+      mock: () => MockSubscriptionRepository(),
+      remote: (api) => RemoteSubscriptionRepository(api),
+    ));
 
 /// Get all subscriptions for a student.
 @riverpod

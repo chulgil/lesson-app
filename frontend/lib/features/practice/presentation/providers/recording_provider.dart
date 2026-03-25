@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/remote_recording_repository.dart';
 import '../../domain/entities/recording.dart';
 import '../../../../repositories/recording_repository.dart';
@@ -100,12 +99,12 @@ class RecordingState {
 
 /// Provider for recording repository - switches between Hive (local) and Remote.
 @Riverpod(keepAlive: true)
-RecordingRepository recordingRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return HiveRecordingRepository();
-  }
-  return RemoteRecordingRepository(ref.read(apiClientProvider));
-}
+RecordingRepository recordingRepository(Ref ref) =>
+    createRepository<RecordingRepository>(
+      ref: ref,
+      mock: () => HiveRecordingRepository(),
+      remote: (api) => RemoteRecordingRepository(api),
+    );
 
 /// Provider for audio recorder service.
 @Riverpod(keepAlive: true)

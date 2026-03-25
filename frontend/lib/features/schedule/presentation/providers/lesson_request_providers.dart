@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_lesson_request_repository.dart';
 import '../../data/repositories/remote_lesson_request_repository.dart';
 import '../../domain/entities/lesson_request.dart';
@@ -13,12 +12,12 @@ part 'lesson_request_providers.g.dart';
 /// Repository provider - switches between Mock and Remote.
 final lessonRequestRepositoryProvider = Provider<LessonRequestRepository>((
   ref,
-) {
-  if (EnvironmentConfig.useMockData) {
-    return MockLessonRequestRepository();
-  }
-  return RemoteLessonRequestRepository(ref.read(apiClientProvider));
-});
+) =>
+    createRepository<LessonRequestRepository>(
+      ref: ref,
+      mock: () => MockLessonRequestRepository(),
+      remote: (api) => RemoteLessonRequestRepository(api),
+    ));
 
 /// Get all lesson requests for a teacher
 @riverpod

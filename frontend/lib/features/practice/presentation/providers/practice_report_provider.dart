@@ -1,9 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../core/utils/time_format_utils.dart';
-import '../../../../core/network/api_client.dart';
 import '../../data/repositories/mock_practice_stats_repository.dart';
 import '../../data/repositories/remote_practice_stats_repository.dart';
 import '../../domain/entities/entities.dart';
@@ -13,12 +12,12 @@ part 'practice_report_provider.g.dart';
 
 /// Practice stats repository provider - switches between Mock and Remote.
 @riverpod
-PracticeStatsRepository practiceReportRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockPracticeStatsRepository();
-  }
-  return RemotePracticeStatsRepository(ref.read(apiClientProvider));
-}
+PracticeStatsRepository practiceReportRepository(Ref ref) =>
+    createRepository<PracticeStatsRepository>(
+      ref: ref,
+      mock: () => MockPracticeStatsRepository(),
+      remote: (api) => RemotePracticeStatsRepository(api),
+    );
 
 /// Weekly report params
 typedef WeeklyReportParams = ({String studentId, DateTime weekStart});

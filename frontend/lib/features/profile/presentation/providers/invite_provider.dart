@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../domain/entities/invite.dart';
 import '../../../../repositories/invite_repository.dart';
 import '../../../../providers/auth/user_role_provider.dart';
@@ -14,13 +13,12 @@ part 'invite_provider.g.dart';
 
 /// Provider for invite repository - switches between Mock and Remote.
 @Riverpod(keepAlive: true)
-InviteRepository inviteRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockInviteRepository();
-  }
-  final apiClient = ref.read(apiClientProvider);
-  return RemoteInviteRepository(apiClient);
-}
+InviteRepository inviteRepository(Ref ref) =>
+    createRepository<InviteRepository>(
+      ref: ref,
+      mock: () => MockInviteRepository(),
+      remote: (api) => RemoteInviteRepository(api),
+    );
 
 /// Current user role - synced with app's role system
 @Riverpod(keepAlive: true)

@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_teacher_student_relation_repository.dart';
 import '../../data/repositories/remote_teacher_student_relation_repository.dart';
 import '../../domain/entities/notification_setting.dart';
@@ -15,12 +14,12 @@ part 'relationship_providers.g.dart';
 @Riverpod(keepAlive: true)
 TeacherStudentRelationRepository teacherStudentRelationRepository(
   TeacherStudentRelationRepositoryRef ref,
-) {
-  if (EnvironmentConfig.useMockData) {
-    return MockTeacherStudentRelationRepository();
-  }
-  return RemoteTeacherStudentRelationRepository(ref.read(apiClientProvider));
-}
+) =>
+    createRepository<TeacherStudentRelationRepository>(
+      ref: ref,
+      mock: () => MockTeacherStudentRelationRepository(),
+      remote: (api) => RemoteTeacherStudentRelationRepository(api),
+    );
 
 /// Get relationship by ID
 @riverpod

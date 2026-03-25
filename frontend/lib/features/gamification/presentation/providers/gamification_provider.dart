@@ -2,8 +2,7 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_gamification_repository.dart';
 import '../../data/repositories/remote_gamification_repository.dart';
 import '../../domain/entities/gamification.dart';
@@ -13,12 +12,12 @@ part 'gamification_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 GamificationRepository gamificationRepository(
-    GamificationRepositoryRef ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockGamificationRepository();
-  }
-  return RemoteGamificationRepository(ref.read(apiClientProvider));
-}
+    GamificationRepositoryRef ref) =>
+    createRepository<GamificationRepository>(
+      ref: ref,
+      mock: () => MockGamificationRepository(),
+      remote: (api) => RemoteGamificationRepository(api),
+    );
 
 @riverpod
 Future<StudentGamification> studentGamification(

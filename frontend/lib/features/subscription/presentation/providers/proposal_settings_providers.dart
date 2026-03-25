@@ -1,11 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_proposal_settings_repository.dart';
+import '../../data/repositories/remote_proposal_settings_repository.dart';
 import '../../domain/entities/proposal_settings.dart';
 import '../../domain/repositories/proposal_settings_repository.dart';
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
-import '../../data/repositories/remote_proposal_settings_repository.dart';
 
 part 'proposal_settings_providers.g.dart';
 
@@ -16,12 +15,12 @@ part 'proposal_settings_providers.g.dart';
 @Riverpod(keepAlive: true)
 ProposalSettingsRepository proposalSettingsRepository(
   ProposalSettingsRepositoryRef ref,
-) {
-  if (EnvironmentConfig.useMockData) {
-    return MockProposalSettingsRepository();
-  }
-  return RemoteProposalSettingsRepository(ref.read(apiClientProvider));
-}
+) =>
+    createRepository<ProposalSettingsRepository>(
+      ref: ref,
+      mock: () => MockProposalSettingsRepository(),
+      remote: (api) => RemoteProposalSettingsRepository(api),
+    );
 
 // ============================================================
 // Settings Provider

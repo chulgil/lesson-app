@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_membership_repository.dart';
 import '../../data/repositories/remote_membership_repository.dart';
 import '../../domain/entities/class_membership.dart';
@@ -11,13 +10,12 @@ part 'membership_providers.g.dart';
 
 /// Repository provider for ClassMembership.
 @riverpod
-MembershipRepository membershipRepository(MembershipRepositoryRef ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockMembershipRepository();
-  }
-  final apiClient = ref.read(apiClientProvider);
-  return RemoteMembershipRepository(apiClient);
-}
+MembershipRepository membershipRepository(MembershipRepositoryRef ref) =>
+    createRepository<MembershipRepository>(
+      ref: ref,
+      mock: () => MockMembershipRepository(),
+      remote: (api) => RemoteMembershipRepository(api),
+    );
 
 /// Get all memberships for a class.
 @riverpod

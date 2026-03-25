@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../models/teacher.dart';
 import '../../../../repositories/teacher_repository.dart';
 import '../../data/repositories/remote_teacher_repository.dart';
@@ -11,12 +10,12 @@ import '../../data/repositories/remote_teacher_repository.dart';
 // =============================================================================
 
 /// Teacher repository provider
-final teacherRepositoryProvider = Provider<TeacherRepository>((ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockTeacherRepository();
-  }
-  return RemoteTeacherRepository(ref.read(apiClientProvider));
-});
+final teacherRepositoryProvider = Provider<TeacherRepository>((ref) =>
+    createRepository<TeacherRepository>(
+      ref: ref,
+      mock: () => MockTeacherRepository(),
+      remote: (api) => RemoteTeacherRepository(api),
+    ));
 
 // =============================================================================
 // Query Providers

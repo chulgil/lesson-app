@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_location_repository.dart';
 import '../../data/repositories/remote_location_repository.dart';
 import '../../domain/entities/lesson_location.dart';
@@ -11,13 +10,12 @@ part 'location_providers.g.dart';
 
 /// Repository provider for LessonLocation.
 @riverpod
-LocationRepository locationRepository(LocationRepositoryRef ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockLocationRepository();
-  }
-  final apiClient = ref.read(apiClientProvider);
-  return RemoteLocationRepository(apiClient);
-}
+LocationRepository locationRepository(LocationRepositoryRef ref) =>
+    createRepository<LocationRepository>(
+      ref: ref,
+      mock: () => MockLocationRepository(),
+      remote: (api) => RemoteLocationRepository(api),
+    );
 
 /// Get all locations for a class.
 @riverpod

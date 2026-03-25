@@ -1,7 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_lesson_class_repository.dart';
 import '../../data/repositories/remote_lesson_class_repository.dart';
 import '../../domain/entities/lesson_class.dart';
@@ -11,13 +10,12 @@ part 'lesson_class_providers.g.dart';
 
 /// Repository provider for LessonClass.
 @riverpod
-LessonClassRepository lessonClassRepository(LessonClassRepositoryRef ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockLessonClassRepository();
-  }
-  final apiClient = ref.read(apiClientProvider);
-  return RemoteLessonClassRepository(apiClient);
-}
+LessonClassRepository lessonClassRepository(LessonClassRepositoryRef ref) =>
+    createRepository<LessonClassRepository>(
+      ref: ref,
+      mock: () => MockLessonClassRepository(),
+      remote: (api) => RemoteLessonClassRepository(api),
+    );
 
 /// Get all classes for the current teacher.
 @riverpod

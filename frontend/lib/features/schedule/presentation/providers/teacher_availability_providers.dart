@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../../../models/lesson_booking.dart';
 import '../../../../models/teacher.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
@@ -26,12 +25,12 @@ part 'teacher_availability_providers.g.dart';
 // ============================================================
 
 final teacherAvailabilityRepositoryProvider =
-    Provider<TeacherAvailabilityRepository>((ref) {
-      if (EnvironmentConfig.useMockData) {
-        return MockTeacherAvailabilityRepository();
-      }
-      return RemoteTeacherAvailabilityRepository(ref.read(apiClientProvider));
-    });
+    Provider<TeacherAvailabilityRepository>((ref) =>
+        createRepository<TeacherAvailabilityRepository>(
+          ref: ref,
+          mock: () => MockTeacherAvailabilityRepository(),
+          remote: (api) => RemoteTeacherAvailabilityRepository(api),
+        ));
 
 // ============================================================
 // Teacher Availability Settings

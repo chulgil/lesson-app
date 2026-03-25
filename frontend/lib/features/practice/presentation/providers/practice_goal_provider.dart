@@ -1,19 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_practice_goal_repository.dart';
 import '../../data/repositories/remote_practice_goal_repository.dart';
 import '../../domain/entities/entities.dart';
 import '../../domain/repositories/practice_goal_repository.dart';
 
 /// Practice goal repository provider - switches between Mock and Remote.
-final practiceGoalRepositoryProvider = Provider<PracticeGoalRepository>((ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockPracticeGoalRepository();
-  }
-  return RemotePracticeGoalRepository(ref.read(apiClientProvider));
-});
+final practiceGoalRepositoryProvider = Provider<PracticeGoalRepository>((ref) =>
+    createRepository<PracticeGoalRepository>(
+      ref: ref,
+      mock: () => MockPracticeGoalRepository(),
+      remote: (api) => RemotePracticeGoalRepository(api),
+    ));
 
 /// Student's current active goal
 final practiceGoalProvider = FutureProvider.family<PracticeGoal?, String>((

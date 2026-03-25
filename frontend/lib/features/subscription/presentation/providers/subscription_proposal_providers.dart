@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
-import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_subscription_proposal_repository.dart';
 import '../../data/repositories/remote_subscription_proposal_repository.dart';
 import '../../domain/entities/subscription_proposal.dart';
@@ -19,12 +18,12 @@ part 'subscription_proposal_providers.g.dart';
 
 /// Proposal repository provider - switches between Mock and Remote.
 final subscriptionProposalRepositoryProvider =
-    Provider<SubscriptionProposalRepository>((ref) {
-      if (EnvironmentConfig.useMockData) {
-        return MockSubscriptionProposalRepository();
-      }
-      return RemoteSubscriptionProposalRepository(ref.read(apiClientProvider));
-    });
+    Provider<SubscriptionProposalRepository>((ref) =>
+        createRepository<SubscriptionProposalRepository>(
+          ref: ref,
+          mock: () => MockSubscriptionProposalRepository(),
+          remote: (api) => RemoteSubscriptionProposalRepository(api),
+        ));
 
 // ============================================================
 // Teacher Proposals
