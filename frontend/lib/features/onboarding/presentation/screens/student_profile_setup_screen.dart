@@ -362,6 +362,7 @@ class _ProgressStep extends StatelessWidget {
     required this.step,
     required this.label,
     required this.isActive,
+    this.isCompleted = false,
   });
 
   @override
