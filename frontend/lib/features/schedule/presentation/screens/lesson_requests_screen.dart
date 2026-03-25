@@ -68,7 +68,7 @@ class LessonRequestsScreen extends ConsumerWidget {
                 const Text('레슨 요청'),
                 if (pendingCount > 0)
                   Text(
-                    '대기 중 ${pendingCount}건',
+                    '대기 중 $pendingCount건',
                     style: AppTypography.caption.copyWith(
                       color: AppColors.warning,
                       fontWeight: FontWeight.w600,

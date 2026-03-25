@@ -293,7 +293,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             _buildLabel('전문 분야'),
             const SizedBox(height: AppSpacing.space1),
             Text(
-              '최대 ${_maxSpecialties}개까지 선택할 수 있습니다',
+              '최대 $_maxSpecialties개까지 선택할 수 있습니다',
               style: AppTypography.caption.copyWith(
                 color: AppColors.textTertiaryLight,
               ),
@@ -322,7 +322,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
                 if (_selectedSpecialties.length >= _maxSpecialties) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('최대 ${_maxSpecialties}개까지 선택할 수 있습니다'),
+                      content: Text('최대 $_maxSpecialties개까지 선택할 수 있습니다'),
                       behavior: SnackBarBehavior.floating,
                       duration: const Duration(seconds: 2),
                     ),

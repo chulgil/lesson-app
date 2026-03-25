@@ -91,7 +91,6 @@ class TeachingResource {
       case TeachingResourceType.youtube:
         if (youtubeUrl == null) return null;
         if (youtubeStartSeconds != null && youtubeStartSeconds! > 0) {
-          final baseUrl = youtubeUrl!.split('?').first;
           final videoId = youtubeVideoId ?? _extractVideoId(youtubeUrl!);
           if (videoId != null) {
             return 'https://www.youtube.com/watch?v=$videoId&t=${youtubeStartSeconds}s';

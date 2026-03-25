@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../domain/entities/class_membership.dart';
 import '../../domain/entities/grouped_students.dart';
 import '../../domain/entities/lesson_class.dart';
 import '../../domain/entities/student_with_membership.dart';

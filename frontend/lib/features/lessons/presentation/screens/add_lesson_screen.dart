@@ -590,7 +590,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         );
         if (conflict != null) {
           final dayLabel = dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
-          conflictDays.add('${dayLabel}요일 ($conflict)');
+          conflictDays.add('$dayLabel요일 ($conflict)');
         }
       }
       if (conflictDays.isNotEmpty) {
@@ -647,7 +647,6 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     try {
       if (_isRecurring && _recurringDays.isNotEmpty) {
         // Batch-create lessons for each recurring day, 4 weeks ahead
-        final recurrenceGroupId = 'recur_${DateTime.now().millisecondsSinceEpoch}';
         const weeksAhead = 4;
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
@@ -679,7 +678,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '${_selectedStudent!.name} 학생의 정기 레슨 ${createdCount}개가 생성되었습니다 (4주간)',
+              '${_selectedStudent!.name} 학생의 정기 레슨 $createdCount개가 생성되었습니다 (4주간)',
             ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.practiceGood,

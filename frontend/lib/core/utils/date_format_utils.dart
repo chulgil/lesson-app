@@ -1,5 +1,6 @@
 /// Centralized date formatting utilities
 /// All date displays should use these functions for consistency
+library;
 
 /// Format date as YYYY.MM.DD (e.g., 2026.03.11)
 String formatDateYMD(DateTime date) {

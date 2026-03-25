@@ -425,7 +425,7 @@ class _ScheduleWeeklyGridViewState
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
     final timeStr =
-        hours > 0 ? (mins > 0 ? '$hours시간 ${mins}분' : '$hours시간') : '${mins}분';
+        hours > 0 ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간') : '$mins분';
 
     return Container(
       padding: const EdgeInsets.symmetric(

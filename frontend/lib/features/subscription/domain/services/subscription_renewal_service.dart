@@ -101,7 +101,7 @@ class SubscriptionRenewalService {
     } else if (remaining == 1) {
       buffer.write('수강권이 마지막 1회 남았습니다. ');
     } else {
-      buffer.write('수강권이 ${remaining}회 남았습니다. ');
+      buffer.write('수강권이 $remaining회 남았습니다. ');
     }
 
     buffer.write('이전과 동일한 수강권으로 레슨을 이어가세요.');

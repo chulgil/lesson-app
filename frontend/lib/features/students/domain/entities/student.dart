@@ -292,7 +292,7 @@ class Student {
       case 2:
         return '주2회';
       default:
-        return '주${lessonsPerWeek}회';
+        return '주$lessonsPerWeek회';
     }
   }
 

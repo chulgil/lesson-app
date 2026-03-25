@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../domain/entities/class_membership.dart';
 import 'membership_providers.dart';
 import 'lesson_class_providers.dart';
 
@@ -23,9 +22,9 @@ class TravelAnalytics {
     if (totalMinutes == 0) return '0분';
     final hours = totalMinutes ~/ 60;
     final minutes = totalMinutes % 60;
-    if (hours > 0 && minutes > 0) return '${hours}시간 ${minutes}분';
-    if (hours > 0) return '${hours}시간';
-    return '${minutes}분';
+    if (hours > 0 && minutes > 0) return '$hours시간 $minutes분';
+    if (hours > 0) return '$hours시간';
+    return '$minutes분';
   }
 
   /// Average travel time per visit.

@@ -409,7 +409,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
     final timeStr =
-        hours > 0 ? (mins > 0 ? '$hours시간 ${mins}분' : '$hours시간') : '${mins}분';
+        hours > 0 ? (mins > 0 ? '$hours시간 $mins분' : '$hours시간') : '$mins분';
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -464,7 +464,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final end = start + lesson.duration;
       if (start <= nowMinutes && end > nowMinutes) {
         final remaining = end - nowMinutes;
-        return '진행 중: ${lesson.studentName} · ${lesson.instrument} · ${remaining}분 남음';
+        return '진행 중: ${lesson.studentName} · ${lesson.instrument} · $remaining분 남음';
       }
     }
 
@@ -475,7 +475,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       if (start > nowMinutes) {
         final until = start - nowMinutes;
         if (until <= 60) {
-          return '다음: ${lesson.studentName} · ${lesson.instrument} · ${until}분 후';
+          return '다음: ${lesson.studentName} · ${lesson.instrument} · $until분 후';
         }
         return '다음: ${lesson.studentName} · ${lesson.instrument} · ${lesson.startTime}';
       }
@@ -577,7 +577,7 @@ class _TravelTimeBlock extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       alignment: Alignment.centerLeft,
       child: Text(
-        '이동 ${travelMinutes}분',
+        '이동 $travelMinutes분',
         style: AppTypography.caption.copyWith(
           color: AppColors.scheduleTravelAccent,
           fontSize: 10,

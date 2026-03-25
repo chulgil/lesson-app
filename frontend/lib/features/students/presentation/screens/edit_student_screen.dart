@@ -11,7 +11,6 @@ import '../../../../features/students/domain/entities/student.dart';
 import '../../../../features/students/presentation/providers/student_crud_provider.dart';
 import '../providers/membership_providers.dart';
 import '../providers/student_image_provider.dart';
-import '../widgets/student_form/student_form_dialogs.dart';
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for editing an existing student

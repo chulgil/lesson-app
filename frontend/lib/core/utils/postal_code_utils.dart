@@ -4,6 +4,7 @@
 /// - Same first 3 digits → same district (~15min)
 /// - Adjacent codes (within ±5) → neighboring district (~30min)
 /// - Distant codes → far away (~45min+)
+library;
 
 /// Estimate travel time between two postal codes.
 ///

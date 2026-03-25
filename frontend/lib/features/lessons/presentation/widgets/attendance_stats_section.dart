@@ -228,7 +228,7 @@ class AttendanceStatsSection extends ConsumerWidget {
           ),
         ),
         Text(
-          '${count}회',
+          '$count회',
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
           ),

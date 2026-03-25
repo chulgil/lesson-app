@@ -191,7 +191,7 @@ class TimelineLessonBlock extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        '${minutesUntilNext}분 후',
+        '$minutesUntilNext분 후',
         style: AppTypography.caption.copyWith(
           color: AppColors.primary,
           fontSize: 10,

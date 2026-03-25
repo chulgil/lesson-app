@@ -563,7 +563,7 @@ class _LessonTimeCard extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${lesson.studentName} 레슨이 ${confirmLabel}되었습니다'),
+            content: Text('${lesson.studentName} 레슨이 $confirmLabel되었습니다'),
             behavior: SnackBarBehavior.floating,
           ),
         );
