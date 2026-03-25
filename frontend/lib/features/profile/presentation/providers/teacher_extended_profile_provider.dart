@@ -1,8 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../providers/auth/user_role_provider.dart';
-import '../../../../providers/onboarding/teacher_profile_repository_provider.dart';
+import '../../../../features/auth/presentation/providers/user_role_provider.dart';
+import '../../../../features/onboarding/presentation/providers/teacher_profile_repository_provider.dart';
 
 part 'teacher_extended_profile_provider.g.dart';
 

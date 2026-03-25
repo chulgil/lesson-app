@@ -7,7 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../../providers/providers.dart';
+import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 import '../widgets/lesson_time_settings_widgets.dart';
 
 /// Screen for configuring lesson time settings

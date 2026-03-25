@@ -9,7 +9,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../providers/onboarding/onboarding_providers.dart';
+import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
 
 /// Phone verification screen for teacher onboarding
 class PhoneVerificationScreen extends ConsumerStatefulWidget {

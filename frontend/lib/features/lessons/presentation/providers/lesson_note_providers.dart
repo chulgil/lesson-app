@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../providers/providers.dart';
+import 'lesson_crud_provider.dart';
 
 /// Lessons with notes for a student (sorted newest first).
 final studentLessonNotesProvider =

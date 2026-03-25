@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
-import '../../../../providers/search/teacher_search_provider.dart';
+import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 
 /// Filter bottom sheet for teacher search

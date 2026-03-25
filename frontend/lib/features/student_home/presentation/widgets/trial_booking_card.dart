@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/schedule/domain/entities/lesson_booking.dart';
-import '../../../../providers/booking/booking_providers.dart';
+import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 
 /// Trial Booking Card - displays a single trial lesson booking with status and actions
 class TrialBookingCard extends ConsumerWidget {

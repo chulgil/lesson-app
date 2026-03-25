@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
-import '../../../../providers/profile/teacher_extended_profile_provider.dart';
+import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
 import '../providers/background_image_provider.dart';

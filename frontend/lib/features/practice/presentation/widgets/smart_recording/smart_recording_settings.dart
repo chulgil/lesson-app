@@ -4,7 +4,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/smart_recording.dart';
-import '../../../../../providers/smart_recording/smart_recording_provider.dart';
+import '../../../../../features/practice/presentation/providers/smart_recording_provider.dart';
 
 /// Settings widget for smart recording feature.
 class SmartRecordingSettingsCard extends ConsumerWidget {

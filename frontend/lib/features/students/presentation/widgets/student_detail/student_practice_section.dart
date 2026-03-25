@@ -7,7 +7,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../features/practice/domain/entities/practice_log.dart';
-import '../../../../../providers/providers.dart';
+import '../../../../practice/presentation/providers/practice_crud_provider.dart';
 
 /// Practice section for student detail screen
 class StudentPracticeSection extends ConsumerWidget {

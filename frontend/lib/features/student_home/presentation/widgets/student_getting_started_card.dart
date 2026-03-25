@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
-import '../../../../providers/invite/invite_provider.dart';
+import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
 /// Getting Started checklist card for new students.
 /// Shows actionable steps to help them get started with lessons.

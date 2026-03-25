@@ -7,8 +7,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../providers/providers.dart';
-import '../../../../providers/student/student_crud_provider.dart';
+import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
 
 /// Getting Started checklist card for new teachers with 0 students.
 /// Shows actionable steps to help them get started.

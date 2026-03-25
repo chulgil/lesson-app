@@ -6,7 +6,8 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/lessons/domain/entities/payment.dart';
-import '../../../../../providers/providers.dart';
+import '../../../../lessons/presentation/providers/payment_providers.dart';
+import '../../../../students/presentation/providers/student_crud_provider.dart';
 
 /// Bottom sheet for adding a new payment.
 class AddPaymentSheet extends ConsumerStatefulWidget {

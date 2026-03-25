@@ -10,7 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
-import '../../../../providers/invite/invite_provider.dart';
+import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
 /// Screen for creating and sharing invites
 class InviteScreen extends ConsumerStatefulWidget {

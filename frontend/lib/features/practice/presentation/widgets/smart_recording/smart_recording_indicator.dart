@@ -4,7 +4,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../domain/entities/smart_recording.dart';
-import '../../../../../providers/smart_recording/smart_recording_provider.dart';
+import '../../../../../features/practice/presentation/providers/smart_recording_provider.dart';
 
 /// Indicator widget showing smart recording status during recording.
 class SmartRecordingIndicator extends ConsumerWidget {

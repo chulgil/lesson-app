@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../providers/providers.dart';
+import '../providers/lesson_crud_provider.dart';
 
 /// Quick feedback student selection screen
 /// Shows today's lesson students first, then recent lesson students

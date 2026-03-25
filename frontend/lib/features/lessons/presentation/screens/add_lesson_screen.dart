@@ -7,8 +7,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../../providers/profile/teacher_extended_profile_provider.dart';
-import '../../../../providers/providers.dart';
+import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
+import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
 

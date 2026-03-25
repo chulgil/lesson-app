@@ -7,7 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../../providers/student/student_crud_provider.dart';
+import '../../../../features/students/presentation/providers/student_crud_provider.dart';
 import '../widgets/student_form_widgets.dart';
 
 /// Screen for adding a new student

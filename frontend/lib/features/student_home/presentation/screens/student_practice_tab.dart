@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
-import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
+import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/repertoire_sort_type.dart';
 import '../../../practice/presentation/providers/repertoire_sort_provider.dart';

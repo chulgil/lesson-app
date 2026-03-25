@@ -8,8 +8,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../features/schedule/domain/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../../providers/booking/booking_providers.dart';
-import '../../../../providers/settings/teacher_settings_provider.dart';
+import '../../../../features/lessons/presentation/providers/booking_providers.dart';
+import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
 import '../widgets/regular_lesson_widgets.dart';
 import '../widgets/schedule_type_selector.dart';
 

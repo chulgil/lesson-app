@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
-import '../../../../providers/providers.dart';
+import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 
 /// Screen for managing teacher's instruments
 class InstrumentManagementScreen extends ConsumerStatefulWidget {

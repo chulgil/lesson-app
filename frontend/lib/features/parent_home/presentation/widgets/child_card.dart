@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/parent_home/domain/entities/parent_child_relation.dart';
-import '../../../../providers/student/student_crud_provider.dart';
+import '../../../../features/students/presentation/providers/student_crud_provider.dart';
 
 /// Card widget displaying a child's information for parent dashboard
 class ChildCard extends ConsumerWidget {

@@ -12,7 +12,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/image_utils.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
-import '../../../../providers/onboarding/onboarding_providers.dart';
+import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
 
 /// Profile setup screen for teacher onboarding
 class ProfileSetupScreen extends ConsumerStatefulWidget {

@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/tip_template.dart';
-import '../../../../providers/providers.dart';
+import '../providers/tip_template_providers.dart';
 
 /// Bottom sheet for selecting tip templates
 class TipTemplateBottomSheet extends ConsumerStatefulWidget {

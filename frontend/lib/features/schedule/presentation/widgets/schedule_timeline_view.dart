@@ -9,8 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../providers/providers.dart'
-    hide teacherAvailabilityProvider;
+import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 import 'timeline_lesson_block.dart';

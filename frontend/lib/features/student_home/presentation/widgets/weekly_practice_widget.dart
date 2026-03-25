@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
-import '../../../../providers/providers.dart';
+import '../../../practice/presentation/providers/practice_item_providers.dart';
 import '../../../lessons/presentation/widgets/resource_attachment_section.dart';
 
 /// Widget to display student's weekly practice items (from teacher assignments)

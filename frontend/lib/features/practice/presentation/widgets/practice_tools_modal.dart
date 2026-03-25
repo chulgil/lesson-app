@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../providers/metronome/metronome_provider.dart';
+import '../../../../features/practice/presentation/providers/metronome_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
 import 'practice_tools/tuner_panel.dart';

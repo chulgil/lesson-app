@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
-import '../../../../providers/recording/recording_provider.dart';
+import '../../../../features/practice/presentation/providers/recording_provider.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/recording_waveform.dart';
 

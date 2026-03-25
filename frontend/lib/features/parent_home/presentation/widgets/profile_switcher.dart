@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
-import '../../../../providers/parent/user_profile_provider.dart';
+import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
 
 /// Profile switcher widget for switching between parent, student, and child profiles
 ///

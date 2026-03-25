@@ -6,7 +6,7 @@ import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/lessons/domain/entities/payment.dart';
-import '../../../../../providers/providers.dart';
+import '../../../../lessons/presentation/providers/payment_providers.dart';
 
 /// Bottom sheet showing payment details with actions.
 class PaymentDetailSheet extends ConsumerWidget {

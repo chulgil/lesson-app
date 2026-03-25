@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../providers/auth/user_role_provider.dart';
+import '../../features/auth/presentation/providers/user_role_provider.dart';
 import '../config/environment.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';

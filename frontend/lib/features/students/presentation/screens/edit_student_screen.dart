@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
 import '../../../../features/students/domain/entities/student.dart';
-import '../../../../providers/student/student_crud_provider.dart';
+import '../../../../features/students/presentation/providers/student_crud_provider.dart';
 import '../providers/membership_providers.dart';
 import '../providers/student_image_provider.dart';
 import '../widgets/student_form/student_form_dialogs.dart';

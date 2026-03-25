@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../providers/auth/user_role_provider.dart';
+import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 
 /// Tutorial screen for student onboarding
 class StudentTutorialScreen extends ConsumerStatefulWidget {

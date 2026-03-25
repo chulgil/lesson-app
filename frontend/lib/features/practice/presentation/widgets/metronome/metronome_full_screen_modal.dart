@@ -4,7 +4,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../features/practice/domain/entities/metronome_settings.dart';
-import '../../../../../providers/metronome/metronome_provider.dart';
+import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
 import 'cat_beat_indicator.dart';
 
 /// Full screen metronome modal with all controls.

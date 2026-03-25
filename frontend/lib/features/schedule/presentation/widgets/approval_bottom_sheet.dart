@@ -6,7 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/schedule/domain/entities/lesson_booking.dart';
 import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../../providers/booking/booking_providers.dart';
+import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import 'schedule_option_card.dart';
 import 'unavailable_bottom_sheet.dart';
 

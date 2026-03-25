@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/tip_template.dart';
-import '../../../../providers/providers.dart';
+import '../../../lessons/presentation/providers/tip_template_providers.dart';
 
 /// Screen for managing tip templates
 class TipTemplateManagementScreen extends ConsumerStatefulWidget {

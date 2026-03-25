@@ -9,7 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../providers/providers.dart';
+import '../providers/lesson_crud_provider.dart';
 import '../../domain/entities/feedback_preset.dart';
 import '../providers/feedback_preset_providers.dart';
 

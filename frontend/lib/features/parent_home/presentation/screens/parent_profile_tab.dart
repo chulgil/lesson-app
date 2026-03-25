@@ -9,7 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../student_home/presentation/widgets/language_select_sheet.dart';
 import '../providers/child_profile_provider.dart';
-import '../../../../providers/parent/parent_crud_provider.dart';
+import '../../../../features/parent_home/presentation/providers/parent_crud_provider.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_menu_section.dart';
 import '../widgets/profile_notification_section.dart';
