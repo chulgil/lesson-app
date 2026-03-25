@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../models/lesson.dart';
+import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_confirmation_dialog.dart';
 import 'lesson_crud_provider.dart';

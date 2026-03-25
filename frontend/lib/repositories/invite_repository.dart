@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import '../models/invite.dart';
+import '../features/profile/domain/entities/invite.dart';
 
 /// Repository interface for invite and connection management
 abstract class InviteRepository {

@@ -6,7 +6,7 @@ import '../../../../core/audio/audio_session_manager.dart';
 import '../../../../core/audio/metronome_engine_interface.dart';
 import '../../../../core/audio/native_metronome_engine.dart';
 import '../../../../core/audio/soloud_metronome_engine.dart';
-import '../../../../models/metronome_settings.dart';
+import '../../../../features/practice/domain/entities/metronome_settings.dart';
 import '../../../../services/metronome_storage_service.dart';
 
 part 'metronome_provider.g.dart';

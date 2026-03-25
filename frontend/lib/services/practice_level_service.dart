@@ -1,5 +1,5 @@
-import '../models/practice_repertoire.dart';
-import '../models/student.dart';
+import '../features/practice/domain/entities/practice_repertoire.dart';
+import '../features/students/domain/entities/student.dart';
 
 /// Service for calculating student practice levels
 ///

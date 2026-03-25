@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_settings.dart';
-import '../../../../models/time_slot.dart';
+import '../../../../features/profile/domain/entities/teacher_settings.dart';
+import '../../../../features/schedule/domain/entities/time_slot.dart';
 import '../../../../providers/providers.dart';
 import '../widgets/lesson_time_settings_widgets.dart';
 

@@ -17,7 +17,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
-import '../../../../models/recording.dart';
+import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/screens/section_picker_screen.dart';

@@ -1,5 +1,5 @@
 import '../../practice_repertoire_repository.dart';
-import '../../../models/practice_repertoire.dart';
+import '../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../practice_repository_base.dart';
 
 /// Mixin for daily completion and toggle operations

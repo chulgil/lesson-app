@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
-import '../../../../models/child_profile.dart';
+import '../../domain/entities/child_profile.dart';
 import '../../../../repositories/child_profile_repository.dart';
 
 part 'child_profile_provider.g.dart';

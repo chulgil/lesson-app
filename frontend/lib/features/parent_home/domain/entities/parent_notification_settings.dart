@@ -1,5 +1,5 @@
 // Parent notification settings domain entity
-// Moved from lib/models/parent_notification_settings.dart for Clean Architecture
+// Moved from lib/features/parent_home/domain/entities/parent_notification_settings.dart for Clean Architecture
 
 /// Notification category for grouping settings
 enum NotificationCategory {

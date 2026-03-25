@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/practice.dart';
+import '../../../../../features/practice/domain/entities/practice_log.dart';
 import '../../../../../providers/providers.dart';
 
 /// Practice section for student detail screen

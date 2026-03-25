@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../models/lesson_booking.dart';
+import '../../../../features/schedule/domain/entities/lesson_booking.dart';
 import '../../domain/entities/schedule_confirmation_card.dart';
 import '../providers/schedule_confirmation_card_providers.dart';
 import '../providers/teacher_availability_providers.dart';

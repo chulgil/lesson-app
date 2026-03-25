@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lessonaza/models/metronome_settings.dart';
-import 'package:lessonaza/providers/metronome/metronome_provider.dart';
+import 'package:lessonaza/features/practice/domain/entities/metronome_settings.dart';
+import 'package:lessonaza/features/practice/presentation/providers/metronome_provider.dart';
 
 import 'test_helper.dart';
 

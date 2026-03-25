@@ -4,7 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
 import '../../../../core/network/api_client.dart';
-import '../../../../models/notification_settings.dart';
+import '../../../../features/notifications/domain/entities/notification_settings.dart';
 import '../../../../services/notification/notification_service.dart';
 import '../../../../services/notification/practice_reminder_scheduler.dart';
 import '../../data/repositories/remote_notification_repository.dart';

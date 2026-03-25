@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/practice_item.dart';
+import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../../providers/providers.dart';
 
 /// Summary of weekly assignment progress across all students.

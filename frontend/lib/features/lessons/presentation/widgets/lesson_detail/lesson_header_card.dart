@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/lesson.dart';
+import '../../../../../features/lessons/domain/entities/lesson.dart';
 
 /// Lesson header with student/teacher info and status
 class LessonHeaderCard extends StatelessWidget {

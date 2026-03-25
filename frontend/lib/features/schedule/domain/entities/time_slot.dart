@@ -1,5 +1,5 @@
 // Time slot domain entity
-// Moved from lib/models/time_slot.dart for Clean Architecture
+// Moved from lib/features/schedule/domain/entities/time_slot.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

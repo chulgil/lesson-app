@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/practice_repertoire.dart';
+import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 
 /// Practice stats card showing practice count, time, and recordings
 class PracticeStatsCard extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/practice.dart';
+import '../../../../features/practice/domain/entities/practice_log.dart';
 import '../../../../repositories/practice_repository.dart';
 import 'practice_repository_provider.dart';
 

@@ -1,4 +1,4 @@
-import '../models/practice_repertoire.dart';
+import '../features/practice/domain/entities/practice_repertoire.dart';
 
 // Re-export implementation for backward compatibility
 export 'impl/mock_practice_repertoire_impl.dart';

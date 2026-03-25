@@ -1,5 +1,5 @@
 // Teacher domain entity
-// Moved from lib/models/teacher.dart for Clean Architecture
+// Moved from lib/features/profile/domain/entities/teacher.dart for Clean Architecture
 
 import 'package:json_annotation/json_annotation.dart';
 

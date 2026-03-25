@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/piece.dart';
+import '../../domain/entities/piece.dart';
 import '../../../../repositories/piece_repository.dart';
 import 'piece_repository_provider.dart';
 

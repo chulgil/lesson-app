@@ -1,5 +1,5 @@
 // Practice item domain entities
-// Moved from lib/models/practice_item.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/practice_item.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

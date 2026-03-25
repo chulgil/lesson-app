@@ -1,5 +1,5 @@
 // Parent domain entity
-// Moved from lib/models/parent.dart for Clean Architecture
+// Moved from lib/features/parent_home/domain/entities/parent.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

@@ -5,7 +5,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/widgets/bottom_sheet_handle.dart';
-import '../../../../../models/payment.dart';
+import '../../../../../features/lessons/domain/entities/payment.dart';
 import '../../../../../providers/providers.dart';
 
 /// Bottom sheet for adding a new payment.

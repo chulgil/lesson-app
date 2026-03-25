@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../models/practice_repertoire.dart';
-import '../../../../models/recording.dart';
-import '../../../../models/smart_recording.dart';
+import '../../../../features/practice/domain/entities/practice_repertoire.dart';
+import '../../../../features/practice/domain/entities/recording.dart';
+import '../../domain/entities/smart_recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/practice_repertoire/practice_repertoire_crud_provider.dart';
 import '../../../../providers/recording/recording_provider.dart';

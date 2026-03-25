@@ -14,7 +14,7 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/practice/domain/entities/practice_repertoire.dart';
 import 'features/student_home/domain/entities/manual_teacher.dart';
-import 'models/recording.dart';
+import 'features/practice/domain/entities/recording.dart';
 import 'features/practice/presentation/providers/tuner_provider.dart';
 import 'providers/metronome/metronome_provider.dart';
 import 'repositories/recording_repository.dart';

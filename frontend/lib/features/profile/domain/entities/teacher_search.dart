@@ -1,5 +1,5 @@
 // Teacher search domain entity
-// Moved from lib/models/teacher_search.dart for Clean Architecture
+// Moved from lib/features/profile/domain/entities/teacher_search.dart for Clean Architecture
 
 import 'teacher_profile.dart';
 

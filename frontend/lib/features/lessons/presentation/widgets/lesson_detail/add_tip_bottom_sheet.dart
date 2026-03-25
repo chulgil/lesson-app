@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/tip_template.dart';
+import '../../../domain/entities/tip_template.dart';
 import '../tip_template_bottom_sheet.dart';
 
 /// Bottom sheet for adding tips with template support

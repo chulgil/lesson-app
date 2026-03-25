@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../models/teacher_profile.dart';
-import '../../../../models/teacher_search.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../repositories/teacher_search_repository.dart';
 import '../../data/repositories/remote_teacher_search_repository.dart';
 

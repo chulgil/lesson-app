@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/student.dart';
+import '../../../../features/students/domain/entities/student.dart';
 import 'student_crud_provider.dart';
 
 /// Students grouped by practice status

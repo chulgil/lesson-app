@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/practice.dart';
+import '../../../../features/practice/domain/entities/practice_stats.dart';
 import 'practice_repository_provider.dart';
 import 'practice_calendar_provider.dart';
 

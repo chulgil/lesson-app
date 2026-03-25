@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../models/student.dart';
+import '../../../../features/students/domain/entities/student.dart';
 import '../../../../providers/student/student_crud_provider.dart';
 import '../widgets/student_form_widgets.dart';
 

@@ -7,4 +7,4 @@ export '../../../profile/domain/entities/teacher_search.dart';
 export '../../../profile/domain/entities/teacher.dart';
 
 // Re-export from legacy models for backwards compatibility
-export '../../../../models/teacher_profile.dart';
+export '../../../../features/profile/domain/entities/teacher_profile.dart';

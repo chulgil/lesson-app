@@ -1,5 +1,5 @@
 // Invite domain entity
-// Moved from lib/models/invite.dart for Clean Architecture
+// Moved from lib/features/profile/domain/entities/invite.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

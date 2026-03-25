@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/practice_repertoire.dart';
+import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 
 /// Reusable widget for displaying and editing practice count and time
 /// Tapping on count or time opens a dialog for editing

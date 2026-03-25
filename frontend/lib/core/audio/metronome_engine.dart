@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:audioplayers/audioplayers.dart';
-import '../../models/metronome_settings.dart';
+import '../../features/practice/domain/entities/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
 
 /// Timer-based metronome engine with audio playback.

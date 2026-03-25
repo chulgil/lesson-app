@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../models/smart_recording.dart';
+import '../../domain/entities/smart_recording.dart';
 import './recording_provider.dart';
 
 part 'smart_recording_provider.g.dart';

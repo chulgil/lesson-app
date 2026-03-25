@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/parent_notification_settings.dart';
+import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
 
 /// Detailed notification settings sheet for parents.
 class NotificationSettingsSheet extends StatefulWidget {

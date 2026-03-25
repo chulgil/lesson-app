@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/child_profile.dart';
+import '../../domain/entities/child_profile.dart';
 import '../providers/child_profile_provider.dart';
 import 'child_profile_form_screen.dart';
 

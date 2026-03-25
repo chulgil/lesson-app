@@ -1,5 +1,5 @@
 // Notification domain entity
-// Moved from lib/models/notification.dart for Clean Architecture
+// Moved from lib/features/notifications/domain/entities/notification.dart for Clean Architecture
 
 /// Notification type enumeration
 enum NotificationType {

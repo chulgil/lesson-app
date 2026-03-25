@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/parent_notification_settings.dart';
+import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
 import '../../../../providers/parent/parent_crud_provider.dart';
 import 'notification_settings_sheet.dart';
 

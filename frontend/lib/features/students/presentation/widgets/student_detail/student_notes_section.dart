@@ -6,7 +6,7 @@ import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/lesson.dart';
+import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../lessons/presentation/providers/lesson_note_providers.dart';
 
 /// Lesson notes preview section for student detail screen.

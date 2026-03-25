@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../models/metronome_settings.dart';
+import '../../../../../features/practice/domain/entities/metronome_settings.dart';
 
 /// Pastel purple color for paw (per spec).
 const _pawColor = AppColors.catAccent;

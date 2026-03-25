@@ -1,5 +1,5 @@
 import '../core/theme/app_colors.dart';
-import '../models/child_profile.dart';
+import '../features/parent_home/domain/entities/child_profile.dart';
 
 /// Repository interface for child profile operations
 abstract class ChildProfileRepository {

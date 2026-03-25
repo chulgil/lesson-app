@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_settings.dart';
+import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../providers/providers.dart';
 
 /// Screen for managing teacher's instruments

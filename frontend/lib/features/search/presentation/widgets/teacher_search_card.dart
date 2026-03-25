@@ -5,8 +5,8 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_profile.dart';
-import '../../../../models/teacher_search.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_search.dart';
 
 /// Card widget displaying a teacher's profile in search results
 class TeacherSearchCard extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/payment.dart';
+import '../../../../../features/lessons/domain/entities/payment.dart';
 
 /// Card displaying a single payment with status and actions.
 class PaymentCard extends StatelessWidget {

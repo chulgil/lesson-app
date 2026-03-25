@@ -4,7 +4,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/widgets/stat_card.dart';
-import '../../../../../models/payment.dart';
+import '../../../../../features/lessons/domain/entities/payment.dart';
 
 /// Payment summary section showing received/pending amounts.
 class PaymentSummarySection extends StatelessWidget {

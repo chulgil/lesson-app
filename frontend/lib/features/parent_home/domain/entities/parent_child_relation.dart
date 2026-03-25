@@ -1,5 +1,5 @@
 // Parent-Child relation domain entity
-// Moved from lib/models/parent_child_relation.dart for Clean Architecture
+// Moved from lib/features/parent_home/domain/entities/parent_child_relation.dart for Clean Architecture
 
 /// Parent-Child relation status enum
 /// Renamed to avoid conflict with RelationStatus in teacher_student_relation.dart

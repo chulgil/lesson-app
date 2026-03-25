@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
 
-import '../models/practice_item.dart';
+import '../features/practice/domain/entities/practice_item.dart';
 
 /// Repository interface for practice items (이번 주 연습)
 abstract class PracticeItemRepository {

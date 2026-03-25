@@ -6,7 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/child_profile.dart';
+import '../../domain/entities/child_profile.dart';
 import '../screens/child_profile_form_screen.dart';
 import 'add_child_option.dart';
 import 'profile_menu_section.dart';

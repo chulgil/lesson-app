@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
 
 /// Labels for visibility options
 const Map<ProfileVisibility, String> visibilityLabels = {

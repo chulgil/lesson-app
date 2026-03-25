@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../models/practice.dart';
+import '../../../../features/practice/domain/entities/practice_streak.dart';
 import '../../../../features/auth/presentation/providers/user_role_provider.dart';
 import 'practice_repository_provider.dart';
 

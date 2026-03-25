@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import '../../models/metronome_settings.dart';
+import '../../features/practice/domain/entities/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
 
 /// Native platform metronome engine using AVAudioEngine (iOS) and AudioTrack (Android).

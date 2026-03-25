@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/smart_recording.dart';
+import '../../../domain/entities/smart_recording.dart';
 import '../../../../../providers/smart_recording/smart_recording_provider.dart';
 
 /// Settings widget for smart recording feature.

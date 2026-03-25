@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../models/child_profile.dart';
-import '../../../../models/user_profile.dart';
+import '../../domain/entities/child_profile.dart';
+import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../providers/parent/user_profile_provider.dart';
 
 /// Profile switcher widget for switching between parent, student, and child profiles

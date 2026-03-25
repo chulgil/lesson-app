@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
-import '../../../../models/user_profile.dart';
+import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../providers/parent/user_profile_provider.dart';
 import 'parent_dashboard_tab.dart';
 import 'parent_lessons_tab.dart';

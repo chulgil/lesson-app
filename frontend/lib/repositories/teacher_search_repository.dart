@@ -1,5 +1,5 @@
-import '../models/teacher_profile.dart';
-import '../models/teacher_search.dart';
+import '../features/profile/domain/entities/teacher_profile.dart';
+import '../features/profile/domain/entities/teacher_search.dart';
 
 /// Academy info for student app display
 class AcademyInfo {

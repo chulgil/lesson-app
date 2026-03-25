@@ -1,5 +1,5 @@
 // Recording domain entity
-// Moved from lib/models/recording.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/recording.dart for Clean Architecture
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';

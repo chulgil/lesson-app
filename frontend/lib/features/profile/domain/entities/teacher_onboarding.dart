@@ -1,5 +1,5 @@
 // Teacher onboarding domain entity
-// Moved from lib/models/teacher_onboarding.dart for Clean Architecture
+// Moved from lib/features/profile/domain/entities/teacher_onboarding.dart for Clean Architecture
 
 /// Phone verification model
 class PhoneVerification {

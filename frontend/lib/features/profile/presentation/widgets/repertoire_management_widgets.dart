@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/piece.dart';
+import '../../../../features/practice/domain/entities/piece.dart';
 
 /// Get color for difficulty level
 Color getDifficultyColor(String? difficulty) {

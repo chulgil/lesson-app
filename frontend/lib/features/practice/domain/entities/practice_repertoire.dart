@@ -1,5 +1,5 @@
 // Practice repertoire domain entities
-// Moved from lib/models/practice_repertoire.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/practice_repertoire.dart for Clean Architecture
 
 import 'package:hive/hive.dart';
 

@@ -1,5 +1,5 @@
 // Piece domain entities
-// Moved from lib/models/piece.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/piece.dart for Clean Architecture
 
 /// Progress status for a piece
 enum PieceProgress {

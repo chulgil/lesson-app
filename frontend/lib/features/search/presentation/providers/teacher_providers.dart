@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../models/teacher.dart';
+import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../../repositories/teacher_repository.dart';
 import '../../data/repositories/remote_teacher_repository.dart';
 

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/payment.dart';
+import '../../../../features/lessons/domain/entities/payment.dart';
 import '../../../../providers/providers.dart';
 import '../widgets/payment_management/payment_management_widgets.dart';
 

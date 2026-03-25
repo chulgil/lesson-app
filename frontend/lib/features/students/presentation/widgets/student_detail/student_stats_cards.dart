@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/student.dart';
+import '../../../../../features/students/domain/entities/student.dart';
 
 /// Stats cards row for student detail screen
 class StudentStatsCards extends StatelessWidget {

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_search.dart';
+import '../../../../features/profile/domain/entities/teacher_search.dart';
 import '../../../../providers/search/teacher_search_provider.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 

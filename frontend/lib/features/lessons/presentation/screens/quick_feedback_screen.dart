@@ -8,7 +8,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/lesson.dart';
+import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../providers/providers.dart';
 import '../../domain/entities/feedback_preset.dart';
 import '../providers/feedback_preset_providers.dart';

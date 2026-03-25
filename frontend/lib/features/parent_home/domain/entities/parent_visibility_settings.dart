@@ -1,5 +1,5 @@
 // Parent visibility settings domain entity
-// Moved from lib/models/parent_visibility_settings.dart for Clean Architecture
+// Moved from lib/features/parent_home/domain/entities/parent_visibility_settings.dart for Clean Architecture
 
 /// Visibility settings for parent access to student information
 /// Teacher sets these per student

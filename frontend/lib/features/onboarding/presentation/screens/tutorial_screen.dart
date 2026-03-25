@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_onboarding.dart';
+import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../providers/onboarding/onboarding_providers.dart';
 
 /// Tutorial screen for teacher onboarding

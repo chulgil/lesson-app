@@ -1,5 +1,5 @@
 // Payment domain entity
-// Moved from lib/models/payment.dart for Clean Architecture
+// Moved from lib/features/lessons/domain/entities/payment.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

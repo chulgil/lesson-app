@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 
 /// Shows dialog to edit experience years.

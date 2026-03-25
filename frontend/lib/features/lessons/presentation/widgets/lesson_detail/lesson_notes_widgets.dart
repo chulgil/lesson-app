@@ -6,7 +6,7 @@ import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/lesson.dart';
+import '../../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../domain/constants/feedback_constants.dart';
 
 /// Section header widget for lesson detail screen

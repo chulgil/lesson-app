@@ -10,8 +10,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/image_utils.dart';
-import '../../../../models/teacher_onboarding.dart';
-import '../../../../models/teacher_settings.dart';
+import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
+import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../providers/onboarding/onboarding_providers.dart';
 
 /// Profile setup screen for teacher onboarding

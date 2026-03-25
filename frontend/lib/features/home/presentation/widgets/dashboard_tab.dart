@@ -7,7 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/stat_card.dart';
-import '../../../../models/lesson.dart';
+import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../providers/providers.dart';
 import '../../../schedule/presentation/providers/lesson_request_providers.dart';
 import '../../../subscription/subscription_facade.dart';

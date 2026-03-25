@@ -18,13 +18,13 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../models/lesson_booking.dart';
-import '../../models/time_slot.dart';
+import '../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../features/schedule/domain/entities/time_slot.dart';
 import '../lessons/presentation/providers/booking_providers.dart';
 
 // Re-export entities so consumers only need this one import
-export '../../models/lesson_booking.dart'; // LessonBooking, enums, request types
-export '../../models/time_slot.dart'; // TimeSlot
+export '../../features/schedule/domain/entities/lesson_booking.dart'; // LessonBooking, enums, request types
+export '../../features/schedule/domain/entities/time_slot.dart'; // TimeSlot
 
 // =============================================================================
 // QUERY PROVIDERS — use-case named wrappers over raw providers

@@ -6,7 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 
 /// Preview screen showing the teacher's public profile as students would see it

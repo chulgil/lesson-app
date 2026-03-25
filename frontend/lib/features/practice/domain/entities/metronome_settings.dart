@@ -1,5 +1,5 @@
 // Metronome settings domain entities
-// Moved from lib/models/metronome_settings.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/metronome_settings.dart for Clean Architecture
 
 /// Beat intensity type for different sounds per beat position.
 enum BeatType {

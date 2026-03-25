@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/student.dart';
+import '../../../../features/students/domain/entities/student.dart';
 import '../../../../repositories/student_repository.dart';
 import 'student_repository_provider.dart';
 

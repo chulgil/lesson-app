@@ -1,4 +1,4 @@
-import '../../models/metronome_settings.dart';
+import '../../features/practice/domain/entities/metronome_settings.dart';
 
 /// Callback for beat events.
 typedef BeatCallback = void Function(int beatNumber, bool isAccent);

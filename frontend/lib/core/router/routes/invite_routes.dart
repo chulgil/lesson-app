@@ -9,7 +9,7 @@ import '../../../features/invite/presentation/screens/invite_confirm_screen.dart
 import '../../../features/invite/presentation/screens/invite_history_screen.dart';
 import '../../../features/invite/presentation/screens/pending_requests_screen.dart';
 import '../../../features/invite/presentation/screens/my_connections_screen.dart';
-import '../../../models/invite.dart';
+import '../../../features/profile/domain/entities/invite.dart';
 import '../app_routes.dart';
 
 /// Invite and connection routes

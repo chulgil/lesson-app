@@ -1,5 +1,5 @@
 // Notification settings domain entity
-// Moved from lib/models/notification_settings.dart for Clean Architecture
+// Moved from lib/features/notifications/domain/entities/notification_settings.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

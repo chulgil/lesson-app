@@ -1,5 +1,5 @@
 // Lesson booking domain entities
-// Moved from lib/models/lesson_booking.dart for Clean Architecture
+// Moved from lib/features/schedule/domain/entities/lesson_booking.dart for Clean Architecture
 
 import 'package:flutter/material.dart';
 

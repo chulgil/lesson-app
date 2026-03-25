@@ -1,5 +1,5 @@
 // Smart Recording domain entities
-// Moved from lib/models/smart_recording.dart for Clean Architecture
+// Moved from lib/features/practice/domain/entities/smart_recording.dart for Clean Architecture
 
 /// Recording phase during smart recording.
 enum RecordingPhase {

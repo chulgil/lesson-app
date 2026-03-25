@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../models/teacher_profile.dart';
+import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../providers/profile/teacher_extended_profile_provider.dart';
 import '../widgets/profile_visibility_widgets.dart';
 

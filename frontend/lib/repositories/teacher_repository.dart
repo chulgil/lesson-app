@@ -1,4 +1,4 @@
-import '../models/teacher.dart';
+import '../features/profile/domain/entities/teacher.dart';
 
 /// Repository interface for teacher data
 abstract class TeacherRepository {

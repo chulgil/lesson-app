@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/recording.dart';
+import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../../providers/metronome/metronome_provider.dart';
 import '../../../../providers/recording/recording_provider.dart';
 import '../../../../services/audio_player_service.dart';

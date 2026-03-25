@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'package:flutter_soloud/flutter_soloud.dart';
-import '../../models/metronome_settings.dart';
+import '../../features/practice/domain/entities/metronome_settings.dart';
 import 'metronome_engine_interface.dart';
 
 /// Timing isolate entry point - runs high-precision timer independent of main thread.

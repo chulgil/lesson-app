@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../models/child_profile.dart';
-import '../../../../models/user_profile.dart';
+import '../../domain/entities/child_profile.dart';
+import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import './child_profile_provider.dart';
 
 part 'user_profile_provider.g.dart';

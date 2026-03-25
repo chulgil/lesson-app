@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../models/practice_repertoire.dart';
+import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import 'practice_repertoire_repository_provider.dart';
 
 /// Provider for student's repertoires list

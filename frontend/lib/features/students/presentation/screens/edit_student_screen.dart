@@ -7,7 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/profile_photo_header.dart';
-import '../../../../models/student.dart';
+import '../../../../features/students/domain/entities/student.dart';
 import '../../../../providers/student/student_crud_provider.dart';
 import '../providers/membership_providers.dart';
 import '../providers/student_image_provider.dart';

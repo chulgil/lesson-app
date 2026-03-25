@@ -1,5 +1,5 @@
 // Tip template domain entities
-// Moved from lib/models/tip_template.dart for Clean Architecture
+// Moved from lib/features/lessons/domain/entities/tip_template.dart for Clean Architecture
 import 'package:json_annotation/json_annotation.dart';
 part 'tip_template.g.dart';
 

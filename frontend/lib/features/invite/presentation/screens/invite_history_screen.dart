@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/invite.dart';
+import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../providers/invite/invite_provider.dart';
 
 /// Screen for viewing invite history

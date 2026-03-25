@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../models/practice_item.dart';
+import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../../providers/providers.dart';
 import 'resource_attachment_section.dart';
 
