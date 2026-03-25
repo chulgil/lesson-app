@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
 
+    # OpenAI (for AI lesson notes)
+    OPENAI_API_KEY: str = ""
+
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
 
