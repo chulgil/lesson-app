@@ -8,7 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';

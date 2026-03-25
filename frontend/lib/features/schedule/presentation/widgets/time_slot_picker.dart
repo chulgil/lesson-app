@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/schedule/domain/entities/time_slot.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 
 /// Widget for picking available time slots
 class TimeSlotPicker extends StatelessWidget {

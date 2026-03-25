@@ -1,6 +1,6 @@
 import '../../../../core/network/api_client.dart';
 import '../../../profile/domain/entities/teacher_settings.dart';
-import '../../../schedule/domain/entities/time_slot.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 import '../../domain/repositories/settings_repository.dart';
 
 /// Remote implementation of [SettingsRepository] using FastAPI backend.

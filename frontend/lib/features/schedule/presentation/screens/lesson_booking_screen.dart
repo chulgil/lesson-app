@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/week_calendar_widget.dart';
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../domain/entities/availability_slot.dart';

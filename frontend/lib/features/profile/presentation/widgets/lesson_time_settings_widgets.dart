@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
-import '../../../../features/schedule/domain/entities/time_slot.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 
 /// Section title widget for lesson time settings
 class LessonTimeSettingsSectionTitle extends StatelessWidget {

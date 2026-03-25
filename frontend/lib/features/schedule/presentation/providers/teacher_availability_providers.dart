@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/profile/domain/entities/teacher.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../lessons/presentation/providers/lesson_repository_provider.dart';

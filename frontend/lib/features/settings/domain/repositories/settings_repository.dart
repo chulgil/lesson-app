@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../profile/domain/entities/teacher_settings.dart';
-import '../../../schedule/domain/entities/time_slot.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 
 /// Repository interface for teacher settings
 abstract class SettingsRepository {

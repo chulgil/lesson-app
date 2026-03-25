@@ -7,7 +7,7 @@ import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../../features/lessons/presentation/providers/booking_providers.dart';
 
 /// Card showing the next upcoming lesson for a student.

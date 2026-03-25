@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import '../widgets/approval_bottom_sheet.dart';
 import '../widgets/teacher_approval_card.dart';

@@ -3,7 +3,7 @@
 
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../../schedule/domain/entities/time_slot.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 
 part 'teacher_settings.g.dart';
 

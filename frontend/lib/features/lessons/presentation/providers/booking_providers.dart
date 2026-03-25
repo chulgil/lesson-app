@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
-import '../../../../features/schedule/domain/entities/time_slot.dart';
-import '../../../schedule/domain/repositories/booking_repository.dart';
+import '../../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/booking/repositories/booking_repository.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'booking_repository_provider.dart';
 

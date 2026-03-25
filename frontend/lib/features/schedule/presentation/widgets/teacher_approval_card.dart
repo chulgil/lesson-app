@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../features/schedule/domain/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
 import 'schedule_option_card.dart';
 
 /// A card for teacher to approve booking with multiple schedule options

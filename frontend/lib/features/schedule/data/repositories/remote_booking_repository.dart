@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/paginated_response.dart';
-import '../../domain/repositories/booking_repository.dart';
-import '../../domain/entities/lesson_booking.dart';
-import '../../domain/entities/time_slot.dart';
+import '../../../../core/booking/repositories/booking_repository.dart';
+import '../../../../core/booking/entities/lesson_booking.dart';
+import '../../../../core/booking/entities/time_slot.dart';
 
 /// Remote implementation of [BookingRepository] using FastAPI backend.
 class RemoteBookingRepository implements BookingRepository {
