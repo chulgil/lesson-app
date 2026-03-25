@@ -8,8 +8,8 @@ import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/remote_recording_repository.dart';
 import '../../domain/entities/recording.dart';
 import '../../domain/repositories/recording_repository.dart';
-import '../../../../services/audio_recorder_service.dart';
-import '../../../../services/audio_player_service.dart';
+import '../../../../core/audio/audio_recorder_service.dart';
+import '../../../../core/audio/audio_player_service.dart';
 
 part 'recording_provider.g.dart';
 

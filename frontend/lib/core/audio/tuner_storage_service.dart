@@ -1,6 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../features/practice/domain/entities/tuner_settings.dart';
-import '../features/practice/domain/entities/tuner_types.dart';
+import '../../features/practice/domain/entities/tuner_settings.dart';
+import '../../features/practice/domain/entities/tuner_types.dart';
 
 /// Service for persisting tuner settings using Hive.
 class TunerStorageService {

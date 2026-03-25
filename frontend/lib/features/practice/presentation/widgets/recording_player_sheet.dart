@@ -9,8 +9,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
 import '../../../../features/practice/presentation/providers/metronome_provider.dart';
 import '../../../../features/practice/presentation/providers/recording_provider.dart';
-import '../../../../services/audio_player_service.dart';
-import '../../../../services/audio_trimmer_service.dart';
+import '../../../../core/audio/audio_player_service.dart';
+import '../../../../core/audio/audio_trimmer_service.dart';
 import 'recording_waveform.dart' show ABLoop, ZoomableWaveformProgressBar;
 
 /// Playback speed options.

@@ -2,7 +2,7 @@
 // Handles notifications for teacher-student connection events
 
 import '../../domain/entities/notification.dart';
-import '../../../../services/notification/notification_service.dart';
+import '../../../../features/notifications/domain/services/notification_service.dart';
 import '../../../../core/router/app_routes.dart';
 
 /// Service for sending connection-related notifications

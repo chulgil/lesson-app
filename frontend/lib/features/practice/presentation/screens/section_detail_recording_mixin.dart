@@ -12,7 +12,7 @@ import '../../../../features/practice/presentation/providers/metronome_provider.
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../../../features/practice/presentation/providers/recording_provider.dart';
 import '../../../../features/practice/presentation/providers/smart_recording_provider.dart';
-import '../../../../services/audio_trimmer_service.dart';
+import '../../../../core/audio/audio_trimmer_service.dart';
 import '../widgets/recording_player_sheet.dart';
 import '../widgets/smart_recording/smart_recording_indicator.dart';
 

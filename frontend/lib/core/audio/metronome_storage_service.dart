@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../features/practice/domain/entities/metronome_settings.dart';
+import '../../features/practice/domain/entities/metronome_settings.dart';
 
 /// Service for persisting metronome settings using Hive.
 class MetronomeStorageService {

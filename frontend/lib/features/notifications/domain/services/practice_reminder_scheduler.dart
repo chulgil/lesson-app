@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../features/notifications/domain/entities/notification.dart';
-import '../../features/notifications/domain/entities/notification_settings.dart';
+import '../entities/notification.dart';
+import '../entities/notification_settings.dart';
 import 'notification_service.dart';
 
 /// Scheduler for practice-related notifications
