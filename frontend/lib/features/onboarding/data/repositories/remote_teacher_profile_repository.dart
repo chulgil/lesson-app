@@ -140,13 +140,32 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
         .toList();
   }
 
+  ProfileVisibility _parseVisibility(dynamic value) {
+    if (value is String) {
+      return ProfileVisibility.values.firstWhere(
+        (v) => v.name == value,
+        orElse: () => ProfileVisibility.public,
+      );
+    }
+    return ProfileVisibility.public;
+  }
+
   /// Map backend TeacherResponse to frontend TeacherProfile.
   TeacherProfile _profileFromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>?;
     final name = user?['name'] as String? ?? '선생님';
     final profileImage = user?['profile_image_url'] as String?;
     final userId = json['user_id'] as String? ?? '';
+
     final instruments = (json['instruments'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        [];
+    final specialties = (json['specialties'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        [];
+    final lessonAreas = (json['lesson_areas'] as List<dynamic>?)
             ?.map((e) => e as String)
             .toList() ??
         [];
@@ -165,26 +184,117 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
             })
             .toList() ??
         [];
+
     final feeMin = json['fee_min'] as int?;
     final feeMax = json['fee_max'] as int?;
+    final feeDuration = json['fee_duration'] as int? ?? 60;
     final createdAtStr = json['created_at'] as String?;
     final updatedAtStr = json['updated_at'] as String?;
+
+    // Parse education list
+    final educationList = (json['education'] as List<dynamic>?)
+            ?.map((e) {
+              final m = e as Map<String, dynamic>;
+              return Education(
+                school: m['school'] as String? ?? '',
+                major: m['major'] as String? ?? '',
+                degree: m['degree'] as String? ?? '',
+                graduationYear: m['graduation_year'] as int?,
+              );
+            })
+            .toList() ??
+        [];
+
+    // Parse career list
+    final careerList = (json['career'] as List<dynamic>?)
+            ?.map((e) {
+              final m = e as Map<String, dynamic>;
+              return Career(
+                organization: m['organization'] as String? ?? '',
+                position: m['position'] as String? ?? '',
+                startYear: m['start_year'] as int? ?? 2020,
+                endYear: m['end_year'] as int?,
+                description: m['description'] as String?,
+              );
+            })
+            .toList() ??
+        [];
+
+    // Parse certificates
+    final certList = (json['certificates'] as List<dynamic>?)
+            ?.map((e) {
+              final m = e as Map<String, dynamic>;
+              final issueDateStr = m['issue_date'] as String?;
+              final submittedAtStr = m['submitted_at'] as String?;
+              return Certificate(
+                id: m['id'] as String? ?? '',
+                type: CertificateType.values.firstWhere(
+                  (t) => t.name == (m['type'] as String?),
+                  orElse: () => CertificateType.other,
+                ),
+                name: m['name'] as String? ?? '',
+                issuingBody: m['issuing_body'] as String? ?? '',
+                issueDate: issueDateStr != null
+                    ? DateTime.tryParse(issueDateStr) ?? DateTime.now()
+                    : DateTime.now(),
+                imageUrl: m['image_url'] as String? ?? '',
+                submittedAt: submittedAtStr != null
+                    ? DateTime.tryParse(submittedAtStr) ?? DateTime.now()
+                    : DateTime.now(),
+                status: CertificateStatus.values.firstWhere(
+                  (s) => s.name == (m['status'] as String?),
+                  orElse: () => CertificateStatus.pending,
+                ),
+              );
+            })
+            .toList() ??
+        [];
+
+    // Parse visibility settings
+    final visJson = json['visibility_settings'] as Map<String, dynamic>?;
+    final visibility = visJson != null
+        ? ProfileVisibilitySettings(
+            isSearchable: visJson['is_searchable'] as bool? ?? true,
+            contactVisibility: _parseVisibility(visJson['contact_visibility']),
+            feeVisibility: _parseVisibility(visJson['fee_visibility']),
+            careerVisibility: _parseVisibility(visJson['career_visibility']),
+            certificateVisibility: _parseVisibility(visJson['certificate_visibility']),
+          )
+        : const ProfileVisibilitySettings();
+
+    // Parse bank account
+    final bankName = json['bank_name'] as String?;
+    final accountNumber = json['account_number'] as String?;
+    final accountHolder = json['account_holder'] as String?;
+    final bankAccount = (bankName != null || accountNumber != null)
+        ? BankAccount(
+            bankName: bankName ?? '',
+            accountNumber: accountNumber ?? '',
+            accountHolder: accountHolder ?? '',
+          )
+        : null;
 
     return TeacherProfile(
       id: json['id'] as String,
       userId: userId,
       name: name,
       profileImage: profileImage,
+      backgroundImage: json['background_image'] as String?,
       instruments: instruments,
+      specialties: specialties,
       introduction: json['introduction'] as String? ?? '',
       experienceYears: json['experience_years'] as int?,
+      lessonAreas: lessonAreas,
       lessonTypes: lessonTypes,
       feeRange: (feeMin != null || feeMax != null)
-          ? FeeRange(minFee: feeMin ?? 0, maxFee: feeMax ?? 0)
+          ? FeeRange(minFee: feeMin ?? 0, maxFee: feeMax ?? 0, duration: feeDuration)
           : null,
       teachingStyle: json['teaching_style'] as String?,
-      verification: const TeacherVerification(),
-      visibilitySettings: const ProfileVisibilitySettings(),
+      education: educationList,
+      career: careerList,
+      verification: TeacherVerification(certificates: certList),
+      visibilitySettings: visibility,
+      bankAccount: bankAccount,
       createdAt: createdAtStr != null
           ? DateTime.tryParse(createdAtStr) ?? DateTime.now()
           : DateTime.now(),
@@ -200,6 +310,8 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
       'instruments': profile.instruments,
       'introduction': profile.introduction,
       'experience_years': profile.experienceYears,
+      'specialties': profile.specialties,
+      'lesson_areas': profile.lessonAreas,
       'lesson_types': profile.lessonTypes
           ?.map((t) {
             switch (t) {
@@ -214,7 +326,26 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
           .toList(),
       if (profile.feeRange != null) 'fee_min': profile.feeRange!.minFee,
       if (profile.feeRange != null) 'fee_max': profile.feeRange!.maxFee,
+      if (profile.feeRange != null) 'fee_duration': profile.feeRange!.duration,
       'teaching_style': profile.teachingStyle,
+      if (profile.backgroundImage != null)
+        'background_image': profile.backgroundImage,
+      if (profile.bankAccount != null) ...{
+        'bank_name': profile.bankAccount!.bankName,
+        'account_number': profile.bankAccount!.accountNumber,
+        'account_holder': profile.bankAccount!.accountHolder,
+      },
+      if (profile.verification.isPhoneVerified) ...{
+        'is_phone_verified': true,
+        'phone_number': profile.verification.phoneNumber,
+      },
+      'visibility_settings': {
+        'is_searchable': profile.visibilitySettings.isSearchable,
+        'contact_visibility': profile.visibilitySettings.contactVisibility.name,
+        'fee_visibility': profile.visibilitySettings.feeVisibility.name,
+        'career_visibility': profile.visibilitySettings.careerVisibility.name,
+        'certificate_visibility': profile.visibilitySettings.certificateVisibility.name,
+      },
     };
   }
 }

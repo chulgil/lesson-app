@@ -116,6 +116,24 @@ class ProfilePreviewScreen extends ConsumerWidget {
               ),
             ),
 
+          // Career list
+          if (profile.career != null && profile.career!.isNotEmpty)
+            _buildSection(
+              title: '경력',
+              child: Column(
+                children: profile.career!.map((c) {
+                  final period = c.endYear != null
+                      ? '${c.startYear} - ${c.endYear}'
+                      : '${c.startYear} - 현재';
+                  return _buildListItem(
+                    icon: Icons.business_outlined,
+                    title: '${c.organization}${c.position != null ? ' · ${c.position}' : ''}',
+                    subtitle: period,
+                  );
+                }).toList(),
+              ),
+            ),
+
           // Certificates list
           if (profile.verification.certificates.isNotEmpty)
             _buildSection(
@@ -187,12 +205,17 @@ class ProfilePreviewScreen extends ConsumerWidget {
               CircleAvatar(
                 radius: 48,
                 backgroundColor: Colors.white.withValues(alpha: 0.2),
-                child: Text(
-                  initial,
-                  style: AppTypography.displayLarge.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
+                backgroundImage: profile.profileImage != null
+                    ? NetworkImage(profile.profileImage!)
+                    : null,
+                child: profile.profileImage == null
+                    ? Text(
+                        initial,
+                        style: AppTypography.displayLarge.copyWith(
+                          color: Colors.white,
+                        ),
+                      )
+                    : null,
               ),
               const SizedBox(height: AppSpacing.space4),
               Text(
@@ -317,7 +340,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
   Widget _buildListItem({
     required IconData icon,
     required String title,
-    required String subtitle,
+    String? subtitle,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -340,13 +363,15 @@ class ProfilePreviewScreen extends ConsumerWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                if (subtitle != null && subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
