@@ -29,6 +29,11 @@ TeacherSettings _$TeacherSettingsFromJson(Map<String, dynamic> json) =>
       breakTimeBetweenLessons:
           (json['break_time_between_lessons'] as num?)?.toInt() ?? 0,
       minBookingHours: (json['min_booking_hours'] as num?)?.toInt() ?? 24,
+      lessonPriceTable:
+          (json['lesson_price_table'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, Map<String, int>.from(e as Map)),
+      ),
+      trialLessonFree: json['trial_lesson_free'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$TeacherSettingsToJson(TeacherSettings instance) =>
@@ -42,4 +47,6 @@ Map<String, dynamic> _$TeacherSettingsToJson(TeacherSettings instance) =>
       'updated_at': instance.updatedAt?.toIso8601String(),
       'break_time_between_lessons': instance.breakTimeBetweenLessons,
       'min_booking_hours': instance.minBookingHours,
+      'lesson_price_table': instance.lessonPriceTable,
+      'trial_lesson_free': instance.trialLessonFree,
     };

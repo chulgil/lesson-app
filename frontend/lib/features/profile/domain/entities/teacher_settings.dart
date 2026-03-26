@@ -26,6 +26,12 @@ class TeacherSettings {
   /// Minimum hours before booking (e.g., 24 = must book at least 24 hours ahead)
   final int minBookingHours;
 
+  /// Lesson price table: {"바이올린": {"beginner": 40000, "intermediate": 50000, "advanced": 70000}}
+  final Map<String, Map<String, int>>? lessonPriceTable;
+
+  /// Whether trial lessons are free
+  final bool trialLessonFree;
+
   const TeacherSettings({
     required this.id,
     required this.instruments,
@@ -37,6 +43,8 @@ class TeacherSettings {
     this.updatedAt,
     this.breakTimeBetweenLessons = 0,
     this.minBookingHours = 24,
+    this.lessonPriceTable,
+    this.trialLessonFree = false,
   });
 
   factory TeacherSettings.fromJson(Map<String, dynamic> json) =>
@@ -82,6 +90,11 @@ class TeacherSettings {
   List<TimeSlot> getSlotsForDay(int dayOfWeek) =>
       availableSlots.where((slot) => slot.dayOfWeek == dayOfWeek).toList();
 
+  /// Get price for a specific instrument and level
+  int? getPrice(String instrument, String level) {
+    return lessonPriceTable?[instrument]?[level];
+  }
+
   TeacherSettings copyWith({
     String? id,
     List<String>? instruments,
@@ -93,6 +106,8 @@ class TeacherSettings {
     DateTime? updatedAt,
     int? breakTimeBetweenLessons,
     int? minBookingHours,
+    Map<String, Map<String, int>>? lessonPriceTable,
+    bool? trialLessonFree,
   }) {
     return TeacherSettings(
       id: id ?? this.id,
@@ -105,6 +120,8 @@ class TeacherSettings {
       updatedAt: updatedAt ?? this.updatedAt,
       breakTimeBetweenLessons: breakTimeBetweenLessons ?? this.breakTimeBetweenLessons,
       minBookingHours: minBookingHours ?? this.minBookingHours,
+      lessonPriceTable: lessonPriceTable ?? this.lessonPriceTable,
+      trialLessonFree: trialLessonFree ?? this.trialLessonFree,
     );
   }
 }

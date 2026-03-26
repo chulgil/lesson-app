@@ -110,4 +110,14 @@ class RemoteSettingsRepository implements SettingsRepository {
   Future<TeacherSettings> updateMinBookingHours(int hours) async {
     return _updateSettings({'min_booking_hours': hours});
   }
+
+  @override
+  Future<void> updateTrialLessonFree(bool value) async {
+    await _updateSettings({'trial_lesson_free': value});
+  }
+
+  @override
+  Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable) async {
+    await _updateSettings({'lesson_price_table': priceTable});
+  }
 }

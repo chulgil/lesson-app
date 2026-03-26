@@ -74,6 +74,18 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
           // Available time slots section
           _buildTimeSlotsSection(context, ref),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Trial lesson free toggle
+          _buildTrialLessonSection(context, ref),
+
+          const SizedBox(height: AppSpacing.space6),
+
+          // Lesson price table
+          _buildPriceTableSection(context, ref),
+
+          const SizedBox(height: AppSpacing.space6),
         ],
       ),
     );
@@ -398,6 +410,237 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     ref
         .read(teacherSettingsNotifierProvider.notifier)
         .toggleTimeSlot(slotId, isActive);
+  }
+
+  Widget _buildTrialLessonSection(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LessonTimeSettingsSectionTitle(title: '체험레슨 설정'),
+        const SizedBox(height: AppSpacing.space2),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          child: SwitchListTile(
+            title: const Text('체험레슨 무료'),
+            subtitle: Text(
+              settings.trialLessonFree
+                  ? '시간 확정 시 바로 예약 완료'
+                  : '시간 확정 후 수강권 제안 필요',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            value: settings.trialLessonFree,
+            onChanged: (value) {
+              ref
+                  .read(teacherSettingsNotifierProvider.notifier)
+                  .updateTrialLessonFree(value);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceTableSection(BuildContext context, WidgetRef ref) {
+    final instruments = settings.instruments;
+    const levels = ['beginner', 'intermediate', 'advanced'];
+    const levelLabels = {
+      'beginner': '초급',
+      'intermediate': '중급',
+      'advanced': '고급',
+    };
+
+    if (instruments.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LessonTimeSettingsSectionTitle(title: '레슨 가격표'),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '악기를 먼저 설정하면 가격표를 입력할 수 있습니다.',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LessonTimeSettingsSectionTitle(title: '레슨 가격표'),
+        const SizedBox(height: AppSpacing.space2),
+        Text(
+          '악기별 레벨에 따른 1회 레슨 가격을 설정하세요.',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  const SizedBox(width: 80),
+                  ...levels.map((level) => Expanded(
+                        child: Center(
+                          child: Text(
+                            levelLabels[level]!,
+                            style: AppTypography.caption.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              const Divider(height: 1),
+              ...instruments.map((instrument) => Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.space2),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          child: Text(
+                            instrument,
+                            style: AppTypography.bodySmall.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        ...levels.map((level) {
+                          final price =
+                              settings.getPrice(instrument, level);
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () => _showPriceEditDialog(
+                                context, ref, instrument, level,
+                                levelLabels[level]!, price,
+                              ),
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: price != null
+                                      ? AppColors.primaryLight
+                                          .withValues(alpha: 0.1)
+                                      : null,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: price != null
+                                        ? AppColors.primary
+                                            .withValues(alpha: 0.3)
+                                        : AppColors.borderLight,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    price != null
+                                        ? '${(price / 10000).toStringAsFixed(price % 10000 == 0 ? 0 : 1)}만'
+                                        : '—',
+                                    style: AppTypography.caption.copyWith(
+                                      color: price != null
+                                          ? AppColors.primary
+                                          : AppColors.textTertiaryLight,
+                                      fontWeight: price != null
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showPriceEditDialog(
+    BuildContext context, WidgetRef ref,
+    String instrument, String level, String levelLabel, int? currentPrice,
+  ) async {
+    final controller = TextEditingController(
+      text: currentPrice != null ? currentPrice.toString() : '',
+    );
+
+    final result = await showDialog<int?>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('$instrument $levelLabel 가격'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: '1회 레슨 가격 (원)',
+            hintText: '예: 50000',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          if (currentPrice != null)
+            TextButton(
+              onPressed: () => Navigator.pop(context, -1),
+              child: Text('삭제', style: TextStyle(color: AppColors.error)),
+            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = int.tryParse(controller.text);
+              if (value != null && value > 0) {
+                Navigator.pop(context, value);
+              }
+            },
+            child: const Text('저장'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+
+    if (result != null) {
+      final priceTable = Map<String, Map<String, int>>.from(
+          settings.lessonPriceTable ?? {});
+      if (result == -1) {
+        priceTable[instrument]?.remove(level);
+        if (priceTable[instrument]?.isEmpty ?? false) {
+          priceTable.remove(instrument);
+        }
+      } else {
+        priceTable[instrument] = Map<String, int>.from(
+          priceTable[instrument] ?? {},
+        )..[level] = result;
+      }
+      ref
+          .read(teacherSettingsNotifierProvider.notifier)
+          .updatePriceTable(priceTable);
+    }
   }
 }
 

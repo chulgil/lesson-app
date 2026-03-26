@@ -198,6 +198,36 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  /// Update trial lesson free setting
+  Future<void> updateTrialLessonFree(bool value) async {
+    final current = state.value;
+    if (current == null) return;
+
+    // Optimistic update
+    state = AsyncValue.data(current.copyWith(trialLessonFree: value));
+    try {
+      await _repository.updateTrialLessonFree(value);
+    } catch (e, st) {
+      state = AsyncValue.data(current); // Rollback
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Update lesson price table
+  Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable) async {
+    final current = state.value;
+    if (current == null) return;
+
+    // Optimistic update
+    state = AsyncValue.data(current.copyWith(lessonPriceTable: priceTable));
+    try {
+      await _repository.updatePriceTable(priceTable);
+    } catch (e, st) {
+      state = AsyncValue.data(current); // Rollback
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 final teacherSettingsNotifierProvider =
