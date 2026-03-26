@@ -670,3 +670,131 @@ async def test_fw_time_negotiation_no_propose_after_expire(
         json={"slots": [{"day_of_week": 0, "start_time": "10:00", "end_time": "11:00"}]},
     )
     assert r.status_code == 400
+
+
+# ===========================================================================
+# Scenario S: 가격표 설정 + 자동 매칭
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_price_table_auto_match(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Teacher sets price table → Student request auto-matches suggested price."""
+    # Step 1: 선생님이 가격표 설정
+    await teacher.update_settings(
+        lesson_price_table={
+            "violin": {"beginner": 40000, "intermediate": 50000, "advanced": 70000},
+            "piano": {"beginner": 45000, "intermediate": 55000, "advanced": 75000},
+        },
+    )
+
+    # Step 2: 가격표 영속성 확인
+    settings = await teacher.get_settings()
+    assert settings["lesson_price_table"]["violin"]["beginner"] == 40000
+    assert settings["lesson_price_table"]["piano"]["advanced"] == 75000
+
+    # Step 3: 학생이 바이올린 초급으로 신청 → 가격 자동 매칭
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,
+        preferred_time="14:00",
+    )
+    req = await student.get_lesson_request(request_id)
+    assert req["suggested_price"] == 40000
+
+    # Step 4: 가격표에 없는 악기 → suggested_price=null
+    request_id2 = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="cello",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=2,
+        preferred_time="15:00",
+    )
+    req2 = await student.get_lesson_request(request_id2)
+    assert req2["suggested_price"] is None
+
+
+# ===========================================================================
+# Scenario T: 체험 무료 설정
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_trial_lesson_free_setting(teacher: TeacherActions):
+    """Teacher toggles trial lesson free setting."""
+    # Step 1: 기본값 확인 (유료)
+    settings = await teacher.get_settings()
+    assert settings["trial_lesson_free"] is False
+
+    # Step 2: 무료로 변경
+    await teacher.update_settings(trial_lesson_free=True)
+    settings = await teacher.get_settings()
+    assert settings["trial_lesson_free"] is True
+
+    # Step 3: 다시 유료로 변경
+    await teacher.update_settings(trial_lesson_free=False)
+    settings = await teacher.get_settings()
+    assert settings["trial_lesson_free"] is False
+
+
+# ===========================================================================
+# Scenario U: 시간 확정 후 수강권 제안 연동
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_confirmed_to_subscription_proposal(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Time confirmed → Teacher sends subscription proposal → Student accepts."""
+    # Step 1: 학생 등록 + 수강권 템플릿 생성
+    sid = await teacher.create_student("협상학생", instrument="violin")
+    tmpl_id = await teacher.create_template("4회권", lessons_count=4, amount=200000)
+
+    # Step 2: 학생이 정규 레슨 신청
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,
+        preferred_time="14:00",
+    )
+
+    # Step 3: 시간 협상 → 확정
+    await teacher.propose_alternatives(
+        request_id,
+        [{"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"}],
+    )
+    confirmed = await student.accept_alternative(request_id, 0)
+    assert_status(confirmed, "timeConfirmed")
+
+    # Step 4: 선생님이 수강권 제안 발송 (lesson_request_id 연결)
+    proposal_id = await teacher.send_proposal(
+        sid, tmpl_id, lesson_request_id=request_id
+    )
+
+    # Step 5: 레슨 요청 상태를 proposalSent로 업데이트
+    updated = await teacher.update_lesson_request_status(
+        request_id, "proposalSent", proposal_id=proposal_id
+    )
+    assert_status(updated, "proposalSent")
+
+    # Step 6: 학생이 수강권 수락
+    await student.accept_proposal(proposal_id, tmpl_id)
+
+    # Step 7: 선생님이 입금 확인 → 수강권 발급
+    await teacher.confirm_proposal(proposal_id)
+
+    # Step 8: 레슨 요청 완료 처리
+    completed = await teacher.update_lesson_request_status(request_id, "completed")
+    assert_status(completed, "completed")

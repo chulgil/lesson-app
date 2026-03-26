@@ -19,6 +19,11 @@ class TeacherSettings(UUIDMixin, TimestampMixin, Base):
     break_time_between_lessons: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
     min_booking_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
 
+    # Lesson pricing: {"바이올린": {"beginner": 40000, "intermediate": 50000, "advanced": 70000}}
+    lesson_price_table: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # Trial lesson free toggle
+    trial_lesson_free: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
     __table_args__ = (
         Index("uk_teacher_settings", "teacher_id", unique=True),
     )

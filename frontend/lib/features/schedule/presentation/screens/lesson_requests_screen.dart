@@ -405,6 +405,17 @@ class _UnifiedRequestsSection extends ConsumerWidget {
                 onReject: request.status == UnifiedRequestStatus.pending
                     ? () => _handleReject(context, ref, request)
                     : null,
+                onProposeAlternatives:
+                    (request.status == UnifiedRequestStatus.pending ||
+                            request.status ==
+                                UnifiedRequestStatus.negotiating)
+                        ? () => _handleProposeAlternatives(
+                            context, ref, request)
+                        : null,
+                onSendProposal:
+                    request.status == UnifiedRequestStatus.timeConfirmed
+                        ? () => _handleSendProposal(context, ref, request)
+                        : null,
               );
             },
             childCount: requests.length + 1, // +1 for header
@@ -519,5 +530,39 @@ class _UnifiedRequestsSection extends ConsumerWidget {
       }
     }
     reasonController.dispose();
+  }
+
+  Future<void> _handleProposeAlternatives(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    // TODO: Navigate to schedule slot picker for teacher to select alternatives
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('대안 시간 선택 화면으로 이동합니다'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleSendProposal(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    // TODO: Navigate to subscription proposal creation screen
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            request.type == LessonRequestType.trial
+                ? '체험레슨 예약을 완료합니다'
+                : '수강권 제안 화면으로 이동합니다',
+          ),
+        ),
+      );
+    }
   }
 }

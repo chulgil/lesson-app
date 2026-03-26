@@ -351,6 +351,28 @@ class TeacherActions:
         assert r.status_code == 200
         return r.json()
 
+    async def update_lesson_request_status(
+        self,
+        request_id: str,
+        status: str,
+        *,
+        decline_reason: str | None = None,
+        proposal_id: str | None = None,
+    ) -> dict:
+        """Update lesson request status (teacher action)."""
+        payload: dict = {"status": status}
+        if decline_reason is not None:
+            payload["decline_reason"] = decline_reason
+        if proposal_id is not None:
+            payload["proposal_id"] = proposal_id
+        r = await self.client.patch(
+            f"{self._base}/schedule/lesson-requests/{request_id}/status",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"update_lesson_request_status failed: {r.status_code} {r.text}"
+        return r.json()
+
     async def propose_alternatives(
         self,
         request_id: str,

@@ -130,6 +130,61 @@ class MockUnifiedLessonRequestRepository
       ],
       createdAt: now.subtract(const Duration(hours: 4)),
     ));
+
+    // Time confirmed request (ready for subscription proposal)
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_6',
+      studentId: 'student_6',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '피아노',
+      goal: UnifiedLessonGoal.exam,
+      experience: UnifiedExperienceLevel.intermediate,
+      message: '입시 준비 중입니다',
+      preferredDay: 3, // 목
+      preferredTime: '16:00',
+      preferredDuration: 60,
+      status: UnifiedRequestStatus.timeConfirmed,
+      currentRound: 1,
+      suggestedPrice: 55000,
+      proposals: [
+        TimeProposal(
+          id: 'tp_2',
+          proposerId: 'teacher_1',
+          role: ProposerRole.teacher,
+          action: ProposalAction.propose,
+          slots: [
+            TimeSlotOption(
+              id: 'ts_4',
+              dayOfWeek: 3,
+              startTime: '16:00',
+              endTime: '17:00',
+              isSelected: true,
+            ),
+          ],
+          createdAt: now.subtract(const Duration(hours: 3)),
+        ),
+        TimeProposal(
+          id: 'tp_3',
+          proposerId: 'student_6',
+          role: ProposerRole.student,
+          action: ProposalAction.accept,
+          slots: [
+            TimeSlotOption(
+              id: 'ts_4',
+              dayOfWeek: 3,
+              startTime: '16:00',
+              endTime: '17:00',
+              isSelected: true,
+            ),
+          ],
+          message: '목요일 4시로 할게요!',
+          createdAt: now.subtract(const Duration(hours: 2)),
+        ),
+      ],
+      confirmedAt: now.subtract(const Duration(hours: 2)),
+      createdAt: now.subtract(const Duration(days: 1)),
+    ));
   }
 
   void _addRequest(UnifiedLessonRequest request) {

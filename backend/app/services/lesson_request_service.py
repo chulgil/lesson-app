@@ -57,9 +57,34 @@ class LessonRequestService:
         items = [LessonRequestResponse.model_validate(r) for r in result.all()]
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
+    async def _match_price(self, teacher_id: str, instrument: str | None, experience_level: str | None) -> int | None:
+        """Match price from teacher's lesson_price_table for instrument × level."""
+        from app.models.settings import TeacherSettings
+
+        if not instrument or not experience_level:
+            return None
+
+        result = await self.db.scalars(
+            select(TeacherSettings).where(TeacherSettings.teacher_id == teacher_id)
+        )
+        settings = result.first()
+        if settings is None or settings.lesson_price_table is None:
+            return None
+
+        instrument_prices = settings.lesson_price_table.get(instrument)
+        if instrument_prices is None:
+            return None
+
+        return instrument_prices.get(experience_level)
+
     async def create(self, data: LessonRequestCreate, current_user: Any) -> LessonRequestResponse:
         """Create a unified lesson request."""
         from app.models.schedule import LessonRequest
+
+        # Auto-match price from teacher's price table
+        suggested_price = await self._match_price(
+            data.teacher_id, data.instrument, data.experience_level
+        )
 
         request = LessonRequest(
             student_id=current_user.id,
@@ -74,6 +99,7 @@ class LessonRequestService:
             preferred_time=data.preferred_time,
             preferred_duration=data.preferred_duration,
             is_returning_student=data.is_returning_student,
+            suggested_price=suggested_price,
             # Legacy fields
             preferred_timing=data.preferred_timing,
             keep_previous_schedule=data.keep_previous_schedule,

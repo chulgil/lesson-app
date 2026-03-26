@@ -16,6 +16,7 @@ class UnifiedRequestCard extends StatelessWidget {
   final VoidCallback? onProposeAlternatives;
   final void Function(int slotIndex)? onAcceptAlternative;
   final VoidCallback? onCounterPropose;
+  final VoidCallback? onSendProposal;
 
   const UnifiedRequestCard({
     super.key,
@@ -27,6 +28,7 @@ class UnifiedRequestCard extends StatelessWidget {
     this.onProposeAlternatives,
     this.onAcceptAlternative,
     this.onCounterPropose,
+    this.onSendProposal,
   });
 
   @override
@@ -61,6 +63,10 @@ class UnifiedRequestCard extends StatelessWidget {
               if (request.status == UnifiedRequestStatus.negotiating) ...[
                 const SizedBox(height: AppSpacing.space3),
                 _buildNegotiationSection(),
+              ],
+              if (request.status == UnifiedRequestStatus.timeConfirmed) ...[
+                const SizedBox(height: AppSpacing.space3),
+                _buildTimeConfirmedSection(),
               ],
               if (request.status.isTerminal) ...[
                 const SizedBox(height: AppSpacing.space3),
@@ -295,6 +301,98 @@ class UnifiedRequestCard extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildTimeConfirmedSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Confirmed time display
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            color: AppColors.successLight,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.check_circle, size: 18, color: AppColors.success),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '시간 확정',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (request.preferredDayLabel != null)
+                      Text(
+                        '${request.preferredDayLabel} ${request.preferredTime ?? ''}'
+                        ' · ${request.preferredDuration}분',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Suggested price
+        if (request.suggestedPrice != null) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Row(
+            children: [
+              Icon(Icons.sell_outlined, size: 14, color: AppColors.textTertiaryLight),
+              const SizedBox(width: 4),
+              Text(
+                '참고 가격: ${_formatPrice(request.suggestedPrice!)}원',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+        ],
+
+        // Send proposal button (teacher action)
+        if (onSendProposal != null) ...[
+          const SizedBox(height: AppSpacing.space3),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onSendProposal,
+              icon: const Icon(Icons.send, size: 16),
+              label: Text(
+                request.type == LessonRequestType.trial
+                    ? '체험레슨 예약 완료'
+                    : '수강권 제안 보내기',
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  String _formatPrice(int price) {
+    if (price >= 10000) {
+      final man = price ~/ 10000;
+      final remainder = price % 10000;
+      if (remainder == 0) return '$man만';
+      return '$man만 ${remainder.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')}';
+    }
+    return price.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+$)'),
+      (m) => '${m[1]},',
     );
   }
 

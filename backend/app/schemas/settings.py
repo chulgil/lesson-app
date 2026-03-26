@@ -20,6 +20,8 @@ class TeacherSettingsResponse(BaseModel):
     disabled_durations: list[int] = []
     break_time_between_lessons: int = 10
     min_booking_hours: int = 24
+    lesson_price_table: dict | None = None
+    trial_lesson_free: bool = False
     created_at: _dt.datetime
     updated_at: _dt.datetime
 
@@ -31,6 +33,8 @@ class TeacherSettingsUpdate(BaseModel):
     disabled_durations: list[int] | None = None
     break_time_between_lessons: int | None = None
     min_booking_hours: int | None = None
+    lesson_price_table: dict | None = None
+    trial_lesson_free: bool | None = None
 
 
 # ---------------------------------------------------------------------------
