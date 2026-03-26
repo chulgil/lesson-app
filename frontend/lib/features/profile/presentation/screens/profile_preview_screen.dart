@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -20,6 +21,18 @@ class ProfilePreviewScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('프로필 미리보기'),
+        actions: [
+          profileAsync.whenOrNull(
+                data: (profile) => profile != null
+                    ? IconButton(
+                        icon: const Icon(Icons.copy_outlined),
+                        tooltip: '프로필 복사',
+                        onPressed: () => _copyProfileToClipboard(context, profile),
+                      )
+                    : null,
+              ) ??
+              const SizedBox.shrink(),
+        ],
       ),
       body: profileAsync.when(
         data: (profile) {
@@ -378,6 +391,115 @@ class ProfilePreviewScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void _copyProfileToClipboard(BuildContext context, TeacherProfile profile) {
+    final text = _formatProfileAsText(profile);
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('프로필이 복사되었습니다'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  String _formatProfileAsText(TeacherProfile profile) {
+    final buffer = StringBuffer();
+    const divider = '──────────────────────────────';
+
+    // Header: name + instruments + experience + areas
+    buffer.writeln('${profile.name} 선생님');
+
+    final headerParts = <String>[];
+    if (profile.instruments.isNotEmpty) {
+      headerParts.add(profile.instruments.join(' · '));
+    }
+    if (profile.experienceYears != null) {
+      headerParts.add('경력 ${profile.experienceYears}년');
+    }
+    if (headerParts.isNotEmpty) {
+      buffer.writeln(headerParts.join(' | '));
+    }
+    if (profile.lessonAreas != null && profile.lessonAreas!.isNotEmpty) {
+      buffer.writeln(profile.lessonAreas!.join(', '));
+    }
+
+    buffer.writeln();
+    buffer.writeln(divider);
+
+    // Introduction
+    if (profile.introduction.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[소개]');
+      buffer.writeln(profile.introduction);
+    }
+
+    // Teaching style
+    if (profile.teachingStyle != null &&
+        profile.teachingStyle!.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[교수 스타일]');
+      buffer.writeln(profile.teachingStyle);
+    }
+
+    // Specialties
+    if (profile.specialties != null && profile.specialties!.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[전문 분야]');
+      buffer.writeln(profile.specialties!.join(', '));
+    }
+
+    // Education
+    if (profile.education != null && profile.education!.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[학력]');
+      for (final edu in profile.education!) {
+        final yearPart =
+            edu.graduationYear != null ? ', ${edu.graduationYear}' : '';
+        buffer.writeln(
+            '- ${edu.school} ${edu.major} (${edu.degree}$yearPart)');
+      }
+    }
+
+    // Career
+    if (profile.career != null && profile.career!.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[경력]');
+      for (final c in profile.career!) {
+        final period = c.endYear != null
+            ? '${c.startYear} - ${c.endYear}'
+            : '${c.startYear} - 현재';
+        final positionPart =
+            c.position.isNotEmpty ? ' ${c.position}' : '';
+        buffer.writeln('- ${c.organization}$positionPart ($period)');
+      }
+    }
+
+    // Certificates (approved only)
+    final approvedCerts = profile.verification.certificates
+        .where((c) => c.isApproved)
+        .toList();
+    if (approvedCerts.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('[자격증]');
+      for (final cert in approvedCerts) {
+        buffer.writeln('- ${cert.name} — ${cert.issuingBody}');
+      }
+    }
+
+    // Fee range
+    if (profile.feeRange != null) {
+      buffer.writeln();
+      buffer.writeln('[레슨료]');
+      buffer.writeln(profile.feeRange!.formatted);
+    }
+
+    buffer.writeln();
+    buffer.writeln(divider);
+    buffer.writeln('Lessonaza에서 확인하기');
+
+    return buffer.toString();
   }
 }
 
