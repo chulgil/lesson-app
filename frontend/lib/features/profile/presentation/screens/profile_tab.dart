@@ -151,6 +151,12 @@ class ProfileTab extends ConsumerWidget {
                 subtitle: '전체 결제 이력 확인',
                 onTap: () => context.push(AppRoutes.paymentManagement),
               ),
+              _MenuItem(
+                icon: Icons.account_balance_outlined,
+                label: '입금 계좌',
+                subtitle: '수강료 입금받을 계좌 설정',
+                onTap: () => context.push(AppRoutes.bankAccountEdit),
+              ),
             ],
           ),
 

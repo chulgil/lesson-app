@@ -12,6 +12,7 @@ import '../../../features/profile/presentation/screens/education_edit_screen.dar
 import '../../../features/profile/presentation/screens/career_edit_screen.dart';
 import '../../../features/profile/presentation/screens/basic_info_edit_screen.dart';
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
+import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
 import '../../../features/analytics/presentation/screens/teacher_dashboard_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
@@ -99,6 +100,13 @@ List<GoRoute> profileRoutes = [
       final certificateId = state.uri.queryParameters['id'];
       return CertificateEditScreen(certificateId: certificateId);
     },
+  ),
+
+  // Bank Account Edit
+  GoRoute(
+    path: AppRoutes.bankAccountEdit,
+    name: 'bankAccountEdit',
+    builder: (context, state) => const BankAccountEditScreen(),
   ),
 
   // Profile Preview

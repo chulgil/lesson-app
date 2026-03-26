@@ -378,6 +378,23 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     }
   }
 
+  /// Update bank account information
+  Future<void> updateBankAccount(BankAccount bankAccount) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      final updated = await repo.updateProfile(
+        current.copyWith(bankAccount: bankAccount),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Update searchable setting
   Future<void> updateSearchable(bool isSearchable) async {
     final current = state.valueOrNull;
