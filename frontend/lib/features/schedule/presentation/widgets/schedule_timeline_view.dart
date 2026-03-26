@@ -199,11 +199,11 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     int earliest = 23;
     int latest = 0;
 
-    // Consider teacher's availability for this day of week
-    final dayOfWeek = widget.selectedDate.weekday - 1; // 0=Mon
+    // Consider teacher's availability across ALL active days (global min/max)
+    // This ensures consistent time range regardless of which day is selected
     if (availability != null) {
       for (final schedule in availability.weeklySchedules) {
-        if (schedule.isActive && schedule.dayOfWeek == dayOfWeek) {
+        if (schedule.isActive) {
           final startParts = schedule.startTime.split(':');
           final endParts = schedule.endTime.split(':');
           final startH = int.parse(startParts[0]);
