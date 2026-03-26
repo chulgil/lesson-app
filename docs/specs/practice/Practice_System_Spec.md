@@ -325,7 +325,49 @@ class PracticeItem {
 }
 ```
 
-### 4.2 Badge (뱃지)
+### 4.2.1 과제 → 레퍼토리 동기화 (Assignment Sync)
+
+> **추가일**: 2026-03-26
+> **상태**: ✅ 구현 완료
+
+선생님이 PracticeItem(과제)을 할당하면, 학생의 PracticeRepertoire에 PracticeSection이 자동 생성되어 연습 탭에서 동일한 구조로 관리됩니다.
+
+#### 데이터 흐름
+
+```
+Teacher assigns PracticeItem
+  ├── PracticeItem 생성 (lessons feature)
+  └── PracticeSection 자동 생성 (practice feature)
+        ├── '선생님 과제' 기본 레퍼토리에 추가
+        ├── TeachingResource의 YouTube 정보 복사
+        └── assignedByTeacherId, practiceItemId 역참조 설정
+```
+
+#### PracticeSection 추가 필드
+
+```dart
+// YouTube reference (shared from teacher's TeachingResource)
+final String? youtubeUrl;
+final String? youtubeVideoId;      // For thumbnail display
+final int? youtubeStartSeconds;    // Segment start
+final int? youtubeEndSeconds;      // Segment end
+
+// Teaching resource references
+final List<String> teachingResourceIds;
+
+// Assignment linkage
+final String? assignedByTeacherId; // Teacher who assigned this
+final String? practiceItemId;      // Back-reference to PracticeItem
+```
+
+#### 헬퍼 프로퍼티
+
+- `isAssigned` → 선생님 할당 여부
+- `hasYoutube` → YouTube 참조 존재 여부
+- `youtubeThumbnailUrl` → 썸네일 URL
+- `youtubeLaunchUrl` → 타임스탬프 포함 재생 URL
+
+### 4.3 Badge (뱃지)
 
 ```dart
 /// Badge categories

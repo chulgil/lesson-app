@@ -43,6 +43,13 @@ mixin PracticeSectionMixin on PracticeRepositoryBase
       totalPracticeSeconds: 0,
       recordings: [],
       createdAt: DateTime.now(),
+      youtubeUrl: section.youtubeUrl,
+      youtubeVideoId: section.youtubeVideoId,
+      youtubeStartSeconds: section.youtubeStartSeconds,
+      youtubeEndSeconds: section.youtubeEndSeconds,
+      teachingResourceIds: section.teachingResourceIds,
+      assignedByTeacherId: section.assignedByTeacherId,
+      practiceItemId: section.practiceItemId,
     );
 
     // Find and update the repertoire
@@ -246,5 +253,90 @@ mixin PracticeSectionMixin on PracticeRepositoryBase
       }
     }
     throw Exception('Section not found');
+  }
+
+  @override
+  Future<PracticeRepertoire> getOrCreateDefaultRepertoire(
+      String studentId) async {
+    await ensureInitialized();
+    final reps = repertoires[studentId] ?? [];
+
+    // Find existing default repertoire
+    for (final rep in reps) {
+      if (rep.isDefault && !rep.isArchived) return rep;
+    }
+
+    // Create default repertoire if none exists
+    final now = DateTime.now();
+    final defaultRepertoire = PracticeRepertoire(
+      id: uuid.v4(),
+      studentId: studentId,
+      name: '선생님 과제',
+      description: '선생님이 할당한 과제가 자동으로 추가됩니다',
+      startDate: now,
+      sections: [],
+      createdAt: now,
+      isDefault: true,
+    );
+    repertoires.putIfAbsent(studentId, () => []);
+
+    // Re-check after putIfAbsent to prevent race condition duplicates
+    final existingDefault = repertoires[studentId]!
+        .where((r) => r.isDefault && !r.isArchived)
+        .firstOrNull;
+    if (existingDefault != null) return existingDefault;
+
+    repertoires[studentId]!.add(defaultRepertoire);
+    await saveRepertoiresToHive();
+    return defaultRepertoire;
+  }
+
+  @override
+  Future<PracticeSection> createSectionFromAssignment({
+    required String studentId,
+    required String pieceName,
+    String? sectionName,
+    String? youtubeUrl,
+    String? youtubeVideoId,
+    int? youtubeStartSeconds,
+    int? youtubeEndSeconds,
+    List<String> teachingResourceIds = const [],
+    required String assignedByTeacherId,
+    required String practiceItemId,
+  }) async {
+    final repertoire = await getOrCreateDefaultRepertoire(studentId);
+
+    // Idempotency guard: return existing section if already synced
+    final existing = repertoire.sections
+        .where((s) => s.practiceItemId == practiceItemId)
+        .firstOrNull;
+    if (existing != null) return existing;
+
+    // Validate youtubeVideoId format (11-char alphanumeric)
+    final validVideoId = youtubeVideoId != null &&
+            RegExp(r'^[a-zA-Z0-9_-]{11}$').hasMatch(youtubeVideoId)
+        ? youtubeVideoId
+        : null;
+
+    final section = PracticeSection(
+      id: '',
+      repertoireId: repertoire.id,
+      pieceName: pieceName,
+      rangeType: SectionRangeType.full,
+      startMeasure: 1,
+      endMeasure: 1,
+      sectionName: sectionName,
+      isRepeat: true,
+      createdAt: DateTime.now(),
+      youtubeUrl: validVideoId != null ? youtubeUrl : null,
+      youtubeVideoId: validVideoId,
+      youtubeStartSeconds: validVideoId != null ? youtubeStartSeconds : null,
+      youtubeEndSeconds: validVideoId != null ? youtubeEndSeconds : null,
+      teachingResourceIds: teachingResourceIds,
+      assignedByTeacherId: assignedByTeacherId,
+      practiceItemId: practiceItemId,
+    );
+
+    return createSection(section);
   }
 }

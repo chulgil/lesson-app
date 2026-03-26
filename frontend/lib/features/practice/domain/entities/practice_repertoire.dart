@@ -203,6 +203,19 @@ class PracticeSection {
   final int? sortOrder; // Custom sort order for drag and drop
   final DateTime? lastPracticedAt; // Last practice time for sorting
 
+  // YouTube reference (shared from teacher's TeachingResource)
+  final String? youtubeUrl;
+  final String? youtubeVideoId; // For thumbnail display
+  final int? youtubeStartSeconds; // Segment start
+  final int? youtubeEndSeconds; // Segment end
+
+  // Teaching resource references (shared from teacher's assignment)
+  final List<String> teachingResourceIds;
+
+  // Assignment linkage (when created from teacher's PracticeItem)
+  final String? assignedByTeacherId;
+  final String? practiceItemId; // Back-reference to PracticeItem
+
   const PracticeSection({
     required this.id,
     required this.repertoireId,
@@ -231,6 +244,13 @@ class PracticeSection {
     this.completedAt,
     this.sortOrder,
     this.lastPracticedAt,
+    this.youtubeUrl,
+    this.youtubeVideoId,
+    this.youtubeStartSeconds,
+    this.youtubeEndSeconds,
+    this.teachingResourceIds = const [],
+    this.assignedByTeacherId,
+    this.practiceItemId,
   });
 
   /// Get measure range display string (e.g., "1~4 마디")
@@ -412,6 +432,29 @@ class PracticeSection {
     );
   }
 
+  /// Whether this section was assigned by a teacher
+  bool get isAssigned => assignedByTeacherId != null;
+
+  /// Whether this section has a YouTube reference
+  bool get hasYoutube => youtubeUrl != null && youtubeUrl!.isNotEmpty;
+
+  /// Get YouTube thumbnail URL
+  String? get youtubeThumbnailUrl {
+    if (youtubeVideoId == null) return null;
+    return 'https://img.youtube.com/vi/$youtubeVideoId/mqdefault.jpg';
+  }
+
+  /// Get YouTube launch URL with timestamp
+  String? get youtubeLaunchUrl {
+    if (youtubeUrl == null) return null;
+    if (youtubeStartSeconds != null && youtubeStartSeconds! > 0) {
+      if (youtubeVideoId != null) {
+        return 'https://www.youtube.com/watch?v=$youtubeVideoId&t=${youtubeStartSeconds}s';
+      }
+    }
+    return youtubeUrl;
+  }
+
   PracticeSection copyWith({
     String? id,
     String? repertoireId,
@@ -446,6 +489,14 @@ class PracticeSection {
     DateTime? completedAt,
     int? sortOrder,
     DateTime? lastPracticedAt,
+    String? youtubeUrl,
+    String? youtubeVideoId,
+    int? youtubeStartSeconds,
+    int? youtubeEndSeconds,
+    bool clearYoutubeUrl = false,
+    List<String>? teachingResourceIds,
+    String? assignedByTeacherId,
+    String? practiceItemId,
   }) {
     return PracticeSection(
       id: id ?? this.id,
@@ -478,6 +529,13 @@ class PracticeSection {
       completedAt: completedAt ?? this.completedAt,
       sortOrder: sortOrder ?? this.sortOrder,
       lastPracticedAt: lastPracticedAt ?? this.lastPracticedAt,
+      youtubeUrl: clearYoutubeUrl ? null : (youtubeUrl ?? this.youtubeUrl),
+      youtubeVideoId: clearYoutubeUrl ? null : (youtubeVideoId ?? this.youtubeVideoId),
+      youtubeStartSeconds: clearYoutubeUrl ? null : (youtubeStartSeconds ?? this.youtubeStartSeconds),
+      youtubeEndSeconds: clearYoutubeUrl ? null : (youtubeEndSeconds ?? this.youtubeEndSeconds),
+      teachingResourceIds: teachingResourceIds ?? this.teachingResourceIds,
+      assignedByTeacherId: assignedByTeacherId ?? this.assignedByTeacherId,
+      practiceItemId: practiceItemId ?? this.practiceItemId,
     );
   }
 
@@ -519,6 +577,13 @@ class PracticeSection {
     'completedAt': completedAt?.toIso8601String(),
     'sortOrder': sortOrder,
     'lastPracticedAt': lastPracticedAt?.toIso8601String(),
+    'youtubeUrl': youtubeUrl,
+    'youtubeVideoId': youtubeVideoId,
+    'youtubeStartSeconds': youtubeStartSeconds,
+    'youtubeEndSeconds': youtubeEndSeconds,
+    'teachingResourceIds': teachingResourceIds,
+    'assignedByTeacherId': assignedByTeacherId,
+    'practiceItemId': practiceItemId,
   };
 
   /// JSON deserialization (recordings are loaded separately from Hive)
@@ -593,6 +658,17 @@ class PracticeSection {
           json['lastPracticedAt'] != null
               ? DateTime.parse(json['lastPracticedAt'] as String)
               : null,
+      youtubeUrl: json['youtubeUrl'] as String?,
+      youtubeVideoId: json['youtubeVideoId'] as String?,
+      youtubeStartSeconds: json['youtubeStartSeconds'] as int?,
+      youtubeEndSeconds: json['youtubeEndSeconds'] as int?,
+      teachingResourceIds:
+          (json['teachingResourceIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      assignedByTeacherId: json['assignedByTeacherId'] as String?,
+      practiceItemId: json['practiceItemId'] as String?,
     );
   }
 }

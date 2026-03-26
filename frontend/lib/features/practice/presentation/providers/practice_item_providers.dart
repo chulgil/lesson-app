@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../domain/repositories/practice_item_repository.dart';
+import '../../../lessons/domain/entities/teaching_resource.dart';
+import '../../../lessons/presentation/providers/teaching_resource_providers.dart';
+import 'practice_repertoire_repository_provider.dart';
+import 'practice_repertoire_crud_provider.dart';
 
 import '../../../lessons/presentation/providers/tip_template_providers.dart' show currentTeacherIdProvider;
 
@@ -104,6 +109,17 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
     state = const AsyncValue.loading();
     try {
       final newItem = await _repository.create(item);
+
+      // Auto-create section in student's practice repertoire
+      await _syncToStudentRepertoire(
+        studentId: studentId,
+        teacherId: teacherId,
+        practiceItemId: newItem.id,
+        title: title,
+        description: description,
+        resourceIds: resourceIds,
+      );
+
       state = await AsyncValue.guard(() => _repository.getByLessonId(arg));
       // Invalidate related providers
       ref.invalidate(practiceItemsByStudentProvider(studentId));
@@ -247,6 +263,70 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       rethrow;
+    }
+  }
+
+  /// Sync practice item to student's repertoire as a PracticeSection
+  Future<void> _syncToStudentRepertoire({
+    required String studentId,
+    required String teacherId,
+    required String practiceItemId,
+    required String title,
+    String? description,
+    List<String> resourceIds = const [],
+  }) async {
+    try {
+      final repertoireRepo = ref.read(practiceRepertoireRepositoryProvider);
+
+      // Extract YouTube info from attached teaching resources
+      String? youtubeUrl;
+      String? youtubeVideoId;
+      int? youtubeStartSeconds;
+      int? youtubeEndSeconds;
+
+      if (resourceIds.isNotEmpty) {
+        try {
+          final resources =
+              await ref.read(resourcesByIdsProvider(resourceIds).future);
+          final youtubeResource = resources
+              .where((r) => r.type == TeachingResourceType.youtube)
+              .firstOrNull;
+          if (youtubeResource != null) {
+            youtubeUrl = youtubeResource.youtubeUrl;
+            youtubeVideoId = youtubeResource.youtubeVideoId;
+            youtubeStartSeconds = youtubeResource.youtubeStartSeconds;
+            youtubeEndSeconds = youtubeResource.youtubeEndSeconds;
+          }
+        } catch (_) {
+          // Teaching resource lookup failed — continue without YouTube info
+        }
+      }
+
+      await repertoireRepo.createSectionFromAssignment(
+        studentId: studentId,
+        pieceName: title,
+        sectionName: description,
+        youtubeUrl: youtubeUrl,
+        youtubeVideoId: youtubeVideoId,
+        youtubeStartSeconds: youtubeStartSeconds,
+        youtubeEndSeconds: youtubeEndSeconds,
+        teachingResourceIds: resourceIds,
+        assignedByTeacherId: teacherId,
+        practiceItemId: practiceItemId,
+      );
+
+      // Invalidate repertoire providers to refresh student's practice tab
+      ref.invalidate(studentRepertoiresProvider(studentId));
+    } catch (e, st) {
+      // Assignment created successfully but repertoire sync failed.
+      // Don't fail the main operation — student can still see the assignment
+      // via PracticeItem, just not in the repertoire tab.
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: e,
+        stack: st,
+        library: 'practice_item_providers',
+        context: ErrorDescription('Failed to sync assignment to student repertoire'),
+      ));
     }
   }
 }
