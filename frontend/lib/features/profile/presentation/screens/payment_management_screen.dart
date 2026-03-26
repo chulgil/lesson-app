@@ -22,6 +22,7 @@ class _PaymentManagementScreenState
     extends ConsumerState<PaymentManagementScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  DateTime _selectedMonth = DateTime.now();
 
   @override
   void initState() {
@@ -46,7 +47,7 @@ class _PaymentManagementScreenState
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: const Text('수강료 관리'),
+        title: Text('수강료 관리 · ${_selectedMonth.year}.${_selectedMonth.month.toString().padLeft(2, '0')}'),
         actions: [
           IconButton(
             onPressed: _showMonthPicker,
@@ -94,22 +95,28 @@ class _PaymentManagementScreenState
               ),
             ),
 
-            // Payment list
+            // Payment list (filtered by selected month)
             paymentsAsync.when(
-              data: (payments) => SliverFillRemaining(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildPaymentList(payments),
-                    _buildPaymentList(
-                      payments.where((p) => p.status == PaymentStatus.pending).toList(),
-                    ),
-                    _buildPaymentList(
-                      payments.where((p) => p.status == PaymentStatus.confirmed).toList(),
-                    ),
-                  ],
-                ),
-              ),
+              data: (payments) {
+                final filtered = payments.where((p) {
+                  return p.createdAt.year == _selectedMonth.year &&
+                      p.createdAt.month == _selectedMonth.month;
+                }).toList();
+                return SliverFillRemaining(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildPaymentList(filtered),
+                      _buildPaymentList(
+                        filtered.where((p) => p.status == PaymentStatus.pending).toList(),
+                      ),
+                      _buildPaymentList(
+                        filtered.where((p) => p.status == PaymentStatus.confirmed).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              },
               loading: () => const SliverFillRemaining(
                 child: Center(child: CircularProgressIndicator()),
               ),
@@ -185,7 +192,124 @@ class _PaymentManagementScreenState
   }
 
   void _showMonthPicker() {
-    // TODO: Implement month picker
+    final now = DateTime.now();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        int selectedYear = _selectedMonth.year;
+
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final months = List.generate(12, (i) => i + 1);
+
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Year selector
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space4,
+                      vertical: AppSpacing.space3,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setSheetState(() => selectedYear--);
+                          },
+                          icon: const Icon(Icons.chevron_left),
+                        ),
+                        Text(
+                          '$selectedYear년',
+                          style: AppTypography.headingSmall,
+                        ),
+                        IconButton(
+                          onPressed: selectedYear < now.year
+                              ? () {
+                                  setSheetState(() => selectedYear++);
+                                }
+                              : null,
+                          icon: const Icon(Icons.chevron_right),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+
+                  // Month grid
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.space4),
+                    child: GridView.count(
+                      crossAxisCount: 4,
+                      shrinkWrap: true,
+                      mainAxisSpacing: AppSpacing.space2,
+                      crossAxisSpacing: AppSpacing.space2,
+                      childAspectRatio: 2,
+                      children: months.map((month) {
+                        final isSelected =
+                            selectedYear == _selectedMonth.year &&
+                                month == _selectedMonth.month;
+                        final isFuture = selectedYear > now.year ||
+                            (selectedYear == now.year && month > now.month);
+
+                        return GestureDetector(
+                          onTap: isFuture
+                              ? null
+                              : () {
+                                  setState(() {
+                                    _selectedMonth =
+                                        DateTime(selectedYear, month);
+                                  });
+                                  Navigator.pop(context);
+                                },
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium),
+                              border: isSelected
+                                  ? null
+                                  : Border.all(
+                                      color: isFuture
+                                          ? AppColors.borderLight
+                                              .withValues(alpha: 0.3)
+                                          : AppColors.borderLight,
+                                    ),
+                            ),
+                            child: Text(
+                              '$month월',
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: isSelected
+                                    ? Colors.white
+                                    : isFuture
+                                        ? AppColors.textTertiaryLight
+                                        : AppColors.textPrimaryLight,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void _showPaymentDetail(Payment payment) {
