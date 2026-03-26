@@ -306,6 +306,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     required String introduction,
     String? teachingStyle,
     List<String>? specialties,
+    List<String>? lessonAreas,
   }) async {
     final current = state.valueOrNull;
     if (current == null) return;
@@ -318,6 +319,7 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
           introduction: introduction,
           teachingStyle: teachingStyle ?? current.teachingStyle,
           specialties: specialties ?? current.specialties,
+          lessonAreas: lessonAreas ?? current.lessonAreas,
         ),
       );
       state = AsyncValue.data(updated);

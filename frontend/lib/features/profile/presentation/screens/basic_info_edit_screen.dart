@@ -30,11 +30,14 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
   final _teachingStyleController = TextEditingController();
 
   final Set<String> _selectedSpecialties = {};
+  final List<String> _lessonAreas = [];
+  final _areaController = TextEditingController();
 
   bool _isLoading = false;
 
   static const int _minIntroductionLength = 20;
   static const int _maxSpecialties = 5;
+  static const int _maxAreas = 5;
 
   static const List<String> _specialtyOptions = [
     '클래식',
@@ -65,6 +68,9 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
       if (profile.specialties != null) {
         _selectedSpecialties.addAll(profile.specialties!);
       }
+      if (profile.lessonAreas != null) {
+        _lessonAreas.addAll(profile.lessonAreas!);
+      }
     }
   }
 
@@ -73,6 +79,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
     _nameController.dispose();
     _introductionController.dispose();
     _teachingStyleController.dispose();
+    _areaController.dispose();
     super.dispose();
   }
 
@@ -152,6 +159,7 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
         introduction: _introductionController.text.trim(),
         teachingStyle: teachingStyle.isNotEmpty ? teachingStyle : null,
         specialties: _selectedSpecialties.toList(),
+        lessonAreas: _lessonAreas.toList(),
       );
 
       if (mounted) {
@@ -300,6 +308,22 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             ),
             const SizedBox(height: AppSpacing.space3),
             _buildSpecialtyChips(),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // Lesson areas field
+            _buildLabel('활동 지역'),
+            const SizedBox(height: AppSpacing.space1),
+            Text(
+              '최대 $_maxAreas개까지 추가할 수 있습니다',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            _buildAreaInput(),
+            const SizedBox(height: AppSpacing.space2),
+            _buildAreaChips(),
           ],
         ),
       ),
@@ -350,6 +374,88 @@ class _BasicInfoEditScreenState extends ConsumerState<BasicInfoEditScreen> {
             ),
           ),
           backgroundColor: AppColors.surfaceLight,
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildAreaInput() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _areaController,
+            decoration: _inputDecoration(
+              hintText: '예: 강남구, 서초구',
+            ),
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _addArea(),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        IconButton.filled(
+          onPressed: _addArea,
+          icon: const Icon(Icons.add, size: 20),
+          style: IconButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(44, 44),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _addArea() {
+    final area = _areaController.text.trim();
+    if (area.isEmpty) return;
+    if (_lessonAreas.length >= _maxAreas) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('최대 $_maxAreas개까지 추가할 수 있습니다'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    if (_lessonAreas.contains(area)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이미 추가된 지역입니다'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _lessonAreas.add(area);
+      _areaController.clear();
+    });
+  }
+
+  Widget _buildAreaChips() {
+    if (_lessonAreas.isEmpty) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: AppSpacing.space2,
+      runSpacing: AppSpacing.space2,
+      children: _lessonAreas.map((area) {
+        return Chip(
+          label: Text(area),
+          deleteIcon: const Icon(Icons.close, size: 16),
+          onDeleted: () {
+            setState(() => _lessonAreas.remove(area));
+          },
+          labelStyle: AppTypography.bodySmall.copyWith(
+            color: AppColors.textPrimaryLight,
+          ),
+          backgroundColor: AppColors.surfaceSecondaryLight,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+            side: BorderSide(color: AppColors.borderLight),
+          ),
         );
       }).toList(),
     );

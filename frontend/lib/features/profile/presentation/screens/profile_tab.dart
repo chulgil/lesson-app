@@ -13,7 +13,6 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
 import '../providers/teacher_extended_profile_provider.dart';
-import '../widgets/extended_profile_dialogs.dart';
 
 /// Profile tab with user info and settings — redesigned for 1-tap access.
 ///
@@ -63,7 +62,7 @@ class ProfileTab extends ConsumerWidget {
               _MenuItem(
                 icon: Icons.person_outline,
                 label: '기본 정보 수정',
-                subtitle: '이름, 사진, 소개, 교수 스타일',
+                subtitle: '이름, 사진, 소개, 교수 스타일, 활동 지역',
                 onTap: () => context.push(AppRoutes.basicInfoEdit),
               ),
               _MenuItem(
@@ -71,17 +70,6 @@ class ProfileTab extends ConsumerWidget {
                 label: '악기 관리',
                 subtitle: '가르치는 악기 추가/관리',
                 onTap: () => context.push(AppRoutes.instrumentManagement),
-              ),
-              _MenuItem(
-                icon: Icons.location_on_outlined,
-                label: '활동 지역',
-                subtitle: '레슨 가능 지역 설정',
-                onTap: () {
-                  final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
-                  if (profile != null) {
-                    showAreasDialog(context, ref, profile);
-                  }
-                },
               ),
               _MenuItem(
                 icon: Icons.school_outlined,
