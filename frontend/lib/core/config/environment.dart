@@ -42,4 +42,10 @@ class EnvironmentConfig {
     'GOOGLE_IOS_CLIENT_ID',
     defaultValue: '',
   );
+
+  /// App version string (synced with pubspec.yaml version).
+  static const String appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: '1.0.0',
+  );
 }

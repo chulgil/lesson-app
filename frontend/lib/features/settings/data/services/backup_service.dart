@@ -10,6 +10,7 @@ import 'package:archive/archive.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../../../core/config/environment.dart';
 import '../../domain/entities/backup_state.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 
@@ -283,7 +284,7 @@ class BackupService {
     }
 
     return BackupMetadata(
-      appVersion: '1.0.0', // TODO: Get from package_info
+      appVersion: EnvironmentConfig.appVersion,
       backupVersion: backupVersion,
       createdAt: DateTime.now(),
       recordingCount: recordingCount,

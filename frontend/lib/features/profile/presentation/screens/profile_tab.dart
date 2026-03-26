@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
+import '../../../../core/config/environment.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -193,7 +194,7 @@ class ProfileTab extends ConsumerWidget {
                 icon: Icons.info_outline,
                 label: '앱 정보',
                 trailing: Text(
-                  'v1.0.0',
+                  'v${EnvironmentConfig.appVersion}',
                   style: AppTypography.bodyMedium.copyWith(
                     color: AppColors.textSecondaryLight,
                   ),
