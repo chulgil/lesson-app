@@ -184,6 +184,15 @@ class LessonRequestService:
 
         now = datetime.now(timezone.utc)
         proposals = list(request.time_proposals or [])
+
+        # Prevent consecutive teacher proposals (must wait for student response)
+        # Exception: first proposal on a pending request
+        if proposals and proposals[-1].get("role") == "teacher":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Waiting for student response before proposing again",
+            )
+
         proposal_entry = {
             "proposer_id": current_user.id,
             "role": "teacher",
@@ -278,6 +287,14 @@ class LessonRequestService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Student must counter-propose exactly 1 slot",
+            )
+
+        # Prevent consecutive student proposals (must wait for teacher response)
+        proposals = list(request.time_proposals or [])
+        if proposals and proposals[-1].get("role") == "student":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Waiting for teacher response before counter-proposing again",
             )
 
         max_rounds = 3

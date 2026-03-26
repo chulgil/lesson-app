@@ -1,8 +1,9 @@
 """Lesson request schemas — unified lesson request (trial + regular + returning)."""
 
 import datetime as _dt
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class LessonRequestCreate(BaseModel):
@@ -10,14 +11,14 @@ class LessonRequestCreate(BaseModel):
 
     teacher_id: str
     # Unified fields
-    request_type: str | None = None  # trial, regular
-    instrument: str | None = None
-    goal: str | None = None  # hobby, exam, major, other
-    experience_level: str | None = None  # beginner, intermediate, advanced
-    preferred_day: int | None = None  # 0=Mon...6=Sun
-    preferred_time: str | None = None  # HH:MM
-    preferred_duration: int | None = None  # minutes
-    message: str | None = None
+    request_type: Literal["trial", "regular"] | None = None
+    instrument: str | None = Field(default=None, max_length=50)
+    goal: Literal["hobby", "exam", "major", "other"] | None = None
+    experience_level: Literal["beginner", "intermediate", "advanced"] | None = None
+    preferred_day: int | None = Field(default=None, ge=0, le=6)  # 0=Mon...6=Sun
+    preferred_time: str | None = Field(default=None, max_length=5)  # HH:MM
+    preferred_duration: int | None = Field(default=None, ge=15, le=180)  # minutes
+    message: str | None = Field(default=None, max_length=500)
     is_returning_student: bool = False
     # Legacy fields (backward compatibility)
     preferred_timing: str = "afterConsultation"  # nextWeek, nextMonth, afterConsultation
@@ -79,8 +80,12 @@ class LessonRequestResponse(BaseModel):
 class LessonRequestStatusUpdate(BaseModel):
     """Change lesson request status."""
 
-    status: str  # approved, rejected, negotiating, timeConfirmed, proposalSent, etc.
-    decline_reason: str | None = None
+    status: Literal[
+        "approved", "rejected", "negotiating", "timeConfirmed",
+        "proposalSent", "proposalAccepted", "paymentNotified",
+        "completed", "cancelled", "expired",
+    ]
+    decline_reason: str | None = Field(default=None, max_length=500)
     proposal_id: str | None = None
 
 
@@ -95,12 +100,12 @@ class TimeSlotOptionSchema(BaseModel):
 class TimeProposalCreate(BaseModel):
     """Create a time proposal (teacher proposes alternatives or student counter-proposes)."""
 
-    slots: list[TimeSlotOptionSchema]  # teacher: max 3, student: 1
-    message: str | None = None
+    slots: list[TimeSlotOptionSchema] = Field(min_length=1, max_length=3)
+    message: str | None = Field(default=None, max_length=500)
 
 
 class AlternativeAccept(BaseModel):
     """Student accepts one of the teacher's proposed alternatives."""
 
-    selected_slot_index: int  # 0-based index into the proposal's slots list
-    message: str | None = None
+    selected_slot_index: int = Field(ge=0, le=2)  # 0-based, max 3 slots
+    message: str | None = Field(default=None, max_length=500)
