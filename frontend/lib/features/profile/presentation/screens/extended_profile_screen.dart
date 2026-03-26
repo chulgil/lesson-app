@@ -27,7 +27,7 @@ class ExtendedProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('프로필 수정'),
+        title: const Text('학력·경력·자격증'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
