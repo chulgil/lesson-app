@@ -298,7 +298,7 @@ List<TeacherProfile> _generateMockProfiles() {
   return [
     TeacherProfile(
       id: 'profile_1',
-      userId: 'user_teacher_1',
+      userId: 'teacher_1',
       name: '김선생님',
       profileImage: 'https://example.com/profile1.jpg',
       instruments: ['바이올린', '비올라'],
@@ -339,7 +339,7 @@ List<TeacherProfile> _generateMockProfiles() {
     ),
     TeacherProfile(
       id: 'profile_2',
-      userId: 'user_teacher_2',
+      userId: 'teacher_2',
       name: '박선생님',
       profileImage: 'https://example.com/profile2.jpg',
       instruments: ['피아노'],

@@ -170,9 +170,6 @@ class ProfileTab extends ConsumerWidget {
     final backgroundImageAsync =
         ref.watch(backgroundImageNotifierProvider(userId));
     final backgroundPath = backgroundImageAsync.valueOrNull;
-    final profileState = ref.watch(teacherExtendedProfileProvider);
-    final introduction = profileState.valueOrNull?.introduction;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Column(
@@ -194,30 +191,8 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space3),
 
-          // Name + badge
-          Row(
-            children: [
-              Text(name, style: AppTypography.headingLarge),
-              const SizedBox(width: AppSpacing.space2),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '선생님',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // Name
+          Text(name, style: AppTypography.headingLarge),
 
           // Email
           Text(
@@ -225,59 +200,6 @@ class ProfileTab extends ConsumerWidget {
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
             ),
-          ),
-
-          // Introduction text
-          const SizedBox(height: AppSpacing.space2),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  (introduction != null && introduction.isNotEmpty)
-                      ? introduction
-                      : '소개글을 작성해주세요',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: (introduction != null && introduction.isNotEmpty)
-                        ? AppColors.textSecondaryLight
-                        : AppColors.textTertiaryLight,
-                    fontStyle: (introduction != null && introduction.isNotEmpty)
-                        ? FontStyle.normal
-                        : FontStyle.italic,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space2),
-              InkWell(
-                onTap: () => context.push(AppRoutes.profilePreview),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space2,
-                    vertical: AppSpacing.space1,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.visibility_outlined,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '미리보기',
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
