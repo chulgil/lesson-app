@@ -1,6 +1,6 @@
 # 시나리오 테스트 가이드
 
-> 마지막 업데이트: 2026-03-16
+> 마지막 업데이트: 2026-03-26
 
 ## 개요
 
@@ -68,6 +68,19 @@ tests/
 | T-09 | 노쇼 관리 | `POST /lessons` → `PATCH status(noShow)` → `POST /no-shows` → `POST /bookings/makeup` | 노쇼 기록 deducted_credits=1 |
 | T-10 | 하루 멀티 학생 | (`POST /students` → `POST /lessons`) ×3 → `PATCH status(completed)` ×2 → `PATCH status(cancelled)` ×1 → `PUT feedback` ×2 | 3개 레슨 생성, 2개 완료+피드백, 1개 취소 |
 | T-11 | 수강권 만료 후 재등록 | `POST /subscriptions(4회)` → (`POST /lessons` → `PATCH use-lesson`) ×4 → remaining=0 확인 → `POST /proposals` → `PATCH accept` → `PATCH confirm` → `POST /subscriptions(8회)` → 첫 차감 → remaining=7 | 만료→재제안→수락→새 수강권 발급→사용 시작 |
+
+### 통합 레슨 신청 시나리오
+
+| ID | 시나리오 | API 호출 순서 | 검증 포인트 |
+|----|---------|--------------|------------|
+| U-01 | 통합 신청 → 승인 | `POST /lesson-requests` → `PATCH status(approved)` | pending→approved |
+| U-02 | 통합 신청 → 거절 | `POST /lesson-requests` → `PATCH status(rejected)` | decline_reason 확인 |
+| U-03 | 복귀 학생 프리필 | `POST /lesson-requests(is_returning_student=true)` → 승인 | is_returning_student=true |
+| U-04 | 시간 협상 — 대안 수락 | 신청 → `POST propose-alternatives(3개)` → `POST accept-alternative(index=1)` | negotiating→timeConfirmed, preferred_day/time 갱신 |
+| U-05 | 시간 협상 — 역제안 → 승인 | 신청 → propose → `POST counter-propose` → `PATCH status(approved)` | proposals 2개, status=approved |
+| U-06 | 시간 협상 — 2라운드 | 신청 → propose → counter → propose → accept | current_round=2, timeConfirmed |
+| U-07 | 시간 협상 — 3라운드 만료 | 신청 → (propose → counter) ×3 → 마지막 counter에서 expired | status=expired |
+| U-08 | 만료 후 제안 불가 | U-07 후 → propose-alternatives → 400 | 만료 상태에서 추가 제안 차단 |
 
 ### 학생 시나리오 (StudentActions 사용)
 
