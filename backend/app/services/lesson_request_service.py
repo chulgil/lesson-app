@@ -1,4 +1,4 @@
-"""Lesson request service."""
+"""Lesson request service — unified lesson request lifecycle."""
 
 from __future__ import annotations
 
@@ -11,10 +11,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
 from app.schemas.lesson_request import (
+    AlternativeAccept,
     LessonRequestCreate,
     LessonRequestResponse,
     LessonRequestStatusUpdate,
     LessonRequestUpdate,
+    TimeProposalCreate,
 )
 
 
@@ -56,13 +58,23 @@ class LessonRequestService:
         return PaginatedResponse.create(items=items, total=total, page=page, size=size)
 
     async def create(self, data: LessonRequestCreate, current_user: Any) -> LessonRequestResponse:
-        """Create a lesson request."""
+        """Create a unified lesson request."""
         from app.models.schedule import LessonRequest
 
         request = LessonRequest(
             student_id=current_user.id,
             teacher_id=data.teacher_id,
             message=data.message,
+            # Unified fields
+            request_type=data.request_type,
+            instrument=data.instrument,
+            goal=data.goal,
+            experience_level=data.experience_level,
+            preferred_day=data.preferred_day,
+            preferred_time=data.preferred_time,
+            preferred_duration=data.preferred_duration,
+            is_returning_student=data.is_returning_student,
+            # Legacy fields
             preferred_timing=data.preferred_timing,
             keep_previous_schedule=data.keep_previous_schedule,
             previous_lesson_day=data.previous_lesson_day,
@@ -111,12 +123,20 @@ class LessonRequestService:
         if request is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
 
+        now = datetime.now(timezone.utc)
         request.status = data.status
-        request.status_updated_at = datetime.now(timezone.utc)
+        request.status_updated_at = now
+
         if data.decline_reason:
             request.decline_reason = data.decline_reason
         if data.proposal_id:
             request.proposal_id = data.proposal_id
+
+        # Set timestamp based on status transition
+        if data.status == "approved" or data.status == "timeConfirmed":
+            request.confirmed_at = now
+        elif data.status == "cancelled":
+            request.cancelled_at = now
 
         await self.db.flush()
         await self.db.refresh(request)
@@ -131,6 +151,164 @@ class LessonRequestService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
         await self.db.delete(request)
         await self.db.flush()
+
+    async def propose_alternatives(
+        self, request_id: str, data: TimeProposalCreate, current_user: Any
+    ) -> LessonRequestResponse:
+        """Teacher proposes up to 3 alternative time slots."""
+        from app.models.schedule import LessonRequest
+
+        request = await self.db.get(LessonRequest, request_id)
+        if request is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+
+        if request.status not in ("pending", "negotiating"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot propose alternatives for request in status: {request.status}",
+            )
+
+        if len(data.slots) < 1 or len(data.slots) > 3:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Teacher must propose 1-3 alternative slots",
+            )
+
+        max_rounds = 3
+        current_round = request.current_round or 0
+        if current_round >= max_rounds:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Maximum negotiation rounds reached",
+            )
+
+        now = datetime.now(timezone.utc)
+        proposals = list(request.time_proposals or [])
+        proposal_entry = {
+            "proposer_id": current_user.id,
+            "role": "teacher",
+            "action": "propose",
+            "slots": [s.model_dump() for s in data.slots],
+            "message": data.message,
+            "created_at": now.isoformat(),
+        }
+        proposals.append(proposal_entry)
+
+        request.time_proposals = proposals
+        request.status = "negotiating"
+        request.current_round = current_round + 1
+        request.status_updated_at = now
+
+        await self.db.flush()
+        await self.db.refresh(request)
+        return LessonRequestResponse.model_validate(request)
+
+    async def accept_alternative(
+        self, request_id: str, data: AlternativeAccept, current_user: Any
+    ) -> LessonRequestResponse:
+        """Student accepts one of teacher's proposed alternative slots."""
+        from app.models.schedule import LessonRequest
+
+        request = await self.db.get(LessonRequest, request_id)
+        if request is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+
+        if request.status != "negotiating":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Request is not in negotiating status",
+            )
+
+        proposals = list(request.time_proposals or [])
+        teacher_proposals = [p for p in proposals if p.get("role") == "teacher"]
+        if not teacher_proposals:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No teacher proposals to accept",
+            )
+
+        latest_teacher = teacher_proposals[-1]
+        slots = latest_teacher.get("slots", [])
+        if data.selected_slot_index < 0 or data.selected_slot_index >= len(slots):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid slot index",
+            )
+
+        now = datetime.now(timezone.utc)
+        selected_slot = slots[data.selected_slot_index]
+        accept_entry = {
+            "proposer_id": current_user.id,
+            "role": "student",
+            "action": "accept",
+            "slots": [selected_slot],
+            "message": data.message,
+            "created_at": now.isoformat(),
+        }
+        proposals.append(accept_entry)
+
+        request.time_proposals = proposals
+        request.status = "timeConfirmed"
+        request.confirmed_at = now
+        request.status_updated_at = now
+        request.preferred_day = selected_slot.get("day_of_week")
+        request.preferred_time = selected_slot.get("start_time")
+
+        await self.db.flush()
+        await self.db.refresh(request)
+        return LessonRequestResponse.model_validate(request)
+
+    async def counter_propose(
+        self, request_id: str, data: TimeProposalCreate, current_user: Any
+    ) -> LessonRequestResponse:
+        """Student counter-proposes a different time slot."""
+        from app.models.schedule import LessonRequest
+
+        request = await self.db.get(LessonRequest, request_id)
+        if request is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lesson request not found")
+
+        if request.status != "negotiating":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Request is not in negotiating status",
+            )
+
+        if len(data.slots) != 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Student must counter-propose exactly 1 slot",
+            )
+
+        max_rounds = 3
+        current_round = request.current_round or 0
+        if current_round >= max_rounds:
+            # Auto-expire
+            now = datetime.now(timezone.utc)
+            request.status = "expired"
+            request.status_updated_at = now
+            await self.db.flush()
+            await self.db.refresh(request)
+            return LessonRequestResponse.model_validate(request)
+
+        now = datetime.now(timezone.utc)
+        proposals = list(request.time_proposals or [])
+        counter_entry = {
+            "proposer_id": current_user.id,
+            "role": "student",
+            "action": "counterPropose",
+            "slots": [s.model_dump() for s in data.slots],
+            "message": data.message,
+            "created_at": now.isoformat(),
+        }
+        proposals.append(counter_entry)
+
+        request.time_proposals = proposals
+        request.status_updated_at = now
+
+        await self.db.flush()
+        await self.db.refresh(request)
+        return LessonRequestResponse.model_validate(request)
 
     async def process_expired(self) -> int:
         """Mark expired requests. Returns count of processed items."""

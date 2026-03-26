@@ -7,9 +7,8 @@ import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_detail_screen.dart';
 import '../../../features/search/presentation/screens/teacher_search_screen.dart';
-import '../../../features/schedule/presentation/screens/lesson_booking_screen.dart';
-import '../../../features/schedule/presentation/screens/lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/lesson_requests_screen.dart';
+import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/my_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
@@ -30,57 +29,32 @@ List<GoRoute> scheduleRoutes = [
     builder: (context, state) => const TeacherSearchScreen(),
   ),
 
-  // Lesson Booking (chip-based UI for trial/one-time lessons)
+  // Unified Lesson Request (replaces LessonBookingScreen + LessonRequestScreen)
   GoRoute(
     path: AppRoutes.lessonBooking,
     name: 'lessonBooking',
     builder: (context, state) {
-      final extra = state.extra as Map<String, dynamic>?;
-      return LessonBookingScreen(
-        teacherId: extra?['teacherId'] ??
-            state.uri.queryParameters['teacherId'] ??
-            'teacher_1',
-        teacherName: extra?['teacherName'] ??
-            state.uri.queryParameters['teacherName'] ??
-            '선생님',
-        instrument: extra?['instrument'] ??
-            state.uri.queryParameters['instrument'] ??
-            '바이올린',
-        studentId:
-            extra?['studentId'] ?? state.uri.queryParameters['studentId'],
-        studentName:
-            extra?['studentName'] ?? state.uri.queryParameters['studentName'],
-        remainingLessons: extra?['remainingLessons'],
-        totalLessons: extra?['totalLessons'],
-        isReschedule: extra?['isReschedule'] ?? false,
-        isTrialLesson: extra?['isTrialLesson'] ?? false,
-        remainingReschedules: extra?['remainingReschedules'],
-        totalReschedules: extra?['totalReschedules'],
-      );
-    },
-  ),
-
-  // Lesson Request (student requesting to resume lessons with previous teacher)
-  GoRoute(
-    path: AppRoutes.lessonRequest,
-    name: 'lessonRequest',
-    builder: (context, state) {
-      final extra = state.extra as Map<String, dynamic>?;
-      return LessonRequestScreen(
-        teacherId: extra?['teacherId'] ??
-            state.uri.queryParameters['teacherId'] ??
-            '',
-        teacherName: extra?['teacherName'] ??
-            state.uri.queryParameters['teacherName'] ??
-            '선생님',
-        studentId: extra?['studentId'] ??
-            state.uri.queryParameters['studentId'] ??
-            '',
-        studentName: extra?['studentName'] ??
-            state.uri.queryParameters['studentName'] ??
-            '',
-        previousLessonPeriod: extra?['previousLessonPeriod'] ??
-            state.uri.queryParameters['previousLessonPeriod'],
+      final extra = state.extra;
+      if (extra is UnifiedLessonRequestParams) {
+        return UnifiedLessonRequestScreen(params: extra);
+      }
+      // Fallback: construct params from map (backward compatibility)
+      final map = extra as Map<String, dynamic>?;
+      return UnifiedLessonRequestScreen(
+        params: UnifiedLessonRequestParams(
+          teacherId: map?['teacherId'] ??
+              state.uri.queryParameters['teacherId'] ??
+              'teacher_1',
+          teacherName: map?['teacherName'] ??
+              state.uri.queryParameters['teacherName'] ??
+              '선생님',
+          teacherInstruments:
+              (map?['teacherInstruments'] as List<String>?) ?? ['바이올린'],
+          isReturningStudent: map?['isReturningStudent'] ?? false,
+          previousInstrument: map?['previousInstrument'],
+          previousDay: map?['previousDay'],
+          previousTime: map?['previousTime'],
+        ),
       );
     },
   ),

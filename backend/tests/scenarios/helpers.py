@@ -310,6 +310,66 @@ class TeacherActions:
         assert r.status_code == 200
         return r.json()
 
+    # -- Unified Lesson Requests -----------------------------------------------
+
+    async def list_lesson_requests(self, teacher_id: str, **params) -> dict:
+        """List lesson requests for this teacher."""
+        r = await self.client.get(
+            f"{self._base}/schedule/lesson-requests",
+            headers=self.headers,
+            params={"teacher_id": teacher_id, **params},
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def approve_lesson_request(self, request_id: str) -> dict:
+        """Approve a student's lesson request."""
+        r = await self.client.patch(
+            f"{self._base}/schedule/lesson-requests/{request_id}/status",
+            headers=self.headers,
+            json={"status": "approved"},
+        )
+        assert r.status_code == 200, f"approve_lesson_request failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def reject_lesson_request(self, request_id: str, reason: str = "") -> dict:
+        """Reject a student's lesson request with an optional reason."""
+        r = await self.client.patch(
+            f"{self._base}/schedule/lesson-requests/{request_id}/status",
+            headers=self.headers,
+            json={"status": "rejected", "decline_reason": reason},
+        )
+        assert r.status_code == 200, f"reject_lesson_request failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def get_lesson_request(self, request_id: str) -> dict:
+        """Get a single lesson request."""
+        r = await self.client.get(
+            f"{self._base}/schedule/lesson-requests/{request_id}",
+            headers=self.headers,
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def propose_alternatives(
+        self,
+        request_id: str,
+        slots: list[dict],
+        *,
+        message: str | None = None,
+    ) -> dict:
+        """Teacher proposes alternative time slots (max 3)."""
+        payload: dict = {"slots": slots}
+        if message is not None:
+            payload["message"] = message
+        r = await self.client.post(
+            f"{self._base}/schedule/lesson-requests/{request_id}/propose-alternatives",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"propose_alternatives failed: {r.status_code} {r.text}"
+        return r.json()
+
     # -- Group Classes --------------------------------------------------------
 
     async def create_group_schedule(
@@ -566,4 +626,101 @@ class StudentActions:
             f"{self._base}/gamification/{student_id}", headers=self.headers
         )
         assert r.status_code == 200
+        return r.json()
+
+    # -- Unified Lesson Requests -----------------------------------------------
+
+    async def create_lesson_request(
+        self,
+        teacher_id: str,
+        *,
+        request_type: str = "trial",
+        instrument: str = "violin",
+        goal: str = "hobby",
+        experience_level: str = "beginner",
+        preferred_day: int | None = None,
+        preferred_time: str | None = None,
+        preferred_duration: int = 60,
+        message: str | None = None,
+        is_returning_student: bool = False,
+    ) -> str:
+        """Create a unified lesson request and return its ID."""
+        payload: dict = {
+            "teacher_id": teacher_id,
+            "request_type": request_type,
+            "instrument": instrument,
+            "goal": goal,
+            "experience_level": experience_level,
+            "preferred_duration": preferred_duration,
+            "is_returning_student": is_returning_student,
+        }
+        if preferred_day is not None:
+            payload["preferred_day"] = preferred_day
+        if preferred_time is not None:
+            payload["preferred_time"] = preferred_time
+        if message is not None:
+            payload["message"] = message
+        r = await self.client.post(
+            f"{self._base}/schedule/lesson-requests",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 201, f"create_lesson_request failed: {r.status_code} {r.text}"
+        return r.json()["id"]
+
+    async def get_lesson_request(self, request_id: str) -> dict:
+        """Get a single lesson request."""
+        r = await self.client.get(
+            f"{self._base}/schedule/lesson-requests/{request_id}",
+            headers=self.headers,
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def list_my_lesson_requests(self, student_id: str) -> dict:
+        """List lesson requests sent by this student."""
+        r = await self.client.get(
+            f"{self._base}/schedule/lesson-requests",
+            headers=self.headers,
+            params={"student_id": student_id},
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def accept_alternative(
+        self,
+        request_id: str,
+        selected_slot_index: int,
+        *,
+        message: str | None = None,
+    ) -> dict:
+        """Student accepts one of the teacher's proposed alternative slots."""
+        payload: dict = {"selected_slot_index": selected_slot_index}
+        if message is not None:
+            payload["message"] = message
+        r = await self.client.post(
+            f"{self._base}/schedule/lesson-requests/{request_id}/accept-alternative",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"accept_alternative failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def counter_propose(
+        self,
+        request_id: str,
+        slot: dict,
+        *,
+        message: str | None = None,
+    ) -> dict:
+        """Student counter-proposes a different time slot."""
+        payload: dict = {"slots": [slot]}
+        if message is not None:
+            payload["message"] = message
+        r = await self.client.post(
+            f"{self._base}/schedule/lesson-requests/{request_id}/counter-propose",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"counter_propose failed: {r.status_code} {r.text}"
         return r.json()

@@ -7,8 +7,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/lesson_request.dart';
+import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
+import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/lesson_request_list.dart';
+import '../widgets/unified_request_card.dart';
 
 /// State provider for selection mode
 final _isSelectionModeProvider = StateProvider<bool>((ref) => false);
@@ -149,26 +152,39 @@ class LessonRequestsScreen extends ConsumerWidget {
 
           return Column(
             children: [
-              // Request list
               Expanded(
-                child: LessonRequestList(
-                  requests: requests,
-                  isSelectionMode: isSelectionMode,
-                  selectedIds: selectedIds,
-                  onToggleSelection: (requestId) {
-                    final current =
-                        ref.read(_selectedRequestIdsProvider.notifier).state;
-                    if (current.contains(requestId)) {
-                      ref.read(_selectedRequestIdsProvider.notifier).state = {
-                        ...current,
-                      }..remove(requestId);
-                    } else {
-                      ref.read(_selectedRequestIdsProvider.notifier).state = {
-                        ...current,
-                        requestId,
-                      };
-                    }
-                  },
+                child: CustomScrollView(
+                  slivers: [
+                    // Unified lesson requests section (Phase 1)
+                    _UnifiedRequestsSection(teacherId: teacherId),
+                    // Legacy request list
+                    SliverToBoxAdapter(
+                      child: LessonRequestList(
+                        requests: requests,
+                        isSelectionMode: isSelectionMode,
+                        selectedIds: selectedIds,
+                        onToggleSelection: (requestId) {
+                          final current = ref
+                              .read(_selectedRequestIdsProvider.notifier)
+                              .state;
+                          if (current.contains(requestId)) {
+                            ref
+                                .read(_selectedRequestIdsProvider.notifier)
+                                .state = {
+                              ...current,
+                            }..remove(requestId);
+                          } else {
+                            ref
+                                .read(_selectedRequestIdsProvider.notifier)
+                                .state = {
+                              ...current,
+                              requestId,
+                            };
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -338,6 +354,170 @@ class LessonRequestsScreen extends ConsumerWidget {
       }
     }
 
+    reasonController.dispose();
+  }
+}
+
+/// Section showing unified lesson requests with approve/reject actions.
+class _UnifiedRequestsSection extends ConsumerWidget {
+  final String teacherId;
+
+  const _UnifiedRequestsSection({required this.teacherId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unifiedAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
+
+    return unifiedAsync.when(
+      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
+      error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+      data: (requests) {
+        if (requests.isEmpty) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+
+        return SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              if (index == 0) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.screenPadding,
+                    AppSpacing.space4,
+                    AppSpacing.screenPadding,
+                    AppSpacing.space2,
+                  ),
+                  child: Text(
+                    '레슨 신청',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                );
+              }
+
+              final request = requests[index - 1];
+              return UnifiedRequestCard(
+                request: request,
+                onApprove: request.status == UnifiedRequestStatus.pending
+                    ? () => _handleApprove(context, ref, request)
+                    : null,
+                onReject: request.status == UnifiedRequestStatus.pending
+                    ? () => _handleReject(context, ref, request)
+                    : null,
+              );
+            },
+            childCount: requests.length + 1, // +1 for header
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleApprove(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.approveRequest(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('레슨 신청을 승인했습니다'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('오류가 발생했습니다'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleReject(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final reasonController = TextEditingController(
+      text: '스케줄이 꽉 차서 다음에 신청해주세요',
+    );
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('레슨 신청 거절'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('거절 사유를 입력해주세요.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reasonController,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: '거절 사유 (선택)',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.error,
+            ),
+            child: const Text('거절'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final actions = UnifiedLessonRequestActions(ref);
+        await actions.rejectRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          reason: reasonController.text,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('레슨 신청을 거절했습니다'),
+              backgroundColor: AppColors.textSecondaryLight,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('오류가 발생했습니다'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
     reasonController.dispose();
   }
 }

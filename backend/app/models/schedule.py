@@ -29,11 +29,36 @@ class RequestTiming(str, enum.Enum):
     afterConsultation = "afterConsultation"
 
 
+class RequestType(str, enum.Enum):
+    trial = "trial"
+    regular = "regular"
+
+
+class LessonGoal(str, enum.Enum):
+    hobby = "hobby"
+    exam = "exam"
+    major = "major"
+    other = "other"
+
+
+class ExperienceLevel(str, enum.Enum):
+    beginner = "beginner"
+    intermediate = "intermediate"
+    advanced = "advanced"
+
+
 class RequestStatus(str, enum.Enum):
     pending = "pending"
+    approved = "approved"
+    negotiating = "negotiating"
+    timeConfirmed = "timeConfirmed"
     proposalSent = "proposalSent"
+    proposalAccepted = "proposalAccepted"
+    paymentNotified = "paymentNotified"
+    completed = "completed"
     accepted = "accepted"
     declined = "declined"
+    rejected = "rejected"
     expired = "expired"
     cancelled = "cancelled"
 
@@ -109,31 +134,44 @@ class LessonBooking(UUIDMixin, TimestampMixin, Base):
 
 
 class LessonRequest(UUIDMixin, Base):
-    """Student request for lessons with a teacher."""
+    """Student request for lessons with a teacher (unified: trial + regular + returning)."""
 
     __tablename__ = "lesson_requests"
 
     student_id: Mapped[str] = mapped_column(String(36), nullable=False)
     teacher_id: Mapped[str] = mapped_column(String(36), nullable=False)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
-    preferred_timing: Mapped[RequestTiming] = mapped_column(
-        Enum(RequestTiming, native_enum=True),
-        nullable=False,
-        default=RequestTiming.afterConsultation,
+
+    # Unified lesson request fields
+    request_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # trial, regular
+    instrument: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    goal: Mapped[str | None] = mapped_column(String(20), nullable=True)  # hobby, exam, major, other
+    experience_level: Mapped[str | None] = mapped_column(String(20), nullable=True)  # beginner, intermediate, advanced
+    preferred_day: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 0=Mon...6=Sun
+    preferred_time: Mapped[str | None] = mapped_column(String(5), nullable=True)  # HH:MM
+    preferred_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)  # minutes
+    is_returning_student: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    time_proposals: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
+    current_round: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    suggested_price: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # Legacy fields (kept for backward compatibility)
+    preferred_timing: Mapped[str | None] = mapped_column(
+        String(30), nullable=True, default="afterConsultation",
     )
     keep_previous_schedule: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     previous_lesson_day: Mapped[int | None] = mapped_column(Integer, nullable=True)
     previous_lesson_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     previous_lesson_duration: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    status: Mapped[RequestStatus] = mapped_column(
-        Enum(RequestStatus, native_enum=True),
-        nullable=False,
-        default=RequestStatus.pending,
-    )
+
+    # Status
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="pending")
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     proposal_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     decline_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

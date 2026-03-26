@@ -1,0 +1,775 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'unified_lesson_request_providers.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$teacherUnifiedRequestsHash() =>
+    r'7badd2579857d2673986c6e63733671f710edddc';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// Get all unified lesson requests for a teacher
+///
+/// Copied from [teacherUnifiedRequests].
+@ProviderFor(teacherUnifiedRequests)
+const teacherUnifiedRequestsProvider = TeacherUnifiedRequestsFamily();
+
+/// Get all unified lesson requests for a teacher
+///
+/// Copied from [teacherUnifiedRequests].
+class TeacherUnifiedRequestsFamily
+    extends Family<AsyncValue<List<UnifiedLessonRequest>>> {
+  /// Get all unified lesson requests for a teacher
+  ///
+  /// Copied from [teacherUnifiedRequests].
+  const TeacherUnifiedRequestsFamily();
+
+  /// Get all unified lesson requests for a teacher
+  ///
+  /// Copied from [teacherUnifiedRequests].
+  TeacherUnifiedRequestsProvider call(
+    String teacherId,
+  ) {
+    return TeacherUnifiedRequestsProvider(
+      teacherId,
+    );
+  }
+
+  @override
+  TeacherUnifiedRequestsProvider getProviderOverride(
+    covariant TeacherUnifiedRequestsProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'teacherUnifiedRequestsProvider';
+}
+
+/// Get all unified lesson requests for a teacher
+///
+/// Copied from [teacherUnifiedRequests].
+class TeacherUnifiedRequestsProvider
+    extends AutoDisposeFutureProvider<List<UnifiedLessonRequest>> {
+  /// Get all unified lesson requests for a teacher
+  ///
+  /// Copied from [teacherUnifiedRequests].
+  TeacherUnifiedRequestsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => teacherUnifiedRequests(
+            ref as TeacherUnifiedRequestsRef,
+            teacherId,
+          ),
+          from: teacherUnifiedRequestsProvider,
+          name: r'teacherUnifiedRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$teacherUnifiedRequestsHash,
+          dependencies: TeacherUnifiedRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              TeacherUnifiedRequestsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
+
+  TeacherUnifiedRequestsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<UnifiedLessonRequest>> Function(
+            TeacherUnifiedRequestsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TeacherUnifiedRequestsProvider._internal(
+        (ref) => create(ref as TeacherUnifiedRequestsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>> createElement() {
+    return _TeacherUnifiedRequestsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TeacherUnifiedRequestsProvider &&
+        other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin TeacherUnifiedRequestsRef
+    on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _TeacherUnifiedRequestsProviderElement
+    extends AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>>
+    with TeacherUnifiedRequestsRef {
+  _TeacherUnifiedRequestsProviderElement(super.provider);
+
+  @override
+  String get teacherId => (origin as TeacherUnifiedRequestsProvider).teacherId;
+}
+
+String _$pendingUnifiedRequestsHash() =>
+    r'95aad8bd2f15766cbed1bc8dd2141ff8c1fb1fbc';
+
+/// Get pending unified requests for a teacher
+///
+/// Copied from [pendingUnifiedRequests].
+@ProviderFor(pendingUnifiedRequests)
+const pendingUnifiedRequestsProvider = PendingUnifiedRequestsFamily();
+
+/// Get pending unified requests for a teacher
+///
+/// Copied from [pendingUnifiedRequests].
+class PendingUnifiedRequestsFamily
+    extends Family<AsyncValue<List<UnifiedLessonRequest>>> {
+  /// Get pending unified requests for a teacher
+  ///
+  /// Copied from [pendingUnifiedRequests].
+  const PendingUnifiedRequestsFamily();
+
+  /// Get pending unified requests for a teacher
+  ///
+  /// Copied from [pendingUnifiedRequests].
+  PendingUnifiedRequestsProvider call(
+    String teacherId,
+  ) {
+    return PendingUnifiedRequestsProvider(
+      teacherId,
+    );
+  }
+
+  @override
+  PendingUnifiedRequestsProvider getProviderOverride(
+    covariant PendingUnifiedRequestsProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'pendingUnifiedRequestsProvider';
+}
+
+/// Get pending unified requests for a teacher
+///
+/// Copied from [pendingUnifiedRequests].
+class PendingUnifiedRequestsProvider
+    extends AutoDisposeFutureProvider<List<UnifiedLessonRequest>> {
+  /// Get pending unified requests for a teacher
+  ///
+  /// Copied from [pendingUnifiedRequests].
+  PendingUnifiedRequestsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingUnifiedRequests(
+            ref as PendingUnifiedRequestsRef,
+            teacherId,
+          ),
+          from: pendingUnifiedRequestsProvider,
+          name: r'pendingUnifiedRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingUnifiedRequestsHash,
+          dependencies: PendingUnifiedRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              PendingUnifiedRequestsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
+
+  PendingUnifiedRequestsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<UnifiedLessonRequest>> Function(
+            PendingUnifiedRequestsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PendingUnifiedRequestsProvider._internal(
+        (ref) => create(ref as PendingUnifiedRequestsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>> createElement() {
+    return _PendingUnifiedRequestsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PendingUnifiedRequestsProvider &&
+        other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PendingUnifiedRequestsRef
+    on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _PendingUnifiedRequestsProviderElement
+    extends AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>>
+    with PendingUnifiedRequestsRef {
+  _PendingUnifiedRequestsProviderElement(super.provider);
+
+  @override
+  String get teacherId => (origin as PendingUnifiedRequestsProvider).teacherId;
+}
+
+String _$pendingUnifiedRequestCountHash() =>
+    r'6f97be486f15a369f1aae0f6b2cf9e8441cf5828';
+
+/// Get pending unified request count (for badge)
+///
+/// Copied from [pendingUnifiedRequestCount].
+@ProviderFor(pendingUnifiedRequestCount)
+const pendingUnifiedRequestCountProvider = PendingUnifiedRequestCountFamily();
+
+/// Get pending unified request count (for badge)
+///
+/// Copied from [pendingUnifiedRequestCount].
+class PendingUnifiedRequestCountFamily extends Family<AsyncValue<int>> {
+  /// Get pending unified request count (for badge)
+  ///
+  /// Copied from [pendingUnifiedRequestCount].
+  const PendingUnifiedRequestCountFamily();
+
+  /// Get pending unified request count (for badge)
+  ///
+  /// Copied from [pendingUnifiedRequestCount].
+  PendingUnifiedRequestCountProvider call(
+    String teacherId,
+  ) {
+    return PendingUnifiedRequestCountProvider(
+      teacherId,
+    );
+  }
+
+  @override
+  PendingUnifiedRequestCountProvider getProviderOverride(
+    covariant PendingUnifiedRequestCountProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'pendingUnifiedRequestCountProvider';
+}
+
+/// Get pending unified request count (for badge)
+///
+/// Copied from [pendingUnifiedRequestCount].
+class PendingUnifiedRequestCountProvider
+    extends AutoDisposeFutureProvider<int> {
+  /// Get pending unified request count (for badge)
+  ///
+  /// Copied from [pendingUnifiedRequestCount].
+  PendingUnifiedRequestCountProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingUnifiedRequestCount(
+            ref as PendingUnifiedRequestCountRef,
+            teacherId,
+          ),
+          from: pendingUnifiedRequestCountProvider,
+          name: r'pendingUnifiedRequestCountProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingUnifiedRequestCountHash,
+          dependencies: PendingUnifiedRequestCountFamily._dependencies,
+          allTransitiveDependencies:
+              PendingUnifiedRequestCountFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
+
+  PendingUnifiedRequestCountProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<int> Function(PendingUnifiedRequestCountRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PendingUnifiedRequestCountProvider._internal(
+        (ref) => create(ref as PendingUnifiedRequestCountRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<int> createElement() {
+    return _PendingUnifiedRequestCountProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PendingUnifiedRequestCountProvider &&
+        other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin PendingUnifiedRequestCountRef on AutoDisposeFutureProviderRef<int> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _PendingUnifiedRequestCountProviderElement
+    extends AutoDisposeFutureProviderElement<int>
+    with PendingUnifiedRequestCountRef {
+  _PendingUnifiedRequestCountProviderElement(super.provider);
+
+  @override
+  String get teacherId =>
+      (origin as PendingUnifiedRequestCountProvider).teacherId;
+}
+
+String _$studentUnifiedRequestsHash() =>
+    r'63ffd43d11d17f4c625d2259481c9afd12802b8d';
+
+/// Get unified requests sent by a student
+///
+/// Copied from [studentUnifiedRequests].
+@ProviderFor(studentUnifiedRequests)
+const studentUnifiedRequestsProvider = StudentUnifiedRequestsFamily();
+
+/// Get unified requests sent by a student
+///
+/// Copied from [studentUnifiedRequests].
+class StudentUnifiedRequestsFamily
+    extends Family<AsyncValue<List<UnifiedLessonRequest>>> {
+  /// Get unified requests sent by a student
+  ///
+  /// Copied from [studentUnifiedRequests].
+  const StudentUnifiedRequestsFamily();
+
+  /// Get unified requests sent by a student
+  ///
+  /// Copied from [studentUnifiedRequests].
+  StudentUnifiedRequestsProvider call(
+    String studentId,
+  ) {
+    return StudentUnifiedRequestsProvider(
+      studentId,
+    );
+  }
+
+  @override
+  StudentUnifiedRequestsProvider getProviderOverride(
+    covariant StudentUnifiedRequestsProvider provider,
+  ) {
+    return call(
+      provider.studentId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'studentUnifiedRequestsProvider';
+}
+
+/// Get unified requests sent by a student
+///
+/// Copied from [studentUnifiedRequests].
+class StudentUnifiedRequestsProvider
+    extends AutoDisposeFutureProvider<List<UnifiedLessonRequest>> {
+  /// Get unified requests sent by a student
+  ///
+  /// Copied from [studentUnifiedRequests].
+  StudentUnifiedRequestsProvider(
+    String studentId,
+  ) : this._internal(
+          (ref) => studentUnifiedRequests(
+            ref as StudentUnifiedRequestsRef,
+            studentId,
+          ),
+          from: studentUnifiedRequestsProvider,
+          name: r'studentUnifiedRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$studentUnifiedRequestsHash,
+          dependencies: StudentUnifiedRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              StudentUnifiedRequestsFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
+
+  StudentUnifiedRequestsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<UnifiedLessonRequest>> Function(
+            StudentUnifiedRequestsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StudentUnifiedRequestsProvider._internal(
+        (ref) => create(ref as StudentUnifiedRequestsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>> createElement() {
+    return _StudentUnifiedRequestsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StudentUnifiedRequestsProvider &&
+        other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin StudentUnifiedRequestsRef
+    on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _StudentUnifiedRequestsProviderElement
+    extends AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>>
+    with StudentUnifiedRequestsRef {
+  _StudentUnifiedRequestsProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as StudentUnifiedRequestsProvider).studentId;
+}
+
+String _$unifiedRequestByIdHash() =>
+    r'e31943daeab7e2b56df0eb5185ab1e3d6b46ff7b';
+
+/// Get a single unified request by ID
+///
+/// Copied from [unifiedRequestById].
+@ProviderFor(unifiedRequestById)
+const unifiedRequestByIdProvider = UnifiedRequestByIdFamily();
+
+/// Get a single unified request by ID
+///
+/// Copied from [unifiedRequestById].
+class UnifiedRequestByIdFamily
+    extends Family<AsyncValue<UnifiedLessonRequest?>> {
+  /// Get a single unified request by ID
+  ///
+  /// Copied from [unifiedRequestById].
+  const UnifiedRequestByIdFamily();
+
+  /// Get a single unified request by ID
+  ///
+  /// Copied from [unifiedRequestById].
+  UnifiedRequestByIdProvider call(
+    String requestId,
+  ) {
+    return UnifiedRequestByIdProvider(
+      requestId,
+    );
+  }
+
+  @override
+  UnifiedRequestByIdProvider getProviderOverride(
+    covariant UnifiedRequestByIdProvider provider,
+  ) {
+    return call(
+      provider.requestId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'unifiedRequestByIdProvider';
+}
+
+/// Get a single unified request by ID
+///
+/// Copied from [unifiedRequestById].
+class UnifiedRequestByIdProvider
+    extends AutoDisposeFutureProvider<UnifiedLessonRequest?> {
+  /// Get a single unified request by ID
+  ///
+  /// Copied from [unifiedRequestById].
+  UnifiedRequestByIdProvider(
+    String requestId,
+  ) : this._internal(
+          (ref) => unifiedRequestById(
+            ref as UnifiedRequestByIdRef,
+            requestId,
+          ),
+          from: unifiedRequestByIdProvider,
+          name: r'unifiedRequestByIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$unifiedRequestByIdHash,
+          dependencies: UnifiedRequestByIdFamily._dependencies,
+          allTransitiveDependencies:
+              UnifiedRequestByIdFamily._allTransitiveDependencies,
+          requestId: requestId,
+        );
+
+  UnifiedRequestByIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.requestId,
+  }) : super.internal();
+
+  final String requestId;
+
+  @override
+  Override overrideWith(
+    FutureOr<UnifiedLessonRequest?> Function(UnifiedRequestByIdRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: UnifiedRequestByIdProvider._internal(
+        (ref) => create(ref as UnifiedRequestByIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        requestId: requestId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<UnifiedLessonRequest?> createElement() {
+    return _UnifiedRequestByIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is UnifiedRequestByIdProvider && other.requestId == requestId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, requestId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin UnifiedRequestByIdRef
+    on AutoDisposeFutureProviderRef<UnifiedLessonRequest?> {
+  /// The parameter `requestId` of this provider.
+  String get requestId;
+}
+
+class _UnifiedRequestByIdProviderElement
+    extends AutoDisposeFutureProviderElement<UnifiedLessonRequest?>
+    with UnifiedRequestByIdRef {
+  _UnifiedRequestByIdProviderElement(super.provider);
+
+  @override
+  String get requestId => (origin as UnifiedRequestByIdProvider).requestId;
+}
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

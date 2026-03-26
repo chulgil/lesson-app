@@ -8,8 +8,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/domain/entities/teacher_search.dart';
+import '../../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../../features/search/presentation/providers/teacher_search_provider.dart';
-import '../../../parent_home/presentation/providers/user_profile_provider.dart';
 import '../../../profile/domain/entities/invite.dart';
 import '../../../profile/presentation/providers/invite_provider.dart';
 
@@ -372,83 +372,36 @@ class _TeacherDetailContent extends ConsumerWidget {
                 // Lesson request buttons or Reconnect button
                 const SizedBox(height: AppSpacing.space6),
                 if (isPreviousTeacher) ...[
-                  // Previous teacher - show reconnect button
+                  // Previous teacher - show "다시 시작하기" button
                   _buildReconnectSection(context, ref, disconnectedConnection),
                 ] else ...[
-                  // New teacher - show trial/regular lesson buttons
-                  Builder(
-                    builder: (context) {
-                      final userProfile = ref.watch(currentUserProfileProvider);
-                      return Row(
-                        children: [
-                          // Trial lesson button
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Navigate to new chip-based booking screen for trial lesson
-                                context.push(
-                                  AppRoutes.lessonBooking,
-                                  extra: {
-                                    'teacherId': profile.id,
-                                    'teacherName': profile.name ?? '',
-                                    'instrument': profile.instruments.isNotEmpty
-                                        ? profile.instruments.first
-                                        : '악기',
-                                    'studentId': userProfile.userId,
-                                    'studentName': userProfile.userName,
-                                    'isTrialLesson': true,
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.school_outlined),
-                              label: const Text('체험레슨'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.secondary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: AppSpacing.space3),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
+                  // New teacher - single "레슨 신청" button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.lessonBooking,
+                          extra: UnifiedLessonRequestParams(
+                            teacherId: profile.id,
+                            teacherName: profile.name ?? '',
+                            teacherInstruments: profile.instruments,
+                            isReturningStudent: false,
                           ),
-                          const SizedBox(width: AppSpacing.space3),
-                          // Regular lesson button
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                // Navigate to new chip-based booking screen for regular lesson
-                                context.push(
-                                  AppRoutes.lessonBooking,
-                                  extra: {
-                                    'teacherId': profile.id,
-                                    'teacherName': profile.name ?? '',
-                                    'instrument': profile.instruments.isNotEmpty
-                                        ? profile.instruments.first
-                                        : '악기',
-                                    'studentId': userProfile.userId,
-                                    'studentName': userProfile.userName,
-                                    'isTrialLesson': false,
-                                  },
-                                );
-                              },
-                              icon: const Icon(Icons.calendar_today),
-                              label: const Text('정규레슨'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: AppSpacing.space3),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                        );
+                      },
+                      icon: const Icon(Icons.send_outlined),
+                      label: const Text('레슨 신청'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: AppSpacing.space3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.space6),
@@ -517,27 +470,26 @@ class _TeacherDetailContent extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
-        // Lesson request button (not direct booking - teacher needs to propose subscription)
+        // Unified lesson request (returning student)
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {
-              final userProfile = ref.read(currentUserProfileProvider);
-              // Navigate to lesson request screen (not booking screen)
-              // Teacher will review and send subscription proposal
               context.push(
-                '/schedule/lesson-request',
-                extra: {
-                  'teacherId': profile.id,
-                  'teacherName': profile.name ?? '',
-                  'studentId': userProfile.userId,
-                  'studentName': userProfile.userName,
-                  'previousLessonPeriod': previousLessonPeriod,
-                },
+                AppRoutes.lessonBooking,
+                extra: UnifiedLessonRequestParams(
+                  teacherId: profile.id,
+                  teacherName: profile.name ?? '',
+                  teacherInstruments: profile.instruments,
+                  isReturningStudent: true,
+                  previousInstrument: profile.instruments.isNotEmpty
+                      ? profile.instruments.first
+                      : null,
+                ),
               );
             },
-            icon: const Icon(Icons.send),
-            label: const Text('레슨 요청'),
+            icon: const Icon(Icons.replay),
+            label: const Text('다시 시작하기'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -551,7 +503,7 @@ class _TeacherDetailContent extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space2),
         // Info text
         Text(
-          '선생님이 스케줄 확인 후 수강권을 제안합니다',
+          '선생님에게 레슨 신청서가 전달됩니다',
           style: AppTypography.caption.copyWith(
             color: AppColors.textSecondaryLight,
           ),

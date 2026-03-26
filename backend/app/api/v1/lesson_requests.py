@@ -11,10 +11,12 @@ from app.core.deps import get_current_user, get_db, get_pagination
 from app.models.user import User
 from app.schemas.common import PaginatedResponse, SuccessResponse
 from app.schemas.lesson_request import (
+    AlternativeAccept,
     LessonRequestCreate,
     LessonRequestResponse,
     LessonRequestStatusUpdate,
     LessonRequestUpdate,
+    TimeProposalCreate,
 )
 from app.services.lesson_request_service import LessonRequestService
 
@@ -112,6 +114,57 @@ async def update_lesson_request_status(
     """Change the status of a lesson request."""
     service = LessonRequestService(db)
     return await service.update_status(request_id, body, current_user)
+
+
+@router.post(
+    "/{request_id}/propose-alternatives",
+    response_model=LessonRequestResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Teacher proposes alternative time slots",
+)
+async def propose_alternatives(
+    request_id: str,
+    body: TimeProposalCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> LessonRequestResponse:
+    """Teacher proposes up to 3 alternative time slots."""
+    service = LessonRequestService(db)
+    return await service.propose_alternatives(request_id, body, current_user)
+
+
+@router.post(
+    "/{request_id}/accept-alternative",
+    response_model=LessonRequestResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Student accepts an alternative time slot",
+)
+async def accept_alternative(
+    request_id: str,
+    body: AlternativeAccept,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> LessonRequestResponse:
+    """Student accepts one of the teacher's proposed alternative slots."""
+    service = LessonRequestService(db)
+    return await service.accept_alternative(request_id, body, current_user)
+
+
+@router.post(
+    "/{request_id}/counter-propose",
+    response_model=LessonRequestResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Student counter-proposes a different time",
+)
+async def counter_propose(
+    request_id: str,
+    body: TimeProposalCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> LessonRequestResponse:
+    """Student counter-proposes a different time slot."""
+    service = LessonRequestService(db)
+    return await service.counter_propose(request_id, body, current_user)
 
 
 @router.delete(

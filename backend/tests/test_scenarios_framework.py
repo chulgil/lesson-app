@@ -315,3 +315,358 @@ async def test_fw_subscription_renewal_after_expiry(
 
     new_sub = await teacher.get_subscription(new_sub_id)
     assert_subscription_remaining(new_sub, 7)
+
+
+# ===========================================================================
+# Scenario K: 통합 레슨 신청 — 승인 플로우
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_unified_lesson_request_approve(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Student submits unified lesson request → Teacher approves."""
+    # Step 1: 학생이 통합 레슨 신청 (체험, 바이올린, 초급)
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,  # 화요일
+        preferred_time="14:00",
+        preferred_duration=60,
+        message="바이올린을 배우고 싶습니다",
+    )
+
+    # Step 2: 신청 데이터 확인
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "pending")
+    assert req["request_type"] == "trial"
+    assert req["instrument"] == "violin"
+    assert req["goal"] == "hobby"
+    assert req["experience_level"] == "beginner"
+    assert req["preferred_day"] == 1
+    assert req["preferred_time"] == "14:00"
+    assert req["message"] == "바이올린을 배우고 싶습니다"
+
+    # Step 3: 선생님이 요청 목록에서 확인
+    requests = await teacher.list_lesson_requests("test-user-id")
+    assert_total(requests, 1)
+
+    # Step 4: 선생님이 승인
+    approved = await teacher.approve_lesson_request(request_id)
+    assert_status(approved, "approved")
+
+    # Step 5: 학생이 상태 확인
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "approved")
+
+
+# ===========================================================================
+# Scenario L: 통합 레슨 신청 — 거절 플로우
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_unified_lesson_request_reject(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Student submits unified lesson request → Teacher rejects with reason."""
+    # Step 1: 학생이 정규 레슨 신청
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="piano",
+        goal="exam",
+        experience_level="intermediate",
+        preferred_day=3,  # 목요일
+        preferred_time="16:00",
+        message="입시 준비 중입니다",
+    )
+
+    # Step 2: 선생님이 거절 (사유 포함)
+    rejected = await teacher.reject_lesson_request(
+        request_id, reason="스케줄이 꽉 차서 다음에 신청해주세요"
+    )
+    assert_status(rejected, "rejected")
+    assert rejected["decline_reason"] == "스케줄이 꽉 차서 다음에 신청해주세요"
+
+    # Step 3: 학생이 거절 상태 확인
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "rejected")
+    assert req["decline_reason"] == "스케줄이 꽉 차서 다음에 신청해주세요"
+
+
+# ===========================================================================
+# Scenario M: 통합 레슨 신청 — 복귀 학생 프리필
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_unified_lesson_request_returning_student(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Returning student sends request with previous lesson info prefilled."""
+    # Step 1: 복귀 학생이 이전 정보 포함하여 신청
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="violin",
+        goal="hobby",
+        experience_level="intermediate",
+        preferred_day=2,  # 수요일
+        preferred_time="15:00",
+        preferred_duration=60,
+        is_returning_student=True,
+        message="다시 시작하고 싶습니다",
+    )
+
+    # Step 2: 복귀 학생 정보 확인
+    req = await student.get_lesson_request(request_id)
+    assert req["is_returning_student"] is True
+    assert req["request_type"] == "regular"
+
+    # Step 3: 선생님이 승인
+    approved = await teacher.approve_lesson_request(request_id)
+    assert_status(approved, "approved")
+
+
+# ===========================================================================
+# Scenario N: 시간 협상 — 대안 제안 → 학생 수락 → 시간 확정
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_negotiation_accept_alternative(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Teacher proposes 3 alternatives → Student accepts one → timeConfirmed."""
+    # Step 1: 학생이 레슨 신청
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,
+        preferred_time="14:00",
+        message="화요일 2시 가능할까요?",
+    )
+
+    # Step 2: 선생님이 대안 3개 제안
+    alternatives = [
+        {"day_of_week": 1, "start_time": "15:00", "end_time": "16:00"},
+        {"day_of_week": 3, "start_time": "14:00", "end_time": "15:00"},
+        {"day_of_week": 5, "start_time": "10:00", "end_time": "11:00"},
+    ]
+    result = await teacher.propose_alternatives(
+        request_id, alternatives, message="화요일 2시는 다른 레슨이 있어요"
+    )
+    assert_status(result, "negotiating")
+    assert result["current_round"] == 1
+    assert len(result["time_proposals"]) == 1
+
+    # Step 3: 학생이 두 번째 대안(목요일 2시) 수락
+    confirmed = await student.accept_alternative(
+        request_id, 1, message="목요일 2시로 할게요!"
+    )
+    assert_status(confirmed, "timeConfirmed")
+    assert confirmed["preferred_day"] == 3  # Thursday
+    assert confirmed["preferred_time"] == "14:00"
+    assert len(confirmed["time_proposals"]) == 2
+
+
+# ===========================================================================
+# Scenario O: 시간 협상 — 학생 역제안 → 선생님 승인
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_negotiation_counter_propose_then_approve(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Teacher proposes alternatives → Student counter-proposes → Teacher approves."""
+    # Step 1: 학생이 레슨 신청
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="piano",
+        goal="exam",
+        experience_level="intermediate",
+        preferred_day=0,
+        preferred_time="10:00",
+    )
+
+    # Step 2: 선생님이 대안 제안
+    alternatives = [
+        {"day_of_week": 2, "start_time": "14:00", "end_time": "15:00"},
+    ]
+    result = await teacher.propose_alternatives(
+        request_id, alternatives, message="월요일은 어려워요"
+    )
+    assert_status(result, "negotiating")
+
+    # Step 3: 학생이 역제안
+    counter_slot = {"day_of_week": 4, "start_time": "16:00", "end_time": "17:00"}
+    countered = await student.counter_propose(
+        request_id, counter_slot, message="금요일 4시는 어떨까요?"
+    )
+    assert_status(countered, "negotiating")
+    assert len(countered["time_proposals"]) == 2
+
+    # Step 4: 선생님이 승인 (기존 status update 엔드포인트)
+    approved = await teacher.approve_lesson_request(request_id)
+    assert_status(approved, "approved")
+
+
+# ===========================================================================
+# Scenario P: 시간 협상 — 2라운드 (대안 → 역제안 → 재대안 → 수락)
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_negotiation_two_rounds(
+    teacher: TeacherActions, student: StudentActions
+):
+    """Round 1: propose → counter. Round 2: propose → accept."""
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=0,
+        preferred_time="09:00",
+    )
+
+    # Round 1: 선생님 대안 → 학생 역제안
+    await teacher.propose_alternatives(
+        request_id,
+        [{"day_of_week": 1, "start_time": "10:00", "end_time": "11:00"}],
+    )
+    await student.counter_propose(
+        request_id,
+        {"day_of_week": 2, "start_time": "11:00", "end_time": "12:00"},
+    )
+
+    req = await student.get_lesson_request(request_id)
+    assert req["current_round"] == 1  # round 1 done
+
+    # Round 2: 선생님 재대안 → 학생 수락
+    result = await teacher.propose_alternatives(
+        request_id,
+        [
+            {"day_of_week": 2, "start_time": "14:00", "end_time": "15:00"},
+            {"day_of_week": 3, "start_time": "14:00", "end_time": "15:00"},
+        ],
+    )
+    assert result["current_round"] == 2
+
+    confirmed = await student.accept_alternative(request_id, 0)
+    assert_status(confirmed, "timeConfirmed")
+    assert confirmed["preferred_day"] == 2
+    assert confirmed["preferred_time"] == "14:00"
+
+
+# ===========================================================================
+# Scenario Q: 시간 협상 — 3라운드 미합의 → 만료
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_negotiation_expire_after_three_rounds(
+    teacher: TeacherActions, student: StudentActions
+):
+    """3 rounds of negotiation without agreement → request expires."""
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="cello",
+        goal="major",
+        experience_level="advanced",
+        preferred_day=0,
+        preferred_time="09:00",
+    )
+
+    # Round 1
+    await teacher.propose_alternatives(
+        request_id,
+        [{"day_of_week": 1, "start_time": "10:00", "end_time": "11:00"}],
+    )
+    await student.counter_propose(
+        request_id,
+        {"day_of_week": 2, "start_time": "11:00", "end_time": "12:00"},
+    )
+
+    # Round 2
+    await teacher.propose_alternatives(
+        request_id,
+        [{"day_of_week": 3, "start_time": "14:00", "end_time": "15:00"}],
+    )
+    await student.counter_propose(
+        request_id,
+        {"day_of_week": 4, "start_time": "16:00", "end_time": "17:00"},
+    )
+
+    # Round 3
+    await teacher.propose_alternatives(
+        request_id,
+        [{"day_of_week": 5, "start_time": "10:00", "end_time": "11:00"}],
+    )
+
+    # Student tries counter-propose at round 3 → should expire
+    result = await student.counter_propose(
+        request_id,
+        {"day_of_week": 0, "start_time": "09:00", "end_time": "10:00"},
+    )
+    assert_status(result, "expired")
+
+
+# ===========================================================================
+# Scenario R: 시간 협상 — 만료 후 추가 제안 불가
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_time_negotiation_no_propose_after_expire(
+    teacher: TeacherActions, student: StudentActions
+):
+    """After expiration, teacher cannot propose alternatives."""
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=0,
+        preferred_time="09:00",
+    )
+
+    # Exhaust all 3 rounds
+    for i in range(3):
+        await teacher.propose_alternatives(
+            request_id,
+            [{"day_of_week": i + 1, "start_time": "10:00", "end_time": "11:00"}],
+        )
+        if i < 2:
+            await student.counter_propose(
+                request_id,
+                {"day_of_week": i + 2, "start_time": "11:00", "end_time": "12:00"},
+            )
+
+    # Last counter triggers expire
+    result = await student.counter_propose(
+        request_id,
+        {"day_of_week": 5, "start_time": "09:00", "end_time": "10:00"},
+    )
+    assert_status(result, "expired")
+
+    # Teacher tries to propose after expiration → should fail (400)
+    r = await teacher.client.post(
+        f"{teacher._base}/schedule/lesson-requests/{request_id}/propose-alternatives",
+        headers=teacher.headers,
+        json={"slots": [{"day_of_week": 0, "start_time": "10:00", "end_time": "11:00"}]},
+    )
+    assert r.status_code == 400
