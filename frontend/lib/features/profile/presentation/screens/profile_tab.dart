@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/profile_photo_header.dart';
-import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
-import '../../../students/presentation/widgets/student_form/student_form_dialogs.dart';
-import '../providers/background_image_provider.dart';
-import '../providers/profile_image_provider.dart';
 
-/// Profile tab with user info and settings
+/// Profile tab with user info and settings — redesigned for 1-tap access.
+///
+/// Menu groups:
+/// 1. 내 소개 — profile editing, instruments, credentials, preview
+/// 2. 레슨 운영 — time, availability, policy, repertoire, templates
+/// 3. 수강권·결제 — subscription templates, outstanding, history
+/// 4. 설정 — notifications, recordings, visibility
+/// 5. 지원 — help, app info
+/// 6. 계정 — terms, privacy, logout
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
 
@@ -34,8 +36,8 @@ class ProfileTab extends ConsumerWidget {
         children: [
           const SizedBox(height: AppSpacing.space4),
 
-          // Profile header
-          _buildProfileHeader(context, ref, name, email, teacherId),
+          // Profile header (simplified — no photo editing here)
+          _buildProfileHeader(name, email),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -44,22 +46,42 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
-          // Menu sections
+          // 내 소개
           _buildMenuSection(
-            title: '내 프로필',
+            title: '내 소개',
             items: [
               _MenuItem(
                 icon: Icons.person_outline,
-                label: '프로필 수정',
+                label: '기본 정보 수정',
+                subtitle: '이름, 사진, 소개, 교수 스타일',
+                onTap: () => context.push(AppRoutes.basicInfoEdit),
+              ),
+              _MenuItem(
+                icon: Icons.music_note,
+                label: '악기 관리',
+                subtitle: '가르치는 악기 추가/관리',
+                onTap: () => context.push(AppRoutes.instrumentManagement),
+              ),
+              _MenuItem(
+                icon: Icons.school_outlined,
+                label: '학력·경력·자격증',
+                subtitle: '교육 배경 및 경력 사항',
                 onTap: () => context.push(AppRoutes.extendedProfile),
+              ),
+              _MenuItem(
+                icon: Icons.visibility_outlined,
+                label: '프로필 미리보기',
+                subtitle: '학생에게 보이는 내 프로필',
+                onTap: () => context.push(AppRoutes.profilePreview),
               ),
             ],
           ),
 
           const SizedBox(height: AppSpacing.space4),
 
+          // 레슨 운영
           _buildMenuSection(
-            title: '레슨 관리',
+            title: '레슨 운영',
             items: [
               _MenuItem(
                 icon: Icons.access_time,
@@ -77,16 +99,55 @@ class ProfileTab extends ConsumerWidget {
                 icon: Icons.shield_outlined,
                 label: '취소/노쇼 정책',
                 subtitle: '변경 횟수, 취소 기한, 노쇼 처리',
-                onTap:
-                    () => context.push(
-                      '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
-                    ),
+                onTap: () => context.push(
+                  '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
+                ),
+              ),
+              _MenuItem(
+                icon: Icons.library_music,
+                label: '레퍼토리 관리',
+                subtitle: '교재 및 곡 목록',
+                onTap: () => context.push(AppRoutes.repertoireManagement),
+              ),
+              _MenuItem(
+                icon: Icons.chat_outlined,
+                label: '피드백 템플릿',
+                subtitle: '자주 쓰는 레슨 피드백 문구',
+                onTap: () => context.push(AppRoutes.tipTemplateManagement),
               ),
             ],
           ),
 
           const SizedBox(height: AppSpacing.space4),
 
+          // 수강권·결제
+          _buildMenuSection(
+            title: '수강권·결제',
+            items: [
+              _MenuItem(
+                icon: Icons.card_membership,
+                label: '수강권 템플릿',
+                subtitle: '수강권 종류 및 가격 설정',
+                onTap: () => context.push(AppRoutes.subscriptionTemplates),
+              ),
+              _MenuItem(
+                icon: Icons.warning_amber_outlined,
+                label: '미수금 관리',
+                subtitle: '결제 대기 중인 수강권',
+                onTap: () => context.push(AppRoutes.outstandingPayments),
+              ),
+              _MenuItem(
+                icon: Icons.receipt_long_outlined,
+                label: '결제 내역',
+                subtitle: '전체 결제 이력 확인',
+                onTap: () => context.push(AppRoutes.paymentManagement),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // 설정
           _buildMenuSection(
             title: '설정',
             items: [
@@ -96,15 +157,22 @@ class ProfileTab extends ConsumerWidget {
                 onTap: () => context.push(AppRoutes.notificationSettings),
               ),
               _MenuItem(
-                icon: Icons.library_music_outlined,
+                icon: Icons.mic_outlined,
                 label: '녹음 관리',
                 onTap: () => context.push(AppRoutes.allRecordings),
+              ),
+              _MenuItem(
+                icon: Icons.lock_outlined,
+                label: '공개 설정',
+                subtitle: '프로필 항목별 공개/비공개',
+                onTap: () => context.push(AppRoutes.profileVisibility),
               ),
             ],
           ),
 
           const SizedBox(height: AppSpacing.space4),
 
+          // 지원
           _buildMenuSection(
             title: '지원',
             items: [
@@ -129,6 +197,7 @@ class ProfileTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // 계정
           _buildMenuSection(
             title: '계정',
             items: [
@@ -157,48 +226,35 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(
-    BuildContext context,
-    WidgetRef ref,
-    String name,
-    String email,
-    String userId,
-  ) {
-    final initial = name.isNotEmpty ? name[0] : '?';
-    final profileImageAsync = ref.watch(profileImageNotifierProvider(userId));
-    final imagePath = profileImageAsync.valueOrNull;
-    final backgroundImageAsync =
-        ref.watch(backgroundImageNotifierProvider(userId));
-    final backgroundPath = backgroundImageAsync.valueOrNull;
+  Widget _buildProfileHeader(String name, String email) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // Photo header with background + profile avatar
-          ProfilePhotoHeader(
-            profileImagePath: imagePath,
-            backgroundImagePath: backgroundPath,
-            initial: initial,
-            avatarColor: AppColors.primaryLight,
-            backgroundHeight: 140,
-            avatarRadius: 40,
-            onTapProfile: () =>
-                _showImagePickerOptions(context, ref, userId, isBackground: false),
-            onTapBackground: () =>
-                _showImagePickerOptions(context, ref, userId, isBackground: true),
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: AppColors.primaryLight,
+            child: Text(
+              name.isNotEmpty ? name[0] : '?',
+              style: AppTypography.headingLarge.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
           ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // Name
-          Text(name, style: AppTypography.headingLarge),
-
-          // Email
-          Text(
-            email,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+          const SizedBox(width: AppSpacing.space4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: AppTypography.headingMedium),
+                const SizedBox(height: 2),
+                Text(
+                  email,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -210,14 +266,13 @@ class ProfileTab extends ConsumerWidget {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
 
-    // Student count from grouped students
     final studentCountValue = groupsAsync.whenOrNull(
-      data: (groups) {
-        final total = groups.fold(0, (sum, g) => sum + g.students.length);
-        return '$total명';
-      },
-    ) ?? '-';
-    // Lesson stats
+          data: (groups) {
+            final total = groups.fold(0, (sum, g) => sum + g.students.length);
+            return '$total명';
+          },
+        ) ??
+        '-';
     final lessonCountValue =
         lessonStatsAsync.whenOrNull(
           data: (stats) => '${stats['completed'] ?? 0}회',
@@ -245,13 +300,14 @@ class ProfileTab extends ConsumerWidget {
             _buildStatItem(
               '완료율',
               lessonStatsAsync.whenOrNull(
-                data: (stats) {
-                  final completed = stats['completed'] ?? 0;
-                  final total = stats['total'] ?? 0;
-                  if (total == 0) return '-';
-                  return '${(completed / total * 100).round()}%';
-                },
-              ) ?? '-',
+                    data: (stats) {
+                      final completed = stats['completed'] ?? 0;
+                      final total = stats['total'] ?? 0;
+                      if (total == 0) return '-';
+                      return '${(completed / total * 100).round()}%';
+                    },
+                  ) ??
+                  '-',
             ),
           ],
         ),
@@ -317,24 +373,23 @@ class ProfileTab extends ConsumerWidget {
               ],
             ),
             child: Column(
-              children:
-                  items.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final item = entry.value;
-                    final isLast = index == items.length - 1;
+              children: items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final isLast = index == items.length - 1;
 
-                    return Column(
-                      children: [
-                        _buildMenuItem(item),
-                        if (!isLast)
-                          Divider(
-                            height: 1,
-                            indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                            color: AppColors.borderLight,
-                          ),
-                      ],
-                    );
-                  }).toList(),
+                return Column(
+                  children: [
+                    _buildMenuItem(item),
+                    if (!isLast)
+                      Divider(
+                        height: 1,
+                        indent: AppSpacing.space4 + 24 + AppSpacing.space3,
+                        color: AppColors.borderLight,
+                      ),
+                  ],
+                );
+              }).toList(),
             ),
           ),
         ],
@@ -387,70 +442,27 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Future<void> _showImagePickerOptions(
-    BuildContext context,
-    WidgetRef ref,
-    String userId, {
-    required bool isBackground,
-  }) async {
-    final currentPath = isBackground
-        ? ref.read(backgroundImageNotifierProvider(userId)).valueOrNull
-        : ref.read(profileImageNotifierProvider(userId)).valueOrNull;
-
-    final action = await showImagePickerBottomSheet(
-      context,
-      title: isBackground ? '배경 사진' : '프로필 사진',
-      showDelete: currentPath != null,
-    );
-    if (action == null || !context.mounted) return;
-
-    if (isBackground) {
-      final notifier =
-          ref.read(backgroundImageNotifierProvider(userId).notifier);
-      if (action == ImagePickerAction.delete) {
-        await notifier.removeImage();
-        return;
-      }
-      final source = action == ImagePickerAction.camera
-          ? ImageSource.camera
-          : ImageSource.gallery;
-      await notifier.pickAndSaveImage(source, context);
-    } else {
-      final notifier =
-          ref.read(profileImageNotifierProvider(userId).notifier);
-      if (action == ImagePickerAction.delete) {
-        await notifier.removeImage();
-        return;
-      }
-      final source = action == ImagePickerAction.camera
-          ? ImageSource.camera
-          : ImageSource.gallery;
-      await notifier.pickAndSaveImage(source, context);
-    }
-  }
-
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: const Text('로그아웃'),
-            content: const Text('정말 로그아웃 하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  Navigator.pop(dialogContext);
-                  await ref.read(authNotifierProvider.notifier).logout();
-                },
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-                child: const Text('로그아웃'),
-              ),
-            ],
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('로그아웃'),
+        content: const Text('정말 로그아웃 하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('취소'),
           ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await ref.read(authNotifierProvider.notifier).logout();
+            },
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('로그아웃'),
+          ),
+        ],
+      ),
     );
   }
 }

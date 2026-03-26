@@ -20,25 +20,43 @@
 | **자격 인증** | Lessonface, 숨고 | 자격증 사진이 전환율 결정 |
 | **한 줄 소개** | 숨고, 당근 | 목록에서 첫인상 결정 |
 
-### 1.3 현재 상태
+### 1.3 현재 상태 (v2.0 — 2026-03-26 재설계 완료)
 
 ```
-ProfileTab (선생님 프로필)
-├── 헤더: 사진 + 이름 + 이메일 (수정 불가)
-├── 통계: 학생 수, 완료 레슨, 완료율 (읽기 전용)
-├── 메뉴:
-│   ├── 내 프로필 → ExtendedProfileScreen (전문 경력)
-│   ├── 레슨 관리 → 악기, 레퍼토리, 레슨시간
-│   ├── 설정 → 알림, 백업
-│   └── 지원 → 도움말, 앱정보
-└── 수정 버튼 → ExtendedProfileScreen
+ProfileTab (선생님 프로필) — 1탭 접근 원칙
+├── 헤더: 아바타 + 이름 + 이메일 (간결)
+├── 통계: 학생 수, 완료 레슨, 완료율
+│
+├── [내 소개]
+│   ├── 기본 정보 수정      → BasicInfoEditScreen (이름, 사진, 소개, 교수스타일, 전문분야)
+│   ├── 악기 관리           → InstrumentManagementScreen (1탭 직접 접근)
+│   ├── 학력·경력·자격증    → ExtendedProfileScreen (교육/경력/자격증 전용)
+│   └── 프로필 미리보기     → ProfilePreviewScreen
+│
+├── [레슨 운영]
+│   ├── 레슨 시간 설정      → LessonTimeSettingsScreen
+│   ├── 가용 시간 관리      → TeacherAvailabilityScreen
+│   ├── 취소/노쇼 정책      → LessonPolicyScreen
+│   ├── 레퍼토리 관리       → RepertoireManagementScreen
+│   └── 피드백 템플릿       → TipTemplateManagementScreen
+│
+├── [수강권·결제]
+│   ├── 수강권 템플릿       → SubscriptionTemplateListScreen
+│   ├── 미수금 관리         → OutstandingPaymentsScreen
+│   └── 결제 내역           → PaymentManagementScreen
+│
+├── [설정] — 알림, 녹음, 공개 설정
+├── [지원] — 도움말, 앱 정보
+└── [계정] — 이용약관, 개인정보, 로그아웃
 ```
 
-**문제점**:
-1. "수정" 버튼이 ExtendedProfileScreen(전문 경력)으로만 연결
-2. 기본 정보(이름, 소개, 사진) 편집이 직관적이지 않음
-3. 교수 스타일, 전문 분야, 포트폴리오 편집 UI 없음
-4. 공개 프로필(학생이 보는) vs 비공개 설정 구분 없음
+**v2.0 개선사항** (2026-03-26):
+1. 악기 관리를 3탭→1탭으로 승격 (ExtendedProfile 경유 제거)
+2. 숨겨진 4개 화면 메뉴 노출 (결제, 미수금, 피드백 템플릿, 프로필 미리보기)
+3. 레슨 관련 설정 통합 (레퍼토리, 피드백 템플릿을 "레슨 운영"에 그룹핑)
+4. 수강권·결제 섹션 신설
+5. 사진 편집 진입점 단일화 (BasicInfoEdit에서만)
+6. 프로필 탭 헤더 간소화 (중복 소개글/배지 제거)
 
 ---
 
