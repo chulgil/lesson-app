@@ -11,6 +11,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
+import '../providers/teacher_extended_profile_provider.dart';
 
 /// Profile tab with user info and settings — redesigned for 1-tap access.
 ///
@@ -27,17 +28,24 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    final name = authState is AuthAuthenticated ? authState.name : '-';
+    final authName = authState is AuthAuthenticated ? authState.name : '-';
     final email = authState is AuthAuthenticated ? authState.email : '-';
     final teacherId = ref.watch(currentUserIdProvider);
+
+    // Profile name takes priority over auth name (editable in BasicInfoEdit)
+    final profileState = ref.watch(teacherExtendedProfileProvider);
+    final profile = profileState.valueOrNull;
+    final name = profile?.name ?? authName;
+    final introduction = profile?.introduction;
+    final instruments = profile?.instruments ?? [];
 
     return SingleChildScrollView(
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.space4),
 
-          // Profile header (simplified — no photo editing here)
-          _buildProfileHeader(name, email),
+          // Profile header with key info
+          _buildProfileHeader(name, email, introduction, instruments),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -226,37 +234,80 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(String name, String email) {
+  Widget _buildProfileHeader(
+    String name,
+    String email,
+    String? introduction,
+    List<String> instruments,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 32,
-            backgroundColor: AppColors.primaryLight,
-            child: Text(
-              name.isNotEmpty ? name[0] : '?',
-              style: AppTypography.headingLarge.copyWith(
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space4),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: AppTypography.headingMedium),
-                const SizedBox(height: 2),
-                Text(
-                  email,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: AppColors.primaryLight,
+                child: Text(
+                  name.isNotEmpty ? name[0] : '?',
+                  style: AppTypography.headingLarge.copyWith(
+                    color: AppColors.primary,
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: AppSpacing.space4),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(name, style: AppTypography.headingMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      email,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+          // Instruments chips
+          if (instruments.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.space3),
+            Wrap(
+              spacing: AppSpacing.space2,
+              runSpacing: AppSpacing.space1,
+              children: instruments.map((inst) => Chip(
+                label: Text(
+                  inst,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                side: BorderSide.none,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+              )).toList(),
+            ),
+          ],
+          // Introduction
+          if (introduction != null && introduction.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              introduction,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
         ],
       ),
     );
