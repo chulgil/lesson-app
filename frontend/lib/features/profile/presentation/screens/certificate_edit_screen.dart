@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/image_utils.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 
@@ -31,6 +37,8 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
   bool _isLoading = false;
   bool _isEdit = false;
   Certificate? _existingCertificate;
+  String? _localImagePath; // Local file path for picked image
+  String? _existingImageUrl; // Existing remote image URL (edit mode)
 
   final Map<CertificateType, String> _typeLabels = {
     CertificateType.musicTeacher: '음악 교원 자격증',
@@ -62,7 +70,43 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           _existingCertificate!.certificateNumber ?? '';
       _selectedType = _existingCertificate!.type;
       _issueDate = _existingCertificate!.issueDate;
+      _existingImageUrl = _existingCertificate!.imageUrl;
     }
+  }
+
+  Future<void> _pickImage() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('카메라로 촬영'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('갤러리에서 선택'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final picked = await pickImage(source);
+    if (picked == null) return;
+
+    setState(() {
+      _localImagePath = picked.path;
+    });
   }
 
   @override
@@ -92,8 +136,29 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
     setState(() => _isLoading = true);
 
     final now = DateTime.now();
+    final certId = _isEdit ? widget.certificateId! : const Uuid().v4();
+
+    // Upload image if a new one was picked
+    String? imageUrl = _isEdit ? _existingCertificate!.imageUrl : null;
+    if (_localImagePath != null) {
+      final apiClient = ref.read(apiClientProvider);
+      final uploadService = ImageUploadService(apiClient);
+      final remoteUrl = await uploadService.uploadImage(
+        filePath: _localImagePath!,
+        imageType: 'certificate',
+        entityType: 'teacher',
+        entityId: certId,
+      );
+      if (remoteUrl != null) {
+        imageUrl = remoteUrl;
+      } else {
+        // Mock mode or upload failed — use local path as fallback
+        imageUrl = _localImagePath;
+      }
+    }
+
     final certificate = Certificate(
-      id: _isEdit ? widget.certificateId! : const Uuid().v4(),
+      id: certId,
       type: _selectedType,
       name: _nameController.text.trim(),
       issuingBody: _issuingBodyController.text.trim(),
@@ -101,10 +166,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       certificateNumber: _certificateNumberController.text.trim().isEmpty
           ? null
           : _certificateNumberController.text.trim(),
-      // Placeholder image URL - will be replaced with actual upload later
-      imageUrl: _isEdit
-          ? _existingCertificate!.imageUrl
-          : 'https://placeholder.com/certificate/${const Uuid().v4()}.jpg',
+      imageUrl: imageUrl ?? '',
       status: CertificateStatus.pending,
       submittedAt: _isEdit ? _existingCertificate!.submittedAt : now,
     );
@@ -299,46 +361,45 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
 
             const SizedBox(height: AppSpacing.space4),
 
-            // Image upload placeholder
+            // Image upload
             _buildLabel('자격증 이미지'),
             const SizedBox(height: AppSpacing.space2),
-            Container(
-              height: 150,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.borderLight,
-                  style: BorderStyle.solid,
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: AppColors.borderLight,
+                    style: BorderStyle.solid,
+                  ),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  color: AppColors.surfaceSecondaryLight,
                 ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                color: AppColors.surfaceSecondaryLight,
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.add_photo_alternate_outlined,
-                      size: 48,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    Text(
-                      '자격증 이미지 업로드',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.space1),
-                    Text(
-                      '(추후 지원 예정)',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
-                      ),
-                    ),
-                  ],
-                ),
+                clipBehavior: Clip.hardEdge,
+                child: _buildImageContent(),
               ),
             ),
+            if (_localImagePath != null || _existingImageUrl != null)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.space2),
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _localImagePath = null;
+                      _existingImageUrl = null;
+                    });
+                  },
+                  icon: Icon(Icons.delete_outline,
+                      size: 18, color: AppColors.error),
+                  label: Text(
+                    '이미지 삭제',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.error,
+                    ),
+                  ),
+                ),
+              ),
 
             const SizedBox(height: AppSpacing.space4),
 
@@ -424,6 +485,105 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildImageContent() {
+    // Show locally picked image
+    if (_localImagePath != null) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.file(
+            File(_localImagePath!),
+            fit: BoxFit.cover,
+          ),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '탭하여 변경',
+                style: AppTypography.caption.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // Show existing remote image (edit mode)
+    if (_existingImageUrl != null &&
+        !_existingImageUrl!.startsWith('https://placeholder.com')) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          _existingImageUrl!.startsWith('/')
+              ? Image.file(File(_existingImageUrl!), fit: BoxFit.cover)
+              : Image.network(
+                  _existingImageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildEmptyImagePlaceholder(),
+                ),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '탭하여 변경',
+                style: AppTypography.caption.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return _buildEmptyImagePlaceholder();
+  }
+
+  Widget _buildEmptyImagePlaceholder() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.add_photo_alternate_outlined,
+            size: 48,
+            color: AppColors.textSecondaryLight,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '자격증 이미지를 등록하세요',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '카메라 촬영 또는 갤러리에서 선택',
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
