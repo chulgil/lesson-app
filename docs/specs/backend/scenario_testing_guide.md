@@ -81,6 +81,9 @@ tests/
 | U-06 | 시간 협상 — 2라운드 | 신청 → propose → counter → propose → accept | current_round=2, timeConfirmed |
 | U-07 | 시간 협상 — 3라운드 만료 | 신청 → (propose → counter) ×3 → 마지막 counter에서 expired | status=expired |
 | U-08 | 만료 후 제안 불가 | U-07 후 → propose-alternatives → 400 | 만료 상태에서 추가 제안 차단 |
+| U-09 | 가격표 자동 매칭 | `PUT /settings/teacher(lesson_price_table)` → `POST /lesson-requests(violin/beginner)` → suggested_price=40000 | 악기×레벨 매칭, 미등록 악기=null |
+| U-10 | 체험 무료 토글 | `PUT /settings/teacher(trial_lesson_free=true)` → `GET` → true → `PUT(false)` → `GET` → false | 영속성 확인 |
+| U-11 | 시간 확정→수강권 발급 | 신청 → 협상 → timeConfirmed → `POST /proposals` → `PATCH respond(accept)` → `PATCH confirm` → `PATCH status(completed)` | 전체 E2E 플로우 |
 
 ### 학생 시나리오 (StudentActions 사용)
 
