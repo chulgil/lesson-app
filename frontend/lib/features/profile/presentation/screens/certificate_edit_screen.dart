@@ -257,7 +257,12 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.screenPadding,
+            AppSpacing.screenPadding,
+            AppSpacing.screenPadding + MediaQuery.of(context).padding.bottom + 32,
+          ),
           children: [
             // Certificate type
             _buildLabel('자격증 종류', required: true),

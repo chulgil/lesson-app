@@ -190,7 +190,12 @@ class _BankAccountEditScreenState
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.space4),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space4,
+            AppSpacing.space4 + MediaQuery.of(context).padding.bottom + 32,
+          ),
           children: [
             // Info banner
             Container(

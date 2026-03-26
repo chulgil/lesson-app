@@ -70,7 +70,7 @@ class _CredentialsContent extends StatelessWidget {
           const SizedBox(height: AppSpacing.space3),
           _buildCertificateSection(context),
 
-          const SizedBox(height: AppSpacing.space8),
+          SizedBox(height: AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32),
         ],
       ),
     );

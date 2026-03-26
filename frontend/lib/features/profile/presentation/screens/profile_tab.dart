@@ -235,7 +235,7 @@ class ProfileTab extends ConsumerWidget {
             ],
           ),
 
-          const SizedBox(height: AppSpacing.space8),
+          SizedBox(height: AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32),
         ],
       ),
     );
