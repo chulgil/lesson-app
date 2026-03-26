@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/config/environment.dart';
@@ -14,6 +17,10 @@ import '../../domain/services/connection_notification_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
 
 part 'notification_providers.g.dart';
+
+const _notificationSettingsBoxName = 'notification_settings';
+const _studentSettingsKey = 'student_settings';
+const _teacherSettingsKey = 'teacher_settings';
 
 /// Notification repository provider (only used for remote mode).
 @Riverpod(keepAlive: true)
@@ -51,49 +58,73 @@ ProposalNotificationService proposalNotificationService(Ref ref) {
   return ProposalNotificationService(notificationService);
 }
 
-/// Provider for student notification settings
-/// TODO: Load from Hive storage
+/// Provider for student notification settings (persisted to Hive)
 @riverpod
 class StudentNotificationSettingsNotifier
     extends _$StudentNotificationSettingsNotifier {
   @override
   StudentNotificationSettings build() {
-    // Return default settings for now
-    // TODO: Load from storage based on current user
-    return StudentNotificationSettings.defaultSettings;
+    return _loadFromHive() ?? StudentNotificationSettings.defaultSettings;
+  }
+
+  StudentNotificationSettings? _loadFromHive() {
+    try {
+      final box = Hive.box(_notificationSettingsBoxName);
+      final jsonStr = box.get(_studentSettingsKey) as String?;
+      if (jsonStr == null) return null;
+      final json = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return StudentNotificationSettings.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _saveToHive(StudentNotificationSettings settings) async {
+    try {
+      final box = Hive.box(_notificationSettingsBoxName);
+      await box.put(_studentSettingsKey, jsonEncode(settings.toJson()));
+    } catch (_) {
+      // Storage failure is non-blocking
+    }
   }
 
   void updateSettings(StudentNotificationSettings newSettings) {
     state = newSettings;
-    // TODO: Save to storage
+    _saveToHive(newSettings);
   }
 
   void toggleLessonReminder(bool enabled) {
     state = state.copyWith(lessonReminderEnabled: enabled);
+    _saveToHive(state);
   }
 
   void togglePracticeReminder(bool enabled) {
     state = state.copyWith(practiceReminderEnabled: enabled);
+    _saveToHive(state);
   }
 
   void toggleStreakWarning(bool enabled) {
     state = state.copyWith(streakWarningEnabled: enabled);
+    _saveToHive(state);
   }
 
   void setPracticeReminderTime(int hour, int minute) {
     state = state.copyWith(
       practiceReminderTime: TimeOfDay(hour: hour, minute: minute),
     );
+    _saveToHive(state);
   }
 
   void setStreakWarningTime(int hour, int minute) {
     state = state.copyWith(
       streakWarningTime: TimeOfDay(hour: hour, minute: minute),
     );
+    _saveToHive(state);
   }
 
   void toggleDnd(bool enabled) {
     state = state.copyWith(dndEnabled: enabled);
+    _saveToHive(state);
   }
 
   void setDndTimes({
@@ -112,52 +143,78 @@ class StudentNotificationSettingsNotifier
         minute: endMinute ?? state.dndEnd.minute,
       ),
     );
+    _saveToHive(state);
   }
 }
 
-/// Provider for teacher notification settings
-/// TODO: Load from Hive storage
+/// Provider for teacher notification settings (persisted to Hive)
 @riverpod
 class TeacherNotificationSettingsNotifier
     extends _$TeacherNotificationSettingsNotifier {
   @override
   TeacherNotificationSettings build() {
-    // Return default settings for now
-    // TODO: Load from storage based on current user
-    return TeacherNotificationSettings.defaultSettings;
+    return _loadFromHive() ?? TeacherNotificationSettings.defaultSettings;
+  }
+
+  TeacherNotificationSettings? _loadFromHive() {
+    try {
+      final box = Hive.box(_notificationSettingsBoxName);
+      final jsonStr = box.get(_teacherSettingsKey) as String?;
+      if (jsonStr == null) return null;
+      final json = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return TeacherNotificationSettings.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _saveToHive(TeacherNotificationSettings settings) async {
+    try {
+      final box = Hive.box(_notificationSettingsBoxName);
+      await box.put(_teacherSettingsKey, jsonEncode(settings.toJson()));
+    } catch (_) {
+      // Storage failure is non-blocking
+    }
   }
 
   void updateSettings(TeacherNotificationSettings newSettings) {
     state = newSettings;
-    // TODO: Save to storage
+    _saveToHive(newSettings);
   }
 
   void toggleLessonReminder(bool enabled) {
     state = state.copyWith(lessonReminderEnabled: enabled);
+    _saveToHive(state);
   }
 
   void toggleNewStudentAlert(bool enabled) {
     state = state.copyWith(newStudentAlert: enabled);
+    _saveToHive(state);
   }
 
   void toggleTrialBookingAlert(bool enabled) {
     state = state.copyWith(trialBookingAlert: enabled);
+    _saveToHive(state);
   }
 
   void togglePaymentReceivedAlert(bool enabled) {
     state = state.copyWith(paymentReceivedAlert: enabled);
+    _saveToHive(state);
   }
 
   void toggleStudentPracticeReport(bool enabled) {
     state = state.copyWith(studentPracticeReport: enabled);
+    _saveToHive(state);
   }
 
   void toggleReviewReceivedAlert(bool enabled) {
     state = state.copyWith(reviewReceivedAlert: enabled);
+    _saveToHive(state);
   }
 
   void toggleDnd(bool enabled) {
     state = state.copyWith(dndEnabled: enabled);
+    _saveToHive(state);
   }
 }
 

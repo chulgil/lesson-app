@@ -183,6 +183,7 @@ void main() async {
   final practiceRecordingsBox = await Hive.openBox<PracticeRecording>(
     'practice_recordings',
   );
+  await Hive.openBox('notification_settings');
 
   // Recover recording paths at startup (fixes Issue #9)
   // We have two types of recordings: Recording and PracticeRecording
