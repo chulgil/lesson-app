@@ -305,7 +305,7 @@ class AcademyDetailScreen extends ConsumerWidget {
             onTrialTap: () {
               final userProfile = ref.read(currentUserProfileProvider);
               context.push(
-                '/schedule/booking',
+                AppRoutes.lessonBooking,
                 extra: {
                   'teacherId': teacher.id,
                   'teacherName': teacher.name ?? '',

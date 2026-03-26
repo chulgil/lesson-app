@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -386,7 +387,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                               onPressed: () {
                                 // Navigate to new chip-based booking screen for trial lesson
                                 context.push(
-                                  '/schedule/booking',
+                                  AppRoutes.lessonBooking,
                                   extra: {
                                     'teacherId': profile.id,
                                     'teacherName': profile.name ?? '',
@@ -419,7 +420,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                               onPressed: () {
                                 // Navigate to new chip-based booking screen for regular lesson
                                 context.push(
-                                  '/schedule/booking',
+                                  AppRoutes.lessonBooking,
                                   extra: {
                                     'teacherId': profile.id,
                                     'teacherName': profile.name ?? '',
