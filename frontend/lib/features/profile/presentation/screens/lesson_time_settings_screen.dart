@@ -624,23 +624,23 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     );
     controller.dispose();
 
-    if (result != null) {
-      final priceTable = Map<String, Map<String, int>>.from(
-          settings.lessonPriceTable ?? {});
-      if (result == -1) {
-        priceTable[instrument]?.remove(level);
-        if (priceTable[instrument]?.isEmpty ?? false) {
-          priceTable.remove(instrument);
-        }
-      } else {
-        priceTable[instrument] = Map<String, int>.from(
-          priceTable[instrument] ?? {},
-        )..[level] = result;
+    if (!context.mounted || result == null) return;
+
+    final priceTable = Map<String, Map<String, int>>.from(
+        settings.lessonPriceTable ?? {});
+    if (result == -1) {
+      priceTable[instrument]?.remove(level);
+      if (priceTable[instrument]?.isEmpty ?? false) {
+        priceTable.remove(instrument);
       }
-      ref
-          .read(teacherSettingsNotifierProvider.notifier)
-          .updatePriceTable(priceTable);
+    } else {
+      priceTable[instrument] = Map<String, int>.from(
+        priceTable[instrument] ?? {},
+      )..[level] = result;
     }
+    ref
+        .read(teacherSettingsNotifierProvider.notifier)
+        .updatePriceTable(priceTable);
   }
 }
 
