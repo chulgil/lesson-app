@@ -491,7 +491,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     return teacherProfileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => const ProposalPaymentInfoCard(),
-      data: (profile) => ProposalPaymentInfoCard(bankAccount: profile?.bankAccount),
+      data: (profile) => ProposalPaymentInfoCard(
+        bankAccount: profile?.defaultBankAccount,
+        bankAccounts: profile?.bankAccounts ?? [],
+      ),
     );
   }
 

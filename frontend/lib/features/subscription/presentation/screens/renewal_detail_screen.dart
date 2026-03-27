@@ -409,7 +409,8 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const ProposalPaymentInfoCard(),
       data: (profile) => ProposalPaymentInfoCard(
-        bankAccount: profile?.bankAccount,
+        bankAccount: profile?.defaultBankAccount,
+        bankAccounts: profile?.bankAccounts ?? [],
       ),
     );
   }

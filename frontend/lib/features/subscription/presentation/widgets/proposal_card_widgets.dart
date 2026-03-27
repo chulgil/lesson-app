@@ -346,17 +346,39 @@ class ProposalDiscountCard extends StatelessWidget {
   }
 }
 
-/// Payment info card with bank account details
-class ProposalPaymentInfoCard extends StatelessWidget {
+/// Payment info card with bank account details.
+/// When multiple accounts exist, shows a dropdown to select which account to display.
+class ProposalPaymentInfoCard extends StatefulWidget {
   final BankAccount? bankAccount;
+  final List<BankAccount> bankAccounts;
 
-  const ProposalPaymentInfoCard({super.key, this.bankAccount});
+  const ProposalPaymentInfoCard({
+    super.key,
+    this.bankAccount,
+    this.bankAccounts = const [],
+  });
+
+  @override
+  State<ProposalPaymentInfoCard> createState() =>
+      _ProposalPaymentInfoCardState();
+}
+
+class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
+  BankAccount? _selectedAccount;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedAccount = widget.bankAccount;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bankName = bankAccount?.bankName ?? '계좌 미등록';
-    final accountNumber = bankAccount?.accountNumber ?? '-';
-    final accountHolder = bankAccount?.accountHolder ?? '-';
+    final account = _selectedAccount;
+    final bankName = account?.bankName ?? '계좌 미등록';
+    final accountNumber = account?.accountNumber ?? '-';
+    final accountHolder = account?.accountHolder ?? '-';
+    final hasMultiple = widget.bankAccounts.length > 1;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -379,6 +401,10 @@ class ProposalPaymentInfoCard extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              if (hasMultiple) ...[
+                const Spacer(),
+                _buildAccountSelector(),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -392,6 +418,48 @@ class ProposalPaymentInfoCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           _PaymentInfoRow(label: '예금주', value: accountHolder),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAccountSelector() {
+    return PopupMenuButton<BankAccount>(
+      onSelected: (account) => setState(() => _selectedAccount = account),
+      itemBuilder: (context) => widget.bankAccounts
+          .map((account) => PopupMenuItem<BankAccount>(
+                value: account,
+                child: Row(
+                  children: [
+                    if (account.id == _selectedAccount?.id)
+                      Icon(Icons.check, size: 16, color: AppColors.primary)
+                    else
+                      const SizedBox(width: 16),
+                    const SizedBox(width: 8),
+                    Text('${account.bankName} ${account.accountNumber}'),
+                  ],
+                ),
+              ))
+          .toList(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '계좌 변경',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Icon(Icons.arrow_drop_down, size: 16, color: AppColors.primary),
+          ],
+        ),
       ),
     );
   }
