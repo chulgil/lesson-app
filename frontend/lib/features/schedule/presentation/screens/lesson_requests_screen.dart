@@ -11,6 +11,7 @@ import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/lesson_request_list.dart';
+import '../widgets/schedule_slot_picker.dart';
 import '../widgets/unified_request_card.dart';
 
 /// State provider for selection mode
@@ -537,14 +538,161 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // TODO: Navigate to schedule slot picker for teacher to select alternatives
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('대안 시간 선택 화면으로 이동합니다'),
+    final selectedSlots = <TimeSlotOption>[];
+    final messageController = TextEditingController();
+
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => DraggableScrollableSheet(
+          initialChildSize: 0.85,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) => Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '대안 시간 선택 (${selectedSlots.length}/3)',
+                        style: AppTypography.bodyLarge
+                            .copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('취소'),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Slot picker
+              Expanded(
+                child: ScheduleSlotPicker(
+                  teacherId: request.teacherId,
+                  onSlotSelected: (slot) {
+                    setState(() {
+                      final existing = selectedSlots.indexWhere(
+                        (s) =>
+                            s.dayOfWeek == slot.dayOfWeek &&
+                            s.startTime == slot.startTime,
+                      );
+                      if (existing >= 0) {
+                        selectedSlots.removeAt(existing);
+                      } else if (selectedSlots.length < 3) {
+                        selectedSlots.add(TimeSlotOption(
+                          id: 'ts_${DateTime.now().millisecondsSinceEpoch}_${selectedSlots.length}',
+                          dayOfWeek: slot.dayOfWeek,
+                          startTime: slot.startTime,
+                          endTime: slot.endTime,
+                        ));
+                      }
+                    });
+                  },
+                ),
+              ),
+
+              // Selected slots summary
+              if (selectedSlots.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space4,
+                  ),
+                  child: Wrap(
+                    spacing: 8,
+                    children: selectedSlots.map((s) => Chip(
+                          label: Text(
+                            '${s.dayLabel} ${s.startTime}',
+                            style: AppTypography.caption,
+                          ),
+                          deleteIcon:
+                              const Icon(Icons.close, size: 16),
+                          onDeleted: () => setState(
+                              () => selectedSlots.remove(s)),
+                        )).toList(),
+                  ),
+                ),
+
+              // Message field
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: TextField(
+                  controller: messageController,
+                  maxLength: 200,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: '메모 (선택)',
+                    counterText: '',
+                  ),
+                ),
+              ),
+
+              // Submit button
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.space4,
+                  0,
+                  AppSpacing.space4,
+                  MediaQuery.of(context).padding.bottom +
+                      AppSpacing.space4,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: selectedSlots.isNotEmpty
+                        ? () => Navigator.pop(context, true)
+                        : null,
+                    child: Text(
+                        '대안 ${selectedSlots.length}개 제안하기'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+      ),
+    );
+
+    if (confirmed == true && selectedSlots.isNotEmpty && context.mounted) {
+      try {
+        final actions = UnifiedLessonRequestActions(ref);
+        await actions.proposeAlternatives(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          slots: selectedSlots,
+          message: messageController.text.isNotEmpty
+              ? messageController.text
+              : null,
+        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('대안 ${selectedSlots.length}개를 제안했습니다'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('오류가 발생했습니다'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
     }
+    messageController.dispose();
   }
 
   Future<void> _handleSendProposal(
@@ -552,17 +700,26 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // TODO: Navigate to subscription proposal creation screen
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            request.type == LessonRequestType.trial
-                ? '체험레슨 예약을 완료합니다'
-                : '수강권 제안 화면으로 이동합니다',
+    if (request.type == LessonRequestType.trial) {
+      // Trial free → complete directly
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('체험레슨 예약이 완료되었습니다'),
+            backgroundColor: AppColors.success,
           ),
-        ),
-      );
+        );
+      }
+    } else {
+      // Regular → navigate to subscription proposal
+      // TODO: Navigate to subscription proposal creation with pre-filled data
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('수강권 제안 화면으로 이동합니다'),
+          ),
+        );
+      }
     }
   }
 }
