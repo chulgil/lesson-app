@@ -1,6 +1,6 @@
 # CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-03-14
+> 마지막 업데이트: 2026-03-27
 
 음악 레슨/연습 관리 앱 (Monorepo: docs + backend + frontend)
 
@@ -9,9 +9,9 @@
 | 항목 | 값 |
 |------|-----|
 | 구조 | Monorepo (docs / backend / frontend) |
-| Frontend | Flutter, Riverpod, Go Router, Hive |
+| Frontend | Flutter 3.29.0, Riverpod, Go Router, Hive |
 | Backend | FastAPI (개발 예정) |
-| 플랫폼 | iOS, Android |
+| 플랫폼 | iOS, Android, macOS |
 | 아키텍처 | Clean Architecture + Feature-based |
 
 ## 프로젝트 구조
