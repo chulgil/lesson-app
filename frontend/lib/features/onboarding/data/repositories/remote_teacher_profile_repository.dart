@@ -268,9 +268,13 @@ class RemoteTeacherProfileRepository implements TeacherProfileRepository {
     final accountHolder = json['account_holder'] as String?;
     final bankAccount = (bankName != null || accountNumber != null)
         ? BankAccount(
+            id: json['bank_account_id'] as String? ?? '',
             bankName: bankName ?? '',
             accountNumber: accountNumber ?? '',
             accountHolder: accountHolder ?? '',
+            createdAt: json['bank_account_created_at'] != null
+                ? DateTime.parse(json['bank_account_created_at'] as String)
+                : DateTime.now(),
           )
         : null;
 

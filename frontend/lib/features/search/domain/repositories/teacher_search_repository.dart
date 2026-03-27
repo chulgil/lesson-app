@@ -122,10 +122,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           ),
         ],
       ),
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_search_1',
         bankName: '국민은행',
         accountNumber: '123-456-789012',
         accountHolder: '김지수',
+        createdAt: DateTime(2024, 1, 1),
       ),
       visibilitySettings: const ProfileVisibilitySettings(
         isSearchable: true,
@@ -191,10 +193,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           ),
         ],
       ),
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_search_2',
         bankName: '신한은행',
         accountNumber: '110-234-567890',
         accountHolder: '이서연',
+        createdAt: DateTime(2024, 3, 1),
       ),
       visibilitySettings: const ProfileVisibilitySettings(
         isSearchable: true,
@@ -242,10 +246,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           startYear: 2018,
         ),
       ],
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_search_3',
         bankName: '하나은행',
         accountNumber: '910-123456-12345',
         accountHolder: '정민호',
+        createdAt: DateTime(2024, 4, 1),
       ),
       verification: TeacherVerification(
         isPhoneVerified: true,
@@ -314,10 +320,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
         careerVisibility: ProfileVisibility.public,
         certificateVisibility: ProfileVisibility.public,
       ),
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_search_4',
         bankName: '우리은행',
         accountNumber: '1002-123-456789',
         accountHolder: '박현우',
+        createdAt: DateTime(2024, 2, 1),
       ),
       createdAt: DateTime(2024, 2, 1),
     ),
@@ -370,10 +378,12 @@ class MockTeacherSearchRepository implements TeacherSearchRepository {
           ),
         ],
       ),
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_search_5',
         bankName: '농협은행',
         accountNumber: '302-1234-5678-91',
         accountHolder: '최유진',
+        createdAt: DateTime(2024, 5, 1),
       ),
       visibilitySettings: const ProfileVisibilitySettings(
         isSearchable: true,
