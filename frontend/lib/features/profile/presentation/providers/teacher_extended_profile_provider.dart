@@ -397,6 +397,28 @@ class TeacherExtendedProfile extends _$TeacherExtendedProfile {
     }
   }
 
+  /// Update multiple bank accounts
+  Future<void> updateBankAccounts(List<BankAccount> accounts) async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    try {
+      final repo = ref.read(teacherProfileRepositoryProvider);
+      // Also update legacy single account with the default
+      final defaultAccount = accounts.where((a) => a.isDefault).firstOrNull ?? accounts.firstOrNull;
+      final updated = await repo.updateProfile(
+        current.copyWith(
+          bankAccounts: accounts,
+          bankAccount: defaultAccount,
+        ),
+      );
+      state = AsyncValue.data(updated);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      rethrow;
+    }
+  }
+
   /// Update searchable setting
   Future<void> updateSearchable(bool isSearchable) async {
     final current = state.valueOrNull;

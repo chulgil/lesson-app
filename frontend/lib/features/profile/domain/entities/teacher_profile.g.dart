@@ -37,16 +37,22 @@ Map<String, dynamic> _$CareerToJson(Career instance) => <String, dynamic>{
     };
 
 BankAccount _$BankAccountFromJson(Map<String, dynamic> json) => BankAccount(
+      id: json['id'] as String,
       bankName: json['bank_name'] as String,
       accountNumber: json['account_number'] as String,
       accountHolder: json['account_holder'] as String,
+      isDefault: json['is_default'] as bool? ?? false,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
 
 Map<String, dynamic> _$BankAccountToJson(BankAccount instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'bank_name': instance.bankName,
       'account_number': instance.accountNumber,
       'account_holder': instance.accountHolder,
+      'is_default': instance.isDefault,
+      'created_at': instance.createdAt.toIso8601String(),
     };
 
 FeeRange _$FeeRangeFromJson(Map<String, dynamic> json) => FeeRange(
@@ -214,6 +220,10 @@ TeacherProfile _$TeacherProfileFromJson(Map<String, dynamic> json) =>
       bankAccount: json['bank_account'] == null
           ? null
           : BankAccount.fromJson(json['bank_account'] as Map<String, dynamic>),
+      bankAccounts: (json['bank_accounts'] as List<dynamic>?)
+              ?.map((e) => BankAccount.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       verification: json['verification'] == null
           ? const TeacherVerification()
           : TeacherVerification.fromJson(
@@ -251,6 +261,7 @@ Map<String, dynamic> _$TeacherProfileToJson(TeacherProfile instance) =>
       'teaching_style': instance.teachingStyle,
       'portfolio_video_urls': instance.portfolioVideoUrls,
       'bank_account': instance.bankAccount?.toJson(),
+      'bank_accounts': instance.bankAccounts.map((e) => e.toJson()).toList(),
       'verification': instance.verification.toJson(),
       'visibility_settings': instance.visibilitySettings.toJson(),
       'created_at': instance.createdAt.toIso8601String(),

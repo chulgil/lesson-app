@@ -140,14 +140,20 @@ class Career {
 /// Bank account information for receiving payments
 @JsonSerializable()
 class BankAccount {
+  final String id;
   final String bankName;
   final String accountNumber;
   final String accountHolder;
+  final bool isDefault;
+  final DateTime createdAt;
 
   const BankAccount({
+    required this.id,
     required this.bankName,
     required this.accountNumber,
     required this.accountHolder,
+    this.isDefault = false,
+    required this.createdAt,
   });
 
   factory BankAccount.fromJson(Map<String, dynamic> json) =>
@@ -155,14 +161,20 @@ class BankAccount {
   Map<String, dynamic> toJson() => _$BankAccountToJson(this);
 
   BankAccount copyWith({
+    String? id,
     String? bankName,
     String? accountNumber,
     String? accountHolder,
+    bool? isDefault,
+    DateTime? createdAt,
   }) {
     return BankAccount(
+      id: id ?? this.id,
       bankName: bankName ?? this.bankName,
       accountNumber: accountNumber ?? this.accountNumber,
       accountHolder: accountHolder ?? this.accountHolder,
+      isDefault: isDefault ?? this.isDefault,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }
@@ -404,8 +416,9 @@ class TeacherProfile {
   final String? teachingStyle;
   final List<String>? portfolioVideoUrls;
 
-  // Payment info
+  // Payment info (legacy single + new multiple)
   final BankAccount? bankAccount;
+  final List<BankAccount> bankAccounts;
 
   // Verification
   final TeacherVerification verification;
@@ -416,6 +429,14 @@ class TeacherProfile {
   // Metadata
   final DateTime createdAt;
   final DateTime? updatedAt;
+
+  /// Get the default bank account (from bankAccounts list, fallback to legacy)
+  BankAccount? get defaultBankAccount {
+    final defaultFromList = bankAccounts.where((a) => a.isDefault).firstOrNull;
+    if (defaultFromList != null) return defaultFromList;
+    if (bankAccounts.isNotEmpty) return bankAccounts.first;
+    return bankAccount;
+  }
 
   /// Check if this is an academy teacher
   bool get isAcademy => organizationId != null;
@@ -443,6 +464,7 @@ class TeacherProfile {
     this.teachingStyle,
     this.portfolioVideoUrls,
     this.bankAccount,
+    this.bankAccounts = const [],
     this.verification = const TeacherVerification(),
     this.visibilitySettings = const ProfileVisibilitySettings(),
     required this.createdAt,
@@ -579,6 +601,7 @@ class TeacherProfile {
     String? teachingStyle,
     List<String>? portfolioVideoUrls,
     BankAccount? bankAccount,
+    List<BankAccount>? bankAccounts,
     TeacherVerification? verification,
     ProfileVisibilitySettings? visibilitySettings,
     DateTime? createdAt,
@@ -604,6 +627,7 @@ class TeacherProfile {
       teachingStyle: teachingStyle ?? this.teachingStyle,
       portfolioVideoUrls: portfolioVideoUrls ?? this.portfolioVideoUrls,
       bankAccount: bankAccount ?? this.bankAccount,
+      bankAccounts: bankAccounts ?? this.bankAccounts,
       verification: verification ?? this.verification,
       visibilitySettings: visibilitySettings ?? this.visibilitySettings,
       createdAt: createdAt ?? this.createdAt,

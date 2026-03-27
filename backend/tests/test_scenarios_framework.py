@@ -798,3 +798,63 @@ async def test_fw_time_confirmed_to_subscription_proposal(
     # Step 8: 레슨 요청 완료 처리
     completed = await teacher.update_lesson_request_status(request_id, "completed")
     assert_status(completed, "completed")
+
+
+# ===========================================================================
+# Scenario V: 복수 입금 계좌 관리
+# ===========================================================================
+
+
+@pytest.mark.asyncio
+async def test_fw_multiple_bank_accounts(teacher: TeacherActions):
+    """Teacher registers multiple bank accounts, sets default, deletes one."""
+    my_profile = await teacher.get_my_teacher_profile()
+    teacher_id = my_profile["id"]
+
+    # Step 1: 계좌 2개 등록
+    accounts = [
+        {
+            "id": "ba_1",
+            "bank_name": "국민은행",
+            "account_number": "123-456-789",
+            "account_holder": "김선생",
+            "is_default": True,
+            "created_at": "2026-03-27T00:00:00Z",
+        },
+        {
+            "id": "ba_2",
+            "bank_name": "신한은행",
+            "account_number": "987-654-321",
+            "account_holder": "김선생",
+            "is_default": False,
+            "created_at": "2026-03-27T00:00:00Z",
+        },
+    ]
+    result = await teacher.update_teacher_profile(
+        teacher_id, bank_accounts=accounts
+    )
+    assert len(result["bank_accounts"]) == 2
+
+    # Step 2: 영속성 확인
+    profile = await teacher.get_my_teacher_profile()
+    assert len(profile["bank_accounts"]) == 2
+    assert profile["bank_accounts"][0]["bank_name"] == "국민은행"
+    assert profile["bank_accounts"][0]["is_default"] is True
+    assert profile["bank_accounts"][1]["bank_name"] == "신한은행"
+    assert profile["bank_accounts"][1]["is_default"] is False
+
+    # Step 3: 디폴트 변경 (신한은행을 기본으로)
+    accounts[0]["is_default"] = False
+    accounts[1]["is_default"] = True
+    result = await teacher.update_teacher_profile(
+        teacher_id, bank_accounts=accounts
+    )
+    assert result["bank_accounts"][1]["is_default"] is True
+
+    # Step 4: 계좌 1개 삭제 (국민은행)
+    updated_accounts = [accounts[1]]
+    result = await teacher.update_teacher_profile(
+        teacher_id, bank_accounts=updated_accounts
+    )
+    assert len(result["bank_accounts"]) == 1
+    assert result["bank_accounts"][0]["bank_name"] == "신한은행"

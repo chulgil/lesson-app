@@ -125,7 +125,7 @@ def student_auth_headers() -> dict[str, str]:
 
 @pytest.fixture
 async def teacher(
-    client: AsyncClient, auth_headers: dict, create_test_user
+    client: AsyncClient, auth_headers: dict, create_test_user, db_session: "AsyncSession"
 ) -> "TeacherActions":
     """Pre-seeded teacher with scenario helper methods.
 
@@ -137,6 +137,11 @@ async def teacher(
     from tests.scenarios.helpers import TeacherActions
 
     await create_test_user(user_id="test-user-id", role="teacher", name="Test Teacher")
+    # Ensure Teacher profile record exists
+    from app.models.teacher import Teacher
+    teacher_record = Teacher(user_id="test-user-id")
+    db_session.add(teacher_record)
+    await db_session.flush()
     return TeacherActions(client, auth_headers)
 
 

@@ -28,6 +28,25 @@ class TeacherActions:
         assert r.status_code == 200, f"get_profile failed: {r.status_code} {r.text}"
         return r.json()
 
+    async def get_my_teacher_profile(self) -> dict:
+        """Get teacher's own profile (creates teacher record if needed)."""
+        r = await self.client.get(
+            f"{self._base}/teachers/me/profile",
+            headers=self.headers,
+        )
+        assert r.status_code == 200, f"get_my_teacher_profile failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def update_teacher_profile(self, teacher_id: str, **kwargs) -> dict:
+        """Update teacher profile fields (bank_accounts, instruments, etc.)."""
+        r = await self.client.put(
+            f"{self._base}/teachers/{teacher_id}",
+            headers=self.headers,
+            json=kwargs,
+        )
+        assert r.status_code == 200, f"update_teacher_profile failed: {r.status_code} {r.text}"
+        return r.json()
+
     async def get_settings(self) -> dict:
         r = await self.client.get(f"{self._base}/settings/teacher", headers=self.headers)
         assert r.status_code == 200

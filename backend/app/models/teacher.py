@@ -41,10 +41,12 @@ class Teacher(UUIDMixin, TimestampMixin, Base):
     specialties: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     portfolio_video_urls: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
 
-    # Banking info
+    # Banking info (legacy single account — kept for backward compatibility)
     bank_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     account_number: Mapped[str | None] = mapped_column(String(50), nullable=True)
     account_holder: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    # Multiple bank accounts (append-only list)
+    bank_accounts: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
 
     # Phone verification
     is_phone_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)

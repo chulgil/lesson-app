@@ -91,6 +91,7 @@ class TeacherResponse(BaseModel):
     bank_name: str | None = None
     account_number: str | None = None
     account_holder: str | None = None
+    bank_accounts: list[dict] | None = None
 
     # Phone verification
     is_phone_verified: bool = False
@@ -128,6 +129,7 @@ class TeacherUpdate(BaseModel):
     bank_name: str | None = None
     account_number: str | None = None
     account_holder: str | None = None
+    bank_accounts: list[dict] | None = None
 
     # Phone verification
     is_phone_verified: bool | None = None

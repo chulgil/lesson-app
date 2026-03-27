@@ -325,11 +325,24 @@ List<TeacherProfile> _generateMockProfiles() {
           endYear: 2015,
         ),
       ],
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_1',
         bankName: '국민은행',
         accountNumber: '123-456-789012',
         accountHolder: '김선생',
+        isDefault: true,
+        createdAt: now.subtract(const Duration(days: 300)),
       ),
+      bankAccounts: [
+        BankAccount(
+          id: 'ba_1',
+          bankName: '국민은행',
+          accountNumber: '123-456-789012',
+          accountHolder: '김선생',
+          isDefault: true,
+          createdAt: now.subtract(const Duration(days: 300)),
+        ),
+      ],
       verification: TeacherVerification(
         isPhoneVerified: true,
         phoneNumber: '010-1234-5678',
@@ -348,10 +361,13 @@ List<TeacherProfile> _generateMockProfiles() {
       lessonAreas: ['서울 서초구'],
       lessonTypes: [LessonType.inPerson],
       feeRange: const FeeRange(minFee: 60000, maxFee: 100000),
-      bankAccount: const BankAccount(
+      bankAccount: BankAccount(
+        id: 'ba_2',
         bankName: '신한은행',
         accountNumber: '110-234-567890',
         accountHolder: '박선생',
+        isDefault: true,
+        createdAt: now.subtract(const Duration(days: 200)),
       ),
       verification: const TeacherVerification(isPhoneVerified: true),
       createdAt: now.subtract(const Duration(days: 200)),
