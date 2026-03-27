@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../features/practice/domain/entities/metronome_settings.dart';
+import '../../../../../models/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting subdivision.
 class SubdivisionPicker extends StatefulWidget {
@@ -223,7 +223,8 @@ class _SubdivisionChip extends StatelessWidget {
             // Visual pattern
             Text(
               subdivision.visualPattern,
-              style: AppTypography.bodyMedium.copyWith(
+              style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isSelected ? Colors.white : AppColors.textPrimaryLight,
                 letterSpacing: 1,
@@ -233,7 +234,8 @@ class _SubdivisionChip extends StatelessWidget {
             // Korean label
             Text(
               subdivision.label,
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.bodySmall.copyWith(
+                fontSize: 11,
                 color: isSelected ? Colors.white : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../features/practice/domain/entities/metronome_settings.dart';
+import '../../../../../models/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting time signature.
 class TimeSignaturePicker extends StatelessWidget {
@@ -114,7 +114,7 @@ class TimeSignaturePicker extends StatelessWidget {
               final isSelected = ts == current;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: _TimeSignatureCard(
                     timeSignature: ts,
                     isSelected: isSelected,
@@ -180,6 +180,7 @@ class _TimeSignatureCard extends StatelessWidget {
                 '큰박 ${timeSignature.mainBeats}개',
                 style: AppTypography.bodySmall.copyWith(
                   color: isSelected ? Colors.white70 : AppColors.textSecondaryLight,
+                  fontSize: 10,
                 ),
               ),
             ],

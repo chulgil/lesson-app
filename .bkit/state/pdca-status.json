@@ -1,0 +1,131 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-03-19T06:11:56.209Z",
+  "activeFeatures": [
+    "schemas",
+    "subscription_service.py",
+    "v1",
+    "schedule_ext_service.py"
+  ],
+  "primaryFeature": "schemas",
+  "features": {
+    "schemas": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-19T06:10:04.415Z",
+        "lastUpdated": "2026-03-19T06:10:04.415Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/schemas/subscription.py"
+    },
+    "subscription_service.py": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-19T06:10:17.823Z",
+        "lastUpdated": "2026-03-19T06:10:17.823Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/services/subscription_service.py"
+    },
+    "v1": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-19T06:10:26.300Z",
+        "lastUpdated": "2026-03-19T06:11:56.209Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/api/v1/groups.py"
+    },
+    "schedule_ext_service.py": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-19T06:11:49.658Z",
+        "lastUpdated": "2026-03-19T06:11:49.658Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/services/schedule_ext_service.py"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-03-16T18:01:22.169Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-03-19T06:11:56.209Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-03-19T06:10:04.415Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:10:17.823Z",
+      "feature": "subscription_service.py",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:10:26.300Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:10:39.366Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:10:59.375Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:11:10.328Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:11:28.247Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:11:49.658Z",
+      "feature": "schedule_ext_service.py",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-19T06:11:56.209Z",
+      "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}
