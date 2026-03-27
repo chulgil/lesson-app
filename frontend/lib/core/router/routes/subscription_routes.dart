@@ -9,11 +9,19 @@ import '../../../features/subscription/presentation/screens/lesson_policy_screen
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
+import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
 
 /// Subscription-related routes.
 /// NOTE: More specific routes (like /issue, /policy) must come BEFORE parameterized routes (like /:id)
 /// to prevent GoRouter from matching them as an ID parameter.
 List<RouteBase> subscriptionRoutes = [
+  GoRoute(
+    path: AppRoutes.subscriptionTemplates,
+    builder: (context, state) {
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      return SubscriptionTemplateListScreen(teacherId: teacherId);
+    },
+  ),
   GoRoute(
     path: AppRoutes.subscriptions,
     builder: (context, state) {
