@@ -378,22 +378,19 @@ class _TimeSignatureSelector extends StatelessWidget {
           ),
         ),
         SizedBox(height: AppSpacing.space2),
-        Row(
+        Wrap(
+          spacing: AppSpacing.space1,
+          runSpacing: AppSpacing.space1,
           children: TimeSignature.values.map((ts) {
             final isSelected = ts == selected;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
-                child: ChoiceChip(
-                  label: Text(ts.label),
-                  selected: isSelected,
-                  onSelected: (_) => onChanged(ts),
-                  selectedColor: AppColors.primary,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
+            return ChoiceChip(
+              label: Text(ts.label),
+              selected: isSelected,
+              onSelected: (_) => onChanged(ts),
+              selectedColor: AppColors.primary,
+              labelStyle: TextStyle(
+                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             );
           }).toList(),

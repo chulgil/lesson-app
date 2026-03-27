@@ -38,14 +38,7 @@ class CatBeatIndicator extends StatelessWidget {
   /// Force eyes to be closed/smiling. Overrides automatic logic.
   final bool? forceSmile;
 
-  int get _beatCount => switch (timeSignature) {
-        TimeSignature.twoFour => 2,
-        TimeSignature.threeFour => 3,
-        TimeSignature.fourFour => 4,
-        TimeSignature.sixEight => 6,
-        TimeSignature.nineEight => 9,
-        TimeSignature.twelveEight => 12,
-      };
+  int get _beatCount => timeSignature.beatsPerMeasure;
 
   /// Determine if eyes should be open based on accent pattern.
   bool get _shouldEyesOpen {

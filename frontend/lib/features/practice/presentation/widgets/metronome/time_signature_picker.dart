@@ -114,7 +114,7 @@ class TimeSignaturePicker extends StatelessWidget {
               final isSelected = ts == current;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
                   child: _TimeSignatureCard(
                     timeSignature: ts,
                     isSelected: isSelected,
