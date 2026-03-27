@@ -479,24 +479,27 @@ class _SubdivisionSelector extends StatelessWidget {
             color: AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                selected.visualPattern,
-                style: AppTypography.bodyLarge.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 4,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  selected.visualPattern,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                  ),
                 ),
-              ),
-              SizedBox(width: AppSpacing.space4),
-              Text(
-                '(${selected.englishName})',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                SizedBox(width: AppSpacing.space4),
+                Text(
+                  '(${selected.englishName})',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],

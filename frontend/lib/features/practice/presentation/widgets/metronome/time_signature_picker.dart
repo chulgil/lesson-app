@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
-import '../../../../../models/metronome_settings.dart';
+import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting time signature.
 class TimeSignaturePicker extends StatelessWidget {
@@ -193,7 +193,7 @@ class _TimeSignatureCard extends StatelessWidget {
   Widget _buildTimeSignatureDisplay(bool isSelected) {
     final parts = timeSignature.label.split('/');
     final numerator = parts[0];
-    final denominator = parts[1];
+    final denominator = parts.length > 1 ? parts[1] : '4';
 
     return Column(
       mainAxisSize: MainAxisSize.min,

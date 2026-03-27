@@ -132,6 +132,7 @@ class _BpmControls extends StatelessWidget {
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Decrement button
