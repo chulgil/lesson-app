@@ -29,8 +29,8 @@ class ProfileTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    final authName = authState is AuthAuthenticated ? authState.name : '-';
-    final email = authState is AuthAuthenticated ? authState.email : '-';
+    final authName = authState is AuthAuthenticated ? authState.name : '';
+    final email = authState is AuthAuthenticated ? authState.email : '';
     final teacherId = ref.watch(currentUserIdProvider);
 
     // Profile name takes priority over auth name (editable in BasicInfoEdit)
@@ -270,13 +270,15 @@ class ProfileTab extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, style: AppTypography.headingMedium),
-                    const SizedBox(height: 2),
-                    Text(
-                      email,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                    if (email.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        email,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
