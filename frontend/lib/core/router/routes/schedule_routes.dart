@@ -113,16 +113,17 @@ List<GoRoute> scheduleRoutes = [
     },
   ),
 
-  // My Lesson Requests (student view of sent lesson requests)
+  // My Lesson Requests (student view — full calendar + filter screen)
   GoRoute(
     path: AppRoutes.myLessonRequests,
     name: 'myLessonRequests',
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
-      return MyLessonRequestsScreen(
-        studentId: extra?['studentId'] ??
-            state.uri.queryParameters['studentId'] ??
-            '',
+      final studentId = extra?['studentId'] ??
+          state.uri.queryParameters['studentId'] ?? '';
+      return AllLessonRequestsScreen(
+        teacherId: studentId,
+        viewerRole: 'student',
       );
     },
   ),

@@ -20,8 +20,13 @@ import '../widgets/request_list_item.dart';
 /// - Filter search → calendar selection clears
 class AllLessonRequestsScreen extends ConsumerStatefulWidget {
   final String teacherId;
+  final String viewerRole;
 
-  const AllLessonRequestsScreen({super.key, required this.teacherId});
+  const AllLessonRequestsScreen({
+    super.key,
+    required this.teacherId,
+    this.viewerRole = 'teacher',
+  });
 
   @override
   ConsumerState<AllLessonRequestsScreen> createState() =>
@@ -46,7 +51,9 @@ class _AllLessonRequestsScreenState
   @override
   Widget build(BuildContext context) {
     final requestsAsync =
-        ref.watch(teacherUnifiedRequestsProvider(widget.teacherId));
+        widget.viewerRole == 'teacher'
+            ? ref.watch(teacherUnifiedRequestsProvider(widget.teacherId))
+            : ref.watch(studentUnifiedRequestsProvider(widget.teacherId));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -109,7 +116,7 @@ class _AllLessonRequestsScreenState
                             onTap: () => context.push(
                               AppRoutes.requestDetail
                                   .replaceFirst(':id', request.id),
-                              extra: {'viewerRole': 'teacher'},
+                              extra: {'viewerRole': widget.viewerRole},
                             ),
                           );
                         },

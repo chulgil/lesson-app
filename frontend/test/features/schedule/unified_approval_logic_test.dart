@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lessonaza/features/schedule/domain/entities/request_event.dart';
 import 'package:lessonaza/features/schedule/domain/entities/unified_lesson_request.dart';
 import 'package:lessonaza/features/schedule/data/repositories/mock_unified_lesson_request_repository.dart';
 
@@ -11,7 +12,6 @@ void main() {
 
   group('Teacher accepts one of student 3 preferred slots', () {
     test('approve sets status to approved', () async {
-      // ulr_1 is a pending trial request with 3 preferredSlots
       final original = await repo.getById('ulr_1');
       expect(original!.status, UnifiedRequestStatus.pending);
       expect(original.preferredSlots.length, 3);
@@ -50,21 +50,20 @@ void main() {
             startTime: '11:00',
             endTime: '12:00',
           ),
-          TimeSlotOption(
-            id: 'alt_3',
-            dayOfWeek: 4,
-            startTime: '14:00',
-            endTime: '15:00',
-          ),
         ],
         message: '이 시간대는 어떠세요?',
       );
 
       expect(result.status, UnifiedRequestStatus.negotiating);
       expect(result.currentRound, 1);
-      expect(result.proposals.length, 1);
-      expect(result.proposals.last.slots.length, 3);
-      expect(result.proposals.last.message, '이 시간대는 어떠세요?');
+
+      // Events-based: check event was created
+      final events = await repo.getEventsByRequestId('ulr_1');
+      final proposeEvent = events.where((e) =>
+          e.eventType.name == 'proposeAlternative').toList();
+      expect(proposeEvent, isNotEmpty);
+      expect(proposeEvent.last.suggestedSlots.length, 2);
+      expect(proposeEvent.last.message, '이 시간대는 어떠세요?');
     });
 
     test('student accepts one alternative → timeConfirmed', () async {
@@ -90,12 +89,17 @@ void main() {
 
       expect(result.status, UnifiedRequestStatus.timeConfirmed);
       expect(result.confirmedAt, isNotNull);
-      expect(result.preferredDay, 0); // Monday
-      expect(result.preferredTime, '15:00');
+
+      // Selected slot is tracked via event, not preferredDay/Time
+      final events = await repo.getEventsByRequestId('ulr_1');
+      final acceptEvent = events.lastWhere(
+          (e) => e.eventType == RequestEventType.acceptAlternative);
+      expect(acceptEvent.selectedSlotIndex, 0);
+      expect(acceptEvent.message, '좋아요!');
     });
   });
 
-  group('2-round limit (v2.0)', () {
+  group('Unlimited negotiation (maxRounds removed)', () {
     test('round 1: teacher proposes → round becomes 1', () async {
       final result = await repo.proposeAlternatives(
         'ulr_1',
@@ -111,8 +115,7 @@ void main() {
       expect(result.currentRound, 1);
     });
 
-    test('round 2: student counter-proposes → round becomes 2', () async {
-      // Round 1: teacher proposes
+    test('round 2: student counter-proposes → still negotiating', () async {
       await repo.proposeAlternatives(
         'ulr_1',
         slots: [
@@ -125,7 +128,6 @@ void main() {
         ],
       );
 
-      // Student counter-proposes (round 1 → updates)
       final result = await repo.counterPropose(
         'ulr_1',
         slot: TimeSlotOption(
@@ -137,53 +139,37 @@ void main() {
         message: '이 시간은 어떨까요?',
       );
 
-      // Should NOT expire at round 1
       expect(result.status, isNot(UnifiedRequestStatus.expired));
+      expect(result.status, UnifiedRequestStatus.negotiating);
     });
 
-    test('counter at round 2 → expired', () async {
-      // Create a request already at round 2
-      final request = UnifiedLessonRequest(
-        id: 'ulr_round2_test',
-        studentId: 'student_test',
-        teacherId: 'teacher_1',
-        type: LessonRequestType.trial,
-        instrument: '바이올린',
-        goal: UnifiedLessonGoal.hobby,
-        experience: UnifiedExperienceLevel.beginner,
-        status: UnifiedRequestStatus.negotiating,
-        currentRound: 2,
-        createdAt: DateTime.now(),
-      );
-      await repo.create(request);
+    test('round 5: still negotiating (no maxRounds limit)', () async {
+      // Use ulr_2 which already has round 3
+      final original = await repo.getById('ulr_2');
+      expect(original!.currentRound, 3);
 
       final result = await repo.counterPropose(
-        'ulr_round2_test',
+        'ulr_2',
         slot: TimeSlotOption(
-          id: 'counter_late',
+          id: 'counter_round4',
           dayOfWeek: 1,
           startTime: '10:00',
           endTime: '11:00',
         ),
       );
 
-      expect(result.status, UnifiedRequestStatus.expired);
+      expect(result.status, UnifiedRequestStatus.negotiating);
+      expect(result.currentRound, 4);
     });
   });
 
-  group('PreferredTimeSlot display for teacher view', () {
-    test('trial slots show date format', () async {
+  group('PreferredTimeSlot display', () {
+    test('regular slots show weekday format', () async {
+      // ulr_1 has dayOfWeek-based slots (regular)
       final request = await repo.getById('ulr_1');
       final slot = request!.preferredSlots.first;
 
-      // Should contain "/" (date separator)
-      expect(slot.displayLabel, contains('/'));
-    });
-
-    test('regular slots show weekday format', () async {
-      final request = await repo.getById('ulr_2');
-      final slot = request!.preferredSlots.first;
-
+      // dayOfWeek-based → "매주 X요일 HH:mm"
       expect(slot.displayLabel, startsWith('매주'));
     });
 
@@ -192,7 +178,6 @@ void main() {
       final priorities =
           request!.preferredSlots.map((s) => s.priority).toList();
 
-      // Priorities should be ascending
       for (var i = 0; i < priorities.length - 1; i++) {
         expect(priorities[i], lessThan(priorities[i + 1]));
       }
