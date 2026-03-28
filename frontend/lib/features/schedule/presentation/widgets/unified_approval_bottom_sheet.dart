@@ -248,8 +248,7 @@ class _UnifiedApprovalBottomSheetState
                         child: Center(
                           child: Text(
                             '${slot.priority}',
-                            style: TextStyle(
-                              fontSize: 14,
+                            style: AppTypography.bodyMedium.copyWith(
                               fontWeight: FontWeight.bold,
                               color: isSelected
                                   ? Colors.white
