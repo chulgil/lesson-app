@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../../features/home/presentation/widgets/lesson_request_section.dart';
 import '../../../gamification/presentation/widgets/gamification_header.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
@@ -82,13 +83,17 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
+          // Lesson request section (student view)
+          LessonRequestSection(
+            userId: currentStudentId,
+            viewerRole: 'student',
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
           // Action banners
           SubscriptionRenewalBanner(studentId: currentStudentId),
           PendingProposalsBanner(studentId: currentStudentId),
-          LessonRequestsBanner(studentId: currentStudentId),
-
-          // Unified lesson request progress
-          UnifiedRequestProgressSection(studentId: currentStudentId),
 
           // Schedule confirmation cards
           _ScheduleConfirmationSection(studentId: currentStudentId),

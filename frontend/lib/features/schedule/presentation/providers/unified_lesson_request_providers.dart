@@ -112,6 +112,46 @@ Future<List<UnifiedLessonRequest>> todayRequests(
   return filtered;
 }
 
+/// Today's requests for a student: active + completed today, pending first.
+@riverpod
+Future<List<UnifiedLessonRequest>> studentTodayRequests(
+  StudentTodayRequestsRef ref,
+  String studentId,
+) async {
+  final repository = ref.watch(unifiedLessonRequestRepositoryProvider);
+  final all = await repository.getByStudentId(studentId);
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+
+  final filtered = all.where((r) {
+    if (r.status.isActive) return true;
+    if (r.status == UnifiedRequestStatus.completed && r.confirmedAt != null) {
+      final confirmedDate = DateTime(
+        r.confirmedAt!.year,
+        r.confirmedAt!.month,
+        r.confirmedAt!.day,
+      );
+      return confirmedDate == today;
+    }
+    return false;
+  }).toList();
+
+  filtered.sort((a, b) {
+    if (a.status == UnifiedRequestStatus.pending &&
+        b.status != UnifiedRequestStatus.pending) {
+      return -1;
+    }
+    if (b.status == UnifiedRequestStatus.pending &&
+        a.status != UnifiedRequestStatus.pending) {
+      return 1;
+    }
+    return b.createdAt.compareTo(a.createdAt);
+  });
+
+  return filtered;
+}
+
 /// Actions for unified lesson requests (create, approve, reject, cancel, modify).
 /// Accepts both Ref and WidgetRef since it's called from providers and widgets.
 class UnifiedLessonRequestActions {

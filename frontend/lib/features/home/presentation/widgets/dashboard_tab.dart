@@ -106,7 +106,7 @@ class DashboardTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
 
             // Lesson Request Section (replaces UrgentActionsSection)
-            LessonRequestSection(teacherId: teacherId),
+            LessonRequestSection(userId: teacherId),
 
             const SizedBox(height: AppSpacing.space6),
 

@@ -15,16 +15,20 @@ import '../../../schedule/presentation/widgets/request_list_item.dart';
 /// Replaces UrgentActionsSection — shows active + today-completed requests.
 /// Max 3 items + "더보기" button. Hidden when 0 items.
 class LessonRequestSection extends ConsumerWidget {
-  final String teacherId;
+  final String userId;
+  final String viewerRole; // 'teacher' or 'student'
 
   const LessonRequestSection({
     super.key,
-    required this.teacherId,
+    required this.userId,
+    this.viewerRole = 'teacher',
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final requestsAsync = ref.watch(todayRequestsProvider(teacherId));
+    final requestsAsync = viewerRole == 'teacher'
+        ? ref.watch(todayRequestsProvider(userId))
+        : ref.watch(studentTodayRequestsProvider(userId));
 
     return requestsAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -60,7 +64,7 @@ class LessonRequestSection extends ConsumerWidget {
                       onTap: () => context.push(
                         AppRoutes.requestDetail
                             .replaceFirst(':id', displayRequests[i].id),
-                        extra: {'viewerRole': 'teacher'},
+                        extra: {'viewerRole': viewerRole},
                       ),
                     ),
                   ],
@@ -74,7 +78,7 @@ class LessonRequestSection extends ConsumerWidget {
               Center(
                 child: TextButton(
                   onPressed: () => context.push(
-                    '${AppRoutes.lessonRequests}?teacherId=$teacherId',
+                    '${AppRoutes.lessonRequests}?teacherId=$userId',
                   ),
                   child: Text(
                     AppStrings.moreRequests(requests.length - 3),
@@ -114,7 +118,7 @@ class LessonRequestSection extends ConsumerWidget {
         if (totalCount > 3)
           TextButton.icon(
             onPressed: () => context.push(
-              '${AppRoutes.lessonRequests}?teacherId=$teacherId',
+              '${AppRoutes.lessonRequests}?teacherId=$userId',
             ),
             icon: const Icon(Icons.list, size: AppSpacing.iconXS),
             label: const Text('전체보기'),
