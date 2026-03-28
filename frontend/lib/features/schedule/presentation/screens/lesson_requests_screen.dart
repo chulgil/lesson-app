@@ -10,17 +10,10 @@ import '../../domain/entities/lesson_request.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../widgets/batch_decline_dialog.dart';
 import '../widgets/counter_propose_bottom_sheet.dart';
 import '../widgets/lesson_request_list.dart';
 import '../widgets/unified_approval_bottom_sheet.dart';
 import '../widgets/unified_request_card.dart';
-
-/// State provider for selection mode
-final _isSelectionModeProvider = StateProvider<bool>((ref) => false);
-
-/// State provider for selected request IDs
-final _selectedRequestIdsProvider = StateProvider<Set<String>>((ref) => {});
 
 /// Screen for teachers to view and respond to lesson requests.
 ///
@@ -34,13 +27,40 @@ class LessonRequestsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final requestsAsync = ref.watch(teacherLessonRequestsProvider(teacherId));
-    final isSelectionMode = ref.watch(_isSelectionModeProvider);
-    final selectedIds = ref.watch(_selectedRequestIdsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
-      appBar: _buildAppBar(context, ref, requestsAsync, isSelectionMode,
-          selectedIds),
+      appBar: AppBar(
+        backgroundColor: AppColors.backgroundLight,
+        elevation: 0,
+        title: requestsAsync.when(
+          loading: () => const Text('레슨 요청'),
+          error: (_, __) => const Text('레슨 요청'),
+          data: (requests) {
+            final pendingCount = requests
+                .where(
+                  (r) =>
+                      r.status == LessonRequestStatus.pending && !r.isExpired,
+                )
+                .length;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('레슨 요청'),
+                if (pendingCount > 0)
+                  Text(
+                    '대기 중 $pendingCount건',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, __) => Center(
@@ -61,256 +81,19 @@ class LessonRequestsScreen extends ConsumerWidget {
           ),
         ),
         data: (requests) {
-          final pendingRequests = requests
-              .where(
-                (r) =>
-                    r.status == LessonRequestStatus.pending && !r.isExpired,
-              )
-              .toList();
-          final selectedRequests =
-              pendingRequests.where((r) => selectedIds.contains(r.id)).toList();
-
-          return Column(
-            children: [
-              Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    // Unified lesson requests section (Phase 1)
-                    _UnifiedRequestsSection(teacherId: teacherId),
-                    // Legacy request list
-                    SliverToBoxAdapter(
-                      child: LessonRequestList(
-                        requests: requests,
-                        isSelectionMode: isSelectionMode,
-                        selectedIds: selectedIds,
-                        onToggleSelection: (requestId) {
-                          final current = ref
-                              .read(_selectedRequestIdsProvider.notifier)
-                              .state;
-                          if (current.contains(requestId)) {
-                            ref
-                                .read(_selectedRequestIdsProvider.notifier)
-                                .state = {
-                              ...current,
-                            }..remove(requestId);
-                          } else {
-                            ref
-                                .read(_selectedRequestIdsProvider.notifier)
-                                .state = {
-                              ...current,
-                              requestId,
-                            };
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+          return CustomScrollView(
+            slivers: [
+              // Unified lesson requests section
+              _UnifiedRequestsSection(teacherId: teacherId),
+              // Legacy request list
+              SliverToBoxAdapter(
+                child: LessonRequestList(requests: requests),
               ),
-
-              // Bottom action bar (when items selected)
-              if (isSelectionMode && selectedIds.isNotEmpty)
-                _buildBottomActionBar(context, ref, selectedRequests),
             ],
           );
         },
       ),
     );
-  }
-
-  AppBar _buildAppBar(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<LessonRequest>> requestsAsync,
-    bool isSelectionMode,
-    Set<String> selectedIds,
-  ) {
-    return AppBar(
-      backgroundColor: AppColors.backgroundLight,
-      elevation: 0,
-      leading: IconButton(
-        onPressed: () {
-          if (isSelectionMode) {
-            ref.read(_isSelectionModeProvider.notifier).state = false;
-            ref.read(_selectedRequestIdsProvider.notifier).state = {};
-          } else {
-            context.pop();
-          }
-        },
-        icon: Icon(isSelectionMode ? Icons.close : Icons.arrow_back),
-      ),
-      title: requestsAsync.when(
-        loading: () => const Text('레슨 요청'),
-        error: (_, __) => const Text('레슨 요청'),
-        data: (requests) {
-          final pendingCount = requests
-              .where(
-                (r) =>
-                    r.status == LessonRequestStatus.pending && !r.isExpired,
-              )
-              .length;
-
-          if (isSelectionMode) {
-            return Text('${selectedIds.length}명 선택');
-          }
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('레슨 요청'),
-              if (pendingCount > 0)
-                Text(
-                  '대기 중 $pendingCount건',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.warning,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-            ],
-          );
-        },
-      ),
-      actions: [
-        requestsAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (requests) {
-            final pendingCount = requests
-                .where(
-                  (r) =>
-                      r.status == LessonRequestStatus.pending && !r.isExpired,
-                )
-                .length;
-
-            if (pendingCount == 0) return const SizedBox.shrink();
-
-            if (isSelectionMode) {
-              return TextButton(
-                onPressed: () {
-                  final allPendingIds = requests
-                      .where(
-                        (r) =>
-                            r.status == LessonRequestStatus.pending &&
-                            !r.isExpired,
-                      )
-                      .map((r) => r.id)
-                      .toSet();
-                  if (selectedIds.length == pendingCount) {
-                    ref.read(_selectedRequestIdsProvider.notifier).state = {};
-                  } else {
-                    ref.read(_selectedRequestIdsProvider.notifier).state =
-                        allPendingIds;
-                  }
-                },
-                child: Text(
-                  selectedIds.length == pendingCount ? '전체 해제' : '전체 선택',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-              );
-            }
-
-            return TextButton(
-              onPressed: () {
-                ref.read(_isSelectionModeProvider.notifier).state = true;
-              },
-              child: Text(
-                '선택',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.primary,
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBottomActionBar(
-    BuildContext context,
-    WidgetRef ref,
-    List<LessonRequest> selectedRequests,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            // Decline all button
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => showBatchDeclineDialog(
-                  context,
-                  ref,
-                  selectedRequests,
-                  onComplete: () {
-                    ref.read(_isSelectionModeProvider.notifier).state = false;
-                    ref.read(_selectedRequestIdsProvider.notifier).state = {};
-                  },
-                ),
-                icon: const Icon(Icons.schedule, size: 16),
-                label: const Text('모두 다음에'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textSecondaryLight,
-                  side: BorderSide(color: AppColors.borderLight),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-            // Propose to all button
-            Expanded(
-              flex: 2,
-              child: FilledButton.icon(
-                onPressed: () =>
-                    _navigateToBatchProposal(context, ref, selectedRequests),
-                icon: const Icon(Icons.card_giftcard, size: 16),
-                label: Text('${selectedRequests.length}명에게 수강권 제안'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _navigateToBatchProposal(
-    BuildContext context,
-    WidgetRef ref,
-    List<LessonRequest> requests,
-  ) {
-    final studentIds = requests.map((r) => r.studentId).toList();
-    final requestIds = requests.map((r) => r.id).toList();
-
-    context.push(
-      '${AppRoutes.issueSubscription}?studentIds=${studentIds.join(',')}&lessonRequestIds=${requestIds.join(',')}',
-    );
-
-    ref.read(_isSelectionModeProvider.notifier).state = false;
-    ref.read(_selectedRequestIdsProvider.notifier).state = {};
   }
 }
 
