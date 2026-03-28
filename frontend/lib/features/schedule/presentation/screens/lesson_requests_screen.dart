@@ -8,20 +8,16 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../domain/entities/lesson_request.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
-import '../providers/lesson_request_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/decline_bottom_sheet.dart';
-import '../widgets/lesson_request_list.dart';
+import '../widgets/request_list_item.dart';
 import '../widgets/unified_approval_bottom_sheet.dart';
-import '../widgets/unified_request_card.dart';
 
 /// Screen for teachers to view and respond to lesson requests.
 ///
-/// Shows all pending requests sorted by expiration (urgent first),
-/// consistent with other "즉시 확인" screens (PendingBookings, etc.).
+/// v4.0: Unified requests only (legacy removed).
 class LessonRequestsScreen extends ConsumerWidget {
   final String teacherId;
 
@@ -29,7 +25,7 @@ class LessonRequestsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final requestsAsync = ref.watch(teacherLessonRequestsProvider(teacherId));
+    final requestsAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -37,23 +33,20 @@ class LessonRequestsScreen extends ConsumerWidget {
         backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         title: requestsAsync.when(
-          loading: () => const Text('레슨 요청'),
-          error: (_, __) => const Text('레슨 요청'),
+          loading: () => const Text(AppStrings.lessonRequestTitle),
+          error: (_, __) => const Text(AppStrings.lessonRequestTitle),
           data: (requests) {
             final pendingCount = requests
-                .where(
-                  (r) =>
-                      r.status == LessonRequestStatus.pending && !r.isExpired,
-                )
+                .where((r) => r.status == UnifiedRequestStatus.pending)
                 .length;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('레슨 요청'),
+                const Text(AppStrings.lessonRequestTitle),
                 if (pendingCount > 0)
                   Text(
-                    '대기 중 $pendingCount건',
+                    AppStrings.lessonRequestPending(pendingCount),
                     style: AppTypography.caption.copyWith(
                       color: AppColors.warning,
                       fontWeight: FontWeight.w600,
@@ -70,11 +63,12 @@ class LessonRequestsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              const Icon(Icons.error_outline,
+                  size: AppSpacing.iconXL, color: AppColors.error),
               const SizedBox(height: AppSpacing.space4),
-              Text('오류가 발생했습니다',
-                  style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight)),
+              Text(AppStrings.requestLoadError,
+                  style: AppTypography.bodyMedium
+                      .copyWith(color: AppColors.textSecondaryLight)),
               const SizedBox(height: AppSpacing.space4),
               ElevatedButton(
                 onPressed: () => context.pop(),
@@ -84,253 +78,37 @@ class LessonRequestsScreen extends ConsumerWidget {
           ),
         ),
         data: (requests) {
-          return CustomScrollView(
-            slivers: [
-              // Unified lesson requests section
-              _UnifiedRequestsSection(teacherId: teacherId),
-              // Legacy request list
-              SliverToBoxAdapter(
-                child: LessonRequestList(requests: requests),
+          if (requests.isEmpty) {
+            return Center(
+              child: Text(
+                AppStrings.noHistory,
+                style: AppTypography.bodyMedium
+                    .copyWith(color: AppColors.textSecondaryLight),
               ),
-            ],
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+            itemCount: requests.length,
+            separatorBuilder: (_, __) =>
+                const Divider(height: 1, indent: AppSpacing.space4),
+            itemBuilder: (context, index) {
+              final request = requests[index];
+              return RequestListItem(
+                request: request,
+                studentName: AppStrings.student,
+                lastMessage: request.lastMessage,
+                onTap: () => context.push(
+                  AppRoutes.requestDetail
+                      .replaceFirst(':id', request.id),
+                  extra: {'viewerRole': 'teacher'},
+                ),
+              );
+            },
           );
         },
       ),
     );
-  }
-}
-
-/// Section showing unified lesson requests with approve/reject actions.
-class _UnifiedRequestsSection extends ConsumerWidget {
-  final String teacherId;
-
-  const _UnifiedRequestsSection({required this.teacherId});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final unifiedAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
-
-    return unifiedAsync.when(
-      loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-      error: (e, __) => SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          child: Text(
-            AppStrings.requestLoadError,
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        ),
-      ),
-      data: (requests) {
-        if (requests.isEmpty) {
-          return const SliverToBoxAdapter(child: SizedBox.shrink());
-        }
-
-        return SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              if (index == 0) {
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.screenPadding,
-                    AppSpacing.space4,
-                    AppSpacing.screenPadding,
-                    AppSpacing.space2,
-                  ),
-                  child: Text(
-                    AppStrings.lessonRequest,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                );
-              }
-
-              final request = requests[index - 1];
-              return UnifiedRequestCard(
-                request: request,
-                onApprove: request.status == UnifiedRequestStatus.pending
-                    ? () => _handleApprove(context, ref, request)
-                    : null,
-                onReject: request.status == UnifiedRequestStatus.pending
-                    ? () => _handleReject(context, ref, request)
-                    : null,
-                onProposeAlternatives:
-                    (request.status == UnifiedRequestStatus.pending ||
-                            request.status ==
-                                UnifiedRequestStatus.negotiating)
-                        ? () => _handleDeclineOrPropose(
-                            context, ref, request)
-                        : null,
-                onSendProposal:
-                    request.status == UnifiedRequestStatus.timeConfirmed
-                        ? () => _handleSendProposal(context, ref, request)
-                        : null,
-              );
-            },
-            childCount: requests.length + 1, // +1 for header
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _handleApprove(
-    BuildContext context,
-    WidgetRef ref,
-    UnifiedLessonRequest request,
-  ) async {
-    // v2.0: Show approval bottom sheet with 3 preferred slots
-    if (request.preferredSlots.isNotEmpty) {
-      await showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (sheetContext) => DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.4,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) => UnifiedApprovalBottomSheet(
-            request: request,
-            scrollController: scrollController,
-            onComplete: () {
-              ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
-            },
-          ),
-        ),
-      );
-      return;
-    }
-
-    // Legacy: direct approve (no preferred slots)
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-      await actions.approveRequest(
-        request.id,
-        request.teacherId,
-        request.studentId,
-      );
-      if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.requestAccepted);
-      }
-    } catch (e) {
-      if (context.mounted) {
-        showErrorSnackBar(context);
-      }
-    }
-  }
-
-  Future<void> _handleReject(
-    BuildContext context,
-    WidgetRef ref,
-    UnifiedLessonRequest request,
-  ) async {
-    await _handleDeclineOrPropose(context, ref, request);
-  }
-
-  Future<void> _handleDeclineOrPropose(
-    BuildContext context,
-    WidgetRef ref,
-    UnifiedLessonRequest request,
-  ) async {
-    final result = await showDeclineBottomSheet(
-      context,
-      durationMinutes: request.preferredDuration,
-      teacherId: request.teacherId,
-    );
-    if (result == null) return;
-
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-
-      if (result.suggestedSlots.isEmpty) {
-        // Message only → reject
-        await actions.rejectRequest(
-          request.id,
-          request.teacherId,
-          request.studentId,
-          reason: result.message,
-        );
-      } else {
-        // With alternatives → propose
-        await actions.proposeAlternatives(
-          request.id,
-          request.teacherId,
-          request.studentId,
-          slots: result.suggestedSlots.map((s) => TimeSlotOption(
-            id: s.id,
-            dayOfWeek: s.dayOfWeek - 1, // TimeSlot is 1-based, TimeSlotOption is 0-based
-            startTime: '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-            endTime: '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-          )).toList(),
-          message: result.message,
-        );
-      }
-
-      if (context.mounted) {
-        ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
-        if (result.suggestedSlots.isNotEmpty) {
-          showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
-        } else {
-          showInfoSnackBar(context, AppStrings.requestUnavailable);
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        showErrorSnackBar(context);
-      }
-    }
-  }
-
-  Future<void> _handleSendProposal(
-    BuildContext context,
-    WidgetRef ref,
-    UnifiedLessonRequest request,
-  ) async {
-    if (request.type == LessonRequestType.trial) {
-      // Check teacher's trial lesson free setting
-      final settingsAsync = ref.read(teacherSettingsProvider);
-      final isTrialFree = settingsAsync.valueOrNull?.trialLessonFree ?? false;
-
-      if (isTrialFree) {
-        // Free trial: complete directly (수강권 불필요)
-        try {
-          final actions = UnifiedLessonRequestActions(ref);
-          await actions.completeRequest(
-            request.id,
-            request.teacherId,
-            request.studentId,
-          );
-          if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.trialComplete);
-          }
-        } catch (e) {
-          if (context.mounted) {
-            showErrorSnackBar(context);
-          }
-        }
-      } else {
-        // Paid trial: navigate to subscription issuance (same as regular)
-        if (context.mounted) {
-          context.push(
-            '${AppRoutes.issueSubscription}'
-            '?studentId=${Uri.encodeQueryComponent(request.studentId)}'
-            '&lessonRequestId=${Uri.encodeQueryComponent(request.id)}',
-          );
-        }
-      }
-    } else {
-      // Regular: navigate to subscription issuance with pre-filled data
-      if (context.mounted) {
-        context.push(
-          '${AppRoutes.issueSubscription}'
-          '?studentId=${Uri.encodeQueryComponent(request.studentId)}'
-          '&lessonRequestId=${Uri.encodeQueryComponent(request.id)}',
-        );
-      }
-    }
   }
 }
