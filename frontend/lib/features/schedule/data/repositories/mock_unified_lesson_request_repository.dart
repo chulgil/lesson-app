@@ -384,7 +384,14 @@ class MockUnifiedLessonRequestRepository
 
     final teacherProposals =
         request.proposals.where((p) => p.role == ProposerRole.teacher).toList();
+    if (teacherProposals.isEmpty) {
+      throw Exception('No teacher proposals found for request: $id');
+    }
     final latestTeacher = teacherProposals.last;
+    if (selectedSlotIndex < 0 ||
+        selectedSlotIndex >= latestTeacher.slots.length) {
+      throw Exception('Invalid slot index: $selectedSlotIndex');
+    }
     final selectedSlot = latestTeacher.slots[selectedSlotIndex];
 
     final acceptProposal = TimeProposal(

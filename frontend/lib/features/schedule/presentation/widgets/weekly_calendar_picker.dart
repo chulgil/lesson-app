@@ -79,11 +79,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
 
   bool get _canGoPrev => _weekStart.isAfter(_minWeekStart);
 
-  bool get _canGoNext =>
-      _weekStart.isBefore(_maxWeekStart) ||
-      _weekStart.isAtSameMomentAs(_maxWeekStart)
-          ? _weekStart.isBefore(_maxWeekStart)
-          : false;
+  bool get _canGoNext => _weekStart.isBefore(_maxWeekStart);
 
   void _goToPrevWeek() {
     if (!_canGoPrev) return;
