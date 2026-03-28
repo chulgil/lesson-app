@@ -157,6 +157,23 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
+  /// Complete a request (trial: direct, regular: after subscription issued)
+  Future<UnifiedLessonRequest> completeRequest(
+    String requestId,
+    String teacherId,
+    String studentId,
+  ) async {
+    final request = await _repository.getById(requestId);
+    if (request == null) throw Exception('Request not found: $requestId');
+    final updated = request.copyWith(
+      status: UnifiedRequestStatus.completed,
+      confirmedAt: DateTime.now(),
+    );
+    final result = await _repository.update(updated);
+    _invalidateProviders(teacherId, studentId);
+    return result;
+  }
+
   void _invalidateProviders(String teacherId, String studentId) {
     ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
     ref.invalidate(pendingUnifiedRequestsProvider(teacherId));

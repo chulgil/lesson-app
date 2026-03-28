@@ -764,23 +764,39 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     UnifiedLessonRequest request,
   ) async {
     if (request.type == LessonRequestType.trial) {
-      // Trial free → complete directly
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('체험레슨 예약이 완료되었습니다'),
-            backgroundColor: AppColors.success,
-          ),
+      // Trial: complete directly (체험레슨은 무료이므로 수강권 불필요)
+      try {
+        final actions = UnifiedLessonRequestActions(ref);
+        await actions.completeRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
         );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('체험레슨 예약이 완료되었습니다'),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('오류가 발생했습니다'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
       }
     } else {
-      // Regular → navigate to subscription proposal
-      // TODO: Navigate to subscription proposal creation with pre-filled data
+      // Regular: navigate to subscription issuance with pre-filled data
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('수강권 제안 화면으로 이동합니다'),
-          ),
+        context.push(
+          '${AppRoutes.issueSubscription}'
+          '?studentId=${request.studentId}'
+          '&lessonRequestId=${request.id}',
         );
       }
     }
