@@ -9,6 +9,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import '../../../../features/profile/domain/entities/teacher_settings.dart';
+import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/weekly_calendar_picker.dart';
 import 'request_completion_screen.dart';
@@ -219,8 +221,9 @@ class _UnifiedLessonRequestScreenState
   // -- Guidance message (Naver benchmark) --
 
   Widget _buildGuidanceMessage() {
-    // TODO: Replace with teacher's custom bookingGuidanceMessage when available
-    const defaultMessage = '희망레슨시간은 상담가능하니 편하게 메시지 주세요.';
+    final settingsAsync = ref.watch(teacherSettingsProvider);
+    final message = settingsAsync.valueOrNull?.effectiveGuidanceMessage
+        ?? TeacherSettings.defaultGuidanceMessage;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -238,7 +241,7 @@ class _UnifiedLessonRequestScreenState
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
-              defaultMessage,
+              message,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.primary,
                 height: 1.4,

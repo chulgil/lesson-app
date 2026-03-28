@@ -34,6 +34,7 @@ TeacherSettings _$TeacherSettingsFromJson(Map<String, dynamic> json) =>
         (k, e) => MapEntry(k, Map<String, int>.from(e as Map)),
       ),
       trialLessonFree: json['trial_lesson_free'] as bool? ?? false,
+      bookingGuidanceMessage: json['booking_guidance_message'] as String?,
     );
 
 Map<String, dynamic> _$TeacherSettingsToJson(TeacherSettings instance) =>
@@ -49,4 +50,5 @@ Map<String, dynamic> _$TeacherSettingsToJson(TeacherSettings instance) =>
       'min_booking_hours': instance.minBookingHours,
       'lesson_price_table': instance.lessonPriceTable,
       'trial_lesson_free': instance.trialLessonFree,
+      'booking_guidance_message': instance.bookingGuidanceMessage,
     };
