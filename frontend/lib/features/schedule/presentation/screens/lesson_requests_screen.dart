@@ -141,7 +141,23 @@ class LessonRequestsScreen extends ConsumerWidget {
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+        error: (e, __) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              const SizedBox(height: AppSpacing.space4),
+              Text('오류가 발생했습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight)),
+              const SizedBox(height: AppSpacing.space4),
+              ElevatedButton(
+                onPressed: () => context.pop(),
+                child: const Text('돌아가기'),
+              ),
+            ],
+          ),
+        ),
         data: (requests) {
           final pendingRequests = requests
               .where(
@@ -372,7 +388,17 @@ class _UnifiedRequestsSection extends ConsumerWidget {
 
     return unifiedAsync.when(
       loading: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-      error: (_, __) => const SliverToBoxAdapter(child: SizedBox.shrink()),
+      error: (e, __) => SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          child: Text(
+            '통합 레슨 신청을 불러올 수 없습니다',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ),
+      ),
       data: (requests) {
         if (requests.isEmpty) {
           return const SliverToBoxAdapter(child: SizedBox.shrink());
