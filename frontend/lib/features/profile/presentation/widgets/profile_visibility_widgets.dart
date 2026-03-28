@@ -503,6 +503,7 @@ void showProfilePreviewSheet({
       initialChildSize: 0.85,
       maxChildSize: 0.95,
       minChildSize: 0.5,
+      expand: false,
       builder: (context, scrollController) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,

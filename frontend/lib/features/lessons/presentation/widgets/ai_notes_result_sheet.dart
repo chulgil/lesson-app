@@ -44,6 +44,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
       initialChildSize: 0.85,
       minChildSize: 0.5,
       maxChildSize: 0.95,
+      expand: false,
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
