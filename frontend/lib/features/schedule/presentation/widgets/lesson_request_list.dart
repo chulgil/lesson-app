@@ -43,7 +43,8 @@ class LessonRequestList extends StatelessWidget {
     }
 
     return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       children: [
         // Pending requests
@@ -150,9 +151,10 @@ class LessonRequestList extends StatelessWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space8),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
