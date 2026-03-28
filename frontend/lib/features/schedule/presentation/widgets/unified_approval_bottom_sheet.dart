@@ -318,7 +318,7 @@ class _UnifiedApprovalBottomSheetState
           Expanded(
             child: Text(
               currentRound == 0
-                  ? '3안 중 하나를 수락하거나, 모두 불가하면 역제안할 수 있습니다'
+                  ? '희망 시간 중 하나를 선택하거나, 모두 불가하면 역제안하세요'
                   : '협상 $currentRound/$maxRounds 라운드',
               style: AppTypography.caption.copyWith(color: AppColors.info),
             ),
@@ -391,28 +391,6 @@ class _UnifiedApprovalBottomSheetState
   Widget _buildMainButtons() {
     return Row(
       children: [
-        // Reject
-        Expanded(
-          child: OutlinedButton(
-            onPressed: _isProcessing ? null : _handleReject,
-            style: OutlinedButton.styleFrom(
-              padding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: const BorderSide(color: AppColors.borderLight),
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-            ),
-            child: Text(
-              '거절',
-              style: AppTypography.button.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space2),
         // Counter-propose
         Expanded(
           child: OutlinedButton(
@@ -560,33 +538,6 @@ class _UnifiedApprovalBottomSheetState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('승인 처리 중 오류가 발생했습니다'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isProcessing = false);
-    }
-  }
-
-  Future<void> _handleReject() async {
-    setState(() => _isProcessing = true);
-
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-      await actions.rejectRequest(
-        widget.request.id,
-        widget.request.teacherId,
-        widget.request.studentId,
-      );
-
-      if (!mounted) return;
-      Navigator.pop(context);
-      widget.onComplete();
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('거절 처리 중 오류가 발생했습니다'),
           backgroundColor: AppColors.error,
         ),
       );

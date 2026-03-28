@@ -532,7 +532,7 @@ class _UnifiedRequestsSection extends ConsumerWidget {
               maxLines: 3,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: '거절 사유 (선택)',
+                hintText: '예: 현재 가능한 시간이 없어 이번에는 어렵습니다.',
               ),
             ),
           ],
