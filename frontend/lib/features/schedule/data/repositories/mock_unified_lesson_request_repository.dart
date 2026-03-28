@@ -361,17 +361,18 @@ class MockUnifiedLessonRequestRepository
     ]);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 7. 복수 악기 - 바이올린 — pending, 이벤트 1건
+    // 7. 학원 요청 - 바이올린 — pending, 이벤트 1건
     // ─────────────────────────────────────────────────────────────────────────
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_7',
-      studentId: 'student_1',
+      studentId: 'student_3',
       teacherId: 'teacher_1',
       type: LessonRequestType.regular,
       instrument: '바이올린',
       goal: UnifiedLessonGoal.hobby,
       experience: UnifiedExperienceLevel.intermediate,
-      message: '바이올린 레슨 추가 요청',
+      academyId: 'academy_2',
+      message: '학원 바이올린 레슨 요청',
       preferredDuration: 60,
       preferredSlots: [
         const PreferredTimeSlot(
@@ -389,9 +390,9 @@ class MockUnifiedLessonRequestRepository
         id: 'evt_7_1',
         requestId: 'ulr_7',
         actorType: ProposerRole.student,
-        actorId: 'student_1',
+        actorId: 'student_3',
         eventType: RequestEventType.initialRequest,
-        message: '바이올린 레슨 추가 요청',
+        message: '학원 바이올린 레슨 요청',
         createdAt: now.subtract(const Duration(hours: 1)),
       ),
     ]);

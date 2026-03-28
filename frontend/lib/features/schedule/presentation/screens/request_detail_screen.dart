@@ -31,6 +31,8 @@ class RequestDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final requestAsync = ref.watch(unifiedRequestByIdProvider(requestId));
     final eventsAsync = ref.watch(requestEventsProvider(requestId));
+    final studentNames = ref.watch(studentNameMapProvider);
+    final academyNames = ref.watch(academyNameMapProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +75,7 @@ class RequestDetailScreen extends ConsumerWidget {
                   events: events,
                   viewerRole: viewerRole,
                   opponentName: viewerRole == 'teacher'
-                      ? AppStrings.student
+                      ? (studentNames[request.studentId] ?? AppStrings.student)
                       : AppStrings.teacher,
                   onAccept: () => _handleAccept(context, ref, request),
                   onCounterPropose: () =>
@@ -88,7 +90,7 @@ class RequestDetailScreen extends ConsumerWidget {
                   viewerId: viewerRole == 'teacher'
                       ? request.teacherId
                       : request.studentId,
-                  studentName: AppStrings.student,
+                  studentName: studentNames[request.studentId] ?? AppStrings.student,
                 ),
 
                 const SizedBox(height: AppSpacing.space8),
@@ -156,28 +158,32 @@ class RequestDetailScreen extends ConsumerWidget {
             ],
           ),
 
-          // Preferred slots summary
-          if (request.preferredSlots.isNotEmpty) ...[
+          // Student message (if any)
+          if (request.message != null && request.message!.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space3),
-            ...request.preferredSlots.map((slot) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space1),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: AppSpacing.iconXS,
-                        color: AppColors.textTertiaryLight,
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSecondaryLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.chat_bubble_outline,
+                      size: AppSpacing.iconXS,
+                      color: AppColors.textSecondaryLight),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      request.message!,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
                       ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '${slot.priority}순위: ${slot.displayLabel}',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                )),
+                ],
+              ),
+            ),
           ],
         ],
       ),

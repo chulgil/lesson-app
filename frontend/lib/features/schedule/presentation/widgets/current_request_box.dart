@@ -54,16 +54,51 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     }
   }
 
-  /// Get the latest proposed slots (from the most recent proposal event).
+  /// Get the latest proposed slots.
+  /// For pending: use preferredSlots from request.
+  /// For negotiating: use last event's suggestedSlots.
   List<TimeSlotOption> get _latestProposedSlots {
+    // Pending state: show student's preferred slots as selectable options
+    if (widget.request.status == UnifiedRequestStatus.pending &&
+        widget.request.preferredSlots.isNotEmpty) {
+      return widget.request.preferredSlots
+          .map((ps) => TimeSlotOption(
+                id: 'pref_${ps.priority}',
+                dayOfWeek: ps.dayOfWeek ?? 0,
+                startTime: ps.startTime,
+                endTime: ps.endTime,
+              ))
+          .toList();
+    }
+
+    // Negotiating: find latest event with slots
     if (widget.events.isEmpty) return [];
-    // Find the latest event with slots
     for (int i = widget.events.length - 1; i >= 0; i--) {
       if (widget.events[i].suggestedSlots.isNotEmpty) {
         return widget.events[i].suggestedSlots;
       }
     }
     return [];
+  }
+
+  /// Get the latest message from the opponent (request message or event message).
+  String? get _latestMessage {
+    // For pending: use request.message (student's initial message)
+    if (widget.request.status == UnifiedRequestStatus.pending) {
+      return widget.request.message;
+    }
+    // For negotiating: find last opponent event with message
+    for (int i = widget.events.length - 1; i >= 0; i--) {
+      final event = widget.events[i];
+      final isOpponent = (event.actorType == ProposerRole.teacher &&
+              widget.viewerRole == 'student') ||
+          (event.actorType == ProposerRole.student &&
+              widget.viewerRole == 'teacher');
+      if (isOpponent && event.message != null && event.message!.isNotEmpty) {
+        return event.message;
+      }
+    }
+    return null;
   }
 
   /// Determine whose turn it is based on the latest event.
@@ -136,6 +171,34 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           ),
         ),
         const SizedBox(height: AppSpacing.space4),
+
+        // Student message (from request or latest event)
+        if (_latestMessage != null) ...[
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.space3),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSecondaryLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.chat_bubble_outline,
+                    size: AppSpacing.iconXS,
+                    color: AppColors.textSecondaryLight),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: Text(
+                    _latestMessage!,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+        ],
 
         // Slot selection (reuse approval_bottom_sheet pattern)
         if (slots.isNotEmpty) _buildSlotsSection(slots),

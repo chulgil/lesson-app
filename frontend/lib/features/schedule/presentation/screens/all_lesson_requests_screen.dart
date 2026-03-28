@@ -44,7 +44,8 @@ class _AllLessonRequestsScreenState
     ),
   );
   RequestFilterPreset _selectedPreset = RequestFilterPreset.oneWeek;
-  UnifiedRequestStatus? _selectedStatus;
+  RequestStatusGroup _statusGroup = RequestStatusGroup.all;
+  RequestSourceFilter _sourceFilter = RequestSourceFilter.all;
   RequestSortBy _sortBy = RequestSortBy.createdAtDesc;
   bool _isFilterMode = false;
 
@@ -54,6 +55,8 @@ class _AllLessonRequestsScreenState
         widget.viewerRole == 'teacher'
             ? ref.watch(teacherUnifiedRequestsProvider(widget.teacherId))
             : ref.watch(studentUnifiedRequestsProvider(widget.teacherId));
+    final studentNames = ref.watch(studentNameMapProvider);
+    final academyNames = ref.watch(academyNameMapProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -111,7 +114,8 @@ class _AllLessonRequestsScreenState
                           final request = filtered[index];
                           return RequestListItem(
                             request: request,
-                            studentName: AppStrings.student,
+                            studentName: studentNames[request.studentId] ?? AppStrings.student,
+                            academyName: academyNames[request.academyId],
                             lastMessage: request.lastMessage,
                             onTap: () => context.push(
                               AppRoutes.requestDetail
@@ -208,11 +212,10 @@ class _AllLessonRequestsScreenState
       ),
       child: Row(
         children: [
-          // Period preset
+          // Source filter (학원/개인)
           Expanded(
-            child: DropdownButton<RequestFilterPreset>(
-              value: _isFilterMode ? _selectedPreset : null,
-              hint: const Text('기간 필터'),
+            child: DropdownButton<RequestSourceFilter>(
+              value: _sourceFilter,
               underline: const SizedBox.shrink(),
               isDense: true,
               isExpanded: true,
@@ -221,17 +224,74 @@ class _AllLessonRequestsScreenState
               ),
               items: const [
                 DropdownMenuItem(
-                  value: RequestFilterPreset.oneWeek,
-                  child: Text('일주일'),
-                ),
+                    value: RequestSourceFilter.all, child: Text('전체')),
                 DropdownMenuItem(
-                  value: RequestFilterPreset.oneMonth,
-                  child: Text('한달'),
-                ),
+                    value: RequestSourceFilter.individual,
+                    child: Text('개인레슨')),
                 DropdownMenuItem(
-                  value: RequestFilterPreset.threeMonths,
-                  child: Text('세달'),
-                ),
+                    value: RequestSourceFilter.academy,
+                    child: Text('학원')),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _sourceFilter = value;
+                  _filter = _filter.copyWith(source: value);
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          // Status group filter (색상 그룹)
+          Expanded(
+            child: DropdownButton<RequestStatusGroup>(
+              value: _statusGroup,
+              underline: const SizedBox.shrink(),
+              isDense: true,
+              isExpanded: true,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textPrimaryLight,
+              ),
+              items: const [
+                DropdownMenuItem(
+                    value: RequestStatusGroup.all, child: Text('전체 상태')),
+                DropdownMenuItem(
+                    value: RequestStatusGroup.active, child: Text('진행 중')),
+                DropdownMenuItem(
+                    value: RequestStatusGroup.success, child: Text('완료')),
+                DropdownMenuItem(
+                    value: RequestStatusGroup.warning,
+                    child: Text('취소/만료')),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _statusGroup = value;
+                  _filter = _filter.copyWith(statusGroup: value);
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          // Period preset
+          Expanded(
+            child: DropdownButton<RequestFilterPreset>(
+              value: _isFilterMode ? _selectedPreset : null,
+              hint: const Text('기간'),
+              underline: const SizedBox.shrink(),
+              isDense: true,
+              isExpanded: true,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textPrimaryLight,
+              ),
+              items: const [
+                DropdownMenuItem(
+                    value: RequestFilterPreset.oneWeek, child: Text('1주')),
+                DropdownMenuItem(
+                    value: RequestFilterPreset.oneMonth, child: Text('1달')),
+                DropdownMenuItem(
+                    value: RequestFilterPreset.threeMonths,
+                    child: Text('3달')),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -240,40 +300,10 @@ class _AllLessonRequestsScreenState
                   _isFilterMode = true;
                   final presetFilter = RequestFilter.preset(value);
                   _filter = presetFilter.copyWith(
-                    status: _selectedStatus,
+                    statusGroup: _statusGroup,
+                    source: _sourceFilter,
                     sortBy: _sortBy,
                   );
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          // Status filter
-          Expanded(
-            child: DropdownButton<UnifiedRequestStatus?>(
-              value: _selectedStatus,
-              hint: const Text('상태'),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textPrimaryLight,
-              ),
-              items: [
-                const DropdownMenuItem(value: null, child: Text('전체')),
-                ...UnifiedRequestStatus.values.map((s) => DropdownMenuItem(
-                      value: s,
-                      child: Text(s.label),
-                    )),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  _selectedStatus = value;
-                  if (_isFilterMode) {
-                    _filter = _filter.copyWith(status: value);
-                  } else {
-                    _filter = _filter.copyWith(status: value);
-                  }
                 });
               },
             ),

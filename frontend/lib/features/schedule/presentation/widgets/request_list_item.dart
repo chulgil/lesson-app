@@ -8,10 +8,11 @@ import '../../domain/entities/unified_lesson_request.dart';
 
 /// List item for lesson requests — used in home section and full list.
 ///
-/// Layout: [Type badge] [Info: academy/name·instrument·goal | message] [Status chip]
+/// Layout: [Student avatar] [Info: 개인레슨 정규 | 이름·악기·목표 | message] [Status chip]
 class RequestListItem extends StatelessWidget {
   final UnifiedLessonRequest request;
   final String studentName;
+  final String? academyName;
   final String? lastMessage;
   final VoidCallback? onTap;
 
@@ -19,6 +20,7 @@ class RequestListItem extends StatelessWidget {
     super.key,
     required this.request,
     required this.studentName,
+    this.academyName,
     this.lastMessage,
     this.onTap,
   });
@@ -35,8 +37,8 @@ class RequestListItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Left: type badge
-            _buildTypeBadge(),
+            // Left: student profile avatar
+            _buildStudentAvatar(),
             const SizedBox(width: AppSpacing.space3),
 
             // Center: info
@@ -52,44 +54,36 @@ class RequestListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeBadge() {
-    return Container(
-      width: AppSpacing.avatarSmall,
-      height: AppSpacing.avatarSmall,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-      child: Center(
-        child: Text(
-          _typeAbbrev,
-          style: AppTypography.caption.copyWith(
-            fontWeight: FontWeight.w700,
-            color: AppColors.primary,
-          ),
+  /// Student profile photo or initial avatar (like assignment list).
+  Widget _buildStudentAvatar() {
+    return CircleAvatar(
+      radius: AppSpacing.avatarSmall / 2,
+      backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+      child: Text(
+        studentName.isNotEmpty ? studentName[0] : '?',
+        style: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.primary,
         ),
       ),
     );
   }
 
-  String get _typeAbbrev {
-    if (request.isReturningStudent && request.type == LessonRequestType.regular) {
-      return '재';
-    }
-    return switch (request.type) {
-      LessonRequestType.trial => '체험',
-      LessonRequestType.regular => '정규',
-      LessonRequestType.package => '회차',
-    };
+  /// "개인레슨 정규" or "서울음악학원 체험" format.
+  String get _sourceAndType {
+    final source = request.isAcademy
+        ? (academyName ?? AppStrings.academy)
+        : AppStrings.individualLesson;
+    return '$source ${request.typeDisplayLabel}';
   }
 
   Widget _buildInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Line 1: academy or "개인"
+        // Line 1: source + type ("개인레슨 정규" or "서울음악학원 체험")
         Text(
-          request.isAcademy ? AppStrings.academy : AppStrings.individual,
+          _sourceAndType,
           style: AppTypography.caption.copyWith(
             color: AppColors.textTertiaryLight,
           ),

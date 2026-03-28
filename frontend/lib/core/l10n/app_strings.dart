@@ -131,6 +131,9 @@ class AppStrings {
   /// 개인 (학원 아님)
   static const individual = '개인';
 
+  /// 개인레슨
+  static const individualLesson = '개인레슨';
+
   /// 학원
   static const academy = '학원';
 

@@ -29,6 +29,8 @@ class LessonRequestSection extends ConsumerWidget {
     final requestsAsync = viewerRole == 'teacher'
         ? ref.watch(todayRequestsProvider(userId))
         : ref.watch(studentTodayRequestsProvider(userId));
+    final studentNames = ref.watch(studentNameMapProvider);
+    final academyNames = ref.watch(academyNameMapProvider);
 
     return requestsAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -59,7 +61,8 @@ class LessonRequestSection extends ConsumerWidget {
                       const Divider(height: 1, indent: AppSpacing.space4),
                     RequestListItem(
                       request: displayRequests[i],
-                      studentName: AppStrings.student,
+                      studentName: studentNames[displayRequests[i].studentId] ?? AppStrings.student,
+                      academyName: academyNames[displayRequests[i].academyId],
                       lastMessage: displayRequests[i].lastMessage,
                       onTap: () => context.push(
                         AppRoutes.requestDetail

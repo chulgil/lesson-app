@@ -14,11 +14,28 @@ enum RequestFilterPreset {
   custom,
 }
 
+/// Source filter: academy or individual.
+enum RequestSourceFilter {
+  all,
+  academy,
+  individual,
+}
+
+/// Status group for filter UI (color-based grouping).
+enum RequestStatusGroup {
+  all,
+  active, // pending, approved, negotiating, timeConfirmed — normal color
+  success, // completed, proposalAccepted, paymentNotified — green
+  warning, // cancelled, expired, rejected — orange/red
+}
+
 /// Filter + sort + pagination for lesson request lists.
 ///
 /// Immutable value object — create new instances for each filter change.
 class RequestFilter {
   final UnifiedRequestStatus? status;
+  final RequestStatusGroup statusGroup;
+  final RequestSourceFilter source;
   final DateTime? startDate;
   final DateTime? endDate;
   final DateTime? specificDate;
@@ -28,6 +45,8 @@ class RequestFilter {
 
   const RequestFilter({
     this.status,
+    this.statusGroup = RequestStatusGroup.all,
+    this.source = RequestSourceFilter.all,
     this.startDate,
     this.endDate,
     this.specificDate,
@@ -77,9 +96,43 @@ class RequestFilter {
       }).toList();
     }
 
+    // Filter by source (academy/individual)
+    switch (source) {
+      case RequestSourceFilter.academy:
+        result = result.where((r) => r.isAcademy).toList();
+      case RequestSourceFilter.individual:
+        result = result.where((r) => !r.isAcademy).toList();
+      case RequestSourceFilter.all:
+        break;
+    }
+
     // Filter by status
     if (status != null) {
       result = result.where((r) => r.status == status).toList();
+    }
+
+    // Filter by status group
+    switch (statusGroup) {
+      case RequestStatusGroup.active:
+        result = result.where((r) => r.status.isActive).toList();
+      case RequestStatusGroup.success:
+        result = result
+            .where((r) => [
+                  UnifiedRequestStatus.completed,
+                  UnifiedRequestStatus.proposalAccepted,
+                  UnifiedRequestStatus.paymentNotified,
+                ].contains(r.status))
+            .toList();
+      case RequestStatusGroup.warning:
+        result = result
+            .where((r) => [
+                  UnifiedRequestStatus.cancelled,
+                  UnifiedRequestStatus.expired,
+                  UnifiedRequestStatus.rejected,
+                ].contains(r.status))
+            .toList();
+      case RequestStatusGroup.all:
+        break;
     }
 
     // Sort
@@ -99,6 +152,8 @@ class RequestFilter {
 
   RequestFilter copyWith({
     UnifiedRequestStatus? status,
+    RequestStatusGroup? statusGroup,
+    RequestSourceFilter? source,
     DateTime? startDate,
     DateTime? endDate,
     DateTime? specificDate,
@@ -108,6 +163,8 @@ class RequestFilter {
   }) {
     return RequestFilter(
       status: status ?? this.status,
+      statusGroup: statusGroup ?? this.statusGroup,
+      source: source ?? this.source,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       specificDate: specificDate ?? this.specificDate,

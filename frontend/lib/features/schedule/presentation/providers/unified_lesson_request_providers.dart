@@ -7,6 +7,22 @@ import '../../domain/repositories/unified_lesson_request_repository.dart';
 
 part 'unified_lesson_request_providers.g.dart';
 
+/// Student name lookup — Mock only (Remote: fetch from API).
+/// Returns student name by studentId.
+final studentNameMapProvider = Provider<Map<String, String>>((ref) => {
+      'student_1': '김민준',
+      'student_2': '이서현',
+      'student_3': '박지호',
+      'student_4': '최수아',
+      'student_5': '정하은',
+    });
+
+/// Academy name lookup — Mock only.
+final academyNameMapProvider = Provider<Map<String, String>>((ref) => {
+      'academy_1': '서울음악학원',
+      'academy_2': '강남아트스쿨',
+    });
+
 /// Repository provider — currently Mock only (Remote in backend integration phase).
 final unifiedLessonRequestRepositoryProvider =
     Provider<UnifiedLessonRequestRepository>(
