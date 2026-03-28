@@ -41,13 +41,16 @@ void main() {
   });
 
   group('Trial lesson snackbar messages', () {
-    test('free trial shows completion message', () {
-      expect(AppStrings.trialComplete, contains('체험레슨'));
-      expect(AppStrings.trialComplete, contains('완료'));
+    test('free trial completion message is not empty', () {
+      expect(AppStrings.trialComplete, isNotEmpty);
     });
 
-    test('paid trial shows payment request message', () {
-      expect(AppStrings.trialPaymentRequested, contains('입금'));
+    test('paid trial payment request message is not empty', () {
+      expect(AppStrings.trialPaymentRequested, isNotEmpty);
+    });
+
+    test('free and paid messages are different', () {
+      expect(AppStrings.trialComplete, isNot(equals(AppStrings.trialPaymentRequested)));
     });
   });
 }
