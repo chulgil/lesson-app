@@ -35,7 +35,20 @@
 ### Phase 4: 수강권 제안 연동
 - [x] _handleSendProposal: 체험→직접완료, 정규→IssueSubscriptionScreen
 - [x] completeRequest 액션 추가
-- [ ] 학생 화면: 수강권 제안 수신 → 수락 → 입금 알림 (추후)
+- [x] 체험레슨 무료/유료 분기 (trialLessonFree 참조)
+- [x] 가격표 자동 매칭 (TeacherSettings.getPrice 연동)
+- [ ] 학생 화면: 수강권 제안 수신 → 수락 → 입금 알림 (추후, #201)
+
+### Phase 5: 선생님 UX 개선 (2026-03-28 완료)
+- [x] AppStrings 용어 상수 파일 (다국어 기반)
+- [x] 용어 통일: 레슨 요청/수락/다음에
+- [x] 즉시 확인 필요 4→2 축소
+- [x] 안내 메시지 커스텀 (bookingGuidanceMessage)
+- [x] 선생님 설정 편집 UI
+- [x] 학생 역제안 선택 바텀시트
+- [x] 예상 시간 + 취소 정책 표시
+- [x] 악기 1개 → 선택 UI 숨김
+- [x] fontSize → AppTypography 교체
 
 ## 의존성
 Phase 1 → Phase 2 → Phase 3 → Phase 4 (순차)

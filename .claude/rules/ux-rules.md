@@ -6,8 +6,9 @@
 ## 코딩 전 필수 조회 (HARD-GATE)
 
 1. `AppColors` 클래스 → 색상 확인 (없으면 상수 추가)
-2. `core/utils/` → 기존 유틸 사용 (NameUtils, date_format_utils 등)
-3. `core/widgets/` → 기존 공통 위젯 확인
+2. `AppStrings` 클래스 → UI 텍스트 상수 사용 (하드코딩 금지, 다국어 대비)
+3. `core/utils/` → 기존 유틸 사용 (NameUtils, date_format_utils 등)
+4. `core/widgets/` → 기존 공통 위젯 확인
 
 **공통 유틸 필수 사용:**
 - 이름: `NameUtils.givenName()` | 날짜: `formatDateYMD()` | 악기색상: `InstrumentColors.getColor()`
@@ -60,6 +61,9 @@ grep -rn "EdgeInsets\." --include="*.dart" features/ | grep -v "AppSpacing"
 
 # 빈 상태 위젯 미사용
 grep -rn "Text('데이터가 없습니다')" --include="*.dart" features/
+
+# 하드코딩 UI 텍스트 (AppStrings 미사용)
+grep -rn "'레슨 신청\|'승인\|'거절" --include="*.dart" features/
 
 # NO-OP 콜백
 grep -rn "onTap: () {}" --include="*.dart" features/

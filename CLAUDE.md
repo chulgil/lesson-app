@@ -37,6 +37,7 @@ flutter analyze                                              # 분석
 | 색상 | `AppColors`만 사용 (하드코딩 금지) |
 | Provider | `@riverpod` 어노테이션, `features/[domain]/` 아래만 |
 | 위젯 크기 | 500줄 이상 → 별도 파일 분리 |
+| UI 텍스트 | `AppStrings` 상수 사용 (하드코딩 금지, 다국어 대비) |
 
 **Ask First**: 아키텍처 변경, 새 패키지 추가, 데이터 스키마 변경
 **Never**: `Color(0x...)`, 레거시 위치에 새 코드, 사용자 확인 전 이슈 닫기
