@@ -133,13 +133,13 @@ enum Subdivision {
 
 /// Time signature options for the metronome.
 enum TimeSignature {
-  // Simple time signatures
+  // Simple time signatures (단순박자)
+  oneFour('1/4', 1, 4),
   twoFour('2/4', 2, 4),
   threeFour('3/4', 3, 4),
   fourFour('4/4', 4, 4),
-  fourOne('4/1', 4, 1),
-  // Compound time signatures
-  threeEight('3/8', 3, 8),
+  // Compound time signatures (복합박자)
+  threeEight('3/8', 3, 8, isCompound: true),
   sixEight('6/8', 6, 8, isCompound: true),
   nineEight('9/8', 9, 8, isCompound: true),
   twelveEight('12/8', 12, 8, isCompound: true);
