@@ -119,7 +119,11 @@ class _UnifiedLessonRequestScreenState
               const SizedBox(height: AppSpacing.space6),
               _buildExperienceSection(),
               const SizedBox(height: AppSpacing.space6),
+              _buildEstimatedDuration(),
+              const SizedBox(height: AppSpacing.space6),
               _buildSlotPickerSection(),
+              const SizedBox(height: AppSpacing.space6),
+              _buildCancellationPolicy(),
               const SizedBox(height: AppSpacing.space6),
               _buildMessageSection(),
               const SizedBox(height: AppSpacing.space6),
@@ -430,6 +434,70 @@ class _UnifiedLessonRequestScreenState
             _preferredSlots = slots;
           });
         },
+      ),
+    );
+  }
+
+  // -- Estimated duration (read-only, Naver benchmark) --
+
+  Widget _buildEstimatedDuration() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space4,
+        vertical: AppSpacing.space3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.schedule, size: 18, color: AppColors.textSecondaryLight),
+          const SizedBox(width: AppSpacing.space3),
+          Text(
+            AppStrings.estimatedDuration,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            '60분',
+            style: AppTypography.bodyMedium.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -- Cancellation policy (read-only, Naver benchmark) --
+
+  Widget _buildCancellationPolicy() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space4,
+        vertical: AppSpacing.space3,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.info.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.info.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Text(
+              AppStrings.cancellationPolicy,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.info,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

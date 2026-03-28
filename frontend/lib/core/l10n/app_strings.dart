@@ -77,6 +77,14 @@ class AppStrings {
   /// 메시지만 전달 (레슨 불가 시)
   static const messageOnly = '메시지만 전달';
 
+  // ── Info Sections (Read-only, Naver benchmark) ─────────────
+
+  /// 예상 레슨 시간 라벨
+  static const estimatedDuration = '예상 레슨 시간';
+
+  /// 취소/변경 정책 안내
+  static const cancellationPolicy = '레슨 24시간 전까지 변경 가능합니다';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청
