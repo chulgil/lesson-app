@@ -3,6 +3,18 @@
 > lessons-learned.md에서 UX 관련 교훈을 분리. 에이전트가 구현 시 자동 참조.
 > 상세 디자인 토큰/컴포넌트: `docs/specs/design/ux_guidelines.md`
 
+## 코딩 전 필수 조회 (HARD-GATE)
+
+1. `AppColors` 클래스 → 색상 확인 (없으면 상수 추가)
+2. `core/utils/` → 기존 유틸 사용 (NameUtils, date_format_utils 등)
+3. `core/widgets/` → 기존 공통 위젯 확인
+
+**공통 유틸 필수 사용:**
+- 이름: `NameUtils.givenName()` | 날짜: `formatDateYMD()` | 악기색상: `InstrumentColors.getColor()`
+- 스케줄 뮤트: `AppColors.scheduleMutedBackground`, `AppColors.scheduleMutedAccent`
+
+**원샷 UX**: 한 번 탭으로 모든 연관 작업 완료 → [UX 가이드라인](docs/specs/design/ux_guidelines.md)
+
 ## 색상 규칙
 
 - **AppColors만 사용** — `Color(0x...)` 하드코딩 절대 금지 (#6)

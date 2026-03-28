@@ -12,16 +12,10 @@ import 'lesson_request_card.dart';
 /// followed by past requests (most recent first).
 class LessonRequestList extends StatelessWidget {
   final List<LessonRequest> requests;
-  final bool isSelectionMode;
-  final Set<String> selectedIds;
-  final void Function(String) onToggleSelection;
 
   const LessonRequestList({
     super.key,
     required this.requests,
-    required this.isSelectionMode,
-    required this.selectedIds,
-    required this.onToggleSelection,
   });
 
   @override
@@ -52,12 +46,7 @@ class LessonRequestList extends StatelessWidget {
           ...pendingRequests.map(
             (request) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: LessonRequestCard(
-                request: request,
-                isSelectionMode: isSelectionMode,
-                isSelected: selectedIds.contains(request.id),
-                onToggleSelection: () => onToggleSelection(request.id),
-              ),
+              child: LessonRequestCard(request: request),
             ),
           ),
         ],
@@ -84,12 +73,7 @@ class LessonRequestList extends StatelessWidget {
           ...pastRequests.map(
             (request) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: LessonRequestCard(
-                request: request,
-                isSelectionMode: isSelectionMode,
-                isSelected: selectedIds.contains(request.id),
-                onToggleSelection: () => onToggleSelection(request.id),
-              ),
+              child: LessonRequestCard(request: request),
             ),
           ),
         ],

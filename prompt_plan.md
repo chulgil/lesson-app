@@ -32,8 +32,13 @@
 - [x] currentRound 상한 2 적용 (Phase 1에서 완료)
 - [x] 수락/거절/역제안 비즈니스 로직 테스트 (10 tests)
 
+### Phase 4: 수강권 제안 연동
+- [x] _handleSendProposal: 체험→직접완료, 정규→IssueSubscriptionScreen
+- [x] completeRequest 액션 추가
+- [ ] 학생 화면: 수강권 제안 수신 → 수락 → 입금 알림 (추후)
+
 ## 의존성
-Phase 1 → Phase 2 → Phase 3 (순차)
+Phase 1 → Phase 2 → Phase 3 → Phase 4 (순차)
 
 ## 관련 문서
 - 스펙: docs/specs/booking/unified_lesson_request_spec.md (v2.0)

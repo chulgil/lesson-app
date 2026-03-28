@@ -157,12 +157,12 @@ class RemoteBookingRepository implements BookingRepository {
   @override
   Future<LessonBooking> markUnavailable(
     String id,
-    UnavailableReason reason, {
+    String reason, {
     List<TimeSlot>? suggestedTimeSlots,
   }) async {
     final response = await _apiClient.patch(
       '/bookings/$id/reject',
-      data: {'reason': reason.name},
+      data: {'reason': reason},
     );
     return _bookingFromJson(response.data as Map<String, dynamic>);
   }
@@ -343,12 +343,7 @@ class RemoteBookingRepository implements BookingRepository {
           json['cancelled_at'] != null
               ? DateTime.parse(json['cancelled_at'] as String)
               : null,
-      unavailableReason:
-          json['unavailable_reason'] != null
-              ? UnavailableReason.values.byName(
-                json['unavailable_reason'] as String,
-              )
-              : null,
+      unavailableMessage: json['unavailable_reason'] as String?,
       unavailableAt:
           json['unavailable_at'] != null
               ? DateTime.parse(json['unavailable_at'] as String)

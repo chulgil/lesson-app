@@ -145,7 +145,7 @@ class BookingFacadeNotifier extends AsyncNotifier<List<LessonBooking>> {
 
   Future<LessonBooking> markUnavailable(
     String bookingId,
-    UnavailableReason reason, {
+    String reason, {
     List<TimeSlot>? suggestedTimeSlots,
   }) =>
       _inner.markUnavailable(bookingId, reason,

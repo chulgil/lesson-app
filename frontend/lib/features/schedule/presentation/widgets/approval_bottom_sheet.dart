@@ -8,7 +8,7 @@ import '../../../../core/booking/entities/lesson_booking.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import 'schedule_option_card.dart';
-import 'unavailable_bottom_sheet.dart';
+import 'decline_bottom_sheet.dart';
 
 /// Bottom sheet for booking approval with multi-option support.
 class ApprovalBottomSheet extends ConsumerStatefulWidget {
@@ -417,13 +417,10 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
   }
 
   Future<void> _handleReject() async {
-    final result = await showModalBottomSheet<
-        ({UnavailableReason reason, List<TimeSlot> suggestedSlots})>(
-      context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => UnavailableBottomSheet(
-        teacherId: widget.teacherId,
-      ),
+    final result = await showDeclineBottomSheet(
+      context,
+      durationMinutes: widget.booking.durationMinutes,
+      teacherId: widget.teacherId,
     );
 
     if (result == null || !mounted) return;
@@ -433,7 +430,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     try {
       await ref.read(bookingsNotifierProvider.notifier).markUnavailable(
             widget.booking.id,
-            result.reason,
+            result.message,
             suggestedTimeSlots:
                 result.suggestedSlots.isNotEmpty ? result.suggestedSlots : null,
           );
