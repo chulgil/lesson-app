@@ -761,5 +761,292 @@ class _UnifiedRequestByIdProviderElement
   @override
   String get requestId => (origin as UnifiedRequestByIdProvider).requestId;
 }
+
+String _$requestEventsHash() => r'da1fea94f522371ad2dacd163c90617b8064052c';
+
+/// Get all events for a specific request (chat history).
+///
+/// Copied from [requestEvents].
+@ProviderFor(requestEvents)
+const requestEventsProvider = RequestEventsFamily();
+
+/// Get all events for a specific request (chat history).
+///
+/// Copied from [requestEvents].
+class RequestEventsFamily extends Family<AsyncValue<List<RequestEvent>>> {
+  /// Get all events for a specific request (chat history).
+  ///
+  /// Copied from [requestEvents].
+  const RequestEventsFamily();
+
+  /// Get all events for a specific request (chat history).
+  ///
+  /// Copied from [requestEvents].
+  RequestEventsProvider call(
+    String requestId,
+  ) {
+    return RequestEventsProvider(
+      requestId,
+    );
+  }
+
+  @override
+  RequestEventsProvider getProviderOverride(
+    covariant RequestEventsProvider provider,
+  ) {
+    return call(
+      provider.requestId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'requestEventsProvider';
+}
+
+/// Get all events for a specific request (chat history).
+///
+/// Copied from [requestEvents].
+class RequestEventsProvider
+    extends AutoDisposeFutureProvider<List<RequestEvent>> {
+  /// Get all events for a specific request (chat history).
+  ///
+  /// Copied from [requestEvents].
+  RequestEventsProvider(
+    String requestId,
+  ) : this._internal(
+          (ref) => requestEvents(
+            ref as RequestEventsRef,
+            requestId,
+          ),
+          from: requestEventsProvider,
+          name: r'requestEventsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$requestEventsHash,
+          dependencies: RequestEventsFamily._dependencies,
+          allTransitiveDependencies:
+              RequestEventsFamily._allTransitiveDependencies,
+          requestId: requestId,
+        );
+
+  RequestEventsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.requestId,
+  }) : super.internal();
+
+  final String requestId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<RequestEvent>> Function(RequestEventsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: RequestEventsProvider._internal(
+        (ref) => create(ref as RequestEventsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        requestId: requestId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<RequestEvent>> createElement() {
+    return _RequestEventsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RequestEventsProvider && other.requestId == requestId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, requestId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RequestEventsRef on AutoDisposeFutureProviderRef<List<RequestEvent>> {
+  /// The parameter `requestId` of this provider.
+  String get requestId;
+}
+
+class _RequestEventsProviderElement
+    extends AutoDisposeFutureProviderElement<List<RequestEvent>>
+    with RequestEventsRef {
+  _RequestEventsProviderElement(super.provider);
+
+  @override
+  String get requestId => (origin as RequestEventsProvider).requestId;
+}
+
+String _$todayRequestsHash() => r'080dcdf67f1e4cccd8bbc7c8aec53c0ff10a3229';
+
+/// Today's requests for a teacher: active + completed today, pending first.
+///
+/// Copied from [todayRequests].
+@ProviderFor(todayRequests)
+const todayRequestsProvider = TodayRequestsFamily();
+
+/// Today's requests for a teacher: active + completed today, pending first.
+///
+/// Copied from [todayRequests].
+class TodayRequestsFamily
+    extends Family<AsyncValue<List<UnifiedLessonRequest>>> {
+  /// Today's requests for a teacher: active + completed today, pending first.
+  ///
+  /// Copied from [todayRequests].
+  const TodayRequestsFamily();
+
+  /// Today's requests for a teacher: active + completed today, pending first.
+  ///
+  /// Copied from [todayRequests].
+  TodayRequestsProvider call(
+    String teacherId,
+  ) {
+    return TodayRequestsProvider(
+      teacherId,
+    );
+  }
+
+  @override
+  TodayRequestsProvider getProviderOverride(
+    covariant TodayRequestsProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'todayRequestsProvider';
+}
+
+/// Today's requests for a teacher: active + completed today, pending first.
+///
+/// Copied from [todayRequests].
+class TodayRequestsProvider
+    extends AutoDisposeFutureProvider<List<UnifiedLessonRequest>> {
+  /// Today's requests for a teacher: active + completed today, pending first.
+  ///
+  /// Copied from [todayRequests].
+  TodayRequestsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => todayRequests(
+            ref as TodayRequestsRef,
+            teacherId,
+          ),
+          from: todayRequestsProvider,
+          name: r'todayRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$todayRequestsHash,
+          dependencies: TodayRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              TodayRequestsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
+
+  TodayRequestsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<UnifiedLessonRequest>> Function(TodayRequestsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TodayRequestsProvider._internal(
+        (ref) => create(ref as TodayRequestsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>> createElement() {
+    return _TodayRequestsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TodayRequestsProvider && other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin TodayRequestsRef
+    on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _TodayRequestsProviderElement
+    extends AutoDisposeFutureProviderElement<List<UnifiedLessonRequest>>
+    with TodayRequestsRef {
+  _TodayRequestsProviderElement(super.provider);
+
+  @override
+  String get teacherId => (origin as TodayRequestsProvider).teacherId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
