@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -33,14 +34,14 @@ class RequestDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('레슨 요청 상세'),
+        title: const Text(AppStrings.requestDetailTitle),
         centerTitle: true,
       ),
       body: requestAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(
           child: Text(
-            '요청을 불러올 수 없습니다',
+            AppStrings.requestLoadError,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textSecondaryLight,
             ),
@@ -50,7 +51,7 @@ class RequestDetailScreen extends ConsumerWidget {
           if (request == null) {
             return Center(
               child: Text(
-                '요청을 찾을 수 없습니다',
+                AppStrings.requestNotFound,
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
@@ -72,8 +73,8 @@ class RequestDetailScreen extends ConsumerWidget {
                   events: events,
                   viewerRole: viewerRole,
                   opponentName: viewerRole == 'teacher'
-                      ? '학생' // TODO: Fetch student name from student provider
-                      : '선생님',
+                      ? AppStrings.student
+                      : AppStrings.teacher,
                   onAccept: () => _handleAccept(context, ref, request),
                   onCounterPropose: () =>
                       _handleCounterPropose(context, request),
@@ -87,7 +88,7 @@ class RequestDetailScreen extends ConsumerWidget {
                   viewerId: viewerRole == 'teacher'
                       ? request.teacherId
                       : request.studentId,
-                  studentName: '학생', // TODO: Fetch from student provider
+                  studentName: AppStrings.student,
                 ),
 
                 const SizedBox(height: AppSpacing.space8),
@@ -126,9 +127,9 @@ class RequestDetailScreen extends ConsumerWidget {
                 _statusColor(request.status),
               ),
               if (request.isAcademy)
-                _buildBadge('학원', AppColors.info),
+                _buildBadge(AppStrings.academy, AppColors.info),
               if (request.isReturningStudent)
-                _buildBadge('재수강', AppColors.success),
+                _buildBadge(AppStrings.returning, AppColors.success),
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -234,7 +235,7 @@ class RequestDetailScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('수락 처리 중 오류가 발생했습니다')),
+          const SnackBar(content: Text(AppStrings.acceptError)),
         );
       }
     }
@@ -263,12 +264,12 @@ class RequestDetailScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('요청 취소'),
-        content: const Text('이 레슨 요청을 취소하시겠습니까?'),
+        title: const Text(AppStrings.cancelRequestTitle),
+        content: const Text(AppStrings.cancelRequestMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('아니요'),
+            child: const Text(AppStrings.no),
           ),
           TextButton(
             onPressed: () {
@@ -287,7 +288,7 @@ class RequestDetailScreen extends ConsumerWidget {
               );
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('취소하기'),
+            child: const Text(AppStrings.cancelRequestAction),
           ),
         ],
       ),

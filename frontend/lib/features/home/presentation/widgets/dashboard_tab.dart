@@ -12,12 +12,12 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
-import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'assignment_summary_section.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
-import 'urgent_actions_section.dart';
+import 'lesson_request_section.dart';
 
 /// Dashboard Tab - core stats + urgent actions + today's lessons.
 class DashboardTab extends ConsumerWidget {
@@ -34,14 +34,8 @@ class DashboardTab extends ConsumerWidget {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final teacherId = ref.watch(currentUserIdProvider);
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
-    final pendingRequestsAsync = ref.watch(
-      pendingLessonRequestCountProvider(teacherId),
-    );
     final pendingBookingsAsync = ref.watch(
       pendingBookingsCountProvider(teacherId),
-    );
-    final awaitingConfirmAsync = ref.watch(
-      awaitingConfirmationProposalsProvider(teacherId),
     );
     final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
     final expiredAsync = ref.watch(expiredSubscriptionsProvider);
@@ -64,9 +58,8 @@ class DashboardTab extends ConsumerWidget {
         ref.invalidate(lessonsProvider);
         ref.invalidate(lessonStatsProvider);
         ref.invalidate(unpaidSummaryProvider(teacherId));
-        ref.invalidate(pendingLessonRequestCountProvider(teacherId));
         ref.invalidate(pendingBookingsCountProvider(teacherId));
-        ref.invalidate(awaitingConfirmationProposalsProvider(teacherId));
+        ref.invalidate(todayRequestsProvider(teacherId));
         ref.invalidate(expiringSoonSubscriptionsProvider);
         ref.invalidate(expiredSubscriptionsProvider);
       },
@@ -112,14 +105,8 @@ class DashboardTab extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space6),
 
-            // Urgent Actions Section
-            UrgentActionsSection(
-              teacherId: teacherId,
-              pendingRequests: (pendingRequestsAsync.valueOrNull ?? 0) +
-                  (pendingBookingsAsync.valueOrNull ?? 0),
-              awaitingConfirmCount:
-                  (awaitingConfirmAsync.valueOrNull ?? []).length,
-            ),
+            // Lesson Request Section (replaces UrgentActionsSection)
+            LessonRequestSection(teacherId: teacherId),
 
             const SizedBox(height: AppSpacing.space6),
 

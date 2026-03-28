@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/l10n/app_strings.dart' show AppStrings;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -130,7 +130,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
         // Status message
         Text(
-          '${widget.opponentName}님이 시간을 제안했습니다',
+          AppStrings.opponentProposed(widget.opponentName),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textSecondaryLight,
           ),
@@ -217,7 +217,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
         const SizedBox(height: AppSpacing.space3),
         Text(
-          '${widget.opponentName}님의 응답을 기다리고 있습니다',
+          AppStrings.waitingForResponse(widget.opponentName),
           style: AppTypography.bodyMedium.copyWith(
             color: AppColors.textSecondaryLight,
           ),
@@ -239,7 +239,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                     ),
                   ),
                   child: Text(
-                    '수정',
+                    AppStrings.modify,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
@@ -261,7 +261,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   ),
                 ),
                 child: Text(
-                  '취소',
+                  AppStrings.cancel,
                   style: AppTypography.buttonSmall.copyWith(
                     color: AppColors.error,
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -31,7 +32,7 @@ class RequestHistoryChat extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         child: Center(
           child: Text(
-            '아직 히스토리가 없습니다',
+            AppStrings.noHistory,
             style: AppTypography.bodyMedium.copyWith(
               color: AppColors.textTertiaryLight,
             ),
@@ -73,7 +74,7 @@ class RequestHistoryChat extends StatelessWidget {
   Widget _buildChatBubble(RequestEvent event, bool isMyMessage) {
     final actorName = event.actorType == ProposerRole.student
         ? studentName
-        : '선생님';
+        : AppStrings.teacher;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),

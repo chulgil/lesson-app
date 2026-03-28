@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/auth/auth_state.dart';
 import '../../../../core/config/environment.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -92,6 +93,14 @@ class ProfileTab extends ConsumerWidget {
           _buildMenuSection(
             title: '레슨 운영',
             items: [
+              _MenuItem(
+                icon: Icons.assignment,
+                label: AppStrings.lessonRequestManagement,
+                subtitle: AppStrings.lessonRequestManagementDesc,
+                onTap: () => context.push(
+                  '${AppRoutes.lessonRequests}?teacherId=$teacherId',
+                ),
+              ),
               _MenuItem(
                 icon: Icons.access_time,
                 label: '레슨 시간 설정',

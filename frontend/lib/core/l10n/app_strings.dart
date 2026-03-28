@@ -85,6 +85,80 @@ class AppStrings {
   /// 취소/변경 정책 안내
   static const cancellationPolicy = '레슨 24시간 전까지 변경 가능합니다';
 
+  // ── Request Detail Screen ──────────────────────────────────
+
+  /// 레슨 요청 상세 화면 제목
+  static const requestDetailTitle = '레슨 요청 상세';
+
+  /// 요청을 불러올 수 없음
+  static const requestNotFound = '요청을 찾을 수 없습니다';
+
+  /// 수정 버튼
+  static const modify = '수정';
+
+  /// 취소 버튼
+  static const cancel = '취소';
+
+  /// 취소 확인 제목
+  static const cancelRequestTitle = '요청 취소';
+
+  /// 취소 확인 메시지
+  static const cancelRequestMessage = '이 레슨 요청을 취소하시겠습니까?';
+
+  /// 취소하기 버튼
+  static const cancelRequestAction = '취소하기';
+
+  /// 아니요 버튼
+  static const no = '아니요';
+
+  /// 상대방 시간 제안 알림
+  static String opponentProposed(String name) =>
+      '$name님이 시간을 제안했습니다';
+
+  /// 상대방 응답 대기
+  static String waitingForResponse(String name) =>
+      '$name님의 응답을 기다리고 있습니다';
+
+  /// 히스토리 없음
+  static const noHistory = '아직 히스토리가 없습니다';
+
+  /// 선생님 (역할명)
+  static const teacher = '선생님';
+
+  /// 학생 (역할명)
+  static const student = '학생';
+
+  /// 개인 (학원 아님)
+  static const individual = '개인';
+
+  /// 학원
+  static const academy = '학원';
+
+  /// 재수강
+  static const returning = '재수강';
+
+  /// 요청 더보기
+  static String moreRequests(int count) => '$count개 요청 더보기';
+
+  // ── Request List Item Status ──────────────────────────────
+
+  /// 완료
+  static const statusCompleted = '완료';
+
+  /// 입금완료
+  static const statusPaymentDone = '입금완료';
+
+  /// 만료
+  static const statusExpired = '만료';
+
+  // ── Profile Menu ──────────────────────────────────────────
+
+  /// 레슨 요청 관리 메뉴
+  static const lessonRequestManagement = '레슨 요청 관리';
+
+  /// 레슨 요청 관리 설명
+  static const lessonRequestManagementDesc = '받은 레슨 요청 확인 및 관리';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청
