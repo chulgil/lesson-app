@@ -149,7 +149,8 @@ class UnifiedRequestCard extends StatelessWidget {
               icon: Icons.bar_chart_outlined,
               label: request.experience.label,
             ),
-            if (request.preferredDayLabel != null)
+            if (request.preferredSlots.isEmpty &&
+                request.preferredDayLabel != null)
               _InfoChip(
                 icon: Icons.schedule_outlined,
                 label:
@@ -157,6 +158,36 @@ class UnifiedRequestCard extends StatelessWidget {
               ),
           ],
         ),
+        // v2.0: Show 3 preferred time slots
+        if (request.preferredSlots.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          ...request.preferredSlots.map((slot) => Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.schedule_outlined,
+                      size: 14,
+                      color: slot.priority == 1
+                          ? AppColors.primary
+                          : AppColors.textTertiaryLight,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${slot.priority}순위: ${slot.displayLabel}',
+                      style: AppTypography.caption.copyWith(
+                        color: slot.priority == 1
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                        fontWeight: slot.priority == 1
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
       ],
     );
   }

@@ -12,6 +12,7 @@ import '../providers/lesson_request_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/lesson_request_list.dart';
 import '../widgets/schedule_slot_picker.dart';
+import '../widgets/unified_approval_bottom_sheet.dart';
 import '../widgets/unified_request_card.dart';
 
 /// State provider for selection mode
@@ -431,6 +432,31 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
+    // v2.0: Show approval bottom sheet with 3 preferred slots
+    if (request.preferredSlots.isNotEmpty) {
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (context) => DraggableScrollableSheet(
+          initialChildSize: 0.85,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) =>
+              UnifiedApprovalBottomSheet(
+            request: request,
+            scrollController: scrollController,
+            onComplete: () {
+              ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Legacy: direct approve (no preferred slots)
     try {
       final actions = UnifiedLessonRequestActions(ref);
       await actions.approveRequest(
