@@ -159,8 +159,6 @@ class StudentSubscriptionsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentSubscriptionsRef
     on AutoDisposeFutureProviderRef<List<Subscription>> {
   /// The parameter `studentId` of this provider.
@@ -309,8 +307,6 @@ class ActiveStudentSubscriptionsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveStudentSubscriptionsRef
     on AutoDisposeFutureProviderRef<List<Subscription>> {
   /// The parameter `studentId` of this provider.
@@ -457,8 +453,6 @@ class MembershipSubscriptionProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin MembershipSubscriptionRef on AutoDisposeFutureProviderRef<Subscription?> {
   /// The parameter `membershipId` of this provider.
   String get membershipId;
@@ -601,8 +595,6 @@ class SubscriptionProvider extends AutoDisposeFutureProvider<Subscription?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SubscriptionRef on AutoDisposeFutureProviderRef<Subscription?> {
   /// The parameter `id` of this provider.
   String get id;
@@ -635,8 +627,6 @@ final expiringSoonSubscriptionsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ExpiringSoonSubscriptionsRef
     = AutoDisposeFutureProviderRef<List<Subscription>>;
 String _$expiredSubscriptionsHash() =>
@@ -657,8 +647,6 @@ final expiredSubscriptionsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ExpiredSubscriptionsRef
     = AutoDisposeFutureProviderRef<List<Subscription>>;
 String _$subscriptionUsageHistoryHash() =>
@@ -794,8 +782,6 @@ class SubscriptionUsageHistoryProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SubscriptionUsageHistoryRef
     on AutoDisposeFutureProviderRef<List<SubscriptionUsage>> {
   /// The parameter `subscriptionId` of this provider.
@@ -945,8 +931,6 @@ class TeacherStudentSubscriptionsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherStudentSubscriptionsRef
     on AutoDisposeFutureProviderRef<List<Subscription>> {
   /// The parameter `teacherId` of this provider.
@@ -1093,8 +1077,6 @@ class UnpaidSubscriptionsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin UnpaidSubscriptionsRef
     on AutoDisposeFutureProviderRef<List<Subscription>> {
   /// The parameter `teacherId` of this provider.
@@ -1242,8 +1224,6 @@ class UnpaidSummaryProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin UnpaidSummaryRef
     on AutoDisposeFutureProviderRef<({int totalAmount, int studentCount})> {
   /// The parameter `teacherId` of this provider.
@@ -1407,8 +1387,6 @@ class ActiveSubscriptionBetweenProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveSubscriptionBetweenRef
     on AutoDisposeFutureProviderRef<Subscription?> {
   /// The parameter `studentId` of this provider.
@@ -1599,8 +1577,6 @@ class CanBookLessonProvider extends AutoDisposeFutureProvider<bool> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin CanBookLessonRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `studentId` of this provider.
   String get studentId;
@@ -1769,8 +1745,6 @@ class SubscriptionNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SubscriptionNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<Subscription>> {
   /// The parameter `studentId` of this provider.
@@ -1933,8 +1907,6 @@ class MembershipSubscriptionNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin MembershipSubscriptionNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<Subscription?> {
   /// The parameter `membershipId` of this provider.
@@ -1952,4 +1924,4 @@ class _MembershipSubscriptionNotifierProviderElement
       (origin as MembershipSubscriptionNotifierProvider).membershipId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -7,7 +7,7 @@ part of 'membership_providers.dart';
 // **************************************************************************
 
 String _$membershipRepositoryHash() =>
-    r'8fb66b81e49ea2372eb3a2a2f427a49aa5242fce';
+    r'5c0869d58f0afbc3b6381a78a26d14b39dde5861';
 
 /// Repository provider for ClassMembership.
 ///
@@ -24,8 +24,6 @@ final membershipRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MembershipRepositoryRef = AutoDisposeProviderRef<MembershipRepository>;
 String _$classMembershipsHash() => r'f7ce5f9aa7f519fb0c3ad4030b9d948e49daf804';
 
@@ -177,8 +175,6 @@ class ClassMembershipsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ClassMembershipsRef
     on AutoDisposeFutureProviderRef<List<ClassMembership>> {
   /// The parameter `classId` of this provider.
@@ -325,8 +321,6 @@ class StudentMembershipsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentMembershipsRef
     on AutoDisposeFutureProviderRef<List<ClassMembership>> {
   /// The parameter `studentId` of this provider.
@@ -469,8 +463,6 @@ class MembershipProvider extends AutoDisposeFutureProvider<ClassMembership?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin MembershipRef on AutoDisposeFutureProviderRef<ClassMembership?> {
   /// The parameter `id` of this provider.
   String get id;
@@ -618,8 +610,6 @@ class ActiveStudentMembershipsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveStudentMembershipsRef
     on AutoDisposeFutureProviderRef<List<ClassMembership>> {
   /// The parameter `studentId` of this provider.
@@ -780,8 +770,6 @@ class MembershipNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin MembershipNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<ClassMembership>> {
   /// The parameter `classId` of this provider.
@@ -943,8 +931,6 @@ class StudentMembershipNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentMembershipNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<ClassMembership>> {
   /// The parameter `studentId` of this provider.
@@ -961,4 +947,4 @@ class _StudentMembershipNotifierProviderElement
       (origin as StudentMembershipNotifierProvider).studentId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -7,7 +7,7 @@ part of 'gamification_provider.dart';
 // **************************************************************************
 
 String _$gamificationRepositoryHash() =>
-    r'9f0c9cf23dcad77067a82561378a85e2b75267e5';
+    r'61fe9c98d70a913c84780b5a9dbfee2b3bb5d62a';
 
 /// See also [gamificationRepository].
 @ProviderFor(gamificationRepository)
@@ -22,8 +22,6 @@ final gamificationRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef GamificationRepositoryRef = ProviderRef<GamificationRepository>;
 String _$studentGamificationHash() =>
     r'd11d27a1c9113a3aebeb0ec000cf792174ee491f';
@@ -165,8 +163,6 @@ class StudentGamificationProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentGamificationRef
     on AutoDisposeFutureProviderRef<StudentGamification> {
   /// The parameter `studentId` of this provider.
@@ -182,4 +178,4 @@ class _StudentGamificationProviderElement
   String get studentId => (origin as StudentGamificationProvider).studentId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

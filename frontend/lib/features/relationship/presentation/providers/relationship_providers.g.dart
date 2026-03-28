@@ -7,7 +7,7 @@ part of 'relationship_providers.dart';
 // **************************************************************************
 
 String _$teacherStudentRelationRepositoryHash() =>
-    r'93fa0da06a54ed3a4840676597205de2710c2a30';
+    r'05b18e00892da30aa7530728d2eb0d1ad404f52c';
 
 /// Repository provider - switches between Mock and Remote.
 ///
@@ -24,8 +24,6 @@ final teacherStudentRelationRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef TeacherStudentRelationRepositoryRef
     = ProviderRef<TeacherStudentRelationRepository>;
 String _$relationshipByIdHash() => r'65f8eeb965dce5e4394f7960ebe015d2be7373c2';
@@ -179,8 +177,6 @@ class RelationshipByIdProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin RelationshipByIdRef
     on AutoDisposeFutureProviderRef<TeacherStudentRelation?> {
   /// The parameter `id` of this provider.
@@ -340,8 +336,6 @@ class TeacherStudentRelationProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherStudentRelationRef
     on AutoDisposeFutureProviderRef<TeacherStudentRelation?> {
   /// The parameter `teacherId` of this provider.
@@ -496,8 +490,6 @@ class TeacherRelationshipsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherRelationshipsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -647,8 +639,6 @@ class StudentRelationshipsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentRelationshipsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `studentId` of this provider.
@@ -810,8 +800,6 @@ class TeacherRelationshipsByStatusProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherRelationshipsByStatusRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -965,8 +953,6 @@ class ActiveStudentsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveStudentsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -1113,8 +1099,6 @@ class ExpiredStudentsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ExpiredStudentsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -1261,8 +1245,6 @@ class PastStudentsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PastStudentsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -1411,8 +1393,6 @@ class TrialBookedStudentsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TrialBookedStudentsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -1562,8 +1542,6 @@ class ManuallyRegisteredStudentsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ManuallyRegisteredStudentsRef
     on AutoDisposeFutureProviderRef<List<TeacherStudentRelation>> {
   /// The parameter `teacherId` of this provider.
@@ -1725,8 +1703,6 @@ class RelationshipNotificationSettingProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin RelationshipNotificationSettingRef
     on AutoDisposeFutureProviderRef<NotificationSetting?> {
   /// The parameter `userId` of this provider.
@@ -1895,8 +1871,6 @@ class PreviousScheduleProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PreviousScheduleRef on AutoDisposeFutureProviderRef<PreviousSchedule?> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -1936,4 +1910,4 @@ final scheduleRecorderProvider =
 
 typedef _$ScheduleRecorder = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

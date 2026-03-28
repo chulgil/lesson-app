@@ -6,7 +6,7 @@ part of 'follow_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$followRepositoryHash() => r'f4615e20b5345b32d520bf713ea18432c368fad9';
+String _$followRepositoryHash() => r'd1af6ac92f3f7bae8653dfb1e2545253c75fdb58';
 
 /// Repository provider - switches between Mock and Remote.
 ///
@@ -22,8 +22,6 @@ final followRepositoryProvider = Provider<FollowRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef FollowRepositoryRef = ProviderRef<FollowRepository>;
 String _$followByIdHash() => r'389c523e5fd7fd0e242b0f19149da724aa5e240f';
 
@@ -173,8 +171,6 @@ class FollowByIdProvider extends AutoDisposeFutureProvider<Follow?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FollowByIdRef on AutoDisposeFutureProviderRef<Follow?> {
   /// The parameter `id` of this provider.
   String get id;
@@ -327,8 +323,6 @@ class IsFollowingProvider extends AutoDisposeFutureProvider<bool> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin IsFollowingRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -474,8 +468,6 @@ class UserFollowingProvider extends AutoDisposeFutureProvider<List<Follow>> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin UserFollowingRef on AutoDisposeFutureProviderRef<List<Follow>> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -617,8 +609,6 @@ class TargetFollowersProvider extends AutoDisposeFutureProvider<List<Follow>> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TargetFollowersRef on AutoDisposeFutureProviderRef<List<Follow>> {
   /// The parameter `followingId` of this provider.
   String get followingId;
@@ -774,8 +764,6 @@ class UserFollowingByTypeProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin UserFollowingByTypeRef on AutoDisposeFutureProviderRef<List<Follow>> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -923,8 +911,6 @@ class FollowerCountProvider extends AutoDisposeFutureProvider<int> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FollowerCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `followingId` of this provider.
   String get followingId;
@@ -1065,8 +1051,6 @@ class FollowingCountProvider extends AutoDisposeFutureProvider<int> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FollowingCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -1207,8 +1191,6 @@ class FollowedTeachersProvider extends AutoDisposeFutureProvider<List<Follow>> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FollowedTeachersRef on AutoDisposeFutureProviderRef<List<Follow>> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -1351,8 +1333,6 @@ class FollowedAcademiesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FollowedAcademiesRef on AutoDisposeFutureProviderRef<List<Follow>> {
   /// The parameter `followerId` of this provider.
   String get followerId;
@@ -1367,4 +1347,4 @@ class _FollowedAcademiesProviderElement
   String get followerId => (origin as FollowedAcademiesProvider).followerId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

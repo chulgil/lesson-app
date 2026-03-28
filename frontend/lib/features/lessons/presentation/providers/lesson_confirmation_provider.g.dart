@@ -156,8 +156,6 @@ class LessonNeedsConfirmationProvider extends AutoDisposeFutureProvider<bool> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LessonNeedsConfirmationRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `lessonId` of this provider.
   String get lessonId;
@@ -190,8 +188,6 @@ final lessonsNeedingConfirmationProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef LessonsNeedingConfirmationRef
     = AutoDisposeFutureProviderRef<List<Lesson>>;
 String _$canCancelWithoutDeductionHash() =>
@@ -322,8 +318,6 @@ class CanCancelWithoutDeductionProvider extends AutoDisposeProvider<bool> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin CanCancelWithoutDeductionRef on AutoDisposeProviderRef<bool> {
   /// The parameter `lesson` of this provider.
   Lesson get lesson;
@@ -357,4 +351,4 @@ final lessonConfirmationNotifierProvider = AutoDisposeNotifierProvider<
 
 typedef _$LessonConfirmationNotifier = AutoDisposeNotifier<AsyncValue<void>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

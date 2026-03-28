@@ -7,7 +7,7 @@ part of 'recording_provider.dart';
 // **************************************************************************
 
 String _$recordingRepositoryHash() =>
-    r'3aa0f99922fa7077a0b96c6319251b14604f4483';
+    r'425d8abb6bd46886426fe3d089aec789c54cbf60';
 
 /// Provider for recording repository - switches between Hive (local) and Remote.
 ///
@@ -23,8 +23,6 @@ final recordingRepositoryProvider = Provider<RecordingRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef RecordingRepositoryRef = ProviderRef<RecordingRepository>;
 String _$audioRecorderServiceHash() =>
     r'3ff32787ba080237c937f9de520e986b5cf8f1c4';
@@ -43,8 +41,6 @@ final audioRecorderServiceProvider = Provider<AudioRecorderService>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AudioRecorderServiceRef = ProviderRef<AudioRecorderService>;
 String _$audioPlayerServiceHash() =>
     r'101d77a30e3547cf864a612adddb0a444f6b87bc';
@@ -63,8 +59,6 @@ final audioPlayerServiceProvider = Provider<AudioPlayerService>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AudioPlayerServiceRef = ProviderRef<AudioPlayerService>;
 String _$microphonePermissionHash() =>
     r'a0c112647a854774ec00b20723d99bb029abd309';
@@ -83,8 +77,6 @@ final microphonePermissionProvider = AutoDisposeFutureProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MicrophonePermissionRef = AutoDisposeFutureProviderRef<bool>;
 String _$recordingNotifierHash() => r'1fb08fa49cba9e8d6623057f3637e27df60de6e0';
 
@@ -267,8 +259,6 @@ class RecordingNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin RecordingNotifierRef on AutoDisposeNotifierProviderRef<RecordingState> {
   /// The parameter `repertoireId` of this provider.
   String get repertoireId;
@@ -288,4 +278,4 @@ class _RecordingNotifierProviderElement
   String get studentId => (origin as RecordingNotifierProvider).studentId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

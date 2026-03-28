@@ -145,8 +145,6 @@ class TeacherTemplatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherTemplatesRef
     on AutoDisposeFutureProviderRef<List<SubscriptionTemplate>> {
   /// The parameter `teacherId` of this provider.
@@ -283,8 +281,6 @@ class ActiveTeacherTemplatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveTeacherTemplatesRef
     on AutoDisposeFutureProviderRef<List<SubscriptionTemplate>> {
   /// The parameter `teacherId` of this provider.
@@ -445,8 +441,6 @@ class AutoProposalTemplatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AutoProposalTemplatesRef
     on AutoDisposeFutureProviderRef<List<SubscriptionTemplate>> {
   /// The parameter `teacherId` of this provider.
@@ -580,8 +574,6 @@ class AcademyTemplatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AcademyTemplatesRef
     on AutoDisposeFutureProviderRef<List<SubscriptionTemplate>> {
   /// The parameter `academyId` of this provider.
@@ -718,8 +710,6 @@ class ActiveAcademyTemplatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveAcademyTemplatesRef
     on AutoDisposeFutureProviderRef<List<SubscriptionTemplate>> {
   /// The parameter `academyId` of this provider.
@@ -855,8 +845,6 @@ class SubscriptionTemplateProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SubscriptionTemplateRef
     on AutoDisposeFutureProviderRef<SubscriptionTemplate?> {
   /// The parameter `templateId` of this provider.
@@ -891,4 +879,4 @@ final subscriptionTemplateNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SubscriptionTemplateNotifier
     = AutoDisposeNotifier<AsyncValue<SubscriptionTemplate?>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -24,8 +24,6 @@ final currentTeacherProfileProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CurrentTeacherProfileRef
     = AutoDisposeFutureProviderRef<TeacherProfile?>;
 String _$teacherProfileByIdHash() =>
@@ -178,8 +176,6 @@ class TeacherProfileByIdProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherProfileByIdRef on AutoDisposeFutureProviderRef<TeacherProfile?> {
   /// The parameter `profileId` of this provider.
   String get profileId;
@@ -212,8 +208,6 @@ final featuredTeacherProfilesProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef FeaturedTeacherProfilesRef
     = AutoDisposeFutureProviderRef<List<TeacherProfile>>;
 String _$searchTeacherProfilesHash() =>
@@ -347,8 +341,6 @@ class SearchTeacherProfilesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SearchTeacherProfilesRef
     on AutoDisposeFutureProviderRef<List<TeacherProfile>> {
   /// The parameter `filter` of this provider.
@@ -382,8 +374,6 @@ final teacherNeedsOnboardingProvider = AutoDisposeFutureProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef TeacherNeedsOnboardingRef = AutoDisposeFutureProviderRef<bool>;
 String _$teacherOnboardingNotifierHash() =>
     r'8fcd92e47ae125889651d8d1a5dab907ee9c896e';
@@ -444,4 +434,4 @@ final phoneVerificationTimerProvider =
 
 typedef _$PhoneVerificationTimer = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -157,8 +157,6 @@ class ScheduleBookingsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ScheduleBookingsRef
     on AutoDisposeFutureProviderRef<List<GroupClassBooking>> {
   /// The parameter `scheduleId` of this provider.
@@ -304,8 +302,6 @@ class ScheduleWaitlistProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ScheduleWaitlistRef
     on AutoDisposeFutureProviderRef<List<GroupClassBooking>> {
   /// The parameter `scheduleId` of this provider.
@@ -450,8 +446,6 @@ class ScheduleConfirmedCountProvider extends AutoDisposeFutureProvider<int> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ScheduleConfirmedCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `scheduleId` of this provider.
   String get scheduleId;
@@ -596,8 +590,6 @@ class ScheduleWaitlistCountProvider extends AutoDisposeFutureProvider<int> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ScheduleWaitlistCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `scheduleId` of this provider.
   String get scheduleId;
@@ -755,8 +747,6 @@ class StudentScheduleBookingProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentScheduleBookingRef
     on AutoDisposeFutureProviderRef<GroupClassBooking?> {
   /// The parameter `scheduleId` of this provider.
@@ -911,8 +901,6 @@ class StudentActiveBookingsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentActiveBookingsRef
     on AutoDisposeFutureProviderRef<List<GroupClassBooking>> {
   /// The parameter `studentId` of this provider.
@@ -1068,8 +1056,6 @@ class StudentWaitlistPositionProvider extends AutoDisposeFutureProvider<int?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentWaitlistPositionRef on AutoDisposeFutureProviderRef<int?> {
   /// The parameter `scheduleId` of this provider.
   String get scheduleId;
@@ -1109,4 +1095,4 @@ final groupClassBookingNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$GroupClassBookingNotifier
     = AutoDisposeNotifier<AsyncValue<GroupClassBooking?>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -24,8 +24,6 @@ final availableProfileTypesProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AvailableProfileTypesRef = AutoDisposeProviderRef<List<ProfileType>>;
 String _$canSwitchProfilesHash() => r'de100f2d51a2ce68faf28c28c5f714fb5b564070';
 
@@ -43,8 +41,6 @@ final canSwitchProfilesProvider = AutoDisposeProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CanSwitchProfilesRef = AutoDisposeProviderRef<bool>;
 String _$activeProfileTypeHash() => r'391ea48708d992c13d5d47f4bc7cad1ef21f372c';
 
@@ -62,8 +58,6 @@ final activeProfileTypeProvider = AutoDisposeProvider<ProfileType>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ActiveProfileTypeRef = AutoDisposeProviderRef<ProfileType>;
 String _$activeChildProfileHash() =>
     r'6697ff73ef43f828c1bd46e2f0baa44a3230eca6';
@@ -82,8 +76,6 @@ final activeChildProfileProvider = AutoDisposeProvider<ChildProfile?>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ActiveChildProfileRef = AutoDisposeProviderRef<ChildProfile?>;
 String _$isUnconnectedChildModeHash() =>
     r'fa6645b66420f6b7a2cd57628845f2e1c9de47b6';
@@ -106,8 +98,6 @@ final isUnconnectedChildModeProvider = AutoDisposeProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef IsUnconnectedChildModeRef = AutoDisposeProviderRef<bool>;
 String _$syncUserProfileChildrenHash() =>
     r'739133137d95afe10e3213263da4974ae1951f7c';
@@ -259,8 +249,6 @@ class SyncUserProfileChildrenProvider extends AutoDisposeFutureProvider<void> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SyncUserProfileChildrenRef on AutoDisposeFutureProviderRef<void> {
   /// The parameter `parentId` of this provider.
   String get parentId;
@@ -300,4 +288,4 @@ final currentUserProfileProvider =
 
 typedef _$CurrentUserProfile = AutoDisposeNotifier<UserProfile>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -24,8 +24,6 @@ final notificationApiRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef NotificationApiRepositoryRef = ProviderRef<NotificationRepository?>;
 String _$notificationServiceHash() =>
     r'86fee7f1e80c839a0014f1d8283c4fb9e26a098f';
@@ -45,8 +43,6 @@ final notificationServiceProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef NotificationServiceRef
     = AutoDisposeProviderRef<LocalNotificationService>;
 String _$practiceReminderSchedulerHash() =>
@@ -67,8 +63,6 @@ final practiceReminderSchedulerProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef PracticeReminderSchedulerRef
     = AutoDisposeProviderRef<PracticeReminderScheduler>;
 String _$connectionNotificationServiceHash() =>
@@ -89,8 +83,6 @@ final connectionNotificationServiceProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ConnectionNotificationServiceRef
     = AutoDisposeProviderRef<ConnectionNotificationService>;
 String _$proposalNotificationServiceHash() =>
@@ -111,8 +103,6 @@ final proposalNotificationServiceProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ProposalNotificationServiceRef
     = AutoDisposeProviderRef<ProposalNotificationService>;
 String _$userNotificationsHash() => r'9a3c21792285bb1e1431e907a22b1a6b4ac74ce8';
@@ -132,8 +122,6 @@ final userNotificationsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef UserNotificationsRef
     = AutoDisposeFutureProviderRef<List<AppNotification>>;
 String _$unreadNotificationCountHash() =>
@@ -153,14 +141,11 @@ final unreadNotificationCountProvider = AutoDisposeProvider<int>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef UnreadNotificationCountRef = AutoDisposeProviderRef<int>;
 String _$studentNotificationSettingsNotifierHash() =>
-    r'1ba126cc1f0e619eb2a9e35832cfc9ac602d1103';
+    r'906a644cf8a9222e3dd9079a2e14656780b5df60';
 
-/// Provider for student notification settings
-/// TODO: Load from Hive storage
+/// Provider for student notification settings (persisted to Hive)
 ///
 /// Copied from [StudentNotificationSettingsNotifier].
 @ProviderFor(StudentNotificationSettingsNotifier)
@@ -178,10 +163,9 @@ final studentNotificationSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$StudentNotificationSettingsNotifier
     = AutoDisposeNotifier<StudentNotificationSettings>;
 String _$teacherNotificationSettingsNotifierHash() =>
-    r'3cc1ec9b32a722f0236deb69e6f2cb53fe694e72';
+    r'accc3c039ad8d5d4ffc162e011b773e0a93cdf27';
 
-/// Provider for teacher notification settings
-/// TODO: Load from Hive storage
+/// Provider for teacher notification settings (persisted to Hive)
 ///
 /// Copied from [TeacherNotificationSettingsNotifier].
 @ProviderFor(TeacherNotificationSettingsNotifier)
@@ -218,4 +202,4 @@ final notificationActionsProvider =
 
 typedef _$NotificationActions = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

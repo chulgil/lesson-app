@@ -7,7 +7,7 @@ part of 'lesson_class_providers.dart';
 // **************************************************************************
 
 String _$lessonClassRepositoryHash() =>
-    r'bda3e53d966da13bcd33e50a0ee19711e4a5d724';
+    r'2aebadadefb50371e10dc78f2913d58dd72cfbf7';
 
 /// Repository provider for LessonClass.
 ///
@@ -24,8 +24,6 @@ final lessonClassRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef LessonClassRepositoryRef
     = AutoDisposeProviderRef<LessonClassRepository>;
 String _$teacherLessonClassesHash() =>
@@ -180,8 +178,6 @@ class TeacherLessonClassesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherLessonClassesRef
     on AutoDisposeFutureProviderRef<List<LessonClass>> {
   /// The parameter `teacherId` of this provider.
@@ -324,8 +320,6 @@ class LessonClassProvider extends AutoDisposeFutureProvider<LessonClass?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LessonClassRef on AutoDisposeFutureProviderRef<LessonClass?> {
   /// The parameter `classId` of this provider.
   String get classId;
@@ -482,8 +476,6 @@ class LessonClassNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LessonClassNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<LessonClass>> {
   /// The parameter `teacherId` of this provider.
@@ -499,4 +491,4 @@ class _LessonClassNotifierProviderElement
   String get teacherId => (origin as LessonClassNotifierProvider).teacherId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

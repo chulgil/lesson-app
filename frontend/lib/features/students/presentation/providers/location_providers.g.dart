@@ -7,7 +7,7 @@ part of 'location_providers.dart';
 // **************************************************************************
 
 String _$locationRepositoryHash() =>
-    r'00099b5e032a9e4fbb821dbed0ba99ed228d06c9';
+    r'33aa8b089125869d3a9a5e414a3c8e3dfe50f2b7';
 
 /// Repository provider for LessonLocation.
 ///
@@ -24,8 +24,6 @@ final locationRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef LocationRepositoryRef = AutoDisposeProviderRef<LocationRepository>;
 String _$classLocationsHash() => r'e0745c91735918b0e78cd24d94ab95ac49e2d500';
 
@@ -176,8 +174,6 @@ class ClassLocationsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ClassLocationsRef on AutoDisposeFutureProviderRef<List<LessonLocation>> {
   /// The parameter `classId` of this provider.
   String get classId;
@@ -321,8 +317,6 @@ class TeacherLocationsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherLocationsRef
     on AutoDisposeFutureProviderRef<List<LessonLocation>> {
   /// The parameter `teacherId` of this provider.
@@ -464,8 +458,6 @@ class LocationProvider extends AutoDisposeFutureProvider<LessonLocation?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LocationRef on AutoDisposeFutureProviderRef<LessonLocation?> {
   /// The parameter `id` of this provider.
   String get id;
@@ -608,8 +600,6 @@ class DefaultClassLocationProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin DefaultClassLocationRef on AutoDisposeFutureProviderRef<LessonLocation?> {
   /// The parameter `classId` of this provider.
   String get classId;
@@ -766,8 +756,6 @@ class LocationNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LocationNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<LessonLocation>> {
   /// The parameter `classId` of this provider.
@@ -929,8 +917,6 @@ class TeacherLocationNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherLocationNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<LessonLocation>> {
   /// The parameter `teacherId` of this provider.
@@ -946,4 +932,4 @@ class _TeacherLocationNotifierProviderElement
   String get teacherId => (origin as TeacherLocationNotifierProvider).teacherId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

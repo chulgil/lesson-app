@@ -21,8 +21,6 @@ final showComboProvider = AutoDisposeProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ShowComboRef = AutoDisposeProviderRef<bool>;
 String _$comboMessageHash() => r'ddf606573e41c66e9675a762ed91a83f8e1a3928';
 
@@ -39,8 +37,6 @@ final comboMessageProvider = AutoDisposeProvider<String?>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ComboMessageRef = AutoDisposeProviderRef<String?>;
 String _$isCurtainFullyCoveredHash() =>
     r'13205d7a49eb3a1695a71cb89feede287bfba368';
@@ -60,8 +56,6 @@ final isCurtainFullyCoveredProvider = AutoDisposeProvider<bool>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef IsCurtainFullyCoveredRef = AutoDisposeProviderRef<bool>;
 String _$tunerComboHash() => r'3c355b05f9991717cf0fbd6ad7078a1be4049f0b';
 
@@ -80,4 +74,4 @@ final tunerComboProvider = NotifierProvider<TunerCombo, ComboState>.internal(
 
 typedef _$TunerCombo = Notifier<ComboState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

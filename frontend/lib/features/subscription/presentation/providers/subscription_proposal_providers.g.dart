@@ -145,8 +145,6 @@ class TeacherProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `teacherId` of this provider.
@@ -283,8 +281,6 @@ class ActiveTeacherProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveTeacherProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `teacherId` of this provider.
@@ -422,8 +418,6 @@ class AwaitingConfirmationProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AwaitingConfirmationProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `teacherId` of this provider.
@@ -558,8 +552,6 @@ class StudentProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `studentId` of this provider.
@@ -696,8 +688,6 @@ class ActiveStudentProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveStudentProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `studentId` of this provider.
@@ -834,8 +824,6 @@ class PendingStudentProposalsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingStudentProposalsRef
     on AutoDisposeFutureProviderRef<List<SubscriptionProposal>> {
   /// The parameter `studentId` of this provider.
@@ -971,8 +959,6 @@ class PendingRenewalProposalProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingRenewalProposalRef
     on AutoDisposeFutureProviderRef<SubscriptionProposal?> {
   /// The parameter `studentId` of this provider.
@@ -1108,8 +1094,6 @@ class SubscriptionProposalProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin SubscriptionProposalRef
     on AutoDisposeFutureProviderRef<SubscriptionProposal?> {
   /// The parameter `proposalId` of this provider.
@@ -1256,8 +1240,6 @@ class ActiveProposalBetweenProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ActiveProposalBetweenRef
     on AutoDisposeFutureProviderRef<SubscriptionProposal?> {
   /// The parameter `teacherId` of this provider.
@@ -1297,4 +1279,4 @@ final subscriptionProposalNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$SubscriptionProposalNotifier
     = AutoDisposeNotifier<AsyncValue<SubscriptionProposal?>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -7,7 +7,7 @@ part of 'proposal_settings_providers.dart';
 // **************************************************************************
 
 String _$proposalSettingsRepositoryHash() =>
-    r'41dc7b1a3b2d8707a20295ac098ed0ea42dd5ef5';
+    r'f0131f03be956cbd5f8d86adf5abe63b915676b3';
 
 /// See also [proposalSettingsRepository].
 @ProviderFor(proposalSettingsRepository)
@@ -22,8 +22,6 @@ final proposalSettingsRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ProposalSettingsRepositoryRef = ProviderRef<ProposalSettingsRepository>;
 String _$teacherProposalSettingsHash() =>
     r'2f9de50164129bf0fa0d3a673027a5ec4ec4c975';
@@ -166,8 +164,6 @@ class TeacherProposalSettingsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherProposalSettingsRef
     on AutoDisposeFutureProviderRef<ProposalSettings> {
   /// The parameter `teacherId` of this provider.
@@ -202,4 +198,4 @@ final proposalSettingsNotifierProvider = AutoDisposeNotifierProvider<
 typedef _$ProposalSettingsNotifier
     = AutoDisposeNotifier<AsyncValue<ProposalSettings?>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

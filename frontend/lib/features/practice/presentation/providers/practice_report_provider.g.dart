@@ -7,7 +7,7 @@ part of 'practice_report_provider.dart';
 // **************************************************************************
 
 String _$practiceReportRepositoryHash() =>
-    r'f5c08af8e1b0b7404ef6760bbc3507b5dee136df';
+    r'b69475cab52effedd3c2f461f2823fed1e8fcc60';
 
 /// Practice stats repository provider - switches between Mock and Remote.
 ///
@@ -24,8 +24,6 @@ final practiceReportRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef PracticeReportRepositoryRef
     = AutoDisposeProviderRef<PracticeStatsRepository>;
 String _$weeklyReportHash() => r'b6a9aa81cdb3c4930bdacb0a349c1b367dc988df';
@@ -177,8 +175,6 @@ class WeeklyReportProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin WeeklyReportRef on AutoDisposeFutureProviderRef<PracticeStatsReport> {
   /// The parameter `params` of this provider.
   ({String studentId, DateTime weekStart}) get params;
@@ -322,8 +318,6 @@ class MonthlyReportProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin MonthlyReportRef on AutoDisposeFutureProviderRef<PracticeStatsReport> {
   /// The parameter `params` of this provider.
   ({int month, String studentId, int year}) get params;
@@ -355,8 +349,6 @@ final currentWeekStartProvider = AutoDisposeProvider<DateTime>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CurrentWeekStartRef = AutoDisposeProviderRef<DateTime>;
 String _$currentMonthHash() => r'bb55728ea5d1da50879494da35baed217f61fac3';
 
@@ -374,8 +366,6 @@ final currentMonthProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CurrentMonthRef = AutoDisposeProviderRef<({int year, int month})>;
 String _$reportDateHash() => r'e429f15d1e57e55516df00a4e2f2831a2cf58ae4';
 
@@ -395,4 +385,4 @@ final reportDateProvider =
 
 typedef _$ReportDate = AutoDisposeNotifier<ReportDateState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

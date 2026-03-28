@@ -154,8 +154,6 @@ class PracticeStreakProvider extends AutoDisposeFutureProvider<PracticeStreak> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PracticeStreakRef on AutoDisposeFutureProviderRef<PracticeStreak> {
   /// The parameter `studentId` of this provider.
   String get studentId;
@@ -297,8 +295,6 @@ class RecordPracticeProvider extends AutoDisposeFutureProvider<PracticeStreak> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin RecordPracticeRef on AutoDisposeFutureProviderRef<PracticeStreak> {
   /// The parameter `studentId` of this provider.
   String get studentId;
@@ -330,8 +326,6 @@ final currentUserStreakProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CurrentUserStreakRef = AutoDisposeFutureProviderRef<PracticeStreak>;
 String _$streakNotifierHash() => r'2335a6f53fb3b91ba9228444d4503833505f7871';
 
@@ -475,8 +469,6 @@ class StreakNotifierProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StreakNotifierRef on AutoDisposeAsyncNotifierProviderRef<PracticeStreak> {
   /// The parameter `studentId` of this provider.
   String get studentId;
@@ -491,4 +483,4 @@ class _StreakNotifierProviderElement
   String get studentId => (origin as StreakNotifierProvider).studentId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

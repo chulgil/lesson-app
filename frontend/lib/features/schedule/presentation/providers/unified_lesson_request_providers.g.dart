@@ -160,8 +160,6 @@ class TeacherUnifiedRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherUnifiedRequestsRef
     on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
   /// The parameter `teacherId` of this provider.
@@ -310,8 +308,6 @@ class PendingUnifiedRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingUnifiedRequestsRef
     on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
   /// The parameter `teacherId` of this provider.
@@ -457,8 +453,6 @@ class PendingUnifiedRequestCountProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingUnifiedRequestCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -607,8 +601,6 @@ class StudentUnifiedRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentUnifiedRequestsRef
     on AutoDisposeFutureProviderRef<List<UnifiedLessonRequest>> {
   /// The parameter `studentId` of this provider.
@@ -755,8 +747,6 @@ class UnifiedRequestByIdProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin UnifiedRequestByIdRef
     on AutoDisposeFutureProviderRef<UnifiedLessonRequest?> {
   /// The parameter `requestId` of this provider.
@@ -772,4 +762,4 @@ class _UnifiedRequestByIdProviderElement
   String get requestId => (origin as UnifiedRequestByIdProvider).requestId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

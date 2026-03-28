@@ -159,8 +159,6 @@ class TeacherLessonRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherLessonRequestsRef
     on AutoDisposeFutureProviderRef<List<LessonRequest>> {
   /// The parameter `teacherId` of this provider.
@@ -308,8 +306,6 @@ class PendingLessonRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingLessonRequestsRef
     on AutoDisposeFutureProviderRef<List<LessonRequest>> {
   /// The parameter `teacherId` of this provider.
@@ -454,8 +450,6 @@ class PendingLessonRequestCountProvider extends AutoDisposeFutureProvider<int> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin PendingLessonRequestCountRef on AutoDisposeFutureProviderRef<int> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -603,8 +597,6 @@ class StudentLessonRequestsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin StudentLessonRequestsRef
     on AutoDisposeFutureProviderRef<List<LessonRequest>> {
   /// The parameter `studentId` of this provider.
@@ -748,8 +740,6 @@ class LessonRequestByIdProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LessonRequestByIdRef on AutoDisposeFutureProviderRef<LessonRequest?> {
   /// The parameter `requestId` of this provider.
   String get requestId;
@@ -784,4 +774,4 @@ final lessonRequestActionsProvider =
 
 typedef _$LessonRequestActions = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

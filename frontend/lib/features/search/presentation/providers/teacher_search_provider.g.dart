@@ -24,8 +24,6 @@ final teacherSearchRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef TeacherSearchRepositoryRef = ProviderRef<TeacherSearchRepository>;
 String _$teacherPublicProfileHash() =>
     r'e9caba23fdfec94b632bfa62321fb0e95cba04b4';
@@ -180,8 +178,6 @@ class TeacherPublicProfileProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherPublicProfileRef
     on AutoDisposeFutureProviderRef<TeacherPublicProfile?> {
   /// The parameter `teacherId` of this provider.
@@ -326,8 +322,6 @@ class TeacherFullProfileProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherFullProfileRef on AutoDisposeFutureProviderRef<TeacherProfile?> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -359,8 +353,6 @@ final featuredTeachersProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef FeaturedTeachersRef
     = AutoDisposeFutureProviderRef<List<TeacherPublicProfile>>;
 String _$availableInstrumentsHash() =>
@@ -381,8 +373,6 @@ final availableInstrumentsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AvailableInstrumentsRef = AutoDisposeFutureProviderRef<List<String>>;
 String _$availableAreasHash() => r'f00b5c0b64ca4155437faa7f0659910ee7e6e4eb';
 
@@ -400,8 +390,6 @@ final availableAreasProvider = AutoDisposeFutureProvider<List<String>>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AvailableAreasRef = AutoDisposeFutureProviderRef<List<String>>;
 String _$academyInfoHash() => r'a09a3a34bbc39263614524564df355b3ca227947';
 
@@ -531,8 +519,6 @@ class AcademyInfoProvider extends AutoDisposeFutureProvider<AcademyInfo?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AcademyInfoRef on AutoDisposeFutureProviderRef<AcademyInfo?> {
   /// The parameter `organizationId` of this provider.
   String get organizationId;
@@ -677,8 +663,6 @@ class AcademyTeachersProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AcademyTeachersRef
     on AutoDisposeFutureProviderRef<List<TeacherPublicProfile>> {
   /// The parameter `organizationId` of this provider.
@@ -711,8 +695,6 @@ final allAcademiesProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AllAcademiesRef = AutoDisposeFutureProviderRef<List<AcademyInfo>>;
 String _$teacherSearchTabStateHash() =>
     r'4db4fb24b8517e3bc40659d0265822bbf9b8346d';
@@ -791,4 +773,4 @@ final teacherSearchResultsProvider = AutoDisposeAsyncNotifierProvider<
 
 typedef _$TeacherSearchResults = AutoDisposeAsyncNotifier<TeacherSearchResult>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

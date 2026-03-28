@@ -6,7 +6,7 @@ part of 'invite_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$inviteRepositoryHash() => r'ffee50852590f67a5cedec2f3bae0a4c40edcb43';
+String _$inviteRepositoryHash() => r'72b15bea199bfddd7699f6a4a633bc194be669f8';
 
 /// Provider for invite repository - switches between Mock and Remote.
 ///
@@ -22,8 +22,6 @@ final inviteRepositoryProvider = Provider<InviteRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef InviteRepositoryRef = ProviderRef<InviteRepository>;
 String _$myInvitesHash() => r'fd327fbdb2c1093102f9a8b2f4f7bfbaf4227918';
 
@@ -40,8 +38,6 @@ final myInvitesProvider = AutoDisposeFutureProvider<List<Invite>>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MyInvitesRef = AutoDisposeFutureProviderRef<List<Invite>>;
 String _$inviteByCodeHash() => r'22b5b8d00538ea7ea96282001966e9daac1f48d3';
 
@@ -191,8 +187,6 @@ class InviteByCodeProvider extends AutoDisposeFutureProvider<Invite?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin InviteByCodeRef on AutoDisposeFutureProviderRef<Invite?> {
   /// The parameter `code` of this provider.
   String get code;
@@ -223,8 +217,6 @@ final pendingRequestsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef PendingRequestsRef
     = AutoDisposeFutureProviderRef<List<ConnectionRequest>>;
 String _$mySentRequestsHash() => r'74b4db0658530fd9b332f63de0981845d4a2bff0';
@@ -244,8 +236,6 @@ final mySentRequestsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MySentRequestsRef
     = AutoDisposeFutureProviderRef<List<ConnectionRequest>>;
 String _$myConnectionsHash() => r'75d96c285cafbcd6b48aeabc73cc0957a3195954';
@@ -265,8 +255,6 @@ final myConnectionsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MyConnectionsRef = AutoDisposeFutureProviderRef<List<Connection>>;
 String _$isConnectedWithHash() => r'4656313139917d552c5ff46bf2fa877a13068e2b';
 
@@ -395,8 +383,6 @@ class IsConnectedWithProvider extends AutoDisposeFutureProvider<bool> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin IsConnectedWithRef on AutoDisposeFutureProviderRef<bool> {
   /// The parameter `otherUserId` of this provider.
   String get otherUserId;
@@ -427,8 +413,6 @@ final pendingRequestCountProvider = AutoDisposeFutureProvider<int>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef PendingRequestCountRef = AutoDisposeFutureProviderRef<int>;
 String _$myDisconnectedConnectionsHash() =>
     r'0581ae9bb5cd67574ec793ca2ea6b3df576ffedd';
@@ -449,8 +433,6 @@ final myDisconnectedConnectionsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef MyDisconnectedConnectionsRef
     = AutoDisposeFutureProviderRef<List<Connection>>;
 String _$previousTeacherIdsHash() =>
@@ -471,8 +453,6 @@ final previousTeacherIdsProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef PreviousTeacherIdsRef = AutoDisposeFutureProviderRef<Set<String>>;
 String _$currentInviteUserRoleHash() =>
     r'588b216dacf821ea8d22a0a20f104b36a1e0303c';
@@ -606,4 +586,4 @@ final connectionManagerProvider =
 
 typedef _$ConnectionManager = AutoDisposeNotifier<AsyncValue<void>>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

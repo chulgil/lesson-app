@@ -22,8 +22,6 @@ final currentNoteNameProvider = AutoDisposeProvider<String?>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef CurrentNoteNameRef = AutoDisposeProviderRef<String?>;
 String _$tunerInfoDisplayHash() => r'3d9b0ed8e1803a35868caf81f18a094c26b295a7';
 
@@ -41,8 +39,6 @@ final tunerInfoDisplayProvider = AutoDisposeProvider<String>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef TunerInfoDisplayRef = AutoDisposeProviderRef<String>;
 String _$tunerHash() => r'e1d1d9ae0e4fd9526a24de30f707bd60483e9450';
 
@@ -64,4 +60,4 @@ final tunerProvider = NotifierProvider<Tuner, TunerProviderState>.internal(
 
 typedef _$Tuner = Notifier<TunerProviderState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

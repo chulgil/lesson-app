@@ -22,8 +22,6 @@ final authRepositoryProvider = Provider<AuthRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AuthRepositoryRef = ProviderRef<AuthRepository>;
 String _$authNotifierHash() => r'67ee2a87c5918ebc04744d41cd3d5b4799140ddf';
 
@@ -45,4 +43,4 @@ final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>.internal(
 
 typedef _$AuthNotifier = Notifier<AuthState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

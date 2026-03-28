@@ -146,8 +146,6 @@ class TeacherAvailabilityProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherAvailabilityRef
     on AutoDisposeFutureProviderRef<TeacherAvailability?> {
   /// The parameter `teacherId` of this provider.
@@ -305,8 +303,6 @@ class AvailableSlotsForDateProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AvailableSlotsForDateRef
     on AutoDisposeFutureProviderRef<List<AvailabilitySlot>> {
   /// The parameter `teacherId` of this provider.
@@ -487,8 +483,6 @@ class AvailableSlotsForDateRangeProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AvailableSlotsForDateRangeRef
     on AutoDisposeFutureProviderRef<List<AvailabilitySlot>> {
   /// The parameter `teacherId` of this provider.
@@ -663,8 +657,6 @@ class NextAvailableDatesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin NextAvailableDatesRef on AutoDisposeFutureProviderRef<List<DateTime>> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -845,8 +837,6 @@ class LessonTimePatternsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin LessonTimePatternsRef
     on AutoDisposeFutureProviderRef<List<LessonTimePattern>> {
   /// The parameter `studentId` of this provider.
@@ -1037,8 +1027,6 @@ class RecommendedSlotsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin RecommendedSlotsRef
     on AutoDisposeFutureProviderRef<List<AvailabilitySlot>> {
   /// The parameter `teacherId` of this provider.
@@ -1225,8 +1213,6 @@ class AvailableSlotsWithRecommendationsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin AvailableSlotsWithRecommendationsRef
     on AutoDisposeFutureProviderRef<List<AvailabilitySlot>> {
   /// The parameter `teacherId` of this provider.
@@ -1371,8 +1357,6 @@ class BookingTeacherInfoProvider extends AutoDisposeFutureProvider<Teacher?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin BookingTeacherInfoRef on AutoDisposeFutureProviderRef<Teacher?> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -1516,8 +1500,6 @@ class BookingSubscriptionProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin BookingSubscriptionRef on AutoDisposeFutureProviderRef<Subscription?> {
   /// The parameter `studentId` of this provider.
   String get studentId;
@@ -1719,8 +1701,6 @@ class TeacherAvailabilityNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherAvailabilityNotifierRef
     on AutoDisposeNotifierProviderRef<AsyncValue<TeacherAvailability?>> {
   /// The parameter `teacherId` of this provider.
@@ -1737,4 +1717,4 @@ class _TeacherAvailabilityNotifierProviderElement
       (origin as TeacherAvailabilityNotifierProvider).teacherId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

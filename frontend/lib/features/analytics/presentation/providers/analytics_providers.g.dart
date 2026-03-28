@@ -21,8 +21,6 @@ final analyticsRepositoryProvider = Provider<AnalyticsRepository>.internal(
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef AnalyticsRepositoryRef = ProviderRef<AnalyticsRepository>;
 String _$teacherMonthlyStatsHash() =>
     r'e0d655e931993af2b721344fc4225eba95aa2459';
@@ -164,8 +162,6 @@ class TeacherMonthlyStatsProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherMonthlyStatsRef
     on AutoDisposeFutureProviderRef<TeacherMonthlyStats> {
   /// The parameter `month` of this provider.
@@ -181,4 +177,4 @@ class _TeacherMonthlyStatsProviderElement
   DateTime get month => (origin as TeacherMonthlyStatsProvider).month;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

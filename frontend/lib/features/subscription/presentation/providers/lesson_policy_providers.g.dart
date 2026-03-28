@@ -24,8 +24,6 @@ final lessonPolicyRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef LessonPolicyRepositoryRef = ProviderRef<LessonPolicyRepository>;
 String _$teacherPolicyHash() => r'bac34e07077fdd362c2459208b410b198fdc3310';
 
@@ -175,8 +173,6 @@ class TeacherPolicyProvider extends AutoDisposeFutureProvider<LessonPolicy?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin TeacherPolicyRef on AutoDisposeFutureProviderRef<LessonPolicy?> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -318,8 +314,6 @@ class ClassPolicyProvider extends AutoDisposeFutureProvider<LessonPolicy?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ClassPolicyRef on AutoDisposeFutureProviderRef<LessonPolicy?> {
   /// The parameter `lessonClassId` of this provider.
   String get lessonClassId;
@@ -473,8 +467,6 @@ class EffectivePolicyProvider extends AutoDisposeFutureProvider<LessonPolicy?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin EffectivePolicyRef on AutoDisposeFutureProviderRef<LessonPolicy?> {
   /// The parameter `teacherId` of this provider.
   String get teacherId;
@@ -495,4 +487,4 @@ class _EffectivePolicyProviderElement
       (origin as EffectivePolicyProvider).lessonClassId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

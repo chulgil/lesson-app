@@ -13,7 +13,7 @@ class MockUnifiedLessonRequestRepository
   void _seedData() {
     final now = DateTime.now();
 
-    // Pending trial request
+    // Pending trial request — v2.0: 3안 제시
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_1',
       studentId: 'student_1',
@@ -23,14 +23,37 @@ class MockUnifiedLessonRequestRepository
       goal: UnifiedLessonGoal.hobby,
       experience: UnifiedExperienceLevel.beginner,
       message: '바이올린을 처음 배우고 싶습니다',
-      preferredDay: 1, // 화
+      preferredDay: 1,
       preferredTime: '14:00',
       preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: now.add(const Duration(days: 2)),
+          dayOfWeek: (now.add(const Duration(days: 2)).weekday - 1),
+          startTime: '14:00',
+          endTime: '15:00',
+        ),
+        PreferredTimeSlot(
+          priority: 2,
+          date: now.add(const Duration(days: 4)),
+          dayOfWeek: (now.add(const Duration(days: 4)).weekday - 1),
+          startTime: '10:00',
+          endTime: '11:00',
+        ),
+        PreferredTimeSlot(
+          priority: 3,
+          date: now.add(const Duration(days: 7)),
+          dayOfWeek: (now.add(const Duration(days: 7)).weekday - 1),
+          startTime: '16:00',
+          endTime: '17:00',
+        ),
+      ],
       status: UnifiedRequestStatus.pending,
       createdAt: now.subtract(const Duration(hours: 3)),
     ));
 
-    // Approved regular request
+    // Approved regular request — v2.0: 요일 기반 3안
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_2',
       studentId: 'student_2',
@@ -40,9 +63,23 @@ class MockUnifiedLessonRequestRepository
       goal: UnifiedLessonGoal.exam,
       experience: UnifiedExperienceLevel.intermediate,
       message: '입시 준비 중입니다',
-      preferredDay: 3, // 목
+      preferredDay: 3,
       preferredTime: '16:00',
       preferredDuration: 60,
+      preferredSlots: [
+        const PreferredTimeSlot(
+          priority: 1,
+          dayOfWeek: 3,
+          startTime: '16:00',
+          endTime: '17:00',
+        ),
+        const PreferredTimeSlot(
+          priority: 2,
+          dayOfWeek: 1,
+          startTime: '15:00',
+          endTime: '16:00',
+        ),
+      ],
       status: UnifiedRequestStatus.approved,
       createdAt: now.subtract(const Duration(days: 1)),
       confirmedAt: now.subtract(const Duration(hours: 12)),
@@ -65,7 +102,7 @@ class MockUnifiedLessonRequestRepository
       createdAt: now.subtract(const Duration(days: 2)),
     ));
 
-    // Returning student request
+    // Returning student request — v2.0: 재수강 + 3안
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_4',
       studentId: 'student_4',
@@ -75,9 +112,23 @@ class MockUnifiedLessonRequestRepository
       goal: UnifiedLessonGoal.hobby,
       experience: UnifiedExperienceLevel.intermediate,
       message: '다시 시작하고 싶습니다',
-      preferredDay: 2, // 수
+      preferredDay: 2,
       preferredTime: '15:00',
       preferredDuration: 60,
+      preferredSlots: [
+        const PreferredTimeSlot(
+          priority: 1,
+          dayOfWeek: 2,
+          startTime: '15:00',
+          endTime: '16:00',
+        ),
+        const PreferredTimeSlot(
+          priority: 2,
+          dayOfWeek: 4,
+          startTime: '14:00',
+          endTime: '15:00',
+        ),
+      ],
       isReturningStudent: true,
       status: UnifiedRequestStatus.pending,
       createdAt: now.subtract(const Duration(hours: 5)),
@@ -93,9 +144,25 @@ class MockUnifiedLessonRequestRepository
       goal: UnifiedLessonGoal.hobby,
       experience: UnifiedExperienceLevel.beginner,
       message: '첼로를 배우고 싶습니다',
-      preferredDay: 0, // 월
+      preferredDay: 0,
       preferredTime: '09:00',
       preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: now.add(const Duration(days: 3)),
+          dayOfWeek: (now.add(const Duration(days: 3)).weekday - 1),
+          startTime: '09:00',
+          endTime: '10:00',
+        ),
+        PreferredTimeSlot(
+          priority: 2,
+          date: now.add(const Duration(days: 5)),
+          dayOfWeek: (now.add(const Duration(days: 5)).weekday - 1),
+          startTime: '11:00',
+          endTime: '12:00',
+        ),
+      ],
       status: UnifiedRequestStatus.negotiating,
       currentRound: 1,
       proposals: [
@@ -353,7 +420,7 @@ class MockUnifiedLessonRequestRepository
       throw Exception('Request not found: $id');
     }
 
-    const maxRounds = 3;
+    const maxRounds = 2;
     if (request.currentRound >= maxRounds) {
       final expired = request.copyWith(status: UnifiedRequestStatus.expired);
       _requests[id] = expired;

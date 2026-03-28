@@ -24,8 +24,6 @@ final childProfileRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef ChildProfileRepositoryRef
     = AutoDisposeProviderRef<ChildProfileRepository>;
 String _$childProfilesHash() => r'0d9d83d12b08cb7d023f8a7375ca9595e466a58d';
@@ -177,8 +175,6 @@ class ChildProfilesProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ChildProfilesRef on AutoDisposeFutureProviderRef<List<ChildProfile>> {
   /// The parameter `parentId` of this provider.
   String get parentId;
@@ -320,8 +316,6 @@ class ChildProfileProvider extends AutoDisposeFutureProvider<ChildProfile?> {
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin ChildProfileRef on AutoDisposeFutureProviderRef<ChildProfile?> {
   /// The parameter `childId` of this provider.
   String get childId;
@@ -375,4 +369,4 @@ final childProfileManagerProvider =
 
 typedef _$ChildProfileManager = AutoDisposeAsyncNotifier<void>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

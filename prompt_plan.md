@@ -17,9 +17,10 @@
 ## Phase 구성
 
 ### Phase 1: PreferredTimeSlot + WeeklyCalendarPicker
-- unified_lesson_request.dart — PreferredTimeSlot 클래스 + preferredSlots 리스트
-- weekly_calendar_picker.dart — NEW: 주간 캘린더 + 3안 선택 엔진
-- mock_unified_lesson_request_repository.dart — seed 데이터 마이그레이션
+- [x] unified_lesson_request.dart — PreferredTimeSlot 클래스 + preferredSlots 리스트
+- [x] slot_selection_logic.dart — 3안 선택 로직 엔진 (TDD 완료)
+- [x] weekly_calendar_picker.dart — NEW: 주간 캘린더 UI (TDD 완료)
+- [x] mock_unified_lesson_request_repository.dart — seed 데이터 마이그레이션 + maxRounds 2
 
 ### Phase 2: 폼 연동 + 완료 페이지
 - unified_lesson_request_screen.dart — ScheduleSlotPicker → WeeklyCalendarPicker 교체

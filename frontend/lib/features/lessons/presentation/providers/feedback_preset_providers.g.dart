@@ -7,7 +7,7 @@ part of 'feedback_preset_providers.dart';
 // **************************************************************************
 
 String _$feedbackPresetRepositoryHash() =>
-    r'8be5135f996c9f7646f6e83d85759a815739a2af';
+    r'63ce578554a5756cc8862d0d823e01ed9a198840';
 
 /// Repository provider for feedback presets.
 ///
@@ -24,8 +24,6 @@ final feedbackPresetRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 typedef FeedbackPresetRepositoryRef = ProviderRef<FeedbackPresetRepository>;
 String _$feedbackPresetNotifierHash() =>
     r'b86004973466cde8005e482a11eebd1e587fcc25';
@@ -194,8 +192,6 @@ class FeedbackPresetNotifierProvider
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
 mixin FeedbackPresetNotifierRef
     on AutoDisposeAsyncNotifierProviderRef<List<FeedbackPreset>> {
   /// The parameter `teacherId` of this provider.
@@ -211,4 +207,4 @@ class _FeedbackPresetNotifierProviderElement
   String? get teacherId => (origin as FeedbackPresetNotifierProvider).teacherId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
