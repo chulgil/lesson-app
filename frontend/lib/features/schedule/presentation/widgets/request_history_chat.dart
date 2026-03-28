@@ -41,6 +41,9 @@ class RequestHistoryChat extends StatelessWidget {
       );
     }
 
+    // Reverse: newest at top
+    final reversed = events.reversed.toList();
+
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -48,15 +51,15 @@ class RequestHistoryChat extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space2,
       ),
-      itemCount: events.length,
+      itemCount: reversed.length,
       itemBuilder: (context, index) {
-        final event = events[index];
+        final event = reversed[index];
         final isMyMessage = event.actorId == viewerId;
 
-        // Date separator (show if first event or different day from previous)
+        // Date separator (show if first in group or different day from next)
         Widget? dateSeparator;
-        if (index == 0 ||
-            !_isSameDay(events[index - 1].createdAt, event.createdAt)) {
+        if (index == reversed.length - 1 ||
+            !_isSameDay(reversed[index + 1].createdAt, event.createdAt)) {
           dateSeparator = _buildDateSeparator(event.createdAt);
         }
 
