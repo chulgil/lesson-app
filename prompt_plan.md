@@ -23,9 +23,9 @@
 - [x] mock_unified_lesson_request_repository.dart — seed 데이터 마이그레이션 + maxRounds 2
 
 ### Phase 2: 폼 연동 + 완료 페이지
-- unified_lesson_request_screen.dart — ScheduleSlotPicker → WeeklyCalendarPicker 교체
-- request_completion_screen.dart — NEW: 5단계 가이드 + 요약
-- schedule_routes.dart — 완료 페이지 라우트 추가
+- [x] unified_lesson_request_screen.dart — ScheduleSlotPicker → WeeklyCalendarPicker 교체
+- [x] request_completion_screen.dart — NEW: 5단계 가이드 + 요약
+- [x] schedule_routes.dart + app_routes.dart — 완료 페이지 라우트 추가
 
 ### Phase 3: 선생님 수락 UI + 2라운드
 - approval_bottom_sheet.dart — 3안 표시 + 수락/역제안 UI

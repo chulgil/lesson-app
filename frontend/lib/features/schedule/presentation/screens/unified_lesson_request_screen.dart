@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../widgets/schedule_slot_picker.dart';
+import '../widgets/weekly_calendar_picker.dart';
+import 'request_completion_screen.dart';
 
 /// Parameters passed via GoRouter extra for the unified lesson request screen.
 class UnifiedLessonRequestParams {
@@ -55,9 +57,7 @@ class _UnifiedLessonRequestScreenState
   String? _selectedInstrument;
   UnifiedLessonGoal _selectedGoal = UnifiedLessonGoal.hobby;
   UnifiedExperienceLevel _selectedExperience = UnifiedExperienceLevel.beginner;
-  int? _selectedDay;
-  String? _selectedStartTime;
-  String? _selectedEndTime;
+  List<PreferredTimeSlot> _preferredSlots = [];
   bool _isSubmitting = false;
 
   @override
@@ -67,11 +67,9 @@ class _UnifiedLessonRequestScreenState
         ? LessonRequestType.regular
         : LessonRequestType.trial;
 
-    // Pre-fill from previous lesson info for returning students
+    // Pre-fill instrument for returning students
     if (widget.params.isReturningStudent) {
       _selectedInstrument = widget.params.previousInstrument;
-      _selectedDay = widget.params.previousDay;
-      _selectedStartTime = widget.params.previousTime;
     }
 
     // Default instrument selection if only one available
@@ -384,45 +382,14 @@ class _UnifiedLessonRequestScreenState
       icon: Icons.calendar_today,
       title: '희망 레슨 시간',
       isRequired: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_selectedDay != null && _selectedStartTime != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusSmall),
-                ),
-                child: Text(
-                  '선택: ${_dayLabel(_selectedDay!)}요일 $_selectedStartTime'
-                  '${_selectedEndTime != null ? ' ~ $_selectedEndTime' : ''}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ScheduleSlotPicker(
-            teacherId: widget.params.teacherId,
-            selectedDay: _selectedDay,
-            selectedTime: _selectedStartTime,
-            onSlotSelected: (slot) {
-              setState(() {
-                _selectedDay = slot.dayOfWeek;
-                _selectedStartTime = slot.startTime;
-                _selectedEndTime = slot.endTime;
-              });
-            },
-          ),
-        ],
+      child: WeeklyCalendarPicker(
+        teacherId: widget.params.teacherId,
+        lessonType: _selectedType,
+        onSlotsChanged: (slots) {
+          setState(() {
+            _preferredSlots = slots;
+          });
+        },
       ),
     );
   }
@@ -546,8 +513,8 @@ class _UnifiedLessonRequestScreenState
       _showValidationError('악기를 선택해주세요');
       return false;
     }
-    if (_selectedDay == null || _selectedStartTime == null) {
-      _showValidationError('희망 레슨 시간을 선택해주세요');
+    if (_preferredSlots.isEmpty) {
+      _showValidationError('희망 레슨 시간을 1개 이상 선택해주세요');
       return false;
     }
     return true;
@@ -582,9 +549,14 @@ class _UnifiedLessonRequestScreenState
         message: _messageController.text.trim().isEmpty
             ? null
             : _messageController.text.trim(),
-        preferredDay: _selectedDay,
-        preferredTime: _selectedStartTime,
+        preferredDay: _preferredSlots.isNotEmpty
+            ? _preferredSlots.first.dayOfWeek
+            : null,
+        preferredTime: _preferredSlots.isNotEmpty
+            ? _preferredSlots.first.startTime
+            : null,
         preferredDuration: 60,
+        preferredSlots: _preferredSlots,
         isReturningStudent: widget.params.isReturningStudent,
         suggestedPrice: _lookupReferencePrice(),
         createdAt: now,
@@ -594,15 +566,16 @@ class _UnifiedLessonRequestScreenState
       await actions.createRequest(request);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '${widget.params.teacherName} 선생님에게 레슨 신청을 보냈습니다',
-            ),
-            backgroundColor: AppColors.success,
+        context.push(
+          AppRoutes.requestCompletion,
+          extra: RequestCompletionParams(
+            teacherName: widget.params.teacherName,
+            instrument: _selectedInstrument!,
+            lessonType: _selectedType,
+            preferredSlots: _preferredSlots,
+            duration: 60,
           ),
         );
-        context.pop(true);
       }
     } catch (e) {
       if (mounted) {
@@ -623,11 +596,6 @@ class _UnifiedLessonRequestScreenState
   }
 
   // -- Helpers --
-
-  String _dayLabel(int dayOfWeek) {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
-    return days[dayOfWeek.clamp(0, 6)];
-  }
 
   int? _lookupReferencePrice() {
     // TODO: Integrate with teacher price table provider

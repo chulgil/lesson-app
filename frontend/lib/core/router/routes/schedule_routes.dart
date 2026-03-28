@@ -2,6 +2,7 @@
 
 import 'package:go_router/go_router.dart';
 
+import '../../../features/schedule/domain/entities/unified_lesson_request.dart';
 import '../../../features/schedule/domain/entities/group_class.dart';
 import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
@@ -9,6 +10,7 @@ import '../../../features/schedule/presentation/screens/group_class_detail_scree
 import '../../../features/search/presentation/screens/teacher_search_screen.dart';
 import '../../../features/schedule/presentation/screens/lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
+import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
 import '../../../features/schedule/presentation/screens/my_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
@@ -54,6 +56,28 @@ List<GoRoute> scheduleRoutes = [
           previousInstrument: map?['previousInstrument'],
           previousDay: map?['previousDay'],
           previousTime: map?['previousTime'],
+        ),
+      );
+    },
+  ),
+
+  // Request Completion (after lesson request submission)
+  GoRoute(
+    path: AppRoutes.requestCompletion,
+    name: 'requestCompletion',
+    builder: (context, state) {
+      final extra = state.extra;
+      if (extra is RequestCompletionParams) {
+        return RequestCompletionScreen(params: extra);
+      }
+      // Fallback: should not happen in normal flow
+      return const RequestCompletionScreen(
+        params: RequestCompletionParams(
+          teacherName: '',
+          instrument: '',
+          lessonType: LessonRequestType.trial,
+          preferredSlots: [],
+          duration: 60,
         ),
       );
     },
