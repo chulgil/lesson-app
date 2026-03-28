@@ -10,7 +10,7 @@ import '../../domain/entities/lesson_request.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../widgets/counter_propose_bottom_sheet.dart';
+import '../widgets/decline_bottom_sheet.dart';
 import '../widgets/lesson_request_list.dart';
 import '../widgets/unified_approval_bottom_sheet.dart';
 import '../widgets/unified_request_card.dart';
@@ -158,12 +158,8 @@ class _UnifiedRequestsSection extends ConsumerWidget {
                     (request.status == UnifiedRequestStatus.pending ||
                             request.status ==
                                 UnifiedRequestStatus.negotiating)
-                        ? () => showCounterProposeBottomSheet(
-                              context,
-                              request,
-                              onComplete: () => ref.invalidate(
-                                  teacherUnifiedRequestsProvider(teacherId)),
-                            )
+                        ? () => _handleDeclineOrPropose(
+                            context, ref, request)
                         : null,
                 onSendProposal:
                     request.status == UnifiedRequestStatus.timeConfirmed
@@ -239,74 +235,71 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final reasonController = TextEditingController(
-      text: '현재 가능한 시간이 없어 이번에는 어렵습니다. 자리가 나면 안내드릴게요!',
-    );
+    await _handleDeclineOrPropose(context, ref, request);
+  }
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레슨 신청 거절'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('거절 사유를 입력해주세요.'),
-            const SizedBox(height: 12),
-            TextField(
-              controller: reasonController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '예: 현재 가능한 시간이 없어 이번에는 어렵습니다.',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('거절'),
-          ),
-        ],
-      ),
+  Future<void> _handleDeclineOrPropose(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final result = await showDeclineBottomSheet(
+      context,
+      durationMinutes: request.preferredDuration,
+      teacherId: request.teacherId,
     );
+    if (result == null) return;
 
-    if (confirmed == true) {
-      try {
-        final actions = UnifiedLessonRequestActions(ref);
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+
+      if (result.suggestedSlots.isEmpty) {
+        // Message only → reject
         await actions.rejectRequest(
           request.id,
           request.teacherId,
           request.studentId,
-          reason: reasonController.text,
+          reason: result.message,
         );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('레슨 신청을 거절했습니다'),
-              backgroundColor: AppColors.textSecondaryLight,
-            ),
-          );
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('오류가 발생했습니다'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+      } else {
+        // With alternatives → propose
+        await actions.proposeAlternatives(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          slots: result.suggestedSlots.map((s) => TimeSlotOption(
+            id: s.id,
+            dayOfWeek: s.dayOfWeek - 1, // TimeSlot is 1-based, TimeSlotOption is 0-based
+            startTime: '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+            endTime: '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+          )).toList(),
+          message: result.message,
+        );
+      }
+
+      if (context.mounted) {
+        ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.suggestedSlots.isNotEmpty
+                ? '대안 시간과 함께 안내가 전달되었습니다'
+                : '레슨 신청을 거절했습니다'),
+            backgroundColor: result.suggestedSlots.isNotEmpty
+                ? AppColors.success
+                : AppColors.textSecondaryLight,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('오류가 발생했습니다'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
-    reasonController.dispose();
   }
 
   Future<void> _handleSendProposal(

@@ -31,7 +31,7 @@ abstract class BookingRepository {
 
   Future<LessonBooking> markUnavailable(
     String id,
-    UnavailableReason reason, {
+    String reason, {
     List<TimeSlot>? suggestedTimeSlots,
   });
 
@@ -327,7 +327,7 @@ class MockBookingRepository implements BookingRepository {
   @override
   Future<LessonBooking> markUnavailable(
     String id,
-    UnavailableReason reason, {
+    String reason, {
     List<TimeSlot>? suggestedTimeSlots,
   }) async {
     await Future.delayed(const Duration(milliseconds: 300));
@@ -337,7 +337,7 @@ class MockBookingRepository implements BookingRepository {
     }
     final updated = _bookings[index].copyWith(
       status: BookingStatus.unavailable,
-      unavailableReason: reason,
+      unavailableMessage: reason,
       suggestedTimeSlots: suggestedTimeSlots,
       unavailableAt: DateTime.now(),
     );

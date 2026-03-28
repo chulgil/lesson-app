@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_utils.dart';
 import '../../domain/entities/lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
+import 'decline_bottom_sheet.dart';
 
 /// Lesson request card - styled like TrialBookingCard
 class LessonRequestCard extends ConsumerWidget {
@@ -395,77 +396,39 @@ class LessonRequestCard extends ConsumerWidget {
   }
 
   Future<void> _showDeclineDialog(BuildContext context, WidgetRef ref) async {
-    final reasonController = TextEditingController();
-
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('레슨 요청 보류'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('학생에게 전달할 안내 메시지를 입력해주세요. (선택)'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: reasonController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: '예: 현재 가능한 시간이 없어 이번에는 어렵습니다.',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.textSecondaryLight,
-                ),
-                child: const Text('보류'),
-              ),
-            ],
-          ),
+    final result = await showDeclineBottomSheet(
+      context,
+      durationMinutes: request.previousLessonDuration ?? 60,
     );
+    if (result == null) return;
 
-    if (confirmed == true) {
-      try {
-        await ref
-            .read(lessonRequestActionsProvider.notifier)
-            .declineRequest(
-              requestId: request.id,
-              reason:
-                  reasonController.text.isEmpty
-                      ? '현재 스케줄 조정이 어려워요. 다음에 꼭 연락드릴게요!'
-                      : reasonController.text,
-            );
+    try {
+      await ref
+          .read(lessonRequestActionsProvider.notifier)
+          .declineRequest(
+            requestId: request.id,
+            reason: result.message,
+          );
 
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('학생에게 안내 메시지를 전달했습니다'),
-              backgroundColor: AppColors.textSecondaryLight,
-            ),
-          );
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.suggestedSlots.isNotEmpty
+                ? '대안 시간과 함께 안내가 전달되었습니다'
+                : '학생에게 안내 메시지를 전달했습니다'),
+            backgroundColor: AppColors.textSecondaryLight,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
-
-    reasonController.dispose();
   }
 }

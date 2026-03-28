@@ -169,35 +169,8 @@ enum BookingStatus {
       this == BookingStatus.unavailable || this == BookingStatus.expired;
 }
 
-/// Reason for unavailability (predefined, neutral options)
-enum UnavailableReason {
-  timeSlotFull,     // 해당 시간 마감
-  scheduleConflict, // 일정 조율 필요
-  temporaryBreak;   // 잠시 레슨 쉬는 중
-
-  String get label {
-    switch (this) {
-      case UnavailableReason.timeSlotFull:
-        return '해당 시간 마감';
-      case UnavailableReason.scheduleConflict:
-        return '일정 조율 필요';
-      case UnavailableReason.temporaryBreak:
-        return '잠시 레슨 쉬는 중';
-    }
-  }
-
-  /// Student-friendly message
-  String get studentMessage {
-    switch (this) {
-      case UnavailableReason.timeSlotFull:
-        return '요청하신 시간이 마감되었어요';
-      case UnavailableReason.scheduleConflict:
-        return '해당 시간 조율이 필요해요';
-      case UnavailableReason.temporaryBreak:
-        return '선생님이 잠시 쉬고 계세요';
-    }
-  }
-}
+/// Default message for unavailability
+const kDefaultUnavailableMessage = '현재 가능한 시간이 없어 이번에는 어렵습니다.';
 
 /// Lesson goal enum (for trial lessons)
 enum LessonGoal {
@@ -475,7 +448,7 @@ class LessonBooking {
   final TimeOfDay? requestedEndTime;   // Requested new end time
   final DateTime? changeRequestedAt;   // When change was requested
   // Unavailable fields (for unavailable status - replaces rejected)
-  final UnavailableReason? unavailableReason;   // Predefined reason (no free text)
+  final String? unavailableMessage;              // Free text reason
   final List<TimeSlot>? suggestedTimeSlots;     // Teacher's alternative suggestions
   final DateTime? unavailableAt;                // When marked unavailable
   final DateTime? expiredAt;                    // When auto-expired (48h timeout)
@@ -513,7 +486,7 @@ class LessonBooking {
     this.requestedStartTime,
     this.requestedEndTime,
     this.changeRequestedAt,
-    this.unavailableReason,
+    this.unavailableMessage,
     this.suggestedTimeSlots,
     this.unavailableAt,
     this.expiredAt,
@@ -613,10 +586,10 @@ class LessonBooking {
   bool get hasSuggestedTimes =>
       suggestedTimeSlots != null && suggestedTimeSlots!.isNotEmpty;
 
-  /// Get student-friendly unavailable message
-  String? get unavailableMessage {
-    if (status == BookingStatus.unavailable && unavailableReason != null) {
-      return unavailableReason!.studentMessage;
+  /// Get student-friendly display message
+  String? get displayMessage {
+    if (status == BookingStatus.unavailable && unavailableMessage != null) {
+      return unavailableMessage!;
     }
     if (status == BookingStatus.expired) {
       return status.studentMessage;
@@ -695,7 +668,7 @@ class LessonBooking {
     TimeOfDay? requestedStartTime,
     TimeOfDay? requestedEndTime,
     DateTime? changeRequestedAt,
-    UnavailableReason? unavailableReason,
+    String? unavailableMessage,
     List<TimeSlot>? suggestedTimeSlots,
     DateTime? unavailableAt,
     DateTime? expiredAt,
@@ -732,7 +705,7 @@ class LessonBooking {
       requestedStartTime: requestedStartTime ?? this.requestedStartTime,
       requestedEndTime: requestedEndTime ?? this.requestedEndTime,
       changeRequestedAt: changeRequestedAt ?? this.changeRequestedAt,
-      unavailableReason: unavailableReason ?? this.unavailableReason,
+      unavailableMessage: unavailableMessage ?? this.unavailableMessage,
       suggestedTimeSlots: suggestedTimeSlots ?? this.suggestedTimeSlots,
       unavailableAt: unavailableAt ?? this.unavailableAt,
       expiredAt: expiredAt ?? this.expiredAt,

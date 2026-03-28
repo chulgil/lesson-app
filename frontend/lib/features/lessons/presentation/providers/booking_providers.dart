@@ -187,7 +187,7 @@ class BookingsNotifier extends AsyncNotifier<List<LessonBooking>> {
   /// Mark booking as unavailable (teacher cannot do this time)
   Future<LessonBooking> markUnavailable(
     String bookingId,
-    UnavailableReason reason, {
+    String reason, {
     List<TimeSlot>? suggestedTimeSlots,
   }) async {
     state = const AsyncValue.loading();
