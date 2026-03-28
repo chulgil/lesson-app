@@ -11,7 +11,8 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../../schedule/domain/entities/schedule_confirmation_card.dart';
-import '../../../schedule/presentation/providers/lesson_request_providers.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../../settings/presentation/providers/teacher_settings_provider.dart';
 import '../../domain/entities/subscription.dart';
@@ -138,14 +139,16 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
       // Create schedule confirmation card for student (Issue #62)
       await _createScheduleConfirmationCard(subscription);
 
-      // Update lesson request status to proposalSent
+      // Update lesson request: link proposal and set status
       if (lessonRequestId != null) {
-        await ref
-            .read(lessonRequestActionsProvider.notifier)
-            .sendProposal(
-              requestId: lessonRequestId!,
-              proposalId: subscription.id,
-            );
+        final repo = ref.read(unifiedLessonRequestRepositoryProvider);
+        final request = await repo.getById(lessonRequestId!);
+        if (request != null) {
+          await repo.update(request.copyWith(
+            proposalId: subscription.id,
+            status: UnifiedRequestStatus.proposalSent,
+          ));
+        }
       }
 
       if (mounted) {
@@ -444,12 +447,14 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           await repository.create(subscription);
 
           if (i < lessonRequestIds.length) {
-            await ref
-                .read(lessonRequestActionsProvider.notifier)
-                .sendProposal(
-                  requestId: lessonRequestIds[i],
-                  proposalId: subscription.id,
-                );
+            final repo = ref.read(unifiedLessonRequestRepositoryProvider);
+            final req = await repo.getById(lessonRequestIds[i]);
+            if (req != null) {
+              await repo.update(req.copyWith(
+                proposalId: subscription.id,
+                status: UnifiedRequestStatus.proposalSent,
+              ));
+            }
           }
 
           successCount++;

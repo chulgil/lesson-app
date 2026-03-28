@@ -13,7 +13,6 @@ import '../../../gamification/presentation/widgets/gamification_header.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
 import '../../../schedule/presentation/widgets/schedule_confirmation_card_widget.dart';
 import '../widgets/dashboard/dashboard_widgets.dart';
-import '../widgets/dashboard/unified_request_progress_card.dart';
 import '../widgets/student_getting_started_card.dart';
 import '../widgets/student_subscription_summary.dart';
 import '../widgets/trial_bookings_section.dart';
