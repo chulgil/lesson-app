@@ -302,6 +302,9 @@ class _UnifiedLessonRequestScreenState
     final instruments = widget.params.teacherInstruments;
     if (instruments.isEmpty) return const SizedBox.shrink();
 
+    // Single instrument → hide UI, auto-selected in initState (spec Section 11)
+    if (instruments.length == 1) return const SizedBox.shrink();
+
     return _SectionWrapper(
       icon: Icons.music_note,
       title: '악기',
