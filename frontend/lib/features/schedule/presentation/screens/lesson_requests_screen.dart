@@ -463,20 +463,20 @@ class _UnifiedRequestsSection extends ConsumerWidget {
       await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
-        useSafeArea: true,
-        builder: (sheetContext) {
-          final scrollController = ScrollController();
-          return FractionallySizedBox(
-            heightFactor: 0.85,
-            child: UnifiedApprovalBottomSheet(
-              request: request,
-              scrollController: scrollController,
-              onComplete: () {
-                ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
-              },
-            ),
-          );
-        },
+        backgroundColor: Colors.transparent,
+        builder: (sheetContext) => DraggableScrollableSheet(
+          initialChildSize: 0.85,
+          minChildSize: 0.4,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) => UnifiedApprovalBottomSheet(
+            request: request,
+            scrollController: scrollController,
+            onComplete: () {
+              ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
+            },
+          ),
+        ),
       );
       return;
     }
@@ -595,117 +595,21 @@ class _UnifiedRequestsSection extends ConsumerWidget {
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) => Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '대안 시간 선택 (${selectedSlots.length}/3)',
-                        style: AppTypography.bodyLarge
-                            .copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('취소'),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Slot picker
-              Expanded(
-                child: ScheduleSlotPicker(
-                  teacherId: request.teacherId,
-                  onSlotSelected: (slot) {
-                    setState(() {
-                      final existing = selectedSlots.indexWhere(
-                        (s) =>
-                            s.dayOfWeek == slot.dayOfWeek &&
-                            s.startTime == slot.startTime,
-                      );
-                      if (existing >= 0) {
-                        selectedSlots.removeAt(existing);
-                      } else if (selectedSlots.length < 3) {
-                        selectedSlots.add(TimeSlotOption(
-                          id: 'ts_${DateTime.now().millisecondsSinceEpoch}_${selectedSlots.length}',
-                          dayOfWeek: slot.dayOfWeek,
-                          startTime: slot.startTime,
-                          endTime: slot.endTime,
-                        ));
-                      }
-                    });
-                  },
-                ),
-              ),
-
-              // Selected slots summary
-              if (selectedSlots.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space4,
-                  ),
-                  child: Wrap(
-                    spacing: 8,
-                    children: selectedSlots.map((s) => Chip(
-                          label: Text(
-                            '${s.dayLabel} ${s.startTime}',
-                            style: AppTypography.caption,
-                          ),
-                          deleteIcon:
-                              const Icon(Icons.close, size: 16),
-                          onDeleted: () => setState(
-                              () => selectedSlots.remove(s)),
-                        )).toList(),
-                  ),
-                ),
-
-              // Message field
-              Padding(
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: TextField(
-                  controller: messageController,
-                  maxLength: 200,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: '메모 (선택)',
-                    counterText: '',
-                  ),
-                ),
-              ),
-
-              // Submit button
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.space4,
-                  0,
-                  AppSpacing.space4,
-                  MediaQuery.of(context).padding.bottom +
-                      AppSpacing.space4,
-                ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: selectedSlots.isNotEmpty
-                        ? () => Navigator.pop(context, true)
-                        : null,
-                    child: Text(
-                        '대안 ${selectedSlots.length}개 제안하기'),
-                  ),
-                ),
-              ),
-            ],
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => StatefulBuilder(
+          builder: (context, setState) => _buildCounterProposeContent(
+            context,
+            setState,
+            ref,
+            request,
+            scrollController,
+            selectedSlots,
+            messageController,
           ),
         ),
       ),
@@ -744,6 +648,114 @@ class _UnifiedRequestsSection extends ConsumerWidget {
       }
     }
     messageController.dispose();
+  }
+
+  Widget _buildCounterProposeContent(
+    BuildContext context,
+    StateSetter setState,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+    ScrollController scrollController,
+    List<TimeSlotOption> selectedSlots,
+    TextEditingController messageController,
+  ) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.backgroundLight,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '대안 시간 선택 (${selectedSlots.length}/3)',
+                    style: AppTypography.bodyLarge
+                        .copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('취소'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ScheduleSlotPicker(
+              teacherId: request.teacherId,
+              onSlotSelected: (slot) {
+                setState(() {
+                  final existing = selectedSlots.indexWhere(
+                    (s) =>
+                        s.dayOfWeek == slot.dayOfWeek &&
+                        s.startTime == slot.startTime,
+                  );
+                  if (existing >= 0) {
+                    selectedSlots.removeAt(existing);
+                  } else if (selectedSlots.length < 3) {
+                    selectedSlots.add(TimeSlotOption(
+                      id: 'ts_${DateTime.now().millisecondsSinceEpoch}_${selectedSlots.length}',
+                      dayOfWeek: slot.dayOfWeek,
+                      startTime: slot.startTime,
+                      endTime: slot.endTime,
+                    ));
+                  }
+                });
+              },
+            ),
+          ),
+          if (selectedSlots.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
+              child: Wrap(
+                spacing: 8,
+                children: selectedSlots
+                    .map((s) => Chip(
+                          label: Text('${s.dayLabel} ${s.startTime}',
+                              style: AppTypography.caption),
+                          deleteIcon: const Icon(Icons.close, size: 16),
+                          onDeleted: () =>
+                              setState(() => selectedSlots.remove(s)),
+                        ))
+                    .toList(),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: TextField(
+              controller: messageController,
+              maxLength: 200,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: '메모 (선택)',
+                counterText: '',
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.space4,
+              0,
+              AppSpacing.space4,
+              MediaQuery.of(context).padding.bottom + AppSpacing.space4,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: selectedSlots.isNotEmpty
+                    ? () => Navigator.pop(context, true)
+                    : null,
+                child: Text('대안 ${selectedSlots.length}개 제안하기'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _handleSendProposal(
