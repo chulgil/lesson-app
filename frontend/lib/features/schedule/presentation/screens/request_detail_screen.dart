@@ -5,9 +5,11 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/current_request_box.dart';
+import '../widgets/decline_bottom_sheet.dart';
 import '../widgets/request_history_chat.dart';
 
 /// Detail screen for a single lesson request — Jira-ticket style.
@@ -83,7 +85,7 @@ class RequestDetailScreen extends ConsumerWidget {
                       : AppStrings.teacher,
                   onAccept: () => _handleAccept(context, ref, request),
                   onCounterPropose: () =>
-                      _handleCounterPropose(context, request),
+                      _handleCounterPropose(context, ref, request),
                   onModify: () => _handleModify(context, request),
                   onCancel: () => _handleCancel(context, ref, request),
                 ),
@@ -234,18 +236,67 @@ class RequestDetailScreen extends ConsumerWidget {
     }
   }
 
-  void _handleCounterPropose(
-      BuildContext context, UnifiedLessonRequest request) {
-    // TODO: Open existing DeclineBottomSheet (temporary, #216 will redesign)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('다른 시간 제안 (구현 예정)')),
+  Future<void> _handleCounterPropose(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final result = await showDeclineBottomSheet(
+      context,
+      durationMinutes: request.preferredDuration,
+      teacherId: request.teacherId,
     );
+    if (result == null) return;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+
+      if (result.suggestedSlots.isEmpty) {
+        // Message only → reject
+        await actions.rejectRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          reason: result.message,
+        );
+      } else {
+        // With alternatives → propose
+        await actions.proposeAlternatives(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          slots: result.suggestedSlots
+              .map((s) => TimeSlotOption(
+                    id: s.id,
+                    dayOfWeek: s.dayOfWeek - 1,
+                    startTime:
+                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                    endTime:
+                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                  ))
+              .toList(),
+          message: result.message,
+        );
+      }
+
+      if (context.mounted) {
+        if (result.suggestedSlots.isNotEmpty) {
+          showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
+        } else {
+          showInfoSnackBar(context, AppStrings.requestUnavailable);
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showErrorSnackBar(context);
+      }
+    }
   }
 
   void _handleModify(BuildContext context, UnifiedLessonRequest request) {
-    // TODO: Navigate to edit screen
+    // TODO: Navigate to edit screen (requires request edit flow)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('요청 수정 (구현 예정)')),
+      const SnackBar(content: Text('요청 수정 기능은 준비 중입니다')),
     );
   }
 
