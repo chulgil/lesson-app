@@ -666,6 +666,7 @@ class _UnifiedRequestsSection extends ConsumerWidget {
       ),
       child: Column(
         children: [
+          // Header
           Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Row(
@@ -684,62 +685,79 @@ class _UnifiedRequestsSection extends ConsumerWidget {
               ],
             ),
           ),
+          // Scrollable content: picker + chips
           Expanded(
-            child: ScheduleSlotPicker(
-              teacherId: request.teacherId,
-              onSlotSelected: (slot) {
-                setState(() {
-                  final existing = selectedSlots.indexWhere(
-                    (s) =>
-                        s.dayOfWeek == slot.dayOfWeek &&
-                        s.startTime == slot.startTime,
-                  );
-                  if (existing >= 0) {
-                    selectedSlots.removeAt(existing);
-                  } else if (selectedSlots.length < 3) {
-                    selectedSlots.add(TimeSlotOption(
-                      id: 'ts_${DateTime.now().millisecondsSinceEpoch}_${selectedSlots.length}',
-                      dayOfWeek: slot.dayOfWeek,
-                      startTime: slot.startTime,
-                      endTime: slot.endTime,
-                    ));
-                  }
-                });
-              },
-            ),
-          ),
-          if (selectedSlots.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
-              child: Wrap(
-                spacing: 8,
-                children: selectedSlots
-                    .map((s) => Chip(
-                          label: Text('${s.dayLabel} ${s.startTime}',
-                              style: AppTypography.caption),
-                          deleteIcon: const Icon(Icons.close, size: 16),
-                          onDeleted: () =>
-                              setState(() => selectedSlots.remove(s)),
-                        ))
-                    .toList(),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                children: [
+                  ScheduleSlotPicker(
+                    teacherId: request.teacherId,
+                    selectedDay: selectedSlots.isNotEmpty
+                        ? selectedSlots.last.dayOfWeek
+                        : null,
+                    selectedTime: selectedSlots.isNotEmpty
+                        ? selectedSlots.last.startTime
+                        : null,
+                    onSlotSelected: (slot) {
+                      setState(() {
+                        final existing = selectedSlots.indexWhere(
+                          (s) =>
+                              s.dayOfWeek == slot.dayOfWeek &&
+                              s.startTime == slot.startTime,
+                        );
+                        if (existing >= 0) {
+                          selectedSlots.removeAt(existing);
+                        } else if (selectedSlots.length < 3) {
+                          selectedSlots.add(TimeSlotOption(
+                            id: 'ts_${DateTime.now().millisecondsSinceEpoch}_${selectedSlots.length}',
+                            dayOfWeek: slot.dayOfWeek,
+                            startTime: slot.startTime,
+                            endTime: slot.endTime,
+                          ));
+                        }
+                      });
+                    },
+                  ),
+                  if (selectedSlots.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.space4),
+                      child: Wrap(
+                        spacing: 8,
+                        children: selectedSlots
+                            .map((s) => Chip(
+                                  label: Text('${s.dayLabel} ${s.startTime}',
+                                      style: AppTypography.caption),
+                                  deleteIcon:
+                                      const Icon(Icons.close, size: 16),
+                                  onDeleted: () =>
+                                      setState(() => selectedSlots.remove(s)),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(AppSpacing.space4),
+                    child: TextField(
+                      controller: messageController,
+                      maxLength: 200,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: '메모 (선택)',
+                        counterText: '',
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: TextField(
-              controller: messageController,
-              maxLength: 200,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '메모 (선택)',
-                counterText: '',
-              ),
-            ),
           ),
+          // Fixed bottom button
           Padding(
             padding: EdgeInsets.fromLTRB(
               AppSpacing.space4,
-              0,
+              AppSpacing.space2,
               AppSpacing.space4,
               MediaQuery.of(context).padding.bottom + AppSpacing.space4,
             ),
