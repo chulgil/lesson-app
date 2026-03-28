@@ -28,8 +28,9 @@
 - [x] schedule_routes.dart + app_routes.dart — 완료 페이지 라우트 추가
 
 ### Phase 3: 선생님 수락 UI + 2라운드
-- approval_bottom_sheet.dart — 3안 표시 + 수락/역제안 UI
-- currentRound 상한 2 적용
+- [x] unified_approval_bottom_sheet.dart — NEW: 3안 표시 + 수락/역제안 UI
+- [x] currentRound 상한 2 적용 (Phase 1에서 완료)
+- [x] 수락/거절/역제안 비즈니스 로직 테스트 (10 tests)
 
 ## 의존성
 Phase 1 → Phase 2 → Phase 3 (순차)
