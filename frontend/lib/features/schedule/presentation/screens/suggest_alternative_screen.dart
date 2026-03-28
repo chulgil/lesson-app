@@ -37,7 +37,7 @@ class SuggestAlternativeScreen extends ConsumerStatefulWidget {
 
 class _SuggestAlternativeScreenState
     extends ConsumerState<SuggestAlternativeScreen> {
-  final _suggestedSlots = <TimeSlot>[];
+  var _suggestedSlots = <TimeSlot>[];
   late DateTime _weekStart;
 
   @override
@@ -365,7 +365,7 @@ class _SuggestAlternativeScreenState
         ),
         child: Center(
           child: Text(
-            '❶❷❸'[suggestedIndex],
+            ['❶', '❷', '❸'][suggestedIndex.clamp(0, 2)],
             style: AppTypography.caption.copyWith(
               fontSize: 10,
               color: AppColors.primary,
@@ -456,17 +456,20 @@ class _SuggestAlternativeScreenState
 
     HapticFeedback.lightImpact();
     setState(() {
-      _suggestedSlots.add(TimeSlot(
-        id: 'suggest_${DateTime.now().millisecondsSinceEpoch}',
-        dayOfWeek: date.weekday,
-        startTime: TimeOfDay(hour: hour, minute: minute),
-        endTime: TimeOfDay(
-          hour: endMinutes ~/ 60,
-          minute: endMinutes % 60,
+      _suggestedSlots = [
+        ..._suggestedSlots,
+        TimeSlot(
+          id: 'suggest_${DateTime.now().millisecondsSinceEpoch}',
+          dayOfWeek: date.weekday,
+          startTime: TimeOfDay(hour: hour, minute: minute),
+          endTime: TimeOfDay(
+            hour: endMinutes ~/ 60,
+            minute: endMinutes % 60,
+          ),
+          isActive: true,
+          specificDate: date,
         ),
-        isActive: true,
-        specificDate: date,
-      ));
+      ];
     });
   }
 
@@ -509,7 +512,7 @@ class _SuggestAlternativeScreenState
                 child: Row(
                   children: [
                     Text(
-                      '❶❷❸'[index],
+                      ['❶', '❷', '❸'][index.clamp(0, 2)],
                       style: AppTypography.bodyMedium.copyWith(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,
@@ -531,7 +534,12 @@ class _SuggestAlternativeScreenState
                     ),
                     IconButton(
                       onPressed: () =>
-                          setState(() => _suggestedSlots.removeAt(index)),
+                          setState(() {
+                            _suggestedSlots = [
+                              ..._suggestedSlots.sublist(0, index),
+                              ..._suggestedSlots.sublist(index + 1),
+                            ];
+                          }),
                       icon: const Icon(Icons.close, size: 18),
                       color: AppColors.error,
                       visualDensity: VisualDensity.compact,
@@ -598,17 +606,21 @@ class _SuggestAlternativeScreenState
     }
 
     setState(() {
-      _suggestedSlots[index] = TimeSlot(
-        id: slot.id,
-        dayOfWeek: newDate.weekday,
-        startTime: newStartTime,
-        endTime: TimeOfDay(
-          hour: endMinutes ~/ 60,
-          minute: endMinutes % 60,
+      _suggestedSlots = [
+        ..._suggestedSlots.sublist(0, index),
+        TimeSlot(
+          id: slot.id,
+          dayOfWeek: newDate.weekday,
+          startTime: newStartTime,
+          endTime: TimeOfDay(
+            hour: endMinutes ~/ 60,
+            minute: endMinutes % 60,
+          ),
+          isActive: true,
+          specificDate: newDate,
         ),
-        isActive: true,
-        specificDate: newDate,
-      );
+        ..._suggestedSlots.sublist(index + 1),
+      ];
     });
   }
 

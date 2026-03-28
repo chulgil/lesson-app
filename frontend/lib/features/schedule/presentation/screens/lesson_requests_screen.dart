@@ -339,8 +339,8 @@ class _UnifiedRequestsSection extends ConsumerWidget {
       if (context.mounted) {
         context.push(
           '${AppRoutes.issueSubscription}'
-          '?studentId=${request.studentId}'
-          '&lessonRequestId=${request.id}',
+          '?studentId=${Uri.encodeQueryComponent(request.studentId)}'
+          '&lessonRequestId=${Uri.encodeQueryComponent(request.id)}',
         );
       }
     }

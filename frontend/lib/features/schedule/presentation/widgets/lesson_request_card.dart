@@ -307,7 +307,7 @@ class LessonRequestCard extends ConsumerWidget {
                   child: FilledButton.icon(
                     onPressed: () {
                       context.push(
-                        '${AppRoutes.issueSubscription}?studentId=${request.studentId}&lessonRequestId=${request.id}',
+                        '${AppRoutes.issueSubscription}?studentId=${Uri.encodeQueryComponent(request.studentId)}&lessonRequestId=${Uri.encodeQueryComponent(request.id)}',
                       );
                     },
                     icon: const Icon(Icons.card_giftcard, size: 16),
