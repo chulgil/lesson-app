@@ -278,6 +278,55 @@ class TimeProposal extends HiveObject {
   Map<String, dynamic> toJson() => _$TimeProposalToJson(this);
 }
 
+/// Preferred time slot with priority ranking (1=highest, 3=lowest).
+@HiveType(typeId: 129)
+@JsonSerializable()
+class PreferredTimeSlot {
+  @HiveField(0)
+  final int priority;
+
+  /// Specific date for trial/per-session lessons.
+  @HiveField(1)
+  final DateTime? date;
+
+  /// Day of week for regular lessons (0=Mon...6=Sun).
+  @HiveField(2)
+  final int? dayOfWeek;
+
+  @HiveField(3)
+  final String startTime;
+
+  @HiveField(4)
+  final String endTime;
+
+  const PreferredTimeSlot({
+    required this.priority,
+    this.date,
+    this.dayOfWeek,
+    required this.startTime,
+    required this.endTime,
+  });
+
+  factory PreferredTimeSlot.fromJson(Map<String, dynamic> json) =>
+      _$PreferredTimeSlotFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PreferredTimeSlotToJson(this);
+
+  /// Display label for the selection list.
+  String get displayLabel {
+    const days = ['월', '화', '수', '목', '금', '토', '일'];
+    if (date != null) {
+      final d = date!;
+      final dayLabel = days[d.weekday - 1];
+      return '${d.month}/${d.day}($dayLabel) $startTime';
+    }
+    if (dayOfWeek != null) {
+      return '매주 ${days[dayOfWeek!.clamp(0, 6)]}요일 $startTime';
+    }
+    return startTime;
+  }
+}
+
 /// Unified lesson request — replaces separate trial/regular/returning flows
 @HiveType(typeId: 128)
 @JsonSerializable()
@@ -347,6 +396,10 @@ class UnifiedLessonRequest extends HiveObject {
   @HiveField(19)
   final int? suggestedPrice;
 
+  // Preferred time slots (v2.0 — max 3 preferences)
+  @HiveField(20)
+  final List<PreferredTimeSlot> preferredSlots;
+
   UnifiedLessonRequest({
     required this.id,
     required this.studentId,
@@ -368,6 +421,7 @@ class UnifiedLessonRequest extends HiveObject {
     this.cancelledAt,
     this.rejectionReason,
     this.suggestedPrice,
+    this.preferredSlots = const [],
   });
 
   factory UnifiedLessonRequest.fromJson(Map<String, dynamic> json) =>
@@ -409,6 +463,7 @@ class UnifiedLessonRequest extends HiveObject {
     DateTime? cancelledAt,
     String? rejectionReason,
     int? suggestedPrice,
+    List<PreferredTimeSlot>? preferredSlots,
   }) {
     return UnifiedLessonRequest(
       id: id ?? this.id,
@@ -431,6 +486,7 @@ class UnifiedLessonRequest extends HiveObject {
       cancelledAt: cancelledAt ?? this.cancelledAt,
       rejectionReason: rejectionReason ?? this.rejectionReason,
       suggestedPrice: suggestedPrice ?? this.suggestedPrice,
+      preferredSlots: preferredSlots ?? this.preferredSlots,
     );
   }
 

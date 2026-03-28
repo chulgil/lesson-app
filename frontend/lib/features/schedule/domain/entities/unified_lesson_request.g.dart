@@ -104,6 +104,52 @@ class TimeProposalAdapter extends TypeAdapter<TimeProposal> {
           typeId == other.typeId;
 }
 
+class PreferredTimeSlotAdapter extends TypeAdapter<PreferredTimeSlot> {
+  @override
+  final int typeId = 129;
+
+  @override
+  PreferredTimeSlot read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return PreferredTimeSlot(
+      priority: fields[0] as int,
+      date: fields[1] as DateTime?,
+      dayOfWeek: fields[2] as int?,
+      startTime: fields[3] as String,
+      endTime: fields[4] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, PreferredTimeSlot obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.priority)
+      ..writeByte(1)
+      ..write(obj.date)
+      ..writeByte(2)
+      ..write(obj.dayOfWeek)
+      ..writeByte(3)
+      ..write(obj.startTime)
+      ..writeByte(4)
+      ..write(obj.endTime);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PreferredTimeSlotAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
   @override
   final int typeId = 128;
@@ -135,13 +181,14 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       cancelledAt: fields[17] as DateTime?,
       rejectionReason: fields[18] as String?,
       suggestedPrice: fields[19] as int?,
+      preferredSlots: (fields[20] as List).cast<PreferredTimeSlot>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UnifiedLessonRequest obj) {
     writer
-      ..writeByte(20)
+      ..writeByte(21)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -181,7 +228,9 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       ..writeByte(18)
       ..write(obj.rejectionReason)
       ..writeByte(19)
-      ..write(obj.suggestedPrice);
+      ..write(obj.suggestedPrice)
+      ..writeByte(20)
+      ..write(obj.preferredSlots);
   }
 
   @override
@@ -557,6 +606,25 @@ const _$ProposalActionEnumMap = {
   ProposalAction.counterPropose: 'counterPropose',
 };
 
+PreferredTimeSlot _$PreferredTimeSlotFromJson(Map<String, dynamic> json) =>
+    PreferredTimeSlot(
+      priority: (json['priority'] as num).toInt(),
+      date:
+          json['date'] == null ? null : DateTime.parse(json['date'] as String),
+      dayOfWeek: (json['day_of_week'] as num?)?.toInt(),
+      startTime: json['start_time'] as String,
+      endTime: json['end_time'] as String,
+    );
+
+Map<String, dynamic> _$PreferredTimeSlotToJson(PreferredTimeSlot instance) =>
+    <String, dynamic>{
+      'priority': instance.priority,
+      'date': instance.date?.toIso8601String(),
+      'day_of_week': instance.dayOfWeek,
+      'start_time': instance.startTime,
+      'end_time': instance.endTime,
+    };
+
 UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
         Map<String, dynamic> json) =>
     UnifiedLessonRequest(
@@ -590,6 +658,11 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
           : DateTime.parse(json['cancelled_at'] as String),
       rejectionReason: json['rejection_reason'] as String?,
       suggestedPrice: (json['suggested_price'] as num?)?.toInt(),
+      preferredSlots: (json['preferred_slots'] as List<dynamic>?)
+              ?.map(
+                  (e) => PreferredTimeSlot.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$UnifiedLessonRequestToJson(
@@ -615,6 +688,8 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'cancelled_at': instance.cancelledAt?.toIso8601String(),
       'rejection_reason': instance.rejectionReason,
       'suggested_price': instance.suggestedPrice,
+      'preferred_slots':
+          instance.preferredSlots.map((e) => e.toJson()).toList(),
     };
 
 const _$LessonRequestTypeEnumMap = {
