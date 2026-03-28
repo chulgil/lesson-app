@@ -277,8 +277,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                 children: [
                   Text(
                     _dayLabels[i],
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: AppTypography.caption.copyWith(
                       fontWeight: FontWeight.w600,
                       color: isToday
                           ? AppColors.primary
@@ -298,8 +297,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                     child: Center(
                       child: Text(
                         '${date.day}',
-                        style: TextStyle(
-                          fontSize: 11,
+                        style: AppTypography.caption.copyWith(
                           fontWeight:
                               isToday ? FontWeight.bold : FontWeight.normal,
                           color: isToday
@@ -339,7 +337,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                   alignment: Alignment.topRight,
                   child: Text(
                     timeLabel,
-                    style: const TextStyle(
+                    style: AppTypography.caption.copyWith(
                       fontSize: 10,
                       color: AppColors.textTertiaryLight,
                     ),
@@ -393,8 +391,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
           child: Center(
             child: Text(
               _priorityLabel(priority),
-              style: const TextStyle(
-                fontSize: 14,
+              style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),

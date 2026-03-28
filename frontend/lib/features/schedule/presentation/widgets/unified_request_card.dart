@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -222,7 +223,7 @@ class UnifiedRequestCard extends StatelessWidget {
               side: BorderSide(color: AppColors.borderLight),
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            child: const Text('거절'),
+            child: Text(AppStrings.unavailable),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -233,7 +234,7 @@ class UnifiedRequestCard extends StatelessWidget {
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            child: const Text('승인'),
+            child: Text(AppStrings.accept),
           ),
         ),
       ],

@@ -115,11 +115,10 @@ class DashboardTab extends ConsumerWidget {
             // Urgent Actions Section
             UrgentActionsSection(
               teacherId: teacherId,
-              pendingRequests: pendingRequestsAsync.valueOrNull ?? 0,
-              pendingBookings: pendingBookingsAsync.valueOrNull ?? 0,
-              awaitingConfirm: awaitingConfirmAsync.valueOrNull ?? [],
-              expiringSoon: expiringSoonAsync.valueOrNull ?? [],
-              expired: expiredAsync.valueOrNull ?? [],
+              pendingRequests: (pendingRequestsAsync.valueOrNull ?? 0) +
+                  (pendingBookingsAsync.valueOrNull ?? 0),
+              awaitingConfirmCount:
+                  (awaitingConfirmAsync.valueOrNull ?? []).length,
             ),
 
             const SizedBox(height: AppSpacing.space6),
