@@ -38,11 +38,19 @@ class _SuggestAlternativeScreenState
     extends ConsumerState<SuggestAlternativeScreen> {
   var _suggestedSlots = <TimeSlot>[];
   late DateTime _weekStart;
+  late TextEditingController _messageController;
 
   @override
   void initState() {
     super.initState();
     _weekStart = _getWeekStart(DateTime.now());
+    _messageController = TextEditingController(text: widget.message);
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -73,33 +81,25 @@ class _SuggestAlternativeScreenState
       ),
       body: Column(
         children: [
-          // Message preview
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(
+          // Editable message input
+          Padding(
+            padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.message_outlined,
-                    size: 16, color: AppColors.textSecondaryLight),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    widget.message,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            child: TextField(
+              controller: _messageController,
+              maxLines: 2,
+              maxLength: 200,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: '학생에게 전달할 메시지',
+                counterText: '',
+                prefixIcon: const Icon(Icons.message_outlined, size: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2,
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -380,6 +380,9 @@ class _SuggestAlternativeScreenState
   }
 
   void _submit() {
-    Navigator.pop(context, _suggestedSlots);
+    Navigator.pop(context, (
+      message: _messageController.text.trim(),
+      slots: _suggestedSlots,
+    ));
   }
 }

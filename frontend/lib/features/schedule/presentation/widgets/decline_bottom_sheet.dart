@@ -159,7 +159,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
         ? AppStrings.proposeDefaultMessage
         : currentText;
 
-    final suggestedSlots = await Navigator.push<List<TimeSlot>>(
+    final result = await Navigator.push<({String message, List<TimeSlot> slots})>(
       context,
       MaterialPageRoute(
         builder: (context) => SuggestAlternativeScreen(
@@ -170,10 +170,10 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
       ),
     );
 
-    if (suggestedSlots != null && mounted) {
+    if (result != null && mounted) {
       Navigator.pop<DeclineResult>(
         context,
-        (message: message, suggestedSlots: suggestedSlots),
+        (message: result.message, suggestedSlots: result.slots),
       );
     }
   }
