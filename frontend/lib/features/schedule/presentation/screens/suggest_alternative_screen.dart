@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/instrument_colors.dart';
-import '../../../../core/utils/name_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/domain/entities/lesson.dart';
-import '../../domain/entities/teacher_availability.dart';
-import '../providers/teacher_availability_providers.dart';
 import '../providers/week_lessons_provider.dart';
+import '../widgets/alternative_time_grid.dart';
 
 /// Screen for suggesting alternative time slots via a weekly schedule grid.
 ///
@@ -51,10 +47,10 @@ class _SuggestAlternativeScreenState
     return DateTime(date.year, date.month, date.day - diff);
   }
 
-  int _parseHour(String time) => int.parse(time.split(':')[0]);
-  int _parseMinute(String time) => int.parse(time.split(':')[1]);
-  int _parseTimeMinutes(String time) =>
-      _parseHour(time) * 60 + _parseMinute(time);
+  int _parseTimeMinutes(String time) {
+    final parts = time.split(':');
+    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+  }
 
   int _lessonEndMinutes(Lesson lesson) =>
       _parseTimeMinutes(lesson.startTime) + lesson.duration;
@@ -64,8 +60,6 @@ class _SuggestAlternativeScreenState
     final teacherId =
         widget.teacherId ?? ref.watch(currentUserIdProvider) ?? 'teacher_1';
     final weekLessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
-    final availabilityAsync =
-        ref.watch(teacherAvailabilityProvider(teacherId));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -113,10 +107,13 @@ class _SuggestAlternativeScreenState
           // Grid
           Expanded(
             child: weekLessonsAsync.when(
-              data: (lessons) {
-                final availability = availabilityAsync.valueOrNull;
-                return _buildGrid(lessons, availability);
-              },
+              data: (lessons) => AlternativeTimeGrid(
+                weekStart: _weekStart,
+                lessons: lessons,
+                suggestedSlots: _suggestedSlots,
+                onEmptyCellTap: (cell) =>
+                    _addSlotFromGrid(cell.date, cell.hour, cell.minute),
+              ),
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
               error: (e, _) =>
@@ -189,246 +186,6 @@ class _SuggestAlternativeScreenState
     );
   }
 
-  Widget _buildGrid(
-      List<Lesson> lessons, TeacherAvailability? availability) {
-    int startHour = 9;
-    int endHour = 21;
-    if (lessons.isNotEmpty) {
-      final minHour = lessons
-          .map((l) => _parseHour(l.startTime))
-          .reduce((a, b) => a < b ? a : b);
-      final maxHour = lessons
-          .map((l) {
-            final end = _lessonEndMinutes(l);
-            return end ~/ 60 + (end % 60 > 0 ? 1 : 0);
-          })
-          .reduce((a, b) => a > b ? a : b);
-      startHour = minHour < startHour ? minHour : startHour;
-      endHour = maxHour > endHour ? maxHour : endHour;
-    }
-
-    const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
-    const cellHeight = 28.0;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final cellWidth = (constraints.maxWidth - 36) / 7;
-
-          return Column(
-            children: [
-              // Day headers
-              Row(
-                children: [
-                  const SizedBox(width: 36),
-                  ...List.generate(7, (i) {
-                    final date = _weekStart.add(Duration(days: i));
-                    final isToday = _isToday(date);
-                    return SizedBox(
-                      width: cellWidth,
-                      child: Column(
-                        children: [
-                          Text(
-                            dayLabels[i],
-                            style: AppTypography.caption.copyWith(
-                              color: isToday
-                                  ? AppColors.primary
-                                  : AppColors.textSecondaryLight,
-                              fontWeight:
-                                  isToday ? FontWeight.bold : null,
-                            ),
-                          ),
-                          Text(
-                            '${date.day}',
-                            style: AppTypography.caption.copyWith(
-                              color: isToday
-                                  ? AppColors.primary
-                                  : AppColors.textTertiaryLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ),
-              const SizedBox(height: 4),
-
-              // Grid body
-              ...List.generate(
-                (endHour - startHour) * 2,
-                (slotIndex) {
-                  final slotMinutes =
-                      startHour * 60 + slotIndex * 30;
-                  final hour = slotMinutes ~/ 60;
-                  final minute = slotMinutes % 60;
-                  final isHourBoundary = minute == 0;
-
-                  return Row(
-                    children: [
-                      SizedBox(
-                        width: 36,
-                        height: cellHeight,
-                        child: isHourBoundary
-                            ? Text(
-                                '$hour:00',
-                                style:
-                                    AppTypography.caption.copyWith(
-                                  fontSize: 10,
-                                  color:
-                                      AppColors.textTertiaryLight,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      ...List.generate(7, (dayIndex) {
-                        final date = _weekStart
-                            .add(Duration(days: dayIndex));
-                        return _buildCell(
-                          date: date,
-                          slotMinutes: slotMinutes,
-                          width: cellWidth,
-                          height: cellHeight,
-                          lessons: lessons,
-                        );
-                      }),
-                    ],
-                  );
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCell({
-    required DateTime date,
-    required int slotMinutes,
-    required double width,
-    required double height,
-    required List<Lesson> lessons,
-  }) {
-    final hour = slotMinutes ~/ 60;
-    final minute = slotMinutes % 60;
-
-    // Check if this cell has a lesson
-    final lesson = _findLessonAt(lessons, date, slotMinutes);
-    if (lesson != null) {
-      final lessonStartMinutes = _parseTimeMinutes(lesson.startTime);
-      final isStart = lessonStartMinutes == slotMinutes;
-      final colors = InstrumentColors.getColor(lesson.instrument);
-      return Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: colors.background,
-          border: Border(
-            top: isStart
-                ? BorderSide(color: colors.accent, width: 2)
-                : BorderSide.none,
-          ),
-        ),
-        child: isStart
-            ? Padding(
-                padding: const EdgeInsets.only(left: 2, top: 1),
-                child: Text(
-                  NameUtils.givenName(lesson.studentName),
-                  style: AppTypography.caption.copyWith(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.clip,
-                  maxLines: 1,
-                ),
-              )
-            : null,
-      );
-    }
-
-    // Check if this cell is a suggested slot
-    final suggestedIndex = _findSuggestedSlotAt(date, slotMinutes);
-    if (suggestedIndex >= 0) {
-      return Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.2),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.5),
-            width: 0.5,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            ['❶', '❷', '❸'][suggestedIndex.clamp(0, 2)],
-            style: AppTypography.caption.copyWith(
-              fontSize: 10,
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Empty cell — tappable
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _suggestedSlots.length < 3
-          ? () => _addSlotFromGrid(date, hour, minute)
-          : null,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.borderLight.withValues(alpha: 0.3),
-            width: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Lesson? _findLessonAt(
-      List<Lesson> lessons, DateTime date, int cellMinutes) {
-    for (final lesson in lessons) {
-      if (lesson.date.year == date.year &&
-          lesson.date.month == date.month &&
-          lesson.date.day == date.day) {
-        final lessonStart = _parseTimeMinutes(lesson.startTime);
-        final lessonEnd = _lessonEndMinutes(lesson);
-        if (cellMinutes >= lessonStart && cellMinutes < lessonEnd) {
-          return lesson;
-        }
-      }
-    }
-    return null;
-  }
-
-  int _findSuggestedSlotAt(DateTime date, int cellMinutes) {
-    for (int i = 0; i < _suggestedSlots.length; i++) {
-      final slot = _suggestedSlots[i];
-      if (slot.specificDate != null &&
-          slot.specificDate!.year == date.year &&
-          slot.specificDate!.month == date.month &&
-          slot.specificDate!.day == date.day) {
-        final slotStart =
-            slot.startTime.hour * 60 + slot.startTime.minute;
-        final slotEnd = slot.endTime.hour * 60 + slot.endTime.minute;
-        if (cellMinutes >= slotStart && cellMinutes < slotEnd) {
-          return i;
-        }
-      }
-    }
-    return -1;
-  }
-
   void _addSlotFromGrid(DateTime date, int hour, int minute) {
     final weekLessons =
         ref.read(weekLessonsProvider(_weekStart)).valueOrNull ?? [];
@@ -454,7 +211,6 @@ class _SuggestAlternativeScreenState
       }
     }
 
-    HapticFeedback.lightImpact();
     setState(() {
       _suggestedSlots = [
         ..._suggestedSlots,
@@ -626,12 +382,5 @@ class _SuggestAlternativeScreenState
 
   void _submit() {
     Navigator.pop(context, _suggestedSlots);
-  }
-
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
   }
 }
