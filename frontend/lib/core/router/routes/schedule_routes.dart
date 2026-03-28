@@ -11,6 +11,7 @@ import '../../../features/search/presentation/screens/teacher_search_screen.dart
 import '../../../features/schedule/presentation/screens/lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
+import '../../../features/schedule/presentation/screens/all_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/my_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/request_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
@@ -98,13 +99,13 @@ List<GoRoute> scheduleRoutes = [
     },
   ),
 
-  // Lesson Requests (teacher view of received lesson requests)
+  // Lesson Requests (teacher view — full calendar + filter screen)
   GoRoute(
     path: AppRoutes.lessonRequests,
     name: 'lessonRequests',
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
-      return LessonRequestsScreen(
+      return AllLessonRequestsScreen(
         teacherId: extra?['teacherId'] ??
             state.uri.queryParameters['teacherId'] ??
             'teacher_1',
