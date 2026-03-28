@@ -199,6 +199,21 @@ class TeacherSettingsNotifier extends AsyncNotifier<TeacherSettings> {
     }
   }
 
+  /// Update booking guidance message
+  Future<void> updateBookingGuidanceMessage(String? message) async {
+    final current = state.value;
+    if (current == null) return;
+
+    final effectiveMessage = (message != null && message.isEmpty) ? null : message;
+    state = AsyncValue.data(current.copyWith(bookingGuidanceMessage: effectiveMessage));
+    try {
+      await _repository.updateBookingGuidanceMessage(effectiveMessage);
+    } catch (e, st) {
+      state = AsyncValue.data(current);
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   /// Update trial lesson free setting
   Future<void> updateTrialLessonFree(bool value) async {
     final current = state.value;

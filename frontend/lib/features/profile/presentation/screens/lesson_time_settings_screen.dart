@@ -77,6 +77,11 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space6),
 
+          // Booking guidance message
+          _buildGuidanceMessageSection(context, ref),
+
+          const SizedBox(height: AppSpacing.space6),
+
           // Trial lesson free toggle
           _buildTrialLessonSection(context, ref),
 
@@ -410,6 +415,75 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     ref
         .read(teacherSettingsNotifierProvider.notifier)
         .toggleTimeSlot(slotId, isActive);
+  }
+
+  Widget _buildGuidanceMessageSection(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LessonTimeSettingsSectionTitle(title: '레슨 요청 안내'),
+        const SizedBox(height: AppSpacing.space2),
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.space4),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceSecondaryLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '학생에게 표시할 안내 메시지',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              TextField(
+                controller: TextEditingController(
+                  text: settings.bookingGuidanceMessage ?? '',
+                ),
+                maxLength: 100,
+                maxLines: 2,
+                decoration: InputDecoration(
+                  hintText: TeacherSettings.defaultGuidanceMessage,
+                  hintStyle: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.backgroundLight,
+                  border: OutlineInputBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderSide:
+                        const BorderSide(color: AppColors.borderLight),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderSide:
+                        const BorderSide(color: AppColors.borderLight),
+                  ),
+                  counterText: '',
+                ),
+                onChanged: (value) {
+                  ref
+                      .read(teacherSettingsNotifierProvider.notifier)
+                      .updateBookingGuidanceMessage(value);
+                },
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                '비우면 기본 메시지가 표시됩니다',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildTrialLessonSection(BuildContext context, WidgetRef ref) {
