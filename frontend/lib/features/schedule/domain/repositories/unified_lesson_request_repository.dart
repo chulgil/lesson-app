@@ -1,7 +1,14 @@
+import '../entities/request_event.dart';
 import '../entities/unified_lesson_request.dart';
 
 /// Repository interface for unified lesson requests.
 abstract class UnifiedLessonRequestRepository {
+  /// Get all events for a request, sorted by createdAt ascending.
+  Future<List<RequestEvent>> getEventsByRequestId(String requestId);
+
+  /// Add a new event to a request's history.
+  Future<RequestEvent> addEvent(RequestEvent event);
+
   /// Create a new unified lesson request
   Future<UnifiedLessonRequest> create(UnifiedLessonRequest request);
 

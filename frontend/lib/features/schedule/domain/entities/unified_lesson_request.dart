@@ -10,7 +10,10 @@ enum LessonRequestType {
   trial,
 
   @HiveField(1)
-  regular;
+  regular,
+
+  @HiveField(2)
+  package;
 
   String get label {
     switch (this) {
@@ -18,6 +21,8 @@ enum LessonRequestType {
         return '체험레슨';
       case LessonRequestType.regular:
         return '정규레슨';
+      case LessonRequestType.package:
+        return '회차권';
     }
   }
 }
@@ -407,6 +412,10 @@ class UnifiedLessonRequest extends HiveObject {
   @HiveField(21)
   final String? proposalId;
 
+  // v4.0: Academy association
+  @HiveField(22)
+  final String? academyId;
+
   UnifiedLessonRequest({
     required this.id,
     required this.studentId,
@@ -430,6 +439,7 @@ class UnifiedLessonRequest extends HiveObject {
     this.suggestedPrice,
     this.preferredSlots = const [],
     this.proposalId,
+    this.academyId,
   });
 
   factory UnifiedLessonRequest.fromJson(Map<String, dynamic> json) =>
@@ -502,6 +512,52 @@ class UnifiedLessonRequest extends HiveObject {
   /// Whether a subscription proposal is linked.
   bool get hasProposal => proposalId != null;
 
+  /// Whether this request belongs to an academy.
+  bool get isAcademy => academyId != null;
+
+  /// Whether the request is expired by date (7 days from creation).
+  bool get isExpiredByDate =>
+      DateTime.now().difference(createdAt).inDays >= 7;
+
+  /// Last message from the most recent event (for list preview).
+  String? get lastMessage => null; // TODO: Populate from RequestEvent list
+
+  /// Status chip label for the list item.
+  String get statusChipLabel {
+    switch (status) {
+      case UnifiedRequestStatus.pending:
+        return '대기';
+      case UnifiedRequestStatus.approved:
+        return '승인';
+      case UnifiedRequestStatus.negotiating:
+        return '시간협상 $currentRound';
+      case UnifiedRequestStatus.timeConfirmed:
+        return '시간확정';
+      case UnifiedRequestStatus.proposalSent:
+        return '제안완료';
+      case UnifiedRequestStatus.proposalAccepted:
+        return '수강권수락';
+      case UnifiedRequestStatus.paymentNotified:
+        return '입금완료';
+      case UnifiedRequestStatus.completed:
+        return '완료';
+      case UnifiedRequestStatus.rejected:
+        return '거절';
+      case UnifiedRequestStatus.cancelled:
+        return '취소';
+      case UnifiedRequestStatus.expired:
+        return '기간만료';
+    }
+  }
+
+  /// Type display label (재수강 > 정규 priority).
+  String get typeDisplayLabel {
+    if (isReturningStudent && type == LessonRequestType.regular) {
+      return '재수강';
+    }
+    return type.label;
+  }
+
   /// Preferred day label (Korean)
   String? get preferredDayLabel {
     if (preferredDay == null) return null;
@@ -532,6 +588,7 @@ class UnifiedLessonRequest extends HiveObject {
     int? suggestedPrice,
     List<PreferredTimeSlot>? preferredSlots,
     String? proposalId,
+    String? academyId,
   }) {
     return UnifiedLessonRequest(
       id: id ?? this.id,
@@ -556,6 +613,7 @@ class UnifiedLessonRequest extends HiveObject {
       suggestedPrice: suggestedPrice ?? this.suggestedPrice,
       preferredSlots: preferredSlots ?? this.preferredSlots,
       proposalId: proposalId ?? this.proposalId,
+      academyId: academyId ?? this.academyId,
     );
   }
 

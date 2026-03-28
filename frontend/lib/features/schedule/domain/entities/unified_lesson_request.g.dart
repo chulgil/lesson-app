@@ -183,13 +183,14 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       suggestedPrice: fields[19] as int?,
       preferredSlots: (fields[20] as List).cast<PreferredTimeSlot>(),
       proposalId: fields[21] as String?,
+      academyId: fields[22] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UnifiedLessonRequest obj) {
     writer
-      ..writeByte(22)
+      ..writeByte(23)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -233,7 +234,9 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       ..writeByte(20)
       ..write(obj.preferredSlots)
       ..writeByte(21)
-      ..write(obj.proposalId);
+      ..write(obj.proposalId)
+      ..writeByte(22)
+      ..write(obj.academyId);
   }
 
   @override
@@ -258,6 +261,8 @@ class LessonRequestTypeAdapter extends TypeAdapter<LessonRequestType> {
         return LessonRequestType.trial;
       case 1:
         return LessonRequestType.regular;
+      case 2:
+        return LessonRequestType.package;
       default:
         return LessonRequestType.trial;
     }
@@ -271,6 +276,9 @@ class LessonRequestTypeAdapter extends TypeAdapter<LessonRequestType> {
         break;
       case LessonRequestType.regular:
         writer.writeByte(1);
+        break;
+      case LessonRequestType.package:
+        writer.writeByte(2);
         break;
     }
   }
@@ -667,6 +675,7 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
               .toList() ??
           const [],
       proposalId: json['proposal_id'] as String?,
+      academyId: json['academy_id'] as String?,
     );
 
 Map<String, dynamic> _$UnifiedLessonRequestToJson(
@@ -695,11 +704,13 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'preferred_slots':
           instance.preferredSlots.map((e) => e.toJson()).toList(),
       'proposal_id': instance.proposalId,
+      'academy_id': instance.academyId,
     };
 
 const _$LessonRequestTypeEnumMap = {
   LessonRequestType.trial: 'trial',
   LessonRequestType.regular: 'regular',
+  LessonRequestType.package: 'package',
 };
 
 const _$UnifiedLessonGoalEnumMap = {
