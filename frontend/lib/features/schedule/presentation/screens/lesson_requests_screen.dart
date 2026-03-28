@@ -438,20 +438,19 @@ class _UnifiedRequestsSection extends ConsumerWidget {
         context: context,
         isScrollControlled: true,
         useSafeArea: true,
-        builder: (context) => DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) =>
-              UnifiedApprovalBottomSheet(
-            request: request,
-            scrollController: scrollController,
-            onComplete: () {
-              ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
-            },
-          ),
-        ),
+        builder: (sheetContext) {
+          final scrollController = ScrollController();
+          return FractionallySizedBox(
+            heightFactor: 0.85,
+            child: UnifiedApprovalBottomSheet(
+              request: request,
+              scrollController: scrollController,
+              onComplete: () {
+                ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
+              },
+            ),
+          );
+        },
       );
       return;
     }
