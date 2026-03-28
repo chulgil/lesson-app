@@ -756,20 +756,19 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     }
   }
 
-  /// Auto-fill lesson date, time, and duration from student's regular lesson pattern
   void _autoFillFromStudent(Student student) {
     setState(() {
-      // Auto-fill lesson day
-      if (student.lessonDay != null) {
-        final nextDate = _getNextLessonDate(student.lessonDay!);
-        if (nextDate != null) {
-          _selectedDate = nextDate;
-        }
-      }
+      final slot = student.primarySlot;
+      if (slot != null) {
+        // Auto-fill lesson day
+        final weekday = slot.dayOfWeek + 1; // 0-based → DateTime.weekday (1=Mon)
+        final now = DateTime.now();
+        var daysUntil = weekday - now.weekday;
+        if (daysUntil <= 0) daysUntil += 7;
+        _selectedDate = DateTime(now.year, now.month, now.day + daysUntil);
 
-      // Auto-fill lesson time
-      if (student.lessonTime != null) {
-        final parts = student.lessonTime!.split(':');
+        // Auto-fill lesson time
+        final parts = slot.startTime.split(':');
         if (parts.length == 2) {
           final hour = int.tryParse(parts[0]);
           final minute = int.tryParse(parts[1]);
@@ -821,24 +820,4 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
     return result ?? false;
   }
 
-  /// Calculate the next occurrence of a given day name
-  DateTime? _getNextLessonDate(String dayName) {
-    const dayMap = {
-      '월요일': DateTime.monday,
-      '화요일': DateTime.tuesday,
-      '수요일': DateTime.wednesday,
-      '목요일': DateTime.thursday,
-      '금요일': DateTime.friday,
-      '토요일': DateTime.saturday,
-      '일요일': DateTime.sunday,
-    };
-
-    final targetDay = dayMap[dayName];
-    if (targetDay == null) return null;
-
-    final now = DateTime.now();
-    var daysUntil = targetDay - now.weekday;
-    if (daysUntil <= 0) daysUntil += 7;
-    return DateTime(now.year, now.month, now.day + daysUntil);
-  }
 }

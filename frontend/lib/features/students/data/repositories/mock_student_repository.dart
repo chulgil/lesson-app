@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/entities.dart';
+import '../../domain/entities/lesson_slot.dart';
 import '../../domain/repositories/student_repository.dart';
 
 /// Mock implementation for development
@@ -33,8 +34,10 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 730)),
         phone: '010-1234-5678',
         email: 'minjun.kim@example.com',
-        lessonDay: '화,금',
-        lessonTime: '16:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 1, startTime: '16:00', endTime: '17:00'),
+          LessonSlot(dayOfWeek: 4, startTime: '16:00', endTime: '17:00'),
+        ],
         lessonDuration: 60,
         totalLessons: 192,
         monthlyLessons: 7,
@@ -66,8 +69,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 60)),
         phone: '010-2345-6789',
         email: 'seoyeon.lee@example.com',
-        lessonDay: '수',
-        lessonTime: '15:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 2, startTime: '15:00', endTime: '15:45'),
+        ],
         lessonDuration: 45,
         totalLessons: 8,
         monthlyLessons: 4,
@@ -99,8 +103,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 540)),
         phone: '010-3456-7890',
         email: 'jiho.park@example.com',
-        lessonDay: '토',
-        lessonTime: '10:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 5, startTime: '10:00', endTime: '11:30'),
+        ],
         lessonDuration: 90,
         totalLessons: 72,
         monthlyLessons: 4,
@@ -128,8 +133,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 5)),
         phone: '010-4567-8901',
         parentPhone: '010-4567-1234',
-        lessonDay: '목',
-        lessonTime: '17:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 3, startTime: '17:00', endTime: '17:30'),
+        ],
         lessonDuration: 30,
         totalLessons: 1,
         monthlyLessons: 1,
@@ -160,8 +166,9 @@ class MockStudentRepository implements StudentRepository {
         phone: '010-5678-9012',
         parentPhone: '010-5678-3456',
         email: 'daeun.parent@example.com',
-        lessonDay: '월',
-        lessonTime: '16:30',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 0, startTime: '16:30', endTime: '17:15'),
+        ],
         lessonDuration: 45,
         totalLessons: 48,
         monthlyLessons: 4,
@@ -192,8 +199,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 300)),
         phone: '010-6789-0123',
         email: 'seojun.han@example.com',
-        lessonDay: '수',
-        lessonTime: '18:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 2, startTime: '18:00', endTime: '19:00'),
+        ],
         lessonDuration: 60,
         totalLessons: 38,
         monthlyLessons: 0,
@@ -223,8 +231,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 210)),
         phone: '010-7890-1234',
         parentPhone: '010-7890-5678',
-        lessonDay: '금',
-        lessonTime: '15:30',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 4, startTime: '15:30', endTime: '16:15'),
+        ],
         lessonDuration: 45,
         totalLessons: 20,
         monthlyLessons: 0,
@@ -335,8 +344,10 @@ class MockStudentRepository implements StudentRepository {
         phone: '010-1357-2468',
         parentPhone: '010-1357-9876',
         email: 'haeun.lee@example.com',
-        lessonDay: '월,목',
-        lessonTime: '17:00',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 0, startTime: '17:00', endTime: '18:00'),
+          LessonSlot(dayOfWeek: 3, startTime: '17:00', endTime: '18:00'),
+        ],
         lessonDuration: 60,
         totalLessons: 110,
         monthlyLessons: 8,
@@ -364,8 +375,9 @@ class MockStudentRepository implements StudentRepository {
         createdAt: now.subtract(const Duration(days: 120)),
         phone: '010-2468-1357',
         parentPhone: '010-2468-9753',
-        lessonDay: '화',
-        lessonTime: '17:30',
+        lessonSlots: [
+          LessonSlot(dayOfWeek: 1, startTime: '17:30', endTime: '18:15'),
+        ],
         lessonDuration: 45,
         totalLessons: 14,
         monthlyLessons: 3,

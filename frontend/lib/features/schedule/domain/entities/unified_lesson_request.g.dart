@@ -182,13 +182,14 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       rejectionReason: fields[18] as String?,
       suggestedPrice: fields[19] as int?,
       preferredSlots: (fields[20] as List).cast<PreferredTimeSlot>(),
+      proposalId: fields[21] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UnifiedLessonRequest obj) {
     writer
-      ..writeByte(21)
+      ..writeByte(22)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -230,7 +231,9 @@ class UnifiedLessonRequestAdapter extends TypeAdapter<UnifiedLessonRequest> {
       ..writeByte(19)
       ..write(obj.suggestedPrice)
       ..writeByte(20)
-      ..write(obj.preferredSlots);
+      ..write(obj.preferredSlots)
+      ..writeByte(21)
+      ..write(obj.proposalId);
   }
 
   @override
@@ -663,6 +666,7 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
                   (e) => PreferredTimeSlot.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      proposalId: json['proposal_id'] as String?,
     );
 
 Map<String, dynamic> _$UnifiedLessonRequestToJson(
@@ -690,6 +694,7 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'suggested_price': instance.suggestedPrice,
       'preferred_slots':
           instance.preferredSlots.map((e) => e.toJson()).toList(),
+      'proposal_id': instance.proposalId,
     };
 
 const _$LessonRequestTypeEnumMap = {

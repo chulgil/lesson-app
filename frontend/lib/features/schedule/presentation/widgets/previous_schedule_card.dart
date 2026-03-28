@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/date_utils.dart';
 import '../../../relationship/presentation/providers/relationship_providers.dart';
 
 /// Card widget to display previous schedule for re-enrollment restoration.
@@ -162,10 +161,9 @@ class PreviousScheduleCard extends ConsumerWidget {
   }
 
   String _formatSchedule(PreviousSchedule schedule) {
-    return LessonDateUtils.formatScheduleDisplay(
-      weekday: schedule.lessonDay,
-      time: schedule.lessonTime,
-      includeWeekly: true,
-    );
+    if (schedule.lessonSlots.isEmpty) return '';
+    return schedule.lessonSlots
+        .map((s) => '매주 ${s.displayLabel}')
+        .join(', ');
   }
 }

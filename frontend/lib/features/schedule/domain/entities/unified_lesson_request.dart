@@ -403,6 +403,10 @@ class UnifiedLessonRequest extends HiveObject {
   @HiveField(20)
   final List<PreferredTimeSlot> preferredSlots;
 
+  // Linked subscription proposal (v3.0 — proposal integration)
+  @HiveField(21)
+  final String? proposalId;
+
   UnifiedLessonRequest({
     required this.id,
     required this.studentId,
@@ -425,6 +429,7 @@ class UnifiedLessonRequest extends HiveObject {
     this.rejectionReason,
     this.suggestedPrice,
     this.preferredSlots = const [],
+    this.proposalId,
   });
 
   factory UnifiedLessonRequest.fromJson(Map<String, dynamic> json) =>
@@ -437,6 +442,65 @@ class UnifiedLessonRequest extends HiveObject {
 
   /// Whether the request is in a terminal state
   bool get isTerminal => status.isTerminal;
+
+  /// Valid state transitions for the request lifecycle.
+  static const _transitions = <UnifiedRequestStatus, Set<UnifiedRequestStatus>>{
+    UnifiedRequestStatus.pending: {
+      UnifiedRequestStatus.approved,
+      UnifiedRequestStatus.rejected,
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.approved: {
+      UnifiedRequestStatus.negotiating,
+      UnifiedRequestStatus.timeConfirmed,
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.negotiating: {
+      UnifiedRequestStatus.timeConfirmed,
+      UnifiedRequestStatus.expired,
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.timeConfirmed: {
+      UnifiedRequestStatus.proposalSent,
+      UnifiedRequestStatus.completed, // trial-free path
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.proposalSent: {
+      UnifiedRequestStatus.proposalAccepted,
+      UnifiedRequestStatus.rejected,
+      UnifiedRequestStatus.expired,
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.proposalAccepted: {
+      UnifiedRequestStatus.paymentNotified,
+      UnifiedRequestStatus.cancelled,
+    },
+    UnifiedRequestStatus.paymentNotified: {
+      UnifiedRequestStatus.completed,
+      UnifiedRequestStatus.cancelled,
+    },
+  };
+
+  /// Whether the request can transition to [target] status.
+  bool canTransitionTo(UnifiedRequestStatus target) {
+    return _transitions[status]?.contains(target) ?? false;
+  }
+
+  /// Whether the student is waiting for the teacher to send a proposal.
+  bool get isWaitingForProposal =>
+      status == UnifiedRequestStatus.timeConfirmed;
+
+  /// Whether a proposal has been received (awaiting student action).
+  bool get isProposalReceived =>
+      status == UnifiedRequestStatus.proposalSent;
+
+  /// Whether payment is pending (accepted but not yet confirmed by teacher).
+  bool get isPaymentPending =>
+      status == UnifiedRequestStatus.proposalAccepted ||
+      status == UnifiedRequestStatus.paymentNotified;
+
+  /// Whether a subscription proposal is linked.
+  bool get hasProposal => proposalId != null;
 
   /// Preferred day label (Korean)
   String? get preferredDayLabel {
@@ -467,6 +531,7 @@ class UnifiedLessonRequest extends HiveObject {
     String? rejectionReason,
     int? suggestedPrice,
     List<PreferredTimeSlot>? preferredSlots,
+    String? proposalId,
   }) {
     return UnifiedLessonRequest(
       id: id ?? this.id,
@@ -490,6 +555,7 @@ class UnifiedLessonRequest extends HiveObject {
       rejectionReason: rejectionReason ?? this.rejectionReason,
       suggestedPrice: suggestedPrice ?? this.suggestedPrice,
       preferredSlots: preferredSlots ?? this.preferredSlots,
+      proposalId: proposalId ?? this.proposalId,
     );
   }
 

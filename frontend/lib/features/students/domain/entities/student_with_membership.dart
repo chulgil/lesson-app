@@ -24,8 +24,8 @@ class StudentWithMembership {
   String get instrument => membership?.instrument ?? student.instrument;
 
   String? get lessonSchedule {
-    if (membership?.lessonDay != null && membership?.lessonTime != null) {
-      return '${membership!.lessonDay} ${membership!.lessonTime}';
+    if (membership != null && membership!.lessonSlots.isNotEmpty) {
+      return membership!.scheduleDisplay;
     }
     return student.lessonSchedule;
   }

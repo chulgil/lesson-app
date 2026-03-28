@@ -25,8 +25,7 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
       level: fields[5] as String?,
       monthlyFee: fields[6] as int,
       lessonsPerWeek: fields[7] as int,
-      lessonDay: fields[8] as String?,
-      lessonTime: fields[9] as String?,
+      lessonSlots: (fields[8] as List).cast<LessonSlot>(),
       lessonDuration: fields[10] as int,
       notes: fields[11] as String?,
       lessonLocationId: fields[14] as String?,
@@ -39,7 +38,7 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
   @override
   void write(BinaryWriter writer, ClassMembership obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(15)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -57,9 +56,7 @@ class ClassMembershipAdapter extends TypeAdapter<ClassMembership> {
       ..writeByte(7)
       ..write(obj.lessonsPerWeek)
       ..writeByte(8)
-      ..write(obj.lessonDay)
-      ..writeByte(9)
-      ..write(obj.lessonTime)
+      ..write(obj.lessonSlots)
       ..writeByte(10)
       ..write(obj.lessonDuration)
       ..writeByte(11)
@@ -148,8 +145,10 @@ ClassMembership _$ClassMembershipFromJson(Map<String, dynamic> json) =>
       level: json['level'] as String?,
       monthlyFee: (json['monthly_fee'] as num).toInt(),
       lessonsPerWeek: (json['lessons_per_week'] as num?)?.toInt() ?? 1,
-      lessonDay: json['lesson_day'] as String?,
-      lessonTime: json['lesson_time'] as String?,
+      lessonSlots: (json['lesson_slots'] as List<dynamic>?)
+              ?.map((e) => LessonSlot.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       lessonDuration: (json['lesson_duration'] as num?)?.toInt() ?? 60,
       notes: json['notes'] as String?,
       lessonLocationId: json['lesson_location_id'] as String?,
@@ -170,8 +169,7 @@ Map<String, dynamic> _$ClassMembershipToJson(ClassMembership instance) =>
       'level': instance.level,
       'monthly_fee': instance.monthlyFee,
       'lessons_per_week': instance.lessonsPerWeek,
-      'lesson_day': instance.lessonDay,
-      'lesson_time': instance.lessonTime,
+      'lesson_slots': instance.lessonSlots.map((e) => e.toJson()).toList(),
       'lesson_duration': instance.lessonDuration,
       'notes': instance.notes,
       'lesson_location_id': instance.lessonLocationId,

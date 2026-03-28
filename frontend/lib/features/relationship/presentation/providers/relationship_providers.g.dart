@@ -1725,7 +1725,7 @@ class _RelationshipNotificationSettingProviderElement
       (origin as RelationshipNotificationSettingProvider).targetUserId;
 }
 
-String _$previousScheduleHash() => r'5bed7718bdc1b9ee2eec193267cfe4e7ad120e55';
+String _$previousScheduleHash() => r'8a2ce0bc641807fb3e00c23f4a7329edbc9d77cc';
 
 /// Get previous schedule for a student-teacher pair.
 /// Returns the last known regular lesson schedule for re-enrollment restoration.
@@ -1890,7 +1890,7 @@ class _PreviousScheduleProviderElement
   String get studentId => (origin as PreviousScheduleProvider).studentId;
 }
 
-String _$scheduleRecorderHash() => r'810a009f67b762bb886bcdbec5820f69f742cef3';
+String _$scheduleRecorderHash() => r'b4de614d261129984cf8db2ff4e2f8122fba9102';
 
 /// Record schedule for a student-teacher relationship.
 /// Call this when regular lessons are confirmed or schedule changes.

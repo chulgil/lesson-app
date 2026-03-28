@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'lesson_slot.dart';
+
 part 'class_membership.g.dart';
 
 /// Membership status in a class.
@@ -51,10 +53,7 @@ class ClassMembership extends HiveObject {
 
   // Lesson schedule
   @HiveField(8)
-  final String? lessonDay; // Lesson day (Mon, Tue, ...)
-
-  @HiveField(9)
-  final String? lessonTime; // Lesson time (14:00)
+  final List<LessonSlot> lessonSlots;
 
   @HiveField(10)
   final int lessonDuration; // Lesson duration in minutes (default 60)
@@ -86,8 +85,7 @@ class ClassMembership extends HiveObject {
     this.level,
     required this.monthlyFee,
     this.lessonsPerWeek = 1,
-    this.lessonDay,
-    this.lessonTime,
+    this.lessonSlots = const [],
     this.lessonDuration = 60,
     this.notes,
     this.lessonLocationId,
@@ -126,6 +124,12 @@ class ClassMembership extends HiveObject {
     }
   }
 
+  LessonSlot? get primarySlot => lessonSlots.isNotEmpty ? lessonSlots.first : null;
+
+  String? get scheduleDisplay => lessonSlots.isNotEmpty
+      ? lessonSlots.map((s) => s.shortLabel).join(', ')
+      : null;
+
   ClassMembership copyWith({
     String? id,
     String? lessonClassId,
@@ -135,8 +139,7 @@ class ClassMembership extends HiveObject {
     String? level,
     int? monthlyFee,
     int? lessonsPerWeek,
-    String? lessonDay,
-    String? lessonTime,
+    List<LessonSlot>? lessonSlots,
     int? lessonDuration,
     String? notes,
     String? lessonLocationId,
@@ -153,8 +156,7 @@ class ClassMembership extends HiveObject {
       level: level ?? this.level,
       monthlyFee: monthlyFee ?? this.monthlyFee,
       lessonsPerWeek: lessonsPerWeek ?? this.lessonsPerWeek,
-      lessonDay: lessonDay ?? this.lessonDay,
-      lessonTime: lessonTime ?? this.lessonTime,
+      lessonSlots: lessonSlots ?? this.lessonSlots,
       lessonDuration: lessonDuration ?? this.lessonDuration,
       notes: notes ?? this.notes,
       lessonLocationId: lessonLocationId ?? this.lessonLocationId,

@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../features/students/domain/entities/lesson_slot.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../../features/students/presentation/providers/student_crud_provider.dart';
 import '../widgets/student_form_widgets.dart';
@@ -260,12 +261,16 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     final monthlyFee = int.tryParse(_monthlyFeeController.text) ??
         _selectedLevel.defaultMonthlyFee;
 
-    // Create lesson day string from selected days
     final sortedDays = _selectedDays.toList()..sort();
-    final lessonDays = sortedDays.map((i) => _dayNames[i]).join(', ');
-
-    // Build lessonTime: per-day format if times differ, simple format otherwise
-    final lessonTimeStr = _buildLessonTimeString(sortedDays);
+    final lessonSlots = sortedDays.map((d) {
+      final time = _dayTimeMap[d] ?? _lessonTime;
+      final startTime = formatTime(time);
+      return LessonSlot(
+        dayOfWeek: d,
+        startTime: startTime,
+        endTime: '',
+      );
+    }).toList();
 
     // Generate random profile color
     final profileColors = [
@@ -300,8 +305,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       email:
           _emailController.text.isNotEmpty ? _emailController.text.trim() : null,
       profileColor: profileColor,
-      lessonDay: lessonDays.isNotEmpty ? lessonDays : null,
-      lessonTime: lessonTimeStr,
+      lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
       notes:
           _notesController.text.isNotEmpty ? _notesController.text.trim() : null,
@@ -384,22 +388,4 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     return null;
   }
 
-  /// Build lessonTime string: "14:00" if all same, "월14:00,수15:30" if different.
-  String _buildLessonTimeString(List<int> sortedDays) {
-    if (sortedDays.isEmpty) return formatTime(_lessonTime);
-
-    // Check if all days have the same time
-    final times = sortedDays.map((d) => _dayTimeMap[d] ?? _lessonTime).toList();
-    final allSame = times.every(
-      (t) => t.hour == times.first.hour && t.minute == times.first.minute,
-    );
-
-    if (allSame) return formatTime(times.first);
-
-    // Build per-day format
-    return sortedDays.map((d) {
-      final time = _dayTimeMap[d] ?? _lessonTime;
-      return '${_dayNames[d]}${formatTime(time)}';
-    }).join(',');
-  }
 }

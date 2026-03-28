@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import '../../../../core/theme/app_colors.dart';
 // Import shared enums from core layer
 import '../../../../core/models/shared_enums.dart';
+import 'lesson_slot.dart';
 
 // Re-export shared enums for convenience
 export '../../../../core/models/shared_enums.dart'
@@ -157,8 +158,7 @@ class Student {
   final String? backgroundImageUrl;
   @JsonKey(includeFromJson: false, includeToJson: false)
   final Color profileColor;
-  final String? lessonDay;
-  final String? lessonTime;
+  final List<LessonSlot> lessonSlots;
   final int lessonDuration;
   final int totalLessons;
   final int monthlyLessons;
@@ -206,8 +206,7 @@ class Student {
     this.profileImageUrl,
     this.backgroundImageUrl,
     Color? profileColor,
-    this.lessonDay,
-    this.lessonTime,
+    this.lessonSlots = const [],
     this.lessonDuration = 60,
     this.totalLessons = 0,
     this.monthlyLessons = 0,
@@ -317,10 +316,11 @@ class Student {
   /// Get first character of name for avatar
   String get initial => name.isNotEmpty ? name[0] : '?';
 
-  /// Get formatted lesson schedule
+  LessonSlot? get primarySlot => lessonSlots.isNotEmpty ? lessonSlots.first : null;
+
   String? get lessonSchedule {
-    if (lessonDay == null || lessonTime == null) return null;
-    return '$lessonDay $lessonTime';
+    if (lessonSlots.isEmpty) return null;
+    return lessonSlots.map((s) => s.shortLabel).join(', ');
   }
 
   /// Check if student has a registered address
@@ -357,8 +357,7 @@ class Student {
     String? profileImageUrl,
     String? backgroundImageUrl,
     Color? profileColor,
-    String? lessonDay,
-    String? lessonTime,
+    List<LessonSlot>? lessonSlots,
     int? lessonDuration,
     int? totalLessons,
     int? monthlyLessons,
@@ -395,8 +394,7 @@ class Student {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       backgroundImageUrl: backgroundImageUrl ?? this.backgroundImageUrl,
       profileColor: profileColor ?? this.profileColor,
-      lessonDay: lessonDay ?? this.lessonDay,
-      lessonTime: lessonTime ?? this.lessonTime,
+      lessonSlots: lessonSlots ?? this.lessonSlots,
       lessonDuration: lessonDuration ?? this.lessonDuration,
       totalLessons: totalLessons ?? this.totalLessons,
       monthlyLessons: monthlyLessons ?? this.monthlyLessons,

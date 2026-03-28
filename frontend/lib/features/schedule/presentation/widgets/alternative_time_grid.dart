@@ -161,7 +161,13 @@ class AlternativeTimeGrid extends StatelessWidget {
     if (lesson != null) {
       final lessonStartMinutes = _parseTimeMinutes(lesson.startTime);
       final isStart = lessonStartMinutes == slotMinutes;
-      final colors = InstrumentColors.getColor(lesson.instrument);
+      final baseColors = InstrumentColors.getColor(lesson.instrument);
+      final colors = lesson.isPreview
+          ? InstrumentColorPair(
+              baseColors.background.withValues(alpha: 0.15),
+              baseColors.accent.withValues(alpha: 0.25),
+            )
+          : baseColors;
       return Container(
         width: width,
         height: height,
@@ -169,7 +175,10 @@ class AlternativeTimeGrid extends StatelessWidget {
           color: colors.background,
           border: Border(
             top: isStart
-                ? BorderSide(color: colors.accent, width: 2)
+                ? BorderSide(
+                    color: colors.accent,
+                    width: lesson.isPreview ? 2.5 : 2,
+                  )
                 : BorderSide.none,
           ),
         ),
@@ -180,7 +189,9 @@ class AlternativeTimeGrid extends StatelessWidget {
                   NameUtils.givenName(lesson.studentName),
                   style: AppTypography.caption.copyWith(
                     fontSize: 9,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        lesson.isPreview ? FontWeight.w400 : FontWeight.w600,
+                    color: lesson.isPreview ? colors.accent : null,
                   ),
                   overflow: TextOverflow.clip,
                   maxLines: 1,
@@ -216,10 +227,13 @@ class AlternativeTimeGrid extends StatelessWidget {
       );
     }
 
-    // Empty cell — tappable
+    // Empty cell — tappable (past cells disabled)
+    final cellDateTime = DateTime(date.year, date.month, date.day, hour, minute);
+    final isPast = cellDateTime.isBefore(DateTime.now());
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: suggestedSlots.length < maxSlots
+      onTap: !isPast && suggestedSlots.length < maxSlots
           ? () {
               HapticFeedback.lightImpact();
               onEmptyCellTap((date: date, hour: hour, minute: minute));
@@ -229,6 +243,7 @@ class AlternativeTimeGrid extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
+          color: isPast ? AppColors.scheduleMutedBackground : null,
           border: Border.all(
             color: AppColors.borderLight.withValues(alpha: 0.3),
             width: 0.5,

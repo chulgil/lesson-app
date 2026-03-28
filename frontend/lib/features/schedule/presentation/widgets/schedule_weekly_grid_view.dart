@@ -299,40 +299,53 @@ class _ScheduleWeeklyGridViewState
         );
       }
 
-      // Empty slot — tap to add lesson at this time
+      // Empty slot — tap to add lesson at this time (past slots disabled)
+      final date = _weekStart.add(Duration(days: dayIndex));
+      final hour = slotMinutes ~/ 60;
+      final minute = slotMinutes % 60;
+      final cellDateTime = DateTime(date.year, date.month, date.day, hour, minute);
+      final isPast = cellDateTime.isBefore(DateTime.now());
+
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          HapticFeedback.lightImpact();
-          final date = _weekStart.add(Duration(days: dayIndex));
-          final hour = slotMinutes ~/ 60;
-          final minute = slotMinutes % 60;
-          _navigateToAddLesson(date, hour, minute);
-        },
+        onTap: isPast
+            ? null
+            : () {
+                HapticFeedback.lightImpact();
+                _navigateToAddLesson(date, hour, minute);
+              },
         child: SizedBox(width: width, height: height),
       );
     }
 
     final baseColors = InstrumentColors.getColor(lesson.instrument);
 
-    // Color logic by day type:
-    // - today → vivid instrument colors
-    // - past → grey muted
-    // - future → instrument colors (slightly muted)
+    // Preview lessons: ultra-light with distinct border
     final InstrumentColorPair colors;
-    switch (dayType) {
-      case _DayType.today:
-        colors = baseColors;
-      case _DayType.past:
-        colors = const InstrumentColorPair(
-          AppColors.scheduleMutedBackground,
-          AppColors.scheduleMutedAccent,
-        );
-      case _DayType.future:
-        colors = InstrumentColorPair(
-          Color.lerp(baseColors.background, Colors.white, 0.5)!,
-          baseColors.accent.withValues(alpha: 0.45),
-        );
+    if (lesson.isPreview) {
+      colors = InstrumentColorPair(
+        baseColors.background.withValues(alpha: 0.15),
+        baseColors.accent.withValues(alpha: 0.25),
+      );
+    } else {
+      // Color logic by day type:
+      // - today → vivid instrument colors
+      // - past → grey muted
+      // - future → instrument colors (slightly muted)
+      switch (dayType) {
+        case _DayType.today:
+          colors = baseColors;
+        case _DayType.past:
+          colors = const InstrumentColorPair(
+            AppColors.scheduleMutedBackground,
+            AppColors.scheduleMutedAccent,
+          );
+        case _DayType.future:
+          colors = InstrumentColorPair(
+            Color.lerp(baseColors.background, Colors.white, 0.5)!,
+            baseColors.accent.withValues(alpha: 0.45),
+          );
+      }
     }
 
     // Check if this is the start slot of a lesson
@@ -340,12 +353,26 @@ class _ScheduleWeeklyGridViewState
     final lessonStartMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
     final isStartSlot = slotMinutes == lessonStartMinutes;
 
+    // Preview lessons navigate to student detail; normal lessons to lesson detail
+    final tapRoute = lesson.isPreview
+        ? AppRoutes.studentDetail.replaceFirst(':id', lesson.studentId)
+        : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
+
+    // Preview border: wider dashed-like accent border
+    final leftBorder = BorderSide(
+      color: colors.accent,
+      width: lesson.isPreview ? 2.5 : 2,
+      strokeAlign: lesson.isPreview
+          ? BorderSide.strokeAlignInside
+          : BorderSide.strokeAlignCenter,
+    );
+
     if (!isStartSlot) {
       // Continuation slot — show colored background only
       return GestureDetector(
         onTap: () {
           HapticFeedback.lightImpact();
-          context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
+          context.push(tapRoute);
         },
         child: Container(
           width: width - 2,
@@ -353,9 +380,7 @@ class _ScheduleWeeklyGridViewState
           margin: const EdgeInsets.symmetric(horizontal: 1),
           decoration: BoxDecoration(
             color: colors.background,
-            border: Border(
-              left: BorderSide(color: colors.accent, width: 2),
-            ),
+            border: Border(left: leftBorder),
           ),
         ),
       );
@@ -367,7 +392,7 @@ class _ScheduleWeeklyGridViewState
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
-        context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id));
+        context.push(tapRoute);
       },
       child: Container(
         width: width - 2,
@@ -379,9 +404,7 @@ class _ScheduleWeeklyGridViewState
             topLeft: Radius.circular(4),
             topRight: Radius.circular(4),
           ),
-          border: Border(
-            left: BorderSide(color: colors.accent, width: 2),
-          ),
+          border: Border(left: leftBorder),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -389,7 +412,7 @@ class _ScheduleWeeklyGridViewState
           style: TextStyle(
             color: colors.accent,
             fontSize: 10,
-            fontWeight: FontWeight.w600,
+            fontWeight: lesson.isPreview ? FontWeight.w400 : FontWeight.w600,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

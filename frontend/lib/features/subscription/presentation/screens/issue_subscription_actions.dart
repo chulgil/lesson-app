@@ -256,29 +256,10 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
 
     final cardType = await _detectScheduleCardType(subscription, membership);
 
-    int? parseLessonDay(String? day) {
-      if (day == null) return null;
-      const dayMap = {
-        'Mon': 1,
-        'Tue': 2,
-        'Wed': 3,
-        'Thu': 4,
-        'Fri': 5,
-        'Sat': 6,
-        'Sun': 7,
-        '월': 1,
-        '화': 2,
-        '수': 3,
-        '목': 4,
-        '금': 5,
-        '토': 6,
-        '일': 7,
-      };
-      return dayMap[day];
-    }
-
-    final suggestedDay = parseLessonDay(membership.lessonDay);
-    final suggestedTime = membership.lessonTime;
+    final suggestedDay = membership.primarySlot != null
+        ? membership.primarySlot!.dayOfWeek + 1
+        : null;
+    final suggestedTime = membership.primarySlot?.startTime;
     final lessonDuration = membership.lessonDuration;
 
     // Generate up to 2 alternative time slots from teacher's available schedule

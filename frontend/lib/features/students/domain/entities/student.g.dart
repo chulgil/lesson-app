@@ -22,8 +22,10 @@ Student _$StudentFromJson(Map<String, dynamic> json) => Student(
       email: json['email'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       backgroundImageUrl: json['background_image_url'] as String?,
-      lessonDay: json['lesson_day'] as String?,
-      lessonTime: json['lesson_time'] as String?,
+      lessonSlots: (json['lesson_slots'] as List<dynamic>?)
+              ?.map((e) => LessonSlot.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
       lessonDuration: (json['lesson_duration'] as num?)?.toInt() ?? 60,
       totalLessons: (json['total_lessons'] as num?)?.toInt() ?? 0,
       monthlyLessons: (json['monthly_lessons'] as num?)?.toInt() ?? 0,
@@ -74,8 +76,7 @@ Map<String, dynamic> _$StudentToJson(Student instance) => <String, dynamic>{
       'email': instance.email,
       'profile_image_url': instance.profileImageUrl,
       'background_image_url': instance.backgroundImageUrl,
-      'lesson_day': instance.lessonDay,
-      'lesson_time': instance.lessonTime,
+      'lesson_slots': instance.lessonSlots.map((e) => e.toJson()).toList(),
       'lesson_duration': instance.lessonDuration,
       'total_lessons': instance.totalLessons,
       'monthly_lessons': instance.monthlyLessons,

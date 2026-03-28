@@ -189,6 +189,8 @@ class Lesson {
   final LessonLocationInfo? location; // Lesson location
   final String? studentNote; // Student's own memo about the lesson
   final int travelTimeMinutes; // Teacher's travel time after this lesson
+  final String? subscriptionId; // Linked subscription (null for trial-free lessons)
+  final bool isPreview; // Preview lesson (beyond subscription range)
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -212,6 +214,8 @@ class Lesson {
     this.location,
     this.studentNote,
     this.travelTimeMinutes = 0,
+    this.subscriptionId,
+    this.isPreview = false,
     required this.createdAt,
     this.updatedAt,
   });
@@ -237,6 +241,9 @@ class Lesson {
 
   /// Check if lesson has feedback
   bool get hasFeedback => feedback != null && feedback!.isNotEmpty;
+
+  /// Check if lesson is linked to a subscription
+  bool get hasSubscription => subscriptionId != null;
 
   /// Display status — auto-completes past scheduled lessons based on time.
   /// UI should use this instead of raw `status` for rendering.
@@ -286,6 +293,8 @@ class Lesson {
     LessonLocationInfo? location,
     String? studentNote,
     int? travelTimeMinutes,
+    String? subscriptionId,
+    bool? isPreview,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -309,6 +318,8 @@ class Lesson {
       location: location ?? this.location,
       studentNote: studentNote ?? this.studentNote,
       travelTimeMinutes: travelTimeMinutes ?? this.travelTimeMinutes,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
+      isPreview: isPreview ?? this.isPreview,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

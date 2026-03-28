@@ -252,6 +252,44 @@ class MockUnifiedLessonRequestRepository
       confirmedAt: now.subtract(const Duration(hours: 2)),
       createdAt: now.subtract(const Duration(days: 1)),
     ));
+
+    // Proposal sent — student needs to review subscription proposal
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_7',
+      studentId: 'student_1',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '바이올린',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.beginner,
+      preferredDay: 2,
+      preferredTime: '14:00',
+      preferredDuration: 60,
+      status: UnifiedRequestStatus.proposalSent,
+      proposalId: 'sp_mock_1',
+      suggestedPrice: 40000,
+      confirmedAt: now.subtract(const Duration(days: 1)),
+      createdAt: now.subtract(const Duration(days: 2)),
+    ));
+
+    // Payment notified — waiting for teacher confirmation
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_8',
+      studentId: 'student_1',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '피아노',
+      goal: UnifiedLessonGoal.exam,
+      experience: UnifiedExperienceLevel.intermediate,
+      preferredDay: 4,
+      preferredTime: '16:00',
+      preferredDuration: 60,
+      status: UnifiedRequestStatus.paymentNotified,
+      proposalId: 'sp_mock_2',
+      suggestedPrice: 50000,
+      confirmedAt: now.subtract(const Duration(days: 2)),
+      createdAt: now.subtract(const Duration(days: 3)),
+    ));
   }
 
   void _addRequest(UnifiedLessonRequest request) {

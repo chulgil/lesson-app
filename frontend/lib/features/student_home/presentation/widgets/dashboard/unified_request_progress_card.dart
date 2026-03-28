@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -56,6 +58,16 @@ class _RequestProgressCard extends StatelessWidget {
 
   const _RequestProgressCard({required this.request});
 
+  void _onTap(BuildContext context) {
+    // Navigate to proposal detail if a proposal is linked
+    if (request.hasProposal) {
+      context.push(
+        AppRoutes.proposalDetail.replaceFirst(':id', request.proposalId!),
+      );
+    }
+    // TODO(#201): Navigate to request status screen for other states
+  }
+
   @override
   Widget build(BuildContext context) {
     final (statusIcon, statusColor, statusText) = _getStatusDisplay();
@@ -65,7 +77,9 @@ class _RequestProgressCard extends StatelessWidget {
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space1,
       ),
-      child: Container(
+      child: GestureDetector(
+        onTap: () => _onTap(context),
+        child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.surfaceLight,
@@ -112,6 +126,7 @@ class _RequestProgressCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

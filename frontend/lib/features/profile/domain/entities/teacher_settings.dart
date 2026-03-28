@@ -4,6 +4,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
 
 part 'teacher_settings.g.dart';
 
@@ -107,6 +108,11 @@ class TeacherSettings {
   /// Get price for a specific instrument and level
   int? getPrice(String instrument, String level) {
     return lessonPriceTable?[instrument]?[level];
+  }
+
+  /// Get price using [UnifiedExperienceLevel] enum (maps enum name to key).
+  int? getPriceByExperience(String instrument, UnifiedExperienceLevel level) {
+    return getPrice(instrument, level.name);
   }
 
   TeacherSettings copyWith({

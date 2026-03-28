@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../students/domain/entities/lesson_slot.dart';
 import '../../data/repositories/mock_teacher_student_relation_repository.dart';
 import '../../data/repositories/remote_teacher_student_relation_repository.dart';
 import '../../domain/entities/notification_setting.dart';
@@ -140,7 +141,7 @@ Future<NotificationSetting?> relationshipNotificationSetting(
 
 /// Previous schedule data record
 typedef PreviousSchedule =
-    ({int lessonDay, String lessonTime, int? lessonDuration});
+    ({List<LessonSlot> lessonSlots, int? lessonDuration});
 
 /// Get previous schedule for a student-teacher pair.
 /// Returns the last known regular lesson schedule for re-enrollment restoration.
@@ -161,8 +162,13 @@ Future<PreviousSchedule?> previousSchedule(
   }
 
   return (
-    lessonDay: result.lessonDay!,
-    lessonTime: result.lessonTime!,
+    lessonSlots: [
+      LessonSlot(
+        dayOfWeek: result.lessonDay! - 1,
+        startTime: result.lessonTime!,
+        endTime: '',
+      ),
+    ],
     lessonDuration: result.lessonDuration,
   );
 }
@@ -174,39 +180,13 @@ class ScheduleRecorder extends _$ScheduleRecorder {
   @override
   Future<void> build() async {}
 
-  /// Records a lesson schedule for a student-teacher pair.
-  ///
-  /// Parameters:
-  /// - [lessonDay]: Day of week (1=Monday to 7=Sunday)
-  /// - [lessonTime]: Time in HH:mm format (e.g., "15:00")
-  /// - [lessonDuration]: Optional duration in minutes
-  ///
-  /// Throws [ArgumentError] if parameters are invalid.
   Future<void> recordSchedule({
     required String teacherId,
     required String studentId,
-    required int lessonDay,
-    required String lessonTime,
+    required List<LessonSlot> lessonSlots,
     int? lessonDuration,
   }) async {
-    // Validate lessonDay (1-7)
-    if (lessonDay < 1 || lessonDay > 7) {
-      throw ArgumentError.value(
-        lessonDay,
-        'lessonDay',
-        'Must be between 1 (Monday) and 7 (Sunday)',
-      );
-    }
-
-    // Validate lessonTime format (HH:mm)
-    final timeRegex = RegExp(r'^([01]?[0-9]|2[0-3]):[0-5][0-9]$');
-    if (!timeRegex.hasMatch(lessonTime)) {
-      throw ArgumentError.value(
-        lessonTime,
-        'lessonTime',
-        'Must be in HH:mm format (e.g., "15:00")',
-      );
-    }
+    if (lessonSlots.isEmpty) return;
 
     // Validate lessonDuration if provided
     if (lessonDuration != null && lessonDuration <= 0) {
@@ -217,16 +197,18 @@ class ScheduleRecorder extends _$ScheduleRecorder {
       );
     }
 
+    final slot = lessonSlots.first;
+    final lessonDay = slot.dayOfWeek + 1; // LessonSlot 0-based → repo 1-based
+
     final repository = ref.read(teacherStudentRelationRepositoryProvider);
     await repository.recordSchedule(
       teacherId: teacherId,
       studentId: studentId,
       lessonDay: lessonDay,
-      lessonTime: lessonTime,
+      lessonTime: slot.startTime,
       lessonDuration: lessonDuration,
     );
 
-    // Invalidate the previous schedule cache
     ref.invalidate(
       previousScheduleProvider(teacherId: teacherId, studentId: studentId),
     );

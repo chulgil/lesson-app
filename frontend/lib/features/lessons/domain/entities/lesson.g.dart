@@ -90,6 +90,8 @@ Lesson _$LessonFromJson(Map<String, dynamic> json) => Lesson(
               json['location'] as Map<String, dynamic>),
       studentNote: json['student_note'] as String?,
       travelTimeMinutes: (json['travel_time_minutes'] as num?)?.toInt() ?? 0,
+      subscriptionId: json['subscription_id'] as String?,
+      isPreview: json['is_preview'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -116,6 +118,8 @@ Map<String, dynamic> _$LessonToJson(Lesson instance) => <String, dynamic>{
       'location': instance.location?.toJson(),
       'student_note': instance.studentNote,
       'travel_time_minutes': instance.travelTimeMinutes,
+      'subscription_id': instance.subscriptionId,
+      'is_preview': instance.isPreview,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

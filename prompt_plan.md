@@ -1,6 +1,40 @@
-# 통합 레슨 신청 v2.0 (Cherry) — 구현 계획
+# #211 과거 시간 선택 차단 — 구현 계획
 
 > 확정일: 2026-03-28
+> 범위: 대안 시간 제안 + 메인 주간 스케줄에서 과거 셀 비활성화
+> 복잡도: LOW (~23줄 수정, 2개 파일)
+
+## 수정 파일
+
+| 파일 | 변경 |
+|------|------|
+| `alternative_time_grid.dart` (line 219-239) | `_buildCell` empty 분기에 isPast 체크 + 회색 비활성 |
+| `schedule_weekly_grid_view.dart` (line 302-313) | `_buildGridCell` empty 분기에 isPast 체크 |
+
+## 과거 판단 기준
+
+```
+isPast = DateTime(date.y, date.m, date.d, hour, minute).isBefore(DateTime.now())
+```
+
+## 검증
+
+```bash
+flutter test test/features/schedule/
+flutter analyze
+```
+
+## 관련
+
+- 이슈: #211
+- PAD: docs/specs/schedule/alternative_proposal_enhancement_pad.md
+
+---
+
+## 이전 계획
+
+### 통합 레슨 신청 v2.0 (Cherry) — 2026-03-28, ✅ Phase 1-5 완료
+
 > 범위: Cherry (3안 선택 엔진 + 완료 페이지 + 선생님 수락 UI)
 > 복잡도: MEDIUM (~500줄 신규 + ~130줄 수정)
 
