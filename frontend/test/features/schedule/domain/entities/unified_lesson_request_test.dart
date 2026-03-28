@@ -138,4 +138,132 @@ void main() {
       expect(createRequest(proposalId: null).hasProposal, isFalse);
     });
   });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // v4.0: package type + academyId + events
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  group('LessonRequestType', () {
+    test('package 타입 존재', () {
+      expect(LessonRequestType.package.label, '회차권');
+    });
+
+    test('3가지 타입', () {
+      expect(LessonRequestType.values.length, 3);
+    });
+  });
+
+  group('academyId', () {
+    test('기본값 null — 개인', () {
+      final request = createRequest();
+      expect(request.academyId, isNull);
+      expect(request.isAcademy, isFalse);
+    });
+
+    test('학원 소속', () {
+      final request = createRequest().copyWith(academyId: 'academy_1');
+      expect(request.academyId, 'academy_1');
+      expect(request.isAcademy, isTrue);
+    });
+  });
+
+  group('7일 만료', () {
+    test('생성 후 6일 — 미만료', () {
+      final request = UnifiedLessonRequest(
+        id: 'req_1',
+        studentId: 'student_1',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.regular,
+        instrument: '바이올린',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        status: UnifiedRequestStatus.pending,
+        createdAt: DateTime.now().subtract(const Duration(days: 6)),
+      );
+      expect(request.isExpiredByDate, isFalse);
+    });
+
+    test('생성 후 8일 — 만료', () {
+      final request = UnifiedLessonRequest(
+        id: 'req_1',
+        studentId: 'student_1',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.regular,
+        instrument: '바이올린',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        status: UnifiedRequestStatus.pending,
+        createdAt: DateTime.now().subtract(const Duration(days: 8)),
+      );
+      expect(request.isExpiredByDate, isTrue);
+    });
+  });
+
+  group('lastMessage', () {
+    test('이벤트 없으면 null', () {
+      final request = createRequest();
+      expect(request.lastMessage, isNull);
+    });
+  });
+
+  group('statusChipLabel', () {
+    test('협상 중 — 라운드 표시', () {
+      final request = createRequest(
+        status: UnifiedRequestStatus.negotiating,
+      ).copyWith(currentRound: 3);
+      expect(request.statusChipLabel, '시간협상 3');
+    });
+
+    test('완료', () {
+      final request = createRequest(status: UnifiedRequestStatus.completed);
+      expect(request.statusChipLabel, '완료');
+    });
+
+    test('취소(학생)', () {
+      final request = createRequest(status: UnifiedRequestStatus.cancelled);
+      expect(request.statusChipLabel, '취소');
+    });
+
+    test('대기', () {
+      final request = createRequest(status: UnifiedRequestStatus.pending);
+      expect(request.statusChipLabel, '대기');
+    });
+
+    test('입금완료', () {
+      final request = createRequest(status: UnifiedRequestStatus.paymentNotified);
+      expect(request.statusChipLabel, '입금완료');
+    });
+
+    test('기간만료', () {
+      final request = createRequest(status: UnifiedRequestStatus.expired);
+      expect(request.statusChipLabel, '기간만료');
+    });
+  });
+
+  group('typeDisplayLabel', () {
+    test('재수강 우선', () {
+      final request = createRequest().copyWith(isReturningStudent: true);
+      expect(request.typeDisplayLabel, '재수강');
+    });
+
+    test('정규레슨', () {
+      final request = createRequest();
+      expect(request.typeDisplayLabel, '정규레슨');
+    });
+
+    test('회차권', () {
+      final request = UnifiedLessonRequest(
+        id: 'req_1',
+        studentId: 'student_1',
+        teacherId: 'teacher_1',
+        type: LessonRequestType.package,
+        instrument: '바이올린',
+        goal: UnifiedLessonGoal.hobby,
+        experience: UnifiedExperienceLevel.beginner,
+        status: UnifiedRequestStatus.pending,
+        createdAt: DateTime(2026, 3, 1),
+      );
+      expect(request.typeDisplayLabel, '회차권');
+    });
+  });
 }
