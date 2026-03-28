@@ -112,6 +112,7 @@ class AppRoutes {
   static const groupClassDetail = '/schedule/group-class/:id';
   static const groupClassAttendance = '/schedule/group-class/:id/attendance';
   static const requestCompletion = '/schedule/request-completion';
+  static const requestDetail = '/schedule/request/:id';
 
   // Subscription routes
   static const subscriptions = '/subscriptions';

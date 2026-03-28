@@ -12,6 +12,7 @@ import '../../../features/schedule/presentation/screens/lesson_requests_screen.d
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
 import '../../../features/schedule/presentation/screens/my_lesson_requests_screen.dart';
+import '../../../features/schedule/presentation/screens/request_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
@@ -79,6 +80,20 @@ List<GoRoute> scheduleRoutes = [
           preferredSlots: [],
           duration: 60,
         ),
+      );
+    },
+  ),
+
+  // Request Detail (Jira-ticket style detail view)
+  GoRoute(
+    path: AppRoutes.requestDetail,
+    name: 'requestDetail',
+    builder: (context, state) {
+      final requestId = state.pathParameters['id'] ?? '';
+      final extra = state.extra as Map<String, dynamic>?;
+      return RequestDetailScreen(
+        requestId: requestId,
+        viewerRole: extra?['viewerRole'] ?? 'teacher',
       );
     },
   ),
