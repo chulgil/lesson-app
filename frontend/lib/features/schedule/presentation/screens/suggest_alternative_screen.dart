@@ -19,12 +19,14 @@ class SuggestAlternativeScreen extends ConsumerStatefulWidget {
   final String message;
   final int durationMinutes;
   final String? teacherId;
+  final bool isStudentView;
 
   const SuggestAlternativeScreen({
     super.key,
     required this.message,
     required this.durationMinutes,
     this.teacherId,
+    this.isStudentView = false,
   });
 
   @override
@@ -112,6 +114,7 @@ class _SuggestAlternativeScreenState
                 weekStart: _weekStart,
                 lessons: lessons,
                 suggestedSlots: _suggestedSlots,
+                hideStudentNames: widget.isStudentView,
                 onEmptyCellTap: (cell) =>
                     _addSlotFromGrid(cell.date, cell.hour, cell.minute),
               ),

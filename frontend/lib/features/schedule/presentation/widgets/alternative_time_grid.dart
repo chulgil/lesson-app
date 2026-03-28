@@ -20,6 +20,9 @@ class AlternativeTimeGrid extends StatelessWidget {
   final int maxSlots;
   final ValueChanged<({DateTime date, int hour, int minute})> onEmptyCellTap;
 
+  /// When true, hides student names in lesson cells (student view privacy).
+  final bool hideStudentNames;
+
   const AlternativeTimeGrid({
     super.key,
     required this.weekStart,
@@ -27,6 +30,7 @@ class AlternativeTimeGrid extends StatelessWidget {
     required this.suggestedSlots,
     this.maxSlots = 3,
     required this.onEmptyCellTap,
+    this.hideStudentNames = false,
   });
 
   int _parseTimeMinutes(String time) {
@@ -186,7 +190,7 @@ class AlternativeTimeGrid extends StatelessWidget {
             ? Padding(
                 padding: const EdgeInsets.only(left: 2, top: 1),
                 child: Text(
-                  NameUtils.givenName(lesson.studentName),
+                  hideStudentNames ? '레슨' : NameUtils.givenName(lesson.studentName),
                   style: AppTypography.caption.copyWith(
                     fontSize: 9,
                     fontWeight:
