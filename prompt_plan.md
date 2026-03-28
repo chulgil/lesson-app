@@ -1,67 +1,45 @@
-# Mock → Remote 전환 구현 계획
+# 통합 레슨 신청 v2.0 (Cherry) — 구현 계획
 
-> 확정일: 2026-03-17
-> 상태: ✅ 백엔드 지원 범위 내 전환 완료
+> 확정일: 2026-03-28
+> 범위: Cherry (3안 선택 엔진 + 완료 페이지 + 선생님 수락 UI)
+> 복잡도: MEDIUM (~500줄 신규 + ~130줄 수정)
 
-## 개요
+## 범위
 
-프론트엔드 Mock Repository를 Remote Repository로 전환하여 `USE_MOCK=false`로 전체 앱 동작 가능하게 함.
+| 포함 | 제외 (추후) |
+|------|------------|
+| ✅ WeeklyCalendarPicker (이전/다음, 3안 ❶❷❸) | ❌ 안내 메시지 커스텀 |
+| ✅ PreferredTimeSlot 데이터 모델 | ❌ 취소 정책/예상 시간 표시 |
+| ✅ RequestCompletionScreen (5단계 가이드) | ❌ perSession 타입 추가 |
+| ✅ 선생님 3안 수락 UI | ❌ 재수강 프리필 |
+| ✅ 2라운드 협상 축소 | ❌ 악기 1개 숨김 |
 
-## Phase 1: 인프라 및 공통 준비 ✅ 완료
+## Phase 구성
 
-### 1.1 Entity JSON 직렬화 완성 (21개)
-- [x] gamification (StudentGamification, PointHistory, PracticeBadge, LevelDefinition)
-- [x] analytics (TeacherMonthlyStats, MonthlyTrend, StudentPracticeRank)
-- [x] practice (PracticeStats, PracticeStreak, PracticeItem, PracticeGoal, PracticeNote)
-- [x] lessons (TeachingResource, TipTemplate, Payment, TuitionSettings, PaymentSummary, FeedbackPreset)
-- [x] profile (TeacherSettings, Teacher, TeacherProfile + 7 중첩타입)
-- [x] student_home (ManualTeacher)
+### Phase 1: PreferredTimeSlot + WeeklyCalendarPicker
+- unified_lesson_request.dart — PreferredTimeSlot 클래스 + preferredSlots 리스트
+- weekly_calendar_picker.dart — NEW: 주간 캘린더 + 3안 선택 엔진
+- mock_unified_lesson_request_repository.dart — seed 데이터 마이그레이션
 
-### 1.2 Repository 인터페이스 정비
-- [x] 4개 abstract 인터페이스 추출 (Analytics, Gamification, FeedbackPreset, ManualTeacher)
+### Phase 2: 폼 연동 + 완료 페이지
+- unified_lesson_request_screen.dart — ScheduleSlotPicker → WeeklyCalendarPicker 교체
+- request_completion_screen.dart — NEW: 5단계 가이드 + 요약
+- schedule_routes.dart — 완료 페이지 라우트 추가
 
-## Phase 2: Remote Repository 작성 ✅ 완료 (백엔드 지원 범위)
+### Phase 3: 선생님 수락 UI + 2라운드
+- approval_bottom_sheet.dart — 3안 표시 + 수락/역제안 UI
+- currentRound 상한 2 적용
 
-### 2.1 높은 우선순위 — 모두 완료
-- [x] SettingsRepository ✅ GET/PUT /settings/teacher (12 메서드)
-- [x] TeacherRepository ✅ GET /teachers (중첩 UserResponse 매핑)
-- [x] TeacherSearchRepository ✅ GET /teachers 검색/필터/페이지네이션
-- [x] TeacherProfileRepository ✅ GET/PUT /teachers/{id}, /teachers/me/profile
-- [x] ProposalSettingsRepository ✅ GET/PUT /settings/proposal
-- [x] GamificationRepository ✅ GET /gamification/{student_id}
-- [ ] LessonPolicyRepository — 백엔드 API 미구현
+## 의존성
+Phase 1 → Phase 2 → Phase 3 (순차)
 
-### 2.2 중간 우선순위 — 대부분 완료
-- [x] PracticeGoalRepository ✅ GET/PUT /practice/goals
-- [x] PracticeStatsRepository ✅ GET /practice/stats (monthly/weekly/daily 매핑)
-- [x] FeedbackPresetRepository ✅ /settings/feedback-presets CRUD
-- [x] TeachingResourceRepository ✅ /settings/teaching-resources CRUD
-- [ ] PracticeNoteRepository — 백엔드 create만 지원
-- [ ] ScheduleConfirmationCardRepository — 백엔드 API 미구현
+## 관련 문서
+- 스펙: docs/specs/booking/unified_lesson_request_spec.md (v2.0)
+- 체크리스트: docs/specs/booking/unified_lesson_request_checklist.md
+- PAD: docs/specs/booking/unified_lesson_request_v2_pad.md
 
-### 2.3 낮은 우선순위 — 백엔드 의존
-- [ ] MembershipRepository — 백엔드 API 미구현
-- [ ] LocationRepository — 백엔드 API 미구현
-- [ ] LessonClassRepository — 백엔드 API 미구현
-- [ ] PieceRepository — 백엔드 API 미구현
-- [ ] PracticeItemRepository — 백엔드 API 미구현
-- [ ] PracticeRepertoireRepository — Hive 로컬 저장소 의존 (녹음 파일)
-- [ ] TipTemplateRepository — 백엔드 API 미구현
-- [ ] ManualTeacherRepository — 백엔드 API 미구현
-- [ ] PaymentRepository — 백엔드 API 미구현
-- [ ] AnalyticsRepository — 백엔드 API 미구현
+---
 
-## Phase 3: Provider 스위칭 로직 정비
-- [x] 10개 완료 (Gamification, FeedbackPreset, TeachingResource, ProposalSettings, Settings, PracticeGoal, PracticeStats, Teacher, TeacherProfile, TeacherSearch)
-- [x] 6개 TODO 주석 구체화 (백엔드 차단 사유 명시)
+## 이전 계획
 
-## 최종 요약
-
-| 지표 | 값 |
-|------|-----|
-| 신규 Remote Repository | 11개 |
-| Entity 직렬화 | 21+ 클래스 |
-| Interface 추출 | 4개 |
-| Provider 스위칭 | 10개 |
-| 총 커밋 | 9개 (8세션) |
-| 남은 항목 | 13개 (모두 백엔드 의존) |
+### Mock → Remote 전환 (2026-03-17, ✅ 완료)

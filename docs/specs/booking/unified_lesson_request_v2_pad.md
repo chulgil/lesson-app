@@ -3,6 +3,7 @@
 > **작성일**: 2026-03-28
 > **관련 스펙**: `docs/specs/booking/unified_lesson_request_spec.md` (v2.0)
 > **체크리스트**: `docs/specs/booking/unified_lesson_request_checklist.md`
+> **GitHub Issues**: #202 (캘린더 엔진) → #203 (폼+완료) → #204 (선생님 UI)
 
 ---
 
