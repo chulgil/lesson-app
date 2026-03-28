@@ -1,47 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../subscription/subscription_facade.dart';
 
 /// Displays urgent action items requiring immediate teacher attention.
+///
+/// Shows only 2 item types:
+/// - Pending lesson requests (unified + legacy combined)
+/// - Awaiting payment confirmation
 class UrgentActionsSection extends StatelessWidget {
   final String teacherId;
   final int pendingRequests;
-  final int pendingBookings;
-  final List<SubscriptionProposal> awaitingConfirm;
-  final List<Subscription> expiringSoon;
-  final List<Subscription> expired;
+  final int awaitingConfirmCount;
 
   const UrgentActionsSection({
     super.key,
     required this.teacherId,
     required this.pendingRequests,
-    required this.pendingBookings,
-    required this.awaitingConfirm,
-    required this.expiringSoon,
-    this.expired = const [],
+    required this.awaitingConfirmCount,
   });
 
   @override
   Widget build(BuildContext context) {
-    final awaitingConfirmCount = awaitingConfirm.length;
-
-    // Combine expiringSoon + expired into one count (unique students)
-    final allSubscriptionStudents = {
-      ...expiringSoon.map((s) => s.studentId),
-      ...expired.map((s) => s.studentId),
-    };
-    final subscriptionAlertCount = allSubscriptionStudents.length;
-    final hasExpired = expired.isNotEmpty;
-
-    final totalUrgent = pendingRequests +
-        pendingBookings +
-        (awaitingConfirmCount > 0 ? 1 : 0) +
-        (subscriptionAlertCount > 0 ? 1 : 0);
+    final totalUrgent = pendingRequests + (awaitingConfirmCount > 0 ? 1 : 0);
 
     if (totalUrgent == 0) {
       return const SizedBox.shrink();
@@ -52,12 +37,7 @@ class UrgentActionsSection extends StatelessWidget {
       children: [
         _buildSectionHeader(totalUrgent),
         const SizedBox(height: AppSpacing.space3),
-        _buildItemsContainer(
-          context,
-          awaitingConfirmCount: awaitingConfirmCount,
-          subscriptionAlertCount: subscriptionAlertCount,
-          hasExpired: hasExpired,
-        ),
+        _buildItemsContainer(context),
       ],
     );
   }
@@ -96,12 +76,7 @@ class UrgentActionsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildItemsContainer(
-    BuildContext context, {
-    required int awaitingConfirmCount,
-    required int subscriptionAlertCount,
-    required bool hasExpired,
-  }) {
+  Widget _buildItemsContainer(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.05),
@@ -114,39 +89,23 @@ class UrgentActionsSection extends StatelessWidget {
             _UrgentItem(
               icon: Icons.person_add,
               iconColor: AppColors.error,
-              title: '레슨 요청 $pendingRequests건 대기',
+              title: AppStrings.lessonRequestPending(pendingRequests),
+              ctaLabel: '요청 보기',
               onTap: () => context.push(
                 AppRoutes.lessonRequests,
                 extra: {'teacherId': teacherId},
               ),
             ),
-          if (pendingBookings > 0)
-            _UrgentItem(
-              icon: Icons.event_note,
-              iconColor: AppColors.warning,
-              title: '예약 승인 $pendingBookings건 대기',
-              onTap: () => context.push(AppRoutes.pendingBookings),
-              showDivider: pendingRequests > 0,
-            ),
           if (awaitingConfirmCount > 0)
             _UrgentItem(
               icon: Icons.payments,
               iconColor: AppColors.warning,
-              title: '입금 확인 $awaitingConfirmCount건 대기',
+              title: AppStrings.paymentConfirmPending(awaitingConfirmCount),
+              ctaLabel: AppStrings.paymentConfirm,
               onTap: () => context.push(
                 '${AppRoutes.proposalConfirm}?teacherId=$teacherId',
               ),
-              showDivider: pendingRequests > 0 || pendingBookings > 0,
-            ),
-          if (subscriptionAlertCount > 0)
-            _UrgentItem(
-              icon: Icons.card_membership,
-              iconColor: hasExpired ? AppColors.error : AppColors.warning,
-              title: '수강권 확인 $subscriptionAlertCount명',
-              onTap: () => context.push(AppRoutes.expiringSubscriptions),
-              showDivider: pendingRequests > 0 ||
-                  pendingBookings > 0 ||
-                  awaitingConfirmCount > 0,
+              showDivider: pendingRequests > 0,
             ),
         ],
       ),
@@ -159,6 +118,7 @@ class _UrgentItem extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String title;
+  final String ctaLabel;
   final VoidCallback onTap;
   final bool showDivider;
 
@@ -166,6 +126,7 @@ class _UrgentItem extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.title,
+    required this.ctaLabel,
     required this.onTap,
     this.showDivider = false,
   });
@@ -204,7 +165,7 @@ class _UrgentItem extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '확인하기',
+                  ctaLabel,
                   style: AppTypography.bodySmall.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
