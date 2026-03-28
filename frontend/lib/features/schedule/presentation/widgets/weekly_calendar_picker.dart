@@ -55,12 +55,25 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   static const _headerHeight = 48.0;
 
   late DateTime _weekStart;
+  late DateTime _now;
+  late Map<int, List<WeeklySchedule>> _schedulesByDay;
   final _selectionLogic = SlotSelectionLogic(maxSlots: 3);
 
   @override
   void initState() {
     super.initState();
     _weekStart = _currentWeekStart();
+    _now = DateTime.now();
+  }
+
+  @override
+  void didUpdateWidget(WeeklyCalendarPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.teacherId != widget.teacherId ||
+        oldWidget.lessonType != widget.lessonType) {
+      _selectionLogic.clear();
+      _notifyParent();
+    }
   }
 
   /// Monday of the current week.
@@ -96,7 +109,6 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   }
 
   bool _isPastSlot(int dayIndex, int hour) {
-    final now = DateTime.now();
     final slotDate = _weekStart.add(Duration(days: dayIndex));
     final slotDateTime = DateTime(
       slotDate.year,
@@ -104,7 +116,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
       slotDate.day,
       hour,
     );
-    return slotDateTime.isBefore(now);
+    return slotDateTime.isBefore(_now);
   }
 
   void _onSlotTapped(int dayIndex, int hour) {
@@ -189,6 +201,15 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         height: 200,
         child: Center(child: Text('선생님의 스케줄 정보가 없습니다')),
       );
+    }
+
+    // Cache for this build cycle
+    _now = DateTime.now();
+    _schedulesByDay = {};
+    for (var i = 0; i < 7; i++) {
+      _schedulesByDay[i] = availability.weeklySchedules
+          .where((s) => s.dayOfWeek == i && s.isActive)
+          .toList();
     }
 
     return Column(
@@ -405,10 +426,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     int hour,
     TeacherAvailability availability,
   ) {
-    // Check teacher availability for this dayOfWeek + hour
-    final daySchedules = availability.weeklySchedules
-        .where((s) => s.dayOfWeek == dayIndex && s.isActive)
-        .toList();
+    final daySchedules = _schedulesByDay[dayIndex] ?? [];
 
     for (final schedule in daySchedules) {
       final schedStart =
@@ -440,7 +458,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   }
 
   Widget _buildSelectionList() {
-    const maxSlots = 3;
+    final maxSlots = _selectionLogic.maxSlots;
     final slots = _selectionLogic.slots;
 
     return Column(
@@ -502,8 +520,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   }
 
   String _slotDisplayLabel(SelectedSlot slot) {
-    const days = ['월', '화', '수', '목', '금', '토', '일'];
-    final dayLabel = days[slot.dayOfWeek.clamp(0, 6)];
+    final dayLabel = _dayLabels[slot.dayOfWeek.clamp(0, 6)];
 
     if (widget.lessonType == LessonRequestType.regular) {
       return '매주 $dayLabel요일 ${slot.startTime}';
