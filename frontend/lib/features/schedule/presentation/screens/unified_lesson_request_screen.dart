@@ -706,9 +706,10 @@ class _UnifiedLessonRequestScreenState
   // -- Helpers --
 
   int? _lookupReferencePrice() {
-    // TODO: Integrate with teacher price table provider
-    // Return null when no matching price entry exists
-    return null;
+    if (_selectedInstrument == null) return null;
+    final settings = ref.read(teacherSettingsProvider).valueOrNull;
+    if (settings == null) return null;
+    return settings.getPrice(_selectedInstrument!, _selectedExperience.name);
   }
 
   String _formatPrice(int price) {
