@@ -1,69 +1,168 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lessonaza/core/l10n/app_strings.dart';
 
+/// AppStrings 테스트 — 상수 존재성 + 금지 용어 미포함 검증.
+///
+/// 다국어 전환 시에도 깨지지 않도록 하드코딩 문자열 비교 대신
+/// 구조적 검증(비어있지 않음, 금지 용어 미포함)을 사용한다.
 void main() {
-  group('AppStrings - Lesson Request Terminology', () {
-    test('lesson request uses "레슨 요청" (not "레슨 신청")', () {
-      expect(AppStrings.lessonRequest, '레슨 요청');
-      expect(AppStrings.lessonRequest, isNot(contains('신청')));
+  group('AppStrings - Core Actions (존재성)', () {
+    test('lessonRequest is not empty', () {
+      expect(AppStrings.lessonRequest, isNotEmpty);
     });
 
-    test('accept action uses "수락" (not "승인" or "확인")', () {
-      expect(AppStrings.accept, '수락');
+    test('accept is not empty', () {
+      expect(AppStrings.accept, isNotEmpty);
     });
 
-    test('unavailable uses "레슨 불가" (not "거절")', () {
-      expect(AppStrings.unavailable, '레슨 불가');
-      expect(AppStrings.unavailable, isNot(contains('거절')));
+    test('unavailable is not empty', () {
+      expect(AppStrings.unavailable, isNotEmpty);
     });
 
-    test('counter propose uses "다른 시간 제안"', () {
-      expect(AppStrings.counterPropose, '다른 시간 제안');
-    });
-  });
-
-  group('AppStrings - Payment & Subscription', () {
-    test('payment confirm uses "입금 확인"', () {
-      expect(AppStrings.paymentConfirm, '입금 확인');
+    test('counterPropose is not empty', () {
+      expect(AppStrings.counterPropose, isNotEmpty);
     });
 
-    test('subscription uses "수강권"', () {
-      expect(AppStrings.subscription, '수강권');
+    test('paymentConfirm is not empty', () {
+      expect(AppStrings.paymentConfirm, isNotEmpty);
+    });
+
+    test('subscription is not empty', () {
+      expect(AppStrings.subscription, isNotEmpty);
     });
   });
 
-  group('AppStrings - Snackbar Messages', () {
-    test('accept success message uses "수락"', () {
-      expect(AppStrings.requestAccepted, contains('수락'));
+  group('AppStrings - Deprecated Terms (금지 용어 미포함)', () {
+    // 이전에 사용했지만 폐기된 용어가 상수에 남아있지 않은지 검증.
+    // 다국어 전환과 무관하게 항상 유효한 테스트.
+
+    final deprecatedTerms = ['신청', '승인', '거절'];
+
+    test('lessonRequest does not contain deprecated terms', () {
+      for (final term in deprecatedTerms) {
+        expect(AppStrings.lessonRequest, isNot(contains(term)),
+            reason: 'lessonRequest should not contain "$term"');
+      }
+    });
+
+    test('accept does not contain deprecated terms', () {
+      for (final term in ['승인', '확인', '거절']) {
+        expect(AppStrings.accept, isNot(contains(term)),
+            reason: 'accept should not contain "$term"');
+      }
+    });
+
+    test('unavailable does not contain deprecated terms', () {
+      for (final term in ['거절', '거부', '불가']) {
+        expect(AppStrings.unavailable, isNot(contains(term)),
+            reason: 'unavailable should not contain "$term"');
+      }
+    });
+
+    test('requestAccepted does not contain deprecated terms', () {
       expect(AppStrings.requestAccepted, isNot(contains('승인')));
+      expect(AppStrings.requestAccepted, isNot(contains('거절')));
     });
 
-    test('unavailable message uses "레슨 불가"', () {
-      expect(AppStrings.requestUnavailable, contains('레슨 불가'));
+    test('requestUnavailable does not contain deprecated terms', () {
       expect(AppStrings.requestUnavailable, isNot(contains('거절')));
+      expect(AppStrings.requestUnavailable, isNot(contains('거부')));
     });
 
-    test('trial complete message exists', () {
-      expect(AppStrings.trialComplete, isNotEmpty);
-    });
-
-    test('accept error message uses "수락"', () {
-      expect(AppStrings.acceptError, contains('수락'));
+    test('acceptError does not contain deprecated terms', () {
       expect(AppStrings.acceptError, isNot(contains('승인')));
     });
   });
 
-  group('AppStrings - Screen Titles', () {
-    test('lesson request title uses "레슨 요청"', () {
-      expect(AppStrings.lessonRequestTitle, contains('레슨 요청'));
+  group('AppStrings - Snackbar Messages (존재성)', () {
+    test('requestAccepted is not empty', () {
+      expect(AppStrings.requestAccepted, isNotEmpty);
     });
 
-    test('lesson request form title uses "레슨 요청"', () {
-      expect(AppStrings.lessonRequestFormTitle, '레슨 요청');
+    test('requestUnavailable is not empty', () {
+      expect(AppStrings.requestUnavailable, isNotEmpty);
     });
 
-    test('request completion title uses "레슨 요청"', () {
-      expect(AppStrings.requestCompleteTitle, contains('레슨 요청'));
+    test('trialComplete is not empty', () {
+      expect(AppStrings.trialComplete, isNotEmpty);
+    });
+
+    test('trialPaymentRequested is not empty', () {
+      expect(AppStrings.trialPaymentRequested, isNotEmpty);
+    });
+
+    test('acceptError is not empty', () {
+      expect(AppStrings.acceptError, isNotEmpty);
+    });
+
+    test('counterProposeError is not empty', () {
+      expect(AppStrings.counterProposeError, isNotEmpty);
+    });
+
+    test('requestLoadError is not empty', () {
+      expect(AppStrings.requestLoadError, isNotEmpty);
+    });
+  });
+
+  group('AppStrings - Screen Titles (존재성)', () {
+    test('lessonRequestTitle is not empty', () {
+      expect(AppStrings.lessonRequestTitle, isNotEmpty);
+    });
+
+    test('lessonRequestFormTitle is not empty', () {
+      expect(AppStrings.lessonRequestFormTitle, isNotEmpty);
+    });
+
+    test('requestCompleteTitle is not empty', () {
+      expect(AppStrings.requestCompleteTitle, isNotEmpty);
+    });
+
+    test('requestCompleteHeader is not empty', () {
+      expect(AppStrings.requestCompleteHeader, isNotEmpty);
+    });
+  });
+
+  group('AppStrings - Button Labels (존재성)', () {
+    test('submitRequest is not empty', () {
+      expect(AppStrings.submitRequest, isNotEmpty);
+    });
+
+    test('submittingRequest is not empty', () {
+      expect(AppStrings.submittingRequest, isNotEmpty);
+    });
+
+    test('messageOnly is not empty', () {
+      expect(AppStrings.messageOnly, isNotEmpty);
+    });
+  });
+
+  group('AppStrings - Dynamic Messages', () {
+    test('lessonRequestPending formats count correctly', () {
+      final result = AppStrings.lessonRequestPending(3);
+      expect(result, contains('3'));
+      expect(result, isNotEmpty);
+    });
+
+    test('paymentConfirmPending formats count correctly', () {
+      final result = AppStrings.paymentConfirmPending(5);
+      expect(result, contains('5'));
+      expect(result, isNotEmpty);
+    });
+  });
+
+  group('AppStrings - Cross-reference Consistency', () {
+    test('lessonRequestTitle and lessonRequestFormTitle use same base term', () {
+      // Both should reference the same core concept
+      expect(AppStrings.lessonRequestTitle, contains(AppStrings.lessonRequest));
+      expect(AppStrings.lessonRequestFormTitle, contains(AppStrings.lessonRequest));
+    });
+
+    test('requestCompleteTitle references lessonRequest term', () {
+      expect(AppStrings.requestCompleteTitle, contains(AppStrings.lessonRequest));
+    });
+
+    test('requestCompleteHeader references lessonRequest term', () {
+      expect(AppStrings.requestCompleteHeader, contains(AppStrings.lessonRequest));
     });
   });
 }

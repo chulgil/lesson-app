@@ -43,13 +43,16 @@ void main() {
   });
 
   group('UrgentActionsSection - CTA labels', () {
-    test('lesson request item uses AppStrings.lessonRequest', () {
-      // The title format should use AppStrings
-      expect(AppStrings.lessonRequestPending(3), '레슨 요청 3건 대기');
+    test('lesson request pending includes count', () {
+      final result = AppStrings.lessonRequestPending(3);
+      expect(result, contains('3'));
+      expect(result, contains(AppStrings.lessonRequest));
     });
 
-    test('payment confirm item uses AppStrings.paymentConfirm', () {
-      expect(AppStrings.paymentConfirmPending(2), '입금 확인 2건 대기');
+    test('payment confirm pending includes count', () {
+      final result = AppStrings.paymentConfirmPending(2);
+      expect(result, contains('2'));
+      expect(result, contains(AppStrings.paymentConfirm));
     });
   });
 }

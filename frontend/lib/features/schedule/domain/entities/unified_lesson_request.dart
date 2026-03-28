@@ -235,6 +235,9 @@ class TimeSlotOption extends HiveObject {
     const days = ['월', '화', '수', '목', '금', '토', '일'];
     return days[dayOfWeek.clamp(0, 6)];
   }
+
+  /// Display label: "토요일 14:00 ~ 15:00"
+  String get displayLabel => '$dayLabel요일 $startTime ~ $endTime';
 }
 
 /// A negotiation turn (proposal or counter-proposal)

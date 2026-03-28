@@ -117,6 +117,11 @@ class RemoteSettingsRepository implements SettingsRepository {
   }
 
   @override
+  Future<void> updateBookingGuidanceMessage(String? message) async {
+    await _updateSettings({'booking_guidance_message': message});
+  }
+
+  @override
   Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable) async {
     await _updateSettings({'lesson_price_table': priceTable});
   }

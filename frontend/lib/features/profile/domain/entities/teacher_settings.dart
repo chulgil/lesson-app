@@ -32,6 +32,19 @@ class TeacherSettings {
   /// Whether trial lessons are free
   final bool trialLessonFree;
 
+  /// Custom booking guidance message shown to students in the lesson request form.
+  /// null or empty → default message is used.
+  final String? bookingGuidanceMessage;
+
+  /// Default booking guidance message
+  static const defaultGuidanceMessage = '희망레슨시간은 상담가능하니 편하게 메시지 주세요.';
+
+  /// Returns custom message if set, otherwise default
+  String get effectiveGuidanceMessage =>
+      (bookingGuidanceMessage != null && bookingGuidanceMessage!.isNotEmpty)
+          ? bookingGuidanceMessage!
+          : defaultGuidanceMessage;
+
   const TeacherSettings({
     required this.id,
     required this.instruments,
@@ -45,6 +58,7 @@ class TeacherSettings {
     this.minBookingHours = 24,
     this.lessonPriceTable,
     this.trialLessonFree = false,
+    this.bookingGuidanceMessage,
   });
 
   factory TeacherSettings.fromJson(Map<String, dynamic> json) =>
@@ -108,6 +122,7 @@ class TeacherSettings {
     int? minBookingHours,
     Map<String, Map<String, int>>? lessonPriceTable,
     bool? trialLessonFree,
+    String? bookingGuidanceMessage,
   }) {
     return TeacherSettings(
       id: id ?? this.id,
@@ -122,6 +137,7 @@ class TeacherSettings {
       minBookingHours: minBookingHours ?? this.minBookingHours,
       lessonPriceTable: lessonPriceTable ?? this.lessonPriceTable,
       trialLessonFree: trialLessonFree ?? this.trialLessonFree,
+      bookingGuidanceMessage: bookingGuidanceMessage ?? this.bookingGuidanceMessage,
     );
   }
 }

@@ -18,7 +18,7 @@ class AppStrings {
   static const accept = '수락';
 
   /// 선생님이 레슨을 거부하는 행위 (부드러운 톤)
-  static const unavailable = '레슨 불가';
+  static const unavailable = '다음에';
 
   /// 선생님이 다른 시간을 제안하는 행위
   static const counterPropose = '다른 시간 제안';
@@ -48,8 +48,8 @@ class AppStrings {
   /// 수락 성공
   static const requestAccepted = '레슨 요청을 수락했습니다';
 
-  /// 레슨 불가 처리 완료
-  static const requestUnavailable = '레슨 불가 처리를 완료했습니다';
+  /// 다음에 처리 완료
+  static const requestUnavailable = '안내를 전달했습니다';
 
   /// 체험레슨(무료) 예약 완료
   static const trialComplete = '체험레슨 예약이 완료되었습니다';
@@ -76,6 +76,14 @@ class AppStrings {
 
   /// 메시지만 전달 (레슨 불가 시)
   static const messageOnly = '메시지만 전달';
+
+  // ── Info Sections (Read-only, Naver benchmark) ─────────────
+
+  /// 예상 레슨 시간 라벨
+  static const estimatedDuration = '예상 레슨 시간';
+
+  /// 취소/변경 정책 안내
+  static const cancellationPolicy = '레슨 24시간 전까지 변경 가능합니다';
 
   // ── Urgent Actions (Dashboard) ────────────────────────────
 

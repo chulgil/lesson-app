@@ -18,6 +18,7 @@ abstract class SettingsRepository {
   Future<TeacherSettings> updateBreakTime(int minutes);
   Future<TeacherSettings> updateMinBookingHours(int hours);
   Future<void> updateTrialLessonFree(bool value);
+  Future<void> updateBookingGuidanceMessage(String? message);
   Future<void> updatePriceTable(Map<String, Map<String, int>> priceTable);
 }
 
@@ -291,6 +292,15 @@ class MockSettingsRepository implements SettingsRepository {
     await Future.delayed(const Duration(milliseconds: 200));
     _settings = _settings.copyWith(
       trialLessonFree: value,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  @override
+  Future<void> updateBookingGuidanceMessage(String? message) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _settings = _settings.copyWith(
+      bookingGuidanceMessage: message,
       updatedAt: DateTime.now(),
     );
   }
