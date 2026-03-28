@@ -105,6 +105,8 @@ class _UnifiedLessonRequestScreenState
                 const SizedBox(height: AppSpacing.space4),
                 _buildReturningBanner(),
               ],
+              const SizedBox(height: AppSpacing.space4),
+              _buildGuidanceMessage(),
               const SizedBox(height: AppSpacing.space6),
               _buildLessonTypeSection(),
               const SizedBox(height: AppSpacing.space6),
@@ -205,6 +207,40 @@ class _UnifiedLessonRequestScreenState
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.info,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -- Guidance message (Naver benchmark) --
+
+  Widget _buildGuidanceMessage() {
+    // TODO: Replace with teacher's custom bookingGuidanceMessage when available
+    const defaultMessage = '희망레슨시간은 상담가능하니 편하게 메시지 주세요.';
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.chat_bubble_outline, size: 18, color: AppColors.primary),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: Text(
+              defaultMessage,
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.primary,
+                height: 1.4,
               ),
             ),
           ),

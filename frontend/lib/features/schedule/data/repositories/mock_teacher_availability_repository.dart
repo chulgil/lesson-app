@@ -79,6 +79,70 @@ class MockTeacherAvailabilityRepository
 
     _availabilities[teacherId] = availability;
 
+    // teacher_2: 월/수/금 오전+오후
+    _availabilities['teacher_2'] = TeacherAvailability(
+      id: _uuid.v4(),
+      teacherId: 'teacher_2',
+      slotDurationMinutes: 60,
+      slotStartInterval: 60,
+      breakTimeBetweenLessons: 10,
+      weeklySchedules: [
+        WeeklySchedule(
+          id: _uuid.v4(),
+          dayOfWeek: 0, // Monday
+          startTime: '10:00',
+          endTime: '18:00',
+          createdAt: now,
+        ),
+        WeeklySchedule(
+          id: _uuid.v4(),
+          dayOfWeek: 2, // Wednesday
+          startTime: '10:00',
+          endTime: '18:00',
+          createdAt: now,
+        ),
+        WeeklySchedule(
+          id: _uuid.v4(),
+          dayOfWeek: 4, // Friday
+          startTime: '10:00',
+          endTime: '18:00',
+          createdAt: now,
+        ),
+      ],
+      exceptions: [],
+      createdAt: now,
+    );
+
+    // teacher_3 ~ teacher_8: teacher_1과 동일한 스케줄 공유 (간단 설정)
+    for (final tid in ['teacher_3', 'teacher_4', 'teacher_5',
+                        'teacher_6', 'teacher_7', 'teacher_8']) {
+      _availabilities[tid] = TeacherAvailability(
+        id: _uuid.v4(),
+        teacherId: tid,
+        slotDurationMinutes: 60,
+        slotStartInterval: 60,
+        breakTimeBetweenLessons: 10,
+        weeklySchedules: [
+          WeeklySchedule(
+            id: _uuid.v4(),
+            dayOfWeek: 1, // Tuesday
+            startTime: '14:00',
+            endTime: '18:00',
+            createdAt: now,
+          ),
+          WeeklySchedule(
+            id: _uuid.v4(),
+            dayOfWeek: 3, // Thursday
+            startTime: '14:00',
+            endTime: '18:00',
+            createdAt: now,
+          ),
+        ],
+        exceptions: [],
+        createdAt: now,
+      );
+    }
+
     // Add some mock lesson history for recommendations
     _lessonHistory['student_1'] = [
       _MockLessonHistory(
