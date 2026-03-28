@@ -159,6 +159,21 @@ class AppStrings {
   /// 레슨 요청 관리 설명
   static const lessonRequestManagementDesc = '받은 레슨 요청 확인 및 관리';
 
+  // ── Decline Bottom Sheet ───────────────────────────────────
+
+  /// 바텀시트 제목
+  static const declineBottomSheetTitle = '이 시간에 레슨이 어렵습니다';
+
+  /// 메시지 입력 힌트
+  static const messageHint = '학생에게 전달할 메시지';
+
+  /// 거절 시 디폴트 메시지
+  static const declineDefaultMessage =
+      '현재 가능한 시간이 없어 이번에는 어렵습니다.';
+
+  /// 대안 제안 시 디폴트 메시지
+  static const proposeDefaultMessage = '다른 시간을 제안드립니다.';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청

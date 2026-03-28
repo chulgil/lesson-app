@@ -45,7 +45,7 @@ class _DeclineBottomSheet extends StatefulWidget {
 
 class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
   final _messageController = TextEditingController(
-    text: '현재 가능한 시간이 없어 이번에는 어렵습니다.',
+    text: AppStrings.declineDefaultMessage,
   );
 
   @override
@@ -87,19 +87,19 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
 
               // Title
               Text(
-                '이 시간에 레슨이 어렵습니다',
+                AppStrings.declineBottomSheetTitle,
                 style: AppTypography.headingMedium,
               ),
               const SizedBox(height: AppSpacing.space4),
 
-              // Message input
+              // Message input (free text, editable)
               TextField(
                 controller: _messageController,
                 maxLines: 3,
                 maxLength: 200,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: '학생에게 전달할 메시지',
+                  hintText: AppStrings.messageHint,
                   counterText: '',
                 ),
               ),
@@ -114,10 +114,10 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                       onPressed: _sendMessageOnly,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondaryLight,
-                        side: BorderSide(color: AppColors.borderLight),
+                        side: const BorderSide(color: AppColors.borderLight),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(AppStrings.messageOnly),
+                      child: const Text(AppStrings.messageOnly),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -129,7 +129,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: Text(AppStrings.counterPropose),
+                      child: const Text(AppStrings.counterPropose),
                     ),
                   ),
                 ],
@@ -143,7 +143,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
 
   void _sendMessageOnly() {
     final message = _messageController.text.trim().isEmpty
-        ? '현재 가능한 시간이 없어 이번에는 어렵습니다.'
+        ? AppStrings.declineDefaultMessage
         : _messageController.text.trim();
 
     Navigator.pop<DeclineResult>(
@@ -153,9 +153,11 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
   }
 
   Future<void> _suggestAlternative() async {
-    final message = _messageController.text.trim().isEmpty
-        ? '현재 가능한 시간이 없어 이번에는 어렵습니다.'
-        : _messageController.text.trim();
+    // Switch to propose default if user hasn't modified the decline default
+    final currentText = _messageController.text.trim();
+    final message = currentText.isEmpty || currentText == AppStrings.declineDefaultMessage
+        ? AppStrings.proposeDefaultMessage
+        : currentText;
 
     final suggestedSlots = await Navigator.push<List<TimeSlot>>(
       context,
