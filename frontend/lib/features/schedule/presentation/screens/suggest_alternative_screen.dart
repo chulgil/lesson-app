@@ -5,6 +5,7 @@ import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 import '../providers/week_lessons_provider.dart';
@@ -200,12 +201,7 @@ class _SuggestAlternativeScreenState
         final lessonStart = _parseTimeMinutes(lesson.startTime);
         final lessonEnd = _lessonEndMinutes(lesson);
         if (startMinutes < lessonEnd && endMinutes > lessonStart) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('이미 수업이 있는 시간입니다'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          showErrorSnackBar(context, '이미 수업이 있는 시간입니다');
           return;
         }
       }

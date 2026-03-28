@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/lesson_request.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
@@ -211,21 +212,11 @@ class _UnifiedRequestsSection extends ConsumerWidget {
         request.studentId,
       );
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('레슨 신청을 승인했습니다'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        showSuccessSnackBar(context, '레슨 신청을 승인했습니다');
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('오류가 발생했습니다'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        showErrorSnackBar(context);
       }
     }
   }
@@ -279,25 +270,15 @@ class _UnifiedRequestsSection extends ConsumerWidget {
 
       if (context.mounted) {
         ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.suggestedSlots.isNotEmpty
-                ? '대안 시간과 함께 안내가 전달되었습니다'
-                : '레슨 신청을 거절했습니다'),
-            backgroundColor: result.suggestedSlots.isNotEmpty
-                ? AppColors.success
-                : AppColors.textSecondaryLight,
-          ),
-        );
+        if (result.suggestedSlots.isNotEmpty) {
+          showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
+        } else {
+          showInfoSnackBar(context, '레슨 신청을 거절했습니다');
+        }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('오류가 발생했습니다'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        showErrorSnackBar(context);
       }
     }
   }
@@ -317,21 +298,11 @@ class _UnifiedRequestsSection extends ConsumerWidget {
           request.studentId,
         );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('체험레슨 예약이 완료되었습니다'),
-              backgroundColor: AppColors.success,
-            ),
-          );
+          showSuccessSnackBar(context, '체험레슨 예약이 완료되었습니다');
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('오류가 발생했습니다'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          showErrorSnackBar(context);
         }
       }
     } else {

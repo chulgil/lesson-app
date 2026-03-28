@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_utils.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/lesson_request.dart';
 import '../providers/lesson_request_providers.dart';
 import 'decline_bottom_sheet.dart';
@@ -411,23 +412,16 @@ class LessonRequestCard extends ConsumerWidget {
           );
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.suggestedSlots.isNotEmpty
-                ? '대안 시간과 함께 안내가 전달되었습니다'
-                : '학생에게 안내 메시지를 전달했습니다'),
-            backgroundColor: AppColors.textSecondaryLight,
-          ),
+        showInfoSnackBar(
+          context,
+          result.suggestedSlots.isNotEmpty
+              ? '대안 시간과 함께 안내가 전달되었습니다'
+              : '학생에게 안내 메시지를 전달했습니다',
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        showErrorSnackBar(context, '오류가 발생했습니다. 다시 시도해주세요.');
       }
     }
   }
