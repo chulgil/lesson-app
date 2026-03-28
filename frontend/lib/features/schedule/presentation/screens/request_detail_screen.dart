@@ -74,7 +74,7 @@ class RequestDetailScreen extends ConsumerWidget {
                   opponentName: viewerRole == 'teacher'
                       ? '학생' // TODO: Fetch student name from student provider
                       : '선생님',
-                  onAccept: () => _handleAccept(ref, request),
+                  onAccept: () => _handleAccept(context, ref, request),
                   onCounterPropose: () =>
                       _handleCounterPropose(context, request),
                   onModify: () => _handleModify(context, request),
@@ -219,13 +219,25 @@ class RequestDetailScreen extends ConsumerWidget {
     };
   }
 
-  void _handleAccept(WidgetRef ref, UnifiedLessonRequest request) {
-    final actions = UnifiedLessonRequestActions(ref);
-    actions.approveRequest(
-      request.id,
-      request.teacherId,
-      request.studentId,
-    );
+  Future<void> _handleAccept(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.approveRequest(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('수락 처리 중 오류가 발생했습니다')),
+        );
+      }
+    }
   }
 
   void _handleCounterPropose(

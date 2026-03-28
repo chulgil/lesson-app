@@ -147,7 +147,8 @@ class UnifiedLessonRequestActions {
       createdAt: DateTime.now(),
     ));
 
-    _invalidateProviders(request.teacherId, request.studentId);
+    _invalidateProviders(request.teacherId, request.studentId,
+        requestId: result.id);
     return result;
   }
 
@@ -168,7 +169,7 @@ class UnifiedLessonRequestActions {
       createdAt: DateTime.now(),
     ));
 
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -191,7 +192,7 @@ class UnifiedLessonRequestActions {
       createdAt: DateTime.now(),
     ));
 
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -203,24 +204,14 @@ class UnifiedLessonRequestActions {
     required List<TimeSlotOption> slots,
     String? message,
   }) async {
+    // Repository internally creates the event — no duplicate here
     final result = await _repository.proposeAlternatives(
       requestId,
       slots: slots,
       message: message,
     );
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
-      eventType: RequestEventType.proposeAlternative,
-      suggestedSlots: slots,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
-
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -232,24 +223,14 @@ class UnifiedLessonRequestActions {
     required int selectedSlotIndex,
     String? message,
   }) async {
+    // Repository internally creates the event — no duplicate here
     final result = await _repository.acceptAlternative(
       requestId,
       selectedSlotIndex: selectedSlotIndex,
       message: message,
     );
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.acceptAlternative,
-      selectedSlotIndex: selectedSlotIndex,
-      message: message,
-      createdAt: DateTime.now(),
-    ));
-
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -261,24 +242,14 @@ class UnifiedLessonRequestActions {
     required TimeSlotOption slot,
     String? message,
   }) async {
+    // Repository internally creates the event — no duplicate here
     final result = await _repository.counterPropose(
       requestId,
       slot: slot,
       message: message,
     );
 
-    await _repository.addEvent(RequestEvent(
-      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
-      requestId: requestId,
-      actorType: ProposerRole.student,
-      actorId: studentId,
-      eventType: RequestEventType.counterPropose,
-      suggestedSlots: [slot],
-      message: message,
-      createdAt: DateTime.now(),
-    ));
-
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -305,7 +276,7 @@ class UnifiedLessonRequestActions {
       createdAt: DateTime.now(),
     ));
 
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -342,7 +313,7 @@ class UnifiedLessonRequestActions {
       createdAt: DateTime.now(),
     ));
 
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
@@ -368,16 +339,23 @@ class UnifiedLessonRequestActions {
     );
     final result = await _repository.update(updated);
 
-    _invalidateProviders(teacherId, studentId);
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
     return result;
   }
 
-  void _invalidateProviders(String teacherId, String studentId) {
+  void _invalidateProviders(
+    String teacherId,
+    String studentId, {
+    String? requestId,
+  }) {
     ref.invalidate(teacherUnifiedRequestsProvider(teacherId));
     ref.invalidate(pendingUnifiedRequestsProvider(teacherId));
     ref.invalidate(pendingUnifiedRequestCountProvider(teacherId));
     ref.invalidate(studentUnifiedRequestsProvider(studentId));
     ref.invalidate(todayRequestsProvider(teacherId));
-    // Note: requestEventsProvider is per-requestId, invalidated by callers if needed
+    if (requestId != null) {
+      ref.invalidate(requestEventsProvider(requestId));
+      ref.invalidate(unifiedRequestByIdProvider(requestId));
+    }
   }
 }
