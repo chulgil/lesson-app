@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -40,7 +41,7 @@ class RequestCompletionScreen extends StatelessWidget {
 
   static const _steps = [
     _StepData(
-      title: '레슨 신청 완료',
+      title: AppStrings.requestCompleteTitle,
       description: '선생님에게 요청이 전송되었습니다',
     ),
     _StepData(
@@ -108,7 +109,7 @@ class RequestCompletionScreen extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.space4),
         Text(
-          '레슨 신청 완료!',
+          AppStrings.requestCompleteHeader,
           style: AppTypography.headingLarge.copyWith(
             color: AppColors.textPrimaryLight,
           ),

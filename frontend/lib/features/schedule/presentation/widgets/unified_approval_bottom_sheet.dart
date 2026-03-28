@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -430,7 +431,7 @@ class _UnifiedApprovalBottomSheetState
                     ),
                   )
                 : Text(
-                    '수락',
+                    AppStrings.accept,
                     style:
                         AppTypography.button.copyWith(color: Colors.white),
                   ),
@@ -524,7 +525,7 @@ class _UnifiedApprovalBottomSheetState
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('승인 처리 중 오류가 발생했습니다'),
+          content: Text(AppStrings.acceptError),
           backgroundColor: AppColors.error,
         ),
       );
@@ -560,8 +561,8 @@ class _UnifiedApprovalBottomSheetState
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('역제안 전송 중 오류가 발생했습니다'),
+        SnackBar(
+          content: Text(AppStrings.counterProposeError),
           backgroundColor: AppColors.error,
         ),
       );

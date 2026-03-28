@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -89,7 +90,7 @@ class _UnifiedLessonRequestScreenState
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('레슨 신청'),
+        title: Text(AppStrings.lessonRequestFormTitle),
         backgroundColor: AppColors.backgroundLight,
         elevation: 0,
       ),
@@ -528,7 +529,7 @@ class _UnifiedLessonRequestScreenState
                 ),
               )
             : const Icon(Icons.send),
-        label: Text(_isSubmitting ? '신청 중...' : '레슨 신청하기'),
+        label: Text(_isSubmitting ? AppStrings.submittingRequest : AppStrings.submitRequest),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,

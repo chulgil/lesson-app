@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -116,7 +117,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                         side: BorderSide(color: AppColors.borderLight),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('메시지만 전달'),
+                      child: Text(AppStrings.messageOnly),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -128,7 +129,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('다른 시간 제안'),
+                      child: Text(AppStrings.counterPropose),
                     ),
                   ),
                 ],
