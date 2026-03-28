@@ -1,85 +1,57 @@
-# #216 레슨요청 개편: 홈 리스트 & 바텀시트 & 레거시 제거 — 구현 계획
+# 레슨요청 개편 — 전체 진행 상황
 
-> 확정일: 2026-03-29
-> 범위: 홈 섹션 교체 + 리스트 아이템 + 바텀시트 개편 + 프로필 메뉴 + 레거시 삭제
-> 복잡도: HIGH (~600줄 신규 + ~200줄 수정 + ~1500줄 삭제, 12개 파일)
+> 마지막 업데이트: 2026-03-29
 > PAD: docs/specs/lesson_request_redesign_pad.md
-> Issue: #216 (blocked by #215 ✅)
+> API 스펙: docs/specs/schedule/lesson_request_api_spec.md
 
-## Phase 구성
+## 이슈 상태
 
-### Phase 1: 리스트 아이템 위젯 + 홈 섹션
-**파일 3개 (신규 2 + 수정 1)**
+| 이슈 | 제목 | 상태 | 커밋 |
+|------|------|------|------|
+| #215 | 엔티티 & 상세화면 코어 | ✅ Closed | 7 |
+| #216 | 홈 리스트 & 바텀시트 & 레거시 제거 | ✅ Closed | 4 |
+| #217 | 전체 화면 (달력+필터) & API 스펙 | 🔧 In Progress | 3 |
+| #218 | 학생 측 전체 (2차) | 🔧 In Progress | 2 |
 
-1-1. `request_list_item.dart` 신규
-```
-features/schedule/presentation/widgets/request_list_item.dart
-```
-- 왼쪽: 타입 배지 (체험/정규/회차권/재수강)
-- 가운데: 학원/개인 + 학생이름·악기·목표·레벨 + 최근 메시지 (3줄 truncate)
-- 오른쪽: 상태 칩 (검정/error/success/warning)
-- onTap → requestDetail 라우트
+## 완료 항목
 
-1-2. `lesson_request_section.dart` 신규
-```
-features/home/presentation/widgets/lesson_request_section.dart
-```
-- "레슨요청 (N)" 헤더 (_buildTodayLessonsHeader 패턴 참조)
-- todayRequestsProvider 사용 (Phase 3에서 만든 것)
-- 최대 3개 + "N개 요청 더보기" 버튼
-- 0건 → 섹션 숨김
+### #215 (✅ Closed)
+- [x] RequestEvent 엔티티 (HiveType 130-131)
+- [x] UnifiedLessonRequest 수정 (package, academyId, isExpiredByDate)
+- [x] Mock 10개 경계값 시나리오
+- [x] Provider 리팩토링 (requestEventsProvider, todayRequestsProvider, cancel, modify)
+- [x] 상세 화면 (CurrentRequestBox + RequestHistoryChat + RequestDetailScreen)
+- [x] 라우팅 (/schedule/request/:id)
 
-1-3. `dashboard_tab.dart` 수정
-- UrgentActionsSection → LessonRequestSection 교체
-- import 변경: lesson_request_providers → unified 프로바이더
-- pendingRequestsAsync 제거 (더 이상 사용 안 함)
+### #216 (✅ Closed)
+- [x] LessonRequestSection (UrgentActionsSection 대체)
+- [x] RequestListItem (타입 배지 + 상태 칩)
+- [x] 프로필 "레슨 요청 관리" 메뉴
+- [x] 바텀시트 디폴트 메시지 분기 (거절/제안)
+- [x] AppStrings 다국어 대비 30+ 상수
+- [x] 레거시 10개 파일 완전 삭제 (-3,775줄)
 
-### Phase 2: 프로필 메뉴 + 바텀시트 개편
-**파일 2개 수정**
+### #217 (🔧 진행 중)
+- [x] RequestFilter 엔티티 (상태/기간/정렬/페이지네이션)
+- [x] AllLessonRequestsScreen (달력+필터+정렬)
+- [x] API 스펙 6개 엔드포인트 정의
+- [ ] 무한 스크롤 페이지네이션 (서버 API 필요)
+- [ ] 푸시 알림 + 만료 타이머 (서버 필요)
 
-2-1. `profile_tab.dart` 수정
-- "레슨 운영" 그룹 첫 번째에 "레슨 요청 관리" 메뉴 추가
-- icon: Icons.assignment, route: AppRoutes.lessonRequests
+### #218 (🔧 진행 중)
+- [x] studentTodayRequestsProvider
+- [x] LessonRequestSection 학생용 (viewerRole 분기)
+- [x] 학생 대시보드 통합
+- [x] 시간 그리드 이름 마스킹 (hideStudentNames)
+- [x] 레거시 배너/프로그레스 카드 삭제
+- [x] my_lesson_requests_screen 통합 전용 전환
+- [ ] 학생 전체 화면 라우팅 (AllLessonRequestsScreen 학생용)
 
-2-2. `decline_bottom_sheet.dart` 수정
-- 고정 메시지 → 자유 입력 TextField (디폴트 텍스트 유지)
-- 거절: 디폴트 "현재 가능한 시간이 없어 이번에는 어렵습니다."
-- 대안 제안: 디폴트 "다른 시간을 제안드립니다"
+## 세션 통계
 
-### Phase 3: 레거시 제거
-**파일 5개 삭제 + 참조 정리**
-
-3-1. 삭제 대상:
-- `domain/entities/lesson_request.dart`
-- `presentation/widgets/lesson_request_card.dart`
-- `presentation/widgets/lesson_request_list.dart`
-- `presentation/providers/lesson_request_providers.dart` + `.g.dart`
-- `home/presentation/widgets/urgent_actions_section.dart`
-
-3-2. 참조 정리:
-- `lesson_requests_screen.dart` — 레거시 섹션 제거, 통합 요청만 표시
-- `my_lesson_requests_screen.dart` — 레거시 import 제거
-- `schedule_routes.dart` — 레거시 import 정리
-
-## 의존성
-
-```
-Phase 1 (위젯+홈) → Phase 2 (메뉴+바텀시트) → Phase 3 (레거시 삭제)
-모두 순차 (삭제 전 대체 먼저)
-```
-
-## 검증 계획
-
-```bash
-flutter analyze           # 에러 0
-flutter test test/features/schedule/  # 기존 테스트 통과
-flutter run               # 홈화면 레슨요청 섹션 표시 확인
-```
-
----
-
-## 이전 계획
-
-### #215 레슨요청 개편: 엔티티 & 상세화면 코어 (2026-03-29, ✅ 완료)
-
-> Phase 1-6 모두 완료, 7개 커밋 push
+- 총 커밋: 19개
+- 신규 코드: ~3,500줄
+- 삭제 코드: ~3,800줄 (순 -300줄)
+- 테스트: 48개 신규 (186개 전체 통과)
+- 신규 파일: 12개
+- 삭제 파일: 11개
