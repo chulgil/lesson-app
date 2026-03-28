@@ -83,7 +83,7 @@ class MockLessonRequestRepository implements LessonRequestRepository {
       status: LessonRequestStatus.declined,
       createdAt: now.subtract(const Duration(days: 5)),
       expiresAt: now.add(const Duration(days: 2)),
-      declineReason: '죄송합니다. 현재 토요일 오전은 스케줄이 꽉 차서 어렵습니다. 오후 시간은 어떠세요?',
+      declineReason: '죄송합니다. 현재 토요일 오전은 어렵습니다. 오후 시간은 어떠세요?',
       statusUpdatedAt: now.subtract(const Duration(days: 4)),
     );
     _requests[request4.id] = request4;
@@ -180,7 +180,7 @@ class MockLessonRequestRepository implements LessonRequestRepository {
       status: LessonRequestStatus.declined,
       createdAt: now.subtract(const Duration(days: 5)),
       expiresAt: now.add(const Duration(days: 2)),
-      declineReason: '현재 스케줄이 꽉 차서 다음 달에 연락드릴게요!',
+      declineReason: '현재 가능한 시간이 없어 다음 달에 연락드릴게요!',
       statusUpdatedAt: now.subtract(const Duration(days: 3)),
     );
     _requests[request9.id] = request9;

@@ -442,7 +442,7 @@ class LessonRequestCard extends ConsumerWidget {
                   controller: reasonController,
                   maxLines: 3,
                   decoration: const InputDecoration(
-                    hintText: '예: 현재 스케줄이 꽉 차서 다음 기회에 연락드릴게요.',
+                    hintText: '예: 현재 가능한 시간이 없어 이번에는 어렵습니다.',
                     border: OutlineInputBorder(),
                   ),
                 ),

@@ -98,7 +98,7 @@ class MockUnifiedLessonRequestRepository
       preferredTime: '10:00',
       preferredDuration: 30,
       status: UnifiedRequestStatus.rejected,
-      rejectionReason: '스케줄이 꽉 차서 다음에 신청해주세요',
+      rejectionReason: '현재 가능한 시간이 없어 이번에는 어렵습니다. 자리가 나면 안내드릴게요!',
       createdAt: now.subtract(const Duration(days: 2)),
     ));
 
@@ -333,7 +333,7 @@ class MockUnifiedLessonRequestRepository
     }
     final updated = request.copyWith(
       status: UnifiedRequestStatus.rejected,
-      rejectionReason: reason ?? '스케줄이 꽉 차서 다음에 신청해주세요',
+      rejectionReason: reason ?? '현재 가능한 시간이 없어 이번에는 어렵습니다. 자리가 나면 안내드릴게요!',
     );
     _requests[id] = updated;
     return updated;
