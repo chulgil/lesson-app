@@ -105,31 +105,50 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
               ),
               const SizedBox(height: AppSpacing.space4),
 
-              // CTA buttons
+              // CTA buttons (same design as CurrentRequestBox)
               Row(
                 children: [
-                  // Send message only (complete rejection, 5%)
+                  // Send message only (complete rejection)
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _sendMessageOnly,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.textSecondaryLight,
+                        minimumSize:
+                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
                         side: const BorderSide(color: AppColors.borderLight),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusMedium),
+                        ),
                       ),
-                      child: const Text(AppStrings.messageOnly),
+                      child: Text(
+                        AppStrings.messageOnly,
+                        style: AppTypography.buttonSmall.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
-                  // Suggest alternative times (95%)
+                  // Suggest alternative times
                   Expanded(
-                    flex: 2,
-                    child: FilledButton(
+                    child: ElevatedButton(
                       onPressed: _suggestAlternative,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize:
+                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusMedium),
+                        ),
                       ),
-                      child: const Text(AppStrings.counterPropose),
+                      child: Text(
+                        AppStrings.counterPropose,
+                        style: AppTypography.buttonSmall.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ],
