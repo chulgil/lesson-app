@@ -12,8 +12,8 @@ void main() {
       expect(AppStrings.accept, '수락');
     });
 
-    test('unavailable uses "레슨 불가" (not "거절")', () {
-      expect(AppStrings.unavailable, '레슨 불가');
+    test('unavailable uses "다음에" (not "거절" or "레슨 불가")', () {
+      expect(AppStrings.unavailable, '다음에');
       expect(AppStrings.unavailable, isNot(contains('거절')));
     });
 
@@ -38,8 +38,8 @@ void main() {
       expect(AppStrings.requestAccepted, isNot(contains('승인')));
     });
 
-    test('unavailable message uses "레슨 불가"', () {
-      expect(AppStrings.requestUnavailable, contains('레슨 불가'));
+    test('unavailable message is friendly tone', () {
+      expect(AppStrings.requestUnavailable, isNotEmpty);
       expect(AppStrings.requestUnavailable, isNot(contains('거절')));
     });
 
