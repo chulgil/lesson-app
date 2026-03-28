@@ -66,8 +66,12 @@ class RequestDetailScreen extends ConsumerWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                // Profile + type badges
-                _buildProfileCard(request),
+                // Profile card (same as list item layout)
+                _buildProfileCard(
+                  request,
+                  studentNames[request.studentId] ?? AppStrings.student,
+                  academyNames[request.academyId],
+                ),
 
                 // Current request action box
                 CurrentRequestBox(
@@ -102,8 +106,16 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Profile card with type/status badges
-  Widget _buildProfileCard(UnifiedLessonRequest request) {
+  /// Profile card — same layout as RequestListItem (avatar + source/type + info + status)
+  Widget _buildProfileCard(
+    UnifiedLessonRequest request,
+    String studentName,
+    String? academyName,
+  ) {
+    final source = request.isAcademy
+        ? (academyName ?? AppStrings.academy)
+        : AppStrings.individualLesson;
+
     return Container(
       margin: const EdgeInsets.all(AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -112,85 +124,58 @@ class RequestDetailScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // Badges row
-          Wrap(
-            spacing: AppSpacing.space2,
-            runSpacing: AppSpacing.space1,
-            children: [
-              _buildBadge(
-                request.typeDisplayLabel,
-                AppColors.primary,
-              ),
-              _buildBadge(
-                request.statusChipLabel,
-                _statusColor(request.status),
-              ),
-              if (request.isAcademy)
-                _buildBadge(AppStrings.academy, AppColors.info),
-              if (request.isReturningStudent)
-                _buildBadge(AppStrings.returning, AppColors.success),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space3),
-
-          // Instrument + goal + experience
-          Row(
-            children: [
-              const Icon(Icons.music_note,
-                  size: AppSpacing.iconSM, color: AppColors.primary),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                request.instrument,
-                style: AppTypography.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Text(
-                '${request.goal.label} · ${request.experience.label}',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
-          ),
-
-          // Student message (if any)
-          if (request.message != null && request.message!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.space3),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.chat_bubble_outline,
-                      size: AppSpacing.iconXS,
-                      color: AppColors.textSecondaryLight),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      request.message!,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ),
-                ],
+          // Student avatar
+          CircleAvatar(
+            radius: AppSpacing.avatarMedium / 2,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+            child: Text(
+              studentName.isNotEmpty ? studentName[0] : '?',
+              style: AppTypography.headingSmall.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
               ),
             ),
-          ],
+          ),
+          const SizedBox(width: AppSpacing.space3),
+
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Source + type
+                Text(
+                  '$source ${request.typeDisplayLabel}',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space1),
+                // Name + instrument + goal + level
+                Text(
+                  '$studentName · ${request.instrument} · ${request.goal.label} · ${request.experience.label}',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+
+          // Status chip
+          _buildStatusBadge(request),
         ],
       ),
     );
   }
 
-  Widget _buildBadge(String label, Color color) {
+  Widget _buildStatusBadge(UnifiedLessonRequest request) {
+    final color = _statusColor(request.status);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,
@@ -201,14 +186,16 @@ class RequestDetailScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
-        label,
+        request.statusChipLabel,
         style: AppTypography.caption.copyWith(
-          color: color,
           fontWeight: FontWeight.w600,
+          color: color,
         ),
       ),
     );
   }
+
+
 
   Color _statusColor(UnifiedRequestStatus status) {
     return switch (status) {
