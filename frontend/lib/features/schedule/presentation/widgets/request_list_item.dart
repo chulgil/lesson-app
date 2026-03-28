@@ -146,11 +146,16 @@ class RequestListItem extends StatelessWidget {
 
   (String, Color) get _statusStyle {
     return switch (request.status) {
-      UnifiedRequestStatus.completed => ('완료', AppColors.success),
-      UnifiedRequestStatus.paymentNotified => ('입금완료', AppColors.error),
-      UnifiedRequestStatus.cancelled => ('취소', AppColors.warning),
-      UnifiedRequestStatus.expired => ('만료', AppColors.warning),
-      UnifiedRequestStatus.rejected => ('거절', AppColors.warning),
+      UnifiedRequestStatus.completed =>
+        (AppStrings.statusCompleted, AppColors.success),
+      UnifiedRequestStatus.paymentNotified =>
+        (AppStrings.statusPaymentDone, AppColors.error),
+      UnifiedRequestStatus.cancelled =>
+        (AppStrings.cancel, AppColors.warning),
+      UnifiedRequestStatus.expired =>
+        (AppStrings.statusExpired, AppColors.warning),
+      UnifiedRequestStatus.rejected =>
+        (request.statusChipLabel, AppColors.warning),
       _ => (request.statusChipLabel, AppColors.textPrimaryLight),
     };
   }
