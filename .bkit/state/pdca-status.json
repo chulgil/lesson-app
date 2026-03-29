@@ -1,11 +1,17 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-19T06:11:56.209Z",
+  "lastUpdated": "2026-03-29T12:08:20.969Z",
   "activeFeatures": [
     "schemas",
     "subscription_service.py",
     "v1",
-    "schedule_ext_service.py"
+    "schedule_ext_service.py",
+    "backend",
+    "scripts",
+    "tests",
+    "lesson_request_service.py",
+    "scenarios",
+    ".claude"
   ],
   "primaryFeature": "schemas",
   "features": {
@@ -18,9 +24,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-19T06:10:04.415Z",
-        "lastUpdated": "2026-03-19T06:10:04.415Z"
+        "lastUpdated": "2026-03-29T11:11:41.864Z"
       },
-      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/schemas/subscription.py"
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/schemas/lesson_request.py"
     },
     "subscription_service.py": {
       "phase": "do",
@@ -60,6 +66,84 @@
         "lastUpdated": "2026-03-19T06:11:49.658Z"
       },
       "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/services/schedule_ext_service.py"
+    },
+    "backend": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T03:01:25.029Z",
+        "lastUpdated": "2026-03-29T03:01:50.972Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/models/student.py"
+    },
+    "scripts": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T03:37:38.712Z",
+        "lastUpdated": "2026-03-29T03:38:29.922Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/scripts/seed_beta_teachers.py"
+    },
+    "tests": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T04:32:11.486Z",
+        "lastUpdated": "2026-03-29T11:13:24.706Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/tests/test_scenario_schedule_integration.py"
+    },
+    "lesson_request_service.py": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T11:12:03.060Z",
+        "lastUpdated": "2026-03-29T11:12:03.060Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/app/services/lesson_request_service.py"
+    },
+    "scenarios": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T11:12:30.884Z",
+        "lastUpdated": "2026-03-29T11:12:30.884Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/backend/tests/scenarios/helpers.py"
+    },
+    ".claude": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-29T12:08:20.969Z",
+        "lastUpdated": "2026-03-29T12:08:20.969Z"
+      },
+      "lastFile": "/Users/cglee/Dev/Personal/development/app/lesson-app/.claude/hooks/check-hardcoded-strings.sh"
     }
   },
   "pipeline": {
@@ -70,7 +154,7 @@
   "session": {
     "startedAt": "2026-03-16T18:01:22.169Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-19T06:11:56.209Z"
+    "lastActivity": "2026-03-29T12:08:20.969Z"
   },
   "history": [
     {
@@ -124,6 +208,102 @@
     {
       "timestamp": "2026-03-19T06:11:56.209Z",
       "feature": "v1",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T02:59:28.852Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T02:59:38.661Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:00:15.978Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:00:39.585Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:01:25.029Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:01:50.972Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:02:06.796Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:37:38.712Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T03:38:29.922Z",
+      "feature": "scripts",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T04:32:11.486Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T04:33:48.974Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T11:11:41.864Z",
+      "feature": "schemas",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T11:12:03.060Z",
+      "feature": "lesson_request_service.py",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T11:12:30.884Z",
+      "feature": "scenarios",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T11:13:24.706Z",
+      "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-29T12:08:20.969Z",
+      "feature": ".claude",
       "phase": "do",
       "action": "updated"
     }

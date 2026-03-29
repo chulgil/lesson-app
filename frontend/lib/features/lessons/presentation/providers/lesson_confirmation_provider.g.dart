@@ -332,7 +332,7 @@ class _CanCancelWithoutDeductionProviderElement
 }
 
 String _$lessonConfirmationNotifierHash() =>
-    r'eb52f38171978d4683efe1826fafbb5f5d26a663';
+    r'334ba65ed2bc83a4ef3672980352ba153c812421';
 
 /// Provider for confirming lesson completion
 ///
