@@ -136,13 +136,16 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Profile card — branches by lesson type
+  /// Profile card — branches by viewer role and lesson type
   Widget _buildProfileCard(
     UnifiedLessonRequest request,
     String studentName,
     String? academyName,
     Student? student,
   ) {
+    if (viewerRole == 'student') {
+      return _buildStudentViewProfileCard(request);
+    }
     return request.type == LessonRequestType.trial
         ? _buildTrialProfileCard(request, studentName, academyName)
         : _buildRegularProfileCard(request, studentName, student);
@@ -357,6 +360,80 @@ class RequestDetailScreen extends ConsumerWidget {
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  /// Student view: shows request summary (teacher perspective → student sees what they sent)
+  Widget _buildStudentViewProfileCard(UnifiedLessonRequest request) {
+    final urgent = isRequestUrgent(request.createdAt);
+
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: type badge + elapsed time
+          Row(
+            children: [
+              _buildTypeBadge(request),
+              const Spacer(),
+              Text(
+                formatRelativeTime(request.createdAt),
+                style: AppTypography.caption.copyWith(
+                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space3),
+
+          // Request info: teacher name + instrument + status
+          Row(
+            children: [
+              CircleAvatar(
+                radius: AppSpacing.avatarMedium / 2,
+                backgroundColor: AppColors.info.withValues(alpha: 0.08),
+                child: Text(
+                  AppStrings.teacher[0],
+                  style: AppTypography.headingSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.info,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppStrings.teacher,
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${request.instrument} · ${request.experience.label} · ${request.goal.label}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildStatusBadge(request),
+            ],
+          ),
         ],
       ),
     );
