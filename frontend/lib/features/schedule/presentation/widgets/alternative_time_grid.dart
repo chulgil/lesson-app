@@ -180,35 +180,47 @@ class AlternativeTimeGrid extends StatelessWidget {
     if (lesson != null) {
       final lessonStartMinutes = _parseTimeMinutes(lesson.startTime);
       final isStart = lessonStartMinutes == slotMinutes;
-      // Unified muted color for all existing lessons (so highlighted slot stands out)
-      final bgColor = AppColors.scheduleMutedBackground;
+      // Unified muted color; preview lessons (subscription expiring) get dashed border
+      final isPreview = lesson.isPreview;
+      final bgColor = isPreview
+          ? AppColors.scheduleMutedBackground.withValues(alpha: 0.4)
+          : AppColors.scheduleMutedBackground;
       final accentColor = AppColors.scheduleMutedAccent;
-      return Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: bgColor,
-          border: Border(
-            top: isStart
-                ? BorderSide(color: accentColor, width: 2)
-                : BorderSide.none,
+      return CustomPaint(
+        painter: isPreview && isStart
+            ? _DashedTopBorderPainter(color: accentColor, width: 2)
+            : null,
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: bgColor,
+            border: !isPreview
+                ? Border(
+                    top: isStart
+                        ? BorderSide(color: accentColor, width: 2)
+                        : BorderSide.none,
+                  )
+                : null,
           ),
-        ),
-        child: isStart
-            ? Padding(
-                padding: const EdgeInsets.only(left: 2, top: 1),
-                child: Text(
-                  hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
-                  style: AppTypography.caption.copyWith(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondaryLight,
+          child: isStart
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 2, top: 1),
+                  child: Text(
+                    hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
+                    style: AppTypography.caption.copyWith(
+                      fontSize: 9,
+                      fontWeight: isPreview ? FontWeight.w400 : FontWeight.w500,
+                      color: isPreview
+                          ? AppColors.textTertiaryLight
+                          : AppColors.textSecondaryLight,
                   ),
                   overflow: TextOverflow.clip,
                   maxLines: 1,
                 ),
               )
             : null,
+        ),
       );
     }
 
@@ -374,4 +386,35 @@ class PreferredTimeSlotHighlight {
     required this.startMinutes,
     required this.endMinutes,
   });
+}
+
+/// Dashed top border painter for preview lessons.
+class _DashedTopBorderPainter extends CustomPainter {
+  final Color color;
+  final double width;
+
+  _DashedTopBorderPainter({required this.color, required this.width});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = width
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 4.0;
+    const dashGap = 3.0;
+    double startX = 0;
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, width / 2),
+        Offset((startX + dashWidth).clamp(0, size.width), width / 2),
+        paint,
+      );
+      startX += dashWidth + dashGap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
