@@ -52,7 +52,7 @@ class RequestHistoryChat extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
-        vertical: AppSpacing.space2,
+        vertical: AppSpacing.space4,
       ),
       itemCount: chronological.length,
       itemBuilder: (context, index) {

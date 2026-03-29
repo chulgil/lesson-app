@@ -170,7 +170,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Message input
         TextField(
           controller: _messageController,
-          maxLines: 5,
+          maxLines: 8,
           minLines: 1,
           maxLength: 200,
           style: AppTypography.bodySmall,
