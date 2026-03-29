@@ -160,8 +160,35 @@ class RequestHistoryChat extends StatelessWidget {
     );
   }
 
+  /// Find the confirmed slot label for approve/acceptAlternative events.
+  /// Looks at selectedSlotIndex and finds the matching slot from the
+  /// most recent preceding event that has suggestedSlots.
+  String? _resolveConfirmedSlotLabel(RequestEvent event) {
+    if (event.selectedSlotIndex == null) return null;
+
+    // Search backwards through events for the nearest event with slots
+    final eventIndex = events.indexOf(event);
+    for (int i = eventIndex - 1; i >= 0; i--) {
+      final prev = events[i];
+      if (prev.suggestedSlots.isNotEmpty) {
+        final idx = event.selectedSlotIndex!;
+        if (idx >= 0 && idx < prev.suggestedSlots.length) {
+          return prev.suggestedSlots[idx].displayLabel;
+        }
+      }
+    }
+    return null;
+  }
+
   /// Bubble inner content: status text + optional slots + optional message
   Widget _buildBubbleContent(RequestEvent event) {
+    // For approve/acceptAlternative: resolve the confirmed slot
+    final isAcceptEvent =
+        event.eventType == RequestEventType.approve ||
+        event.eventType == RequestEventType.acceptAlternative;
+    final confirmedSlotLabel =
+        isAcceptEvent ? _resolveConfirmedSlotLabel(event) : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,30 +203,62 @@ class RequestHistoryChat extends StatelessWidget {
           ),
         ),
 
-        // Time slots (compact cards)
-        if (event.suggestedSlots.isNotEmpty) ...[
+        // Confirmed slot (for approve/accept events)
+        if (confirmedSlotLabel != null) ...[
           const SizedBox(height: AppSpacing.space2),
-          ...event.suggestedSlots.take(3).map((slot) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space1),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space3,
-                    vertical: AppSpacing.space1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusSmall),
-                    border: Border.all(color: AppColors.borderLight),
-                  ),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: AppSpacing.space1,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              border: Border.all(
+                color: AppColors.success.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.check_circle,
+                  size: AppSpacing.iconXS,
+                  color: AppColors.success,
+                ),
+                const SizedBox(width: AppSpacing.space1),
+                Flexible(
                   child: Text(
-                    slot.displayLabel,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textPrimaryLight,
+                    confirmedSlotLabel,
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.success,
                     ),
                   ),
                 ),
-              )),
+              ],
+            ),
+          ),
+        ],
+
+        // Time slots (text only — for propose/counterPropose events)
+        if (event.suggestedSlots.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          ...event.suggestedSlots
+              .take(3)
+              .toList()
+              .asMap()
+              .entries
+              .map((entry) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: AppSpacing.space1 / 2),
+                    child: Text(
+                      '${entry.key + 1}순위 ${entry.value.displayLabel}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  )),
         ],
 
         // User message
