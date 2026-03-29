@@ -93,6 +93,18 @@ class AppColors {
   // Schedule: grid line color
   static const scheduleGridLine = Color(0xFFE8E8E8);
 
+  // Schedule: booking slot colors (design_master.md 5.3)
+  static const slotAvailable = Color(0xFF4CAF50);
+  static const slotMyBooking = Color(0xFF2196F3);
+  static const slotAlmostFull = Color(0xFFFFC107);
+  static const slotUnavailable = Color(0xFF9E9E9E);
+  static const slotRecommended = Color(0xFFF4A460);
+
+  // Schedule: availability block (empty/available)
+  static const availabilityEmpty = Color(0xFFFAFAFA);
+  static const availabilityBorder = Color(0xFFE0E0E0);
+  static const availabilityText = Color(0xFFBDBDBD);
+
   // Light mode
   static const backgroundLight = Color(0xFFFFFAF5);
   static const surfaceLight = Color(0xFFFFFFFF);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import 'timeline_lesson_block.dart' show kTimelineUnitHeight;
 
@@ -25,21 +26,18 @@ class TimelineAvailabilityBlock extends StatelessWidget {
         height: blockHeight,
         margin: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFA),
+          color: AppColors.availabilityEmpty,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: const Color(0xFFE0E0E0),
+            color: AppColors.availabilityBorder,
             width: 1,
-            // Dashed border is simulated via CustomPaint or just solid thin
-            // Using solid thin for simplicity — dashed is hard in Flutter without CustomPainter
           ),
         ),
         child: Center(
           child: Text(
             '가용',
             style: AppTypography.caption.copyWith(
-              color: const Color(0xFFBDBDBD),
-              fontSize: 12,
+              color: AppColors.availabilityText,
             ),
           ),
         ),

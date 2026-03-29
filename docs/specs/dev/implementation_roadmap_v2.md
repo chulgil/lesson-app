@@ -78,7 +78,7 @@
 | 2-3 | **게이미피케이션 Phase 1** (포인트+레벨) | gamification_spec.md Phase 1 | L | ✅ done |
 | 2-4 | 대시보드 정보 계층화 | design_master.md 5.3 | M | ✅ done |
 | 2-5 | 수강권 카드 UI 개선 (프로그레스 바) | subscription_master.md | S | ✅ done |
-| 2-6 | 예약 색상 체계 적용 | design_master.md 5.3 | S | MEDIUM |
+| 2-6 | 예약 색상 체계 적용 | design_master.md 5.3 | S | ✅ done |
 
 ### Phase 3: 고급 기능 (6~12주)
 
