@@ -107,6 +107,12 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (widget.events.isEmpty) return _TurnState.theirTurn;
 
     final lastEvent = widget.events.last;
+
+    // withdrawApproval returns control to the same actor (teacher re-decides)
+    if (lastEvent.eventType == RequestEventType.withdrawApproval) {
+      return _TurnState.myTurn;
+    }
+
     final lastActorIsViewer =
         (lastEvent.actorType == ProposerRole.teacher &&
                 widget.viewerRole == 'teacher') ||
@@ -312,7 +318,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   ),
                 ),
               ),
-            ] else ...[
+            ] else if (!isTeacher) ...[
+              // Student waiting: modify (if pending) + cancel
               if (isPending) ...[
                 Expanded(
                   child: OutlinedButton(
@@ -357,6 +364,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 ),
               ),
             ],
+            // Teacher waiting (not approved): no buttons — teacher rejects via 역제안 screen
           ],
         ),
       ],
