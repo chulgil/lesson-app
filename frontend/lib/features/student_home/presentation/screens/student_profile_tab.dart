@@ -353,6 +353,12 @@ class StudentProfileTab extends ConsumerWidget {
           ),
           _buildMenuDivider(),
           _buildMenuItem(
+            icon: Icons.assignment_outlined,
+            title: '레슨 요청',
+            onTap: () => context.push(AppRoutes.myLessonRequests),
+          ),
+          _buildMenuDivider(),
+          _buildMenuItem(
             icon: Icons.library_music_outlined,
             title: '레퍼토리',
             subtitle: repertoireCount != null

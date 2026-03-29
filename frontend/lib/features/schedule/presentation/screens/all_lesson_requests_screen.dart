@@ -106,20 +106,31 @@ class _AllLessonRequestsScreenState
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.space2),
+                          horizontal: AppSpacing.screenPadding,
+                          vertical: AppSpacing.space3,
+                        ),
                         itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const Divider(
-                            height: 1, indent: AppSpacing.space4),
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: AppSpacing.space2),
                         itemBuilder: (context, index) {
                           final request = filtered[index];
-                          return RequestListItem(
-                            request: request,
-                            studentName: studentNames[request.studentId] ?? AppStrings.student,
-                            academyName: academyNames[request.academyId],
-                            onTap: () => context.push(
-                              AppRoutes.requestDetail
-                                  .replaceFirst(':id', request.id),
-                              extra: {'viewerRole': widget.viewerRole},
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceLight,
+                              borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium),
+                              border: Border.all(
+                                  color: AppColors.borderLight),
+                            ),
+                            child: RequestListItem(
+                              request: request,
+                              studentName: studentNames[request.studentId] ?? AppStrings.student,
+                              academyName: academyNames[request.academyId],
+                              onTap: () => context.push(
+                                AppRoutes.requestDetail
+                                    .replaceFirst(':id', request.id),
+                                extra: {'viewerRole': widget.viewerRole},
+                              ),
                             ),
                           );
                         },
