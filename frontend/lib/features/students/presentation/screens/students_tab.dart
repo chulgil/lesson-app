@@ -14,6 +14,7 @@ import '../../domain/entities/grouped_students.dart';
 import '../providers/student_crud_provider.dart';
 import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
+import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/student_subscription_badge.dart';
 
@@ -37,6 +38,8 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
   final _searchController = TextEditingController();
   StudentFilter _currentFilter = StudentFilter.all;
   StudentSortOption _sortOption = StudentSortOption.name;
+  bool _isSelectionMode = false;
+  final Set<String> _selectedStudentIds = {};
 
   @override
   void dispose() {
@@ -49,32 +52,43 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     final teacherId = ref.watch(currentUserIdProvider);
     final groupedAsync = ref.watch(filteredGroupedStudentsProvider(teacherId));
 
-    return Column(
+    return Stack(
       children: [
-        // Header
-        _buildHeader(),
+        Column(
+          children: [
+            // Header
+            _buildHeader(),
 
-        // Search bar
-        _buildSearchBar(),
+            // Search bar
+            _buildSearchBar(),
 
-        // Filter chips
-        _buildFilterChips(),
+            // Filter chips
+            _buildFilterChips(),
 
-        const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space2),
 
-        // Student count and sort
-        _buildCountAndSort(groupedAsync),
+            // Student count and sort
+            _buildCountAndSort(groupedAsync),
 
-        const SizedBox(height: AppSpacing.space2),
+            const SizedBox(height: AppSpacing.space2),
 
-        // Grouped student list
-        Expanded(
-          child: groupedAsync.when(
-            data: (groups) => _buildGroupedStudentList(groups),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => _buildErrorState(error),
-          ),
+            // Grouped student list
+            Expanded(
+              child: groupedAsync.when(
+                data: (groups) => _buildGroupedStudentList(groups),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => _buildErrorState(error),
+              ),
+            ),
+
+            // Reserve space for bottom bar when selections exist
+            if (_selectedStudentIds.isNotEmpty)
+              const SizedBox(height: 72),
+          ],
         ),
+
+        // Bottom action bar
+        if (_selectedStudentIds.isNotEmpty) _buildBottomActionBar(),
       ],
     );
   }
@@ -108,26 +122,63 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         .toList();
   }
 
+  void _exitSelectionMode() {
+    setState(() {
+      _isSelectionMode = false;
+      _selectedStudentIds.clear();
+    });
+  }
+
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('학생 관리', style: AppTypography.headingLarge),
-          FilledButton.icon(
-            onPressed: () {
-              context.push(AppRoutes.addStudentMethod);
-            },
-            icon: const Icon(Icons.person_add, size: 18),
-            label: const Text('학생 추가'),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space4,
-                vertical: AppSpacing.space2,
+          if (_isSelectionMode) ...[
+            Text(
+              '${_selectedStudentIds.length}명 선택됨',
+              style: AppTypography.headingLarge,
+            ),
+            TextButton(
+              onPressed: _exitSelectionMode,
+              child: Text(
+                '취소',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
             ),
-          ),
+          ] else ...[
+            Text('학생 관리', style: AppTypography.headingLarge),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () => setState(() => _isSelectionMode = true),
+                  child: Text(
+                    '선택',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                FilledButton.icon(
+                  onPressed: () {
+                    context.push(AppRoutes.addStudentMethod);
+                  },
+                  icon: const Icon(Icons.person_add, size: 18),
+                  label: const Text('학생 추가'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space4,
+                      vertical: AppSpacing.space2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -364,7 +415,20 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         ),
         itemCount: filtered.length,
         itemBuilder: (context, index) {
-          return _ClassGroupSection(group: filtered[index]);
+          return _ClassGroupSection(
+            group: filtered[index],
+            isSelectionMode: _isSelectionMode,
+            selectedStudentIds: _selectedStudentIds,
+            onSelectionChanged: (studentId, isSelected) {
+              setState(() {
+                if (isSelected) {
+                  _selectedStudentIds.add(studentId);
+                } else {
+                  _selectedStudentIds.remove(studentId);
+                }
+              });
+            },
+          );
         },
       ),
     );
@@ -382,6 +446,56 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       actionLabel: query.isEmpty ? '학생 추가' : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
       onAction: query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
+    );
+  }
+
+  Widget _buildBottomActionBar() {
+    final teacherId = ref.watch(currentUserIdProvider);
+
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            children: [
+              Text(
+                '${_selectedStudentIds.length}명 선택됨',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              const Spacer(),
+              FilledButton(
+                onPressed: () {
+                  UnifiedSubscriptionSheet.show(
+                    context,
+                    teacherId: teacherId,
+                    studentIds: _selectedStudentIds.toList(),
+                  );
+                },
+                child: const Text('수강권 발급'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -428,8 +542,16 @@ enum StudentFilter {
 /// Supports collapse/expand.
 class _ClassGroupSection extends StatefulWidget {
   final StudentGroup group;
+  final bool isSelectionMode;
+  final Set<String> selectedStudentIds;
+  final void Function(String studentId, bool isSelected) onSelectionChanged;
 
-  const _ClassGroupSection({required this.group});
+  const _ClassGroupSection({
+    required this.group,
+    required this.isSelectionMode,
+    required this.selectedStudentIds,
+    required this.onSelectionChanged,
+  });
 
   @override
   State<_ClassGroupSection> createState() => _ClassGroupSectionState();
@@ -477,7 +599,14 @@ class _ClassGroupSectionState extends State<_ClassGroupSection> {
           ...widget.group.students.map(
             (swm) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-              child: _StudentCard(studentWithMembership: swm),
+              child: _StudentCard(
+                studentWithMembership: swm,
+                isSelectionMode: widget.isSelectionMode,
+                isSelected: widget.selectedStudentIds.contains(swm.studentId),
+                onSelectionChanged: (isSelected) {
+                  widget.onSelectionChanged(swm.studentId, isSelected);
+                },
+              ),
             ),
           ),
       ],
@@ -487,8 +616,16 @@ class _ClassGroupSectionState extends State<_ClassGroupSection> {
 
 class _StudentCard extends ConsumerWidget {
   final StudentWithMembership studentWithMembership;
+  final bool isSelectionMode;
+  final bool isSelected;
+  final ValueChanged<bool> onSelectionChanged;
 
-  const _StudentCard({required this.studentWithMembership});
+  const _StudentCard({
+    required this.studentWithMembership,
+    required this.isSelectionMode,
+    required this.isSelected,
+    required this.onSelectionChanged,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -496,8 +633,13 @@ class _StudentCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: isSelected
+            ? AppColors.primary.withValues(alpha: 0.05)
+            : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: isSelected
+            ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -507,9 +649,13 @@ class _StudentCard extends ConsumerWidget {
         ],
       ),
       child: InkWell(
-        onTap: () {
-          context.push(AppRoutes.studentDetail.replaceFirst(':id', swm.studentId));
-        },
+        onTap: isSelectionMode
+            ? () => onSelectionChanged(!isSelected)
+            : () {
+                context.push(
+                  AppRoutes.studentDetail.replaceFirst(':id', swm.studentId),
+                );
+              },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -518,6 +664,23 @@ class _StudentCard extends ConsumerWidget {
           ),
           child: Row(
             children: [
+              // Checkbox (selection mode only)
+              if (isSelectionMode) ...[
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: (value) => onSelectionChanged(value ?? false),
+                    activeColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+              ],
+
               // Avatar
               CircleAvatar(
                 radius: 20,
@@ -577,16 +740,16 @@ class _StudentCard extends ConsumerWidget {
               ),
 
               // Status section
-              _buildSubscriptionStatus(context, ref, swm.studentId),
-
-              const SizedBox(width: AppSpacing.space1),
-
-              // Arrow
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
-                size: 20,
-              ),
+              if (!isSelectionMode) ...[
+                _buildSubscriptionStatus(context, ref, swm.studentId),
+                const SizedBox(width: AppSpacing.space1),
+                // Arrow
+                const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.textTertiaryLight,
+                  size: 20,
+                ),
+              ],
             ],
           ),
         ),
