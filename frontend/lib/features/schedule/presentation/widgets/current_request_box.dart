@@ -108,9 +108,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
     final lastEvent = widget.events.last;
 
-    // withdrawApproval returns control to the same actor (teacher re-decides)
+    // withdrawApproval: teacher re-decides (myTurn for teacher, theirTurn for student)
     if (lastEvent.eventType == RequestEventType.withdrawApproval) {
-      return _TurnState.myTurn;
+      return widget.viewerRole == 'teacher'
+          ? _TurnState.myTurn
+          : _TurnState.theirTurn;
     }
 
     final lastActorIsViewer =
