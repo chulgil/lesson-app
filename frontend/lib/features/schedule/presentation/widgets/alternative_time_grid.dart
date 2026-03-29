@@ -6,7 +6,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/instrument_colors.dart';
+
 import '../../../../core/utils/name_utils.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 
@@ -180,24 +180,17 @@ class AlternativeTimeGrid extends StatelessWidget {
     if (lesson != null) {
       final lessonStartMinutes = _parseTimeMinutes(lesson.startTime);
       final isStart = lessonStartMinutes == slotMinutes;
-      final baseColors = InstrumentColors.getColor(lesson.instrument);
-      final colors = lesson.isPreview
-          ? InstrumentColorPair(
-              baseColors.background.withValues(alpha: 0.15),
-              baseColors.accent.withValues(alpha: 0.25),
-            )
-          : baseColors;
+      // Unified muted color for all existing lessons (so highlighted slot stands out)
+      final bgColor = AppColors.scheduleMutedBackground;
+      final accentColor = AppColors.scheduleMutedAccent;
       return Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: colors.background,
+          color: bgColor,
           border: Border(
             top: isStart
-                ? BorderSide(
-                    color: colors.accent,
-                    width: lesson.isPreview ? 2.5 : 2,
-                  )
+                ? BorderSide(color: accentColor, width: 2)
                 : BorderSide.none,
           ),
         ),
@@ -208,9 +201,8 @@ class AlternativeTimeGrid extends StatelessWidget {
                   hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
                   style: AppTypography.caption.copyWith(
                     fontSize: 9,
-                    fontWeight:
-                        lesson.isPreview ? FontWeight.w400 : FontWeight.w600,
-                    color: lesson.isPreview ? colors.accent : null,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondaryLight,
                   ),
                   overflow: TextOverflow.clip,
                   maxLines: 1,
