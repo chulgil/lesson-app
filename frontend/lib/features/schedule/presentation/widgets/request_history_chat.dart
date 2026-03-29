@@ -17,6 +17,7 @@ class RequestHistoryChat extends StatelessWidget {
   final String studentName;
   final String? studentProfileUrl;
   final UnifiedLessonRequest? request;
+  final VoidCallback? onOpponentAvatarTap;
 
   const RequestHistoryChat({
     super.key,
@@ -25,6 +26,7 @@ class RequestHistoryChat extends StatelessWidget {
     required this.studentName,
     this.studentProfileUrl,
     this.request,
+    this.onOpponentAvatarTap,
   });
 
   @override
@@ -89,7 +91,9 @@ class RequestHistoryChat extends StatelessWidget {
         children: [
           // Left: opponent avatar + name
           if (!isMyMessage) ...[
-            CircleAvatar(
+            GestureDetector(
+              onTap: onOpponentAvatarTap,
+              child: CircleAvatar(
               radius: AppSpacing.avatarSmall / 2,
               backgroundColor: AppColors.scheduleMutedBackground,
               backgroundImage: studentProfileUrl != null &&
@@ -106,6 +110,7 @@ class RequestHistoryChat extends StatelessWidget {
                       ),
                     )
                   : null,
+              ),
             ),
             const SizedBox(width: AppSpacing.space2),
           ],

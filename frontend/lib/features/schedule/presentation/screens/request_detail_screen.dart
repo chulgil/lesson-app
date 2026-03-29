@@ -100,6 +100,12 @@ class RequestDetailScreen extends ConsumerWidget {
                       ? request.teacherId
                       : request.studentId,
                   studentName: studentName,
+                  onOpponentAvatarTap: () => _showProfileBottomSheet(
+                    context,
+                    request,
+                    opponentName,
+                    academyName,
+                  ),
                 ),
               ),
 
