@@ -37,13 +37,7 @@ class AllLessonRequestsScreen extends ConsumerStatefulWidget {
 class _AllLessonRequestsScreenState
     extends ConsumerState<AllLessonRequestsScreen> {
   DateTime _selectedDate = DateTime.now();
-  RequestFilter _filter = RequestFilter(
-    specificDate: DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-    ),
-  );
+  RequestFilter _filter = const RequestFilter();
   RequestFilterPreset _selectedPreset = RequestFilterPreset.oneWeek;
   RequestSourceFilter _sourceFilter = RequestSourceFilter.all;
   RequestSortBy _sortBy = RequestSortBy.createdAtDesc;
