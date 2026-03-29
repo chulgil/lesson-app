@@ -169,6 +169,9 @@ class AppStrings {
   /// 일정이 확정되었습니다
   static const scheduleConfirmed = '일정이 확정되었습니다';
 
+  /// 레슨을 요청했습니다 (접미사)
+  static const lessonRequestSuffix = '레슨을 요청했습니다';
+
   // ── Schedule Comparison & Actions ─────────────────────────
 
   /// 결정 변경

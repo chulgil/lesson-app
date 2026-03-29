@@ -247,9 +247,12 @@ class RequestHistoryChat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Event type label
+        // Event type label (initialRequest: include instrument + type)
         Text(
-          event.chatDisplayMessage,
+          event.eventType == RequestEventType.initialRequest &&
+                  request != null
+              ? '${request!.instrument} ${request!.typeDisplayLabel}${AppStrings.lessonRequestSuffix}'
+              : event.chatDisplayMessage,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
             color: event.eventType.isTerminal
