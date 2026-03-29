@@ -18,7 +18,7 @@ class CurrentRequestBox extends StatefulWidget {
   final List<RequestEvent> events;
   final String viewerRole; // 'teacher' or 'student'
   final String opponentName;
-  final ValueChanged<int>? onAccept;
+  final void Function(int slotIndex, String message)? onAccept;
   final VoidCallback? onCounterPropose;
   final VoidCallback? onModify;
   final VoidCallback? onCancel;
@@ -230,7 +230,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 child: ElevatedButton(
                   onPressed: _selectedSlotIndex != null
                       ? () {
-                          widget.onAccept?.call(_selectedSlotIndex!);
+                          widget.onAccept?.call(
+                            _selectedSlotIndex!,
+                            _messageController.text.trim(),
+                          );
+                          _messageController.clear();
                         }
                       : null,
                   style: ElevatedButton.styleFrom(

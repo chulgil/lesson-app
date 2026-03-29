@@ -222,6 +222,7 @@ class UnifiedLessonRequestActions {
     String teacherId,
     String studentId, {
     int? selectedSlotIndex,
+    String? message,
   }) async {
     final result = await _repository.approve(requestId);
 
@@ -232,6 +233,7 @@ class UnifiedLessonRequestActions {
       actorId: teacherId,
       eventType: RequestEventType.approve,
       selectedSlotIndex: selectedSlotIndex,
+      message: message,
       createdAt: DateTime.now(),
     ));
 
@@ -245,6 +247,7 @@ class UnifiedLessonRequestActions {
     String teacherId,
     String studentId, {
     int? selectedSlotIndex,
+    String? message,
   }) async {
     final result = await _repository.approve(requestId);
 
@@ -255,6 +258,7 @@ class UnifiedLessonRequestActions {
       actorId: studentId,
       eventType: RequestEventType.acceptAlternative,
       selectedSlotIndex: selectedSlotIndex,
+      message: message,
       createdAt: DateTime.now(),
     ));
 

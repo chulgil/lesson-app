@@ -115,8 +115,8 @@ class RequestDetailScreen extends ConsumerWidget {
                 events: events,
                 viewerRole: viewerRole,
                 opponentName: opponentName,
-                onAccept: (slotIndex) =>
-                    _handleAccept(context, ref, request, slotIndex),
+                onAccept: (slotIndex, message) =>
+                    _handleAccept(context, ref, request, slotIndex, message),
                 onCounterPropose: () =>
                     _handleCounterPropose(context, ref, request),
                 onModify: () => _handleModify(context, request),
@@ -649,23 +649,26 @@ class RequestDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
     int selectedSlotIndex,
+    String message,
   ) async {
     try {
       final actions = UnifiedLessonRequestActions(ref);
+      final msg = message.isEmpty ? null : message;
       if (viewerRole == 'teacher') {
         await actions.approveRequest(
           request.id,
           request.teacherId,
           request.studentId,
           selectedSlotIndex: selectedSlotIndex,
+          message: msg,
         );
       } else {
-        // Student accepting teacher's alternative proposal
         await actions.acceptAlternativeRequest(
           request.id,
           request.teacherId,
           request.studentId,
           selectedSlotIndex: selectedSlotIndex,
+          message: msg,
         );
       }
     } catch (e) {
