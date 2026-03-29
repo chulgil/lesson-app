@@ -7,7 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/week_calendar_widget.dart';
+import '../../../../core/widgets/compact_week_strip.dart';
 import '../../domain/entities/request_filter.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
@@ -81,11 +81,19 @@ class _AllLessonRequestsScreenState
 
           return Column(
             children: [
-              // Calendar
-              WeekCalendarWidget(
-                selectedDate: _selectedDate,
-                onDateSelected: _onCalendarDateSelected,
-                lessonDates: requestDates,
+              // Compact week strip (unified across all screens)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenPadding,
+                  AppSpacing.space2,
+                  AppSpacing.screenPadding,
+                  0,
+                ),
+                child: CompactWeekStrip(
+                  selectedDate: _selectedDate,
+                  onDateSelected: _onCalendarDateSelected,
+                  markerDates: requestDates,
+                ),
               ),
 
               // Date label + count + sort
@@ -160,166 +168,241 @@ class _AllLessonRequestsScreenState
     final d = _selectedDate;
     final dayLabel = weekdays[d.weekday - 1];
     final now = DateTime.now();
-    final isToday = d.year == now.year && d.month == now.month && d.day == now.day;
+    final isToday =
+        d.year == now.year && d.month == now.month && d.day == now.day;
+
+    final dateText = _isFilterMode
+        ? _selectedPreset.label
+        : '${d.month}월 ${d.day}일 $dayLabel요일${isToday ? ' 오늘' : ''}';
 
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              '${d.month}월 ${d.day}일 $dayLabel요일${isToday ? ' 오늘' : ''}',
-              style: AppTypography.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Text(
-            '$count개 요청',
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          // Sort selector
-          DropdownButton<RequestSortBy>(
-            value: _sortBy,
-            underline: const SizedBox.shrink(),
-            isDense: true,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-            items: const [
-              DropdownMenuItem(
-                value: RequestSortBy.createdAtDesc,
-                child: Text(AppStrings.sortByTime),
-              ),
-              DropdownMenuItem(
-                value: RequestSortBy.studentNameAsc,
-                child: Text(AppStrings.sortByName),
-              ),
-            ],
-            onChanged: (value) {
-              if (value == null) return;
-              setState(() {
-                _sortBy = value;
-                _filter = _filter.copyWith(sortBy: value);
-              });
-            },
-          ),
-        ],
+      child: Text(
+        '$dateText · $count개 요청',
+        style: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
 
   Widget _buildFilterBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
+      padding: const EdgeInsets.only(
+        left: AppSpacing.screenPadding,
+        right: AppSpacing.screenPadding,
+        bottom: AppSpacing.space2,
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Source filter (학원/개인)
-          Expanded(
-            child: DropdownButton<RequestSourceFilter>(
-              value: _sourceFilter,
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textPrimaryLight,
-              ),
-              items: const [
-                DropdownMenuItem(
-                    value: RequestSourceFilter.all, child: Text(AppStrings.all)),
-                DropdownMenuItem(
-                    value: RequestSourceFilter.individual,
-                    child: Text(AppStrings.individualLesson)),
-                DropdownMenuItem(
-                    value: RequestSourceFilter.academy,
-                    child: Text(AppStrings.academy)),
-              ],
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() {
-                  _sourceFilter = value;
-                  _filter = _filter.copyWith(source: value);
-                });
-              },
-            ),
+          // Row 1: source + status + sort
+          Wrap(
+            spacing: AppSpacing.space1,
+            runSpacing: AppSpacing.space1,
+            children: [
+              ..._buildSourceChips(),
+              _buildDivider(),
+              ..._buildStatusChips(),
+              _buildDivider(),
+              _buildSortChip(),
+            ],
           ),
-          const SizedBox(width: AppSpacing.space2),
-          // Status group filter (색상 그룹)
-          Expanded(
-            child: DropdownButton<RequestStatusGroup>(
-              value: _statusGroup,
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textPrimaryLight,
-              ),
-              items: [
-                DropdownMenuItem(
-                    value: RequestStatusGroup.all, child: Text(AppStrings.allStatus)),
-                DropdownMenuItem(
-                    value: RequestStatusGroup.active, child: Text(AppStrings.statusActive)),
-                DropdownMenuItem(
-                    value: RequestStatusGroup.success, child: Text(AppStrings.statusCompleted)),
-                DropdownMenuItem(
-                    value: RequestStatusGroup.warning,
-                    child: Text(AppStrings.statusCancelledExpired)),
-              ],
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() {
-                  _statusGroup = value;
-                  _filter = _filter.copyWith(statusGroup: value);
-                });
-              },
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          // Period preset
-          Expanded(
-            child: DropdownButton<RequestFilterPreset>(
-              value: _isFilterMode ? _selectedPreset : null,
-              hint: const Text(AppStrings.period),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textPrimaryLight,
-              ),
-              items: const [
-                DropdownMenuItem(
-                    value: RequestFilterPreset.oneWeek, child: Text('1주')),
-                DropdownMenuItem(
-                    value: RequestFilterPreset.oneMonth, child: Text('1달')),
-                DropdownMenuItem(
-                    value: RequestFilterPreset.threeMonths,
-                    child: Text('3달')),
-              ],
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() {
-                  _selectedPreset = value;
-                  _isFilterMode = true;
-                  final presetFilter = RequestFilter.preset(value);
-                  _filter = presetFilter.copyWith(
-                    statusGroup: _statusGroup,
-                    source: _sourceFilter,
-                    sortBy: _sortBy,
-                  );
-                });
-              },
-            ),
+          const SizedBox(height: AppSpacing.space1),
+          // Row 2: period presets
+          Row(
+            children: _buildPeriodChips(),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+      child: Container(
+        width: 1,
+        height: 20,
+        color: AppColors.borderLight,
+      ),
+    );
+  }
+
+  Widget _buildSortChip() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _sortBy = _sortBy == RequestSortBy.createdAtDesc
+              ? RequestSortBy.studentNameAsc
+              : RequestSortBy.createdAtDesc;
+          _filter = _filter.copyWith(sortBy: _sortBy);
+        });
+      },
+      child: Chip(
+        avatar: Icon(
+          Icons.swap_vert,
+          size: 14,
+          color: AppColors.textSecondaryLight,
+        ),
+        label: Text(
+          _sortBy == RequestSortBy.createdAtDesc
+              ? AppStrings.sortByTime
+              : AppStrings.sortByName,
+        ),
+        labelStyle: AppTypography.caption.copyWith(
+          color: AppColors.textSecondaryLight,
+        ),
+        backgroundColor: AppColors.surfaceLight,
+        side: BorderSide(color: AppColors.borderLight),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+    );
+  }
+
+  List<Widget> _buildSourceChips() {
+    // Toggle chips: no "전체" — deselect = all
+    const options = [
+      (RequestSourceFilter.academy, AppStrings.academy),
+      (RequestSourceFilter.individual, AppStrings.filterIndividual),
+    ];
+
+    return options.map((option) {
+      final (value, label) = option;
+      final selected = _sourceFilter == value;
+      return FilterChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) {
+          setState(() {
+            // Toggle: tap again to deselect → back to all
+            _sourceFilter = selected ? RequestSourceFilter.all : value;
+            _filter = _filter.copyWith(source: _sourceFilter);
+          });
+        },
+        labelStyle: AppTypography.caption.copyWith(
+          color: selected ? Colors.white : AppColors.textSecondaryLight,
+          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+        ),
+        backgroundColor: AppColors.surfaceLight,
+        selectedColor: AppColors.primary,
+        side: BorderSide(
+          color: selected ? AppColors.primary : AppColors.borderLight,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        showCheckmark: false,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildStatusChips() {
+    // Toggle chips: no "전체" — deselect = all
+    const options = [
+      (RequestStatusGroup.active, AppStrings.filterActive),
+      (RequestStatusGroup.success, AppStrings.statusCompleted),
+      (RequestStatusGroup.warning, AppStrings.statusCancelledExpired),
+    ];
+
+    return options.map((option) {
+      final (value, label) = option;
+      final selected = _statusGroup == value;
+      return FilterChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) {
+          setState(() {
+            _statusGroup = selected ? RequestStatusGroup.all : value;
+            _filter = _filter.copyWith(statusGroup: _statusGroup);
+          });
+        },
+        labelStyle: AppTypography.caption.copyWith(
+          color: selected ? Colors.white : AppColors.textSecondaryLight,
+          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+        ),
+        backgroundColor: AppColors.surfaceLight,
+        selectedColor: AppColors.primary,
+        side: BorderSide(
+          color: selected ? AppColors.primary : AppColors.borderLight,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        showCheckmark: false,
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildPeriodChips() {
+    const options = [
+      (RequestFilterPreset.oneWeek, AppStrings.periodOneWeek),
+      (RequestFilterPreset.oneMonth, AppStrings.periodOneMonth),
+      (RequestFilterPreset.threeMonths, AppStrings.periodThreeMonths),
+    ];
+
+    return options.map((option) {
+      final (value, label) = option;
+      final selected = _isFilterMode && _selectedPreset == value;
+      return Padding(
+        padding: const EdgeInsets.only(right: AppSpacing.space1),
+        child: FilterChip(
+          label: Text(label),
+          selected: selected,
+          onSelected: (_) {
+            setState(() {
+              if (selected) {
+                // Toggle off → return to calendar date mode
+                _isFilterMode = false;
+                _filter = RequestFilter(
+                  specificDate: DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                  ),
+                  statusGroup: _statusGroup,
+                  source: _sourceFilter,
+                  sortBy: _sortBy,
+                );
+              } else {
+                _selectedPreset = value;
+                _isFilterMode = true;
+                final presetFilter = RequestFilter.preset(value);
+                _filter = presetFilter.copyWith(
+                  statusGroup: _statusGroup,
+                  source: _sourceFilter,
+                  sortBy: _sortBy,
+                );
+              }
+            });
+          },
+          labelStyle: AppTypography.caption.copyWith(
+            color: selected ? Colors.white : AppColors.textSecondaryLight,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          ),
+          backgroundColor: AppColors.surfaceLight,
+          selectedColor: AppColors.info,
+          side: BorderSide(
+            color: selected ? AppColors.info : AppColors.borderLight,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          showCheckmark: false,
+          visualDensity: VisualDensity.compact,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      );
+    }).toList();
   }
 }

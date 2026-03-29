@@ -12,7 +12,7 @@ import '../../../../features/practice/presentation/providers/practice_repertoire
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../practice/domain/entities/repertoire_sort_type.dart';
 import '../../../practice/presentation/providers/repertoire_sort_provider.dart';
-import '../widgets/week_calendar_widget.dart';
+import '../../../../core/widgets/compact_week_strip.dart';
 
 /// Student practice tab with calendar-based repertoire management
 class StudentPracticeTab extends ConsumerStatefulWidget {
@@ -90,22 +90,22 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               ),
             ),
 
-            // Calendar
+            // Compact week strip (unified with teacher schedule)
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.screenPadding,
-                AppSpacing.space3,
+                AppSpacing.space2,
                 AppSpacing.screenPadding,
                 0,
               ),
-              child: WeekCalendarWidget(
+              child: CompactWeekStrip(
                 selectedDate: _selectedDate,
                 onDateSelected: (date) {
                   setState(() {
                     _selectedDate = date;
                   });
                 },
-                practicedDates: practicedDates,
+                markerDates: practicedDates,
               ),
             ),
 

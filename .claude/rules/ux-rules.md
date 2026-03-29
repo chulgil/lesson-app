@@ -62,8 +62,10 @@ grep -rn "EdgeInsets\." --include="*.dart" features/ | grep -v "AppSpacing"
 # 빈 상태 위젯 미사용
 grep -rn "Text('데이터가 없습니다')" --include="*.dart" features/
 
-# 하드코딩 UI 텍스트 (AppStrings 미사용)
-grep -rn "'레슨 신청\|'승인\|'거절" --include="*.dart" features/
+# 하드코딩 UI 텍스트 (AppStrings 미사용) — /auto, /plan 완료 후 필수 실행
+# 한글 문자열이 Text() 또는 label/hint 파라미터에 직접 사용된 경우 검출
+grep -rn "Text('[가-힣]" --include="*.dart" features/
+grep -rn "label: '[가-힣]\|hint.*'[가-힣]" --include="*.dart" features/
 
 # NO-OP 콜백
 grep -rn "onTap: () {}" --include="*.dart" features/

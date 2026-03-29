@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
+
 part 'unified_lesson_request.g.dart';
 
 /// Type of lesson being requested
@@ -541,27 +543,91 @@ class UnifiedLessonRequest extends HiveObject {
   String get statusChipLabel {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return '대기';
+        return AppStrings.statusPending;
       case UnifiedRequestStatus.approved:
-        return '승인';
+        return AppStrings.statusApproved;
       case UnifiedRequestStatus.negotiating:
-        return '시간협상 $currentRound';
+        return AppStrings.statusNegotiating(currentRound);
       case UnifiedRequestStatus.timeConfirmed:
-        return '시간확정';
+        return AppStrings.statusTimeConfirmed;
       case UnifiedRequestStatus.proposalSent:
-        return '제안완료';
+        return AppStrings.statusProposalSent;
       case UnifiedRequestStatus.proposalAccepted:
-        return '수강권수락';
+        return AppStrings.statusProposalAccepted;
       case UnifiedRequestStatus.paymentNotified:
-        return '입금완료';
+        return AppStrings.statusPaymentDone;
       case UnifiedRequestStatus.completed:
-        return '완료';
+        return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:
-        return '거절';
+        return AppStrings.statusRejected;
       case UnifiedRequestStatus.cancelled:
-        return '취소';
+        return AppStrings.statusCancelled;
       case UnifiedRequestStatus.expired:
-        return '기간만료';
+        return AppStrings.statusExpiredFull;
+    }
+  }
+
+  /// Whether it's the teacher's turn based on last proposal.
+  bool get isTeacherTurn {
+    if (status == UnifiedRequestStatus.pending) return true;
+    if (status == UnifiedRequestStatus.timeConfirmed) return true;
+    if (status == UnifiedRequestStatus.negotiating && proposals.isNotEmpty) {
+      return proposals.last.role == ProposerRole.student;
+    }
+    return false;
+  }
+
+  /// Action-oriented chip label for teacher's list view.
+  /// Shows what teacher should do next instead of just status.
+  String get teacherActionLabel {
+    switch (status) {
+      case UnifiedRequestStatus.pending:
+        return AppStrings.actionRequired;
+      case UnifiedRequestStatus.approved:
+        return AppStrings.statusApproved;
+      case UnifiedRequestStatus.negotiating:
+        return isTeacherTurn
+            ? AppStrings.responseRequired
+            : AppStrings.responseWaiting;
+      case UnifiedRequestStatus.timeConfirmed:
+        return AppStrings.proposalNeeded;
+      case UnifiedRequestStatus.proposalSent:
+        return AppStrings.statusProposalSent;
+      case UnifiedRequestStatus.proposalAccepted:
+        return AppStrings.statusProposalAccepted;
+      case UnifiedRequestStatus.paymentNotified:
+        return AppStrings.statusPaymentDone;
+      case UnifiedRequestStatus.completed:
+        return AppStrings.statusCompleted;
+      case UnifiedRequestStatus.rejected:
+        return AppStrings.statusRejected;
+      case UnifiedRequestStatus.cancelled:
+        return AppStrings.statusCancelled;
+      case UnifiedRequestStatus.expired:
+        return AppStrings.statusExpiredFull;
+    }
+  }
+
+  /// Color key for action chip: 'action', 'wait', 'success', 'error', 'warning'.
+  String get teacherActionColorKey {
+    switch (status) {
+      case UnifiedRequestStatus.pending:
+      case UnifiedRequestStatus.timeConfirmed:
+        return 'action';
+      case UnifiedRequestStatus.negotiating:
+        return isTeacherTurn ? 'action' : 'wait';
+      case UnifiedRequestStatus.proposalSent:
+      case UnifiedRequestStatus.proposalAccepted:
+        return 'wait';
+      case UnifiedRequestStatus.approved:
+      case UnifiedRequestStatus.completed:
+        return 'success';
+      case UnifiedRequestStatus.paymentNotified:
+        return 'error';
+      case UnifiedRequestStatus.rejected:
+      case UnifiedRequestStatus.cancelled:
+      case UnifiedRequestStatus.expired:
+        return 'warning';
     }
   }
 

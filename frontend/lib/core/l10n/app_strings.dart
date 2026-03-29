@@ -262,6 +262,33 @@ class AppStrings {
   /// 전체
   static const all = '전체';
 
+  /// 필터 칩: 개인 (짧은 라벨)
+  static const filterIndividual = '개인';
+
+  /// 필터 칩: 진행중 (짧은 라벨)
+  static const filterActive = '진행중';
+
+  /// 기간 프리셋: 1주
+  static const periodOneWeek = '1주';
+
+  /// 기간 프리셋: 1달
+  static const periodOneMonth = '1달';
+
+  /// 기간 프리셋: 3달
+  static const periodThreeMonths = '3달';
+
+  /// 기간 프리셋 라벨: 최근 1주
+  static const recentOneWeek = '최근 1주';
+
+  /// 기간 프리셋 라벨: 최근 1달
+  static const recentOneMonth = '최근 1달';
+
+  /// 기간 프리셋 라벨: 최근 3달
+  static const recentThreeMonths = '최근 3달';
+
+  /// 기간 프리셋 라벨: 사용자 지정
+  static const periodCustom = '사용자 지정';
+
   // ── Request List Item Status ──────────────────────────────
 
   /// 완료
@@ -272,6 +299,49 @@ class AppStrings {
 
   /// 만료
   static const statusExpired = '만료';
+
+  // ── Request Status Chip Labels ────────────────────────────
+
+  /// 대기
+  static const statusPending = '대기';
+
+  /// 승인
+  static const statusApproved = '승인';
+
+  /// 거절
+  static const statusRejected = '거절';
+
+  /// 취소
+  static const statusCancelled = '취소';
+
+  /// 기간만료
+  static const statusExpiredFull = '기간만료';
+
+  /// 제안완료
+  static const statusProposalSent = '제안완료';
+
+  /// 수강권수락
+  static const statusProposalAccepted = '수강권수락';
+
+  // ── Teacher Action Labels ─────────────────────────────────
+
+  /// 확인 필요
+  static const actionRequired = '확인 필요';
+
+  /// 응답 필요
+  static const responseRequired = '응답 필요';
+
+  /// 응답 대기
+  static const responseWaiting = '응답 대기';
+
+  /// 제안 작성
+  static const proposalNeeded = '제안 작성';
+
+  /// 시간확정
+  static const statusTimeConfirmed = '시간확정';
+
+  /// 시간협상 N
+  static String statusNegotiating(int round) => '시간협상 $round';
 
   // ── Profile Menu ──────────────────────────────────────────
 
@@ -288,6 +358,9 @@ class AppStrings {
 
   /// 메시지 입력 힌트
   static const messageHint = '학생에게 전달할 메시지';
+
+  /// 수락 시 메시지 입력 힌트
+  static const acceptMessageHint = '학생에게 전할 메시지 (선택)';
 
   /// 거절 시 디폴트 메시지
   static const declineDefaultMessage =

@@ -718,10 +718,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       final actions = UnifiedLessonRequestActions(ref);
 
       if (result.acceptedSlotIndex != null) {
-        // Return to chat with slot pre-selected (user can add message then accept)
-        setState(() {
-          _preselectedSlot = result.acceptedSlotIndex;
-        });
+        // Approve directly from schedule comparison (inline completion)
+        await _handleAccept(
+          context,
+          ref,
+          request,
+          result.acceptedSlotIndex!,
+          result.message,
+        );
         return;
       } else if (result.slots.isEmpty) {
         // Reject (from reject bottom sheet inside schedule screen)

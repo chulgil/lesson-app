@@ -362,35 +362,35 @@ class _SuggestAlternativeScreenState
         mainAxisSize: MainAxisSize.min,
         children: [
           // Message input (same style as chat input)
-          if (!_isAcceptMode) ...[
-            TextField(
-              controller: _messageController,
-              maxLines: 8,
-              minLines: 1,
-              maxLength: 200,
-              style: AppTypography.bodySmall,
-              decoration: InputDecoration(
-                hintText: AppStrings.messageHint,
-                hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-                counterText: '',
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
-                ),
+          TextField(
+            controller: _messageController,
+            maxLines: _isAcceptMode ? 2 : 8,
+            minLines: 1,
+            maxLength: 200,
+            style: AppTypography.bodySmall,
+            decoration: InputDecoration(
+              hintText: _isAcceptMode
+                  ? AppStrings.acceptMessageHint
+                  : AppStrings.messageHint,
+              hintStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
               ),
             ),
-            const SizedBox(height: AppSpacing.space2),
-          ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
 
           // Action buttons
           _isAcceptMode
@@ -743,7 +743,7 @@ class _SuggestAlternativeScreenState
         (s) => s.priority == _selectedPreferredIndex);
 
     Navigator.pop<SuggestAlternativeResult>(context, (
-      message: '',
+      message: _messageController.text.trim(),
       slots: <TimeSlot>[],
       acceptedSlotIndex: sortedIndex >= 0 ? sortedIndex : 0,
     ));

@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
@@ -17,7 +18,6 @@ import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../../../subscription/presentation/widgets/subscription_badge.dart';
 import '../providers/schedule_view_mode_provider.dart';
-import '../../../../core/widgets/week_calendar_widget.dart';
 import '../widgets/compact_week_strip.dart';
 import '../widgets/schedule_timeline_view.dart';
 import '../widgets/schedule_weekly_grid_view.dart';
@@ -49,16 +49,15 @@ class ScheduleTab extends ConsumerWidget {
         // Header: title + view toggle + add button
         _buildHeader(context, ref),
 
-        // Calendar: list mode → expandable month calendar, others → compact strip
-        if (viewMode == ScheduleViewMode.list)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space3,
-              AppSpacing.screenPadding,
-              0,
-            ),
-            child: lessonsAsync.when(
+        // Calendar: unified CompactWeekStrip for all view modes
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenPadding,
+            AppSpacing.space2,
+            AppSpacing.screenPadding,
+            0,
+          ),
+          child: lessonsAsync.when(
             data: (lessons) {
               final lessonDates =
                   lessons
@@ -66,70 +65,30 @@ class ScheduleTab extends ConsumerWidget {
                         (l) => DateTime(l.date.year, l.date.month, l.date.day),
                       )
                       .toSet();
-              return WeekCalendarWidget(
+              return CompactWeekStrip(
                 selectedDate: selectedDate,
                 onDateSelected: (date) {
                   ref.read(teacherSelectedDateProvider.notifier).state = date;
                 },
-                lessonDates: lessonDates,
+                markerDates: lessonDates,
               );
             },
             loading:
-                () => WeekCalendarWidget(
+                () => CompactWeekStrip(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
             error:
-                (_, __) => WeekCalendarWidget(
+                (_, __) => CompactWeekStrip(
                   selectedDate: selectedDate,
                   onDateSelected: (date) {
                     ref.read(teacherSelectedDateProvider.notifier).state = date;
                   },
                 ),
-            ),
-          )
-        else
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space2,
-              AppSpacing.screenPadding,
-              0,
-            ),
-            child: lessonsAsync.when(
-              data: (lessons) {
-                final lessonDates =
-                    lessons
-                        .map(
-                          (l) => DateTime(l.date.year, l.date.month, l.date.day),
-                        )
-                        .toSet();
-                return CompactWeekStrip(
-                  selectedDate: selectedDate,
-                  onDateSelected: (date) {
-                    ref.read(teacherSelectedDateProvider.notifier).state = date;
-                  },
-                  lessonDates: lessonDates,
-                );
-              },
-              loading:
-                  () => CompactWeekStrip(
-                    selectedDate: selectedDate,
-                    onDateSelected: (date) {
-                      ref.read(teacherSelectedDateProvider.notifier).state = date;
-                    },
-                  ),
-              error:
-                  (_, __) => CompactWeekStrip(
-                    selectedDate: selectedDate,
-                    onDateSelected: (date) {
-                      ref.read(teacherSelectedDateProvider.notifier).state = date;
-                    },
-                  ),
-            ),
           ),
+        ),
 
         const SizedBox(height: AppSpacing.space3),
 
@@ -580,23 +539,24 @@ class _LessonTimeCard extends ConsumerWidget {
     final isPastDay = selDay.isBefore(today);
     final isToday = selDay.isAtSameMomentAs(today);
 
-    // Past day → muted colors, completed → success border
+    // Instrument-based color (aligned with grid/timeline views)
+    final instrumentColors = InstrumentColors.getColor(lesson.instrument);
+
     final Color cardBgColor;
     final Color borderColor;
 
-    if (lesson.displayStatus == LessonStatus.completed) {
-      cardBgColor = AppColors.scheduleMutedBackground;
-      borderColor = AppColors.scheduleMutedAccent;
-    } else if (isPastDay) {
+    if (lesson.displayStatus == LessonStatus.completed || isPastDay) {
+      // Past/completed → muted grey (same as grid view)
       cardBgColor = AppColors.scheduleMutedBackground;
       borderColor = AppColors.scheduleMutedAccent;
     } else if (isToday) {
-      cardBgColor = Theme.of(context).colorScheme.surface;
-      borderColor = _getStatusColor();
+      // Today → vivid instrument colors
+      cardBgColor = instrumentColors.background;
+      borderColor = instrumentColors.accent;
     } else {
-      // Future day
-      cardBgColor = Theme.of(context).colorScheme.surface;
-      borderColor = _getStatusColor().withValues(alpha: 0.45);
+      // Future → softened instrument colors (50% lerp toward white)
+      cardBgColor = Color.lerp(instrumentColors.background, Colors.white, 0.5)!;
+      borderColor = instrumentColors.accent.withValues(alpha: 0.45);
     }
 
     return Container(

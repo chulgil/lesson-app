@@ -14,7 +14,7 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../widgets/student_lesson_card.dart';
 import '../widgets/trial_booking_card.dart';
-import '../widgets/week_calendar_widget.dart';
+import '../../../../core/widgets/compact_week_strip.dart';
 
 /// Lesson sort type for schedule views
 enum LessonSortType {
@@ -139,20 +139,20 @@ class StudentLessonsTab extends ConsumerWidget {
         // Header: title + action button
         _buildHeader(context),
 
-        // WeekCalendarWidget
+        // Compact week strip (unified with teacher schedule)
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.screenPadding,
-            AppSpacing.space3,
+            AppSpacing.space2,
             AppSpacing.screenPadding,
             0,
           ),
-          child: WeekCalendarWidget(
+          child: CompactWeekStrip(
             selectedDate: selectedDate,
             onDateSelected: (date) {
               ref.read(studentSelectedDateProvider.notifier).state = date;
             },
-            lessonDates: markedDates,
+            markerDates: markedDates,
           ),
         ),
 
