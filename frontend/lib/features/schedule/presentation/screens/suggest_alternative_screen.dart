@@ -2,24 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/domain/entities/lesson.dart';
+import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
+
+/// Result type for this screen.
+/// - slots not empty + acceptedSlotIndex == null → propose alternatives
+/// - slots empty + acceptedSlotIndex == null → reject
+/// - acceptedSlotIndex != null → accept student's preferred slot directly
+typedef SuggestAlternativeResult = ({
+  String message,
+  List<TimeSlot> slots,
+  int? acceptedSlotIndex,
+});
 
 /// Screen for suggesting alternative time slots via a weekly schedule grid.
 ///
 /// Shows the teacher's existing lessons and allows tapping empty cells
 /// to add suggested time slots (up to 3). Each slot can be edited or removed.
+///
+/// When [preferredSlots] are provided, shows the student's preferred times
+/// as selectable cards. Tapping one switches to "confirm" mode.
 class SuggestAlternativeScreen extends ConsumerStatefulWidget {
   final String message;
   final int durationMinutes;
   final String? teacherId;
   final bool isStudentView;
+  final List<PreferredTimeSlot> preferredSlots;
 
   const SuggestAlternativeScreen({
     super.key,
@@ -27,6 +43,7 @@ class SuggestAlternativeScreen extends ConsumerStatefulWidget {
     required this.durationMinutes,
     this.teacherId,
     this.isStudentView = false,
+    this.preferredSlots = const [],
   });
 
   @override
@@ -39,6 +56,7 @@ class _SuggestAlternativeScreenState
   var _suggestedSlots = <TimeSlot>[];
   late DateTime _weekStart;
   late TextEditingController _messageController;
+  int? _selectedPreferredIndex;
 
   @override
   void initState() {
@@ -66,6 +84,8 @@ class _SuggestAlternativeScreenState
   int _lessonEndMinutes(Lesson lesson) =>
       _parseTimeMinutes(lesson.startTime) + lesson.duration;
 
+  bool get _isAcceptMode => _selectedPreferredIndex != null;
+
   @override
   Widget build(BuildContext context) {
     final teacherId =
@@ -77,32 +97,13 @@ class _SuggestAlternativeScreenState
       appBar: AppBar(
         backgroundColor: AppColors.backgroundLight,
         elevation: 0,
-        title: const Text('대안 시간 제안'),
+        title: Text(AppStrings.counterPropose),
       ),
       body: Column(
         children: [
-          // Editable message input
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenPadding,
-            ),
-            child: TextField(
-              controller: _messageController,
-              maxLines: 2,
-              maxLength: 200,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                hintText: '학생에게 전달할 메시지',
-                counterText: '',
-                prefixIcon: const Icon(Icons.message_outlined, size: 18),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space2),
+          // Student's preferred slots (if any)
+          if (widget.preferredSlots.isNotEmpty)
+            _buildPreferredSlotsSection(),
 
           // Week navigation
           _buildWeekNav(),
@@ -115,8 +116,11 @@ class _SuggestAlternativeScreenState
                 lessons: lessons,
                 suggestedSlots: _suggestedSlots,
                 hideStudentNames: widget.isStudentView,
-                onEmptyCellTap: (cell) =>
-                    _addSlotFromGrid(cell.date, cell.hour, cell.minute),
+                onEmptyCellTap: (cell) {
+                  if (!_isAcceptMode) {
+                    _addSlotFromGrid(cell.date, cell.hour, cell.minute);
+                  }
+                },
               ),
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
@@ -125,33 +129,280 @@ class _SuggestAlternativeScreenState
             ),
           ),
 
-          // Suggested slots list
-          if (_suggestedSlots.isNotEmpty) _buildSuggestedSlotsList(),
+          // Suggested slots list (hidden in accept mode)
+          if (_suggestedSlots.isNotEmpty && !_isAcceptMode)
+            _buildSuggestedSlotsList(),
 
-          // Submit button
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.screenPadding,
-              AppSpacing.space2,
-              AppSpacing.screenPadding,
-              MediaQuery.of(context).padding.bottom + AppSpacing.space4,
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed:
-                    _suggestedSlots.isNotEmpty ? _submit : null,
-                child: Text(
-                  _suggestedSlots.isEmpty
-                      ? '시간을 선택하세요'
-                      : '제안하기 (${_suggestedSlots.length}개)',
-                ),
-              ),
-            ),
-          ),
+          // Bottom section: message + buttons
+          _buildBottomSection(),
         ],
       ),
     );
+  }
+
+  /// Student's preferred time slots as selectable cards.
+  Widget _buildPreferredSlotsSection() {
+    final sorted = [...widget.preferredSlots]
+      ..sort((a, b) => a.priority.compareTo(b.priority));
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+        AppSpacing.screenPadding,
+        AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: AppSpacing.iconSM,
+                color: AppColors.info,
+              ),
+              const SizedBox(width: AppSpacing.space1),
+              Text(
+                AppStrings.studentPreferredSlots,
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.info,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          ...sorted.asMap().entries.map((entry) {
+            final index = entry.key;
+            final slot = entry.value;
+            final isSelected = _selectedPreferredIndex == slot.priority;
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    if (_selectedPreferredIndex == slot.priority) {
+                      _selectedPreferredIndex = null;
+                    } else {
+                      _selectedPreferredIndex = slot.priority;
+                      // Clear suggested slots when switching to accept mode
+                      _suggestedSlots = [];
+                    }
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space3,
+                    vertical: AppSpacing.space2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.success.withValues(alpha: 0.08)
+                        : AppColors.surfaceLight,
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.success
+                          : AppColors.borderLight,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppColors.success
+                              : AppColors.info.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: isSelected
+                              ? const Icon(Icons.check,
+                                  size: 14, color: Colors.white)
+                              : Text(
+                                  '${index + 1}',
+                                  style: AppTypography.caption.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.info,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Text(
+                          slot.displayLabel,
+                          style: AppTypography.bodySmall.copyWith(
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? AppColors.success
+                                : AppColors.textPrimaryLight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  /// Bottom section with message input and action buttons.
+  Widget _buildBottomSection() {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+        AppSpacing.screenPadding,
+        MediaQuery.of(context).padding.bottom + AppSpacing.space4,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Message input (hidden in accept mode)
+          if (!_isAcceptMode) ...[
+            TextField(
+              controller: _messageController,
+              maxLines: 2,
+              maxLength: 200,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: AppStrings.messageHint,
+                counterText: '',
+                prefixIcon: const Icon(Icons.message_outlined, size: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2,
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+          ],
+
+          // Action buttons
+          _isAcceptMode
+              ? _buildAcceptButton()
+              : _buildProposeButtons(),
+        ],
+      ),
+    );
+  }
+
+  /// Accept mode: single green confirm button
+  Widget _buildAcceptButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _submitAccept,
+        icon: const Icon(Icons.check_circle, size: 20),
+        label: Text(
+          AppStrings.confirmThisSchedule,
+          style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
+          backgroundColor: AppColors.success,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Propose mode: [거절하기] [시간을 선택하세요/제안하기]
+  Widget _buildProposeButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: _showRejectBottomSheet,
+            style: OutlinedButton.styleFrom(
+              minimumSize:
+                  const Size.fromHeight(AppSpacing.buttonHeightSmall),
+              side: const BorderSide(color: AppColors.borderLight),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+            ),
+            child: Text(
+              '거절하기',
+              style: AppTypography.buttonSmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: ElevatedButton(
+            onPressed:
+                _suggestedSlots.isNotEmpty ? _submitPropose : null,
+            style: ElevatedButton.styleFrom(
+              minimumSize:
+                  const Size.fromHeight(AppSpacing.buttonHeightSmall),
+              backgroundColor: AppColors.primary,
+              disabledBackgroundColor: AppColors.scheduleMutedAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+            ),
+            child: Text(
+              _suggestedSlots.isEmpty
+                  ? '시간을 선택하세요'
+                  : '제안하기 (${_suggestedSlots.length}개)',
+              style: AppTypography.buttonSmall.copyWith(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Show reject bottom sheet with message input.
+  Future<void> _showRejectBottomSheet() async {
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const _RejectBottomSheet(),
+    );
+
+    if (result != null && mounted) {
+      Navigator.pop<SuggestAlternativeResult>(context, (
+        message: result,
+        slots: <TimeSlot>[],
+        acceptedSlotIndex: null,
+      ));
+    }
   }
 
   Widget _buildWeekNav() {
@@ -191,6 +442,11 @@ class _SuggestAlternativeScreenState
   }
 
   void _addSlotFromGrid(DateTime date, int hour, int minute) {
+    if (_suggestedSlots.length >= 3) {
+      showErrorSnackBar(context, '최대 3개까지 선택할 수 있습니다');
+      return;
+    }
+
     final weekLessons =
         ref.read(weekLessonsProvider(_weekStart)).valueOrNull ?? [];
     final startMinutes = hour * 60 + minute;
@@ -348,12 +604,7 @@ class _SuggestAlternativeScreenState
         final lessonEnd = _lessonEndMinutes(lesson);
         if (startMinutes < lessonEnd && endMinutes > lessonStart) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('이미 수업이 있는 시간입니다'),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            showErrorSnackBar(context, '이미 수업이 있는 시간입니다');
           }
           return;
         }
@@ -379,10 +630,144 @@ class _SuggestAlternativeScreenState
     });
   }
 
-  void _submit() {
-    Navigator.pop(context, (
+  void _submitAccept() {
+    Navigator.pop<SuggestAlternativeResult>(context, (
+      message: '',
+      slots: <TimeSlot>[],
+      acceptedSlotIndex: _selectedPreferredIndex!,
+    ));
+  }
+
+  void _submitPropose() {
+    Navigator.pop<SuggestAlternativeResult>(context, (
       message: _messageController.text.trim(),
       slots: _suggestedSlots,
+      acceptedSlotIndex: null,
     ));
+  }
+}
+
+/// Bottom sheet for rejecting a lesson request with a message.
+class _RejectBottomSheet extends StatefulWidget {
+  const _RejectBottomSheet();
+
+  @override
+  State<_RejectBottomSheet> createState() => _RejectBottomSheetState();
+}
+
+class _RejectBottomSheetState extends State<_RejectBottomSheet> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: AppStrings.declineDefaultMessage,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusLarge),
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.space3,
+        AppSpacing.screenPadding,
+        MediaQuery.of(context).viewInsets.bottom +
+            MediaQuery.of(context).padding.bottom +
+            AppSpacing.space4,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Title
+          Text(
+            AppStrings.rejectBottomSheetTitle,
+            style: AppTypography.headingSmall,
+          ),
+          const SizedBox(height: AppSpacing.space2),
+
+          // Guide text
+          Text(
+            AppStrings.rejectBottomSheetGuide,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Message input
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            maxLength: 200,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              hintText: AppStrings.messageHint,
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space3,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+
+          // Send button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                final message = _controller.text.trim();
+                if (message.isNotEmpty) {
+                  Navigator.pop(context, message);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize:
+                    const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+              ),
+              child: Text(
+                AppStrings.rejectSendAndClose,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

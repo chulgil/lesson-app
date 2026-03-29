@@ -160,6 +160,15 @@ class AppStrings {
   /// 학원 경유
   static String viaAcademy(String name) => '$name 경유';
 
+  /// 학생 희망 일정
+  static const studentPreferredSlots = '학생 희망 일정';
+
+  /// 이 일정으로 확정
+  static const confirmThisSchedule = '이 일정으로 확정';
+
+  /// 일정이 확정되었습니다
+  static const scheduleConfirmed = '일정이 확정되었습니다';
+
   // ── Request List Item Status ──────────────────────────────
 
   /// 완료

@@ -475,14 +475,15 @@ class RequestDetailScreen extends ConsumerWidget {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // Navigate directly to schedule comparison screen
-    final result = await Navigator.push<({String message, List<TimeSlot> slots})>(
+    // Navigate to schedule comparison screen with student's preferred slots
+    final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
         builder: (_) => SuggestAlternativeScreen(
           message: AppStrings.proposeDefaultMessage,
           durationMinutes: request.preferredDuration,
           teacherId: request.teacherId,
+          preferredSlots: request.preferredSlots,
         ),
       ),
     );
@@ -491,7 +492,17 @@ class RequestDetailScreen extends ConsumerWidget {
     try {
       final actions = UnifiedLessonRequestActions(ref);
 
-      if (result.slots.isEmpty) {
+      if (result.acceptedSlotIndex != null) {
+        // Accept student's preferred slot directly
+        await actions.approveRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+        );
+        if (context.mounted) {
+          showSuccessSnackBar(context, AppStrings.scheduleConfirmed);
+        }
+      } else if (result.slots.isEmpty) {
         // Reject (from reject bottom sheet inside schedule screen)
         await actions.rejectRequest(
           request.id,
@@ -499,6 +510,9 @@ class RequestDetailScreen extends ConsumerWidget {
           request.studentId,
           reason: result.message,
         );
+        if (context.mounted) {
+          showInfoSnackBar(context, AppStrings.requestUnavailable);
+        }
       } else {
         // Propose alternatives
         await actions.proposeAlternatives(
@@ -517,13 +531,8 @@ class RequestDetailScreen extends ConsumerWidget {
               .toList(),
           message: result.message,
         );
-      }
-
-      if (context.mounted) {
-        if (result.slots.isNotEmpty) {
+        if (context.mounted) {
           showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
-        } else {
-          showInfoSnackBar(context, AppStrings.requestUnavailable);
         }
       }
     } catch (e) {
