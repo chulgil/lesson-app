@@ -89,19 +89,30 @@ class LessonRequestsScreen extends ConsumerWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+              vertical: AppSpacing.space3,
+            ),
             itemCount: requests.length,
             separatorBuilder: (_, __) =>
-                const Divider(height: 1, indent: AppSpacing.space4),
+                const SizedBox(height: AppSpacing.space2),
             itemBuilder: (context, index) {
               final request = requests[index];
-              return RequestListItem(
-                request: request,
-                studentName: AppStrings.student,
-                onTap: () => context.push(
-                  AppRoutes.requestDetail
-                      .replaceFirst(':id', request.id),
-                  extra: {'viewerRole': 'teacher'},
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium),
+                  border: Border.all(color: AppColors.borderLight),
+                ),
+                child: RequestListItem(
+                  request: request,
+                  studentName: AppStrings.student,
+                  onTap: () => context.push(
+                    AppRoutes.requestDetail
+                        .replaceFirst(':id', request.id),
+                    extra: {'viewerRole': 'teacher'},
+                  ),
                 ),
               );
             },
