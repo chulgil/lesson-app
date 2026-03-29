@@ -589,4 +589,29 @@ class AppStrings {
   /// 예약 승인 대기
   static String pendingBookings(int count) =>
       '예약 승인 대기 ${count}건';
+
+  // ── Subscription Card ─────────────────────────────────────
+
+  /// 변경 횟수
+  static String rescheduleCount(int remaining, int total) =>
+      '변경: $remaining/$total회';
+
+  /// 변경 불가
+  static const rescheduleUnavailable = '변경 불가';
+
+  /// 변경 1회 남음 경고
+  static const rescheduleLastOne = '변경 1회 남음';
+
+  /// 잔여 횟수 경고
+  static String remainingLessonsWarning(int count) =>
+      '잔여 ${count}회 - 갱신 권장';
+
+  /// 마지막 1회 경고
+  static const lastLessonWarning = '마지막 1회!';
+
+  /// 만료 임박 D-day
+  static String expirationDday(int days) => 'D-$days 만료 임박';
+
+  /// 만료 긴급
+  static String expirationUrgent(int days) => 'D-$days 곧 만료!';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -142,11 +143,8 @@ class SubscriptionCard extends StatelessWidget {
               _buildDetailSection(),
             ],
 
-            // Expiration warning
-            if (subscription.isExpiringSoon) ...[
-              const SizedBox(height: AppSpacing.space3),
-              _buildExpirationWarning(),
-            ],
+            // Warnings (multiple possible)
+            ..._buildWarnings(),
           ],
         ),
         ),
@@ -279,19 +277,20 @@ class SubscriptionCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '사용: ${subscription.usedLessons}회',
+              '남음: ${subscription.remainingLessons ?? 0}/$total회',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: SubscriptionStatusColors.getSummaryTextColor(
+                    subscription),
+                fontWeight: FontWeight.w600,
               ),
             ),
-            Text(
-              subscription.hasBonus
-                  ? '전체: $total회 (기본 $base + 보너스 ${subscription.bonusCount})'
-                  : '전체: $total회',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+            if (subscription.hasBonus)
+              Text(
+                '(기본 $base + 보너스 ${subscription.bonusCount})',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
               ),
-            ),
           ],
         ),
       ],
@@ -342,6 +341,19 @@ class SubscriptionCard extends StatelessWidget {
                 ? AppColors.warning
                 : AppColors.primary,
             isBold: true,
+          ),
+          // 변경 횟수
+          _buildDetailRow(
+            '• 변경',
+            AppStrings.rescheduleCount(
+              subscription.remainingReschedule,
+              subscription.totalRescheduleAllowance,
+            ),
+            valueColor: subscription.remainingReschedule <= 0
+                ? AppColors.textTertiaryLight
+                : subscription.remainingReschedule == 1
+                    ? AppColors.warning
+                    : null,
           ),
           // 유효기간
           if (subscription.endDate != null) ...[
@@ -432,38 +444,83 @@ class SubscriptionCard extends StatelessWidget {
     return '${date.year}/${date.month}/${date.day}';
   }
 
-  Widget _buildExpirationWarning() {
-    String message;
-    if (subscription.remainingLessons != null &&
-        subscription.remainingLessons! <= renewalAlertThreshold) {
-      message = '⚠️ 잔여 ${subscription.remainingLessons}회 - 갱신 권장';
-    } else if (subscription.daysUntilExpiration != null &&
-        subscription.daysUntilExpiration! <= renewalAlertDays) {
-      message = '⚠️ D-${subscription.daysUntilExpiration} - 유효기간 만료 임박';
-    } else {
-      message = '⚠️ 수강권 만료 임박';
+  List<Widget> _buildWarnings() {
+    final warnings = <({String text, Color color})>[];
+
+    // Remaining lessons warning
+    final remaining = subscription.remainingLessons;
+    if (remaining != null && remaining <= renewalAlertThreshold) {
+      if (remaining <= 1) {
+        warnings.add((
+          text: AppStrings.lastLessonWarning,
+          color: AppColors.error,
+        ));
+      } else {
+        warnings.add((
+          text: AppStrings.remainingLessonsWarning(remaining),
+          color: AppColors.warning,
+        ));
+      }
     }
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space2),
-      decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              message,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
-                fontWeight: FontWeight.w500,
+    // Expiration warning
+    final days = subscription.daysUntilExpiration;
+    if (days != null && days <= renewalAlertDays) {
+      if (days <= 3) {
+        warnings.add((
+          text: AppStrings.expirationUrgent(days),
+          color: AppColors.error,
+        ));
+      } else {
+        warnings.add((
+          text: AppStrings.expirationDday(days),
+          color: AppColors.warning,
+        ));
+      }
+    }
+
+    // Reschedule warning
+    if (subscription.remainingReschedule <= 0) {
+      warnings.add((
+        text: AppStrings.rescheduleUnavailable,
+        color: AppColors.textTertiaryLight,
+      ));
+    } else if (subscription.remainingReschedule == 1) {
+      warnings.add((
+        text: AppStrings.rescheduleLastOne,
+        color: AppColors.warning,
+      ));
+    }
+
+    if (warnings.isEmpty) return [];
+
+    return [
+      const SizedBox(height: AppSpacing.space3),
+      ...warnings.map((w) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.space2),
+              decoration: BoxDecoration(
+                color: w.color.withValues(alpha: 0.1),
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      w.text,
+                      style: AppTypography.caption.copyWith(
+                        color: w.color,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          )),
+    ];
   }
 
 }

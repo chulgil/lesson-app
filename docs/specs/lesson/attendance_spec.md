@@ -1,8 +1,8 @@
 # 출석 관리 스펙
 
-> 구현 상태: ⚠️ 부분 구현 — LessonStatus enum만 구현, UI 전무
+> 구현 상태: ✅ Phase 1 완료, Phase 2 부분 완료 (3.4 선생님 전체 출석 현황만 미구현)
 > 작성일: 2026-03-07
-> 상태: 스펙 작성 완료, 구현 대기
+> 상태: Phase 1 완료 (2026-03-30 확인)
 > 이슈: [#73](https://github.com/chulgil/lesson-app/issues/73)
 
 ---
