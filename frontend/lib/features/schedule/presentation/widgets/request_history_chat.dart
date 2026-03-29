@@ -135,7 +135,8 @@ class RequestHistoryChat extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 260),
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: isMyMessage
+                    // Color by role (not viewer): teacher=primary, student=secondary
+                    color: event.actorType == ProposerRole.teacher
                         ? AppColors.primary.withValues(alpha: 0.08)
                         : AppColors.surfaceSecondaryLight,
                     borderRadius: BorderRadius.only(
