@@ -9,6 +9,7 @@ import '../../../features/subscription/presentation/screens/lesson_policy_screen
 import '../../../features/subscription/presentation/screens/proposal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
+import '../../../features/subscription/presentation/screens/student_proposal_accept_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
 
 /// Subscription-related routes.
@@ -111,6 +112,14 @@ List<RouteBase> subscriptionRoutes = [
     builder: (context, state) {
       final id = state.pathParameters['id']!;
       return SubscriptionDetailScreen(subscriptionId: id);
+    },
+  ),
+  // Student proposal accept (must come before proposalDetail)
+  GoRoute(
+    path: AppRoutes.proposalAccept,
+    builder: (context, state) {
+      final id = state.pathParameters['id']!;
+      return StudentProposalAcceptScreen(proposalId: id);
     },
   ),
   // Proposal detail route
