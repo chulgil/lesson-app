@@ -207,51 +207,16 @@ class RequestHistoryChat extends StatelessWidget {
           ),
         ),
 
-        // Confirmed slot (for approve/accept events)
+        // Confirmed/withdrawn slot (same style as initial request slots)
         if (confirmedSlotLabel != null) ...[
           const SizedBox(height: AppSpacing.space2),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space2,
-              vertical: AppSpacing.space1,
-            ),
-            decoration: BoxDecoration(
-              color: isWithdrawEvent
-                  ? AppColors.warning.withValues(alpha: 0.08)
-                  : AppColors.success.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-              border: Border.all(
-                color: isWithdrawEvent
-                    ? AppColors.warning.withValues(alpha: 0.3)
-                    : AppColors.success.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isWithdrawEvent ? Icons.undo : Icons.check_circle,
-                  size: AppSpacing.iconXS,
-                  color: isWithdrawEvent
-                      ? AppColors.warning
-                      : AppColors.success,
-                ),
-                const SizedBox(width: AppSpacing.space1),
-                Flexible(
-                  child: Text(
-                    confirmedSlotLabel,
-                    style: AppTypography.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isWithdrawEvent
-                          ? AppColors.warning
-                          : AppColors.success,
-                      decoration: isWithdrawEvent
-                          ? TextDecoration.lineThrough
-                          : null,
-                    ),
-                  ),
-                ),
-              ],
+          Text(
+            confirmedSlotLabel,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+              decoration: isWithdrawEvent
+                  ? TextDecoration.lineThrough
+                  : null,
             ),
           ),
         ],
