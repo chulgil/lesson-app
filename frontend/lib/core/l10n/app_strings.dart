@@ -575,4 +575,18 @@ class AppStrings {
   /// 대기 중인 입금 확인
   static String paymentConfirmPending(int count) =>
       '입금 확인 ${count}건 대기';
+
+  // ── Urgent Alert Zone (Dashboard) ──────────────────────────
+
+  /// 만료된 수강권
+  static String subscriptionExpired(int count) =>
+      '만료 수강권 ${count}건';
+
+  /// 임박한 수강권
+  static String subscriptionExpiringSoon(int count) =>
+      '수강권 임박 ${count}건';
+
+  /// 예약 승인 대기
+  static String pendingBookings(int count) =>
+      '예약 승인 대기 ${count}건';
 }

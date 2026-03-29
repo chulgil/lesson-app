@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -14,15 +13,15 @@ import '../../../lessons/presentation/providers/booking_providers.dart';
 import '../../../lessons/presentation/providers/lesson_confirmation_provider.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
-import '../../../lessons/presentation/widgets/attendance_confirmation_sheet.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'assignment_summary_section.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
+import 'urgent_alert_zone.dart';
 
-/// Dashboard Tab - core stats + urgent actions + today's lessons.
+/// Dashboard Tab - information hierarchy: urgent → today → trends → tools.
 class DashboardTab extends ConsumerWidget {
   final VoidCallback onViewAllLessons;
 
@@ -37,13 +36,6 @@ class DashboardTab extends ConsumerWidget {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final teacherId = ref.watch(currentUserIdProvider);
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
-    final pendingBookingsAsync = ref.watch(
-      pendingBookingsCountProvider(teacherId),
-    );
-    final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
-    final expiredAsync = ref.watch(expiredSubscriptionsProvider);
-
-    // Lessons needing confirmation (Quick Action)
     final needsConfirmationAsync = ref.watch(lessonsNeedingConfirmationProvider);
 
     // Get today's lessons
@@ -68,6 +60,7 @@ class DashboardTab extends ConsumerWidget {
         ref.invalidate(todayRequestsProvider(teacherId));
         ref.invalidate(expiringSoonSubscriptionsProvider);
         ref.invalidate(expiredSubscriptionsProvider);
+        ref.invalidate(lessonsNeedingConfirmationProvider);
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -83,44 +76,15 @@ class DashboardTab extends ConsumerWidget {
             // Getting Started Guide (shown when 0 students)
             const GettingStartedCard(),
 
-            const SizedBox(height: AppSpacing.space5),
-
-            // Stats Row (3 key numbers)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('주요 통계', style: AppTypography.headingMedium),
-                TextButton(
-                  onPressed: () => context.push(AppRoutes.analytics),
-                  child: Text(
-                    '통계 더보기',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            _buildUnpaidBanner(context, unpaidSummaryAsync),
-            _buildStatsRow(
-              context,
-              todayLessons,
-              lessonStatsAsync,
+            // ── 1순위: 긴급 알림 존 ──────────────────────────
+            UrgentAlertZone(
+              teacherId: teacherId,
+              unpaidSummary: unpaidSummaryAsync,
+              needsConfirmation: needsConfirmationAsync,
             ),
 
-            const SizedBox(height: AppSpacing.space6),
-
-            // Lesson Request Section (replaces UrgentActionsSection)
-            LessonRequestSection(userId: teacherId),
-
-            // Attendance Quick Action Banner
-            _buildAttendanceBanner(context, ref, needsConfirmationAsync),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Assignment Summary Section
-            const AssignmentSummarySection(),
+            // ── 2순위: 오늘 ─────────────────────────────────
+            _buildStatsRow(context, todayLessons, lessonStatsAsync),
 
             const SizedBox(height: AppSpacing.space6),
 
@@ -139,6 +103,20 @@ class DashboardTab extends ConsumerWidget {
                   ),
               error: (error, _) => _buildErrorCard('레슨을 불러올 수 없습니다'),
             ),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // ── 3순위: 진행 현황 ────────────────────────────
+            LessonRequestSection(userId: teacherId),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            const AssignmentSummarySection(),
+
+            const SizedBox(height: AppSpacing.space6),
+
+            // ── 하단: 통계 링크 ─────────────────────────────
+            _buildAnalyticsLink(context),
 
             const SizedBox(height: AppSpacing.space8),
           ],
@@ -172,7 +150,6 @@ class DashboardTab extends ConsumerWidget {
     AsyncValue<List<Lesson>> todayLessons,
     AsyncValue<Map<String, int>> lessonStatsAsync,
   ) {
-    // Today's lesson card — unified primary color
     final todayCard = todayLessons.when(
       data:
           (lessons) => StatCard(
@@ -194,7 +171,6 @@ class DashboardTab extends ConsumerWidget {
               StatCard(title: '오늘 레슨', value: '-', color: AppColors.primary),
     );
 
-    // This month card — total lessons count
     final monthCard = lessonStatsAsync.when(
       data:
           (stats) => StatCard(
@@ -216,141 +192,7 @@ class DashboardTab extends ConsumerWidget {
               StatCard(title: '이번 달', value: '-', color: AppColors.primary),
     );
 
-    // Always 2 cards — 미수금 is shown as a separate banner above
     return StatCardRow(cards: [todayCard, monthCard]);
-  }
-
-  /// Unpaid amount banner — shown above stats row when outstanding payments exist.
-  Widget _buildUnpaidBanner(
-    BuildContext context,
-    AsyncValue<({int totalAmount, int studentCount})> unpaidSummaryAsync,
-  ) {
-    return unpaidSummaryAsync.when(
-      data: (summary) {
-        if (summary.totalAmount <= 0) return const SizedBox.shrink();
-
-        final formattedAmount =
-            summary.totalAmount >= 10000
-                ? '${(summary.totalAmount / 10000).toStringAsFixed(0)}만원'
-                : '${summary.totalAmount}원';
-
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-          child: GestureDetector(
-            onTap: () => context.push(AppRoutes.outstandingPayments),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space4,
-                vertical: AppSpacing.space3,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.warningLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet_outlined,
-                    color: AppColors.warning,
-                    size: 20,
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Expanded(
-                    child: Text(
-                      '미수금 $formattedAmount (${summary.studentCount}명)',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textPrimaryLight,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: AppColors.textTertiaryLight,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
-  }
-
-  /// Attendance quick action banner — shows when lessons need confirmation.
-  Widget _buildAttendanceBanner(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<Lesson>> needsConfirmationAsync,
-  ) {
-    return needsConfirmationAsync.when(
-      data: (lessons) {
-        if (lessons.isEmpty) return const SizedBox.shrink();
-
-        return Padding(
-          padding: const EdgeInsets.only(top: AppSpacing.space3),
-          child: InkWell(
-            onTap: () async {
-              // Show attendance confirmation for the first unconfirmed lesson
-              final result = await AttendanceConfirmationSheet.show(
-                context,
-                lesson: lessons.first,
-              );
-              if (result != null) {
-                final notifier = ref.read(
-                  lessonConfirmationNotifierProvider.notifier,
-                );
-                if (result.completed) {
-                  await notifier.confirmLessonCompleted(lessons.first);
-                } else {
-                  await notifier.handleLessonNonCompletion(
-                    lessons.first,
-                    result,
-                  );
-                }
-              }
-            },
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.fact_check,
-                      color: AppColors.warning, size: 20),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      AppStrings.lessonsNeedConfirmation(lessons.length),
-                      style: AppTypography.bodySmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.warning,
-                      ),
-                    ),
-                  ),
-                  Icon(Icons.chevron_right,
-                      color: AppColors.warning, size: 20),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-    );
   }
 
   Widget _buildTodayLessonsHeader(
@@ -469,6 +311,21 @@ class DashboardTab extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildAnalyticsLink(BuildContext context) {
+    return Center(
+      child: TextButton.icon(
+        onPressed: () => context.push(AppRoutes.analytics),
+        icon: Icon(Icons.bar_chart, size: 18, color: AppColors.primary),
+        label: Text(
+          '통계 더보기',
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.primary,
+          ),
+        ),
+      ),
     );
   }
 
