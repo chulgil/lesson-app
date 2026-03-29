@@ -76,11 +76,20 @@ class LessonService:
         """Create a new lesson."""
         from app.models.lesson import Lesson
 
+        from app.models.student import Student
+
         tid = await resolve_teacher_id(self.db, current_user.id)
+
+        student_name = data.student_id
+        if data.student_id:
+            student = await self.db.get(Student, data.student_id)
+            if student:
+                student_name = student.name
+
         lesson = Lesson(
             teacher_id=tid,
             student_id=data.student_id,
-            student_name=data.student_id,  # TODO: resolve actual student name
+            student_name=student_name,
             instrument=data.instrument or "",
             date=data.date,
             start_time=data.start_time or "00:00",

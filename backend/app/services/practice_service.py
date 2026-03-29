@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
 from app.schemas.practice import (
+    DailyStat,
     PracticeGoalResponse,
     PracticeGoalUpdate,
     PracticeStatsResponse,
@@ -302,13 +303,66 @@ class PracticeService:
     async def get_stats(
         self, student_id: str | None, year: int | None, month: int | None, current_user: Any
     ) -> PracticeStatsResponse:
-        """Get monthly practice statistics."""
-        # TODO: implement full aggregation from DailyPracticeStatus
+        """Get monthly practice statistics from DailyPracticeStatus."""
+        from datetime import date as date_cls
+
+        from app.models.practice import DailyPracticeStatus, PracticeRepertoire, PracticeSection, PracticeStreak
+
+        sid = student_id or current_user.id
+        today = date_cls.today()
+        target_year = year or today.year
+        target_month = month or today.month
+
+        first_day = date_cls(target_year, target_month, 1)
+        if target_month == 12:
+            last_day = date_cls(target_year + 1, 1, 1)
+        else:
+            last_day = date_cls(target_year, target_month + 1, 1)
+
+        section_ids_query = (
+            select(PracticeSection.id)
+            .join(PracticeRepertoire, PracticeSection.repertoire_id == PracticeRepertoire.id)
+            .where(PracticeRepertoire.student_id == sid)
+        )
+
+        statuses = await self.db.scalars(
+            select(DailyPracticeStatus).where(
+                DailyPracticeStatus.section_id.in_(section_ids_query),
+                DailyPracticeStatus.date >= first_day,
+                DailyPracticeStatus.date < last_day,
+            )
+        )
+        all_statuses = statuses.all()
+
+        daily_map: dict[str, DailyStat] = {}
+        completed_sections = 0
+        for s in all_statuses:
+            day_key = s.date.isoformat()
+            if day_key not in daily_map:
+                daily_map[day_key] = DailyStat()
+            if s.is_completed:
+                daily_map[day_key].sections_completed += 1
+                completed_sections += 1
+
+        total_minutes_result = await self.db.scalar(
+            select(func.coalesce(func.sum(PracticeSection.total_practice_seconds), 0))
+            .where(
+                PracticeSection.repertoire_id.in_(
+                    select(PracticeRepertoire.id).where(PracticeRepertoire.student_id == sid)
+                )
+            )
+        )
+        total_minutes = (total_minutes_result or 0) // 60
+
+        streak = await self.db.scalar(
+            select(PracticeStreak).where(PracticeStreak.student_id == sid)
+        )
+
         return PracticeStatsResponse(
-            total_practice_minutes=0,
-            total_practice_days=0,
-            completed_sections=0,
-            current_streak=0,
-            longest_streak=0,
-            daily_stats={},
+            total_practice_minutes=total_minutes,
+            total_practice_days=len(daily_map),
+            completed_sections=completed_sections,
+            current_streak=streak.current_streak if streak else 0,
+            longest_streak=streak.longest_streak if streak else 0,
+            daily_stats=daily_map,
         )

@@ -36,7 +36,7 @@ class RelationshipService:
         await self.db.flush()
         await self.db.refresh(relation)
 
-        # TODO: send SMS / notification based on `method`
+        # Notification delivery (SMS/push) deferred until FCM integration
 
         return relation
 

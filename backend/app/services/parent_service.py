@@ -77,10 +77,46 @@ class ParentService:
 
     async def connect_child(self, invite_code: str, current_user: Any) -> ParentChildResponse:
         """Link a child via invite code."""
-        # TODO: look up invite code, resolve student, create ParentChildRelation
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Child connection via invite code not yet implemented",
+        from app.models.parent import Parent, ParentChildRelation
+        from app.models.relationship import TeacherStudentRelation
+        from app.models.student import Student
+        from app.schemas.student import StudentResponse
+
+        parent = await self.db.scalar(
+            select(Parent).where(Parent.user_id == current_user.id)
+        )
+        if parent is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent profile not found")
+
+        relation = await self.db.scalar(
+            select(TeacherStudentRelation).where(
+                TeacherStudentRelation.invite_code == invite_code,
+            )
+        )
+        if relation is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid invite code")
+
+        student = await self.db.get(Student, relation.student_id)
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+        existing = await self.db.scalar(
+            select(ParentChildRelation).where(
+                ParentChildRelation.parent_id == parent.id,
+                ParentChildRelation.student_id == student.id,
+            )
+        )
+        if existing:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already linked to this child")
+
+        link = ParentChildRelation(parent_id=parent.id, student_id=student.id)
+        self.db.add(link)
+        await self.db.flush()
+        await self.db.refresh(link)
+
+        return ParentChildResponse(
+            student=StudentResponse.model_validate(student),
+            linked_at=link.connected_at,
         )
 
     async def get_child_lessons(
@@ -112,12 +148,7 @@ class ParentService:
         month: int | None = None,
     ) -> PracticeStatsResponse:
         """Return practice statistics for a child."""
-        # TODO: delegate to PracticeService.get_stats
-        return PracticeStatsResponse(
-            total_practice_minutes=0,
-            total_practice_days=0,
-            completed_sections=0,
-            current_streak=0,
-            longest_streak=0,
-            daily_stats={},
-        )
+        from app.services.practice_service import PracticeService
+
+        practice_svc = PracticeService(self.db)
+        return await practice_svc.get_stats(student_id, year, month, current_user)
