@@ -14,6 +14,7 @@ import '../../data/repositories/remote_notification_repository.dart';
 import '../../domain/entities/notification.dart';
 import '../../domain/repositories/notification_repository.dart';
 import '../../domain/services/connection_notification_service.dart';
+import '../../domain/services/fcm_service.dart';
 import '../../domain/services/proposal_notification_service.dart';
 
 part 'notification_providers.g.dart';
@@ -33,6 +34,19 @@ NotificationRepository? notificationApiRepository(Ref ref) {
 @riverpod
 LocalNotificationService notificationService(Ref ref) {
   final service = LocalNotificationService();
+  ref.onDispose(() => service.dispose());
+  return service;
+}
+
+/// Provider for FCM push notification service (keepAlive for app lifecycle)
+@Riverpod(keepAlive: true)
+FcmService fcmService(Ref ref) {
+  final localService = ref.read(notificationServiceProvider);
+  final apiClient = ref.read(apiClientProvider);
+  final service = FcmService(
+    localNotificationService: localService,
+    apiClient: apiClient,
+  );
   ref.onDispose(() => service.dispose());
   return service;
 }

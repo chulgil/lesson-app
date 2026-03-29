@@ -484,7 +484,7 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 
 | 항목 | 우선순위 |
 |------|---------|
-| FCM 푸시 알림 인프라 | Phase 1 |
+| ~~FCM 푸시 알림 인프라~~ | ✅ 완료 (코드 구현, Firebase 설정 대기) |
 | 알림 설정 화면 (학생/선생님) | Phase 2 |
 | 알림 설정 Hive 영속화 | Phase 2 |
 | 알림 빈도 관리 / 개인화 | Phase 3 |
@@ -513,3 +513,4 @@ class StudentNotificationSettingsNotifier extends _$StudentNotificationSettingsN
 | 2026-01-27 | 인앱 알림 UI 구현 완료 |
 | 2026-03-06 | 구현 코드 기반 Master Spec 작성 (기존 스펙 + 구현 현실 통합) |
 | 2026-03-07 | 알림 유형 상세 테이블(트리거/제목/본문/아이콘/딥링크), Provider 코드 설계, 구현 파일 위치 섹션 추가 |
+| 2026-03-30 | FCM 푸시 알림 인프라 구현 (FcmService, DeviceToken 모델/API, Firebase 설정 가이드) |

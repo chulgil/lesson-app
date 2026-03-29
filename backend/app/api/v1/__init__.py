@@ -6,6 +6,7 @@ from app.api.v1 import (
     ai_notes,
     auth,
     bookings,
+    device_tokens,
     gamification,
     groups,
     invites,
@@ -53,3 +54,4 @@ api_router.include_router(locations.router, prefix="/locations", tags=["location
 api_router.include_router(lesson_requests.router, prefix="/schedule/lesson-requests", tags=["lesson-requests"])
 api_router.include_router(profile_images.router, prefix="/profile-images", tags=["profile-images"])
 api_router.include_router(ai_notes.router, prefix="/ai-notes", tags=["ai-notes"])
+api_router.include_router(device_tokens.router, prefix="/device-tokens", tags=["device-tokens"])

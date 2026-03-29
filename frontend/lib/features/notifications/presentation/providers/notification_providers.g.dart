@@ -45,6 +45,22 @@ final notificationServiceProvider =
 
 typedef NotificationServiceRef
     = AutoDisposeProviderRef<LocalNotificationService>;
+String _$fcmServiceHash() => r'86d014245bd6fb182b03c37be8d7b299c17cb67c';
+
+/// Provider for FCM push notification service (keepAlive for app lifecycle)
+///
+/// Copied from [fcmService].
+@ProviderFor(fcmService)
+final fcmServiceProvider = Provider<FcmService>.internal(
+  fcmService,
+  name: r'fcmServiceProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$fcmServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef FcmServiceRef = ProviderRef<FcmService>;
 String _$practiceReminderSchedulerHash() =>
     r'f388c881d6a641da18b453517714def7184fc9cf';
 

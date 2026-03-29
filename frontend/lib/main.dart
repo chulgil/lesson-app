@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +14,7 @@ import 'core/audio/audio_session_manager.dart';
 import 'core/config/environment.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'features/notifications/domain/services/fcm_service.dart';
 import 'features/practice/domain/entities/practice_repertoire.dart';
 import 'features/student_home/domain/entities/manual_teacher.dart';
 import 'features/practice/domain/entities/recording.dart';
@@ -163,6 +166,12 @@ void clearStartupRecoveryResult() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
+  // Set up background message handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Configure audio session for simultaneous playback and recording
   // This prevents metronome interruption when tuner starts

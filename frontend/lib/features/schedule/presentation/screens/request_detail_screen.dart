@@ -16,6 +16,8 @@ import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import '../widgets/schedule_change_response_bottom_sheet.dart';
+import 'regular_schedule_change_screen.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
 import 'schedule_change_slot_screen.dart';
 import '../../../subscription/presentation/providers/subscription_template_providers.dart';
@@ -187,6 +189,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     _handleLessonCancel(context, ref, request),
                 onScheduleChange: () =>
                     _handleScheduleChange(context, ref, request),
+                onScheduleChangeResponse: () =>
+                    _handleScheduleChangeResponse(context, ref, request),
                 onAddNote: () =>
                     _handleAddNote(context, ref, request),
                 // Phase 4
@@ -1250,7 +1254,26 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } else {
       // Step 2b: Bulk change — navigate to regular schedule change screen
-      // TODO: Phase 4 — RegularScheduleChangeScreen
+      final regularResult =
+          await Navigator.of(context).push<RegularScheduleChangeResult>(
+        MaterialPageRoute(
+          builder: (_) => RegularScheduleChangeScreen(
+            params: RegularScheduleChangeParams(
+              currentScheduleLabel: request.preferredSlots.isNotEmpty
+                  ? request.preferredSlots.first.displayLabel
+                  : '-',
+              currentDayOfWeek: request.preferredSlots.isNotEmpty
+                  ? request.preferredSlots.first.dayOfWeek
+                  : null,
+              currentTime: request.preferredSlots.isNotEmpty
+                  ? request.preferredSlots.first.startTime
+                  : null,
+            ),
+          ),
+        ),
+      );
+      if (regularResult == null || !context.mounted) return;
+
       try {
         final actions = UnifiedLessonRequestActions(ref);
         await actions.recordScheduleChangeProposed(
@@ -1260,7 +1283,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.teacherId,
           request.studentId,
           changeType: changeType,
-          message: AppStrings.scheduleChangeBulkDesc,
+          proposedDayOfWeek: regularResult.dayOfWeek,
+          proposedTime: regularResult.time,
+          message: regularResult.message.isEmpty
+              ? null
+              : regularResult.message,
         );
         if (context.mounted) {
           showSuccessSnackBar(context, AppStrings.scheduleChangePropose);
@@ -1268,6 +1295,101 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       } catch (e) {
         if (context.mounted) showErrorSnackBar(context);
       }
+    }
+  }
+
+  Future<void> _handleScheduleChangeResponse(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
+
+    // Find the pending proposal's slots and change type
+    final events = ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
+    List<TimeSlotOption> proposedSlots = [];
+    ScheduleChangeType changeType = ScheduleChangeType.singleLesson;
+    for (int i = events.length - 1; i >= 0; i--) {
+      final event = events[i];
+      if (event.eventType == RequestEventType.scheduleChangeProposed ||
+          event.eventType == RequestEventType.scheduleChangeCountered) {
+        proposedSlots = event.suggestedSlots;
+        changeType = event.scheduleChangeType ?? ScheduleChangeType.singleLesson;
+        break;
+      }
+    }
+
+    final result = await showScheduleChangeResponseBottomSheet(
+      context,
+      proposedSlots: proposedSlots,
+      changeType: changeType,
+      durationMinutes: 60,
+      teacherId: request.teacherId,
+    );
+    if (result == null || !context.mounted) return;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+
+      switch (result.action) {
+        case ScheduleChangeResponseAction.accept:
+          await actions.recordScheduleChangeAccepted(
+            request.id,
+            actorId,
+            actorRole,
+            request.teacherId,
+            request.studentId,
+            selectedSlotIndex: result.acceptedSlotIndex,
+            message: result.message.isEmpty ? null : result.message,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.scheduleChangeConfirmed);
+          }
+
+        case ScheduleChangeResponseAction.reject:
+          await actions.recordScheduleChangeRejected(
+            request.id,
+            actorId,
+            actorRole,
+            request.teacherId,
+            request.studentId,
+            message: result.message.isEmpty ? null : result.message,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.scheduleChangeReject);
+          }
+
+        case ScheduleChangeResponseAction.counter:
+          await actions.recordScheduleChangeCountered(
+            request.id,
+            actorId,
+            actorRole,
+            request.teacherId,
+            request.studentId,
+            changeType: changeType,
+            suggestedSlots: result.counterSlots
+                .map((s) => TimeSlotOption(
+                      id: s.id,
+                      dayOfWeek: s.dayOfWeek,
+                      startTime:
+                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                      endTime:
+                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                    ))
+                .toList(),
+            message: result.message.isEmpty ? null : result.message,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.scheduleChangeCounter);
+          }
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
     }
   }
 

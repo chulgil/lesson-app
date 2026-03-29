@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
+import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import 'proposal_chat_card.dart';
@@ -241,6 +242,13 @@ class RequestHistoryChat extends StatelessWidget {
     ];
   }
 
+  /// Check if event is a bulk schedule change (proposed/countered with bulkChange type).
+  bool _isBulkScheduleChangeEvent(RequestEvent event) {
+    return (event.eventType == RequestEventType.scheduleChangeProposed ||
+            event.eventType == RequestEventType.scheduleChangeCountered) &&
+        event.scheduleChangeType == ScheduleChangeType.bulkChange;
+  }
+
   /// Find the confirmed slot label for approve/acceptAlternative/withdraw events.
   /// Uses request.preferredSlots (date-aware) when available.
   String? _resolveConfirmedSlotLabel(RequestEvent event) {
@@ -274,10 +282,11 @@ class RequestHistoryChat extends StatelessWidget {
     RequestEvent event, {
     bool isMessageOnly = false,
   }) {
-    // For approve/acceptAlternative: resolve the confirmed slot
+    // For approve/acceptAlternative/scheduleChangeAccepted: resolve the confirmed slot
     final isAcceptEvent =
         event.eventType == RequestEventType.approve ||
-        event.eventType == RequestEventType.acceptAlternative;
+        event.eventType == RequestEventType.acceptAlternative ||
+        event.eventType == RequestEventType.scheduleChangeAccepted;
     final isWithdrawEvent =
         event.eventType == RequestEventType.withdrawApproval;
     final confirmedSlotLabel =
@@ -337,6 +346,20 @@ class RequestHistoryChat extends StatelessWidget {
         // Time slots — use preferredSlots for initialRequest (date-aware),
         // suggestedSlots for other events
         ..._buildSlotLabels(event),
+
+        // Bulk schedule change: show proposed day/time
+        if (_isBulkScheduleChangeEvent(event) &&
+            event.proposedDayOfWeek != null &&
+            event.proposedTime != null) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            '${LessonScheduleChange.dayOfWeekLabel(event.proposedDayOfWeek!)} ${event.proposedTime}',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
 
         // User message (skip for proposal events — template info replaces it)
         if (event.message != null && event.message!.isNotEmpty && !isProposalEvent) ...[

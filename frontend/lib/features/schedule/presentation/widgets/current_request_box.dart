@@ -47,6 +47,7 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onLessonCancel;
   final VoidCallback? onScheduleChange;
   final VoidCallback? onAddNote;
+  final VoidCallback? onScheduleChangeResponse;
 
   // Phase 4 (completed) callbacks
   final VoidCallback? onProposeRenewal;
@@ -76,6 +77,7 @@ class CurrentRequestBox extends StatefulWidget {
     this.onLessonCancel,
     this.onScheduleChange,
     this.onAddNote,
+    this.onScheduleChangeResponse,
     this.onProposeRenewal,
     this.onRequestRenewal,
   });
@@ -677,7 +679,63 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
   // ── Phase 3: Lesson Progress ───────────────────────────────
 
+  /// Scan schedule change state: returns who owns the pending proposal.
+  /// null = no pending, 'self' = viewer proposed, 'opponent' = opponent proposed.
+  String? get _pendingScheduleChangeOwner {
+    final viewerId = _isTeacher
+        ? widget.request.teacherId
+        : widget.request.studentId;
+
+    for (int i = widget.events.length - 1; i >= 0; i--) {
+      final event = widget.events[i];
+      final type = event.eventType;
+
+      // Found a resolution — no pending proposal
+      if (type == RequestEventType.scheduleChangeAccepted ||
+          type == RequestEventType.scheduleChangeRejected) {
+        return null;
+      }
+
+      // Found a proposal/counter
+      if (type == RequestEventType.scheduleChangeProposed ||
+          type == RequestEventType.scheduleChangeCountered) {
+        return event.actorId == viewerId ? 'self' : 'opponent';
+      }
+    }
+    return null;
+  }
+
+  bool get _hasPendingScheduleChange =>
+      _pendingScheduleChangeOwner == 'opponent';
+
+  bool get _hasOwnPendingScheduleChange =>
+      _pendingScheduleChangeOwner == 'self';
+
   Widget _buildPhase3Lessons() {
+    // Show response UI if there's a pending schedule change for this viewer
+    if (_hasPendingScheduleChange) {
+      return _buildActionRow(
+        icon: Icons.schedule,
+        iconColor: AppColors.warning,
+        message: AppStrings.scheduleChangeRequestArrived,
+        primaryLabel: AppStrings.scheduleChangeAccept,
+        primaryIcon: Icons.reply,
+        onPrimary: widget.onScheduleChangeResponse,
+      );
+    }
+
+    // Show "in progress" if viewer's own proposal is pending
+    if (_hasOwnPendingScheduleChange) {
+      return _buildActionRow(
+        icon: Icons.schedule,
+        iconColor: AppColors.info,
+        message: AppStrings.scheduleChangeInProgress,
+        primaryLabel: AppStrings.actionScheduleChange,
+        primaryIcon: Icons.schedule,
+        onPrimary: null, // Disabled — waiting for opponent response
+      );
+    }
+
     if (_isTeacher) {
       return _buildTeacherLessonActions();
     }

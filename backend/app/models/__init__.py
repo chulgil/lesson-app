@@ -42,6 +42,7 @@ from app.models.schedule import (  # noqa: F401
     GroupClass,
 )
 from app.models.notification import Notification  # noqa: F401
+from app.models.device_token import DeviceToken  # noqa: F401
 from app.models.parent import Parent, ParentChildRelation, ParentTeacherConnection  # noqa: F401
 from app.models.policy import LessonPolicy, MakeupLesson, ScheduleConfirmationCard  # noqa: F401
 from app.models.i18n import I18nTranslation, SupportedLocale  # noqa: F401
