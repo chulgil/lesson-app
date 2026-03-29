@@ -498,6 +498,14 @@ class AppStrings {
   static const paymentMessageHint = '추가 안내 메시지 (선택)';
   static const sendPaymentGuide = '안내 보내기';
 
+  /// Proposal BottomSheet
+  static const proposalTitle = '수강권 제안';
+  static const proposalSelectTemplates = '수강권 선택 (최대 3개)';
+  static const proposalBankAccount = '입금 계좌';
+  static const proposalSend = '제안 보내기';
+  static const proposalNoTemplates = '등록된 수강권 템플릿이 없습니다';
+  static const proposalNoBankAccount = '등록된 계좌가 없습니다';
+
   /// Phase 3: Teacher → 레슨 완료
   static const actionLessonComplete = '레슨 완료';
 

@@ -15,8 +15,9 @@ import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import '../../../subscription/presentation/providers/subscription_template_providers.dart';
 import '../widgets/current_request_box.dart';
-import '../widgets/payment_guide_bottom_sheet.dart';
+import '../widgets/proposal_bottom_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
 
@@ -950,19 +951,33 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // Open payment guide bottom sheet
-    final result = await showPaymentGuideBottomSheet(context);
+    // Open proposal bottom sheet with template selection
+    final result = await showProposalBottomSheet(
+      context,
+      teacherId: request.teacherId,
+    );
     if (result == null || !context.mounted) return;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
+
+      // Build message with template names and bank account
+      final templates =
+          await ref.read(activeTeacherTemplatesProvider(request.teacherId).future);
+      final selectedTemplates = templates
+          .where((t) => result.templateIds.contains(t.id))
+          .toList();
+
+      final templateSummary = selectedTemplates
+          .map((t) => '${t.name} ${t.totalLessons}${AppStrings.lessonsUnit} · ${t.formattedPrice}')
+          .join('\n');
+
       final message = [
-        result.isMonthly
-            ? '${AppStrings.subscriptionTypeMonthly} ${result.totalLessons}${AppStrings.lessonsUnit}'
-            : '${AppStrings.subscriptionTypePackage} ${result.totalLessons}${AppStrings.lessonsUnit}',
-        '${result.amount}${AppStrings.amountUnit}',
+        templateSummary,
+        if (result.bankAccountDisplay != null)
+          '입금계좌: ${result.bankAccountDisplay}',
         if (result.message != null) result.message,
-      ].join(' · ');
+      ].join('\n');
 
       await actions.sendPaymentGuide(
         request.id,
@@ -971,7 +986,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         message: message,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionSendPaymentGuide);
+        showSuccessSnackBar(context, AppStrings.proposalSend);
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);
