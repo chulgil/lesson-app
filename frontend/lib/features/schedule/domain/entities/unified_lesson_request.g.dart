@@ -22,13 +22,14 @@ class TimeSlotOptionAdapter extends TypeAdapter<TimeSlotOption> {
       startTime: fields[2] as String,
       endTime: fields[3] as String,
       isSelected: fields[4] as bool,
+      date: fields[5] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TimeSlotOption obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class TimeSlotOptionAdapter extends TypeAdapter<TimeSlotOption> {
       ..writeByte(3)
       ..write(obj.endTime)
       ..writeByte(4)
-      ..write(obj.isSelected);
+      ..write(obj.isSelected)
+      ..writeByte(5)
+      ..write(obj.date);
   }
 
   @override
@@ -571,6 +574,8 @@ TimeSlotOption _$TimeSlotOptionFromJson(Map<String, dynamic> json) =>
       startTime: json['start_time'] as String,
       endTime: json['end_time'] as String,
       isSelected: json['is_selected'] as bool? ?? false,
+      date:
+          json['date'] == null ? null : DateTime.parse(json['date'] as String),
     );
 
 Map<String, dynamic> _$TimeSlotOptionToJson(TimeSlotOption instance) =>
@@ -580,6 +585,7 @@ Map<String, dynamic> _$TimeSlotOptionToJson(TimeSlotOption instance) =>
       'start_time': instance.startTime,
       'end_time': instance.endTime,
       'is_selected': instance.isSelected,
+      'date': instance.date?.toIso8601String(),
     };
 
 TimeProposal _$TimeProposalFromJson(Map<String, dynamic> json) => TimeProposal(

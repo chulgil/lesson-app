@@ -586,6 +586,7 @@ class RequestDetailScreen extends ConsumerWidget {
                         '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
                     endTime:
                         '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                    date: s.specificDate,
                   ))
               .toList(),
           message: result.message,

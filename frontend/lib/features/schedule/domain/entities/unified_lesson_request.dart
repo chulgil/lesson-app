@@ -206,12 +206,16 @@ class TimeSlotOption extends HiveObject {
   @HiveField(4)
   final bool isSelected;
 
+  @HiveField(5)
+  final DateTime? date;
+
   TimeSlotOption({
     required this.id,
     required this.dayOfWeek,
     required this.startTime,
     required this.endTime,
     this.isSelected = false,
+    this.date,
   });
 
   factory TimeSlotOption.fromJson(Map<String, dynamic> json) =>
@@ -225,6 +229,7 @@ class TimeSlotOption extends HiveObject {
     String? startTime,
     String? endTime,
     bool? isSelected,
+    DateTime? date,
   }) {
     return TimeSlotOption(
       id: id ?? this.id,
@@ -232,6 +237,7 @@ class TimeSlotOption extends HiveObject {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       isSelected: isSelected ?? this.isSelected,
+      date: date ?? this.date,
     );
   }
 
@@ -241,8 +247,13 @@ class TimeSlotOption extends HiveObject {
     return days[dayOfWeek.clamp(0, 6)];
   }
 
-  /// Display label: "토 14:00 ~ 15:00"
-  String get displayLabel => '$dayLabel $startTime ~ $endTime';
+  /// Display label: "4/5(토) 14:00 ~ 15:00" or "토 14:00 ~ 15:00"
+  String get displayLabel {
+    if (date != null) {
+      return '${date!.month}/${date!.day}($dayLabel) $startTime ~ $endTime';
+    }
+    return '$dayLabel $startTime ~ $endTime';
+  }
 }
 
 /// A negotiation turn (proposal or counter-proposal)
