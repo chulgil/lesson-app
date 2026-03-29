@@ -100,6 +100,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
+      } else if (authState is AuthNeedsOnboarding) {
+        // Dev login: skip onboarding, go directly to home
+        await ref.read(authNotifierProvider.notifier).completeOnboarding();
+        if (!mounted) return;
+        final updatedState = ref.read(authNotifierProvider);
+        if (updatedState is AuthAuthenticated) {
+          context.go(updatedState.role.homeRoute);
+        }
       }
     } catch (e) {
       if (mounted) {

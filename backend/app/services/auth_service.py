@@ -86,6 +86,7 @@ class AuthService:
                 email=request.email,
                 name=request.name or request.email.split("@")[0],
                 role=role_enum,
+                onboarding_completed=True,
             )
             self.db.add(user)
             await self.db.flush()
@@ -93,7 +94,10 @@ class AuthService:
             # Update role if changed
             if role_enum and user.role != role_enum:
                 user.role = role_enum
-                await self.db.flush()
+            # Dev login always marks onboarding as completed
+            if not user.onboarding_completed:
+                user.onboarding_completed = True
+            await self.db.flush()
 
         # Auto-create role-specific profile
         await self._ensure_role_profile(user, role_enum)
