@@ -502,12 +502,22 @@ class RequestDetailScreen extends ConsumerWidget {
   ) async {
     try {
       final actions = UnifiedLessonRequestActions(ref);
-      await actions.approveRequest(
-        request.id,
-        request.teacherId,
-        request.studentId,
-        selectedSlotIndex: selectedSlotIndex,
-      );
+      if (viewerRole == 'teacher') {
+        await actions.approveRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          selectedSlotIndex: selectedSlotIndex,
+        );
+      } else {
+        // Student accepting teacher's alternative proposal
+        await actions.acceptAlternativeRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          selectedSlotIndex: selectedSlotIndex,
+        );
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

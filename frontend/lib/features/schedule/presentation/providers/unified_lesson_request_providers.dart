@@ -239,6 +239,29 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
+  /// Student accepts teacher's alternative proposal.
+  Future<UnifiedLessonRequest> acceptAlternativeRequest(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    int? selectedSlotIndex,
+  }) async {
+    final result = await _repository.approve(requestId);
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.student,
+      actorId: studentId,
+      eventType: RequestEventType.acceptAlternative,
+      selectedSlotIndex: selectedSlotIndex,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+    return result;
+  }
+
   /// Withdraw approval — revert to pending so teacher can change decision.
   /// Records the previously selected slot index for history display.
   Future<UnifiedLessonRequest> withdrawApprovalRequest(
