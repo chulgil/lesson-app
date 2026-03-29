@@ -48,34 +48,30 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   void initState() {
     super.initState();
     // Auto-select if only 1 slot
-    final latestSlots = _latestProposedSlots;
+    final latestSlots = _latestSlotLabels;
     if (latestSlots.length == 1) {
       _selectedSlotIndex = 0;
     }
   }
 
-  /// Get the latest proposed slots.
-  /// For pending: use preferredSlots from request.
-  /// For negotiating: use last event's suggestedSlots.
-  List<TimeSlotOption> get _latestProposedSlots {
-    // Pending state: show student's preferred slots as selectable options
+  /// Get display labels for the latest proposed slots.
+  /// Uses PreferredTimeSlot.displayLabel directly (preserves date info).
+  List<String> get _latestSlotLabels {
+    // Pending state: use PreferredTimeSlot.displayLabel (includes date)
     if (widget.request.status == UnifiedRequestStatus.pending &&
         widget.request.preferredSlots.isNotEmpty) {
-      return widget.request.preferredSlots
-          .map((ps) => TimeSlotOption(
-                id: 'pref_${ps.priority}',
-                dayOfWeek: ps.dayOfWeek ?? 0,
-                startTime: ps.startTime,
-                endTime: ps.endTime,
-              ))
-          .toList();
+      final sorted = [...widget.request.preferredSlots]
+        ..sort((a, b) => a.priority.compareTo(b.priority));
+      return sorted.map((ps) => ps.displayLabel).toList();
     }
 
-    // Negotiating: find latest event with slots
+    // Negotiating: find latest event with suggestedSlots
     if (widget.events.isEmpty) return [];
     for (int i = widget.events.length - 1; i >= 0; i--) {
       if (widget.events[i].suggestedSlots.isNotEmpty) {
-        return widget.events[i].suggestedSlots;
+        return widget.events[i].suggestedSlots
+            .map((s) => s.displayLabel)
+            .toList();
       }
     }
     return [];
@@ -152,7 +148,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
   /// My turn: show opponent's proposal + slot selection + action buttons
   Widget _buildMyTurn() {
-    final slots = _latestProposedSlots;
+    final slotLabels = _latestSlotLabels;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +205,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ],
 
         // Slot selection (reuse approval_bottom_sheet pattern)
-        if (slots.isNotEmpty) _buildSlotsSection(slots),
+        if (slotLabels.isNotEmpty) _buildSlotsSection(slotLabels),
         const SizedBox(height: AppSpacing.space4),
 
         // Action buttons
@@ -401,13 +397,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Slot selection cards (pattern from unified_approval_bottom_sheet)
-  Widget _buildSlotsSection(List<TimeSlotOption> slots) {
+  /// Slot selection cards — uses pre-computed display labels
+  Widget _buildSlotsSection(List<String> slotLabels) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: slots.asMap().entries.map((entry) {
+      children: slotLabels.asMap().entries.map((entry) {
         final index = entry.key;
-        final slot = entry.value;
+        final label = entry.value;
         final isSelected = _selectedSlotIndex == index;
 
         return Padding(
@@ -455,7 +451,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
                     child: Text(
-                      slot.displayLabel,
+                      label,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,

@@ -36,6 +36,12 @@ class MockUnifiedLessonRequestRepository
   // Seed data — 10 boundary-value scenarios
   // ═══════════════════════════════════════════════════════════════════════════
 
+  /// Get the next occurrence of [targetWeekday] (1=Mon...7=Sun) from [from].
+  DateTime _nextWeekday(DateTime from, int targetWeekday) {
+    final daysAhead = (targetWeekday - from.weekday + 7) % 7;
+    return DateTime(from.year, from.month, from.day + (daysAhead == 0 ? 7 : daysAhead));
+  }
+
   void _seedData() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -56,18 +62,21 @@ class MockUnifiedLessonRequestRepository
       preferredSlots: [
         PreferredTimeSlot(
           priority: 1,
+          date: _nextWeekday(today, 1),
           dayOfWeek: 1,
           startTime: '14:00',
           endTime: '15:00',
         ),
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 2,
+          date: _nextWeekday(today, 3),
           dayOfWeek: 3,
           startTime: '10:00',
           endTime: '11:00',
         ),
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 3,
+          date: _nextWeekday(today, 5),
           dayOfWeek: 5,
           startTime: '16:00',
           endTime: '17:00',
@@ -107,8 +116,9 @@ class MockUnifiedLessonRequestRepository
       message: '입시 준비 중입니다',
       preferredDuration: 60,
       preferredSlots: [
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 1,
+          date: _nextWeekday(today, 3),
           dayOfWeek: 3,
           startTime: '16:00',
           endTime: '17:00',
@@ -396,8 +406,9 @@ class MockUnifiedLessonRequestRepository
       message: '학원 바이올린 레슨 요청',
       preferredDuration: 60,
       preferredSlots: [
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 1,
+          date: _nextWeekday(today, 2),
           dayOfWeek: 2,
           startTime: '14:00',
           endTime: '15:00',
@@ -434,8 +445,9 @@ class MockUnifiedLessonRequestRepository
       experience: UnifiedExperienceLevel.beginner,
       preferredDuration: 60,
       preferredSlots: [
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 1,
+          date: _nextWeekday(today, 4),
           dayOfWeek: 4,
           startTime: '16:00',
           endTime: '17:00',
@@ -557,8 +569,9 @@ class MockUnifiedLessonRequestRepository
       message: '다시 시작하고 싶습니다',
       preferredDuration: 60,
       preferredSlots: [
-        const PreferredTimeSlot(
+        PreferredTimeSlot(
           priority: 1,
+          date: _nextWeekday(today, 2),
           dayOfWeek: 2,
           startTime: '15:00',
           endTime: '16:00',
