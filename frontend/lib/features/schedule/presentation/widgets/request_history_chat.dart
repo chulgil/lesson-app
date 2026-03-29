@@ -55,9 +55,8 @@ class RequestHistoryChat extends StatelessWidget {
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     // Detect withdraw+re-approve(same slot) pairs to hide redundant withdraws
-    final hiddenWithdrawIds = _findSameSlotWithdrawIds(chronological);
-    // Track re-approves that follow a same-slot withdraw (show as "메시지 추가")
-    final messageOnlyApproveIds = _findMessageOnlyApproveIds(chronological);
+    final (hiddenWithdrawIds, messageOnlyApproveIds) =
+        _findSameSlotPairs(chronological);
 
     return ListView.builder(
       shrinkWrap: shrinkWrap,
@@ -406,40 +405,51 @@ class RequestHistoryChat extends StatelessWidget {
     );
   }
 
-  /// Find withdraw events where the next approve has the same slot index.
-  /// These withdraws are redundant (only message changed) and should be hidden.
-  Set<String> _findSameSlotWithdrawIds(List<RequestEvent> sorted) {
-    final ids = <String>{};
-    for (int i = 0; i < sorted.length - 1; i++) {
-      if (sorted[i].eventType == RequestEventType.withdrawApproval) {
-        final next = sorted[i + 1];
-        if ((next.eventType == RequestEventType.approve ||
-                next.eventType == RequestEventType.acceptAlternative) &&
-            sorted[i].selectedSlotIndex != null &&
-            next.selectedSlotIndex == sorted[i].selectedSlotIndex) {
-          ids.add(sorted[i].id);
-        }
-      }
-    }
-    return ids;
-  }
+  /// Find withdraw → re-approve pairs where the slot didn't change.
+  /// Hide the withdraw and show the re-approve as "메시지 추가".
+  ///
+  /// Matching rules (from most to least specific):
+  /// 1. Both have selectedSlotIndex and they match → same slot
+  /// 2. Both have selectedSlotIndex but differ → different slot (don't hide)
+  /// 3. Either has null selectedSlotIndex → treat as same slot (fallback)
+  ///    (null usually means the index wasn't recorded, not that it changed)
+  (Set<String> hiddenWithdraws, Set<String> messageOnlyApproves)
+      _findSameSlotPairs(List<RequestEvent> sorted) {
+    final hiddenWithdraws = <String>{};
+    final messageOnlyApproves = <String>{};
 
-  /// Find approve events that follow a hidden same-slot withdraw.
-  /// These should display as "메시지를 추가했습니다" instead of "수락했습니다".
-  Set<String> _findMessageOnlyApproveIds(List<RequestEvent> sorted) {
-    final ids = <String>{};
-    for (int i = 1; i < sorted.length; i++) {
-      if (sorted[i - 1].eventType == RequestEventType.withdrawApproval) {
-        final approve = sorted[i];
-        if ((approve.eventType == RequestEventType.approve ||
-                approve.eventType == RequestEventType.acceptAlternative) &&
-            sorted[i - 1].selectedSlotIndex != null &&
-            approve.selectedSlotIndex == sorted[i - 1].selectedSlotIndex) {
-          ids.add(approve.id);
+    for (int i = 0; i < sorted.length; i++) {
+      if (sorted[i].eventType != RequestEventType.withdrawApproval) continue;
+      final withdraw = sorted[i];
+
+      // Find the next approve/acceptAlternative after this withdraw
+      for (int j = i + 1; j < sorted.length; j++) {
+        final candidate = sorted[j];
+        if (candidate.eventType == RequestEventType.approve ||
+            candidate.eventType == RequestEventType.acceptAlternative) {
+          // Determine if slot changed
+          final withdrawSlot = withdraw.selectedSlotIndex;
+          final approveSlot = candidate.selectedSlotIndex;
+
+          final bool isSameSlot;
+          if (withdrawSlot != null && approveSlot != null) {
+            isSameSlot = withdrawSlot == approveSlot;
+          } else {
+            // If either is null, default to same-slot (message-only)
+            isSameSlot = true;
+          }
+
+          if (isSameSlot) {
+            hiddenWithdraws.add(withdraw.id);
+            messageOnlyApproves.add(candidate.id);
+          }
+          break;
         }
+        if (candidate.eventType == RequestEventType.withdrawApproval) break;
       }
     }
-    return ids;
+
+    return (hiddenWithdraws, messageOnlyApproves);
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
