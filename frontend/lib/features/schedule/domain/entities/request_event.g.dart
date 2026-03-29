@@ -95,6 +95,8 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         return RequestEventType.paymentNotified;
       case 11:
         return RequestEventType.completed;
+      case 12:
+        return RequestEventType.withdrawApproval;
       default:
         return RequestEventType.initialRequest;
     }
@@ -138,6 +140,9 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         break;
       case RequestEventType.completed:
         writer.writeByte(11);
+        break;
+      case RequestEventType.withdrawApproval:
+        writer.writeByte(12);
         break;
     }
   }
@@ -204,4 +209,5 @@ const _$RequestEventTypeEnumMap = {
   RequestEventType.proposalAccepted: 'proposalAccepted',
   RequestEventType.paymentNotified: 'paymentNotified',
   RequestEventType.completed: 'completed',
+  RequestEventType.withdrawApproval: 'withdrawApproval',
 };

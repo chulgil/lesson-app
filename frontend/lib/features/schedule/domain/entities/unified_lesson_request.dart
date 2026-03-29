@@ -464,6 +464,7 @@ class UnifiedLessonRequest extends HiveObject {
       UnifiedRequestStatus.negotiating,
       UnifiedRequestStatus.timeConfirmed,
       UnifiedRequestStatus.cancelled,
+      UnifiedRequestStatus.pending, // withdraw approval before student acts
     },
     UnifiedRequestStatus.negotiating: {
       UnifiedRequestStatus.timeConfirmed,

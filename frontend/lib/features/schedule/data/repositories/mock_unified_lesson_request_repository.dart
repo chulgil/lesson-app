@@ -83,6 +83,11 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_1',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_1_1', dayOfWeek: 1, startTime: '14:00', endTime: '15:00'),
+          TimeSlotOption(id: 'ts_1_2', dayOfWeek: 3, startTime: '10:00', endTime: '11:00'),
+          TimeSlotOption(id: 'ts_1_3', dayOfWeek: 5, startTime: '16:00', endTime: '17:00'),
+        ],
         message: '바이올린을 처음 배우고 싶습니다',
         createdAt: now.subtract(const Duration(hours: 3)),
       ),
@@ -120,6 +125,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_2',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_2_init_1', dayOfWeek: 3, startTime: '16:00', endTime: '17:00'),
+        ],
         message: '입시 준비 중입니다',
         createdAt: now.subtract(const Duration(days: 2)),
       ),
@@ -212,6 +220,10 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_3',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_3_1', dayOfWeek: 0, startTime: '10:00', endTime: '11:00'),
+          TimeSlotOption(id: 'ts_3_2', dayOfWeek: 4, startTime: '18:00', endTime: '19:00'),
+        ],
         message: '전공 레슨 부탁드립니다',
         createdAt: now.subtract(const Duration(days: 3)),
       ),
@@ -266,6 +278,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_4',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_4_1', dayOfWeek: 5, startTime: '14:00', endTime: '14:30'),
+        ],
         message: '체험레슨 신청합니다',
         createdAt: now.subtract(const Duration(days: 5)),
       ),
@@ -311,6 +326,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_5',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_5_1', dayOfWeek: 1, startTime: '11:00', endTime: '12:00'),
+        ],
         message: '플루트 배우고 싶어요',
         createdAt: now.subtract(const Duration(days: 1)),
       ),
@@ -347,6 +365,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_6',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_6_1', dayOfWeek: 3, startTime: '15:00', endTime: '16:00'),
+        ],
         message: '클라리넷을 배우고 싶습니다',
         createdAt: now.subtract(const Duration(days: 8)),
       ),
@@ -392,6 +413,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_3',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_7_1', dayOfWeek: 2, startTime: '14:00', endTime: '15:00'),
+        ],
         message: '학원 바이올린 레슨 요청',
         createdAt: now.subtract(const Duration(hours: 1)),
       ),
@@ -428,6 +452,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_1',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_8_init_1', dayOfWeek: 4, startTime: '16:00', endTime: '17:00'),
+        ],
         message: '피아노도 배우고 싶습니다',
         createdAt: now.subtract(const Duration(days: 2)),
       ),
@@ -507,6 +534,10 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_2',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_9_1', dayOfWeek: 0, startTime: '10:00', endTime: '11:00'),
+          TimeSlotOption(id: 'ts_9_2', dayOfWeek: 0, startTime: '10:00', endTime: '11:00'),
+        ],
         message: '입시 대비 추가 회차권 요청',
         createdAt: now.subtract(const Duration(hours: 2)),
       ),
@@ -546,6 +577,9 @@ class MockUnifiedLessonRequestRepository
         actorType: ProposerRole.student,
         actorId: 'student_7',
         eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_10_init_1', dayOfWeek: 2, startTime: '15:00', endTime: '16:00'),
+        ],
         message: '다시 시작하고 싶습니다',
         createdAt: now.subtract(const Duration(days: 1, hours: 6)),
       ),
@@ -648,6 +682,18 @@ class MockUnifiedLessonRequestRepository
     final updated = request.copyWith(
       status: UnifiedRequestStatus.approved,
       confirmedAt: DateTime.now(),
+    );
+    _requests[id] = updated;
+    return updated;
+  }
+
+  @override
+  Future<UnifiedLessonRequest> withdrawApproval(String id) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+    final request = _requests[id];
+    if (request == null) throw Exception('Request not found: $id');
+    final updated = request.copyWith(
+      status: UnifiedRequestStatus.pending,
     );
     _requests[id] = updated;
     return updated;

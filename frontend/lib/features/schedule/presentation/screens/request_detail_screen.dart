@@ -105,6 +105,8 @@ class RequestDetailScreen extends ConsumerWidget {
                       _handleCounterPropose(context, ref, request),
                   onModify: () => _handleModify(context, request),
                   onCancel: () => _handleCancel(context, ref, request),
+                  onWithdraw: () =>
+                      _handleWithdraw(context, ref, request),
                 ),
 
                 // Chat history
@@ -500,6 +502,47 @@ class RequestDetailScreen extends ConsumerWidget {
         if (context.mounted) {
           showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
         }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showErrorSnackBar(context);
+      }
+    }
+  }
+
+  Future<void> _handleWithdraw(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('결정 변경'),
+        content: const Text('수락한 결정을 취소하고 다시 선택할 수 있습니다.\n히스토리는 그대로 유지됩니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text(AppStrings.no),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('결정 변경'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.withdrawApprovalRequest(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showInfoSnackBar(context, '이전 상태로 돌아갔습니다. 다시 선택해주세요.');
       }
     } catch (e) {
       if (context.mounted) {

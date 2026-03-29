@@ -42,7 +42,10 @@ enum RequestEventType {
   paymentNotified,
 
   @HiveField(11)
-  completed;
+  completed,
+
+  @HiveField(12)
+  withdrawApproval;
 
   String get label {
     switch (this) {
@@ -70,6 +73,8 @@ enum RequestEventType {
         return '결제 완료';
       case RequestEventType.completed:
         return '발급 완료';
+      case RequestEventType.withdrawApproval:
+        return '결정 변경';
     }
   }
 
@@ -180,6 +185,8 @@ class RequestEvent {
         return '결제가 완료되었습니다';
       case RequestEventType.completed:
         return '수강권이 발급되었습니다';
+      case RequestEventType.withdrawApproval:
+        return '결정을 변경했습니다';
     }
   }
 

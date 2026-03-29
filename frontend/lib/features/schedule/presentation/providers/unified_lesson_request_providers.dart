@@ -229,6 +229,28 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
+  /// Withdraw approval — revert to pending so teacher can change decision.
+  /// History is preserved; a withdrawApproval event is added.
+  Future<UnifiedLessonRequest> withdrawApprovalRequest(
+    String requestId,
+    String teacherId,
+    String studentId,
+  ) async {
+    final result = await _repository.withdrawApproval(requestId);
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.withdrawApproval,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+    return result;
+  }
+
   /// Reject a lesson request (teacher action)
   Future<UnifiedLessonRequest> rejectRequest(
     String requestId,

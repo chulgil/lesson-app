@@ -22,6 +22,7 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onCounterPropose;
   final VoidCallback? onModify;
   final VoidCallback? onCancel;
+  final VoidCallback? onWithdraw;
   final ValueChanged<int>? onSlotSelected;
 
   const CurrentRequestBox({
@@ -34,6 +35,7 @@ class CurrentRequestBox extends StatefulWidget {
     this.onCounterPropose,
     this.onModify,
     this.onCancel,
+    this.onWithdraw,
     this.onSlotSelected,
   });
 
@@ -260,9 +262,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Their turn: waiting message + modify/cancel
+  /// Their turn: waiting message + contextual actions
   Widget _buildTheirTurn() {
     final isPending = widget.request.status == UnifiedRequestStatus.pending;
+    final isApproved = widget.request.status == UnifiedRequestStatus.approved;
+    final isTeacher = widget.viewerRole == 'teacher';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,10 +292,18 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         const SizedBox(height: AppSpacing.space4),
         Row(
           children: [
-            if (isPending) ...[
+            // Teacher approved → show "결정 변경" instead of cancel
+            if (isApproved && isTeacher) ...[
               Expanded(
-                child: OutlinedButton(
-                  onPressed: widget.onModify,
+                child: OutlinedButton.icon(
+                  onPressed: widget.onWithdraw,
+                  icon: const Icon(Icons.undo, size: 16),
+                  label: Text(
+                    '결정 변경',
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
                   style: OutlinedButton.styleFrom(
                     minimumSize:
                         const Size.fromHeight(AppSpacing.buttonHeightSmall),
@@ -301,36 +313,53 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                           BorderRadius.circular(AppSpacing.radiusMedium),
                     ),
                   ),
+                ),
+              ),
+            ] else ...[
+              if (isPending) ...[
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: widget.onModify,
+                    style: OutlinedButton.styleFrom(
+                      minimumSize:
+                          const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                      side: const BorderSide(color: AppColors.borderLight),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMedium),
+                      ),
+                    ),
+                    child: Text(
+                      AppStrings.modify,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space3),
+              ],
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: widget.onCancel,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize:
+                        const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                    side: const BorderSide(color: AppColors.error),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMedium),
+                    ),
+                  ),
                   child: Text(
-                    AppStrings.modify,
+                    AppStrings.cancel,
                     style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.error,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: AppSpacing.space3),
             ],
-            Expanded(
-              child: OutlinedButton(
-                onPressed: widget.onCancel,
-                style: OutlinedButton.styleFrom(
-                  minimumSize:
-                      const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                  side: const BorderSide(color: AppColors.error),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-                child: Text(
-                  AppStrings.cancel,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: AppColors.error,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ],

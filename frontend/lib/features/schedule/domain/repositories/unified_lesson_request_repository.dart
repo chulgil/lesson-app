@@ -30,6 +30,9 @@ abstract class UnifiedLessonRequestRepository {
   /// Approve a request (teacher action)
   Future<UnifiedLessonRequest> approve(String id);
 
+  /// Withdraw approval — revert to pending before student acts (teacher action)
+  Future<UnifiedLessonRequest> withdrawApproval(String id);
+
   /// Reject a request with optional reason (teacher action)
   Future<UnifiedLessonRequest> reject(String id, {String? reason});
 
