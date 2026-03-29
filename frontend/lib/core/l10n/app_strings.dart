@@ -175,6 +175,13 @@ class AppStrings {
   /// 종료됨 (terminal 상태 하단바)
   static const requestClosed = '요청이 종료되었습니다';
 
+  /// 시스템 가이드 메시지 (채팅 상단)
+  static const requestGuideMessage =
+      '학생이 제안한 일정 중 하나를 선택하여 수락하거나, 일정 비교로 다른 시간을 제안할 수 있습니다.';
+
+  /// 슬롯 선택 힌트
+  static const slotSelectionHint = '일정을 탭하여 선택하세요';
+
   // ── Schedule Comparison & Actions ─────────────────────────
 
   /// 결정 변경

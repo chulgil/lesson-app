@@ -1,6 +1,6 @@
 # CLAUDE.md - Lessonaza
 
-> 마지막 업데이트: 2026-03-28
+> 마지막 업데이트: 2026-03-29
 
 음악 레슨/연습 관리 앱 — Flutter 3.29.0, Riverpod, Go Router, Hive | Clean Architecture + Feature-based
 

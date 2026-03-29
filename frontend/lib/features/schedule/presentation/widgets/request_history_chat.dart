@@ -54,15 +54,21 @@ class RequestHistoryChat extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space4,
       ),
-      itemCount: chronological.length,
+      itemCount: chronological.length + 1, // +1 for guide message
       itemBuilder: (context, index) {
-        final event = chronological[index];
+        // First item: system guide message
+        if (index == 0) {
+          return _buildSystemGuide();
+        }
+
+        final event = chronological[index - 1];
         final isMyMessage = event.actorId == viewerId;
 
-        // Date separator (show if first or different day from previous)
+        // Date separator (show if first event or different day from previous)
+        final eventIndex = index - 1;
         Widget? dateSeparator;
-        if (index == 0 ||
-            !_isSameDay(chronological[index - 1].createdAt, event.createdAt)) {
+        if (eventIndex == 0 ||
+            !_isSameDay(chronological[eventIndex - 1].createdAt, event.createdAt)) {
           dateSeparator = _buildDateSeparator(event.createdAt);
         }
 

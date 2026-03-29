@@ -6,7 +6,7 @@
 
 1. **가이드 문서**: `docs/specs/backend/scenario_testing_guide.md` 참조
 2. **프레임워크 사용**: `TeacherActions`, `StudentActions` 헬퍼 클래스 사용
-3. **파일 위치**: `backend/tests/test_scenarios_framework.py`에 추가
+3. **파일 위치**: `backend/tests/test_scenarios_framework.py` 또는 `backend/tests/test_scenario_schedule_integration.py`에 추가
 4. **fixture**: `teacher`, `student` fixture 사용 (conftest.py에 정의)
 
 ## 작성 패턴
