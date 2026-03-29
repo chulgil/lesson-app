@@ -471,8 +471,33 @@ class TeacherProfile {
     this.updatedAt,
   });
 
-  factory TeacherProfile.fromJson(Map<String, dynamic> json) =>
-      _$TeacherProfileFromJson(json);
+  factory TeacherProfile.fromJson(Map<String, dynamic> json) {
+    // Build bank_account from flat fields if nested object is missing
+    final enriched = Map<String, dynamic>.from(json);
+    if (enriched['bank_account'] == null &&
+        enriched['bank_name'] != null &&
+        enriched['account_number'] != null) {
+      enriched['bank_account'] = {
+        'id': 'legacy_${enriched['account_number']}',
+        'bank_name': enriched['bank_name'],
+        'account_number': enriched['account_number'],
+        'account_holder': enriched['account_holder'] ?? '',
+        'is_default': true,
+        'created_at': enriched['created_at'] ?? DateTime.now().toIso8601String(),
+      };
+    }
+    // Ensure bank_accounts items have 'id' field
+    final bankAccounts = enriched['bank_accounts'] as List<dynamic>?;
+    if (bankAccounts != null) {
+      for (var i = 0; i < bankAccounts.length; i++) {
+        final acc = bankAccounts[i] as Map<String, dynamic>;
+        if (acc['id'] == null) {
+          acc['id'] = 'ba_${acc['account_number'] ?? i}';
+        }
+      }
+    }
+    return _$TeacherProfileFromJson(enriched);
+  }
   Map<String, dynamic> toJson() => _$TeacherProfileToJson(this);
 
   /// Calculate profile completion level
