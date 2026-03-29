@@ -447,15 +447,22 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 수강권 발행 후 (Phase 2 완료 상태) — 레슨 시작 안내
+    // 수강권 발행 후 (Phase 2 완료 상태) — 레슨 시작 대기
+    // 실제 레슨이 진행되기 전이므로 "레슨 완료" 버튼을 표시하지 않음
     if (status == UnifiedRequestStatus.subscriptionIssued) {
-      return _buildActionRow(
-        icon: Icons.card_membership,
-        iconColor: AppColors.success,
-        message: AppStrings.chatSubscriptionIssued,
-        primaryLabel: AppStrings.actionLessonComplete,
-        primaryIcon: Icons.play_arrow,
-        onPrimary: widget.onLessonComplete,
+      return Row(
+        children: [
+          Icon(Icons.card_membership, color: AppColors.success, size: 18),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              '${AppStrings.chatSubscriptionIssued}\n레슨을 시작할 준비가 완료되었습니다.',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+        ],
       );
     }
 
