@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../follow/presentation/providers/follow_providers.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
 import '../providers/teacher_extended_profile_provider.dart';
@@ -165,6 +166,21 @@ class ProfileTab extends ConsumerWidget {
                 label: '입금 계좌',
                 subtitle: '수강료 입금받을 계좌 설정',
                 onTap: () => context.push(AppRoutes.bankAccountEdit),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // 소셜
+          _buildMenuSection(
+            title: '소셜',
+            items: [
+              _MenuItem(
+                icon: Icons.people_outline,
+                label: '팔로잉',
+                subtitle: '팔로우한 선생님·학원 관리',
+                onTap: () => context.push(AppRoutes.followList),
               ),
             ],
           ),
@@ -334,6 +350,7 @@ class ProfileTab extends ConsumerWidget {
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
+    final followerCountAsync = ref.watch(followerCountProvider(teacherId));
 
     final studentCountValue = groupsAsync.whenOrNull(
           data: (groups) {
@@ -345,6 +362,10 @@ class ProfileTab extends ConsumerWidget {
     final lessonCountValue =
         lessonStatsAsync.whenOrNull(
           data: (stats) => '${stats['completed'] ?? 0}회',
+        ) ??
+        '-';
+    final followerCountValue = followerCountAsync.whenOrNull(
+          data: (count) => '$count명',
         ) ??
         '-';
 
@@ -366,18 +387,7 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem(
-              '완료율',
-              lessonStatsAsync.whenOrNull(
-                    data: (stats) {
-                      final completed = stats['completed'] ?? 0;
-                      final total = stats['total'] ?? 0;
-                      if (total == 0) return '-';
-                      return '${(completed / total * 100).round()}%';
-                    },
-                  ) ??
-                  '-',
-            ),
+            _buildStatItem('팔로워', followerCountValue),
           ],
         ),
       ),
