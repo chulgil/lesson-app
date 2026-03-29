@@ -255,9 +255,7 @@ class RequestHistoryChat extends StatelessWidget {
               : event.chatDisplayMessage,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: event.eventType.isTerminal
-                ? AppColors.error
-                : AppColors.textPrimaryLight,
+            color: AppColors.textPrimaryLight,
           ),
         ),
 
