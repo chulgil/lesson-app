@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -65,12 +64,18 @@ class ScheduleService:
         """Replace the teacher's weekly availability."""
         from app.models.schedule import AvailabilityTimeSlot, TeacherAvailability
 
-        # Delete existing
+        # Delete existing time slots first (child records)
         existing = await self.db.scalars(
             select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
         )
         for a in existing.all():
+            child_slots = await self.db.scalars(
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == a.id)
+            )
+            for cs in child_slots.all():
+                await self.db.delete(cs)
             await self.db.delete(a)
+        await self.db.flush()
 
         # Create new
         for day in data.availabilities:
@@ -90,28 +95,145 @@ class ScheduleService:
                 self.db.add(ts)
 
         await self.db.flush()
-        return AvailabilityResponse(
-            teacher_id=current_user.id,
-            availabilities=data.availabilities,
-        )
+        return await self.get_availability(current_user)
 
     async def get_weekly_schedule(
         self, current_user: Any, *, week_start: str | None = None
     ) -> WeeklyScheduleResponse:
-        """Return the merged weekly schedule."""
-        from datetime import date as date_type
+        """Return the merged weekly schedule (availability + bookings)."""
+        from datetime import date as date_type, timedelta
+
+        from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
+        from app.schemas.schedule import SlotStatus
 
         ws = date_type.fromisoformat(week_start) if week_start else date_type.today()
-        return WeeklyScheduleResponse(week_start=ws, days={})
+        # Align to Monday
+        ws = ws - timedelta(days=ws.weekday())
+        week_end = ws + timedelta(days=6)
+
+        # Load availability
+        avail_rows = await self.db.scalars(
+            select(TeacherAvailability).where(TeacherAvailability.teacher_id == current_user.id)
+        )
+        avail_by_day: dict[int, list[dict]] = {}
+        for avail in avail_rows.all():
+            slots_rows = await self.db.scalars(
+                select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
+            )
+            avail_by_day[avail.day_of_week] = [
+                {"start_time": s.start_time, "end_time": s.end_time, "type": "available"}
+                for s in slots_rows.all()
+            ]
+
+        # Load bookings for this week
+        bookings = await self.db.scalars(
+            select(LessonBooking).where(
+                LessonBooking.teacher_id == current_user.id,
+                LessonBooking.scheduled_date >= ws,
+                LessonBooking.scheduled_date <= week_end,
+            )
+        )
+        bookings_by_date: dict[str, list[dict]] = {}
+        for b in bookings.all():
+            date_str = b.scheduled_date.isoformat()
+            bookings_by_date.setdefault(date_str, []).append({
+                "start_time": b.scheduled_time,
+                "duration": b.duration,
+                "status": b.status.value if hasattr(b.status, "value") else b.status,
+                "type": "booking",
+            })
+
+        # Build days dict
+        days: dict[str, list] = {}
+        for i in range(7):
+            current_date = ws + timedelta(days=i)
+            date_str = current_date.isoformat()
+            events = []
+            if i in avail_by_day:
+                events.extend(avail_by_day[i])
+            if date_str in bookings_by_date:
+                events.extend(bookings_by_date[date_str])
+            if events:
+                days[date_str] = events
+
+        return WeeklyScheduleResponse(week_start=ws, days=days)
+
+    async def _resolve_teacher_user_id(self, teacher_id: str) -> str:
+        """Resolve Teacher.id or User.id to the correct User.id for queries."""
+        from app.models.teacher import Teacher
+
+        # If teacher_id is a Teacher.id, resolve to user_id
+        teacher = await self.db.get(Teacher, teacher_id)
+        if teacher:
+            return teacher.user_id
+        # Otherwise assume it's already a User.id
+        return teacher_id
 
     async def get_available_slots(
         self, *, teacher_id: str, date: str, duration: int = 60
     ) -> SlotsResponse:
         """Compute available booking slots for a date."""
-        from datetime import date as date_type
+        from datetime import date as date_type, timedelta
+
+        from app.models.schedule import AvailabilityTimeSlot, LessonBooking, TeacherAvailability
+        from app.schemas.schedule import SlotStatus
 
         d = date_type.fromisoformat(date)
-        return SlotsResponse(date=d, slots=[])
+        day_of_week = d.weekday()  # 0=Monday
+
+        # Resolve teacher_id (could be Teacher.id or User.id)
+        user_id = await self._resolve_teacher_user_id(teacher_id)
+
+        # Find availability for this day
+        avail = await self.db.scalar(
+            select(TeacherAvailability).where(
+                TeacherAvailability.teacher_id == user_id,
+                TeacherAvailability.day_of_week == day_of_week,
+            )
+        )
+        if not avail:
+            return SlotsResponse(date=d, slots=[])
+
+        # Get time slots
+        time_slots = await self.db.scalars(
+            select(AvailabilityTimeSlot).where(AvailabilityTimeSlot.availability_id == avail.id)
+        )
+
+        # Get existing bookings for this date
+        bookings = await self.db.scalars(
+            select(LessonBooking).where(
+                LessonBooking.teacher_id == user_id,
+                LessonBooking.scheduled_date == d,
+                LessonBooking.status.in_(["pending", "approved"]),
+            )
+        )
+        booked_times = {b.scheduled_time for b in bookings.all()}
+
+        # Generate slots from availability
+        slots: list[SlotStatus] = []
+        for ts in time_slots.all():
+            # Parse start/end times
+            start_parts = ts.start_time.split(":")
+            end_parts = ts.end_time.split(":")
+            start_minutes = int(start_parts[0]) * 60 + int(start_parts[1])
+            end_minutes = int(end_parts[0]) * 60 + int(end_parts[1])
+
+            # Generate slots at 30-minute intervals
+            current = start_minutes
+            while current + duration <= end_minutes:
+                slot_time = f"{current // 60:02d}:{current % 60:02d}"
+                slot_end_minutes = current + duration
+                slot_end_time = f"{slot_end_minutes // 60:02d}:{slot_end_minutes % 60:02d}"
+
+                is_booked = slot_time in booked_times
+                slots.append(SlotStatus(
+                    start_time=slot_time,
+                    end_time=slot_end_time,
+                    status="booked" if is_booked else "available",
+                ))
+                current += 30  # 30-minute interval
+
+        return SlotsResponse(date=d, slots=slots)
 
     # ------------------------------------------------------------------
     # Schedule exceptions
