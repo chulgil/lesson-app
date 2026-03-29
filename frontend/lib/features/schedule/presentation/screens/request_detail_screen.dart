@@ -531,6 +531,7 @@ class RequestDetailScreen extends ConsumerWidget {
           durationMinutes: request.preferredDuration,
           teacherId: request.teacherId,
           preferredSlots: request.preferredSlots,
+          isStudentView: viewerRole == 'student',
         ),
       ),
     );

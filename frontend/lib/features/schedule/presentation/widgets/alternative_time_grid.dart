@@ -307,7 +307,9 @@ class AlternativeTimeGrid extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isPast ? AppColors.scheduleMutedBackground : null,
+          color: isPast
+              ? AppColors.borderLight.withValues(alpha: 0.15)
+              : null,
           border: Border.all(
             color: AppColors.borderLight.withValues(alpha: 0.3),
             width: 0.5,
