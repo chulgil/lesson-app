@@ -113,6 +113,7 @@ class RequestDetailScreen extends ConsumerWidget {
                 // Chat history
                 RequestHistoryChat(
                   events: events,
+                  request: request,
                   viewerId: viewerRole == 'teacher'
                       ? request.teacherId
                       : request.studentId,

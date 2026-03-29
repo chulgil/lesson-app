@@ -16,6 +16,7 @@ class RequestHistoryChat extends StatelessWidget {
   final String viewerId;
   final String studentName;
   final String? studentProfileUrl;
+  final UnifiedLessonRequest? request;
 
   const RequestHistoryChat({
     super.key,
@@ -23,6 +24,7 @@ class RequestHistoryChat extends StatelessWidget {
     required this.viewerId,
     required this.studentName,
     this.studentProfileUrl,
+    this.request,
   });
 
   @override
@@ -160,18 +162,62 @@ class RequestHistoryChat extends StatelessWidget {
     );
   }
 
-  /// Find the confirmed slot label for approve/acceptAlternative events.
-  /// Looks at selectedSlotIndex and finds the matching slot from the
-  /// most recent preceding event that has suggestedSlots.
+  /// Build slot label widgets for an event.
+  /// For initialRequest: uses request.preferredSlots (date-aware).
+  /// For other events with suggestedSlots: uses TimeSlotOption.displayLabel.
+  List<Widget> _buildSlotLabels(RequestEvent event) {
+    List<String> labels;
+
+    if (event.eventType == RequestEventType.initialRequest &&
+        request != null &&
+        request!.preferredSlots.isNotEmpty) {
+      // Use PreferredTimeSlot.displayLabel (includes date)
+      final sorted = [...request!.preferredSlots]
+        ..sort((a, b) => a.priority.compareTo(b.priority));
+      labels = sorted.map((ps) => ps.displayLabel).toList();
+    } else if (event.suggestedSlots.isNotEmpty) {
+      labels = event.suggestedSlots
+          .take(3)
+          .map((s) => s.displayLabel)
+          .toList();
+    } else {
+      return [];
+    }
+
+    return [
+      const SizedBox(height: AppSpacing.space2),
+      ...labels.asMap().entries.map((entry) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space1 / 2),
+            child: Text(
+              '${entry.key + 1}순위 ${entry.value}',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          )),
+    ];
+  }
+
+  /// Find the confirmed slot label for approve/acceptAlternative/withdraw events.
+  /// Uses request.preferredSlots (date-aware) when available.
   String? _resolveConfirmedSlotLabel(RequestEvent event) {
     if (event.selectedSlotIndex == null) return null;
+    final idx = event.selectedSlotIndex!;
 
-    // Search backwards through events for the nearest event with slots
+    // First try: use request's preferredSlots (date-aware)
+    if (request != null && request!.preferredSlots.isNotEmpty) {
+      final sorted = [...request!.preferredSlots]
+        ..sort((a, b) => a.priority.compareTo(b.priority));
+      if (idx >= 0 && idx < sorted.length) {
+        return sorted[idx].displayLabel;
+      }
+    }
+
+    // Fallback: search backwards through events for suggestedSlots
     final eventIndex = events.indexOf(event);
     for (int i = eventIndex - 1; i >= 0; i--) {
       final prev = events[i];
       if (prev.suggestedSlots.isNotEmpty) {
-        final idx = event.selectedSlotIndex!;
         if (idx >= 0 && idx < prev.suggestedSlots.length) {
           return prev.suggestedSlots[idx].displayLabel;
         }
@@ -221,25 +267,9 @@ class RequestHistoryChat extends StatelessWidget {
           ),
         ],
 
-        // Time slots (text only — for propose/counterPropose events)
-        if (event.suggestedSlots.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.space2),
-          ...event.suggestedSlots
-              .take(3)
-              .toList()
-              .asMap()
-              .entries
-              .map((entry) => Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: AppSpacing.space1 / 2),
-                    child: Text(
-                      '${entry.key + 1}순위 ${entry.value.displayLabel}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  )),
-        ],
+        // Time slots — use preferredSlots for initialRequest (date-aware),
+        // suggestedSlots for other events
+        ..._buildSlotLabels(event),
 
         // User message
         if (event.message != null && event.message!.isNotEmpty) ...[
