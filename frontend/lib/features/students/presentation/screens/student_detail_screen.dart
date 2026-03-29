@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -114,80 +115,53 @@ class _StudentDetailContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(studentProvider(student.id));
-          ref.invalidate(lessonsByStudentProvider(student.id));
-          ref.invalidate(weeklyPracticeProvider(student.id));
-        },
-        child: CustomScrollView(
-          slivers: [
-            // App bar with profile header
-            _buildSliverAppBar(context, ref),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              _buildSliverAppBar(context, ref, innerBoxIsScrolled),
+            ];
+          },
+          body: TabBarView(
+            children: [
+              // Tab 0: Info
+              StudentInfoTab(student: student),
 
-            // Content
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stats cards (neutral tone, no icons)
-                    StudentStatsCards(student: student),
+              // Tab 1: Lessons
+              StudentLessonsTab(studentId: student.id),
 
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Upcoming lessons — teacher's primary concern
-                    StudentUpcomingLessonsSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Subscription status (수강권 현황)
-                    StudentSubscriptionSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Recent lesson history
-                    StudentRecentLessonsSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Lesson notes history
-                    StudentNotesSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space6),
-
-                    // Practice progress this week
-                    StudentPracticeSection(studentId: student.id),
-
-                    const SizedBox(height: AppSpacing.space8),
-                  ],
-                ),
-              ),
-            ),
-          ],
+              // Tab 2: Practice
+              StudentPracticeTab(studentId: student.id),
+            ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push('${AppRoutes.addLesson}?studentId=${student.id}');
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('레슨 예약'),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            context.push('${AppRoutes.addLesson}?studentId=${student.id}');
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('레슨 예약'),
+        ),
       ),
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, WidgetRef ref) {
+  Widget _buildSliverAppBar(
+    BuildContext context,
+    WidgetRef ref,
+    bool innerBoxIsScrolled,
+  ) {
     final profileImagePath =
         ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
     final backgroundImagePath =
         ref.watch(studentBackgroundImageNotifierProvider(student.id)).valueOrNull;
 
     return SliverAppBar(
-      expandedHeight: 200,
+      expandedHeight: 240,
       pinned: true,
+      forceElevated: innerBoxIsScrolled,
       leading: IconButton(
         onPressed: () => context.pop(),
         icon: const Icon(Icons.arrow_back),
@@ -211,6 +185,20 @@ class _StudentDetailContent extends ConsumerWidget {
           profileImagePath: profileImagePath,
           backgroundImagePath: backgroundImagePath,
         ),
+      ),
+      bottom: TabBar(
+        indicatorColor: Colors.white,
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
+        labelStyle: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: AppTypography.bodyMedium,
+        tabs: const [
+          Tab(text: AppStrings.studentTabInfo),
+          Tab(text: AppStrings.studentTabLessons),
+          Tab(text: AppStrings.studentTabPractice),
+        ],
       ),
     );
   }

@@ -628,4 +628,15 @@ class AppStrings {
 
   /// 수강권 차감
   static const subscriptionDeducted = '수강권 차감';
+
+  // ── Student Detail Tabs ──────────────────────────────────
+
+  /// 학생 상세 - 정보 탭
+  static const studentTabInfo = '정보';
+
+  /// 학생 상세 - 레슨 탭
+  static const studentTabLessons = '레슨';
+
+  /// 학생 상세 - 연습 현황 탭
+  static const studentTabPractice = '연습 현황';
 }
