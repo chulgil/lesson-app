@@ -142,7 +142,9 @@ class RequestDetailScreen extends ConsumerWidget {
           academyName,
         ),
         child: Text(
-          '$opponentName (${request.typeDisplayLabel})',
+          request.isAcademy && academyName != null
+              ? '$academyName $opponentName (${request.typeDisplayLabel})'
+              : '$opponentName (${request.typeDisplayLabel})',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
           ),
