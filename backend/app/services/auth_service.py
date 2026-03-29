@@ -75,6 +75,13 @@ class AuthService:
 
         from app.models.user import User, UserRole
 
+        # Check if this email has a predefined seed ID
+        try:
+            from scripts.seeds.ids import SEED_ACCOUNTS
+            seed_info = SEED_ACCOUNTS.get(request.email)
+        except ImportError:
+            seed_info = None
+
         user = await self.db.scalar(
             select(User).where(User.email == request.email)
         )
@@ -83,6 +90,7 @@ class AuthService:
 
         if user is None:
             user = User(
+                id=seed_info["user_id"] if seed_info else None,
                 email=request.email,
                 name=request.name or request.email.split("@")[0],
                 role=role_enum,
