@@ -1,6 +1,6 @@
 # 시나리오 테스트 가이드
 
-> 마지막 업데이트: 2026-03-26
+> 마지막 업데이트: 2026-03-29
 
 ## 개요
 
@@ -30,7 +30,8 @@ tests/
 │   └── assertions.py        # 공통 검증 함수
 ├── conftest.py              # teacher, student fixture (자동 시드)
 ├── test_scenarios_teacher.py     # Raw API 호출 시나리오 (10개)
-└── test_scenarios_framework.py   # 프레임워크 사용 시나리오 (10개)
+├── test_scenarios_framework.py   # 프레임워크 사용 시나리오 (23개)
+└── test_scenario_schedule_integration.py  # 스케줄 연동 E2E (5개)
 ```
 
 ### 핵심 클래스
@@ -84,6 +85,16 @@ tests/
 | U-09 | 가격표 자동 매칭 | `PUT /settings/teacher(lesson_price_table)` → `POST /lesson-requests(violin/beginner)` → suggested_price=40000 | 악기×레벨 매칭, 미등록 악기=null |
 | U-10 | 체험 무료 토글 | `PUT /settings/teacher(trial_lesson_free=true)` → `GET` → true → `PUT(false)` → `GET` → false | 영속성 확인 |
 | U-11 | 시간 확정→수강권 발급 | 신청 → 협상 → timeConfirmed → `POST /proposals` → `PATCH respond(accept)` → `PATCH confirm` → `PATCH status(completed)` | 전체 E2E 플로우 |
+
+### 스케줄 연동 E2E 시나리오 (`test_scenario_schedule_integration.py`)
+
+| ID | 시나리오 | 플로우 | 검증 포인트 |
+|----|---------|--------|------------|
+| SI-01 | 체험레슨 전체 플로우 | 가입 → 초대/연결 → 체험 요청(preferred_duration=30) → 승인 → 학생 등록 → 레슨 생성/완료 → 피드백 → 수강권 템플릿 → 제안 → proposalSent → 학생 수락 → 입금 확인 → completed | 초대 코드 생성, 연결 1건, 체험 duration=30, 레슨 completed, 피드백 key_points 2개, 수강권 전체 E2E |
+| SI-02 | 정규레슨 시간 협상 2라운드 | 가격표 설정(piano/intermediate=60000) → 정규 요청(자동 가격 매칭) → Round 1: 대안 2개 → 역제안 → Round 2: 재대안 2개 → 수락 → 학생 등록 → 수강권 → 첫 레슨 차감 | suggested_price=60000, round1 negotiating, round2 current_round=2, timeConfirmed preferred_day=2/time=15:00, remaining=3 |
+| SI-03 | 거절 후 재신청 | 토요일 요청 → 거절(사유: "토요일은 레슨 없음") → 학생 확인 → 수요일 재신청 → 승인 | rejected+decline_reason, 재신청 pending, 전체 요청 2건 |
+| SI-04 | 그룹 수업 출석 관리 | 그룹 스케줄(max=4, waitlist=2) → 학생 3명 예약 → 출석 2명 + 결석 1명 | 3명 confirmed, attended 2건, noShow 1건 |
+| SI-05 | 한 학생 다중 악기 요청 | 바이올린 정규 요청 + 피아노 체험 요청 → 바이올린 승인 → 피아노 시간 협상 → 학생 수락 | 요청 2건, instruments={violin, piano}, 바이올린 approved, 피아노 timeConfirmed |
 
 ### 학생 시나리오 (StudentActions 사용)
 
@@ -234,6 +245,22 @@ python -m pytest tests/test_scenarios_framework.py::test_fw_subscription_renewal
 | `write_review(teacher_id, rating, content)` | str (id) | 리뷰 작성 |
 | `get_practice_logs(student_id, year, month)` | list | 연습 기록 조회 |
 | `get_gamification(student_id)` | dict | 게이미피케이션 조회 |
+| `create_lesson_request(teacher_id, request_type, instrument, ...)` | str (id) | 통합 레슨 신청 |
+| `get_lesson_request(request_id)` | dict | 레슨 요청 상세 |
+| `list_my_lesson_requests(student_id)` | dict | 내 요청 목록 |
+| `accept_alternative(request_id, selected_slot_index, message)` | dict | 대안 시간 수락 |
+| `counter_propose(request_id, slot, message)` | dict | 역제안 |
+
+### 레슨 요청 (TeacherActions)
+
+| 메서드 | 반환 | 설명 |
+|--------|------|------|
+| `list_lesson_requests(teacher_id, **params)` | dict | 요청 목록 |
+| `get_lesson_request(request_id)` | dict | 요청 상세 |
+| `approve_lesson_request(request_id)` | dict | 승인 (→approved) |
+| `reject_lesson_request(request_id, reason)` | dict | 거절 (→rejected) |
+| `update_lesson_request_status(request_id, status, ...)` | dict | 상태 변경 |
+| `propose_alternatives(request_id, slots, message)` | dict | 대안 시간 제안 (최대 3개) |
 
 ---
 
