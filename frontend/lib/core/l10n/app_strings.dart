@@ -399,6 +399,20 @@ class AppStrings {
   static const chatSubscriptionRenewed = '수강권이 연장되었습니다';
   static const chatSubscriptionCompleted = '수강이 완료되었습니다';
 
+  // ── Progress Bar Phase Labels ─────────────────────────────
+
+  static const phaseRequest = '신청';
+  static const phaseConfirmed = '확정';
+  static const phasePayment = '결제';
+  static const phaseLessons = '진행';
+  static const phaseCompleted = '완료';
+
+  // ── Chapter Titles ────────────────────────────────────────
+
+  static const chapterRequest = '레슨 신청';
+  static const chapterSubscription = '수강권 & 결제';
+  static const chapterLessons = '레슨 진행';
+
   // ── Profile Menu ──────────────────────────────────────────
 
   /// 레슨 요청 관리 메뉴
