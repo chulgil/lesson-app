@@ -173,7 +173,7 @@ class AppStrings {
   static const lessonRequestSuffix = '레슨을 요청했습니다';
 
   /// 종료됨 (terminal 상태 하단바)
-  static const requestClosed = '종료됨';
+  static const requestClosed = '요청이 종료되었습니다';
 
   // ── Schedule Comparison & Actions ─────────────────────────
 
