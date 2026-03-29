@@ -804,42 +804,130 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     }
   }
 
+  /// "결정 변경" — opens schedule comparison directly.
+  /// No withdraw event until user commits to a change.
+  ///
+  /// Result handling:
+  /// - Same slot + new message → approve event only (message add)
+  /// - Different slot → withdraw + approve events
+  /// - Propose alternatives → withdraw + propose events
+  /// - Reject → withdraw + reject events
+  /// - Cancel (back) → nothing happens, approval stays
   Future<void> _handleWithdraw(
     BuildContext context,
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(AppStrings.withdrawApproval),
-        content: const Text(AppStrings.withdrawApprovalMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(AppStrings.no),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text(AppStrings.withdrawApproval),
-          ),
-        ],
+    // Find previously approved slot index from events
+    final events = await ref.read(
+      requestEventsProvider(request.id).future,
+    );
+    int? prevSlotIndex;
+    for (int i = events.length - 1; i >= 0; i--) {
+      if ((events[i].eventType == RequestEventType.approve ||
+              events[i].eventType == RequestEventType.acceptAlternative) &&
+          events[i].selectedSlotIndex != null) {
+        prevSlotIndex = events[i].selectedSlotIndex;
+        break;
+      }
+    }
+
+    // Go directly to schedule comparison (no withdraw event yet)
+    if (!context.mounted) return;
+    final result = await Navigator.push<SuggestAlternativeResult>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SuggestAlternativeScreen(
+          message: '',
+          durationMinutes: request.preferredDuration,
+          teacherId: request.teacherId,
+          preferredSlots: request.preferredSlots,
+          isStudentView: viewerRole == 'student',
+        ),
       ),
     );
-    if (confirmed != true || !context.mounted) return;
+    if (result == null || !context.mounted) return;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
-      await actions.withdrawApprovalRequest(
-        request.id,
-        request.teacherId,
-        request.studentId,
-        actorRole: viewerRole == 'teacher'
-            ? ProposerRole.teacher
-            : ProposerRole.student,
-      );
-      if (context.mounted) {
-        showInfoSnackBar(context, AppStrings.withdrawApprovalSuccess);
+      final actorRole = viewerRole == 'teacher'
+          ? ProposerRole.teacher
+          : ProposerRole.student;
+
+      if (result.acceptedSlotIndex != null) {
+        // Re-approve: check if slot changed
+        final sameSlot = result.acceptedSlotIndex == prevSlotIndex;
+
+        if (sameSlot) {
+          // Same slot — just add a new approve event with message (no withdraw)
+          await actions.approveRequest(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            selectedSlotIndex: result.acceptedSlotIndex,
+            message: result.message.isEmpty ? null : result.message,
+          );
+        } else {
+          // Different slot — withdraw first, then approve
+          await actions.withdrawApprovalRequest(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            actorRole: actorRole,
+          );
+          await actions.approveRequest(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            selectedSlotIndex: result.acceptedSlotIndex,
+            message: result.message.isEmpty ? null : result.message,
+          );
+        }
+      } else if (result.slots.isEmpty) {
+        // Reject — withdraw + reject
+        await actions.withdrawApprovalRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          actorRole: actorRole,
+        );
+        await actions.rejectRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          reason: result.message,
+        );
+        if (context.mounted) {
+          showInfoSnackBar(context, AppStrings.requestUnavailable);
+        }
+      } else {
+        // Propose alternatives — withdraw + propose
+        await actions.withdrawApprovalRequest(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          actorRole: actorRole,
+        );
+        await actions.proposeAlternatives(
+          request.id,
+          request.teacherId,
+          request.studentId,
+          slots: result.slots
+              .map((s) => TimeSlotOption(
+                    id: s.id,
+                    dayOfWeek: s.dayOfWeek - 1,
+                    startTime:
+                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                    endTime:
+                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                    date: s.specificDate,
+                  ))
+              .toList(),
+          message: result.message,
+        );
+        if (context.mounted) {
+          showSuccessSnackBar(context, AppStrings.alternativeProposeSent);
+        }
       }
     } catch (e) {
       if (context.mounted) {
