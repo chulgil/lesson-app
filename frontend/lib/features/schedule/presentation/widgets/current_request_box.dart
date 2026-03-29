@@ -296,9 +296,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         const SizedBox(height: AppSpacing.space4),
         Row(
           children: [
-            // Both teacher and student: show "결정 변경" when they made the last action
-            if (isApproved || isPending) ...[
-              Expanded(
+            // Always show "결정 변경" in theirTurn (any non-terminal state)
+            Expanded(
                 child: OutlinedButton.icon(
                   onPressed: widget.onWithdraw,
                   icon: const Icon(Icons.undo, size: 16),
@@ -319,8 +318,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   ),
                 ),
               ),
-            ],
-            // Other states (negotiating etc): no buttons — just waiting
           ],
         ),
       ],
