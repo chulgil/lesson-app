@@ -17,6 +17,7 @@ import '../../../features/schedule/presentation/screens/request_detail_screen.da
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/register_regular_lesson_screen.dart';
+import '../../../features/schedule/presentation/screens/schedule_change_slot_screen.dart';
 import '../../../features/schedule/presentation/screens/teacher_availability_screen.dart';
 import '../app_routes.dart';
 
@@ -226,6 +227,16 @@ List<GoRoute> scheduleRoutes = [
         schedule: extra['schedule'] as GroupClassSchedule,
         groupClass: extra['groupClass'] as GroupClass,
       );
+    },
+  ),
+
+  // Schedule Change — Single Lesson Slot Selection
+  GoRoute(
+    path: AppRoutes.scheduleChangeSlots,
+    name: 'scheduleChangeSlots',
+    builder: (context, state) {
+      final params = state.extra as ScheduleChangeSlotParams;
+      return ScheduleChangeSlotScreen(params: params);
     },
   ),
 ];

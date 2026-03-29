@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
 import '../../data/repositories/remote_unified_lesson_request_repository.dart';
+import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
@@ -745,6 +746,125 @@ class UnifiedLessonRequestActions {
       actorType: ProposerRole.teacher,
       actorId: teacherId,
       eventType: RequestEventType.subscriptionCompleted,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  // ── Phase 3: Schedule Change Negotiation ────────────────
+
+  /// Propose a schedule change (single or bulk).
+  Future<void> recordScheduleChangeProposed(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    required ScheduleChangeType changeType,
+    List<TimeSlotOption> suggestedSlots = const [],
+    int? proposedDayOfWeek,
+    String? proposedTime,
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChangeProposed,
+      scheduleChangeType: changeType,
+      suggestedSlots: suggestedSlots,
+      proposedDayOfWeek: proposedDayOfWeek,
+      proposedTime: proposedTime,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Accept a schedule change proposal.
+  Future<void> recordScheduleChangeAccepted(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    int? selectedSlotIndex,
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChangeAccepted,
+      selectedSlotIndex: selectedSlotIndex,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    // Record final scheduleChanged event for timeline summary
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch + 1}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChanged,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Reject a schedule change proposal.
+  Future<void> recordScheduleChangeRejected(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChangeRejected,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Counter-propose a schedule change with new times.
+  Future<void> recordScheduleChangeCountered(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    required ScheduleChangeType changeType,
+    List<TimeSlotOption> suggestedSlots = const [],
+    int? proposedDayOfWeek,
+    String? proposedTime,
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChangeCountered,
+      scheduleChangeType: changeType,
+      suggestedSlots: suggestedSlots,
+      proposedDayOfWeek: proposedDayOfWeek,
+      proposedTime: proposedTime,
+      message: message,
       createdAt: DateTime.now(),
     ));
 

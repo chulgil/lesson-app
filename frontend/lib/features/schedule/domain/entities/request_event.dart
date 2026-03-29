@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import 'lesson_schedule_change.dart';
 import 'unified_lesson_request.dart';
 
 part 'request_event.g.dart';
@@ -75,7 +76,20 @@ enum RequestEventType {
   subscriptionRenewed,
 
   @HiveField(21)
-  subscriptionCompleted;
+  subscriptionCompleted,
+
+  // Phase 3: 스케줄 변경 협상 (NEW)
+  @HiveField(22)
+  scheduleChangeProposed,
+
+  @HiveField(23)
+  scheduleChangeAccepted,
+
+  @HiveField(24)
+  scheduleChangeRejected,
+
+  @HiveField(25)
+  scheduleChangeCountered;
 
   String get label {
     switch (this) {
@@ -122,6 +136,14 @@ enum RequestEventType {
         return AppStrings.eventSubscriptionRenewed;
       case RequestEventType.subscriptionCompleted:
         return AppStrings.eventSubscriptionCompleted;
+      case RequestEventType.scheduleChangeProposed:
+        return AppStrings.eventScheduleChangeProposed;
+      case RequestEventType.scheduleChangeAccepted:
+        return AppStrings.eventScheduleChangeAccepted;
+      case RequestEventType.scheduleChangeRejected:
+        return AppStrings.eventScheduleChangeRejected;
+      case RequestEventType.scheduleChangeCountered:
+        return AppStrings.eventScheduleChangeCountered;
     }
   }
 
@@ -165,6 +187,18 @@ class RequestEvent {
   @HiveField(8)
   final DateTime createdAt;
 
+  /// Schedule change type (singleLesson / bulkChange) — for schedule change events only.
+  @HiveField(9)
+  final ScheduleChangeType? scheduleChangeType;
+
+  /// Proposed new day of week (0=Mon) — for bulkChange proposals.
+  @HiveField(10)
+  final int? proposedDayOfWeek;
+
+  /// Proposed new time "HH:mm" — for bulkChange proposals.
+  @HiveField(11)
+  final String? proposedTime;
+
   const RequestEvent({
     required this.id,
     required this.requestId,
@@ -175,6 +209,9 @@ class RequestEvent {
     this.selectedSlotIndex,
     this.message,
     required this.createdAt,
+    this.scheduleChangeType,
+    this.proposedDayOfWeek,
+    this.proposedTime,
   });
 
   factory RequestEvent.fromJson(Map<String, dynamic> json) =>
@@ -192,6 +229,9 @@ class RequestEvent {
     int? selectedSlotIndex,
     String? message,
     DateTime? createdAt,
+    ScheduleChangeType? scheduleChangeType,
+    int? proposedDayOfWeek,
+    String? proposedTime,
   }) {
     return RequestEvent(
       id: id ?? this.id,
@@ -203,6 +243,9 @@ class RequestEvent {
       selectedSlotIndex: selectedSlotIndex ?? this.selectedSlotIndex,
       message: message ?? this.message,
       createdAt: createdAt ?? this.createdAt,
+      scheduleChangeType: scheduleChangeType ?? this.scheduleChangeType,
+      proposedDayOfWeek: proposedDayOfWeek ?? this.proposedDayOfWeek,
+      proposedTime: proposedTime ?? this.proposedTime,
     );
   }
 
@@ -255,6 +298,14 @@ class RequestEvent {
         return AppStrings.chatSubscriptionRenewed;
       case RequestEventType.subscriptionCompleted:
         return AppStrings.chatSubscriptionCompleted;
+      case RequestEventType.scheduleChangeProposed:
+        return AppStrings.chatScheduleChangeProposed;
+      case RequestEventType.scheduleChangeAccepted:
+        return AppStrings.chatScheduleChangeAccepted;
+      case RequestEventType.scheduleChangeRejected:
+        return AppStrings.chatScheduleChangeRejected;
+      case RequestEventType.scheduleChangeCountered:
+        return AppStrings.chatScheduleChangeCountered;
     }
   }
 

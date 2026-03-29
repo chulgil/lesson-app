@@ -26,13 +26,16 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       selectedSlotIndex: fields[6] as int?,
       message: fields[7] as String?,
       createdAt: fields[8] as DateTime,
+      scheduleChangeType: fields[9] as ScheduleChangeType?,
+      proposedDayOfWeek: fields[10] as int?,
+      proposedTime: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RequestEvent obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -50,7 +53,13 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       ..writeByte(7)
       ..write(obj.message)
       ..writeByte(8)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(9)
+      ..write(obj.scheduleChangeType)
+      ..writeByte(10)
+      ..write(obj.proposedDayOfWeek)
+      ..writeByte(11)
+      ..write(obj.proposedTime);
   }
 
   @override
@@ -115,6 +124,14 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         return RequestEventType.subscriptionRenewed;
       case 21:
         return RequestEventType.subscriptionCompleted;
+      case 22:
+        return RequestEventType.scheduleChangeProposed;
+      case 23:
+        return RequestEventType.scheduleChangeAccepted;
+      case 24:
+        return RequestEventType.scheduleChangeRejected;
+      case 25:
+        return RequestEventType.scheduleChangeCountered;
       default:
         return RequestEventType.initialRequest;
     }
@@ -189,6 +206,18 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
       case RequestEventType.subscriptionCompleted:
         writer.writeByte(21);
         break;
+      case RequestEventType.scheduleChangeProposed:
+        writer.writeByte(22);
+        break;
+      case RequestEventType.scheduleChangeAccepted:
+        writer.writeByte(23);
+        break;
+      case RequestEventType.scheduleChangeRejected:
+        writer.writeByte(24);
+        break;
+      case RequestEventType.scheduleChangeCountered:
+        writer.writeByte(25);
+        break;
     }
   }
 
@@ -220,6 +249,10 @@ RequestEvent _$RequestEventFromJson(Map<String, dynamic> json) => RequestEvent(
       selectedSlotIndex: (json['selected_slot_index'] as num?)?.toInt(),
       message: json['message'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
+      scheduleChangeType: $enumDecodeNullable(
+          _$ScheduleChangeTypeEnumMap, json['schedule_change_type']),
+      proposedDayOfWeek: (json['proposed_day_of_week'] as num?)?.toInt(),
+      proposedTime: json['proposed_time'] as String?,
     );
 
 Map<String, dynamic> _$RequestEventToJson(RequestEvent instance) =>
@@ -234,6 +267,10 @@ Map<String, dynamic> _$RequestEventToJson(RequestEvent instance) =>
       'selected_slot_index': instance.selectedSlotIndex,
       'message': instance.message,
       'created_at': instance.createdAt.toIso8601String(),
+      'schedule_change_type':
+          _$ScheduleChangeTypeEnumMap[instance.scheduleChangeType],
+      'proposed_day_of_week': instance.proposedDayOfWeek,
+      'proposed_time': instance.proposedTime,
     };
 
 const _$ProposerRoleEnumMap = {
@@ -264,4 +301,13 @@ const _$RequestEventTypeEnumMap = {
   RequestEventType.lessonNoteAdded: 'lessonNoteAdded',
   RequestEventType.subscriptionRenewed: 'subscriptionRenewed',
   RequestEventType.subscriptionCompleted: 'subscriptionCompleted',
+  RequestEventType.scheduleChangeProposed: 'scheduleChangeProposed',
+  RequestEventType.scheduleChangeAccepted: 'scheduleChangeAccepted',
+  RequestEventType.scheduleChangeRejected: 'scheduleChangeRejected',
+  RequestEventType.scheduleChangeCountered: 'scheduleChangeCountered',
+};
+
+const _$ScheduleChangeTypeEnumMap = {
+  ScheduleChangeType.singleLesson: 'singleLesson',
+  ScheduleChangeType.bulkChange: 'bulkChange',
 };

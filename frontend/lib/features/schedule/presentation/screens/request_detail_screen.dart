@@ -12,9 +12,12 @@ import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
+import '../widgets/schedule_change_type_bottom_sheet.dart';
+import 'schedule_change_slot_screen.dart';
 import '../../../subscription/presentation/providers/subscription_template_providers.dart';
 import '../widgets/current_request_box.dart';
 import '../widgets/proposal_bottom_sheet.dart';
@@ -1195,20 +1198,76 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         ? request.teacherId
         : request.studentId;
 
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-      await actions.recordScheduleChanged(
-        request.id,
-        actorId,
-        actorRole,
-        request.teacherId,
-        request.studentId,
+    // Step 1: Choose change type
+    final changeType = await showScheduleChangeTypeBottomSheet(context);
+    if (changeType == null || !context.mounted) return;
+
+    if (changeType == ScheduleChangeType.singleLesson) {
+      // Step 2a: Navigate to slot selection screen
+      final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
+        MaterialPageRoute(
+          builder: (_) => ScheduleChangeSlotScreen(
+            params: ScheduleChangeSlotParams(
+              teacherId: request.teacherId,
+              studentId: request.studentId,
+              durationMinutes: 60, // TODO: get from subscription
+              currentScheduleLabel: request.preferredSlots.isNotEmpty
+                  ? request.preferredSlots.first.displayLabel
+                  : '-',
+            ),
+          ),
+        ),
       );
-      if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionScheduleChange);
+      if (result == null || !context.mounted) return;
+
+      // Step 3: Record schedule change proposed event
+      try {
+        final actions = UnifiedLessonRequestActions(ref);
+        await actions.recordScheduleChangeProposed(
+          request.id,
+          actorId,
+          actorRole,
+          request.teacherId,
+          request.studentId,
+          changeType: changeType,
+          suggestedSlots: result.slots
+              .map((s) => TimeSlotOption(
+                    id: s.id,
+                    dayOfWeek: s.dayOfWeek,
+                    startTime:
+                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                    endTime:
+                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                  ))
+              .toList(),
+          message: result.message.isEmpty ? null : result.message,
+        );
+        if (context.mounted) {
+          showSuccessSnackBar(context, AppStrings.scheduleChangePropose);
+        }
+      } catch (e) {
+        if (context.mounted) showErrorSnackBar(context);
       }
-    } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+    } else {
+      // Step 2b: Bulk change — navigate to regular schedule change screen
+      // TODO: Phase 4 — RegularScheduleChangeScreen
+      try {
+        final actions = UnifiedLessonRequestActions(ref);
+        await actions.recordScheduleChangeProposed(
+          request.id,
+          actorId,
+          actorRole,
+          request.teacherId,
+          request.studentId,
+          changeType: changeType,
+          message: AppStrings.scheduleChangeBulkDesc,
+        );
+        if (context.mounted) {
+          showSuccessSnackBar(context, AppStrings.scheduleChangePropose);
+        }
+      } catch (e) {
+        if (context.mounted) showErrorSnackBar(context);
+      }
     }
   }
 

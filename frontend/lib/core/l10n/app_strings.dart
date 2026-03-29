@@ -398,6 +398,36 @@ class AppStrings {
   static const chatLessonNoteAdded = '레슨 노트가 추가되었습니다';
   static const chatSubscriptionRenewed = '수강권이 연장되었습니다';
   static const chatSubscriptionCompleted = '수강이 완료되었습니다';
+  static const chatScheduleChangeProposed = '시간 변경을 제안했습니다';
+  static const chatScheduleChangeAccepted = '시간 변경을 수락했습니다';
+  static const chatScheduleChangeRejected = '시간 변경을 거절했습니다';
+  static const chatScheduleChangeCountered = '다른 시간을 역제안했습니다';
+
+  // ── Schedule Change Event Labels ─────────────────────────────
+  static const eventScheduleChangeProposed = '시간 변경 제안';
+  static const eventScheduleChangeAccepted = '시간 변경 수락';
+  static const eventScheduleChangeRejected = '시간 변경 거절';
+  static const eventScheduleChangeCountered = '시간 역제안';
+
+  // ── Schedule Change UI ────────────────────────────────────────
+  static const scheduleChangeTitle = '시간 변경';
+  static const scheduleChangeTypeTitle = '어떤 변경을 원하시나요?';
+  static const scheduleChangeSingleLabel = '이번 회차만';
+  static const scheduleChangeSingleDesc = '이번 회차 레슨만 시간을 변경합니다';
+  static const scheduleChangeBulkLabel = '앞으로 모두';
+  static const scheduleChangeBulkDesc = '앞으로 모든 레슨 시간을 변경합니다';
+  static const scheduleChangeSlotTitle = '변경할 시간을 선택하세요';
+  static const scheduleChangeRegularTitle = '정규 시간 변경';
+  static const scheduleChangeCurrentSchedule = '현재 스케줄';
+  static const scheduleChangeNewSchedule = '변경할 스케줄';
+  static const scheduleChangePropose = '시간 변경 제안';
+  static const scheduleChangeInProgress = '시간 변경 진행 중';
+  static const scheduleChangeRequestArrived = '시간 변경 요청이 도착했습니다';
+  static const scheduleChangeAccept = '수락';
+  static const scheduleChangeReject = '거절';
+  static const scheduleChangeCounter = '역제안';
+  static const scheduleChangeConfirmed = '시간이 변경되었습니다';
+  static const scheduleChangeRecommended = '추천';
 
   // ── Progress Bar Phase Labels ─────────────────────────────
 
