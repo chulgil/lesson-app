@@ -4,8 +4,10 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
+import 'proposal_chat_card.dart';
 
 /// Chat-style history of all events in a lesson request.
 ///
@@ -19,6 +21,10 @@ class RequestHistoryChat extends StatelessWidget {
   final UnifiedLessonRequest? request;
   final VoidCallback? onOpponentAvatarTap;
 
+  /// Proposal template data for rendering proposal cards in chat.
+  final List<SubscriptionTemplate> proposalTemplates;
+  final String? recommendedTemplateId;
+
   /// When true, uses shrinkWrap + NeverScrollableScrollPhysics
   /// so this widget can be placed inside another scrollable.
   final bool shrinkWrap;
@@ -31,6 +37,8 @@ class RequestHistoryChat extends StatelessWidget {
     this.studentProfileUrl,
     this.request,
     this.onOpponentAvatarTap,
+    this.proposalTemplates = const [],
+    this.recommendedTemplateId,
     this.shrinkWrap = false,
   });
 
@@ -289,6 +297,10 @@ class RequestHistoryChat extends StatelessWidget {
       displayLabel = event.chatDisplayMessage;
     }
 
+    // Proposal card for proposalSent events
+    final isProposalEvent =
+        event.eventType == RequestEventType.proposalSent && proposalTemplates.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -300,6 +312,13 @@ class RequestHistoryChat extends StatelessWidget {
             color: AppColors.textPrimaryLight,
           ),
         ),
+
+        // Proposal card with template info
+        if (isProposalEvent)
+          ProposalChatCard(
+            templates: proposalTemplates,
+            recommendedTemplateId: recommendedTemplateId,
+          ),
 
         // Confirmed/withdrawn slot (same style as initial request slots)
         if (confirmedSlotLabel != null) ...[
@@ -319,8 +338,8 @@ class RequestHistoryChat extends StatelessWidget {
         // suggestedSlots for other events
         ..._buildSlotLabels(event),
 
-        // User message
-        if (event.message != null && event.message!.isNotEmpty) ...[
+        // User message (skip for proposal events — template info replaces it)
+        if (event.message != null && event.message!.isNotEmpty && !isProposalEvent) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
             event.message!,

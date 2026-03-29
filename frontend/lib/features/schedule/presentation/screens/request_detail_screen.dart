@@ -96,6 +96,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         // Watch student data for regular lesson profile card
         final studentAsync = ref.watch(studentProvider(request.studentId));
 
+        // Watch teacher templates for Phase 2 proposal display
+        final proposalTemplates = ref
+            .watch(activeTeacherTemplatesProvider(request.teacherId))
+            .valueOrNull ?? [];
+
         final opponentName = viewerRole == 'teacher'
             ? studentName
             : AppStrings.teacher;
@@ -128,6 +133,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                           ? request.teacherId
                           : request.studentId,
                       studentName: studentName,
+                      proposalTemplates: proposalTemplates,
                       onOpponentAvatarTap: () => _showProfileBottomSheet(
                         context,
                         request,
@@ -166,6 +172,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     _handleConfirmPayment(context, ref, request),
                 onVerifyPayment: () =>
                     _handleVerifyPayment(context, ref, request),
+                onAcceptProposal: (templateId) =>
+                    _handleAcceptProposal(context, ref, request, templateId),
+                onRejectProposal: (reason) =>
+                    _handleRejectProposal(context, ref, request, reason),
+                proposalTemplates: proposalTemplates,
                 // Phase 3
                 onLessonComplete: () =>
                     _handleLessonComplete(context, ref, request),
@@ -1071,6 +1082,50 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       );
       if (context.mounted) {
         showSuccessSnackBar(context, AppStrings.actionVerifyPayment);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleAcceptProposal(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+    String? selectedTemplateId,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.acceptProposal(
+        request.id,
+        request.studentId,
+        request.teacherId,
+        selectedTemplateId: selectedTemplateId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.eventProposalAccepted);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleRejectProposal(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+    String? reason,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.rejectProposal(
+        request.id,
+        request.studentId,
+        request.teacherId,
+        reason: reason,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.eventReject);
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);

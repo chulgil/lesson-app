@@ -474,19 +474,29 @@ class UnifiedLessonRequestActions {
 
   // ── Phase 2: Subscription & Payment ─────────────────────
 
-  /// Teacher sends payment guidance to student.
+  /// Teacher sends payment guidance (proposal) to student.
+  /// Updates request status to proposalSent.
   Future<void> sendPaymentGuide(
     String requestId,
     String teacherId,
     String studentId, {
     String? message,
   }) async {
+    // Transition request to proposalSent
+    final request = await _repository.getById(requestId);
+    if (request != null) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.proposalSent,
+      );
+      await _repository.update(updated);
+    }
+
     await _repository.addEvent(RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: requestId,
       actorType: ProposerRole.teacher,
       actorId: teacherId,
-      eventType: RequestEventType.paymentRequested,
+      eventType: RequestEventType.proposalSent,
       message: message,
       createdAt: DateTime.now(),
     ));
@@ -494,19 +504,91 @@ class UnifiedLessonRequestActions {
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
 
-  /// Student confirms payment completed.
+  /// Student accepts the proposal (selects template if multi-choice).
+  /// Updates request status to proposalAccepted.
+  Future<void> acceptProposal(
+    String requestId,
+    String studentId,
+    String teacherId, {
+    String? selectedTemplateId,
+    String? message,
+  }) async {
+    final request = await _repository.getById(requestId);
+    if (request != null) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.proposalAccepted,
+      );
+      await _repository.update(updated);
+    }
+
+    // Include selected template in event message for traceability
+    final eventMessage = selectedTemplateId != null
+        ? (message ?? '수강권을 수락했습니다 (템플릿: $selectedTemplateId)')
+        : message;
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.student,
+      actorId: studentId,
+      eventType: RequestEventType.proposalAccepted,
+      message: eventMessage,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Student rejects the proposal.
+  Future<void> rejectProposal(
+    String requestId,
+    String studentId,
+    String teacherId, {
+    String? reason,
+  }) async {
+    final request = await _repository.getById(requestId);
+    if (request != null) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.rejected,
+      );
+      await _repository.update(updated);
+    }
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.student,
+      actorId: studentId,
+      eventType: RequestEventType.reject,
+      message: reason,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Student notifies payment completed.
+  /// Updates request status to paymentNotified.
   Future<void> confirmPayment(
     String requestId,
     String teacherId,
     String studentId, {
     String? message,
   }) async {
+    final request = await _repository.getById(requestId);
+    if (request != null) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.paymentNotified,
+      );
+      await _repository.update(updated);
+    }
+
     await _repository.addEvent(RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: requestId,
       actorType: ProposerRole.student,
       actorId: studentId,
-      eventType: RequestEventType.paymentConfirmed,
+      eventType: RequestEventType.paymentNotified,
       message: message,
       createdAt: DateTime.now(),
     ));

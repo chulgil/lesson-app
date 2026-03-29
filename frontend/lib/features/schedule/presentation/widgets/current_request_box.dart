@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart' show AppStrings;
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 
@@ -35,6 +36,11 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onIssueFree;          // 무료: 체험 수강권 발급
   final VoidCallback? onConfirmPayment;     // 학생: 입금 완료
   final VoidCallback? onVerifyPayment;      // 선생님: 입금 확인
+  final void Function(String? selectedTemplateId)? onAcceptProposal; // 학생: 수락
+  final void Function(String? reason)? onRejectProposal;             // 학생: 거절
+
+  // Phase 2 data: proposal templates for student selection
+  final List<SubscriptionTemplate> proposalTemplates;
 
   // Phase 3 callbacks
   final VoidCallback? onLessonComplete;
@@ -63,6 +69,9 @@ class CurrentRequestBox extends StatefulWidget {
     this.onIssueFree,
     this.onConfirmPayment,
     this.onVerifyPayment,
+    this.onAcceptProposal,
+    this.onRejectProposal,
+    this.proposalTemplates = const [],
     this.onLessonComplete,
     this.onLessonCancel,
     this.onScheduleChange,
@@ -77,6 +86,7 @@ class CurrentRequestBox extends StatefulWidget {
 
 class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   int? _selectedSlotIndex;
+  String? _selectedTemplateId;
   late TextEditingController _messageController;
 
   bool get _isTeacher => widget.viewerRole == 'teacher';
@@ -515,9 +525,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     UnifiedLessonRequest request,
     UnifiedRequestStatus status,
   ) {
-    // 결제 안내 수신 (proposalAccepted) — 입금 완료 버튼
-    if (status == UnifiedRequestStatus.proposalAccepted ||
-        status == UnifiedRequestStatus.proposalSent) {
+    // 1. 제안 수신 (proposalSent) — 템플릿 선택 + 수락/거절
+    if (status == UnifiedRequestStatus.proposalSent) {
+      return _buildStudentProposalResponse();
+    }
+
+    // 2. 수락 후 (proposalAccepted) — 입금 완료 버튼
+    if (status == UnifiedRequestStatus.proposalAccepted) {
       return _buildActionRow(
         icon: Icons.receipt_long,
         iconColor: AppColors.info,
@@ -528,11 +542,129 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 기본: 수강권 발행 대기
+    // 3. 입금 알림 후 (paymentNotified) — 대기 메시지
+    if (status == UnifiedRequestStatus.paymentNotified) {
+      return _buildMessageOnly(
+        icon: Icons.hourglass_top,
+        iconColor: AppColors.info,
+        message: AppStrings.phase2PaymentReceivedTeacher,
+      );
+    }
+
+    // 수강권 발행 완료
     return _buildMessageOnly(
-      icon: Icons.hourglass_top,
-      iconColor: AppColors.info,
-      message: AppStrings.chapterSubscription,
+      icon: Icons.card_membership,
+      iconColor: AppColors.success,
+      message: AppStrings.chatSubscriptionIssued,
+    );
+  }
+
+  /// Student proposal response: template radio selection + accept/reject
+  Widget _buildStudentProposalResponse() {
+    final templates = widget.proposalTemplates;
+    final isMultiChoice = templates.length > 1;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Guide message
+        Row(
+          children: [
+            Icon(Icons.card_giftcard, color: AppColors.primary, size: 18),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.chatProposalSent,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space2),
+
+        // Template radio selection (multi-choice only)
+        if (isMultiChoice)
+          ...templates.map((t) => _buildTemplateRadio(t)),
+
+        const SizedBox(height: AppSpacing.space2),
+
+        // Accept / Reject buttons
+        Row(
+          children: [
+            Expanded(
+              child: _buildOutlinedButton(
+                label: AppStrings.eventReject,
+                icon: Icons.close,
+                onPressed: () => widget.onRejectProposal?.call(null),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: _buildPrimaryButton(
+                label: AppStrings.eventProposalAccepted,
+                icon: Icons.check,
+                onPressed: isMultiChoice && _selectedTemplateId == null
+                    ? null
+                    : () => widget.onAcceptProposal?.call(
+                          isMultiChoice ? _selectedTemplateId : templates.firstOrNull?.id,
+                        ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTemplateRadio(SubscriptionTemplate template) {
+    final isSelected = _selectedTemplateId == template.id;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedTemplateId = template.id),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.space1),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.06)
+              : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              size: 18,
+              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                template.name,
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              template.summaryText,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

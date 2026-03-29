@@ -600,11 +600,12 @@ class UnifiedLessonRequest extends HiveObject {
       UnifiedRequestStatus.pending ||
       UnifiedRequestStatus.negotiating ||
       UnifiedRequestStatus.approved ||
-      UnifiedRequestStatus.timeConfirmed ||
+      UnifiedRequestStatus.timeConfirmed =>
+        RequestPhase.request,
+      // Phase 2 (Subscription): proposal → payment → issue
       UnifiedRequestStatus.proposalSent ||
       UnifiedRequestStatus.proposalAccepted ||
-      UnifiedRequestStatus.paymentNotified =>
-        RequestPhase.request,
+      UnifiedRequestStatus.paymentNotified ||
       UnifiedRequestStatus.subscriptionIssued => RequestPhase.subscription,
       UnifiedRequestStatus.inProgress => RequestPhase.lessons,
       UnifiedRequestStatus.completed => RequestPhase.completed,
