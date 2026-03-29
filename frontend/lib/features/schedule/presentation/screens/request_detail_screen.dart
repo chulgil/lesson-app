@@ -16,6 +16,7 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/current_request_box.dart';
+import '../widgets/payment_guide_bottom_sheet.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
 
@@ -156,8 +157,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 // Phase 2
                 onSendPaymentGuide: () =>
                     _handleSendPaymentGuide(context, ref, request),
+                onIssuePostpaid: () =>
+                    _handleIssuePostpaid(context, ref, request),
+                onIssueFree: () =>
+                    _handleIssueFree(context, ref, request),
                 onConfirmPayment: () =>
                     _handleConfirmPayment(context, ref, request),
+                onVerifyPayment: () =>
+                    _handleVerifyPayment(context, ref, request),
                 // Phase 3
                 onLessonComplete: () =>
                     _handleLessonComplete(context, ref, request),
@@ -943,15 +950,70 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
+    // Open payment guide bottom sheet
+    final result = await showPaymentGuideBottomSheet(context);
+    if (result == null || !context.mounted) return;
+
     try {
       final actions = UnifiedLessonRequestActions(ref);
+      final message = [
+        result.isMonthly
+            ? '${AppStrings.subscriptionTypeMonthly} ${result.totalLessons}${AppStrings.lessonsUnit}'
+            : '${AppStrings.subscriptionTypePackage} ${result.totalLessons}${AppStrings.lessonsUnit}',
+        '${result.amount}${AppStrings.amountUnit}',
+        if (result.message != null) result.message,
+      ].join(' · ');
+
       await actions.sendPaymentGuide(
         request.id,
         request.teacherId,
         request.studentId,
+        message: message,
       );
       if (context.mounted) {
         showSuccessSnackBar(context, AppStrings.actionSendPaymentGuide);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleIssuePostpaid(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: false,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionIssuePostpaid);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleIssueFree(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionIssueFree);
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);
@@ -972,6 +1034,28 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       );
       if (context.mounted) {
         showSuccessSnackBar(context, AppStrings.actionConfirmPayment);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleVerifyPayment(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.issueSubscription(
+        request.id,
+        request.teacherId,
+        request.studentId,
+        paymentConfirmed: true,
+        message: '입금이 확인되어 수강권이 발급되었습니다',
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionVerifyPayment);
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);

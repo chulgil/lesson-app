@@ -30,8 +30,11 @@ class CurrentRequestBox extends StatefulWidget {
   final int? initialSelectedSlot;
 
   // Phase 2 callbacks
-  final VoidCallback? onSendPaymentGuide;
-  final VoidCallback? onConfirmPayment;
+  final VoidCallback? onSendPaymentGuide;  // 선불: 결제 안내 BottomSheet
+  final VoidCallback? onIssuePostpaid;      // 후불: 수강권 먼저 발급
+  final VoidCallback? onIssueFree;          // 무료: 체험 수강권 발급
+  final VoidCallback? onConfirmPayment;     // 학생: 입금 완료
+  final VoidCallback? onVerifyPayment;      // 선생님: 입금 확인
 
   // Phase 3 callbacks
   final VoidCallback? onLessonComplete;
@@ -56,7 +59,10 @@ class CurrentRequestBox extends StatefulWidget {
     this.onCancel,
     this.onWithdraw,
     this.onSendPaymentGuide,
+    this.onIssuePostpaid,
+    this.onIssueFree,
     this.onConfirmPayment,
+    this.onVerifyPayment,
     this.onLessonComplete,
     this.onLessonCancel,
     this.onScheduleChange,
@@ -405,25 +411,128 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   // ── Phase 2: Subscription & Payment ────────────────────────
 
   Widget _buildPhase2Subscription() {
+    final request = widget.request;
+    final status = request.status;
+
     if (_isTeacher) {
+      return _buildTeacherPhase2(request, status);
+    }
+
+    return _buildStudentPhase2(request, status);
+  }
+
+  Widget _buildTeacherPhase2(
+    UnifiedLessonRequest request,
+    UnifiedRequestStatus status,
+  ) {
+    // 입금 확인 대기 (학생이 입금 완료 알림)
+    if (status == UnifiedRequestStatus.paymentNotified) {
       return _buildActionRow(
-        icon: Icons.payment,
-        iconColor: AppColors.info,
-        message: AppStrings.waitingForPayment(widget.opponentName),
-        primaryLabel: AppStrings.actionSendPaymentGuide,
-        primaryIcon: Icons.send,
-        onPrimary: widget.onSendPaymentGuide,
+        icon: Icons.account_balance,
+        iconColor: AppColors.success,
+        message: AppStrings.phase2PaymentReceivedTeacher,
+        primaryLabel: AppStrings.actionVerifyPayment,
+        primaryIcon: Icons.check_circle,
+        onPrimary: widget.onVerifyPayment,
       );
     }
 
-    // Student: confirm payment
-    return _buildActionRow(
-      icon: Icons.receipt_long,
+    // 수강권 발행 후 (Phase 2 완료 상태) — 레슨 시작 안내
+    if (status == UnifiedRequestStatus.subscriptionIssued) {
+      return _buildActionRow(
+        icon: Icons.card_membership,
+        iconColor: AppColors.success,
+        message: AppStrings.chatSubscriptionIssued,
+        primaryLabel: AppStrings.actionLessonComplete,
+        primaryIcon: Icons.play_arrow,
+        onPrimary: widget.onLessonComplete,
+      );
+    }
+
+    // 체험레슨 무료 — 단일 버튼
+    final isTrial = request.type == LessonRequestType.trial;
+    final isFree = isTrial && (request.suggestedPrice == null || request.suggestedPrice == 0);
+
+    if (isFree) {
+      return _buildActionRow(
+        icon: Icons.card_giftcard,
+        iconColor: AppColors.success,
+        message: AppStrings.phase2TimeConfirmedTrial,
+        primaryLabel: AppStrings.actionIssueFree,
+        primaryIcon: Icons.check_circle,
+        onPrimary: widget.onIssueFree,
+      );
+    }
+
+    // 일반/유료 — 선불 + 후불 선택지
+    return _buildPhase2PaymentChoice();
+  }
+
+  /// 선불/후불 선택 UI (시간 확정 후)
+  Widget _buildPhase2PaymentChoice() {
+    return _buildSection(
+      icon: Icons.payment,
+      iconColor: AppColors.info,
+      message: AppStrings.phase2TimeConfirmedTeacher,
+      children: [
+        const SizedBox(height: AppSpacing.space2),
+        // 선불: 결제 안내 보내기 (primary)
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: widget.onSendPaymentGuide,
+            icon: const Icon(Icons.send, size: 16),
+            label: const Text(AppStrings.actionSendPaymentGuide),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        // 후불: 수강권 먼저 발급 (secondary)
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: widget.onIssuePostpaid,
+            icon: const Icon(Icons.card_membership, size: 16),
+            label: const Text(AppStrings.actionIssuePostpaid),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.borderLight),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStudentPhase2(
+    UnifiedLessonRequest request,
+    UnifiedRequestStatus status,
+  ) {
+    // 결제 안내 수신 (proposalAccepted) — 입금 완료 버튼
+    if (status == UnifiedRequestStatus.proposalAccepted ||
+        status == UnifiedRequestStatus.proposalSent) {
+      return _buildActionRow(
+        icon: Icons.receipt_long,
+        iconColor: AppColors.info,
+        message: AppStrings.phase2WaitingPaymentStudent,
+        primaryLabel: AppStrings.actionConfirmPayment,
+        primaryIcon: Icons.check_circle_outline,
+        onPrimary: widget.onConfirmPayment,
+      );
+    }
+
+    // 기본: 수강권 발행 대기
+    return _buildMessageOnly(
+      icon: Icons.hourglass_top,
       iconColor: AppColors.info,
       message: AppStrings.chapterSubscription,
-      primaryLabel: AppStrings.actionConfirmPayment,
-      primaryIcon: Icons.check_circle_outline,
-      onPrimary: widget.onConfirmPayment,
     );
   }
 
@@ -587,6 +696,57 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 borderRadius:
                     BorderRadius.circular(AppSpacing.radiusMedium),
               ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Section with icon header + custom children (for multi-button layouts).
+  Widget _buildSection({
+    required IconData icon,
+    required Color iconColor,
+    required String message,
+    required List<Widget> children,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: iconColor, size: 18),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+        ...children,
+      ],
+    );
+  }
+
+  /// Message-only row (no button).
+  Widget _buildMessageOnly({
+    required IconData icon,
+    required Color iconColor,
+    required String message,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 18),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            message,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
             ),
           ),
         ),

@@ -462,11 +462,41 @@ class AppStrings {
 
   // ── Action Box Phase 2,3,4 ─────────────────────────────────
 
-  /// Phase 2: Teacher → 결제 안내 전송
-  static const actionSendPaymentGuide = '결제 안내';
+  /// Phase 2: Teacher → 결제 안내 전송 (선불)
+  static const actionSendPaymentGuide = '결제 안내 보내기';
+
+  /// Phase 2: Teacher → 후불 수강권 발급
+  static const actionIssuePostpaid = '수강권 먼저 발급';
+
+  /// Phase 2: Teacher → 무료 수강권 발급 (체험)
+  static const actionIssueFree = '무료 수강권 발급';
 
   /// Phase 2: Student → 입금 완료 알림
   static const actionConfirmPayment = '입금 완료';
+
+  /// Phase 2: Teacher → 입금 확인 완료
+  static const actionVerifyPayment = '입금 확인';
+
+  /// Phase 2: 시간 확정 후 안내 메시지
+  static const phase2TimeConfirmedTeacher =
+      '시간이 확정되었습니다. 수강권을 발급해주세요.';
+  static const phase2TimeConfirmedTrial =
+      '체험레슨이 확정되었습니다.';
+  static const phase2WaitingPaymentStudent =
+      '결제 안내를 확인해주세요.';
+  static const phase2PaymentReceivedTeacher =
+      '학생이 입금 완료를 알렸습니다.';
+
+  /// 결제 안내 BottomSheet
+  static const paymentGuideTitle = '결제 안내 보내기';
+  static const subscriptionTypeMonthly = '월정액';
+  static const subscriptionTypePackage = '회차권';
+  static const totalLessonsLabel = '총 회차';
+  static const amountLabel = '금액';
+  static const amountUnit = '원';
+  static const lessonsUnit = '회';
+  static const paymentMessageHint = '추가 안내 메시지 (선택)';
+  static const sendPaymentGuide = '안내 보내기';
 
   /// Phase 3: Teacher → 레슨 완료
   static const actionLessonComplete = '레슨 완료';

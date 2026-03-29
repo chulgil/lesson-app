@@ -514,6 +514,38 @@ class UnifiedLessonRequestActions {
     _invalidateProviders(teacherId, studentId, requestId: requestId);
   }
 
+  /// Issue subscription (무료/후불/입금확인 후).
+  /// Sets request status to subscriptionIssued.
+  Future<void> issueSubscription(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    required bool paymentConfirmed,
+    String? message,
+  }) async {
+    final request = await _repository.getById(requestId);
+    if (request != null) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.subscriptionIssued,
+      );
+      await _repository.update(updated);
+    }
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.subscriptionIssued,
+      message: message ?? (paymentConfirmed
+          ? '수강권이 발행되었습니다'
+          : '수강권이 발행되었습니다 (후불)'),
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
   // ── Phase 3: Lesson Progress ───────────────────────────
 
   /// Record a lesson as completed + transition request to inProgress.
