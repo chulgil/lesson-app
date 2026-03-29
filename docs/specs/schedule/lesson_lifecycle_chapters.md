@@ -308,12 +308,19 @@ class LessonProgressBar extends StatelessWidget {
 }
 ```
 
-5단계 시각화:
-1. 신청 (pending~approved)
-2. 확정 (timeConfirmed)
-3. 결제 (paymentNotified~subscriptionIssued)
-4. 진행 (inProgress)
-5. 완료 (completed)
+5단계 시각화 — 각 단계의 정확한 의미:
+
+| 단계 | 라벨 | 의미 | 상태 범위 |
+|------|------|------|----------|
+| 1 | 신청 | 학생이 레슨 신청 → 선생님이 수락/거절/시간 협상 | pending ~ approved |
+| 2 | 확정 | 양측 스케줄 합의 완료 | timeConfirmed |
+| 3 | 결제 | 결제 안내 → 학생 입금 → 선생님 확인 → 수강권 발급 | proposalSent ~ subscriptionIssued |
+| 4 | 진행 | 레슨 1회차 ~ N회차 진행 중 | inProgress |
+| 5 | 완료 | 수강권 회차/기간 소진으로 자동 완료 | completed |
+
+> **참고**: "결제" 단계는 결제 + 수강권 발급까지를 포함합니다.
+> 체험레슨(무료)의 경우 결제를 스킵하고 수강권이 즉시 발급됩니다.
+> 후불의 경우 수강권이 먼저 발급되고 결제는 나중에 진행됩니다.
 
 ## Chapter Summary Widget
 
