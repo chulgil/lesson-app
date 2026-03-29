@@ -54,6 +54,11 @@ class RequestHistoryChat extends StatelessWidget {
     final chronological = [...events]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
+    // Detect withdraw+re-approve(same slot) pairs to hide redundant withdraws
+    final hiddenWithdrawIds = _findSameSlotWithdrawIds(chronological);
+    // Track re-approves that follow a same-slot withdraw (show as "메시지 추가")
+    final messageOnlyApproveIds = _findMessageOnlyApproveIds(chronological);
+
     return ListView.builder(
       shrinkWrap: shrinkWrap,
       physics: shrinkWrap
@@ -71,7 +76,14 @@ class RequestHistoryChat extends StatelessWidget {
         }
 
         final event = chronological[index - 1];
+
+        // Skip withdraw events where the same slot was re-approved
+        if (hiddenWithdrawIds.contains(event.id)) {
+          return const SizedBox.shrink();
+        }
+
         final isMyMessage = event.actorId == viewerId;
+        final isMessageOnly = messageOnlyApproveIds.contains(event.id);
 
         // Date separator (show if first event or different day from previous)
         final eventIndex = index - 1;
@@ -84,7 +96,7 @@ class RequestHistoryChat extends StatelessWidget {
         return Column(
           children: [
             if (dateSeparator != null) dateSeparator,
-            _buildChatBubble(event, isMyMessage),
+            _buildChatBubble(event, isMyMessage, isMessageOnly: isMessageOnly),
           ],
         );
       },
@@ -92,7 +104,11 @@ class RequestHistoryChat extends StatelessWidget {
   }
 
   /// Chat bubble: left (opponent) or right (me)
-  Widget _buildChatBubble(RequestEvent event, bool isMyMessage) {
+  Widget _buildChatBubble(
+    RequestEvent event,
+    bool isMyMessage, {
+    bool isMessageOnly = false,
+  }) {
     final actorName = event.actorType == ProposerRole.student
         ? studentName
         : AppStrings.teacher;
@@ -167,7 +183,7 @@ class RequestHistoryChat extends StatelessWidget {
                           isMyMessage ? 4 : AppSpacing.radiusLarge),
                     ),
                   ),
-                  child: _buildBubbleContent(event),
+                  child: _buildBubbleContent(event, isMessageOnly: isMessageOnly),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 _buildTimestamp(event.createdAt),
@@ -247,7 +263,10 @@ class RequestHistoryChat extends StatelessWidget {
   }
 
   /// Bubble inner content: status text + optional slots + optional message
-  Widget _buildBubbleContent(RequestEvent event) {
+  Widget _buildBubbleContent(
+    RequestEvent event, {
+    bool isMessageOnly = false,
+  }) {
     // For approve/acceptAlternative: resolve the confirmed slot
     final isAcceptEvent =
         event.eventType == RequestEventType.approve ||
@@ -255,19 +274,28 @@ class RequestHistoryChat extends StatelessWidget {
     final isWithdrawEvent =
         event.eventType == RequestEventType.withdrawApproval;
     final confirmedSlotLabel =
-        (isAcceptEvent || isWithdrawEvent)
+        (isAcceptEvent || isWithdrawEvent) && !isMessageOnly
             ? _resolveConfirmedSlotLabel(event)
             : null;
+
+    // Determine display label
+    final String displayLabel;
+    if (isMessageOnly) {
+      displayLabel = AppStrings.chatMessageAdded;
+    } else if (event.eventType == RequestEventType.initialRequest &&
+        request != null) {
+      displayLabel =
+          '${request!.instrument} ${request!.typeDisplayLabel}${AppStrings.lessonRequestSuffix}';
+    } else {
+      displayLabel = event.chatDisplayMessage;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Event type label (initialRequest: include instrument + type)
+        // Event type label
         Text(
-          event.eventType == RequestEventType.initialRequest &&
-                  request != null
-              ? '${request!.instrument} ${request!.typeDisplayLabel}${AppStrings.lessonRequestSuffix}'
-              : event.chatDisplayMessage,
+          displayLabel,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimaryLight,
@@ -376,6 +404,42 @@ class RequestHistoryChat extends StatelessWidget {
         color: AppColors.textTertiaryLight,
       ),
     );
+  }
+
+  /// Find withdraw events where the next approve has the same slot index.
+  /// These withdraws are redundant (only message changed) and should be hidden.
+  Set<String> _findSameSlotWithdrawIds(List<RequestEvent> sorted) {
+    final ids = <String>{};
+    for (int i = 0; i < sorted.length - 1; i++) {
+      if (sorted[i].eventType == RequestEventType.withdrawApproval) {
+        final next = sorted[i + 1];
+        if ((next.eventType == RequestEventType.approve ||
+                next.eventType == RequestEventType.acceptAlternative) &&
+            sorted[i].selectedSlotIndex != null &&
+            next.selectedSlotIndex == sorted[i].selectedSlotIndex) {
+          ids.add(sorted[i].id);
+        }
+      }
+    }
+    return ids;
+  }
+
+  /// Find approve events that follow a hidden same-slot withdraw.
+  /// These should display as "메시지를 추가했습니다" instead of "수락했습니다".
+  Set<String> _findMessageOnlyApproveIds(List<RequestEvent> sorted) {
+    final ids = <String>{};
+    for (int i = 1; i < sorted.length; i++) {
+      if (sorted[i - 1].eventType == RequestEventType.withdrawApproval) {
+        final approve = sorted[i];
+        if ((approve.eventType == RequestEventType.approve ||
+                approve.eventType == RequestEventType.acceptAlternative) &&
+            sorted[i - 1].selectedSlotIndex != null &&
+            approve.selectedSlotIndex == sorted[i - 1].selectedSlotIndex) {
+          ids.add(approve.id);
+        }
+      }
+    }
+    return ids;
   }
 
   bool _isSameDay(DateTime a, DateTime b) {

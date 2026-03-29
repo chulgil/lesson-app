@@ -509,6 +509,10 @@ class AppStrings {
   static const sat = '토';
   static const sun = '일';
 
+  // ── Chat Message Only (same-slot re-approve) ───────────────
+
+  static const chatMessageAdded = '메시지를 추가했습니다';
+
   // ── Preview Conflict ───────────────────────────────────────
 
   static const previewConflict = '프리뷰 겹침';
