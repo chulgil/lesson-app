@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_log.dart';
+import '../../../gamification/presentation/providers/point_award_service.dart';
 import '../../domain/repositories/practice_repository.dart';
 import 'practice_repository_provider.dart';
 
@@ -54,6 +55,8 @@ class PracticeNotifier
     try {
       final newLog = await _repository.createPracticeLog(log);
       state = await AsyncValue.guard(() => _repository.getPracticeLogs(arg));
+      // Award points for daily practice completion
+      ref.read(pointAwardNotifierProvider.notifier).awardPracticeComplete(arg);
       return newLog;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -88,6 +91,10 @@ class PracticeNotifier
     try {
       final updated = await _repository.toggleTask(logId, taskId);
       state = await AsyncValue.guard(() => _repository.getPracticeLogs(arg));
+      // Award points when task is toggled to completed
+      if (updated.isCompleted) {
+        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(arg, updated.title);
+      }
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);

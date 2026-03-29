@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/practice/domain/entities/practice_item.dart';
+import '../../../gamification/presentation/providers/point_award_service.dart';
 import '../../domain/repositories/practice_item_repository.dart';
 import '../../../lessons/domain/entities/teaching_resource.dart';
 import '../../../lessons/presentation/providers/teaching_resource_providers.dart';
@@ -174,6 +175,10 @@ class PracticeItemsNotifier extends FamilyAsyncNotifier<List<PracticeItem>, Stri
       ref.invalidate(weeklyPracticeItemsProvider(studentId));
       ref.invalidate(incompletePracticeItemsProvider(studentId));
       ref.invalidate(awaitingFeedbackProvider);
+      // Award points when item is toggled to completed
+      if (updated.isCompleted) {
+        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(studentId, updated.title);
+      }
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -314,6 +319,10 @@ class StudentPracticeNotifier extends FamilyAsyncNotifier<List<PracticeItem>, St
       ref.invalidate(weeklyPracticeItemsProvider(arg));
       ref.invalidate(incompletePracticeItemsProvider(arg));
       ref.invalidate(awaitingFeedbackProvider);
+      // Award points when item is toggled to completed
+      if (updated.isCompleted) {
+        ref.read(pointAwardNotifierProvider.notifier).awardTaskComplete(arg, updated.title);
+      }
       return updated;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
