@@ -22,6 +22,7 @@ from app.schemas.subscription import (
     SubscriptionUpdate,
     UseLessonRequest,
 )
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 
 class SubscriptionService:
@@ -243,9 +244,10 @@ class SubscriptionService:
         """List active templates for the teacher."""
         from app.models.subscription import SubscriptionTemplate
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         result = await self.db.scalars(
             select(SubscriptionTemplate).where(
-                SubscriptionTemplate.teacher_id == current_user.id,
+                SubscriptionTemplate.teacher_id == tid,
                 SubscriptionTemplate.is_active == True,  # noqa: E712
             )
         )
@@ -257,8 +259,9 @@ class SubscriptionService:
         """Create a subscription template."""
         from app.models.subscription import SubscriptionTemplate
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         template = SubscriptionTemplate(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             name=data.name,
             type=data.type,
             lessons_count=data.lessons_count,
@@ -335,8 +338,9 @@ class SubscriptionService:
 
         from app.models.subscription import SubscriptionProposal
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         proposal = SubscriptionProposal(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             student_id=data.student_id,
             message=data.message,
             recommended_template_id=data.recommended_template_id,

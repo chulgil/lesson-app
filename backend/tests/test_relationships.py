@@ -28,7 +28,7 @@ async def test_invite_student(client: AsyncClient, auth_headers, create_test_use
     )
     assert response.status_code == 201
     data = response.json()
-    assert data["teacher_id"] == "test-user-id"
+    assert data["teacher_id"] == "test-user-id-prof"
     assert data["student_id"] == "student-001"
     assert "invite_code" in data
 

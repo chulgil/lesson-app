@@ -99,7 +99,7 @@ async def test_create_subscription_template(client: AsyncClient, auth_headers, c
     data = response.json()
     assert data["name"] == "Basic Monthly"
     assert data["lessons_count"] == 4
-    assert data["teacher_id"] == "test-user-id"
+    assert data["teacher_id"] == "test-user-id-prof"
 
 
 @pytest.mark.asyncio
@@ -119,4 +119,4 @@ async def test_create_subscription_proposal(client: AsyncClient, auth_headers, c
     data = response.json()
     assert data["student_id"] == "student-001"
     assert data["status"] == "pending"
-    assert data["teacher_id"] == "test-user-id"
+    assert data["teacher_id"] == "test-user-id-prof"

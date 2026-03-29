@@ -22,7 +22,7 @@ async def test_create_student(client: AsyncClient, auth_headers, create_test_use
     data = response.json()
     assert data["name"] == "Alice Kim"
     assert data["instrument"] == "violin"
-    assert data["teacher_id"] == "test-user-id"
+    assert data["teacher_id"] == "test-user-id-prof"
     assert "id" in data
 
 

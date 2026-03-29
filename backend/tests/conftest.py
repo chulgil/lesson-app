@@ -78,6 +78,7 @@ async def create_test_user(db_session: AsyncSession):
             user_id="custom-id", role="student", name="Student"
         )
     """
+    from app.models.teacher import Teacher
     from app.models.user import User, UserRole
 
     async def _create(
@@ -99,6 +100,12 @@ async def create_test_user(db_session: AsyncSession):
         )
         db_session.add(user)
         await db_session.flush()
+
+        if role == "teacher":
+            teacher = Teacher(id=f"{user_id}-prof", user_id=user_id, instruments=[])
+            db_session.add(teacher)
+            await db_session.flush()
+
         return user
 
     return _create
@@ -137,11 +144,6 @@ async def teacher(
     from tests.scenarios.helpers import TeacherActions
 
     await create_test_user(user_id="test-user-id", role="teacher", name="Test Teacher")
-    # Ensure Teacher profile record exists
-    from app.models.teacher import Teacher
-    teacher_record = Teacher(user_id="test-user-id")
-    db_session.add(teacher_record)
-    await db_session.flush()
     return TeacherActions(client, auth_headers)
 
 

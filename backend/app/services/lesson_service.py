@@ -22,6 +22,7 @@ from app.schemas.lesson import (
     MembershipResponse,
     MembershipUpdate,
 )
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 
 class LessonService:
@@ -50,7 +51,8 @@ class LessonService:
         """List lessons with filters."""
         from app.models.lesson import Lesson
 
-        query = select(Lesson).where(Lesson.teacher_id == user.id)
+        tid = await resolve_teacher_id(self.db, user.id)
+        query = select(Lesson).where(Lesson.teacher_id == tid)
         if student_id:
             query = query.where(Lesson.student_id == student_id)
         if date:
@@ -74,8 +76,9 @@ class LessonService:
         """Create a new lesson."""
         from app.models.lesson import Lesson
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         lesson = Lesson(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             student_id=data.student_id,
             student_name=data.student_id,  # TODO: resolve actual student name
             instrument=data.instrument or "",
@@ -150,7 +153,7 @@ class LessonService:
         today = date.today()
         result = await self.db.scalars(
             select(Lesson)
-            .where(Lesson.teacher_id == current_user.id, Lesson.date >= today)
+            .where(Lesson.teacher_id == await resolve_teacher_id(self.db, current_user.id), Lesson.date >= today)
             .order_by(Lesson.date)
             .limit(limit)
         )
@@ -162,7 +165,7 @@ class LessonService:
 
         result = await self.db.scalars(
             select(Lesson)
-            .where(Lesson.teacher_id == current_user.id, Lesson.status == "completed")
+            .where(Lesson.teacher_id == await resolve_teacher_id(self.db, current_user.id), Lesson.status == "completed")
             .order_by(Lesson.date.desc())
             .limit(limit)
         )
@@ -178,8 +181,9 @@ class LessonService:
         """List lesson classes for the teacher."""
         from app.models.lesson import LessonClass
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         query = select(LessonClass).where(
-            LessonClass.teacher_id == current_user.id,
+            LessonClass.teacher_id == tid,
             LessonClass.is_archived == False,  # noqa: E712
         )
         count_query = select(func.count()).select_from(query.subquery())
@@ -193,8 +197,9 @@ class LessonService:
         """Create a lesson class."""
         from app.models.lesson import LessonClass
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         lesson_class = LessonClass(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             name=data.name,
             type=data.type,
             payment_type=data.payment_type,
@@ -259,9 +264,10 @@ class LessonService:
         """Set display order for lesson classes."""
         from app.models.lesson import LessonClass
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         for idx, class_id in enumerate(ordered_ids):
             lc = await self.db.get(LessonClass, class_id)
-            if lc and lc.teacher_id == current_user.id:
+            if lc and lc.teacher_id == tid:
                 lc.sort_order = idx
         await self.db.flush()
 

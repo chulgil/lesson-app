@@ -10,6 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
+from app.services.teacher_id_resolver import resolve_teacher_id, try_resolve_teacher_id
 
 
 class RelationshipService:
@@ -22,10 +23,11 @@ class RelationshipService:
         """Create an invitation to connect with a student."""
         from app.models.relationship import TeacherStudentRelation
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         invite_code = secrets.token_urlsafe(6).upper()[:6]
 
         relation = TeacherStudentRelation(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             student_id=student_id,
             invite_code=invite_code,
             status="pending",
@@ -65,8 +67,9 @@ class RelationshipService:
         """List all relationships for the current user."""
         from app.models.relationship import TeacherStudentRelation
 
+        tid = await try_resolve_teacher_id(self.db, user.id)
         query = select(TeacherStudentRelation).where(
-            (TeacherStudentRelation.teacher_id == user.id)
+            (TeacherStudentRelation.teacher_id == (tid or user.id))
             | (TeacherStudentRelation.student_id == user.id)
         )
 

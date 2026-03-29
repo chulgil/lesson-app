@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.common import PaginatedResponse
 from app.schemas.student import StudentCreate, StudentResponse, StudentStatsResponse, StudentUpdate
+from app.services.teacher_id_resolver import resolve_teacher_id
 
 
 class StudentService:
@@ -32,7 +33,8 @@ class StudentService:
         """List students visible to the current user."""
         from app.models.student import Student
 
-        query = select(Student).where(Student.teacher_id == user.id)
+        tid = await resolve_teacher_id(self.db, user.id)
+        query = select(Student).where(Student.teacher_id == tid)
         if status:
             query = query.where(Student.status == status)
         # class_id filter not supported in Student model directly
@@ -53,9 +55,10 @@ class StudentService:
         """Register a new student under the current teacher."""
         from app.models.student import Student
 
+        tid = await resolve_teacher_id(self.db, current_user.id)
         create_data = data.model_dump(exclude_unset=True)
         student = Student(
-            teacher_id=current_user.id,
+            teacher_id=tid,
             name=create_data.pop("name"),
             instrument=create_data.pop("instrument", "") or "",
             level=create_data.pop("level", "beginner"),
