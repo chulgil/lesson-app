@@ -145,9 +145,7 @@ class RequestDetailScreen extends ConsumerWidget {
           request.isAcademy && academyName != null
               ? '$academyName $opponentName (${request.typeDisplayLabel})'
               : '$opponentName (${request.typeDisplayLabel})',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.headingSmall,
         ),
       ),
     );

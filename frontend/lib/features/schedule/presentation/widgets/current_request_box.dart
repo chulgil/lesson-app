@@ -168,31 +168,29 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         const SizedBox(height: AppSpacing.space2),
 
         // Message input
-        SizedBox(
-          height: 36,
-          child: TextField(
-            controller: _messageController,
-            maxLength: 200,
-            style: AppTypography.bodySmall,
-            decoration: InputDecoration(
-              hintText: AppStrings.messageHint,
-              hintStyle: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-              counterText: '',
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: 0,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
-              ),
-              isDense: true,
+        TextField(
+          controller: _messageController,
+          maxLines: 2,
+          minLines: 1,
+          maxLength: 200,
+          style: AppTypography.bodySmall,
+          decoration: InputDecoration(
+            hintText: AppStrings.messageHint,
+            hintStyle: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+            counterText: '',
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space2,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderSide: BorderSide(color: AppColors.borderLight),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              borderSide: BorderSide(color: AppColors.borderLight),
             ),
           ),
         ),
@@ -201,19 +199,34 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Action buttons
         Row(
           children: [
-            // Schedule comparison button
-            IconButton(
-              onPressed: widget.onCounterPropose,
-              icon: const Icon(Icons.calendar_month, size: 22),
-              color: AppColors.textSecondaryLight,
-              tooltip: AppStrings.counterPropose,
-              visualDensity: VisualDensity.compact,
+            // Schedule comparison button (labeled)
+            Expanded(
+              child: SizedBox(
+                height: AppSpacing.buttonHeightSmall,
+                child: OutlinedButton.icon(
+                  onPressed: widget.onCounterPropose,
+                  icon: const Icon(Icons.calendar_month, size: 18),
+                  label: Text(
+                    AppStrings.counterPropose,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.borderLight),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusMedium),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(width: AppSpacing.space1),
+            const SizedBox(width: AppSpacing.space2),
             // Accept button
             Expanded(
               child: SizedBox(
-                height: 36,
+                height: AppSpacing.buttonHeightSmall,
                 child: ElevatedButton(
                   onPressed: _selectedSlotIndex != null
                       ? () {
