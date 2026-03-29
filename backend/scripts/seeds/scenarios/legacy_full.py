@@ -27,41 +27,29 @@ async def seed_legacy_full(db: AsyncSession, *, reset: bool = False) -> None:
     print("[Scenario] 레거시 전체 데이터 (seed_data.py)...")
 
     if reset:
-        # Delete all seed-prefixed data in correct order (FK dependencies)
+        # Get list of existing tables
+        result = await db.execute(text(
+            "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+        ))
+        existing_tables = {row[0] for row in result.fetchall()}
+
+        # Delete seed-prefixed data from known tables (FK order)
         tables_to_clean = [
-            "subscription_usages",
-            "subscription_proposals",
-            "subscriptions",
-            "subscription_templates",
-            "lesson_feedbacks",
-            "lessons",
-            "lesson_bookings",
-            "lesson_requests",
-            "availability_time_slots",
-            "teacher_availabilities",
-            "class_memberships",
-            "lesson_classes",
-            "lesson_policies",
-            "notifications",
-            "follows",
-            "practice_sections",
-            "practice_repertoires",
-            "practice_goals",
-            "practice_streaks",
-            "teacher_student_relations",
-            "parent_child_relations",
+            "subscription_usages", "subscription_proposals", "subscriptions",
+            "subscription_templates", "lesson_feedbacks", "lessons",
+            "lesson_bookings", "lesson_requests",
+            "availability_time_slots", "teacher_availabilities",
+            "class_memberships", "lesson_classes", "lesson_policies",
+            "notifications", "follows",
+            "practice_sections", "practice_repertoires",
+            "practice_goals", "practice_streaks",
+            "teacher_student_relations", "parent_child_relations",
             "parent_teacher_connections",
-            "students",
-            "teachers",
-            "parents",
-            "oauth_accounts",
-            "users",
+            "students", "teachers", "parents", "oauth_accounts", "users",
         ]
         for table in tables_to_clean:
-            try:
+            if table in existing_tables:
                 await db.execute(text(f"DELETE FROM {table} WHERE id LIKE 'seed-%'"))
-            except Exception:
-                pass  # Table may not exist yet
         await db.flush()
         print("  기존 시드 데이터 삭제 완료")
 
