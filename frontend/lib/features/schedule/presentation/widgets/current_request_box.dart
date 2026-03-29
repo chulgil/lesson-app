@@ -18,12 +18,11 @@ class CurrentRequestBox extends StatefulWidget {
   final List<RequestEvent> events;
   final String viewerRole; // 'teacher' or 'student'
   final String opponentName;
-  final VoidCallback? onAccept;
+  final ValueChanged<int>? onAccept;
   final VoidCallback? onCounterPropose;
   final VoidCallback? onModify;
   final VoidCallback? onCancel;
   final VoidCallback? onWithdraw;
-  final ValueChanged<int>? onSlotSelected;
 
   const CurrentRequestBox({
     super.key,
@@ -36,7 +35,6 @@ class CurrentRequestBox extends StatefulWidget {
     this.onModify,
     this.onCancel,
     this.onWithdraw,
-    this.onSlotSelected,
   });
 
   @override
@@ -234,8 +232,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: ElevatedButton(
                 onPressed: _selectedSlotIndex != null
                     ? () {
-                        widget.onSlotSelected?.call(_selectedSlotIndex!);
-                        widget.onAccept?.call();
+                        widget.onAccept?.call(_selectedSlotIndex!);
                       }
                     : null,
                 style: ElevatedButton.styleFrom(

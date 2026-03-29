@@ -100,7 +100,8 @@ class RequestDetailScreen extends ConsumerWidget {
                   opponentName: viewerRole == 'teacher'
                       ? studentName
                       : AppStrings.teacher,
-                  onAccept: () => _handleAccept(context, ref, request),
+                  onAccept: (slotIndex) =>
+                      _handleAccept(context, ref, request, slotIndex),
                   onCounterPropose: () =>
                       _handleCounterPropose(context, ref, request),
                   onModify: () => _handleModify(context, request),
@@ -421,6 +422,7 @@ class RequestDetailScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     UnifiedLessonRequest request,
+    int selectedSlotIndex,
   ) async {
     try {
       final actions = UnifiedLessonRequestActions(ref);
@@ -428,6 +430,7 @@ class RequestDetailScreen extends ConsumerWidget {
         request.id,
         request.teacherId,
         request.studentId,
+        selectedSlotIndex: selectedSlotIndex,
       );
     } catch (e) {
       if (context.mounted) {
@@ -466,6 +469,7 @@ class RequestDetailScreen extends ConsumerWidget {
           request.id,
           request.teacherId,
           request.studentId,
+          selectedSlotIndex: result.acceptedSlotIndex,
         );
         if (context.mounted) {
           showSuccessSnackBar(context, AppStrings.scheduleConfirmed);

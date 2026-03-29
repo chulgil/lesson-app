@@ -208,12 +208,14 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
-  /// Approve a lesson request (teacher action)
+  /// Approve a lesson request (teacher action).
+  /// [selectedSlotIndex] records which preferred slot was chosen (for history display).
   Future<UnifiedLessonRequest> approveRequest(
     String requestId,
     String teacherId,
-    String studentId,
-  ) async {
+    String studentId, {
+    int? selectedSlotIndex,
+  }) async {
     final result = await _repository.approve(requestId);
 
     await _repository.addEvent(RequestEvent(
@@ -222,6 +224,7 @@ class UnifiedLessonRequestActions {
       actorType: ProposerRole.teacher,
       actorId: teacherId,
       eventType: RequestEventType.approve,
+      selectedSlotIndex: selectedSlotIndex,
       createdAt: DateTime.now(),
     ));
 
