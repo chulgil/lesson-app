@@ -215,8 +215,11 @@ class _SuggestAlternativeScreenState
                       _selectedPreferredIndex = null;
                     } else {
                       _selectedPreferredIndex = slot.priority;
-                      // Clear suggested slots when switching to accept mode
                       _suggestedSlots = [];
+                      // Navigate calendar to the selected slot's week
+                      if (slot.date != null) {
+                        _weekStart = _getWeekStart(slot.date!);
+                      }
                     }
                   });
                 },
