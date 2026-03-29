@@ -63,7 +63,6 @@ class LessonRequestSection extends ConsumerWidget {
                       request: displayRequests[i],
                       studentName: studentNames[displayRequests[i].studentId] ?? AppStrings.student,
                       academyName: academyNames[displayRequests[i].academyId],
-                      lastMessage: displayRequests[i].lastMessage,
                       onTap: () => context.push(
                         AppRoutes.requestDetail
                             .replaceFirst(':id', displayRequests[i].id),

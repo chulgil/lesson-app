@@ -20,8 +20,8 @@ class AppStrings {
   /// 선생님이 레슨을 거부하는 행위 (부드러운 톤)
   static const unavailable = '다음에';
 
-  /// 선생님이 다른 시간을 제안하는 행위
-  static const counterPropose = '다른 시간 제안';
+  /// 선생님이 스케줄을 비교하여 시간을 제안하는 행위
+  static const counterPropose = '일정 비교';
 
   /// 입금 확인
   static const paymentConfirm = '입금 확인';
@@ -143,6 +143,23 @@ class AppStrings {
   /// 요청 더보기
   static String moreRequests(int count) => '$count개 요청 더보기';
 
+  // ── Request List Item (Redesign) ──────────────────────────
+
+  /// 희망 시간 외 N건
+  static String slotsRemaining(int count) => '외 $count건';
+
+  /// 시간 미지정
+  static const noTimeSpecified = '시간 미지정';
+
+  /// 레슨 N회
+  static String lessonCount(int count) => '레슨 $count회';
+
+  /// 연습 주N회
+  static String practiceRate(int rate) => '연습 주$rate회';
+
+  /// 학원 경유
+  static String viaAcademy(String name) => '$name 경유';
+
   // ── Request List Item Status ──────────────────────────────
 
   /// 완료
@@ -176,6 +193,17 @@ class AppStrings {
 
   /// 대안 제안 시 디폴트 메시지
   static const proposeDefaultMessage = '다른 시간을 제안드립니다.';
+
+  // ── Reject Bottom Sheet (from schedule comparison) ─────────
+
+  /// 거절 바텀시트 제목
+  static const rejectBottomSheetTitle = '거절 메시지';
+
+  /// 거절 바텀시트 안내
+  static const rejectBottomSheetGuide = '학생에게 전달할 거절 메시지를 입력해주세요.';
+
+  /// 거절 바텀시트 전송 버튼
+  static const rejectSendAndClose = '메시지를 보낸 후 종료합니다';
 
   // ── Urgent Actions (Dashboard) ────────────────────────────
 

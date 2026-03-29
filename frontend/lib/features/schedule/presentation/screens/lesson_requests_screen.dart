@@ -98,7 +98,6 @@ class LessonRequestsScreen extends ConsumerWidget {
               return RequestListItem(
                 request: request,
                 studentName: AppStrings.student,
-                lastMessage: request.lastMessage,
                 onTap: () => context.push(
                   AppRoutes.requestDetail
                       .replaceFirst(':id', request.id),

@@ -116,7 +116,6 @@ class _AllLessonRequestsScreenState
                             request: request,
                             studentName: studentNames[request.studentId] ?? AppStrings.student,
                             academyName: academyNames[request.academyId],
-                            lastMessage: request.lastMessage,
                             onTap: () => context.push(
                               AppRoutes.requestDetail
                                   .replaceFirst(':id', request.id),
