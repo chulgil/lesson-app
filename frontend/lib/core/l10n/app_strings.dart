@@ -639,4 +639,24 @@ class AppStrings {
 
   /// 학생 상세 - 연습 현황 탭
   static const studentTabPractice = '연습 현황';
+
+  // ── Gamification: Weekly Ranking ──────────────────────────────
+
+  /// 이번 주 연습 랭킹
+  static const weeklyRanking = '이번 주 연습 랭킹';
+
+  /// Gold 티어
+  static const tierGold = 'Gold';
+
+  /// Silver 티어
+  static const tierSilver = 'Silver';
+
+  /// Bronze 티어
+  static const tierBronze = 'Bronze';
+
+  /// 주간 포인트
+  static const weeklyPoints = '주간 포인트';
+
+  /// 주간 포인트 값 표시
+  static String weeklyPointsValue(int points) => '${points}pt';
 }
