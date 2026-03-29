@@ -746,6 +746,40 @@ class MockLessonRepository implements LessonRepository {
         ),
         createdAt: today.subtract(const Duration(days: 5)),
       ),
+
+      // === Preview Lessons (subscription expiry preview — next 4 weeks) ===
+      // These represent projected recurring lessons beyond subscription end date.
+      // Shown with dashed border on schedule comparison grid.
+      for (int week = 1; week <= 4; week++) ...[
+        Lesson(
+          id: 'preview_s1_w$week',
+          studentId: 'student_1',
+          studentName: '김민준',
+          teacherId: 'teacher_1',
+          teacherName: '김지수',
+          instrument: '바이올린',
+          date: today.add(Duration(days: 7 * week + (1 - today.weekday + 7) % 7)), // next Mondays
+          startTime: '10:00',
+          duration: 60,
+          status: LessonStatus.scheduled,
+          isPreview: true,
+          createdAt: today,
+        ),
+        Lesson(
+          id: 'preview_s2_w$week',
+          studentId: 'student_2',
+          studentName: '이서연',
+          teacherId: 'teacher_1',
+          teacherName: '김지수',
+          instrument: '피아노',
+          date: today.add(Duration(days: 7 * week + (3 - today.weekday + 7) % 7)), // next Wednesdays
+          startTime: '14:00',
+          duration: 60,
+          status: LessonStatus.scheduled,
+          isPreview: true,
+          createdAt: today,
+        ),
+      ],
     ]);
   }
 
