@@ -3,7 +3,7 @@ import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
 
 /// Mock implementation of UnifiedLessonRequestRepository for development.
-/// v4.0: 10 boundary-value scenarios with RequestEvent history.
+/// v5.0: 17 scenarios with Phase 2 subscription proposal flow (proposalSent/Accepted/paymentNotified).
 class MockUnifiedLessonRequestRepository
     implements UnifiedLessonRequestRepository {
   final Map<String, UnifiedLessonRequest> _requests = {};
@@ -922,7 +922,8 @@ class MockUnifiedLessonRequestRepository
     ]);
 
     // ─────────────────────────────────────────────────────────────────────────
-    // 15. 결제 완료 알림 대기 (Phase 1 마지막) — paymentNotified
+    // 15. 수강권 제안 수신 대기 (Phase 2) — proposalSent
+    //     학생이 수락/거절을 결정해야 하는 상태
     // ─────────────────────────────────────────────────────────────────────────
     _addRequest(UnifiedLessonRequest(
       id: 'ulr_15',
@@ -943,7 +944,7 @@ class MockUnifiedLessonRequestRepository
           endTime: '12:00',
         ),
       ],
-      status: UnifiedRequestStatus.paymentNotified,
+      status: UnifiedRequestStatus.proposalSent,
       confirmedAt: today.subtract(const Duration(days: 2)),
       createdAt: today.subtract(const Duration(days: 6)),
     ));
@@ -971,18 +972,150 @@ class MockUnifiedLessonRequestRepository
         requestId: 'ulr_15',
         actorType: ProposerRole.teacher,
         actorId: 'teacher_1',
-        eventType: RequestEventType.paymentRequested,
-        message: '정규 4회 수강권 결제를 안내드립니다',
+        eventType: RequestEventType.proposalSent,
+        message: '기본 8회권 8회 · 50분 · 40만원\n입금계좌: 신한 110-123-456789 홍길동',
         createdAt: today.subtract(const Duration(days: 3)),
       ),
+    ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 16. 수강권 수락 → 입금 대기 (Phase 2) — proposalAccepted
+    //     학생이 수락했고 입금을 해야 하는 상태
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_16',
+      studentId: 'student_6',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '클라리넷',
+      goal: UnifiedLessonGoal.exam,
+      experience: UnifiedExperienceLevel.advanced,
+      message: '입시 준비 클라리넷 레슨 원합니다',
+      preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: _nextWeekday(today, 2),
+          dayOfWeek: 2,
+          startTime: '15:00',
+          endTime: '16:00',
+        ),
+      ],
+      status: UnifiedRequestStatus.proposalAccepted,
+      confirmedAt: today.subtract(const Duration(days: 4)),
+      createdAt: today.subtract(const Duration(days: 8)),
+    ));
+    _addEvents('ulr_16', [
       RequestEvent(
-        id: 'evt_15_4',
-        requestId: 'ulr_15',
+        id: 'evt_16_1',
+        requestId: 'ulr_16',
         actorType: ProposerRole.student,
-        actorId: 'student_5',
-        eventType: RequestEventType.paymentConfirmed,
+        actorId: 'student_6',
+        eventType: RequestEventType.initialRequest,
+        message: '입시 준비 클라리넷 레슨 원합니다',
+        createdAt: today.subtract(const Duration(days: 8)),
+      ),
+      RequestEvent(
+        id: 'evt_16_2',
+        requestId: 'ulr_16',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 7)),
+      ),
+      RequestEvent(
+        id: 'evt_16_3',
+        requestId: 'ulr_16',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.proposalSent,
+        message: '입시반 12회권 12회 · 60분 · 96만원\n입금계좌: 국민 123-456-789012 홍길동',
+        createdAt: today.subtract(const Duration(days: 5)),
+      ),
+      RequestEvent(
+        id: 'evt_16_4',
+        requestId: 'ulr_16',
+        actorType: ProposerRole.student,
+        actorId: 'student_6',
+        eventType: RequestEventType.proposalAccepted,
+        message: '수강권을 수락했습니다',
+        createdAt: today.subtract(const Duration(days: 4)),
+      ),
+    ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 17. 입금 완료 알림 → 선생님 확인 대기 (Phase 2) — paymentNotified
+    //     학생이 입금 완료를 알렸고, 선생님이 확인해야 하는 상태
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_17',
+      studentId: 'student_4',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '비올라',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.beginner,
+      message: '비올라 기초부터 배우고 싶어요',
+      preferredDuration: 50,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: _nextWeekday(today, 4),
+          dayOfWeek: 4,
+          startTime: '13:00',
+          endTime: '13:50',
+        ),
+      ],
+      status: UnifiedRequestStatus.paymentNotified,
+      confirmedAt: today.subtract(const Duration(days: 3)),
+      createdAt: today.subtract(const Duration(days: 10)),
+    ));
+    _addEvents('ulr_17', [
+      RequestEvent(
+        id: 'evt_17_1',
+        requestId: 'ulr_17',
+        actorType: ProposerRole.student,
+        actorId: 'student_4',
+        eventType: RequestEventType.initialRequest,
+        message: '비올라 기초부터 배우고 싶어요',
+        createdAt: today.subtract(const Duration(days: 10)),
+      ),
+      RequestEvent(
+        id: 'evt_17_2',
+        requestId: 'ulr_17',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 9)),
+      ),
+      RequestEvent(
+        id: 'evt_17_3',
+        requestId: 'ulr_17',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.proposalSent,
+        message: '기본 4회권 4회 · 50분 · 24만원\n입금계좌: 신한 110-123-456789 홍길동',
+        createdAt: today.subtract(const Duration(days: 7)),
+      ),
+      RequestEvent(
+        id: 'evt_17_4',
+        requestId: 'ulr_17',
+        actorType: ProposerRole.student,
+        actorId: 'student_4',
+        eventType: RequestEventType.proposalAccepted,
+        message: '수강권을 수락했습니다',
+        createdAt: today.subtract(const Duration(days: 5)),
+      ),
+      RequestEvent(
+        id: 'evt_17_5',
+        requestId: 'ulr_17',
+        actorType: ProposerRole.student,
+        actorId: 'student_4',
+        eventType: RequestEventType.paymentNotified,
         message: '입금 완료했습니다',
-        createdAt: today.subtract(const Duration(days: 2)),
+        createdAt: today.subtract(const Duration(days: 3)),
       ),
     ]);
   }
