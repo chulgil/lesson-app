@@ -175,27 +175,14 @@ class _AllLessonRequestsScreenState
   void _onPhaseSelected(RequestPhase? phase) {
     setState(() {
       _phaseFilter = phase;
-      if (phase == null) {
-        // "전체" — return to calendar date mode
-        _isFilterMode = false;
-        _filter = RequestFilter(
-          specificDate: DateTime(
-            _selectedDate.year,
-            _selectedDate.month,
-            _selectedDate.day,
-          ),
-          source: _sourceFilter,
-          sortBy: _sortBy,
-        );
-      } else {
-        // Specific phase — clear date filter, show all matching
-        _isFilterMode = false;
-        _filter = RequestFilter(
-          phase: phase,
-          source: _sourceFilter,
-          sortBy: _sortBy,
-        );
-      }
+      _isFilterMode = false;
+      // All phase tabs (including "전체") clear date restriction
+      // and show all matching requests across all dates.
+      _filter = RequestFilter(
+        phase: phase,   // null = all phases
+        source: _sourceFilter,
+        sortBy: _sortBy,
+      );
     });
   }
 
@@ -279,19 +266,10 @@ class _AllLessonRequestsScreenState
   Widget _buildSubHeader(int count) {
     final String dateText;
 
-    if (_phaseFilter != null) {
-      // Phase filter active — show phase name instead of date
-      const phaseLabels = {
-        RequestPhase.request: AppStrings.phaseFilterRequest,
-        RequestPhase.subscription: AppStrings.phaseFilterSubscription,
-        RequestPhase.lessons: AppStrings.phaseFilterInProgress,
-        RequestPhase.completed: AppStrings.phaseFilterCompleted,
-        RequestPhase.terminal: AppStrings.phaseFilterTerminal,
-      };
-      dateText = phaseLabels[_phaseFilter] ?? AppStrings.phaseFilterAll;
-    } else if (_isFilterMode) {
+    if (_isFilterMode) {
       dateText = _selectedPreset.label;
-    } else {
+    } else if (_filter.specificDate != null) {
+      // Calendar date mode
       const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
       final d = _selectedDate;
       final dayLabel = weekdays[d.weekday - 1];
@@ -299,6 +277,19 @@ class _AllLessonRequestsScreenState
       final isToday =
           d.year == now.year && d.month == now.month && d.day == now.day;
       dateText = '${d.month}월 ${d.day}일 $dayLabel요일${isToday ? ' 오늘' : ''}';
+    } else if (_phaseFilter != null) {
+      // Phase filter active — show phase name
+      const phaseLabels = {
+        RequestPhase.request: AppStrings.phaseFilterRequest,
+        RequestPhase.subscription: AppStrings.phaseFilterSubscription,
+        RequestPhase.lessons: AppStrings.phaseFilterInProgress,
+        RequestPhase.completed: AppStrings.phaseFilterCompleted,
+        RequestPhase.terminal: AppStrings.phaseFilterTerminal,
+      };
+      dateText = phaseLabels[_phaseFilter]!;
+    } else {
+      // "전체" with no date restriction
+      dateText = AppStrings.phaseFilterAll;
     }
 
     return Padding(
