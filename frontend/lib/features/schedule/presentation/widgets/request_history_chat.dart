@@ -186,8 +186,12 @@ class RequestHistoryChat extends StatelessWidget {
     final isAcceptEvent =
         event.eventType == RequestEventType.approve ||
         event.eventType == RequestEventType.acceptAlternative;
+    final isWithdrawEvent =
+        event.eventType == RequestEventType.withdrawApproval;
     final confirmedSlotLabel =
-        isAcceptEvent ? _resolveConfirmedSlotLabel(event) : null;
+        (isAcceptEvent || isWithdrawEvent)
+            ? _resolveConfirmedSlotLabel(event)
+            : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,19 +216,25 @@ class RequestHistoryChat extends StatelessWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.08),
+              color: isWithdrawEvent
+                  ? AppColors.warning.withValues(alpha: 0.08)
+                  : AppColors.success.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               border: Border.all(
-                color: AppColors.success.withValues(alpha: 0.3),
+                color: isWithdrawEvent
+                    ? AppColors.warning.withValues(alpha: 0.3)
+                    : AppColors.success.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.check_circle,
+                  isWithdrawEvent ? Icons.undo : Icons.check_circle,
                   size: AppSpacing.iconXS,
-                  color: AppColors.success,
+                  color: isWithdrawEvent
+                      ? AppColors.warning
+                      : AppColors.success,
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Flexible(
@@ -232,7 +242,12 @@ class RequestHistoryChat extends StatelessWidget {
                     confirmedSlotLabel,
                     style: AppTypography.bodySmall.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.success,
+                      color: isWithdrawEvent
+                          ? AppColors.warning
+                          : AppColors.success,
+                      decoration: isWithdrawEvent
+                          ? TextDecoration.lineThrough
+                          : null,
                     ),
                   ),
                 ),
