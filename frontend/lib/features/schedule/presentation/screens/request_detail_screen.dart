@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
@@ -124,38 +125,10 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// AppBar with type badge + title
+  /// AppBar — simple title only, type badge moved to profile card
   AppBar _buildAppBar(UnifiedLessonRequest request) {
-    final typeColor = request.type == LessonRequestType.trial
-        ? AppColors.info
-        : AppColors.primary;
-
     return AppBar(
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space2,
-              vertical: 2,
-            ),
-            decoration: BoxDecoration(
-              color: typeColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
-            child: Text(
-              request.typeDisplayLabel,
-              style: AppTypography.caption.copyWith(
-                fontWeight: FontWeight.w600,
-                color: typeColor,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.space2),
-          const Text(AppStrings.requestDetailTitle),
-        ],
-      ),
-      centerTitle: true,
+      title: const Text(AppStrings.requestDetailTitle),
     );
   }
 
@@ -171,12 +144,14 @@ class RequestDetailScreen extends ConsumerWidget {
         : _buildRegularProfileCard(request, studentName, student);
   }
 
-  /// Trial lesson: emphasize student message (first-time student)
+  /// Trial lesson profile card (first-time student)
   Widget _buildTrialProfileCard(
     UnifiedLessonRequest request,
     String studentName,
     String? academyName,
   ) {
+    final urgent = isRequestUrgent(request.createdAt);
+
     return Container(
       margin: const EdgeInsets.all(AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -188,7 +163,137 @@ class RequestDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row: avatar + info + status
+          // Top row: type badge + academy + elapsed time
+          Row(
+            children: [
+              _buildTypeBadge(request),
+              if (request.isAcademy && academyName != null) ...[
+                const SizedBox(width: AppSpacing.space2),
+                const Text('🏫', style: TextStyle(fontSize: 12)),
+                const SizedBox(width: 2),
+                Flexible(
+                  child: Text(
+                    academyName,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+              const Spacer(),
+              Text(
+                formatRelativeTime(request.createdAt),
+                style: AppTypography.caption.copyWith(
+                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space3),
+
+          // Student info row: avatar + name + instrument + status
+          Row(
+            children: [
+              CircleAvatar(
+                radius: AppSpacing.avatarMedium / 2,
+                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+                child: Text(
+                  studentName.isNotEmpty ? studentName[0] : '?',
+                  style: AppTypography.headingSmall.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      studentName,
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${request.instrument} · ${request.experience.label} · ${request.goal.label}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildStatusBadge(request),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Regular lesson profile card (returning student)
+  Widget _buildRegularProfileCard(
+    UnifiedLessonRequest request,
+    String studentName,
+    Student? student,
+  ) {
+    final urgent = isRequestUrgent(request.createdAt);
+
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row: type badge + returning badge + elapsed time
+          Row(
+            children: [
+              _buildTypeBadge(request),
+              if (request.isReturningStudent) ...[
+                const SizedBox(width: AppSpacing.space2),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space1 + 2,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withValues(alpha: 0.12),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusSmall),
+                  ),
+                  child: Text(
+                    AppStrings.returning,
+                    style: AppTypography.caption.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.success,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+              const Spacer(),
+              Text(
+                formatRelativeTime(request.createdAt),
+                style: AppTypography.caption.copyWith(
+                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space3),
+
+          // Student info row: avatar + name + instrument + status
           Row(
             children: [
               CircleAvatar(
@@ -227,145 +332,6 @@ class RequestDetailScreen extends ConsumerWidget {
             ],
           ),
 
-          // Student message (emphasized for trial)
-          if (request.message != null && request.message!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.space3),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(
-                  color: AppColors.borderLight,
-                ),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.format_quote,
-                    size: AppSpacing.iconSM,
-                    color: AppColors.textTertiaryLight,
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      request.message!,
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          // Academy via
-          if (request.isAcademy && academyName != null) ...[
-            const SizedBox(height: AppSpacing.space2),
-            Row(
-              children: [
-                const Text('🏫', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: AppSpacing.space1),
-                Text(
-                  AppStrings.viaAcademy(academyName),
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  /// Regular lesson: show history summary (returning student)
-  Widget _buildRegularProfileCard(
-    UnifiedLessonRequest request,
-    String studentName,
-    Student? student,
-  ) {
-    return Container(
-      margin: const EdgeInsets.all(AppSpacing.space4),
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header row: avatar + info + badges
-          Row(
-            children: [
-              CircleAvatar(
-                radius: AppSpacing.avatarMedium / 2,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-                child: Text(
-                  studentName.isNotEmpty ? studentName[0] : '?',
-                  style: AppTypography.headingSmall.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          studentName,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (request.isReturningStudent) ...[
-                          const SizedBox(width: AppSpacing.space2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.space1 + 2,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color:
-                                  AppColors.success.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusSmall),
-                            ),
-                            child: Text(
-                              AppStrings.returning,
-                              style: AppTypography.caption.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.success,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${request.instrument} · ${request.experience.label} · ${request.goal.label}',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _buildStatusBadge(request),
-            ],
-          ),
-
           // History summary (from Student entity)
           if (student != null) ...[
             const SizedBox(height: AppSpacing.space3),
@@ -387,32 +353,32 @@ class RequestDetailScreen extends ConsumerWidget {
               ],
             ),
           ],
-
-          // Message (small, below history)
-          if (request.message != null && request.message!.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.space2),
-            Row(
-              children: [
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: AppSpacing.iconXS,
-                  color: AppColors.textTertiaryLight,
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    request.message!,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ],
+      ),
+    );
+  }
+
+  /// Type badge: [체험] or [정규] etc.
+  Widget _buildTypeBadge(UnifiedLessonRequest request) {
+    final typeColor = request.type == LessonRequestType.trial
+        ? AppColors.info
+        : AppColors.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: typeColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+      ),
+      child: Text(
+        request.typeDisplayLabel,
+        style: AppTypography.caption.copyWith(
+          fontWeight: FontWeight.w600,
+          color: typeColor,
+        ),
       ),
     );
   }
