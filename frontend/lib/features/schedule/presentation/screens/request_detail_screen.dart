@@ -121,13 +121,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 ),
               ),
 
-              // Bottom action bar (fixed, chat-input style)
+              // Bottom action bar (phase-aware)
               CurrentRequestBox(
                 request: request,
                 events: events,
                 viewerRole: viewerRole,
                 initialSelectedSlot: _preselectedSlot,
                 opponentName: opponentName,
+                // Phase 1
                 onAccept: (slotIndex, message) =>
                     _handleAccept(context, ref, request, slotIndex, message),
                 onCounterPropose: () =>
@@ -136,6 +137,25 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 onCancel: () => _handleCancel(context, ref, request),
                 onWithdraw: () =>
                     _handleWithdraw(context, ref, request),
+                // Phase 2
+                onSendPaymentGuide: () =>
+                    _handlePhaseAction(context, AppStrings.actionSendPaymentGuide),
+                onConfirmPayment: () =>
+                    _handlePhaseAction(context, AppStrings.actionConfirmPayment),
+                // Phase 3
+                onLessonComplete: () =>
+                    _handlePhaseAction(context, AppStrings.actionLessonComplete),
+                onLessonCancel: () =>
+                    _handlePhaseAction(context, AppStrings.actionLessonCancel),
+                onScheduleChange: () =>
+                    _handlePhaseAction(context, AppStrings.actionScheduleChange),
+                onAddNote: () =>
+                    _handlePhaseAction(context, AppStrings.actionAddNote),
+                // Phase 4
+                onProposeRenewal: () =>
+                    _handlePhaseAction(context, AppStrings.actionProposeRenewal),
+                onRequestRenewal: () =>
+                    _handlePhaseAction(context, AppStrings.actionRequestRenewal),
               ),
             ],
           ),
@@ -810,6 +830,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         showErrorSnackBar(context);
       }
     }
+  }
+
+  /// Placeholder for Phase 2,3,4 actions — shows snackbar until backend is ready.
+  void _handlePhaseAction(BuildContext context, String actionName) {
+    showInfoSnackBar(context, '$actionName — Step 5에서 연동 예정');
   }
 
   void _handleModify(BuildContext context, UnifiedLessonRequest request) {

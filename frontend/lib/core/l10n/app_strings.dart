@@ -450,6 +450,43 @@ class AppStrings {
   /// 거절 바텀시트 전송 버튼
   static const rejectSendAndClose = '메시지를 보낸 후 종료합니다';
 
+  // ── Action Box Phase 2,3,4 ─────────────────────────────────
+
+  /// Phase 2: Teacher → 결제 안내 전송
+  static const actionSendPaymentGuide = '결제 안내';
+
+  /// Phase 2: Student → 입금 완료 알림
+  static const actionConfirmPayment = '입금 완료';
+
+  /// Phase 3: Teacher → 레슨 완료
+  static const actionLessonComplete = '레슨 완료';
+
+  /// Phase 3: Teacher → 레슨 취소
+  static const actionLessonCancel = '레슨 취소';
+
+  /// Phase 3: Both → 시간 변경
+  static const actionScheduleChange = '시간 변경';
+
+  /// Phase 3: Teacher → 메모 추가
+  static const actionAddNote = '메모 추가';
+
+  /// Phase 4 (completed): Teacher → 연장 제안
+  static const actionProposeRenewal = '연장 제안';
+
+  /// Phase 4 (completed): Student → 재수강 신청
+  static const actionRequestRenewal = '재수강 신청';
+
+  /// Phase 2 waiting message
+  static String waitingForPayment(String name) =>
+      '$name의 입금을 기다리고 있습니다';
+
+  /// Phase 3 progress message
+  static String lessonProgressStatus(int completed, int total) =>
+      '레슨 진행 중 ($completed/$total회)';
+
+  /// Phase 3 waiting (student)
+  static const actionRequestScheduleChange = '시간 변경 요청';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청

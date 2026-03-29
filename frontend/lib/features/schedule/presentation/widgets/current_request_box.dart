@@ -7,23 +7,41 @@ import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 
-/// Current request action box — shows the latest state and available actions.
+/// Current request action box — phase-aware actions.
 ///
-/// 3 modes:
-/// - **My turn**: Show opponent's proposal + slot selection + [Counter-propose] [Accept]
-/// - **Their turn**: "Waiting for response" + [Modify] [Cancel]
+/// Renders different UI based on [RequestPhase]:
+/// - **Phase 1 (request)**: Slot selection + Counter-propose/Accept (existing)
+/// - **Phase 2 (subscription)**: Payment guide / Payment confirm
+/// - **Phase 3 (lessons)**: Lesson complete / Cancel / Schedule change / Note
+/// - **Phase 4 (completed)**: Propose renewal / Request renewal
 /// - **Terminal**: Final status message only
 class CurrentRequestBox extends StatefulWidget {
   final UnifiedLessonRequest request;
   final List<RequestEvent> events;
   final String viewerRole; // 'teacher' or 'student'
   final String opponentName;
+
+  // Phase 1 callbacks
   final void Function(int slotIndex, String message)? onAccept;
   final VoidCallback? onCounterPropose;
   final VoidCallback? onModify;
   final VoidCallback? onCancel;
   final VoidCallback? onWithdraw;
   final int? initialSelectedSlot;
+
+  // Phase 2 callbacks
+  final VoidCallback? onSendPaymentGuide;
+  final VoidCallback? onConfirmPayment;
+
+  // Phase 3 callbacks
+  final VoidCallback? onLessonComplete;
+  final VoidCallback? onLessonCancel;
+  final VoidCallback? onScheduleChange;
+  final VoidCallback? onAddNote;
+
+  // Phase 4 (completed) callbacks
+  final VoidCallback? onProposeRenewal;
+  final VoidCallback? onRequestRenewal;
 
   const CurrentRequestBox({
     super.key,
@@ -37,6 +55,14 @@ class CurrentRequestBox extends StatefulWidget {
     this.onModify,
     this.onCancel,
     this.onWithdraw,
+    this.onSendPaymentGuide,
+    this.onConfirmPayment,
+    this.onLessonComplete,
+    this.onLessonCancel,
+    this.onScheduleChange,
+    this.onAddNote,
+    this.onProposeRenewal,
+    this.onRequestRenewal,
   });
 
   @override
@@ -46,6 +72,8 @@ class CurrentRequestBox extends StatefulWidget {
 class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   int? _selectedSlotIndex;
   late TextEditingController _messageController;
+
+  bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
   void initState() {
@@ -73,10 +101,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     super.dispose();
   }
 
-  /// Get display labels for the latest proposed slots.
-  /// Uses PreferredTimeSlot.displayLabel directly (preserves date info).
+  /// Get display labels for the latest proposed slots (Phase 1 only).
   List<String> get _latestSlotLabels {
-    // Pending state: use PreferredTimeSlot.displayLabel (includes date)
     if (widget.request.status == UnifiedRequestStatus.pending &&
         widget.request.preferredSlots.isNotEmpty) {
       final sorted = [...widget.request.preferredSlots]
@@ -84,7 +110,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return sorted.map((ps) => ps.displayLabel).toList();
     }
 
-    // Negotiating: find latest event with suggestedSlots
     if (widget.events.isEmpty) return [];
     for (int i = widget.events.length - 1; i >= 0; i--) {
       if (widget.events[i].suggestedSlots.isNotEmpty) {
@@ -96,50 +121,25 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     return [];
   }
 
-  /// Get the latest message from the opponent (request message or event message).
-  String? get _latestMessage {
-    // For pending: use request.message (student's initial message)
-    if (widget.request.status == UnifiedRequestStatus.pending) {
-      return widget.request.message;
-    }
-    // For negotiating: find last opponent event with message
-    for (int i = widget.events.length - 1; i >= 0; i--) {
-      final event = widget.events[i];
-      final isOpponent = (event.actorType == ProposerRole.teacher &&
-              widget.viewerRole == 'student') ||
-          (event.actorType == ProposerRole.student &&
-              widget.viewerRole == 'teacher');
-      if (isOpponent && event.message != null && event.message!.isNotEmpty) {
-        return event.message;
-      }
-    }
-    return null;
-  }
-
-  /// Determine whose turn it is based on the latest event.
+  /// Determine whose turn it is based on the latest event (Phase 1).
   _TurnState get _turnState {
     if (widget.request.isTerminal) return _TurnState.terminal;
     if (widget.events.isEmpty) return _TurnState.theirTurn;
 
     final lastEvent = widget.events.last;
 
-    // withdrawApproval: whoever withdrew gets myTurn back to re-decide
+    // withdrawApproval: whoever withdrew gets myTurn back
     if (lastEvent.eventType == RequestEventType.withdrawApproval) {
       final withdrawerIsViewer =
-          (lastEvent.actorType == ProposerRole.teacher &&
-                  widget.viewerRole == 'teacher') ||
-              (lastEvent.actorType == ProposerRole.student &&
-                  widget.viewerRole == 'student');
+          (lastEvent.actorType == ProposerRole.teacher && _isTeacher) ||
+              (lastEvent.actorType == ProposerRole.student && !_isTeacher);
       return withdrawerIsViewer ? _TurnState.myTurn : _TurnState.theirTurn;
     }
 
     final lastActorIsViewer =
-        (lastEvent.actorType == ProposerRole.teacher &&
-                widget.viewerRole == 'teacher') ||
-            (lastEvent.actorType == ProposerRole.student &&
-                widget.viewerRole == 'student');
+        (lastEvent.actorType == ProposerRole.teacher && _isTeacher) ||
+            (lastEvent.actorType == ProposerRole.student && !_isTeacher);
 
-    // If I made the last move, it's their turn
     return lastActorIsViewer ? _TurnState.theirTurn : _TurnState.myTurn;
   }
 
@@ -158,12 +158,31 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           top: BorderSide(color: AppColors.borderLight),
         ),
       ),
-      child: switch (_turnState) {
-        _TurnState.myTurn => _buildMyTurn(),
-        _TurnState.theirTurn => _buildTheirTurn(),
-        _TurnState.terminal => _buildTerminal(),
-      },
+      child: _buildPhaseContent(),
     );
+  }
+
+  /// Route to the correct phase UI.
+  Widget _buildPhaseContent() {
+    final phase = widget.request.currentPhase;
+
+    return switch (phase) {
+      RequestPhase.request => _buildPhase1Request(),
+      RequestPhase.subscription => _buildPhase2Subscription(),
+      RequestPhase.lessons => _buildPhase3Lessons(),
+      RequestPhase.completed => _buildPhase4Completed(),
+      RequestPhase.terminal => _buildTerminal(),
+    };
+  }
+
+  // ── Phase 1: Request (existing logic) ──────────────────────
+
+  Widget _buildPhase1Request() {
+    return switch (_turnState) {
+      _TurnState.myTurn => _buildMyTurn(),
+      _TurnState.theirTurn => _buildTheirTurn(),
+      _TurnState.terminal => _buildTerminal(),
+    };
   }
 
   /// My turn: compact chat-input style — slot chips + message input + buttons
@@ -228,7 +247,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Action buttons
         Row(
           children: [
-            // Schedule comparison button (labeled)
+            // Counter-propose button
             Expanded(
               child: SizedBox(
                 height: AppSpacing.buttonHeightSmall,
@@ -356,7 +375,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
-        // Withdraw button (full width for visibility)
+        // Withdraw button (full width)
         SizedBox(
           width: double.infinity,
           height: 36,
@@ -383,7 +402,126 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Terminal: unified "종료됨" in gray
+  // ── Phase 2: Subscription & Payment ────────────────────────
+
+  Widget _buildPhase2Subscription() {
+    if (_isTeacher) {
+      return _buildActionRow(
+        icon: Icons.payment,
+        iconColor: AppColors.info,
+        message: AppStrings.waitingForPayment(widget.opponentName),
+        primaryLabel: AppStrings.actionSendPaymentGuide,
+        primaryIcon: Icons.send,
+        onPrimary: widget.onSendPaymentGuide,
+      );
+    }
+
+    // Student: confirm payment
+    return _buildActionRow(
+      icon: Icons.receipt_long,
+      iconColor: AppColors.info,
+      message: AppStrings.chapterSubscription,
+      primaryLabel: AppStrings.actionConfirmPayment,
+      primaryIcon: Icons.check_circle_outline,
+      onPrimary: widget.onConfirmPayment,
+    );
+  }
+
+  // ── Phase 3: Lesson Progress ───────────────────────────────
+
+  Widget _buildPhase3Lessons() {
+    if (_isTeacher) {
+      return _buildTeacherLessonActions();
+    }
+
+    // Student: only schedule change
+    return _buildActionRow(
+      icon: Icons.music_note,
+      iconColor: AppColors.primary,
+      message: AppStrings.chapterLessons,
+      primaryLabel: AppStrings.actionRequestScheduleChange,
+      primaryIcon: Icons.schedule,
+      onPrimary: widget.onScheduleChange,
+    );
+  }
+
+  /// Teacher gets multiple action buttons for lesson management.
+  Widget _buildTeacherLessonActions() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Primary row: Lesson Complete + Lesson Cancel
+        Row(
+          children: [
+            Expanded(
+              child: _buildPrimaryButton(
+                label: AppStrings.actionLessonComplete,
+                icon: Icons.check_circle,
+                onPressed: widget.onLessonComplete,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: _buildOutlinedButton(
+                label: AppStrings.actionLessonCancel,
+                icon: Icons.cancel_outlined,
+                onPressed: widget.onLessonCancel,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        // Secondary row: Schedule Change + Add Note
+        Row(
+          children: [
+            Expanded(
+              child: _buildOutlinedButton(
+                label: AppStrings.actionScheduleChange,
+                icon: Icons.schedule,
+                onPressed: widget.onScheduleChange,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: _buildOutlinedButton(
+                label: AppStrings.actionAddNote,
+                icon: Icons.note_add,
+                onPressed: widget.onAddNote,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ── Phase 4: Completed ─────────────────────────────────────
+
+  Widget _buildPhase4Completed() {
+    if (_isTeacher) {
+      return _buildActionRow(
+        icon: Icons.check_circle,
+        iconColor: AppColors.success,
+        message: AppStrings.eventSubscriptionCompleted,
+        primaryLabel: AppStrings.actionProposeRenewal,
+        primaryIcon: Icons.autorenew,
+        onPrimary: widget.onProposeRenewal,
+      );
+    }
+
+    // Student
+    return _buildActionRow(
+      icon: Icons.check_circle,
+      iconColor: AppColors.success,
+      message: AppStrings.eventSubscriptionCompleted,
+      primaryLabel: AppStrings.actionRequestRenewal,
+      primaryIcon: Icons.replay,
+      onPrimary: widget.onRequestRenewal,
+    );
+  }
+
+  // ── Terminal ───────────────────────────────────────────────
+
   Widget _buildTerminal() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -402,82 +540,111 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Slot selection cards — uses pre-computed display labels
-  Widget _buildSlotsSection(List<String> slotLabels) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: slotLabels.asMap().entries.map((entry) {
-        final index = entry.key;
-        final label = entry.value;
-        final isSelected = _selectedSlotIndex == index;
+  // ── Shared Builders ────────────────────────────────────────
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _selectedSlotIndex = index);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.08)
-                    : AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(
-                  color:
-                      isSelected ? AppColors.primary : AppColors.borderLight,
-                  width: isSelected ? 2 : 1,
+  /// Standard layout: status icon + message + primary action button.
+  Widget _buildActionRow({
+    required IconData icon,
+    required Color iconColor,
+    required String message,
+    required String primaryLabel,
+    required IconData primaryIcon,
+    required VoidCallback? onPrimary,
+  }) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: iconColor, size: 18),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
                 ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.scheduleMutedBackground,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '${index + 1}',
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isSelected
-                              ? Colors.white
-                              : AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.space3),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
-                  if (isSelected)
-                    const Icon(
-                      Icons.check_circle,
-                      color: AppColors.primary,
-                      size: 24,
-                    ),
-                ],
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        SizedBox(
+          width: double.infinity,
+          height: AppSpacing.buttonHeightSmall,
+          child: ElevatedButton.icon(
+            onPressed: onPrimary,
+            icon: Icon(primaryIcon, size: 18),
+            label: Text(
+              primaryLabel,
+              style: AppTypography.buttonSmall.copyWith(
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
           ),
-        );
-      }).toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Primary filled button with icon.
+  Widget _buildPrimaryButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      height: AppSpacing.buttonHeightSmall,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 16),
+        label: Text(
+          label,
+          style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+        ),
+      ),
+    );
+  }
+
+  /// Outlined button with icon.
+  Widget _buildOutlinedButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback? onPressed,
+  }) {
+    return SizedBox(
+      height: AppSpacing.buttonHeightSmall,
+      child: OutlinedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, size: 16),
+        label: Text(
+          label,
+          style: AppTypography.buttonSmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColors.borderLight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+        ),
+      ),
     );
   }
 }
