@@ -12,6 +12,11 @@ class MockLessonRepository implements LessonRepository {
     _initMockData();
   }
 
+  DateTime _nextWeekday(DateTime from, int targetWeekday) {
+    final daysAhead = (targetWeekday - from.weekday + 7) % 7;
+    return DateTime(from.year, from.month, from.day + (daysAhead == 0 ? 7 : daysAhead));
+  }
+
   void _initMockData() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -748,9 +753,9 @@ class MockLessonRepository implements LessonRepository {
       ),
 
       // === Preview Lessons (subscription expiry preview — next 4 weeks) ===
-      // These represent projected recurring lessons beyond subscription end date.
+      // Start from the NEXT occurrence of each weekday (week 0 = this/next week)
       // Shown with dashed border on schedule comparison grid.
-      for (int week = 1; week <= 4; week++) ...[
+      for (int week = 0; week < 4; week++) ...[
         Lesson(
           id: 'preview_s1_w$week',
           studentId: 'student_1',
@@ -758,7 +763,7 @@ class MockLessonRepository implements LessonRepository {
           teacherId: 'teacher_1',
           teacherName: '김지수',
           instrument: '바이올린',
-          date: today.add(Duration(days: 7 * week + (1 - today.weekday + 7) % 7)), // next Mondays
+          date: _nextWeekday(today, DateTime.monday).add(Duration(days: 7 * week)),
           startTime: '10:00',
           duration: 60,
           status: LessonStatus.scheduled,
@@ -772,7 +777,7 @@ class MockLessonRepository implements LessonRepository {
           teacherId: 'teacher_1',
           teacherName: '김지수',
           instrument: '피아노',
-          date: today.add(Duration(days: 7 * week + (3 - today.weekday + 7) % 7)), // next Wednesdays
+          date: _nextWeekday(today, DateTime.wednesday).add(Duration(days: 7 * week)),
           startTime: '14:00',
           duration: 60,
           status: LessonStatus.scheduled,
