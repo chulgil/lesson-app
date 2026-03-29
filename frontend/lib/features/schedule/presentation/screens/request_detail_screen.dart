@@ -580,7 +580,7 @@ class RequestDetailScreen extends ConsumerWidget {
           message: result.message,
         );
         if (context.mounted) {
-          showSuccessSnackBar(context, '대안 시간과 함께 안내가 전달되었습니다');
+          showSuccessSnackBar(context, AppStrings.alternativeProposeSent);
         }
       }
     } catch (e) {
@@ -598,8 +598,8 @@ class RequestDetailScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('결정 변경'),
-        content: const Text('수락한 결정을 취소하고 다시 선택할 수 있습니다.\n히스토리는 그대로 유지됩니다.'),
+        title: const Text(AppStrings.withdrawApproval),
+        content: const Text(AppStrings.withdrawApprovalMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -607,7 +607,7 @@ class RequestDetailScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('결정 변경'),
+            child: const Text(AppStrings.withdrawApproval),
           ),
         ],
       ),
@@ -622,7 +622,7 @@ class RequestDetailScreen extends ConsumerWidget {
         request.studentId,
       );
       if (context.mounted) {
-        showInfoSnackBar(context, '이전 상태로 돌아갔습니다. 다시 선택해주세요.');
+        showInfoSnackBar(context, AppStrings.withdrawApprovalSuccess);
       }
     } catch (e) {
       if (context.mounted) {
@@ -634,7 +634,7 @@ class RequestDetailScreen extends ConsumerWidget {
   void _handleModify(BuildContext context, UnifiedLessonRequest request) {
     // TODO: Navigate to edit screen (requires request edit flow)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('요청 수정 기능은 준비 중입니다')),
+      const SnackBar(content: Text(AppStrings.modifyRequestPreparing)),
     );
   }
 

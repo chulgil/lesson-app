@@ -147,7 +147,7 @@ class _SuggestAlternativeScreenState
               loading: () =>
                   const Center(child: CircularProgressIndicator()),
               error: (e, _) =>
-                  Center(child: Text('불러오기 실패: $e')),
+                  Center(child: Text('${AppStrings.loadFailed}: $e')),
             ),
           ),
 
@@ -373,7 +373,7 @@ class _SuggestAlternativeScreenState
               ),
             ),
             child: Text(
-              '거절하기',
+              AppStrings.rejectAction,
               style: AppTypography.buttonSmall.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
@@ -397,8 +397,8 @@ class _SuggestAlternativeScreenState
             ),
             child: Text(
               _suggestedSlots.isEmpty
-                  ? '시간을 선택하세요'
-                  : '제안하기 (${_suggestedSlots.length}개)',
+                  ? AppStrings.selectTimePrompt
+                  : AppStrings.proposeAction(_suggestedSlots.length),
               style: AppTypography.buttonSmall.copyWith(
                 color: Colors.white,
               ),
@@ -465,7 +465,7 @@ class _SuggestAlternativeScreenState
 
   void _addSlotFromGrid(DateTime date, int hour, int minute) {
     if (_suggestedSlots.length >= 3) {
-      showErrorSnackBar(context, '최대 3개까지 선택할 수 있습니다');
+      showErrorSnackBar(context, AppStrings.maxSlotsReached);
       return;
     }
 
@@ -482,7 +482,7 @@ class _SuggestAlternativeScreenState
         final lessonStart = _parseTimeMinutes(lesson.startTime);
         final lessonEnd = _lessonEndMinutes(lesson);
         if (startMinutes < lessonEnd && endMinutes > lessonStart) {
-          showErrorSnackBar(context, '이미 수업이 있는 시간입니다');
+          showErrorSnackBar(context, AppStrings.slotConflict);
           return;
         }
       }
@@ -516,7 +516,7 @@ class _SuggestAlternativeScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '제안 시간 (${_suggestedSlots.length}/3)',
+            AppStrings.suggestedSlotsCount(_suggestedSlots.length),
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -595,16 +595,16 @@ class _SuggestAlternativeScreenState
       initialDate: slot.specificDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 60)),
-      helpText: '날짜 선택',
-      cancelText: '취소',
-      confirmText: '확인',
+      helpText: AppStrings.selectDate,
+      cancelText: AppStrings.cancel,
+      confirmText: AppStrings.confirm,
     );
     if (newDate == null || !mounted) return;
 
     final newStartTime = await showTimePicker(
       context: context,
       initialTime: slot.startTime,
-      helpText: '시작 시간',
+      helpText: AppStrings.selectStartTime,
       cancelText: '취소',
       confirmText: '확인',
     );
@@ -626,7 +626,7 @@ class _SuggestAlternativeScreenState
         final lessonEnd = _lessonEndMinutes(lesson);
         if (startMinutes < lessonEnd && endMinutes > lessonStart) {
           if (mounted) {
-            showErrorSnackBar(context, '이미 수업이 있는 시간입니다');
+            showErrorSnackBar(context, AppStrings.slotConflict);
           }
           return;
         }

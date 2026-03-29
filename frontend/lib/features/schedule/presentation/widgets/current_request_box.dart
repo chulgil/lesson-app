@@ -300,7 +300,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   onPressed: widget.onWithdraw,
                   icon: const Icon(Icons.undo, size: 16),
                   label: Text(
-                    '결정 변경',
+                    AppStrings.withdrawApproval,
                     style: AppTypography.buttonSmall.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),

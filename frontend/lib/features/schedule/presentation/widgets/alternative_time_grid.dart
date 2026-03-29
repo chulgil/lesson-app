@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/booking/entities/time_slot.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -204,7 +205,7 @@ class AlternativeTimeGrid extends StatelessWidget {
             ? Padding(
                 padding: const EdgeInsets.only(left: 2, top: 1),
                 child: Text(
-                  hideStudentNames ? '레슨' : NameUtils.givenName(lesson.studentName),
+                  hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
                   style: AppTypography.caption.copyWith(
                     fontSize: 9,
                     fontWeight:
@@ -248,7 +249,7 @@ class AlternativeTimeGrid extends StatelessWidget {
             ? Padding(
                 padding: const EdgeInsets.only(left: 2, top: 1),
                 child: Text(
-                  '희망',
+                  AppStrings.preferredSlotLabel,
                   style: AppTypography.caption.copyWith(
                     fontSize: 9,
                     fontWeight: FontWeight.w600,

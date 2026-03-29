@@ -169,6 +169,86 @@ class AppStrings {
   /// 일정이 확정되었습니다
   static const scheduleConfirmed = '일정이 확정되었습니다';
 
+  // ── Schedule Comparison & Actions ─────────────────────────
+
+  /// 결정 변경
+  static const withdrawApproval = '결정 변경';
+
+  /// 결정 변경 확인 메시지
+  static const withdrawApprovalMessage =
+      '수락한 결정을 취소하고 다시 선택할 수 있습니다.\n히스토리는 그대로 유지됩니다.';
+
+  /// 이전 상태로 돌아갔습니다
+  static const withdrawApprovalSuccess = '이전 상태로 돌아갔습니다. 다시 선택해주세요.';
+
+  /// 대안 시간 제안 성공
+  static const alternativeProposeSent = '대안 시간과 함께 안내가 전달되었습니다';
+
+  /// 요청 수정 준비 중
+  static const modifyRequestPreparing = '요청 수정 기능은 준비 중입니다';
+
+  /// 거절하기
+  static const rejectAction = '거절하기';
+
+  /// 시간을 선택하세요
+  static const selectTimePrompt = '시간을 선택하세요';
+
+  /// 제안하기 (N개)
+  static String proposeAction(int count) => '제안하기 ($count개)';
+
+  /// 최대 3개까지 선택 가능
+  static const maxSlotsReached = '최대 3개까지 선택할 수 있습니다';
+
+  /// 이미 수업이 있는 시간
+  static const slotConflict = '이미 수업이 있는 시간입니다';
+
+  /// 제안 시간 (N/3)
+  static String suggestedSlotsCount(int count) => '제안 시간 ($count/3)';
+
+  /// 불러오기 실패
+  static const loadFailed = '불러오기 실패';
+
+  /// 희망 (그리드 표시용)
+  static const preferredSlotLabel = '희망';
+
+  /// 레슨 (학생 비공개 표시)
+  static const lessonPrivateLabel = '레슨';
+
+  /// 날짜 선택
+  static const selectDate = '날짜 선택';
+
+  /// 시작 시간
+  static const selectStartTime = '시작 시간';
+
+  /// 확인
+  static const confirm = '확인';
+
+  /// 레슨 요청 (학생 프로필 메뉴)
+  static const lessonRequestMenu = '레슨 요청';
+
+  // ── Filter Labels ─────────────────────────────────────────
+
+  /// 시간순
+  static const sortByTime = '시간순';
+
+  /// 이름순
+  static const sortByName = '이름순';
+
+  /// 전체 상태
+  static const allStatus = '전체 상태';
+
+  /// 진행 중
+  static const statusActive = '진행 중';
+
+  /// 취소/만료
+  static const statusCancelledExpired = '취소/만료';
+
+  /// 기간
+  static const period = '기간';
+
+  /// 전체
+  static const all = '전체';
+
   // ── Request List Item Status ──────────────────────────────
 
   /// 완료

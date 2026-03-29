@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -354,7 +355,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.assignment_outlined,
-            title: '레슨 요청',
+            title: AppStrings.lessonRequestMenu,
             onTap: () => context.push(AppRoutes.myLessonRequests),
           ),
           _buildMenuDivider(),

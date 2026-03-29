@@ -195,11 +195,11 @@ class _AllLessonRequestsScreenState
             items: const [
               DropdownMenuItem(
                 value: RequestSortBy.createdAtDesc,
-                child: Text('시간순'),
+                child: Text(AppStrings.sortByTime),
               ),
               DropdownMenuItem(
                 value: RequestSortBy.studentNameAsc,
-                child: Text('이름순'),
+                child: Text(AppStrings.sortByName),
               ),
             ],
             onChanged: (value) {
@@ -234,13 +234,13 @@ class _AllLessonRequestsScreenState
               ),
               items: const [
                 DropdownMenuItem(
-                    value: RequestSourceFilter.all, child: Text('전체')),
+                    value: RequestSourceFilter.all, child: Text(AppStrings.all)),
                 DropdownMenuItem(
                     value: RequestSourceFilter.individual,
-                    child: Text('개인레슨')),
+                    child: Text(AppStrings.individualLesson)),
                 DropdownMenuItem(
                     value: RequestSourceFilter.academy,
-                    child: Text('학원')),
+                    child: Text(AppStrings.academy)),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -262,16 +262,16 @@ class _AllLessonRequestsScreenState
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textPrimaryLight,
               ),
-              items: const [
+              items: [
                 DropdownMenuItem(
-                    value: RequestStatusGroup.all, child: Text('전체 상태')),
+                    value: RequestStatusGroup.all, child: Text(AppStrings.allStatus)),
                 DropdownMenuItem(
-                    value: RequestStatusGroup.active, child: Text('진행 중')),
+                    value: RequestStatusGroup.active, child: Text(AppStrings.statusActive)),
                 DropdownMenuItem(
-                    value: RequestStatusGroup.success, child: Text('완료')),
+                    value: RequestStatusGroup.success, child: Text(AppStrings.statusCompleted)),
                 DropdownMenuItem(
                     value: RequestStatusGroup.warning,
-                    child: Text('취소/만료')),
+                    child: Text(AppStrings.statusCancelledExpired)),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -287,7 +287,7 @@ class _AllLessonRequestsScreenState
           Expanded(
             child: DropdownButton<RequestFilterPreset>(
               value: _isFilterMode ? _selectedPreset : null,
-              hint: const Text('기간'),
+              hint: const Text(AppStrings.period),
               underline: const SizedBox.shrink(),
               isDense: true,
               isExpanded: true,
