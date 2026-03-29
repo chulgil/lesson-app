@@ -30,8 +30,8 @@ PRESETS = {
         "scenarios": [],
     },
     "full": {
-        "description": "전체 데이터 (기존 seed_data.py 호환)",
-        "scenarios": ["legacy-full"],
+        "description": "전체 데이터 (기존 seed_data.py + 스케줄)",
+        "scenarios": ["legacy-full", "schedule"],
     },
     "schedule-test": {
         "description": "스케줄 흐름 테스트 (계정 + 스케줄)",
