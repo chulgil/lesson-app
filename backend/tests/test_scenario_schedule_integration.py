@@ -414,3 +414,183 @@ async def test_student_requests_to_multiple_teachers(
 
     confirmed = await student.accept_alternative(req2, 0)
     assert_status(confirmed, "timeConfirmed")
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 6. Withdraw approval and re-decide
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_withdraw_approval_and_redecide(
+    teacher: TeacherActions, student: StudentActions
+):
+    """
+    Teacher approves → withdraws → proposes alternative instead:
+    승인 → 철회 → 대안 제안 → 학생 수락.
+    """
+    # ── Phase 1: 요청 + 승인 ────────────────────────────────
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="trial",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,
+        preferred_time="14:00",
+        preferred_duration=60,
+        message="화요일 2시 가능할까요?",
+    )
+
+    approved = await teacher.approve_lesson_request(request_id)
+    assert_status(approved, "approved")
+    assert approved["confirmed_at"] is not None
+
+    # ── Phase 2: 승인 철회 ────────────────────────────────────
+    withdrawn = await teacher.withdraw_approval(request_id)
+    assert_status(withdrawn, "pending")
+    assert withdrawn["confirmed_at"] is None
+
+    # ── Phase 3: 대안 제안으로 변경 ──────────────────────────
+    alt = await teacher.propose_alternatives(
+        request_id,
+        [
+            {"day_of_week": 2, "start_time": "15:00", "end_time": "16:00"},
+            {"day_of_week": 4, "start_time": "14:00", "end_time": "15:00"},
+        ],
+        message="다시 생각해보니 수요일이나 금요일이 좋겠어요",
+    )
+    assert_status(alt, "negotiating")
+
+    # ── Phase 4: 학생 수락 ────────────────────────────────────
+    confirmed = await student.accept_alternative(request_id, 0)
+    assert_status(confirmed, "timeConfirmed")
+    assert confirmed["preferred_day"] == 2
+    assert confirmed["preferred_time"] == "15:00"
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 7. Student accepts preferred slot directly from schedule comparison
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_accept_preferred_slot_from_schedule(
+    teacher: TeacherActions, student: StudentActions
+):
+    """
+    Teacher views student's preferred slots on schedule grid,
+    selects one directly → approved without negotiation:
+    학생 선호 슬롯 확인 → 스케줄 비교 화면에서 바로 수락.
+    """
+    # ── Phase 1: 학생이 3개 선호 시간으로 요청 ────────────────
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="piano",
+        goal="exam",
+        experience_level="intermediate",
+        preferred_day=2,  # 수요일
+        preferred_time="15:00",
+        preferred_duration=60,
+        message="수요일 3시가 제일 좋아요",
+    )
+
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "pending")
+
+    # ── Phase 2: 선생님이 학생 선호 슬롯을 바로 승인 ──────────
+    # (프론트엔드에서는 SuggestAlternativeScreen에서 선호 슬롯 탭 → 수락)
+    approved = await teacher.approve_lesson_request(request_id)
+    assert_status(approved, "approved")
+
+    # ── Phase 3: 확인 ────────────────────────────────────────
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "approved")
+    assert req["confirmed_at"] is not None
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# 8. Full E2E: request → negotiate → confirm → subscription → lesson
+# ─────────────────────────────────────────────────────────────────────────
+
+
+@pytest.mark.asyncio
+async def test_full_e2e_request_to_lesson(
+    teacher: TeacherActions, student: StudentActions
+):
+    """
+    Complete flow matching current frontend:
+    요청 → 일정비교 → 대안제시 → 학생수락 → 학생등록 → 수강권 → 레슨 → 완료.
+    """
+    # ── Phase 1: 레슨 요청 ────────────────────────────────────
+    request_id = await student.create_lesson_request(
+        "test-user-id",
+        request_type="regular",
+        instrument="violin",
+        goal="hobby",
+        experience_level="beginner",
+        preferred_day=1,
+        preferred_time="14:00",
+        preferred_duration=60,
+        message="바이올린을 배우고 싶어요",
+    )
+
+    # ── Phase 2: 선생님이 일정비교 후 대안 제시 ──────────────
+    alt = await teacher.propose_alternatives(
+        request_id,
+        [
+            {"day_of_week": 2, "start_time": "16:00", "end_time": "17:00"},
+            {"day_of_week": 4, "start_time": "15:00", "end_time": "16:00"},
+        ],
+        message="화요일은 꽉 차서 수요일이나 금요일 어때요?",
+    )
+    assert_status(alt, "negotiating")
+
+    # ── Phase 3: 학생이 수요일 4시 수락 ──────────────────────
+    confirmed = await student.accept_alternative(
+        request_id, 0, message="수요일 4시로 할게요!",
+    )
+    assert_status(confirmed, "timeConfirmed")
+
+    # ── Phase 4: 학생 등록 + 수강권 ──────────────────────────
+    sid = await teacher.create_student(
+        "신규학생", instrument="violin", level="beginner",
+        monthly_fee=200000, lessons_per_week=1,
+    )
+
+    tmpl_id = await teacher.create_template(
+        "바이올린 4회", lessons_count=4, amount=200000,
+    )
+
+    sub_id = await teacher.create_subscription(
+        sid, total_lessons=4, amount=200000,
+    )
+
+    # ── Phase 5: 수강권 제안 연결 ────────────────────────────
+    proposal_id = await teacher.send_proposal(
+        sid, tmpl_id, lesson_request_id=request_id,
+    )
+    await teacher.update_lesson_request_status(
+        request_id, "proposalSent", proposal_id=proposal_id,
+    )
+
+    await student.accept_proposal(proposal_id, tmpl_id)
+    await teacher.confirm_proposal(proposal_id)
+    await teacher.update_lesson_request_status(request_id, "completed")
+
+    # ── Phase 6: 첫 레슨 생성 + 차감 ────────────────────────
+    lesson_id = await teacher.create_lesson(
+        sid, date="2026-04-02", start_time="16:00",
+        duration=60, instrument="violin",
+    )
+    await teacher.complete_lesson(lesson_id)
+    await teacher.use_lesson(sub_id, lesson_id)
+
+    sub = await teacher.get_subscription(sub_id)
+    assert sub["remaining_lessons"] == 3
+    assert sub["used_lessons"] == 1
+
+    # ── Phase 7: 최종 확인 ────────────────────────────────────
+    req = await student.get_lesson_request(request_id)
+    assert_status(req, "completed")

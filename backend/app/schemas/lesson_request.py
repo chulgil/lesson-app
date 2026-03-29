@@ -82,7 +82,7 @@ class LessonRequestStatusUpdate(BaseModel):
     """Change lesson request status."""
 
     status: Literal[
-        "approved", "rejected", "negotiating", "timeConfirmed",
+        "pending", "approved", "rejected", "negotiating", "timeConfirmed",
         "proposalSent", "proposalAccepted", "paymentNotified",
         "completed", "cancelled", "expired",
     ]

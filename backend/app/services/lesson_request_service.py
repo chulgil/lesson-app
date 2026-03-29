@@ -161,6 +161,9 @@ class LessonRequestService:
         # Set timestamp based on status transition
         if data.status == "approved" or data.status == "timeConfirmed":
             request.confirmed_at = now
+        elif data.status == "pending":
+            # Withdraw approval — reset confirmed_at
+            request.confirmed_at = None
         elif data.status == "cancelled":
             request.cancelled_at = now
 

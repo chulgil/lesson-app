@@ -361,6 +361,16 @@ class TeacherActions:
         assert r.status_code == 200, f"reject_lesson_request failed: {r.status_code} {r.text}"
         return r.json()
 
+    async def withdraw_approval(self, request_id: str) -> dict:
+        """Withdraw approval — revert request back to pending."""
+        r = await self.client.patch(
+            f"{self._base}/schedule/lesson-requests/{request_id}/status",
+            headers=self.headers,
+            json={"status": "pending"},
+        )
+        assert r.status_code == 200, f"withdraw_approval failed: {r.status_code} {r.text}"
+        return r.json()
+
     async def get_lesson_request(self, request_id: str) -> dict:
         """Get a single lesson request."""
         r = await self.client.get(

@@ -95,6 +95,9 @@ tests/
 | SI-03 | 거절 후 재신청 | 토요일 요청 → 거절(사유: "토요일은 레슨 없음") → 학생 확인 → 수요일 재신청 → 승인 | rejected+decline_reason, 재신청 pending, 전체 요청 2건 |
 | SI-04 | 그룹 수업 출석 관리 | 그룹 스케줄(max=4, waitlist=2) → 학생 3명 예약 → 출석 2명 + 결석 1명 | 3명 confirmed, attended 2건, noShow 1건 |
 | SI-05 | 한 학생 다중 악기 요청 | 바이올린 정규 요청 + 피아노 체험 요청 → 바이올린 승인 → 피아노 시간 협상 → 학생 수락 | 요청 2건, instruments={violin, piano}, 바이올린 approved, 피아노 timeConfirmed |
+| SI-06 | 승인 철회 후 재결정 | 요청 → 승인 → 철회(pending 복귀, confirmed_at=null) → 대안 제안 → 학생 수락 | approved→pending→negotiating→timeConfirmed, confirmed_at 리셋 확인 |
+| SI-07 | 스케줄 비교에서 선호 슬롯 바로 수락 | 학생 선호 3개 요청 → 선생님이 스케줄 확인 후 바로 승인 | pending→approved, confirmed_at 설정 |
+| SI-08 | 전체 E2E (요청→레슨 완료) | 요청 → 대안 제시 → 학생 수락 → 학생 등록 → 수강권 → 제안 → 수락 → 입금확인 → 레슨 생성/완료 → 차감 | 모든 상태 전이 검증, remaining=3 |
 
 ### 학생 시나리오 (StudentActions 사용)
 
