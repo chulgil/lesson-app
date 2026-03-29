@@ -148,7 +148,7 @@ class RequestDetailScreen extends ConsumerWidget {
     }
     return request.type == LessonRequestType.trial
         ? _buildTrialProfileCard(request, studentName, academyName)
-        : _buildRegularProfileCard(request, studentName, student);
+        : _buildRegularProfileCard(request, studentName, academyName, student);
   }
 
   /// Trial lesson profile card (first-time student)
@@ -170,34 +170,8 @@ class RequestDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: type badge + academy + elapsed time
-          Row(
-            children: [
-              _buildTypeBadge(request),
-              if (request.isAcademy && academyName != null) ...[
-                const SizedBox(width: AppSpacing.space2),
-                const Text('🏫', style: TextStyle(fontSize: 12)),
-                const SizedBox(width: 2),
-                Flexible(
-                  child: Text(
-                    academyName,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-              const Spacer(),
-              Text(
-                formatRelativeTime(request.createdAt),
-                style: AppTypography.caption.copyWith(
-                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
-                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
+          // Top row: (academy icon + name |OR| 개인레슨) + type + elapsed time
+          _buildTopInfoRow(request, academyName, urgent),
           const SizedBox(height: AppSpacing.space3),
 
           // Student info row: avatar + name + instrument + status
@@ -247,6 +221,7 @@ class RequestDetailScreen extends ConsumerWidget {
   Widget _buildRegularProfileCard(
     UnifiedLessonRequest request,
     String studentName,
+    String? academyName,
     Student? student,
   ) {
     final urgent = isRequestUrgent(request.createdAt);
@@ -262,42 +237,8 @@ class RequestDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: type badge + returning badge + elapsed time
-          Row(
-            children: [
-              _buildTypeBadge(request),
-              if (request.isReturningStudent) ...[
-                const SizedBox(width: AppSpacing.space2),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space1 + 2,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.12),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusSmall),
-                  ),
-                  child: Text(
-                    AppStrings.returning,
-                    style: AppTypography.caption.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.success,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ],
-              const Spacer(),
-              Text(
-                formatRelativeTime(request.createdAt),
-                style: AppTypography.caption.copyWith(
-                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
-                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
+          // Top row: academy/source + type + elapsed time
+          _buildTopInfoRow(request, academyName, urgent),
           const SizedBox(height: AppSpacing.space3),
 
           // Student info row: avatar + name + instrument + status
@@ -380,20 +321,8 @@ class RequestDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row: type badge + elapsed time
-          Row(
-            children: [
-              _buildTypeBadge(request),
-              const Spacer(),
-              Text(
-                formatRelativeTime(request.createdAt),
-                style: AppTypography.caption.copyWith(
-                  color: urgent ? AppColors.error : AppColors.textTertiaryLight,
-                  fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
+          // Top row: source + type + elapsed time
+          _buildTopInfoRow(request, null, urgent),
           const SizedBox(height: AppSpacing.space3),
 
           // Request info: teacher name + instrument + status
@@ -436,6 +365,75 @@ class RequestDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Top info row: 🏫 학원명 | 개인레슨  +  타입  +  경과시간
+  Widget _buildTopInfoRow(
+    UnifiedLessonRequest request,
+    String? academyName,
+    bool urgent,
+  ) {
+    return Row(
+      children: [
+        // Source: academy icon + name, or "개인레슨"
+        if (request.isAcademy && academyName != null) ...[
+          const Text('🏫', style: TextStyle(fontSize: 12)),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(
+              academyName,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+        ] else ...[
+          Text(
+            AppStrings.individualLesson,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+        ],
+        // Type badge
+        _buildTypeBadge(request),
+        // Returning badge (if applicable)
+        if (request.isReturningStudent) ...[
+          const SizedBox(width: AppSpacing.space1),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space1 + 2,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            ),
+            child: Text(
+              AppStrings.returning,
+              style: AppTypography.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.success,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+        const Spacer(),
+        // Elapsed time
+        Text(
+          formatRelativeTime(request.createdAt),
+          style: AppTypography.caption.copyWith(
+            color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+            fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
     );
   }
 
