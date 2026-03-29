@@ -86,6 +86,27 @@ class _SuggestAlternativeScreenState
 
   bool get _isAcceptMode => _selectedPreferredIndex != null;
 
+  /// Compute highlight for the selected preferred slot (for grid display).
+  PreferredTimeSlotHighlight? get _selectedHighlight {
+    if (_selectedPreferredIndex == null) return null;
+    final sorted = [...widget.preferredSlots]
+      ..sort((a, b) => a.priority.compareTo(b.priority));
+    final selected = sorted.firstWhere(
+      (s) => s.priority == _selectedPreferredIndex,
+      orElse: () => sorted.first,
+    );
+    if (selected.date == null) return null;
+
+    final startParts = selected.startTime.split(':');
+    final endParts = selected.endTime.split(':');
+    return PreferredTimeSlotHighlight(
+      date: selected.date!,
+      startMinutes:
+          int.parse(startParts[0]) * 60 + int.parse(startParts[1]),
+      endMinutes: int.parse(endParts[0]) * 60 + int.parse(endParts[1]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final teacherId =
@@ -116,6 +137,7 @@ class _SuggestAlternativeScreenState
                 lessons: lessons,
                 suggestedSlots: _suggestedSlots,
                 hideStudentNames: widget.isStudentView,
+                highlightedSlot: _selectedHighlight,
                 onEmptyCellTap: (cell) {
                   if (!_isAcceptMode) {
                     _addSlotFromGrid(cell.date, cell.hour, cell.minute);

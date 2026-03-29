@@ -23,6 +23,10 @@ class AlternativeTimeGrid extends StatelessWidget {
   /// When true, hides student names in lesson cells (student view privacy).
   final bool hideStudentNames;
 
+  /// Selected student's preferred slot to highlight on the grid.
+  /// Shows where the selected time falls on the weekly schedule.
+  final PreferredTimeSlotHighlight? highlightedSlot;
+
   const AlternativeTimeGrid({
     super.key,
     required this.weekStart,
@@ -31,6 +35,7 @@ class AlternativeTimeGrid extends StatelessWidget {
     this.maxSlots = 3,
     required this.onEmptyCellTap,
     this.hideStudentNames = false,
+    this.highlightedSlot,
   });
 
   int _parseTimeMinutes(String time) {
@@ -60,7 +65,7 @@ class AlternativeTimeGrid extends StatelessWidget {
     const dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
     const cellHeight = 28.0;
 
-    return SingleChildScrollView(
+    return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
       ),
@@ -70,7 +75,7 @@ class AlternativeTimeGrid extends StatelessWidget {
 
           return Column(
             children: [
-              // Day headers
+              // Day headers (fixed, not scrollable)
               Row(
                 children: [
                   const SizedBox(width: 36),
@@ -106,43 +111,52 @@ class AlternativeTimeGrid extends StatelessWidget {
               ),
               const SizedBox(height: 4),
 
-              // Grid body
-              ...List.generate(
-                (endHour - startHour) * 2,
-                (slotIndex) {
-                  final slotMinutes = startHour * 60 + slotIndex * 30;
-                  final hour = slotMinutes ~/ 60;
-                  final minute = slotMinutes % 60;
-                  final isHourBoundary = minute == 0;
+              // Grid body (scrollable)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(
+                      (endHour - startHour) * 2,
+                      (slotIndex) {
+                        final slotMinutes =
+                            startHour * 60 + slotIndex * 30;
+                        final hour = slotMinutes ~/ 60;
+                        final minute = slotMinutes % 60;
+                        final isHourBoundary = minute == 0;
 
-                  return Row(
-                    children: [
-                      SizedBox(
-                        width: 36,
-                        height: cellHeight,
-                        child: isHourBoundary
-                            ? Text(
-                                '$hour:00',
-                                style: AppTypography.caption.copyWith(
-                                  fontSize: 10,
-                                  color: AppColors.textTertiaryLight,
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      ...List.generate(7, (dayIndex) {
-                        final date =
-                            weekStart.add(Duration(days: dayIndex));
-                        return _buildCell(
-                          date: date,
-                          slotMinutes: slotMinutes,
-                          width: cellWidth,
-                          height: cellHeight,
+                        return Row(
+                          children: [
+                            SizedBox(
+                              width: 36,
+                              height: cellHeight,
+                              child: isHourBoundary
+                                  ? Text(
+                                      '$hour:00',
+                                      style:
+                                          AppTypography.caption.copyWith(
+                                        fontSize: 10,
+                                        color:
+                                            AppColors.textTertiaryLight,
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
+                            ...List.generate(7, (dayIndex) {
+                              final date = weekStart
+                                  .add(Duration(days: dayIndex));
+                              return _buildCell(
+                                date: date,
+                                slotMinutes: slotMinutes,
+                                width: cellWidth,
+                                height: cellHeight,
+                              );
+                            }),
+                          ],
                         );
-                      }),
-                    ],
-                  );
-                },
+                      },
+                    ),
+                  ),
+                ),
               ),
             ],
           );
@@ -199,6 +213,47 @@ class AlternativeTimeGrid extends StatelessWidget {
                   ),
                   overflow: TextOverflow.clip,
                   maxLines: 1,
+                ),
+              )
+            : null,
+      );
+    }
+
+    // Check if this cell is the highlighted student slot
+    if (_isHighlightedSlot(date, slotMinutes)) {
+      final isStart = _isHighlightedSlotStart(date, slotMinutes);
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: AppColors.success.withValues(alpha: 0.15),
+          border: Border(
+            top: isStart
+                ? BorderSide(
+                    color: AppColors.success.withValues(alpha: 0.6),
+                    width: 2,
+                  )
+                : BorderSide.none,
+            left: BorderSide(
+              color: AppColors.success.withValues(alpha: 0.3),
+              width: 0.5,
+            ),
+            right: BorderSide(
+              color: AppColors.success.withValues(alpha: 0.3),
+              width: 0.5,
+            ),
+          ),
+        ),
+        child: isStart
+            ? Padding(
+                padding: const EdgeInsets.only(left: 2, top: 1),
+                child: Text(
+                  '희망',
+                  style: AppTypography.caption.copyWith(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.success,
+                  ),
                 ),
               )
             : null,
@@ -289,10 +344,41 @@ class AlternativeTimeGrid extends StatelessWidget {
     return -1;
   }
 
+  bool _isHighlightedSlot(DateTime date, int cellMinutes) {
+    final h = highlightedSlot;
+    if (h == null) return false;
+    if (h.date.year != date.year ||
+        h.date.month != date.month ||
+        h.date.day != date.day) return false;
+    return cellMinutes >= h.startMinutes && cellMinutes < h.endMinutes;
+  }
+
+  bool _isHighlightedSlotStart(DateTime date, int cellMinutes) {
+    final h = highlightedSlot;
+    if (h == null) return false;
+    if (h.date.year != date.year ||
+        h.date.month != date.month ||
+        h.date.day != date.day) return false;
+    return cellMinutes == h.startMinutes;
+  }
+
   bool _isToday(DateTime date) {
     final now = DateTime.now();
     return date.year == now.year &&
         date.month == now.month &&
         date.day == now.day;
   }
+}
+
+/// Data class for highlighting a student's preferred slot on the grid.
+class PreferredTimeSlotHighlight {
+  final DateTime date;
+  final int startMinutes;
+  final int endMinutes;
+
+  const PreferredTimeSlotHighlight({
+    required this.date,
+    required this.startMinutes,
+    required this.endMinutes,
+  });
 }
