@@ -622,6 +622,69 @@ class MockUnifiedLessonRequestRepository
         createdAt: now.subtract(const Duration(hours: 10)),
       ),
     ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 11. Conflict scenario — preferred slot overlaps with confirmed lesson
+    //     student_3 wants Mon 10:00 (conflicts with student_1's confirmed lesson)
+    //     + Wed 14:00 (conflicts with student_2's preview lesson)
+    //     + Fri 16:00 (no conflict)
+    // ─────────────────────────────────────────────────────────────────────────
+    final nextMon = _nextWeekday(today, 1);
+    final nextWed = _nextWeekday(today, 3);
+    final nextFri = _nextWeekday(today, 5);
+
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_11',
+      studentId: 'student_3',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.trial,
+      instrument: '첼로',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.beginner,
+      message: '첼로를 처음 배우고 싶습니다. 시간 맞춰주세요!',
+      preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: nextMon,
+          dayOfWeek: 1,
+          startTime: '10:00',
+          endTime: '11:00',
+        ),
+        PreferredTimeSlot(
+          priority: 2,
+          date: nextWed,
+          dayOfWeek: 3,
+          startTime: '14:00',
+          endTime: '15:00',
+        ),
+        PreferredTimeSlot(
+          priority: 3,
+          date: nextFri,
+          dayOfWeek: 5,
+          startTime: '16:00',
+          endTime: '17:00',
+        ),
+      ],
+      status: UnifiedRequestStatus.pending,
+      createdAt: now.subtract(const Duration(hours: 2)),
+    ));
+    _addEvents('ulr_11', [
+      RequestEvent(
+        id: 'evt_11_1',
+        requestId: 'ulr_11',
+        actorType: ProposerRole.student,
+        actorId: 'student_3',
+        eventType: RequestEventType.initialRequest,
+        suggestedSlots: [
+          TimeSlotOption(id: 'ts_11_1', dayOfWeek: 1, startTime: '10:00', endTime: '11:00'),
+          TimeSlotOption(id: 'ts_11_2', dayOfWeek: 3, startTime: '14:00', endTime: '15:00'),
+          TimeSlotOption(id: 'ts_11_3', dayOfWeek: 5, startTime: '16:00', endTime: '17:00'),
+        ],
+        message: '첼로를 처음 배우고 싶습니다. 시간 맞춰주세요!',
+        createdAt: now.subtract(const Duration(hours: 2)),
+      ),
+    ]);
   }
 
   void _addRequest(UnifiedLessonRequest request) {

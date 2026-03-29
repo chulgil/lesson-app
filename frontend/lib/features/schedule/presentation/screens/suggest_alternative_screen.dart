@@ -86,6 +86,32 @@ class _SuggestAlternativeScreenState
 
   bool get _isAcceptMode => _selectedPreferredIndex != null;
 
+  /// Check if a preferred slot conflicts with existing lessons.
+  /// Returns: null=no conflict, 'confirmed'=hard conflict, 'preview'=preview conflict
+  String? _checkSlotConflict(PreferredTimeSlot slot, List<Lesson> lessons) {
+    if (slot.date == null) return null;
+    final slotDate = slot.date!;
+    final startParts = slot.startTime.split(':');
+    final endParts = slot.endTime.split(':');
+    final slotStart = int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
+    final slotEnd = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
+
+    for (final lesson in lessons) {
+      if (lesson.date.year == slotDate.year &&
+          lesson.date.month == slotDate.month &&
+          lesson.date.day == slotDate.day) {
+        final lessonParts = lesson.startTime.split(':');
+        final lessonStart =
+            int.parse(lessonParts[0]) * 60 + int.parse(lessonParts[1]);
+        final lessonEnd = lessonStart + lesson.duration;
+        if (slotStart < lessonEnd && slotEnd > lessonStart) {
+          return lesson.isPreview ? 'preview' : 'confirmed';
+        }
+      }
+    }
+    return null;
+  }
+
   /// Compute highlight for the selected preferred slot (for grid display).
   PreferredTimeSlotHighlight? get _selectedHighlight {
     if (_selectedPreferredIndex == null) return null;
@@ -124,7 +150,9 @@ class _SuggestAlternativeScreenState
         children: [
           // Student's preferred slots (if any)
           if (widget.preferredSlots.isNotEmpty)
-            _buildPreferredSlotsSection(),
+            _buildPreferredSlotsSection(
+              weekLessonsAsync.valueOrNull ?? [],
+            ),
 
           // Week navigation
           _buildWeekNav(),
@@ -163,7 +191,7 @@ class _SuggestAlternativeScreenState
   }
 
   /// Student's preferred time slots as selectable cards.
-  Widget _buildPreferredSlotsSection() {
+  Widget _buildPreferredSlotsSection(List<Lesson> currentWeekLessons) {
     final sorted = [...widget.preferredSlots]
       ..sort((a, b) => a.priority.compareTo(b.priority));
 
@@ -205,6 +233,7 @@ class _SuggestAlternativeScreenState
             final index = entry.key;
             final slot = entry.value;
             final isSelected = _selectedPreferredIndex == slot.priority;
+            final conflict = _checkSlotConflict(slot, currentWeekLessons);
 
             return Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -279,6 +308,30 @@ class _SuggestAlternativeScreenState
                           ),
                         ),
                       ),
+                      // Conflict hint
+                      if (conflict == 'confirmed') ...[
+                        const SizedBox(width: AppSpacing.space1),
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: 16,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          AppStrings.slotConflict,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.error,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ] else if (conflict == 'preview') ...[
+                        const SizedBox(width: AppSpacing.space1),
+                        Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: AppColors.warning,
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -330,27 +383,43 @@ class _SuggestAlternativeScreenState
 
           // Action buttons
           _isAcceptMode
-              ? _buildAcceptButton()
+              ? _buildAcceptButton(
+                  ref.watch(weekLessonsProvider(_weekStart)).valueOrNull ?? [],
+                )
               : _buildProposeButtons(),
         ],
       ),
     );
   }
 
-  /// Accept mode: single green confirm button
-  Widget _buildAcceptButton() {
+  /// Accept mode: confirm button (disabled if hard conflict)
+  Widget _buildAcceptButton(List<Lesson> lessons) {
+    // Check if selected slot has a confirmed (non-preview) conflict
+    final selectedSlot = widget.preferredSlots.firstWhere(
+      (s) => s.priority == _selectedPreferredIndex,
+      orElse: () => widget.preferredSlots.first,
+    );
+    final conflict = _checkSlotConflict(selectedSlot, lessons);
+    final hasHardConflict = conflict == 'confirmed';
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: _submitAccept,
-        icon: const Icon(Icons.check_circle, size: 20),
+        onPressed: hasHardConflict ? null : _submitAccept,
+        icon: Icon(
+          hasHardConflict ? Icons.block : Icons.check_circle,
+          size: 20,
+        ),
         label: Text(
-          AppStrings.confirmThisSchedule,
+          hasHardConflict
+              ? AppStrings.slotConflict
+              : AppStrings.confirmThisSchedule,
           style: AppTypography.buttonSmall.copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
-          backgroundColor: AppColors.success,
+          backgroundColor: hasHardConflict ? AppColors.error : AppColors.success,
+          disabledBackgroundColor: AppColors.scheduleMutedAccent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
