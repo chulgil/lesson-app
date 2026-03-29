@@ -349,14 +349,14 @@ async def test_contract_lesson_request_crud(client, auth_headers, student_auth_h
     )
     assert list_resp.status_code == 200
 
-    # Update status (teacher accepts)
+    # Update status (teacher approves)
     status_resp = await client.patch(
         f"/api/v1/schedule/lesson-requests/{request_id}/status",
-        json={"status": "accepted"},
+        json={"status": "approved"},
         headers=auth_headers,
     )
     assert status_resp.status_code == 200
-    assert status_resp.json()["status"] == "accepted"
+    assert status_resp.json()["status"] == "approved"
 
 
 # ---------------------------------------------------------------------------
