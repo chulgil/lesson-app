@@ -203,20 +203,21 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             Expanded(
               child: SizedBox(
                 height: AppSpacing.buttonHeightSmall,
-                child: OutlinedButton.icon(
+                child: OutlinedButton(
                   onPressed: widget.onCounterPropose,
-                  icon: const Icon(Icons.calendar_month, size: 18),
-                  label: Text(
-                    AppStrings.counterPropose,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.borderLight),
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMedium),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3),
+                  ),
+                  child: Text(
+                    AppStrings.counterPropose,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
                 ),
