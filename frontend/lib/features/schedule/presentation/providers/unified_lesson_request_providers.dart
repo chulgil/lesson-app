@@ -472,6 +472,193 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
+  // ── Phase 2: Subscription & Payment ─────────────────────
+
+  /// Teacher sends payment guidance to student.
+  Future<void> sendPaymentGuide(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.paymentRequested,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Student confirms payment completed.
+  Future<void> confirmPayment(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.student,
+      actorId: studentId,
+      eventType: RequestEventType.paymentConfirmed,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  // ── Phase 3: Lesson Progress ───────────────────────────
+
+  /// Record a lesson as completed + transition request to inProgress.
+  Future<void> recordLessonCompleted(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    // Transition request to inProgress if not already
+    final request = await _repository.getById(requestId);
+    if (request != null &&
+        request.status == UnifiedRequestStatus.subscriptionIssued) {
+      final updated = request.copyWith(
+        status: UnifiedRequestStatus.inProgress,
+      );
+      await _repository.update(updated);
+    }
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.lessonCompleted,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Record a lesson cancellation.
+  Future<void> recordLessonCancelled(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.lessonCancelled,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Record a schedule change.
+  Future<void> recordScheduleChanged(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.scheduleChanged,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Teacher adds a lesson note.
+  Future<void> recordLessonNote(
+    String requestId,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.lessonNoteAdded,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Complete the entire subscription (all lessons done).
+  Future<void> completeSubscription(
+    String requestId,
+    String teacherId,
+    String studentId,
+  ) async {
+    final request = await _repository.getById(requestId);
+    if (request == null) throw Exception('Request not found: $requestId');
+
+    final updated = request.copyWith(
+      status: UnifiedRequestStatus.completed,
+      confirmedAt: DateTime.now(),
+    );
+    await _repository.update(updated);
+
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: ProposerRole.teacher,
+      actorId: teacherId,
+      eventType: RequestEventType.subscriptionCompleted,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
+  /// Renew a subscription (extend lessons).
+  Future<void> renewSubscription(
+    String requestId,
+    String actorId,
+    ProposerRole actorRole,
+    String teacherId,
+    String studentId, {
+    String? message,
+  }) async {
+    await _repository.addEvent(RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: requestId,
+      actorType: actorRole,
+      actorId: actorId,
+      eventType: RequestEventType.subscriptionRenewed,
+      message: message,
+      createdAt: DateTime.now(),
+    ));
+
+    _invalidateProviders(teacherId, studentId, requestId: requestId);
+  }
+
   void _invalidateProviders(
     String teacherId,
     String studentId, {

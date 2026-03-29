@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../features/lessons/domain/entities/lesson.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
+import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_confirmation_dialog.dart';
 import 'lesson_crud_provider.dart';
@@ -54,6 +56,12 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
         lesson: lesson,
         usageType: UsageType.normal,
         deducted: true,
+      );
+
+      // Auto-record RequestEvent for chapter model integration
+      await _recordLessonEventToRequest(
+        lesson: lesson,
+        isCompleted: true,
       );
 
       // Refresh lessons list
@@ -118,6 +126,13 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
         );
       }
 
+      // Auto-record RequestEvent for chapter model integration
+      await _recordLessonEventToRequest(
+        lesson: lesson,
+        isCompleted: false,
+        note: confirmationResult.note,
+      );
+
       // Refresh lessons list
       ref.invalidate(lessonsProvider);
       ref.invalidate(lessonProvider(lesson.id));
@@ -135,6 +150,57 @@ class LessonConfirmationNotifier extends _$LessonConfirmationNotifier {
         success: false,
         errorMessage: e.toString(),
       );
+    }
+  }
+
+  /// Auto-record lesson completion/cancellation as RequestEvent.
+  /// Finds the linked UnifiedLessonRequest by studentId + teacherId
+  /// and creates the appropriate event for chapter model integration.
+  Future<void> _recordLessonEventToRequest({
+    required Lesson lesson,
+    required bool isCompleted,
+    String? note,
+  }) async {
+    try {
+      if (lesson.teacherId == null) return;
+
+      final teacherId = lesson.teacherId!;
+      final actions = UnifiedLessonRequestActions(ref);
+
+      // Find active request for this student-teacher pair
+      final requests = await ref.read(
+        teacherUnifiedRequestsProvider(teacherId).future,
+      );
+
+      final activeRequest = requests.cast<UnifiedLessonRequest?>().firstWhere(
+        (r) =>
+            r!.studentId == lesson.studentId &&
+            (r.status == UnifiedRequestStatus.inProgress ||
+                r.status == UnifiedRequestStatus.subscriptionIssued),
+        orElse: () => null,
+      );
+
+      if (activeRequest == null) return;
+
+      if (isCompleted) {
+        await actions.recordLessonCompleted(
+          activeRequest.id,
+          teacherId,
+          lesson.studentId,
+          message: note,
+        );
+      } else {
+        await actions.recordLessonCancelled(
+          activeRequest.id,
+          teacherId,
+          ProposerRole.teacher,
+          teacherId,
+          lesson.studentId,
+          message: note,
+        );
+      }
+    } catch (_) {
+      // Non-critical: don't fail the main lesson operation
     }
   }
 

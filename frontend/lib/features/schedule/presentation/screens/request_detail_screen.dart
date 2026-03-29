@@ -139,23 +139,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     _handleWithdraw(context, ref, request),
                 // Phase 2
                 onSendPaymentGuide: () =>
-                    _handlePhaseAction(context, AppStrings.actionSendPaymentGuide),
+                    _handleSendPaymentGuide(context, ref, request),
                 onConfirmPayment: () =>
-                    _handlePhaseAction(context, AppStrings.actionConfirmPayment),
+                    _handleConfirmPayment(context, ref, request),
                 // Phase 3
                 onLessonComplete: () =>
-                    _handlePhaseAction(context, AppStrings.actionLessonComplete),
+                    _handleLessonComplete(context, ref, request),
                 onLessonCancel: () =>
-                    _handlePhaseAction(context, AppStrings.actionLessonCancel),
+                    _handleLessonCancel(context, ref, request),
                 onScheduleChange: () =>
-                    _handlePhaseAction(context, AppStrings.actionScheduleChange),
+                    _handleScheduleChange(context, ref, request),
                 onAddNote: () =>
-                    _handlePhaseAction(context, AppStrings.actionAddNote),
+                    _handleAddNote(context, ref, request),
                 // Phase 4
                 onProposeRenewal: () =>
-                    _handlePhaseAction(context, AppStrings.actionProposeRenewal),
+                    _handleRenewal(context, ref, request),
                 onRequestRenewal: () =>
-                    _handlePhaseAction(context, AppStrings.actionRequestRenewal),
+                    _handleRenewal(context, ref, request),
               ),
             ],
           ),
@@ -832,9 +832,182 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     }
   }
 
-  /// Placeholder for Phase 2,3,4 actions — shows snackbar until backend is ready.
-  void _handlePhaseAction(BuildContext context, String actionName) {
-    showInfoSnackBar(context, '$actionName — Step 5에서 연동 예정');
+  // ── Phase 2 handlers ────────────────────────────────────
+
+  Future<void> _handleSendPaymentGuide(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.sendPaymentGuide(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionSendPaymentGuide);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleConfirmPayment(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.confirmPayment(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionConfirmPayment);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  // ── Phase 3 handlers ────────────────────────────────────
+
+  Future<void> _handleLessonComplete(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.recordLessonCompleted(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionLessonComplete);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleLessonCancel(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.recordLessonCancelled(
+        request.id,
+        actorId,
+        actorRole,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showInfoSnackBar(context, AppStrings.actionLessonCancel);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleScheduleChange(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.recordScheduleChanged(
+        request.id,
+        actorId,
+        actorRole,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionScheduleChange);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  Future<void> _handleAddNote(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.recordLessonNote(
+        request.id,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(context, AppStrings.actionAddNote);
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  // ── Phase 4 handler ─────────────────────────────────────
+
+  Future<void> _handleRenewal(
+    BuildContext context,
+    WidgetRef ref,
+    UnifiedLessonRequest request,
+  ) async {
+    final actorRole = viewerRole == 'teacher'
+        ? ProposerRole.teacher
+        : ProposerRole.student;
+    final actorId = viewerRole == 'teacher'
+        ? request.teacherId
+        : request.studentId;
+
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.renewSubscription(
+        request.id,
+        actorId,
+        actorRole,
+        request.teacherId,
+        request.studentId,
+      );
+      if (context.mounted) {
+        showSuccessSnackBar(
+          context,
+          viewerRole == 'teacher'
+              ? AppStrings.actionProposeRenewal
+              : AppStrings.actionRequestRenewal,
+        );
+      }
+    } catch (e) {
+      if (context.mounted) showErrorSnackBar(context);
+    }
   }
 
   void _handleModify(BuildContext context, UnifiedLessonRequest request) {
