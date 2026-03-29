@@ -414,17 +414,27 @@ class _AllLessonRequestsScreenState
         onTap: () {
           setState(() {
             if (selected) {
+              // Toggle off period → restore previous mode
               _isFilterMode = false;
-              _filter = RequestFilter(
-                specificDate: DateTime(
-                  _selectedDate.year,
-                  _selectedDate.month,
-                  _selectedDate.day,
-                ),
-                phase: _phaseFilter,
-                source: _sourceFilter,
-                sortBy: _sortBy,
-              );
+              if (_phaseFilter != null) {
+                // Phase filter active → keep phase, no date restriction
+                _filter = RequestFilter(
+                  phase: _phaseFilter,
+                  source: _sourceFilter,
+                  sortBy: _sortBy,
+                );
+              } else {
+                // No phase → return to calendar date
+                _filter = RequestFilter(
+                  specificDate: DateTime(
+                    _selectedDate.year,
+                    _selectedDate.month,
+                    _selectedDate.day,
+                  ),
+                  source: _sourceFilter,
+                  sortBy: _sortBy,
+                );
+              }
             } else {
               _selectedPreset = value;
               _isFilterMode = true;
