@@ -36,6 +36,8 @@ docker compose restart backend
 | 0004 | add_onboarding_completed | users.onboarding_completed |
 | 0005 | frontend_backend_alignment | lesson_locations 6컬럼 + teacher_student_relations 15컬럼 + RelationStatus enum |
 | 0006 | add_background_image_fields | teachers.background_image + students.background_image_url |
+| d91e | add_bank_accounts_column | teachers.bank_accounts + teacher_settings 2컬럼 |
+| e34f | frontend_backend_schema_alignment_phase2 | students 주소 4컬럼 + lesson_requests.academy_id |
 
 ### 마이그레이션 확인
 ```bash
