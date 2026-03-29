@@ -43,15 +43,23 @@ class CurrentRequestBox extends StatefulWidget {
 
 class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   int? _selectedSlotIndex;
+  late TextEditingController _messageController;
 
   @override
   void initState() {
     super.initState();
+    _messageController = TextEditingController();
     // Auto-select if only 1 slot
     final latestSlots = _latestSlotLabels;
     if (latestSlots.length == 1) {
       _selectedSlotIndex = 0;
     }
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
   }
 
   /// Get display labels for the latest proposed slots.
@@ -157,6 +165,37 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       children: [
         // Compact slot selection (horizontal chips)
         if (slotLabels.isNotEmpty) _buildCompactSlots(slotLabels),
+        const SizedBox(height: AppSpacing.space2),
+
+        // Message input
+        SizedBox(
+          height: 36,
+          child: TextField(
+            controller: _messageController,
+            maxLength: 200,
+            style: AppTypography.bodySmall,
+            decoration: InputDecoration(
+              hintText: AppStrings.messageHint,
+              hintStyle: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: 0,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              isDense: true,
+            ),
+          ),
+        ),
         const SizedBox(height: AppSpacing.space2),
 
         // Action buttons
