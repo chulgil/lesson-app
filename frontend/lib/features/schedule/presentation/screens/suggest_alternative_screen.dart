@@ -327,9 +327,17 @@ class _SuggestAlternativeScreenState
                       ] else if (conflict == 'preview') ...[
                         const SizedBox(width: AppSpacing.space1),
                         Icon(
-                          Icons.info_outline,
+                          Icons.warning_amber_rounded,
                           size: 16,
                           color: AppColors.warning,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          AppStrings.previewConflict,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.warning,
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ],
@@ -403,33 +411,49 @@ class _SuggestAlternativeScreenState
     );
   }
 
-  /// Accept mode: confirm button (disabled if hard conflict)
+  /// Accept mode: confirm button — 3 states:
+  /// - null conflict: green "이 일정으로 확정"
+  /// - 'preview' conflict: warning "프리뷰 겹침 — 확정" (enabled)
+  /// - 'confirmed' conflict: disabled "일정 겹침"
   Widget _buildAcceptButton(List<Lesson> lessons) {
-    // Check if selected slot has a confirmed (non-preview) conflict
     final selectedSlot = widget.preferredSlots.firstWhere(
       (s) => s.priority == _selectedPreferredIndex,
       orElse: () => widget.preferredSlots.first,
     );
     final conflict = _checkSlotConflict(selectedSlot, lessons);
     final hasHardConflict = conflict == 'confirmed';
+    final hasPreviewConflict = conflict == 'preview';
+
+    final Color bgColor;
+    final IconData icon;
+    final String label;
+
+    if (hasHardConflict) {
+      bgColor = AppColors.error;
+      icon = Icons.block;
+      label = AppStrings.slotConflict;
+    } else if (hasPreviewConflict) {
+      bgColor = AppColors.warning;
+      icon = Icons.warning_amber_rounded;
+      label = AppStrings.previewConflictConfirm;
+    } else {
+      bgColor = AppColors.success;
+      icon = Icons.check_circle;
+      label = AppStrings.confirmThisSchedule;
+    }
 
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: hasHardConflict ? null : _submitAccept,
-        icon: Icon(
-          hasHardConflict ? Icons.block : Icons.check_circle,
-          size: 20,
-        ),
+        icon: Icon(icon, size: 20),
         label: Text(
-          hasHardConflict
-              ? AppStrings.slotConflict
-              : AppStrings.confirmThisSchedule,
+          label,
           style: AppTypography.buttonSmall.copyWith(color: Colors.white),
         ),
         style: ElevatedButton.styleFrom(
           minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
-          backgroundColor: hasHardConflict ? AppColors.error : AppColors.success,
+          backgroundColor: bgColor,
           disabledBackgroundColor: AppColors.scheduleMutedAccent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

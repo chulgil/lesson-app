@@ -509,6 +509,11 @@ class AppStrings {
   static const sat = '토';
   static const sun = '일';
 
+  // ── Preview Conflict ───────────────────────────────────────
+
+  static const previewConflict = '프리뷰 겹침';
+  static const previewConflictConfirm = '프리뷰 겹침 — 확정';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청

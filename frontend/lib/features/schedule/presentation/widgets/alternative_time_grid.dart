@@ -14,7 +14,7 @@ import '../../../lessons/domain/entities/lesson.dart';
 ///
 /// Shows existing lessons as colored cells and allows tapping
 /// empty cells to suggest alternative times.
-class AlternativeTimeGrid extends StatelessWidget {
+class AlternativeTimeGrid extends StatefulWidget {
   final DateTime weekStart;
   final List<Lesson> lessons;
   final List<TimeSlot> suggestedSlots;
@@ -38,6 +38,84 @@ class AlternativeTimeGrid extends StatelessWidget {
     this.hideStudentNames = false,
     this.highlightedSlot,
   });
+
+  @override
+  State<AlternativeTimeGrid> createState() => _AlternativeTimeGridState();
+}
+
+class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
+  final ScrollController _scrollController = ScrollController();
+  PreferredTimeSlotHighlight? _lastScrolledSlot;
+
+  // Delegate properties for cleaner access
+  DateTime get weekStart => widget.weekStart;
+  List<Lesson> get lessons => widget.lessons;
+  List<TimeSlot> get suggestedSlots => widget.suggestedSlots;
+  int get maxSlots => widget.maxSlots;
+  ValueChanged<({DateTime date, int hour, int minute})> get onEmptyCellTap =>
+      widget.onEmptyCellTap;
+  bool get hideStudentNames => widget.hideStudentNames;
+  PreferredTimeSlotHighlight? get highlightedSlot => widget.highlightedSlot;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initial scroll to highlighted slot
+    if (widget.highlightedSlot != null) {
+      _scrollToHighlightedSlot();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant AlternativeTimeGrid oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Auto-scroll when highlighted slot changes
+    if (widget.highlightedSlot != oldWidget.highlightedSlot &&
+        widget.highlightedSlot != null &&
+        widget.highlightedSlot != _lastScrolledSlot) {
+      _scrollToHighlightedSlot();
+    }
+  }
+
+  void _scrollToHighlightedSlot() {
+    final h = highlightedSlot;
+    if (h == null) return;
+    _lastScrolledSlot = h;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      final startHour = _computeStartHour();
+      const cellHeight = 28.0;
+      final targetOffset =
+          (h.startMinutes - startHour * 60) / 30 * cellHeight - 2 * cellHeight;
+      final clampedOffset = targetOffset.clamp(
+        0.0,
+        _scrollController.position.maxScrollExtent,
+      );
+      _scrollController.animateTo(
+        clampedOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  int _computeStartHour() {
+    int startHour = 9;
+    if (lessons.isNotEmpty) {
+      final minHour = lessons
+          .map((l) => int.parse(l.startTime.split(':')[0]))
+          .reduce((a, b) => a < b ? a : b);
+      startHour = minHour < startHour ? minHour : startHour;
+    }
+    return startHour;
+  }
 
   int _parseTimeMinutes(String time) {
     final parts = time.split(':');
@@ -112,9 +190,10 @@ class AlternativeTimeGrid extends StatelessWidget {
               ),
               const SizedBox(height: 4),
 
-              // Grid body (scrollable)
+              // Grid body (scrollable, auto-scrolls to highlighted slot)
               Expanded(
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   child: Column(
                     children: List.generate(
                       (endHour - startHour) * 2,
@@ -180,14 +259,33 @@ class AlternativeTimeGrid extends StatelessWidget {
     if (lesson != null) {
       final lessonStartMinutes = _parseTimeMinutes(lesson.startTime);
       final isStart = lessonStartMinutes == slotMinutes;
-      // Unified muted color; preview lessons (subscription expiring) get dashed border
       final isPreview = lesson.isPreview;
-      final bgColor = isPreview
-          ? AppColors.scheduleMutedBackground.withValues(alpha: 0.4)
-          : AppColors.scheduleMutedBackground;
-      final accentColor = AppColors.scheduleMutedAccent;
+
+      // Check if this lesson cell overlaps with the highlighted preferred slot
+      final isOverlapWithHighlight =
+          isPreview && _isHighlightedSlot(date, slotMinutes);
+
+      // Warning color for preview + highlight overlap
+      final Color bgColor;
+      final Color accentColor;
+      final Color textColor;
+
+      if (isOverlapWithHighlight) {
+        bgColor = AppColors.warning.withValues(alpha: 0.15);
+        accentColor = AppColors.warning;
+        textColor = AppColors.warning;
+      } else if (isPreview) {
+        bgColor = AppColors.scheduleMutedBackground.withValues(alpha: 0.4);
+        accentColor = AppColors.scheduleMutedAccent;
+        textColor = AppColors.textTertiaryLight;
+      } else {
+        bgColor = AppColors.scheduleMutedBackground;
+        accentColor = AppColors.scheduleMutedAccent;
+        textColor = AppColors.textSecondaryLight;
+      }
+
       return CustomPaint(
-        painter: isPreview && isStart
+        painter: (isPreview || isOverlapWithHighlight) && isStart
             ? _DashedTopBorderPainter(color: accentColor, width: 2)
             : null,
         child: Container(
@@ -195,7 +293,7 @@ class AlternativeTimeGrid extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             color: bgColor,
-            border: !isPreview
+            border: !isPreview && !isOverlapWithHighlight
                 ? Border(
                     top: isStart
                         ? BorderSide(color: accentColor, width: 2)
@@ -210,10 +308,12 @@ class AlternativeTimeGrid extends StatelessWidget {
                     hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
                     style: AppTypography.caption.copyWith(
                       fontSize: 9,
-                      fontWeight: isPreview ? FontWeight.w400 : FontWeight.w500,
-                      color: isPreview
-                          ? AppColors.textTertiaryLight
-                          : AppColors.textSecondaryLight,
+                      fontWeight: isOverlapWithHighlight
+                          ? FontWeight.w600
+                          : isPreview
+                              ? FontWeight.w400
+                              : FontWeight.w500,
+                      color: textColor,
                   ),
                   overflow: TextOverflow.clip,
                   maxLines: 1,
