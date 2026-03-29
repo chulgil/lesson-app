@@ -241,8 +241,8 @@ class TimeSlotOption extends HiveObject {
     return days[dayOfWeek.clamp(0, 6)];
   }
 
-  /// Display label: "토요일 14:00 ~ 15:00"
-  String get displayLabel => '$dayLabel요일 $startTime ~ $endTime';
+  /// Display label: "토 14:00 ~ 15:00"
+  String get displayLabel => '$dayLabel $startTime ~ $endTime';
 }
 
 /// A negotiation turn (proposal or counter-proposal)
@@ -321,17 +321,19 @@ class PreferredTimeSlot {
   Map<String, dynamic> toJson() => _$PreferredTimeSlotToJson(this);
 
   /// Display label for the selection list.
+  /// date있으면: "3/29(토) 14:00 ~ 15:00"
+  /// dayOfWeek만: "토 14:00 ~ 15:00"
   String get displayLabel {
     const days = ['월', '화', '수', '목', '금', '토', '일'];
     if (date != null) {
       final d = date!;
       final dayLabel = days[d.weekday - 1];
-      return '${d.month}/${d.day}($dayLabel) $startTime';
+      return '${d.month}/${d.day}($dayLabel) $startTime ~ $endTime';
     }
     if (dayOfWeek != null) {
-      return '매주 ${days[dayOfWeek!.clamp(0, 6)]}요일 $startTime';
+      return '${days[dayOfWeek!.clamp(0, 6)]} $startTime ~ $endTime';
     }
-    return startTime;
+    return '$startTime ~ $endTime';
   }
 }
 
