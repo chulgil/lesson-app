@@ -95,6 +95,124 @@ Future<AttendanceStats> studentAttendanceStats(
   );
 }
 
+/// Teacher-wide attendance overview: per-student rates + recent absences.
+@riverpod
+Future<TeacherAttendanceOverview> teacherAttendanceOverview(
+  TeacherAttendanceOverviewRef ref,
+) async {
+  final lessons = await ref.watch(lessonsProvider.future);
+  final now = DateTime.now();
+
+  // Only past lessons
+  final pastLessons = lessons.where((l) =>
+      l.date.isBefore(now) || l.status != LessonStatus.scheduled).toList();
+
+  // Group by student
+  final byStudent = <String, List<Lesson>>{};
+  for (final lesson in pastLessons) {
+    byStudent.putIfAbsent(lesson.studentId, () => []).add(lesson);
+  }
+
+  int totalCompleted = 0;
+  int totalCountable = 0;
+  final studentRates = <StudentAttendanceRate>[];
+  final recentAbsences = <AbsenceRecord>[];
+
+  for (final entry in byStudent.entries) {
+    int completed = 0;
+    int countable = 0;
+
+    for (final lesson in entry.value) {
+      if (lesson.status.isDeducted) {
+        countable++;
+        if (lesson.status == LessonStatus.completed) {
+          completed++;
+        }
+      }
+      // Collect absence/noShow records
+      if (lesson.status == LessonStatus.studentAbsent ||
+          lesson.status == LessonStatus.noShow ||
+          lesson.status == LessonStatus.cancelledByStudentLate) {
+        recentAbsences.add(AbsenceRecord(
+          studentId: lesson.studentId,
+          date: lesson.date,
+          status: lesson.status,
+        ));
+      }
+    }
+
+    totalCompleted += completed;
+    totalCountable += countable;
+
+    if (countable > 0) {
+      studentRates.add(StudentAttendanceRate(
+        studentId: entry.key,
+        completed: completed,
+        total: countable,
+      ));
+    }
+  }
+
+  // Sort students by rate ascending (lowest first for attention)
+  studentRates.sort((a, b) => a.rate.compareTo(b.rate));
+
+  // Sort absences by date descending (most recent first)
+  recentAbsences.sort((a, b) => b.date.compareTo(a.date));
+
+  return TeacherAttendanceOverview(
+    totalCompleted: totalCompleted,
+    totalCountable: totalCountable,
+    studentRates: studentRates,
+    recentAbsences: recentAbsences.take(10).toList(),
+  );
+}
+
+/// Teacher attendance overview data.
+class TeacherAttendanceOverview {
+  final int totalCompleted;
+  final int totalCountable;
+  final List<StudentAttendanceRate> studentRates;
+  final List<AbsenceRecord> recentAbsences;
+
+  const TeacherAttendanceOverview({
+    required this.totalCompleted,
+    required this.totalCountable,
+    required this.studentRates,
+    required this.recentAbsences,
+  });
+
+  double get overallRate =>
+      totalCountable > 0 ? totalCompleted / totalCountable * 100 : 0;
+}
+
+/// Per-student attendance rate.
+class StudentAttendanceRate {
+  final String studentId;
+  final int completed;
+  final int total;
+
+  const StudentAttendanceRate({
+    required this.studentId,
+    required this.completed,
+    required this.total,
+  });
+
+  double get rate => total > 0 ? completed / total * 100 : 0;
+}
+
+/// Single absence/noShow record.
+class AbsenceRecord {
+  final String studentId;
+  final DateTime date;
+  final LessonStatus status;
+
+  const AbsenceRecord({
+    required this.studentId,
+    required this.date,
+    required this.status,
+  });
+}
+
 class _MonthlyCounter {
   final int year;
   final int month;

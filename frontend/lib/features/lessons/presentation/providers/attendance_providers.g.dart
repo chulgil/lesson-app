@@ -172,5 +172,26 @@ class _StudentAttendanceStatsProviderElement
   @override
   String get studentId => (origin as StudentAttendanceStatsProvider).studentId;
 }
+
+String _$teacherAttendanceOverviewHash() =>
+    r'382a839d01dbb9c97693537006306ca849e0a6ec';
+
+/// Teacher-wide attendance overview: per-student rates + recent absences.
+///
+/// Copied from [teacherAttendanceOverview].
+@ProviderFor(teacherAttendanceOverview)
+final teacherAttendanceOverviewProvider =
+    AutoDisposeFutureProvider<TeacherAttendanceOverview>.internal(
+  teacherAttendanceOverview,
+  name: r'teacherAttendanceOverviewProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$teacherAttendanceOverviewHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef TeacherAttendanceOverviewRef
+    = AutoDisposeFutureProviderRef<TeacherAttendanceOverview>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

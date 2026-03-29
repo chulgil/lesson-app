@@ -614,4 +614,18 @@ class AppStrings {
 
   /// 만료 긴급
   static String expirationUrgent(int days) => 'D-$days 곧 만료!';
+
+  // ── Teacher Attendance ────────────────────────────────────
+
+  /// 전체 출석률
+  static const overallAttendanceRate = '전체 출석률';
+
+  /// 학생별 출석률
+  static const studentAttendanceRates = '학생별 출석률';
+
+  /// 결석/노쇼 이력
+  static const recentAbsences = '결석/노쇼 이력';
+
+  /// 수강권 차감
+  static const subscriptionDeducted = '수강권 차감';
 }

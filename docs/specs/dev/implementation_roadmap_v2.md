@@ -86,7 +86,7 @@
 
 | # | 작업 | 스펙 | 예상 규모 | 우선순위 |
 |---|------|------|:---------:|:--------:|
-| 3-1 | **출석 관리 Phase 2** (통계 + 그룹 출석) | attendance_spec.md Phase 2 | M | HIGH |
+| 3-1 | **출석 관리 Phase 2** (통계 + 그룹 출석) | attendance_spec.md Phase 2 | M | ✅ done |
 | 3-2 | **게이미피케이션 Phase 2** (뱃지 + 리더보드) | gamification_spec.md Phase 2 | L | HIGH |
 | 3-3 | 학생 연습 현황 상세 조회 | practice_master.md | M | MEDIUM |
 | 3-4 | 알림 시스템 고도화 (FCM) | notification_master.md | L | MEDIUM |

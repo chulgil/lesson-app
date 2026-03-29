@@ -14,6 +14,7 @@ import '../../../features/profile/presentation/screens/basic_info_edit_screen.da
 import '../../../features/profile/presentation/screens/certificate_edit_screen.dart';
 import '../../../features/profile/presentation/screens/bank_account_edit_screen.dart';
 import '../../../features/analytics/presentation/screens/teacher_dashboard_screen.dart';
+import '../../../features/lessons/presentation/screens/teacher_attendance_screen.dart';
 import '../../../features/profile/presentation/screens/outstanding_payments_screen.dart';
 import '../../../features/profile/presentation/screens/profile_preview_screen.dart';
 import '../../../features/profile/presentation/screens/profile_visibility_screen.dart';
@@ -135,5 +136,12 @@ List<GoRoute> profileRoutes = [
     path: AppRoutes.analytics,
     name: 'analytics',
     builder: (context, state) => const TeacherDashboardScreen(),
+  ),
+
+  // Teacher Attendance Overview
+  GoRoute(
+    path: AppRoutes.teacherAttendance,
+    name: 'teacherAttendance',
+    builder: (context, state) => const TeacherAttendanceScreen(),
   ),
 ];
