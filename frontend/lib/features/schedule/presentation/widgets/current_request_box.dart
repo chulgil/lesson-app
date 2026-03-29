@@ -104,11 +104,14 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
     final lastEvent = widget.events.last;
 
-    // withdrawApproval: teacher re-decides (myTurn for teacher, theirTurn for student)
+    // withdrawApproval: whoever withdrew gets myTurn back to re-decide
     if (lastEvent.eventType == RequestEventType.withdrawApproval) {
-      return widget.viewerRole == 'teacher'
-          ? _TurnState.myTurn
-          : _TurnState.theirTurn;
+      final withdrawerIsViewer =
+          (lastEvent.actorType == ProposerRole.teacher &&
+                  widget.viewerRole == 'teacher') ||
+              (lastEvent.actorType == ProposerRole.student &&
+                  widget.viewerRole == 'student');
+      return withdrawerIsViewer ? _TurnState.myTurn : _TurnState.theirTurn;
     }
 
     final lastActorIsViewer =
