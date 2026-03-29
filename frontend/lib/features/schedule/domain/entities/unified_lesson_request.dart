@@ -116,32 +116,44 @@ enum UnifiedRequestStatus {
   cancelled,
 
   @HiveField(10)
-  expired;
+  expired,
+
+  // Phase 2: 수강권 발행 (NEW)
+  @HiveField(11)
+  subscriptionIssued,
+
+  // Phase 3: 레슨 진행 (NEW)
+  @HiveField(12)
+  inProgress;
 
   String get label {
     switch (this) {
       case UnifiedRequestStatus.pending:
-        return '확인 대기';
+        return AppStrings.statusPending;
       case UnifiedRequestStatus.approved:
-        return '승인됨';
+        return AppStrings.statusApproved;
       case UnifiedRequestStatus.negotiating:
-        return '시간 협상 중';
+        return AppStrings.statusTimeConfirmed;
       case UnifiedRequestStatus.timeConfirmed:
-        return '시간 확정';
+        return AppStrings.statusTimeConfirmed;
       case UnifiedRequestStatus.proposalSent:
-        return '수강권 제안됨';
+        return AppStrings.statusProposalSent;
       case UnifiedRequestStatus.proposalAccepted:
-        return '수강권 수락됨';
+        return AppStrings.statusProposalAccepted;
       case UnifiedRequestStatus.paymentNotified:
-        return '결제 완료 알림';
+        return AppStrings.statusPaymentDone;
       case UnifiedRequestStatus.completed:
-        return '발급 완료';
+        return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:
-        return '거절됨';
+        return AppStrings.statusRejected;
       case UnifiedRequestStatus.cancelled:
-        return '취소됨';
+        return AppStrings.statusCancelled;
       case UnifiedRequestStatus.expired:
-        return '만료됨';
+        return AppStrings.statusExpiredFull;
+      case UnifiedRequestStatus.subscriptionIssued:
+        return AppStrings.statusSubscriptionIssued;
+      case UnifiedRequestStatus.inProgress:
+        return AppStrings.statusInProgress;
     }
   }
 
@@ -153,6 +165,8 @@ enum UnifiedRequestStatus {
         UnifiedRequestStatus.proposalSent,
         UnifiedRequestStatus.proposalAccepted,
         UnifiedRequestStatus.paymentNotified,
+        UnifiedRequestStatus.subscriptionIssued,
+        UnifiedRequestStatus.inProgress,
       ].contains(this);
 
   bool get isTerminal => [
@@ -161,6 +175,15 @@ enum UnifiedRequestStatus {
         UnifiedRequestStatus.cancelled,
         UnifiedRequestStatus.expired,
       ].contains(this);
+}
+
+/// Lifecycle phase for chapter-based UI.
+enum RequestPhase {
+  request,       // Phase 1: 레슨 신청 → 결제
+  subscription,  // Phase 2: 수강권 발행
+  lessons,       // Phase 3: 레슨 진행
+  completed,     // 전체 완료
+  terminal,      // 거절/취소/만료
 }
 
 /// Who proposed the time slot
@@ -564,7 +587,32 @@ class UnifiedLessonRequest extends HiveObject {
         return AppStrings.statusCancelled;
       case UnifiedRequestStatus.expired:
         return AppStrings.statusExpiredFull;
+      case UnifiedRequestStatus.subscriptionIssued:
+        return AppStrings.statusSubscriptionIssued;
+      case UnifiedRequestStatus.inProgress:
+        return AppStrings.statusInProgress;
     }
+  }
+
+  /// Current lifecycle phase for chapter-based UI.
+  RequestPhase get currentPhase {
+    return switch (status) {
+      UnifiedRequestStatus.pending ||
+      UnifiedRequestStatus.negotiating ||
+      UnifiedRequestStatus.approved ||
+      UnifiedRequestStatus.timeConfirmed ||
+      UnifiedRequestStatus.proposalSent ||
+      UnifiedRequestStatus.proposalAccepted ||
+      UnifiedRequestStatus.paymentNotified =>
+        RequestPhase.request,
+      UnifiedRequestStatus.subscriptionIssued => RequestPhase.subscription,
+      UnifiedRequestStatus.inProgress => RequestPhase.lessons,
+      UnifiedRequestStatus.completed => RequestPhase.completed,
+      UnifiedRequestStatus.rejected ||
+      UnifiedRequestStatus.cancelled ||
+      UnifiedRequestStatus.expired =>
+        RequestPhase.terminal,
+    };
   }
 
   /// Whether it's the teacher's turn based on last proposal.
@@ -605,6 +653,10 @@ class UnifiedLessonRequest extends HiveObject {
         return AppStrings.statusCancelled;
       case UnifiedRequestStatus.expired:
         return AppStrings.statusExpiredFull;
+      case UnifiedRequestStatus.subscriptionIssued:
+        return AppStrings.statusSubscriptionIssued;
+      case UnifiedRequestStatus.inProgress:
+        return AppStrings.statusInProgress;
     }
   }
 
@@ -621,7 +673,10 @@ class UnifiedLessonRequest extends HiveObject {
         return 'wait';
       case UnifiedRequestStatus.approved:
       case UnifiedRequestStatus.completed:
+      case UnifiedRequestStatus.subscriptionIssued:
         return 'success';
+      case UnifiedRequestStatus.inProgress:
+        return 'action';
       case UnifiedRequestStatus.paymentNotified:
         return 'error';
       case UnifiedRequestStatus.rejected:

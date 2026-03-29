@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import 'unified_lesson_request.dart';
 
 part 'request_event.g.dart';
@@ -45,43 +46,89 @@ enum RequestEventType {
   completed,
 
   @HiveField(12)
-  withdrawApproval;
+  withdrawApproval,
+
+  // Phase 2: 수강권 & 결제 (NEW)
+  @HiveField(13)
+  paymentRequested,
+
+  @HiveField(14)
+  paymentConfirmed,
+
+  @HiveField(15)
+  subscriptionIssued,
+
+  // Phase 3: 레슨 진행 (NEW)
+  @HiveField(16)
+  lessonCompleted,
+
+  @HiveField(17)
+  lessonCancelled,
+
+  @HiveField(18)
+  scheduleChanged,
+
+  @HiveField(19)
+  lessonNoteAdded,
+
+  @HiveField(20)
+  subscriptionRenewed,
+
+  @HiveField(21)
+  subscriptionCompleted;
 
   String get label {
     switch (this) {
       case RequestEventType.initialRequest:
-        return '레슨 요청';
+        return AppStrings.eventLessonRequest;
       case RequestEventType.approve:
-        return '수락';
+        return AppStrings.eventApprove;
       case RequestEventType.reject:
-        return '거절';
+        return AppStrings.eventReject;
       case RequestEventType.proposeAlternative:
-        return '다른 시간 제안';
       case RequestEventType.counterPropose:
-        return '다른 시간 제안';
+        return AppStrings.eventProposeAlternative;
       case RequestEventType.acceptAlternative:
-        return '시간 수락';
+        return AppStrings.eventAcceptAlternative;
       case RequestEventType.cancel:
-        return '취소';
+        return AppStrings.eventCancel;
       case RequestEventType.expire:
-        return '기간 만료';
+        return AppStrings.eventExpire;
       case RequestEventType.proposalSent:
-        return '수강권 제안';
+        return AppStrings.eventProposalSent;
       case RequestEventType.proposalAccepted:
-        return '수강권 수락';
+        return AppStrings.eventProposalAccepted;
       case RequestEventType.paymentNotified:
-        return '결제 완료';
+        return AppStrings.eventPaymentNotified;
       case RequestEventType.completed:
-        return '발급 완료';
+        return AppStrings.eventCompleted;
       case RequestEventType.withdrawApproval:
-        return '결정 변경';
+        return AppStrings.eventWithdrawApproval;
+      case RequestEventType.paymentRequested:
+        return AppStrings.eventPaymentRequested;
+      case RequestEventType.paymentConfirmed:
+        return AppStrings.eventPaymentConfirmed;
+      case RequestEventType.subscriptionIssued:
+        return AppStrings.eventSubscriptionIssued;
+      case RequestEventType.lessonCompleted:
+        return AppStrings.eventLessonCompleted;
+      case RequestEventType.lessonCancelled:
+        return AppStrings.eventLessonCancelled;
+      case RequestEventType.scheduleChanged:
+        return AppStrings.eventScheduleChanged;
+      case RequestEventType.lessonNoteAdded:
+        return AppStrings.eventLessonNoteAdded;
+      case RequestEventType.subscriptionRenewed:
+        return AppStrings.eventSubscriptionRenewed;
+      case RequestEventType.subscriptionCompleted:
+        return AppStrings.eventSubscriptionCompleted;
     }
   }
 
   bool get isTerminal => [
         RequestEventType.cancel,
         RequestEventType.expire,
-        RequestEventType.completed,
+        RequestEventType.subscriptionCompleted,
         RequestEventType.reject,
       ].contains(this);
 }
@@ -162,31 +209,52 @@ class RequestEvent {
   /// Display message for chat bubble header.
   String get chatDisplayMessage {
     switch (eventType) {
+      // Phase 1: 레슨 신청
       case RequestEventType.initialRequest:
-        return '레슨을 요청했습니다';
+        return AppStrings.chatInitialRequest;
       case RequestEventType.approve:
-        return '요청을 수락했습니다';
+        return AppStrings.chatApprove;
       case RequestEventType.reject:
-        return '요청이 종료되었습니다';
+        return AppStrings.chatReject;
       case RequestEventType.proposeAlternative:
       case RequestEventType.counterPropose:
-        return '다른 시간을 제안했습니다';
+        return AppStrings.chatProposeAlternative;
       case RequestEventType.acceptAlternative:
-        return '제안한 시간을 수락했습니다';
+        return AppStrings.chatAcceptAlternative;
       case RequestEventType.cancel:
-        return '요청을 취소했습니다';
+        return AppStrings.chatCancel;
       case RequestEventType.expire:
-        return '요청이 만료되었습니다';
+        return AppStrings.chatExpire;
       case RequestEventType.proposalSent:
-        return '수강권을 제안했습니다';
+        return AppStrings.chatProposalSent;
       case RequestEventType.proposalAccepted:
-        return '수강권을 수락했습니다';
+        return AppStrings.chatProposalAccepted;
       case RequestEventType.paymentNotified:
-        return '결제가 완료되었습니다';
+        return AppStrings.chatPaymentNotified;
       case RequestEventType.completed:
-        return '수강권이 발급되었습니다';
+        return AppStrings.chatCompleted;
       case RequestEventType.withdrawApproval:
-        return '결정을 변경했습니다';
+        return AppStrings.chatWithdrawApproval;
+      // Phase 2: 수강권 & 결제
+      case RequestEventType.paymentRequested:
+        return AppStrings.chatPaymentRequested;
+      case RequestEventType.paymentConfirmed:
+        return AppStrings.chatPaymentConfirmed;
+      case RequestEventType.subscriptionIssued:
+        return AppStrings.chatSubscriptionIssued;
+      // Phase 3: 레슨 진행
+      case RequestEventType.lessonCompleted:
+        return AppStrings.chatLessonCompleted;
+      case RequestEventType.lessonCancelled:
+        return AppStrings.chatLessonCancelled;
+      case RequestEventType.scheduleChanged:
+        return AppStrings.chatScheduleChanged;
+      case RequestEventType.lessonNoteAdded:
+        return AppStrings.chatLessonNoteAdded;
+      case RequestEventType.subscriptionRenewed:
+        return AppStrings.chatSubscriptionRenewed;
+      case RequestEventType.subscriptionCompleted:
+        return AppStrings.chatSubscriptionCompleted;
     }
   }
 

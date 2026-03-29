@@ -420,6 +420,10 @@ class UnifiedRequestStatusAdapter extends TypeAdapter<UnifiedRequestStatus> {
         return UnifiedRequestStatus.cancelled;
       case 10:
         return UnifiedRequestStatus.expired;
+      case 11:
+        return UnifiedRequestStatus.subscriptionIssued;
+      case 12:
+        return UnifiedRequestStatus.inProgress;
       default:
         return UnifiedRequestStatus.pending;
     }
@@ -460,6 +464,12 @@ class UnifiedRequestStatusAdapter extends TypeAdapter<UnifiedRequestStatus> {
         break;
       case UnifiedRequestStatus.expired:
         writer.writeByte(10);
+        break;
+      case UnifiedRequestStatus.subscriptionIssued:
+        writer.writeByte(11);
+        break;
+      case UnifiedRequestStatus.inProgress:
+        writer.writeByte(12);
         break;
     }
   }
@@ -744,4 +754,6 @@ const _$UnifiedRequestStatusEnumMap = {
   UnifiedRequestStatus.rejected: 'rejected',
   UnifiedRequestStatus.cancelled: 'cancelled',
   UnifiedRequestStatus.expired: 'expired',
+  UnifiedRequestStatus.subscriptionIssued: 'subscriptionIssued',
+  UnifiedRequestStatus.inProgress: 'inProgress',
 };

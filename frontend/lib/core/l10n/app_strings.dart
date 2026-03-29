@@ -343,6 +343,62 @@ class AppStrings {
   /// 시간협상 N
   static String statusNegotiating(int round) => '시간협상 $round';
 
+  // ── Phase 2, 3 Status Labels ──────────────────────────────
+
+  /// 수강권 발행됨
+  static const statusSubscriptionIssued = '수강권발행';
+
+  /// 레슨 진행중
+  static const statusInProgress = '레슨진행';
+
+  // ── Event Labels (for RequestEventType.label) ─────────────
+
+  static const eventLessonRequest = '레슨 요청';
+  static const eventApprove = '수락';
+  static const eventReject = '거절';
+  static const eventProposeAlternative = '다른 시간 제안';
+  static const eventAcceptAlternative = '시간 수락';
+  static const eventCancel = '취소';
+  static const eventExpire = '기간 만료';
+  static const eventProposalSent = '수강권 제안';
+  static const eventProposalAccepted = '수강권 수락';
+  static const eventPaymentNotified = '결제 완료';
+  static const eventCompleted = '발급 완료';
+  static const eventWithdrawApproval = '결정 변경';
+  static const eventPaymentRequested = '결제 안내';
+  static const eventPaymentConfirmed = '입금 확인';
+  static const eventSubscriptionIssued = '수강권 발행';
+  static const eventLessonCompleted = '레슨 완료';
+  static const eventLessonCancelled = '레슨 취소';
+  static const eventScheduleChanged = '스케줄 변경';
+  static const eventLessonNoteAdded = '레슨 노트';
+  static const eventSubscriptionRenewed = '수강권 연장';
+  static const eventSubscriptionCompleted = '수강 완료';
+
+  // ── Chat Display Messages ─────────────────────────────────
+
+  static const chatInitialRequest = '레슨을 요청했습니다';
+  static const chatApprove = '요청을 수락했습니다';
+  static const chatReject = '요청이 종료되었습니다';
+  static const chatProposeAlternative = '다른 시간을 제안했습니다';
+  static const chatAcceptAlternative = '제안한 시간을 수락했습니다';
+  static const chatCancel = '요청을 취소했습니다';
+  static const chatExpire = '요청이 만료되었습니다';
+  static const chatProposalSent = '수강권을 제안했습니다';
+  static const chatProposalAccepted = '수강권을 수락했습니다';
+  static const chatPaymentNotified = '결제가 완료되었습니다';
+  static const chatCompleted = '수강권이 발급되었습니다';
+  static const chatWithdrawApproval = '결정을 변경했습니다';
+  static const chatPaymentRequested = '결제 안내를 보냈습니다';
+  static const chatPaymentConfirmed = '입금이 확인되었습니다';
+  static const chatSubscriptionIssued = '수강권이 발행되었습니다';
+  static const chatLessonCompleted = '레슨이 완료되었습니다';
+  static const chatLessonCancelled = '레슨이 취소되었습니다';
+  static const chatScheduleChanged = '스케줄이 변경되었습니다';
+  static const chatLessonNoteAdded = '레슨 노트가 추가되었습니다';
+  static const chatSubscriptionRenewed = '수강권이 연장되었습니다';
+  static const chatSubscriptionCompleted = '수강이 완료되었습니다';
+
   // ── Profile Menu ──────────────────────────────────────────
 
   /// 레슨 요청 관리 메뉴

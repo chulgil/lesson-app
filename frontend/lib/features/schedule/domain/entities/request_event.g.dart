@@ -97,6 +97,24 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         return RequestEventType.completed;
       case 12:
         return RequestEventType.withdrawApproval;
+      case 13:
+        return RequestEventType.paymentRequested;
+      case 14:
+        return RequestEventType.paymentConfirmed;
+      case 15:
+        return RequestEventType.subscriptionIssued;
+      case 16:
+        return RequestEventType.lessonCompleted;
+      case 17:
+        return RequestEventType.lessonCancelled;
+      case 18:
+        return RequestEventType.scheduleChanged;
+      case 19:
+        return RequestEventType.lessonNoteAdded;
+      case 20:
+        return RequestEventType.subscriptionRenewed;
+      case 21:
+        return RequestEventType.subscriptionCompleted;
       default:
         return RequestEventType.initialRequest;
     }
@@ -143,6 +161,33 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         break;
       case RequestEventType.withdrawApproval:
         writer.writeByte(12);
+        break;
+      case RequestEventType.paymentRequested:
+        writer.writeByte(13);
+        break;
+      case RequestEventType.paymentConfirmed:
+        writer.writeByte(14);
+        break;
+      case RequestEventType.subscriptionIssued:
+        writer.writeByte(15);
+        break;
+      case RequestEventType.lessonCompleted:
+        writer.writeByte(16);
+        break;
+      case RequestEventType.lessonCancelled:
+        writer.writeByte(17);
+        break;
+      case RequestEventType.scheduleChanged:
+        writer.writeByte(18);
+        break;
+      case RequestEventType.lessonNoteAdded:
+        writer.writeByte(19);
+        break;
+      case RequestEventType.subscriptionRenewed:
+        writer.writeByte(20);
+        break;
+      case RequestEventType.subscriptionCompleted:
+        writer.writeByte(21);
         break;
     }
   }
@@ -210,4 +255,13 @@ const _$RequestEventTypeEnumMap = {
   RequestEventType.paymentNotified: 'paymentNotified',
   RequestEventType.completed: 'completed',
   RequestEventType.withdrawApproval: 'withdrawApproval',
+  RequestEventType.paymentRequested: 'paymentRequested',
+  RequestEventType.paymentConfirmed: 'paymentConfirmed',
+  RequestEventType.subscriptionIssued: 'subscriptionIssued',
+  RequestEventType.lessonCompleted: 'lessonCompleted',
+  RequestEventType.lessonCancelled: 'lessonCancelled',
+  RequestEventType.scheduleChanged: 'scheduleChanged',
+  RequestEventType.lessonNoteAdded: 'lessonNoteAdded',
+  RequestEventType.subscriptionRenewed: 'subscriptionRenewed',
+  RequestEventType.subscriptionCompleted: 'subscriptionCompleted',
 };
