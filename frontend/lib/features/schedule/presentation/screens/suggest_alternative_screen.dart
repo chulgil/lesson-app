@@ -241,10 +241,14 @@ class _SuggestAlternativeScreenState
                 onTap: () {
                   setState(() {
                     if (_selectedPreferredIndex == slot.priority) {
+                      // Deselect → back to propose mode
                       _selectedPreferredIndex = null;
+                      _messageController.text = widget.message;
                     } else {
+                      // Select → accept mode, clear propose message
                       _selectedPreferredIndex = slot.priority;
                       _suggestedSlots = [];
+                      _messageController.clear();
                       // Navigate calendar to the selected slot's week
                       if (slot.date != null) {
                         _weekStart = _getWeekStart(slot.date!);
