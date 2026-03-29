@@ -287,29 +287,38 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Their turn: compact waiting + withdraw button
+  /// Their turn: waiting message + withdraw button
   Widget _buildTheirTurn() {
-    return Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.hourglass_top,
-            color: AppColors.info, size: 18),
-        const SizedBox(width: AppSpacing.space2),
-        Expanded(
-          child: Text(
-            AppStrings.waitingForResponse(widget.opponentName),
-            style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+        // Waiting message row
+        Row(
+          children: [
+            Icon(Icons.hourglass_top,
+                color: AppColors.info, size: 18),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.waitingForResponse(widget.opponentName),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
+        const SizedBox(height: AppSpacing.space2),
+        // Withdraw button (full width for visibility)
         SizedBox(
-          height: 32,
+          width: double.infinity,
+          height: 36,
           child: OutlinedButton.icon(
             onPressed: widget.onWithdraw,
-            icon: const Icon(Icons.undo, size: 14),
+            icon: const Icon(Icons.undo, size: 16),
             label: Text(
               AppStrings.withdrawApproval,
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.buttonSmall.copyWith(
                 color: AppColors.textSecondaryLight,
               ),
             ),
