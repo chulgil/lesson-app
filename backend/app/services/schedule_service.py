@@ -414,7 +414,7 @@ class ScheduleService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
         booking.scheduled_date = data.new_date
         booking.scheduled_time = data.new_time
-        booking.status = "change_requested"
+        booking.status = "changeRequested"
         booking.reason = data.reason
         await self.db.flush()
         await self.db.refresh(booking)

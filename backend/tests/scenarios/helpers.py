@@ -329,6 +329,105 @@ class TeacherActions:
         assert r.status_code == 200
         return r.json()
 
+    # -- Schedule (availability, weekly, exceptions) ----------------------------
+
+    async def set_availability(self, availabilities: list[dict]) -> dict:
+        r = await self.client.put(
+            f"{self._base}/schedule/availability",
+            headers=self.headers,
+            json={"availabilities": availabilities},
+        )
+        assert r.status_code == 200, f"set_availability failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def get_availability(self) -> dict:
+        r = await self.client.get(
+            f"{self._base}/schedule/availability", headers=self.headers
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def get_weekly_schedule(self, week_start: str | None = None) -> dict:
+        params = {}
+        if week_start:
+            params["week_start"] = week_start
+        r = await self.client.get(
+            f"{self._base}/schedule/weekly", headers=self.headers, params=params
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def create_schedule_exception(
+        self, date: str, exception_type: str = "holiday", reason: str = ""
+    ) -> dict:
+        r = await self.client.post(
+            f"{self._base}/schedule/exceptions",
+            headers=self.headers,
+            json={"date": date, "type": exception_type, "reason": reason},
+        )
+        assert r.status_code == 201, f"create_schedule_exception failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def delete_schedule_exception(self, exception_id: str) -> None:
+        r = await self.client.delete(
+            f"{self._base}/schedule/exceptions/{exception_id}",
+            headers=self.headers,
+        )
+        assert r.status_code == 204
+
+    async def cancel_booking(self, booking_id: str, reason: str = "") -> dict:
+        r = await self.client.patch(
+            f"{self._base}/bookings/{booking_id}/cancel",
+            headers=self.headers,
+            json={"reason": reason},
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def create_makeup_booking(
+        self,
+        student_id: str,
+        *,
+        scheduled_date: str,
+        scheduled_time: str,
+        duration: int = 60,
+        original_lesson_id: str | None = None,
+    ) -> dict:
+        payload: dict = {
+            "student_id": student_id,
+            "scheduled_date": scheduled_date,
+            "scheduled_time": scheduled_time,
+            "duration": duration,
+        }
+        if original_lesson_id:
+            payload["original_lesson_id"] = original_lesson_id
+        r = await self.client.post(
+            f"{self._base}/bookings/makeup",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 201, f"create_makeup_booking failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def change_booking(
+        self,
+        booking_id: str,
+        *,
+        new_date: str,
+        new_time: str,
+        reason: str | None = None,
+    ) -> dict:
+        payload: dict = {"new_date": new_date, "new_time": new_time}
+        if reason:
+            payload["reason"] = reason
+        r = await self.client.post(
+            f"{self._base}/bookings/{booking_id}/change-request",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"change_booking failed: {r.status_code} {r.text}"
+        return r.json()
+
     # -- Unified Lesson Requests -----------------------------------------------
 
     async def list_lesson_requests(self, teacher_id: str, **params) -> dict:
@@ -774,4 +873,74 @@ class StudentActions:
             json=payload,
         )
         assert r.status_code == 200, f"counter_propose failed: {r.status_code} {r.text}"
+        return r.json()
+
+    # -- Schedule (slots, bookings) --------------------------------------------
+
+    async def get_available_slots(
+        self, teacher_id: str, date: str, duration: int = 60
+    ) -> dict:
+        r = await self.client.get(
+            f"{self._base}/schedule/slots",
+            headers=self.headers,
+            params={"teacher_id": teacher_id, "date": date, "duration": duration},
+        )
+        assert r.status_code == 200, f"get_available_slots failed: {r.status_code} {r.text}"
+        return r.json()
+
+    async def create_booking(
+        self,
+        teacher_id: str,
+        *,
+        date: str = "2026-04-01",
+        time: str = "14:00",
+        duration: int = 60,
+        instrument: str = "violin",
+        lesson_type: str = "regular",
+    ) -> str:
+        r = await self.client.post(
+            f"{self._base}/bookings",
+            headers=self.headers,
+            json={
+                "teacher_id": teacher_id,
+                "lesson_type": lesson_type,
+                "scheduled_date": date,
+                "scheduled_time": time,
+                "duration": duration,
+                "instrument": instrument,
+            },
+        )
+        assert r.status_code == 201, f"create_booking failed: {r.status_code} {r.text}"
+        return r.json()["id"]
+
+    async def cancel_booking(self, booking_id: str, reason: str = "") -> dict:
+        r = await self.client.patch(
+            f"{self._base}/bookings/{booking_id}/cancel",
+            headers=self.headers,
+            json={"reason": reason},
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def list_bookings(self) -> dict:
+        r = await self.client.get(
+            f"{self._base}/bookings", headers=self.headers
+        )
+        assert r.status_code == 200
+        return r.json()
+
+    async def request_booking_change(
+        self, booking_id: str, *, new_date: str | None = None, new_time: str | None = None
+    ) -> dict:
+        payload: dict = {}
+        if new_date:
+            payload["new_date"] = new_date
+        if new_time:
+            payload["new_time"] = new_time
+        r = await self.client.post(
+            f"{self._base}/bookings/{booking_id}/change-request",
+            headers=self.headers,
+            json=payload,
+        )
+        assert r.status_code == 200, f"request_booking_change failed: {r.status_code} {r.text}"
         return r.json()

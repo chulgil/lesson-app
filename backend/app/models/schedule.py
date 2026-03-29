@@ -21,6 +21,7 @@ class BookingStatus(str, enum.Enum):
     cancelled = "cancelled"
     completed = "completed"
     noShow = "noShow"
+    changeRequested = "changeRequested"
 
 
 class RequestTiming(str, enum.Enum):
