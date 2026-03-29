@@ -43,25 +43,24 @@ class RequestHistoryChat extends StatelessWidget {
       );
     }
 
-    // Reverse: newest at top
-    final reversed = events.reversed.toList();
+    // Chronological: oldest first, newest at bottom (chat style)
+    final chronological = [...events]
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space2,
       ),
-      itemCount: reversed.length,
+      itemCount: chronological.length,
       itemBuilder: (context, index) {
-        final event = reversed[index];
+        final event = chronological[index];
         final isMyMessage = event.actorId == viewerId;
 
-        // Date separator (show if first in group or different day from next)
+        // Date separator (show if first or different day from previous)
         Widget? dateSeparator;
-        if (index == reversed.length - 1 ||
-            !_isSameDay(reversed[index + 1].createdAt, event.createdAt)) {
+        if (index == 0 ||
+            !_isSameDay(chronological[index - 1].createdAt, event.createdAt)) {
           dateSeparator = _buildDateSeparator(event.createdAt);
         }
 

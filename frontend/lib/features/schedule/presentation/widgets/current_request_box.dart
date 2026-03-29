@@ -127,19 +127,17 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(AppSpacing.space4),
-      padding: const EdgeInsets.all(AppSpacing.space4),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.space3,
+        AppSpacing.space3,
+        AppSpacing.space3,
+        MediaQuery.of(context).padding.bottom + AppSpacing.space3,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight),
+        ),
       ),
       child: switch (_turnState) {
         _TurnState.myTurn => _buildMyTurn(),
@@ -149,182 +147,148 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// My turn: show opponent's proposal + slot selection + action buttons
+  /// My turn: compact chat-input style — slot chips + message input + buttons
   Widget _buildMyTurn() {
     final slotLabels = _latestSlotLabels;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Header
-        Row(
-          children: [
-            const Icon(Icons.notifications_active,
-                color: AppColors.primary, size: AppSpacing.iconSM),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              AppStrings.lessonRequest,
-              style: AppTypography.headingSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // Status message
-        Text(
-          AppStrings.opponentProposed(widget.opponentName),
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space4),
-
-        // Student message (from request or latest event)
-        if (_latestMessage != null) ...[
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.chat_bubble_outline,
-                    size: AppSpacing.iconXS,
-                    color: AppColors.textSecondaryLight),
-                const SizedBox(width: AppSpacing.space2),
-                Expanded(
-                  child: Text(
-                    _latestMessage!,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.space3),
-        ],
-
-        // Slot selection (reuse approval_bottom_sheet pattern)
-        if (slotLabels.isNotEmpty) _buildSlotsSection(slotLabels),
-        const SizedBox(height: AppSpacing.space4),
+        // Compact slot selection (horizontal chips)
+        if (slotLabels.isNotEmpty) _buildCompactSlots(slotLabels),
+        const SizedBox(height: AppSpacing.space2),
 
         // Action buttons
         Row(
           children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: widget.onCounterPropose,
-                style: OutlinedButton.styleFrom(
-                  minimumSize:
-                      const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                  side: const BorderSide(color: AppColors.borderLight),
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-                child: Text(
-                  AppStrings.counterPropose,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ),
+            // Schedule comparison button
+            IconButton(
+              onPressed: widget.onCounterPropose,
+              icon: const Icon(Icons.calendar_month, size: 22),
+              color: AppColors.textSecondaryLight,
+              tooltip: AppStrings.counterPropose,
+              visualDensity: VisualDensity.compact,
             ),
-            const SizedBox(width: AppSpacing.space3),
+            const SizedBox(width: AppSpacing.space1),
+            // Accept button
             Expanded(
-              child: ElevatedButton(
-                onPressed: _selectedSlotIndex != null
-                    ? () {
-                        widget.onAccept?.call(_selectedSlotIndex!);
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  minimumSize:
-                      const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                  backgroundColor: AppColors.primary,
-                  disabledBackgroundColor: AppColors.scheduleMutedAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                ),
-                child: Text(
-                  AppStrings.accept,
-                  style: AppTypography.buttonSmall.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// Their turn: waiting message + contextual actions
-  Widget _buildTheirTurn() {
-    final isPending = widget.request.status == UnifiedRequestStatus.pending;
-    final isApproved = widget.request.status == UnifiedRequestStatus.approved;
-    final isTeacher = widget.viewerRole == 'teacher';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(Icons.hourglass_top,
-                color: AppColors.info, size: AppSpacing.iconSM),
-            const SizedBox(width: AppSpacing.space2),
-            Text(
-              AppStrings.lessonRequest,
-              style: AppTypography.headingSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space3),
-        Text(
-          AppStrings.waitingForResponse(widget.opponentName),
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space4),
-        Row(
-          children: [
-            // Always show "결정 변경" in theirTurn (any non-terminal state)
-            Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: widget.onWithdraw,
-                  icon: const Icon(Icons.undo, size: 16),
-                  label: Text(
-                    AppStrings.withdrawApproval,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    minimumSize:
-                        const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                    side: const BorderSide(color: AppColors.borderLight),
+              child: SizedBox(
+                height: 36,
+                child: ElevatedButton(
+                  onPressed: _selectedSlotIndex != null
+                      ? () {
+                          widget.onAccept?.call(_selectedSlotIndex!);
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    disabledBackgroundColor: AppColors.scheduleMutedAccent,
                     shape: RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusMedium),
                     ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3),
+                  ),
+                  child: Text(
+                    AppStrings.accept,
+                    style: AppTypography.buttonSmall.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  /// Terminal: show final status
+  /// Compact horizontal slot chips (tap to select)
+  Widget _buildCompactSlots(List<String> slotLabels) {
+    return Wrap(
+      spacing: AppSpacing.space2,
+      runSpacing: AppSpacing.space1,
+      children: slotLabels.asMap().entries.map((entry) {
+        final index = entry.key;
+        final label = entry.value;
+        final isSelected = _selectedSlotIndex == index;
+
+        return GestureDetector(
+          onTap: () => setState(() => _selectedSlotIndex = index),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space1 + 2,
+            ),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? AppColors.primary : AppColors.borderLight,
+                width: isSelected ? 1.5 : 1,
+              ),
+            ),
+            child: Text(
+              '${index + 1}. $label',
+              style: AppTypography.caption.copyWith(
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.textPrimaryLight,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// Their turn: compact waiting + withdraw button
+  Widget _buildTheirTurn() {
+    return Row(
+      children: [
+        Icon(Icons.hourglass_top,
+            color: AppColors.info, size: 18),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            AppStrings.waitingForResponse(widget.opponentName),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 32,
+          child: OutlinedButton.icon(
+            onPressed: widget.onWithdraw,
+            icon: const Icon(Icons.undo, size: 14),
+            label: Text(
+              AppStrings.withdrawApproval,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.borderLight),
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Terminal: compact final status
   Widget _buildTerminal() {
     final status = widget.request.status;
     final (icon, color) = switch (status) {
@@ -336,16 +300,15 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     };
 
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: color, size: AppSpacing.iconMD),
-        const SizedBox(width: AppSpacing.space3),
-        Expanded(
-          child: Text(
-            status.label,
-            style: AppTypography.bodyLarge.copyWith(
-              fontWeight: FontWeight.w600,
-              color: color,
-            ),
+        Icon(icon, color: color, size: 18),
+        const SizedBox(width: AppSpacing.space2),
+        Text(
+          status.label,
+          style: AppTypography.bodySmall.copyWith(
+            fontWeight: FontWeight.w600,
+            color: color,
           ),
         ),
       ],

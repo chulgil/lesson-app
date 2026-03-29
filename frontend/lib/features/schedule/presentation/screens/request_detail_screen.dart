@@ -16,13 +16,12 @@ import '../widgets/current_request_box.dart';
 import '../widgets/request_history_chat.dart';
 import 'suggest_alternative_screen.dart';
 
-/// Detail screen for a single lesson request — Jira-ticket style.
+/// Detail screen for a single lesson request — chat-style layout.
 ///
 /// Layout:
-/// - AppBar: request type badge + title + status
-/// - Profile card (type-specific: trial=message focus, regular=history summary)
-/// - CurrentRequestBox (action area)
-/// - RequestHistoryChat (event timeline)
+/// - AppBar: opponent avatar + name + type + status (tap → student detail)
+/// - Chat history (scrollable, chronological, newest at bottom)
+/// - Bottom bar: compact slot selection + message input + action buttons
 class RequestDetailScreen extends ConsumerWidget {
   final String requestId;
   final String viewerRole; // 'teacher' or 'student'
@@ -79,39 +78,22 @@ class RequestDetailScreen extends ConsumerWidget {
         // Watch student data for regular lesson profile card
         final studentAsync = ref.watch(studentProvider(request.studentId));
 
+        final opponentName = viewerRole == 'teacher'
+            ? studentName
+            : AppStrings.teacher;
+
         return Scaffold(
-          appBar: _buildAppBar(request),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Profile card — type-specific
-                _buildProfileCard(
-                  request,
-                  studentName,
-                  academyName,
-                  studentAsync.valueOrNull,
-                ),
-
-                // Current request action box
-                CurrentRequestBox(
-                  request: request,
-                  events: events,
-                  viewerRole: viewerRole,
-                  opponentName: viewerRole == 'teacher'
-                      ? studentName
-                      : AppStrings.teacher,
-                  onAccept: (slotIndex) =>
-                      _handleAccept(context, ref, request, slotIndex),
-                  onCounterPropose: () =>
-                      _handleCounterPropose(context, ref, request),
-                  onModify: () => _handleModify(context, request),
-                  onCancel: () => _handleCancel(context, ref, request),
-                  onWithdraw: () =>
-                      _handleWithdraw(context, ref, request),
-                ),
-
-                // Chat history
-                RequestHistoryChat(
+          appBar: _buildChatAppBar(
+            context,
+            request,
+            opponentName,
+            academyName,
+          ),
+          body: Column(
+            children: [
+              // Chat history (scrollable, chronological)
+              Expanded(
+                child: RequestHistoryChat(
                   events: events,
                   request: request,
                   viewerId: viewerRole == 'teacher'
@@ -119,20 +101,108 @@ class RequestDetailScreen extends ConsumerWidget {
                       : request.studentId,
                   studentName: studentName,
                 ),
+              ),
 
-                const SizedBox(height: AppSpacing.space8),
-              ],
-            ),
+              // Bottom action bar (fixed, chat-input style)
+              CurrentRequestBox(
+                request: request,
+                events: events,
+                viewerRole: viewerRole,
+                opponentName: opponentName,
+                onAccept: (slotIndex) =>
+                    _handleAccept(context, ref, request, slotIndex),
+                onCounterPropose: () =>
+                    _handleCounterPropose(context, ref, request),
+                onModify: () => _handleModify(context, request),
+                onCancel: () => _handleCancel(context, ref, request),
+                onWithdraw: () =>
+                    _handleWithdraw(context, ref, request),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  /// AppBar — simple title only, type badge moved to profile card
-  AppBar _buildAppBar(UnifiedLessonRequest request) {
+  /// Chat-style AppBar: opponent avatar + name + type badge + status
+  AppBar _buildChatAppBar(
+    BuildContext context,
+    UnifiedLessonRequest request,
+    String opponentName,
+    String? academyName,
+  ) {
+    final typeColor = request.type == LessonRequestType.trial
+        ? AppColors.info
+        : AppColors.primary;
+
     return AppBar(
-      title: const Text(AppStrings.requestDetailTitle),
+      titleSpacing: 0,
+      title: GestureDetector(
+        onTap: () {
+          // TODO: Navigate to student/teacher detail
+        },
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.08),
+              child: Text(
+                opponentName.isNotEmpty ? opponentName[0] : '?',
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        opponentName,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.space1),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: typeColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          request.typeDisplayLabel,
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: typeColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '${request.instrument} · ${request.experience.label}',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _buildStatusBadge(request),
+            const SizedBox(width: AppSpacing.space2),
+          ],
+        ),
+      ),
     );
   }
 
