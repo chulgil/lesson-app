@@ -13,11 +13,12 @@ import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/request_list_item.dart';
 
-/// Full-screen lesson request list with calendar, filter, and pagination.
+/// Full-screen lesson request list with calendar, phase tabs, and filters.
 ///
-/// Calendar click and filter search are exclusive:
-/// - Calendar click → filter resets, shows requests for that day
-/// - Filter search → calendar selection clears
+/// Filter hierarchy (top → bottom):
+/// 1. Calendar strip — date selection
+/// 2. Phase tabs — lifecycle phase (primary filter)
+/// 3. Secondary filters — source, sort, period (single row)
 class AllLessonRequestsScreen extends ConsumerStatefulWidget {
   final String teacherId;
   final String viewerRole;
@@ -44,9 +45,9 @@ class _AllLessonRequestsScreenState
     ),
   );
   RequestFilterPreset _selectedPreset = RequestFilterPreset.oneWeek;
-  RequestStatusGroup _statusGroup = RequestStatusGroup.all;
   RequestSourceFilter _sourceFilter = RequestSourceFilter.all;
   RequestSortBy _sortBy = RequestSortBy.createdAtDesc;
+  RequestPhase? _phaseFilter;
   bool _isFilterMode = false;
 
   @override
@@ -81,7 +82,7 @@ class _AllLessonRequestsScreenState
 
           return Column(
             children: [
-              // Compact week strip (unified across all screens)
+              // 1. Calendar strip
               Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AppSpacing.screenPadding,
@@ -96,13 +97,16 @@ class _AllLessonRequestsScreenState
                 ),
               ),
 
-              // Date label + count + sort
+              // 2. Phase filter tabs (primary)
+              _buildPhaseTabs(allRequests),
+
+              // Date label + count
               _buildSubHeader(filtered.length),
 
-              // Filter bar
-              _buildFilterBar(),
+              // 3. Secondary filters (single row)
+              _buildSecondaryFilters(),
 
-              // Request list
+              // 4. Request list
               Expanded(
                 child: filtered.isEmpty
                     ? Center(
@@ -151,11 +155,16 @@ class _AllLessonRequestsScreenState
     );
   }
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Calendar
+  // ═══════════════════════════════════════════════════════════════════════════
+
   void _onCalendarDateSelected(DateTime date) {
     final dateOnly = DateTime(date.year, date.month, date.day);
     setState(() {
       _selectedDate = date;
       _isFilterMode = false;
+      _phaseFilter = null;
       _filter = RequestFilter(
         specificDate: dateOnly,
         sortBy: _sortBy,
@@ -163,17 +172,134 @@ class _AllLessonRequestsScreenState
     });
   }
 
-  Widget _buildSubHeader(int count) {
-    const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
-    final d = _selectedDate;
-    final dayLabel = weekdays[d.weekday - 1];
-    final now = DateTime.now();
-    final isToday =
-        d.year == now.year && d.month == now.month && d.day == now.day;
+  void _onPhaseSelected(RequestPhase? phase) {
+    setState(() {
+      _phaseFilter = phase;
+      if (phase == null) {
+        // "전체" — return to calendar date mode
+        _isFilterMode = false;
+        _filter = RequestFilter(
+          specificDate: DateTime(
+            _selectedDate.year,
+            _selectedDate.month,
+            _selectedDate.day,
+          ),
+          source: _sourceFilter,
+          sortBy: _sortBy,
+        );
+      } else {
+        // Specific phase — clear date filter, show all matching
+        _isFilterMode = false;
+        _filter = RequestFilter(
+          phase: phase,
+          source: _sourceFilter,
+          sortBy: _sortBy,
+        );
+      }
+    });
+  }
 
-    final dateText = _isFilterMode
-        ? _selectedPreset.label
-        : '${d.month}월 ${d.day}일 $dayLabel요일${isToday ? ' 오늘' : ''}';
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Phase tabs (primary filter)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildPhaseTabs(List<UnifiedLessonRequest> allRequests) {
+    final phaseCounts = <RequestPhase?, int>{null: allRequests.length};
+    for (final r in allRequests) {
+      final phase = r.currentPhase;
+      phaseCounts[phase] = (phaseCounts[phase] ?? 0) + 1;
+    }
+
+    final tabs = <(RequestPhase?, String)>[
+      (null, AppStrings.phaseFilterAll),
+      (RequestPhase.request, AppStrings.phaseFilterRequest),
+      (RequestPhase.subscription, AppStrings.phaseFilterSubscription),
+      (RequestPhase.lessons, AppStrings.phaseFilterInProgress),
+      (RequestPhase.completed, AppStrings.phaseFilterCompleted),
+      (RequestPhase.terminal, AppStrings.phaseFilterTerminal),
+    ];
+
+    return Container(
+      height: 40,
+      margin: const EdgeInsets.only(top: AppSpacing.space2),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.screenPadding,
+        ),
+        itemCount: tabs.length,
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.space1),
+        itemBuilder: (context, index) {
+          final (phase, label) = tabs[index];
+          final count = phaseCounts[phase] ?? 0;
+          final isSelected = _phaseFilter == phase;
+
+          return GestureDetector(
+            onTap: () => _onPhaseSelected(phase),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space1,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary
+                    : AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.primary
+                      : AppColors.borderLight,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  count > 0 ? '$label $count' : label,
+                  style: AppTypography.caption.copyWith(
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.textSecondaryLight,
+                    fontWeight: isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Sub header
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildSubHeader(int count) {
+    final String dateText;
+
+    if (_phaseFilter != null) {
+      // Phase filter active — show phase name instead of date
+      const phaseLabels = {
+        RequestPhase.request: AppStrings.phaseFilterRequest,
+        RequestPhase.subscription: AppStrings.phaseFilterSubscription,
+        RequestPhase.lessons: AppStrings.phaseFilterInProgress,
+        RequestPhase.completed: AppStrings.phaseFilterCompleted,
+        RequestPhase.terminal: AppStrings.phaseFilterTerminal,
+      };
+      dateText = phaseLabels[_phaseFilter] ?? AppStrings.phaseFilterAll;
+    } else if (_isFilterMode) {
+      dateText = _selectedPreset.label;
+    } else {
+      const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+      final d = _selectedDate;
+      final dayLabel = weekdays[d.weekday - 1];
+      final now = DateTime.now();
+      final isToday =
+          d.year == now.year && d.month == now.month && d.day == now.day;
+      dateText = '${d.month}월 ${d.day}일 $dayLabel요일${isToday ? ' 오늘' : ''}';
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -189,32 +315,29 @@ class _AllLessonRequestsScreenState
     );
   }
 
-  Widget _buildFilterBar() {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Secondary filters (single row: source + sort + period)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildSecondaryFilters() {
     return Padding(
       padding: const EdgeInsets.only(
         left: AppSpacing.screenPadding,
         right: AppSpacing.screenPadding,
         bottom: AppSpacing.space2,
       ),
-      child: Column(
+      child: Wrap(
+        spacing: AppSpacing.space1,
+        runSpacing: AppSpacing.space1,
         children: [
-          // Row 1: source + status + sort
-          Wrap(
-            spacing: AppSpacing.space1,
-            runSpacing: AppSpacing.space1,
-            children: [
-              ..._buildSourceChips(),
-              _buildDivider(),
-              ..._buildStatusChips(),
-              _buildDivider(),
-              _buildSortChip(),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.space1),
-          // Row 2: period presets
-          Row(
-            children: _buildPeriodChips(),
-          ),
+          // Source filters
+          ..._buildSourceChips(),
+          _buildDivider(),
+          // Sort toggle
+          _buildSortChip(),
+          _buildDivider(),
+          // Period presets
+          ..._buildPeriodChips(),
         ],
       ),
     );
@@ -222,52 +345,20 @@ class _AllLessonRequestsScreenState
 
   Widget _buildDivider() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Container(
         width: 1,
-        height: 20,
+        height: 24,
         color: AppColors.borderLight,
       ),
     );
   }
 
-  Widget _buildSortChip() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _sortBy = _sortBy == RequestSortBy.createdAtDesc
-              ? RequestSortBy.studentNameAsc
-              : RequestSortBy.createdAtDesc;
-          _filter = _filter.copyWith(sortBy: _sortBy);
-        });
-      },
-      child: Chip(
-        avatar: Icon(
-          Icons.swap_vert,
-          size: 14,
-          color: AppColors.textSecondaryLight,
-        ),
-        label: Text(
-          _sortBy == RequestSortBy.createdAtDesc
-              ? AppStrings.sortByTime
-              : AppStrings.sortByName,
-        ),
-        labelStyle: AppTypography.caption.copyWith(
-          color: AppColors.textSecondaryLight,
-        ),
-        backgroundColor: AppColors.surfaceLight,
-        side: BorderSide(color: AppColors.borderLight),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
-  }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Chip builders (unified pill style)
+  // ═══════════════════════════════════════════════════════════════════════════
 
   List<Widget> _buildSourceChips() {
-    // Toggle chips: no "전체" — deselect = all
     const options = [
       (RequestSourceFilter.academy, AppStrings.academy),
       (RequestSourceFilter.individual, AppStrings.filterIndividual),
@@ -276,72 +367,35 @@ class _AllLessonRequestsScreenState
     return options.map((option) {
       final (value, label) = option;
       final selected = _sourceFilter == value;
-      return FilterChip(
-        label: Text(label),
+      return _buildUnifiedChip(
+        label: label,
         selected: selected,
-        onSelected: (_) {
+        onTap: () {
           setState(() {
-            // Toggle: tap again to deselect → back to all
             _sourceFilter = selected ? RequestSourceFilter.all : value;
             _filter = _filter.copyWith(source: _sourceFilter);
           });
         },
-        labelStyle: AppTypography.caption.copyWith(
-          color: selected ? Colors.white : AppColors.textSecondaryLight,
-          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-        ),
-        backgroundColor: AppColors.surfaceLight,
-        selectedColor: AppColors.primary,
-        side: BorderSide(
-          color: selected ? AppColors.primary : AppColors.borderLight,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        showCheckmark: false,
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       );
     }).toList();
   }
 
-  List<Widget> _buildStatusChips() {
-    // Toggle chips: no "전체" — deselect = all
-    const options = [
-      (RequestStatusGroup.active, AppStrings.filterActive),
-      (RequestStatusGroup.success, AppStrings.statusCompleted),
-      (RequestStatusGroup.warning, AppStrings.statusCancelledExpired),
-    ];
-
-    return options.map((option) {
-      final (value, label) = option;
-      final selected = _statusGroup == value;
-      return FilterChip(
-        label: Text(label),
-        selected: selected,
-        onSelected: (_) {
-          setState(() {
-            _statusGroup = selected ? RequestStatusGroup.all : value;
-            _filter = _filter.copyWith(statusGroup: _statusGroup);
-          });
-        },
-        labelStyle: AppTypography.caption.copyWith(
-          color: selected ? Colors.white : AppColors.textSecondaryLight,
-          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-        ),
-        backgroundColor: AppColors.surfaceLight,
-        selectedColor: AppColors.primary,
-        side: BorderSide(
-          color: selected ? AppColors.primary : AppColors.borderLight,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        ),
-        showCheckmark: false,
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      );
-    }).toList();
+  Widget _buildSortChip() {
+    return _buildUnifiedChip(
+      label: _sortBy == RequestSortBy.createdAtDesc
+          ? AppStrings.sortByTime
+          : AppStrings.sortByName,
+      selected: false,
+      icon: Icons.swap_vert,
+      onTap: () {
+        setState(() {
+          _sortBy = _sortBy == RequestSortBy.createdAtDesc
+              ? RequestSortBy.studentNameAsc
+              : RequestSortBy.createdAtDesc;
+          _filter = _filter.copyWith(sortBy: _sortBy);
+        });
+      },
+    );
   }
 
   List<Widget> _buildPeriodChips() {
@@ -354,55 +408,83 @@ class _AllLessonRequestsScreenState
     return options.map((option) {
       final (value, label) = option;
       final selected = _isFilterMode && _selectedPreset == value;
-      return Padding(
-        padding: const EdgeInsets.only(right: AppSpacing.space1),
-        child: FilterChip(
-          label: Text(label),
-          selected: selected,
-          onSelected: (_) {
-            setState(() {
-              if (selected) {
-                // Toggle off → return to calendar date mode
-                _isFilterMode = false;
-                _filter = RequestFilter(
-                  specificDate: DateTime(
-                    _selectedDate.year,
-                    _selectedDate.month,
-                    _selectedDate.day,
-                  ),
-                  statusGroup: _statusGroup,
-                  source: _sourceFilter,
-                  sortBy: _sortBy,
-                );
-              } else {
-                _selectedPreset = value;
-                _isFilterMode = true;
-                final presetFilter = RequestFilter.preset(value);
-                _filter = presetFilter.copyWith(
-                  statusGroup: _statusGroup,
-                  source: _sourceFilter,
-                  sortBy: _sortBy,
-                );
-              }
-            });
-          },
-          labelStyle: AppTypography.caption.copyWith(
-            color: selected ? Colors.white : AppColors.textSecondaryLight,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          ),
-          backgroundColor: AppColors.surfaceLight,
-          selectedColor: AppColors.info,
-          side: BorderSide(
-            color: selected ? AppColors.info : AppColors.borderLight,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          ),
-          showCheckmark: false,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+      return _buildUnifiedChip(
+        label: label,
+        selected: selected,
+        onTap: () {
+          setState(() {
+            if (selected) {
+              _isFilterMode = false;
+              _filter = RequestFilter(
+                specificDate: DateTime(
+                  _selectedDate.year,
+                  _selectedDate.month,
+                  _selectedDate.day,
+                ),
+                phase: _phaseFilter,
+                source: _sourceFilter,
+                sortBy: _sortBy,
+              );
+            } else {
+              _selectedPreset = value;
+              _isFilterMode = true;
+              final presetFilter = RequestFilter.preset(value);
+              _filter = presetFilter.copyWith(
+                phase: _phaseFilter,
+                source: _sourceFilter,
+                sortBy: _sortBy,
+              );
+            }
+          });
+        },
       );
     }).toList();
+  }
+
+  /// Unified chip style — pill shape for all secondary filters.
+  Widget _buildUnifiedChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space1,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.borderLight,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 14,
+                color: selected ? Colors.white : AppColors.textSecondaryLight,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: AppTypography.caption.copyWith(
+                color: selected
+                    ? Colors.white
+                    : AppColors.textSecondaryLight,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

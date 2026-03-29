@@ -46,6 +46,7 @@ class RequestFilter {
   final UnifiedRequestStatus? status;
   final RequestStatusGroup statusGroup;
   final RequestSourceFilter source;
+  final RequestPhase? phase;
   final DateTime? startDate;
   final DateTime? endDate;
   final DateTime? specificDate;
@@ -57,6 +58,7 @@ class RequestFilter {
     this.status,
     this.statusGroup = RequestStatusGroup.all,
     this.source = RequestSourceFilter.all,
+    this.phase,
     this.startDate,
     this.endDate,
     this.specificDate,
@@ -116,6 +118,11 @@ class RequestFilter {
         break;
     }
 
+    // Filter by phase
+    if (phase != null) {
+      result = result.where((r) => r.currentPhase == phase).toList();
+    }
+
     // Filter by status
     if (status != null) {
       result = result.where((r) => r.status == status).toList();
@@ -164,6 +171,8 @@ class RequestFilter {
     UnifiedRequestStatus? status,
     RequestStatusGroup? statusGroup,
     RequestSourceFilter? source,
+    RequestPhase? phase,
+    bool clearPhase = false,
     DateTime? startDate,
     DateTime? endDate,
     DateTime? specificDate,
@@ -175,6 +184,7 @@ class RequestFilter {
       status: status ?? this.status,
       statusGroup: statusGroup ?? this.statusGroup,
       source: source ?? this.source,
+      phase: clearPhase ? null : (phase ?? this.phase),
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       specificDate: specificDate ?? this.specificDate,

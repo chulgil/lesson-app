@@ -9,7 +9,12 @@ import '../theme/app_typography.dart';
 /// 5-phase progress bar for the lesson lifecycle chapter model.
 ///
 /// Displays: 신청 → 확정 → 결제 → 진행 → 완료
-/// Active/completed phases show primary color, future phases show muted.
+///
+/// Visual encoding (standard stepper pattern):
+/// - Completed: filled circle + checkmark (✓)
+/// - Active: filled circle + outer ring
+/// - Future: hollow circle (border only)
+/// - Muted (terminal): hollow circle, muted color
 class LessonProgressBar extends StatelessWidget {
   final RequestPhase currentPhase;
 
@@ -34,12 +39,17 @@ class LessonProgressBar extends StatelessWidget {
             final phaseIndex = index ~/ 2;
             final isCompleted = phaseIndex < _currentIndex;
             return Expanded(
-              child: Container(
-                height: 2,
-                color: isCompleted
-                    ? AppColors.primary
-                    : AppColors.borderLight,
-              ),
+              child: isCompleted
+                  ? Container(height: 2, color: AppColors.primary)
+                  : CustomPaint(
+                      size: const Size(double.infinity, 2),
+                      painter: _DashedLinePainter(
+                        color: AppColors.borderLight,
+                        strokeWidth: 1.5,
+                        dashWidth: 4,
+                        dashGap: 3,
+                      ),
+                    ),
             );
           }
 
@@ -91,9 +101,51 @@ class _PhaseInfo {
   const _PhaseInfo(this.label);
 }
 
+/// Dashed line painter for future/incomplete connector segments.
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double dashWidth;
+  final double dashGap;
+
+  _DashedLinePainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.dashWidth,
+    required this.dashGap,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final y = size.height / 2;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset((x + dashWidth).clamp(0, size.width), y),
+        paint,
+      );
+      x += dashWidth + dashGap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      color != oldDelegate.color ||
+      strokeWidth != oldDelegate.strokeWidth;
+}
+
 class _PhaseDot extends StatelessWidget {
   final String label;
   final _PhaseState state;
+
+  static const _dotSize = 20.0;
+  static const _ringSize = 28.0;
 
   const _PhaseDot({
     required this.label,
@@ -102,52 +154,116 @@ class _PhaseDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color dotColor;
-    final Color textColor;
-    final double dotSize;
+    return SizedBox(
+      width: _ringSize,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: _ringSize,
+            height: _ringSize,
+            child: Center(child: _buildDot()),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            label,
+            style: AppTypography.caption.copyWith(
+              color: _textColor,
+              fontWeight: state == _PhaseState.active
+                  ? FontWeight.w600
+                  : FontWeight.normal,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildDot() {
     switch (state) {
       case _PhaseState.completed:
-        dotColor = AppColors.primary;
-        textColor = AppColors.primary;
-        dotSize = 8;
-      case _PhaseState.active:
-        dotColor = AppColors.primary;
-        textColor = AppColors.primary;
-        dotSize = 12;
-      case _PhaseState.future:
-        dotColor = AppColors.borderLight;
-        textColor = AppColors.textTertiaryLight;
-        dotSize = 8;
-      case _PhaseState.muted:
-        dotColor = AppColors.scheduleMutedAccent;
-        textColor = AppColors.textTertiaryLight;
-        dotSize = 8;
-    }
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: dotSize,
-          height: dotSize,
-          decoration: BoxDecoration(
-            color: dotColor,
+        return Container(
+          width: _dotSize,
+          height: _dotSize,
+          decoration: const BoxDecoration(
+            color: AppColors.primary,
             shape: BoxShape.circle,
           ),
-        ),
-        const SizedBox(height: AppSpacing.space1),
-        Text(
-          label,
-          style: AppTypography.caption.copyWith(
-            color: textColor,
-            fontWeight: state == _PhaseState.active
-                ? FontWeight.w600
-                : FontWeight.normal,
-            fontSize: 10,
+          child: const Icon(
+            Icons.check,
+            size: 12,
+            color: Colors.white,
           ),
-        ),
-      ],
-    );
+        );
+
+      case _PhaseState.active:
+        // Filled dot + outer ring for emphasis
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            // Outer ring
+            Container(
+              width: _ringSize,
+              height: _ringSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primaryLight,
+                  width: 2,
+                ),
+              ),
+            ),
+            // Inner filled dot
+            Container(
+              width: _dotSize,
+              height: _dotSize,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
+        );
+
+      case _PhaseState.future:
+        // Hollow circle (border only)
+        return Container(
+          width: _dotSize,
+          height: _dotSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.borderLight,
+              width: 1.5,
+            ),
+          ),
+        );
+
+      case _PhaseState.muted:
+        // Hollow circle, muted color
+        return Container(
+          width: _dotSize,
+          height: _dotSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: AppColors.scheduleMutedAccent,
+              width: 1.5,
+            ),
+          ),
+        );
+    }
+  }
+
+  Color get _textColor {
+    switch (state) {
+      case _PhaseState.completed:
+      case _PhaseState.active:
+        return AppColors.primary;
+      case _PhaseState.future:
+      case _PhaseState.muted:
+        return AppColors.textTertiaryLight;
+    }
   }
 }

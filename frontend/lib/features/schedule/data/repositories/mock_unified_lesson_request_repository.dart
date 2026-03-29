@@ -789,6 +789,202 @@ class MockUnifiedLessonRequestRepository
         createdAt: today.subtract(const Duration(days: 7)),
       ),
     ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 13. 수강권 발행됨 (Phase 2) — subscriptionIssued, 결제 완료 후 수강권 발급
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_13',
+      studentId: 'student_3',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '첼로',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.beginner,
+      message: '첼로 취미로 배우고 싶습니다',
+      preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: _nextWeekday(today, 2),
+          dayOfWeek: 2,
+          startTime: '19:00',
+          endTime: '20:00',
+        ),
+      ],
+      status: UnifiedRequestStatus.subscriptionIssued,
+      confirmedAt: today.subtract(const Duration(days: 5)),
+      createdAt: today.subtract(const Duration(days: 10)),
+    ));
+    _addEvents('ulr_13', [
+      RequestEvent(
+        id: 'evt_13_1',
+        requestId: 'ulr_13',
+        actorType: ProposerRole.student,
+        actorId: 'student_3',
+        eventType: RequestEventType.initialRequest,
+        message: '첼로 취미로 배우고 싶습니다',
+        createdAt: today.subtract(const Duration(days: 10)),
+      ),
+      RequestEvent(
+        id: 'evt_13_2',
+        requestId: 'ulr_13',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 9)),
+      ),
+      RequestEvent(
+        id: 'evt_13_3',
+        requestId: 'ulr_13',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.paymentRequested,
+        message: '정규 8회 수강권 결제를 안내드립니다',
+        createdAt: today.subtract(const Duration(days: 7)),
+      ),
+      RequestEvent(
+        id: 'evt_13_4',
+        requestId: 'ulr_13',
+        actorType: ProposerRole.student,
+        actorId: 'student_3',
+        eventType: RequestEventType.paymentConfirmed,
+        message: '입금 완료했습니다',
+        createdAt: today.subtract(const Duration(days: 6)),
+      ),
+      RequestEvent(
+        id: 'evt_13_5',
+        requestId: 'ulr_13',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.subscriptionIssued,
+        message: '정규 8회 수강권이 발행되었습니다',
+        createdAt: today.subtract(const Duration(days: 5)),
+      ),
+    ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 14. 수강권 발행됨 (Phase 2) — subscriptionIssued, 학원 소속
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_14',
+      studentId: 'student_4',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.package,
+      instrument: '바이올린',
+      goal: UnifiedLessonGoal.exam,
+      experience: UnifiedExperienceLevel.advanced,
+      message: '입시 대비 집중 레슨 원합니다',
+      preferredDuration: 90,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: _nextWeekday(today, 4),
+          dayOfWeek: 4,
+          startTime: '15:00',
+          endTime: '16:30',
+        ),
+      ],
+      status: UnifiedRequestStatus.subscriptionIssued,
+      confirmedAt: today.subtract(const Duration(days: 3)),
+      createdAt: today.subtract(const Duration(days: 8)),
+      academyId: 'academy_1',
+    ));
+    _addEvents('ulr_14', [
+      RequestEvent(
+        id: 'evt_14_1',
+        requestId: 'ulr_14',
+        actorType: ProposerRole.student,
+        actorId: 'student_4',
+        eventType: RequestEventType.initialRequest,
+        message: '입시 대비 집중 레슨 원합니다',
+        createdAt: today.subtract(const Duration(days: 8)),
+      ),
+      RequestEvent(
+        id: 'evt_14_2',
+        requestId: 'ulr_14',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 7)),
+      ),
+      RequestEvent(
+        id: 'evt_14_3',
+        requestId: 'ulr_14',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.subscriptionIssued,
+        message: '회차권 12회 수강권이 발행되었습니다',
+        createdAt: today.subtract(const Duration(days: 3)),
+      ),
+    ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 15. 결제 완료 알림 대기 (Phase 1 마지막) — paymentNotified
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_15',
+      studentId: 'student_5',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '플루트',
+      goal: UnifiedLessonGoal.hobby,
+      experience: UnifiedExperienceLevel.intermediate,
+      message: '플루트 취미 레슨 원합니다',
+      preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: _nextWeekday(today, 3),
+          dayOfWeek: 3,
+          startTime: '11:00',
+          endTime: '12:00',
+        ),
+      ],
+      status: UnifiedRequestStatus.paymentNotified,
+      confirmedAt: today.subtract(const Duration(days: 2)),
+      createdAt: today.subtract(const Duration(days: 6)),
+    ));
+    _addEvents('ulr_15', [
+      RequestEvent(
+        id: 'evt_15_1',
+        requestId: 'ulr_15',
+        actorType: ProposerRole.student,
+        actorId: 'student_5',
+        eventType: RequestEventType.initialRequest,
+        message: '플루트 취미 레슨 원합니다',
+        createdAt: today.subtract(const Duration(days: 6)),
+      ),
+      RequestEvent(
+        id: 'evt_15_2',
+        requestId: 'ulr_15',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 5)),
+      ),
+      RequestEvent(
+        id: 'evt_15_3',
+        requestId: 'ulr_15',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.paymentRequested,
+        message: '정규 4회 수강권 결제를 안내드립니다',
+        createdAt: today.subtract(const Duration(days: 3)),
+      ),
+      RequestEvent(
+        id: 'evt_15_4',
+        requestId: 'ulr_15',
+        actorType: ProposerRole.student,
+        actorId: 'student_5',
+        eventType: RequestEventType.paymentConfirmed,
+        message: '입금 완료했습니다',
+        createdAt: today.subtract(const Duration(days: 2)),
+      ),
+    ]);
   }
 
   void _addRequest(UnifiedLessonRequest request) {

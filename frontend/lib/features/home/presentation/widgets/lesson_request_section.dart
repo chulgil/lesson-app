@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../schedule/presentation/widgets/request_list_item.dart';
 
@@ -45,6 +46,10 @@ class LessonRequestSection extends ConsumerWidget {
           children: [
             // Header: "레슨요청 (N)"
             _buildHeader(context, requests.length),
+            const SizedBox(height: AppSpacing.space1),
+
+            // Phase mini stats
+            _buildPhaseStats(requests),
             const SizedBox(height: AppSpacing.space2),
 
             // Request list items
@@ -94,6 +99,50 @@ class LessonRequestSection extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildPhaseStats(List<UnifiedLessonRequest> requests) {
+    final counts = <RequestPhase, int>{};
+    for (final r in requests) {
+      final phase = r.currentPhase;
+      if (phase != RequestPhase.terminal) {
+        counts[phase] = (counts[phase] ?? 0) + 1;
+      }
+    }
+
+    if (counts.isEmpty) return const SizedBox.shrink();
+
+    final entries = <String>[];
+    const phaseLabels = {
+      RequestPhase.request: AppStrings.phaseFilterRequest,
+      RequestPhase.subscription: AppStrings.phaseFilterSubscription,
+      RequestPhase.lessons: AppStrings.phaseFilterInProgress,
+      RequestPhase.completed: AppStrings.phaseFilterCompleted,
+    };
+
+    for (final phase in [
+      RequestPhase.request,
+      RequestPhase.subscription,
+      RequestPhase.lessons,
+      RequestPhase.completed,
+    ]) {
+      final count = counts[phase];
+      if (count != null && count > 0) {
+        entries.add(AppStrings.phaseStatLabel(phaseLabels[phase]!, count));
+      }
+    }
+
+    if (entries.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(left: AppSpacing.space2),
+      child: Text(
+        entries.join(' · '),
+        style: AppTypography.caption.copyWith(
+          color: AppColors.textTertiaryLight,
+        ),
+      ),
     );
   }
 

@@ -407,6 +407,16 @@ class AppStrings {
   static const phaseLessons = '진행';
   static const phaseCompleted = '완료';
 
+  // ── Phase Mini Stats (Dashboard) ──────────────────────────
+  static String phaseStatLabel(String phaseName, int count) =>
+      '$phaseName $count';
+  static const phaseFilterAll = '전체';
+  static const phaseFilterRequest = '신청';
+  static const phaseFilterSubscription = '수강권';
+  static const phaseFilterInProgress = '진행중';
+  static const phaseFilterCompleted = '완료';
+  static const phaseFilterTerminal = '종료';
+
   // ── Chapter Titles ────────────────────────────────────────
 
   static const chapterRequest = '레슨 신청';
