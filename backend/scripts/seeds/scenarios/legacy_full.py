@@ -17,18 +17,57 @@ from scripts.seeds.helpers import log_seed
 async def seed_legacy_full(db: AsyncSession, *, reset: bool = False) -> None:
     """Run the original seed_data.py within the new framework.
 
-    Note: The legacy script has its own idempotency check (email existence).
-    When reset=True, accounts.py already cleans up dev-login users,
-    so the legacy script's check will pass.
+    When reset=True, deletes all seed-prefixed data first so the
+    legacy script's idempotency check passes and it re-creates everything.
     """
+    from sqlalchemy import text
+
     from scripts.seed_data import seed
 
     print("[Scenario] 레거시 전체 데이터 (seed_data.py)...")
 
+    if reset:
+        # Delete all seed-prefixed data in correct order (FK dependencies)
+        tables_to_clean = [
+            "subscription_usages",
+            "subscription_proposals",
+            "subscriptions",
+            "subscription_templates",
+            "lesson_feedbacks",
+            "lessons",
+            "lesson_bookings",
+            "lesson_requests",
+            "availability_time_slots",
+            "teacher_availabilities",
+            "class_memberships",
+            "lesson_classes",
+            "lesson_policies",
+            "notifications",
+            "follows",
+            "practice_sections",
+            "practice_repertoires",
+            "practice_goals",
+            "practice_streaks",
+            "teacher_student_relations",
+            "parent_child_relations",
+            "parent_teacher_connections",
+            "students",
+            "teachers",
+            "parents",
+            "oauth_accounts",
+            "users",
+        ]
+        for table in tables_to_clean:
+            try:
+                await db.execute(text(f"DELETE FROM {table} WHERE id LIKE 'seed-%'"))
+            except Exception:
+                pass  # Table may not exist yet
+        await db.flush()
+        print("  기존 시드 데이터 삭제 완료")
+
     try:
         await seed(db)
     except Exception as e:
-        # If legacy seed fails due to existing data, log and continue
         if "already exists" in str(e).lower():
             print(f"  ⚠️ 레거시 시드 스킵 (기존 데이터 존재): {e}")
         else:
