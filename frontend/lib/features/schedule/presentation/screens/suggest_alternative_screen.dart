@@ -736,10 +736,16 @@ class _SuggestAlternativeScreenState
   }
 
   void _submitAccept() {
+    // Convert priority (1-based) to sorted index (0-based)
+    final sorted = [...widget.preferredSlots]
+      ..sort((a, b) => a.priority.compareTo(b.priority));
+    final sortedIndex = sorted.indexWhere(
+        (s) => s.priority == _selectedPreferredIndex);
+
     Navigator.pop<SuggestAlternativeResult>(context, (
       message: '',
       slots: <TimeSlot>[],
-      acceptedSlotIndex: _selectedPreferredIndex!,
+      acceptedSlotIndex: sortedIndex >= 0 ? sortedIndex : 0,
     ));
   }
 
