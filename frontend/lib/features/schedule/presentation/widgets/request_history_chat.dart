@@ -297,6 +297,36 @@ class RequestHistoryChat extends StatelessWidget {
     );
   }
 
+  /// System guide message at the top of chat
+  Widget _buildSystemGuide() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space4),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          color: AppColors.info.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.lightbulb_outline,
+                size: 18, color: AppColors.info),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Text(
+                AppStrings.requestGuideMessage,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Date separator: "3월 25일 화요일"
   Widget _buildDateSeparator(DateTime date) {
     const weekdays = ['월', '화', '수', '목', '금', '토', '일'];

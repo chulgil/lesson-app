@@ -174,6 +174,24 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Slot selection hint (shown only when nothing selected)
+        if (slotLabels.isNotEmpty && _selectedSlotIndex == null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+            child: Row(
+              children: [
+                Icon(Icons.touch_app, size: 14,
+                    color: AppColors.textTertiaryLight),
+                const SizedBox(width: 4),
+                Text(
+                  AppStrings.slotSelectionHint,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+              ],
+            ),
+          ),
         // Compact slot selection (horizontal chips)
         if (slotLabels.isNotEmpty) _buildCompactSlots(slotLabels),
         const SizedBox(height: AppSpacing.space2),
