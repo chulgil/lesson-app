@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,8 +11,10 @@ import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/booking_providers.dart';
+import '../../../lessons/presentation/providers/lesson_confirmation_provider.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
+import '../../../lessons/presentation/widgets/attendance_confirmation_sheet.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/subscription_facade.dart';
 import 'assignment_summary_section.dart';
@@ -39,6 +42,9 @@ class DashboardTab extends ConsumerWidget {
     );
     final expiringSoonAsync = ref.watch(expiringSoonSubscriptionsProvider);
     final expiredAsync = ref.watch(expiredSubscriptionsProvider);
+
+    // Lessons needing confirmation (Quick Action)
+    final needsConfirmationAsync = ref.watch(lessonsNeedingConfirmationProvider);
 
     // Get today's lessons
     final now = DateTime.now();
@@ -107,6 +113,9 @@ class DashboardTab extends ConsumerWidget {
 
             // Lesson Request Section (replaces UrgentActionsSection)
             LessonRequestSection(userId: teacherId),
+
+            // Attendance Quick Action Banner
+            _buildAttendanceBanner(context, ref, needsConfirmationAsync),
 
             const SizedBox(height: AppSpacing.space6),
 
@@ -263,6 +272,76 @@ class DashboardTab extends ConsumerWidget {
                     color: AppColors.textTertiaryLight,
                     size: 20,
                   ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+    );
+  }
+
+  /// Attendance quick action banner — shows when lessons need confirmation.
+  Widget _buildAttendanceBanner(
+    BuildContext context,
+    WidgetRef ref,
+    AsyncValue<List<Lesson>> needsConfirmationAsync,
+  ) {
+    return needsConfirmationAsync.when(
+      data: (lessons) {
+        if (lessons.isEmpty) return const SizedBox.shrink();
+
+        return Padding(
+          padding: const EdgeInsets.only(top: AppSpacing.space3),
+          child: InkWell(
+            onTap: () async {
+              // Show attendance confirmation for the first unconfirmed lesson
+              final result = await AttendanceConfirmationSheet.show(
+                context,
+                lesson: lessons.first,
+              );
+              if (result != null) {
+                final notifier = ref.read(
+                  lessonConfirmationNotifierProvider.notifier,
+                );
+                if (result.completed) {
+                  await notifier.confirmLessonCompleted(lessons.first);
+                } else {
+                  await notifier.handleLessonNonCompletion(
+                    lessons.first,
+                    result,
+                  );
+                }
+              }
+            },
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.fact_check,
+                      color: AppColors.warning, size: 20),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      AppStrings.lessonsNeedConfirmation(lessons.length),
+                      style: AppTypography.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.warning,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right,
+                      color: AppColors.warning, size: 20),
                 ],
               ),
             ),

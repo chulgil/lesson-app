@@ -487,6 +487,28 @@ class AppStrings {
   /// Phase 3 waiting (student)
   static const actionRequestScheduleChange = '시간 변경 요청';
 
+  // ── Attendance Confirmation ──────────────────────────────
+
+  static const lessonConfirmation = '레슨 확인';
+  static const lessonCompleted = '레슨 완료';
+  static const lessonNotCompleted = '레슨 미진행';
+  static const deductOne = '수강권 1회 차감';
+  static const selectReason = '사유 선택 필요';
+  static const nonCompletionReason = '레슨 미진행 사유';
+  static const optionalNote = '추가 메모를 입력하세요 (선택)';
+  static String lessonsNeedConfirmation(int count) =>
+      '미확인 레슨 ${count}건';
+
+  // ── Day of Week ────────────────────────────────────────
+
+  static const mon = '월';
+  static const tue = '화';
+  static const wed = '수';
+  static const thu = '목';
+  static const fri = '금';
+  static const sat = '토';
+  static const sun = '일';
+
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청
