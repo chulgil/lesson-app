@@ -125,81 +125,155 @@ class RequestDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// Chat-style AppBar: opponent avatar + name + type badge + status
+  /// Simple AppBar: "< 스케줄요청 박지호 (정규레슨)"
+  /// Tap name → bottom sheet profile
   AppBar _buildChatAppBar(
     BuildContext context,
     UnifiedLessonRequest request,
     String opponentName,
     String? academyName,
   ) {
-    final typeColor = request.type == LessonRequestType.trial
-        ? AppColors.info
-        : AppColors.primary;
-
     return AppBar(
-      titleSpacing: 0,
       title: GestureDetector(
-        onTap: () {
-          // TODO: Navigate to student/teacher detail
-        },
-        child: Row(
+        onTap: () => _showProfileBottomSheet(
+          context,
+          request,
+          opponentName,
+          academyName,
+        ),
+        child: Text(
+          '$opponentName (${request.typeDisplayLabel})',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Bottom sheet with opponent profile info (slides up like metronome)
+  void _showProfileBottomSheet(
+    BuildContext context,
+    UnifiedLessonRequest request,
+    String opponentName,
+    String? academyName,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppSpacing.radiusLarge),
+          ),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.screenPadding,
+          AppSpacing.space3,
+          AppSpacing.screenPadding,
+          MediaQuery.of(ctx).padding.bottom + AppSpacing.space4,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
+            // Drag handle
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.borderLight,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+
+            // Avatar + name
             CircleAvatar(
-              radius: 16,
+              radius: 32,
               backgroundColor: AppColors.primary.withValues(alpha: 0.08),
               child: Text(
                 opponentName.isNotEmpty ? opponentName[0] : '?',
-                style: AppTypography.bodySmall.copyWith(
+                style: AppTypography.headingMedium.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: AppSpacing.space3),
+            Text(
+              opponentName,
+              style: AppTypography.headingSmall.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space1),
+
+            // Type + instrument + level
+            Text(
+              '${request.typeDisplayLabel} · ${request.instrument} · ${request.experience.label} · ${request.goal.label}',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+
+            // Academy
+            if (request.isAcademy && academyName != null) ...[
+              const SizedBox(height: AppSpacing.space1),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        opponentName,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.space1),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 1,
-                        ),
-                        decoration: BoxDecoration(
-                          color: typeColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          request.typeDisplayLabel,
-                          style: AppTypography.caption.copyWith(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: typeColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('🏫', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 4),
                   Text(
-                    '${request.instrument} · ${request.experience.label}',
-                    style: AppTypography.caption.copyWith(
+                    academyName,
+                    style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textTertiaryLight,
                     ),
                   ),
                 ],
               ),
+            ],
+
+            // Status + elapsed time
+            const SizedBox(height: AppSpacing.space3),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildStatusBadge(request),
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  formatRelativeTime(request.createdAt),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+              ],
             ),
-            _buildStatusBadge(request),
-            const SizedBox(width: AppSpacing.space2),
+
+            // Message (if any)
+            if (request.message != null && request.message!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.space4),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Text(
+                  request.message!,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: AppSpacing.space4),
           ],
         ),
       ),
