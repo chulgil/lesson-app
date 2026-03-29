@@ -172,6 +172,9 @@ class AppStrings {
   /// 레슨을 요청했습니다 (접미사)
   static const lessonRequestSuffix = '레슨을 요청했습니다';
 
+  /// 종료됨 (terminal 상태 하단바)
+  static const requestClosed = '종료됨';
+
   // ── Schedule Comparison & Actions ─────────────────────────
 
   /// 결정 변경

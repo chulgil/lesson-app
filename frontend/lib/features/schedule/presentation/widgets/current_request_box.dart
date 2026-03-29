@@ -365,27 +365,19 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Terminal: compact final status
+  /// Terminal: unified "종료됨" in gray
   Widget _buildTerminal() {
-    final status = widget.request.status;
-    final (icon, color) = switch (status) {
-      UnifiedRequestStatus.completed => (Icons.check_circle, AppColors.success),
-      UnifiedRequestStatus.cancelled => (Icons.cancel, AppColors.error),
-      UnifiedRequestStatus.rejected => (Icons.block, AppColors.error),
-      UnifiedRequestStatus.expired => (Icons.timer_off, AppColors.warning),
-      _ => (Icons.info, AppColors.info),
-    };
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: color, size: 18),
+        Icon(Icons.check_circle_outline,
+            color: AppColors.textTertiaryLight, size: 18),
         const SizedBox(width: AppSpacing.space2),
         Text(
-          status.label,
+          AppStrings.requestClosed,
           style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textTertiaryLight,
           ),
         ),
       ],

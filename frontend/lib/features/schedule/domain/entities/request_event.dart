@@ -167,7 +167,7 @@ class RequestEvent {
       case RequestEventType.approve:
         return '요청을 수락했습니다';
       case RequestEventType.reject:
-        return '요청을 거절했습니다';
+        return '일정을 조율하지 못했습니다';
       case RequestEventType.proposeAlternative:
       case RequestEventType.counterPropose:
         return '다른 시간을 제안했습니다';
