@@ -685,6 +685,110 @@ class MockUnifiedLessonRequestRepository
         createdAt: now.subtract(const Duration(hours: 2)),
       ),
     ]);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 12. 레슨 진행 중 (Phase 3) — inProgress, 3회차 완료
+    // ─────────────────────────────────────────────────────────────────────────
+    _addRequest(UnifiedLessonRequest(
+      id: 'ulr_12',
+      studentId: 'student_2',
+      teacherId: 'teacher_1',
+      type: LessonRequestType.regular,
+      instrument: '피아노',
+      goal: UnifiedLessonGoal.major,
+      experience: UnifiedExperienceLevel.intermediate,
+      message: '피아노 입시 준비 레슨 희망합니다',
+      preferredDuration: 60,
+      preferredSlots: [
+        PreferredTimeSlot(
+          priority: 1,
+          date: today.subtract(const Duration(days: 28)),
+          dayOfWeek: 6,
+          startTime: '10:00',
+          endTime: '11:00',
+        ),
+      ],
+      status: UnifiedRequestStatus.inProgress,
+      confirmedAt: today.subtract(const Duration(days: 25)),
+      createdAt: today.subtract(const Duration(days: 30)),
+    ));
+    _addEvents('ulr_12', [
+      // Phase 1 events (request → approval)
+      RequestEvent(
+        id: 'evt_12_1',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.student,
+        actorId: 'student_2',
+        eventType: RequestEventType.initialRequest,
+        message: '피아노 입시 준비 레슨 희망합니다',
+        createdAt: today.subtract(const Duration(days: 30)),
+      ),
+      RequestEvent(
+        id: 'evt_12_2',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.approve,
+        selectedSlotIndex: 0,
+        createdAt: today.subtract(const Duration(days: 29)),
+      ),
+      // Phase 2 events (payment)
+      RequestEvent(
+        id: 'evt_12_3',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.paymentRequested,
+        message: '정규 10회 수강권 결제를 안내드립니다',
+        createdAt: today.subtract(const Duration(days: 28)),
+      ),
+      RequestEvent(
+        id: 'evt_12_4',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.student,
+        actorId: 'student_2',
+        eventType: RequestEventType.paymentConfirmed,
+        message: '입금 완료했습니다',
+        createdAt: today.subtract(const Duration(days: 27)),
+      ),
+      RequestEvent(
+        id: 'evt_12_5',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.subscriptionIssued,
+        message: '정규 10회 수강권이 발행되었습니다',
+        createdAt: today.subtract(const Duration(days: 26)),
+      ),
+      // Phase 3 events (lesson progress)
+      RequestEvent(
+        id: 'evt_12_6',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.lessonCompleted,
+        message: '1회차 레슨 완료 — 기초 스케일 연습',
+        createdAt: today.subtract(const Duration(days: 21)),
+      ),
+      RequestEvent(
+        id: 'evt_12_7',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.lessonCompleted,
+        message: '2회차 레슨 완료 — 하논 1-5번',
+        createdAt: today.subtract(const Duration(days: 14)),
+      ),
+      RequestEvent(
+        id: 'evt_12_8',
+        requestId: 'ulr_12',
+        actorType: ProposerRole.teacher,
+        actorId: 'teacher_1',
+        eventType: RequestEventType.lessonCompleted,
+        message: '3회차 레슨 완료 — 체르니 100 시작',
+        createdAt: today.subtract(const Duration(days: 7)),
+      ),
+    ]);
   }
 
   void _addRequest(UnifiedLessonRequest request) {

@@ -19,6 +19,10 @@ class RequestHistoryChat extends StatelessWidget {
   final UnifiedLessonRequest? request;
   final VoidCallback? onOpponentAvatarTap;
 
+  /// When true, uses shrinkWrap + NeverScrollableScrollPhysics
+  /// so this widget can be placed inside another scrollable.
+  final bool shrinkWrap;
+
   const RequestHistoryChat({
     super.key,
     required this.events,
@@ -27,6 +31,7 @@ class RequestHistoryChat extends StatelessWidget {
     this.studentProfileUrl,
     this.request,
     this.onOpponentAvatarTap,
+    this.shrinkWrap = false,
   });
 
   @override
@@ -50,6 +55,10 @@ class RequestHistoryChat extends StatelessWidget {
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     return ListView.builder(
+      shrinkWrap: shrinkWrap,
+      physics: shrinkWrap
+          ? const NeverScrollableScrollPhysics()
+          : null,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space4,

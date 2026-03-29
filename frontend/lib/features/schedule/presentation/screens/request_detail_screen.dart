@@ -8,8 +8,11 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/chapter_summary.dart';
+import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/current_request_box.dart';
@@ -39,6 +42,7 @@ class RequestDetailScreen extends ConsumerStatefulWidget {
 
 class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   int? _preselectedSlot;
+  final Set<RequestPhase> _expandedChapters = {};
 
   String get viewerRole => widget.viewerRole;
   String get requestId => widget.requestId;
@@ -103,21 +107,33 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           ),
           body: Column(
             children: [
-              // Chat history (scrollable, chronological)
+              // Progress bar (fixed, below AppBar)
+              LessonProgressBar(currentPhase: request.currentPhase),
+
+              // Chapter summaries + chat (scrollable)
               Expanded(
-                child: RequestHistoryChat(
-                  events: events,
-                  request: request,
-                  viewerId: viewerRole == 'teacher'
-                      ? request.teacherId
-                      : request.studentId,
-                  studentName: studentName,
-                  onOpponentAvatarTap: () => _showProfileBottomSheet(
-                    context,
-                    request,
-                    opponentName,
-                    academyName,
-                  ),
+                child: ListView(
+                  children: [
+                    // Completed chapter summaries (collapsed)
+                    ..._buildChapterSummaries(request, events),
+
+                    // Chat history (chronological, newest at bottom)
+                    RequestHistoryChat(
+                      events: _eventsForCurrentPhase(request, events),
+                      request: request,
+                      shrinkWrap: true,
+                      viewerId: viewerRole == 'teacher'
+                          ? request.teacherId
+                          : request.studentId,
+                      studentName: studentName,
+                      onOpponentAvatarTap: () => _showProfileBottomSheet(
+                        context,
+                        request,
+                        opponentName,
+                        academyName,
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
@@ -1007,6 +1023,192 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);
+    }
+  }
+
+  // ── Chapter Model Helpers ─────────────────────────────────
+
+  /// Build collapsed chapter summaries for completed phases.
+  List<Widget> _buildChapterSummaries(
+    UnifiedLessonRequest request,
+    List<RequestEvent> events,
+  ) {
+    final phase = request.currentPhase;
+    final chapters = <Widget>[];
+
+    // Phase 1: 레슨 신청 — show as collapsed if past Phase 1
+    if (phase != RequestPhase.request && phase != RequestPhase.terminal) {
+      final isExpanded = _expandedChapters.contains(RequestPhase.request);
+      chapters.add(ChapterSummary(
+        icon: Icons.send,
+        title: AppStrings.chapterRequest,
+        completedDate: _phaseCompletedDate(request, RequestPhase.request),
+        summary: _phaseSummary(request, events, RequestPhase.request),
+        isExpanded: isExpanded,
+        onTap: () => setState(() {
+          if (isExpanded) {
+            _expandedChapters.remove(RequestPhase.request);
+          } else {
+            _expandedChapters.add(RequestPhase.request);
+          }
+        }),
+        child: isExpanded
+            ? RequestHistoryChat(
+                events: _eventsForPhase(events, RequestPhase.request),
+                request: request,
+                shrinkWrap: true,
+                viewerId: viewerRole == 'teacher'
+                    ? request.teacherId
+                    : request.studentId,
+                studentName: '',
+              )
+            : null,
+      ));
+    }
+
+    // Phase 2: 수강권 & 결제 — show if past Phase 2
+    if (_isPhaseCompleted(phase, RequestPhase.subscription)) {
+      final isExpanded =
+          _expandedChapters.contains(RequestPhase.subscription);
+      chapters.add(ChapterSummary(
+        icon: Icons.credit_card,
+        title: AppStrings.chapterSubscription,
+        completedDate:
+            _phaseCompletedDate(request, RequestPhase.subscription),
+        summary:
+            _phaseSummary(request, events, RequestPhase.subscription),
+        isExpanded: isExpanded,
+        onTap: () => setState(() {
+          if (isExpanded) {
+            _expandedChapters.remove(RequestPhase.subscription);
+          } else {
+            _expandedChapters.add(RequestPhase.subscription);
+          }
+        }),
+      ));
+    }
+
+    // Phase 3: 레슨 진행 — show as active header if current
+    if (phase == RequestPhase.lessons || phase == RequestPhase.completed) {
+      final isActive = phase == RequestPhase.lessons;
+      chapters.add(ChapterSummary(
+        icon: Icons.music_note,
+        title: AppStrings.chapterLessons,
+        isActive: isActive,
+        summary: isActive ? null : _phaseSummary(request, events, RequestPhase.lessons),
+        completedDate: isActive
+            ? null
+            : _phaseCompletedDate(request, RequestPhase.lessons),
+      ));
+    }
+
+    return chapters;
+  }
+
+  /// Filter events belonging to the current active phase.
+  List<RequestEvent> _eventsForCurrentPhase(
+    UnifiedLessonRequest request,
+    List<RequestEvent> events,
+  ) {
+    final phase = request.currentPhase;
+    // For request phase (Phase 1) or terminal, show all events
+    if (phase == RequestPhase.request || phase == RequestPhase.terminal) {
+      return events;
+    }
+    return _eventsForPhase(events, phase);
+  }
+
+  /// Get events that belong to a specific phase.
+  List<RequestEvent> _eventsForPhase(
+    List<RequestEvent> events,
+    RequestPhase phase,
+  ) {
+    return events.where((e) => _eventBelongsToPhase(e, phase)).toList();
+  }
+
+  /// Check if an event belongs to a given phase.
+  bool _eventBelongsToPhase(RequestEvent event, RequestPhase phase) {
+    return switch (phase) {
+      RequestPhase.request => const {
+          RequestEventType.initialRequest,
+          RequestEventType.approve,
+          RequestEventType.reject,
+          RequestEventType.proposeAlternative,
+          RequestEventType.counterPropose,
+          RequestEventType.acceptAlternative,
+          RequestEventType.withdrawApproval,
+          RequestEventType.cancel,
+          RequestEventType.expire,
+          RequestEventType.proposalSent,
+          RequestEventType.proposalAccepted,
+          RequestEventType.paymentNotified,
+        }.contains(event.eventType),
+      RequestPhase.subscription => const {
+          RequestEventType.paymentRequested,
+          RequestEventType.paymentConfirmed,
+          RequestEventType.subscriptionIssued,
+        }.contains(event.eventType),
+      RequestPhase.lessons => const {
+          RequestEventType.lessonCompleted,
+          RequestEventType.lessonCancelled,
+          RequestEventType.scheduleChanged,
+          RequestEventType.lessonNoteAdded,
+        }.contains(event.eventType),
+      RequestPhase.completed => const {
+          RequestEventType.subscriptionRenewed,
+          RequestEventType.subscriptionCompleted,
+          RequestEventType.completed,
+        }.contains(event.eventType),
+      RequestPhase.terminal => true,
+    };
+  }
+
+  /// Whether a phase is fully completed (current phase is past it).
+  bool _isPhaseCompleted(RequestPhase current, RequestPhase target) {
+    const order = [
+      RequestPhase.request,
+      RequestPhase.subscription,
+      RequestPhase.lessons,
+      RequestPhase.completed,
+    ];
+    final currentIdx = order.indexOf(current);
+    final targetIdx = order.indexOf(target);
+    if (currentIdx == -1 || targetIdx == -1) return false;
+    return currentIdx > targetIdx;
+  }
+
+  /// Get a display date for when a phase was completed.
+  String? _phaseCompletedDate(
+    UnifiedLessonRequest request,
+    RequestPhase phase,
+  ) {
+    if (phase == RequestPhase.request && request.confirmedAt != null) {
+      final d = request.confirmedAt!;
+      return '${d.month}/${d.day}';
+    }
+    return null;
+  }
+
+  /// Generate a one-line summary for a collapsed chapter.
+  String? _phaseSummary(
+    UnifiedLessonRequest request,
+    List<RequestEvent> events,
+    RequestPhase phase,
+  ) {
+    switch (phase) {
+      case RequestPhase.request:
+        return request.typeDisplayLabel;
+      case RequestPhase.subscription:
+        return AppStrings.subscription;
+      case RequestPhase.lessons:
+        final completedCount = events
+            .where((e) => e.eventType == RequestEventType.lessonCompleted)
+            .length;
+        if (completedCount > 0) return '$completedCount회 완료';
+        return null;
+      case RequestPhase.completed:
+      case RequestPhase.terminal:
+        return null;
     }
   }
 
