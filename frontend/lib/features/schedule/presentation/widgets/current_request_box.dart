@@ -23,6 +23,7 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onModify;
   final VoidCallback? onCancel;
   final VoidCallback? onWithdraw;
+  final int? initialSelectedSlot;
 
   const CurrentRequestBox({
     super.key,
@@ -31,6 +32,7 @@ class CurrentRequestBox extends StatefulWidget {
     required this.viewerRole,
     required this.opponentName,
     this.onAccept,
+    this.initialSelectedSlot,
     this.onCounterPropose,
     this.onModify,
     this.onCancel,
@@ -53,6 +55,15 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     final latestSlots = _latestSlotLabels;
     if (latestSlots.length == 1) {
       _selectedSlotIndex = 0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CurrentRequestBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialSelectedSlot != null &&
+        widget.initialSelectedSlot != oldWidget.initialSelectedSlot) {
+      _selectedSlotIndex = widget.initialSelectedSlot;
     }
   }
 

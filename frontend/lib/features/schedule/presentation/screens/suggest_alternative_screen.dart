@@ -361,24 +361,35 @@ class _SuggestAlternativeScreenState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Message input (hidden in accept mode)
+          // Message input (same style as chat input)
           if (!_isAcceptMode) ...[
             TextField(
               controller: _messageController,
-              maxLines: 2,
+              maxLines: 8,
+              minLines: 1,
               maxLength: 200,
+              style: AppTypography.bodySmall,
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
                 hintText: AppStrings.messageHint,
+                hintStyle: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
                 counterText: '',
-                prefixIcon: const Icon(Icons.message_outlined, size: 18),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space3,
                   vertical: AppSpacing.space2,
                 ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderSide: BorderSide(color: AppColors.borderLight),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderSide: BorderSide(color: AppColors.borderLight),
+                ),
               ),
             ),
-            const SizedBox(height: AppSpacing.space3),
+            const SizedBox(height: AppSpacing.space2),
           ],
 
           // Action buttons

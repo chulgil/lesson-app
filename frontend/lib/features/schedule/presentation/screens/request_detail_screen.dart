@@ -22,7 +22,7 @@ import 'suggest_alternative_screen.dart';
 /// - AppBar: opponent avatar + name + type + status (tap → student detail)
 /// - Chat history (scrollable, chronological, newest at bottom)
 /// - Bottom bar: compact slot selection + message input + action buttons
-class RequestDetailScreen extends ConsumerWidget {
+class RequestDetailScreen extends ConsumerStatefulWidget {
   final String requestId;
   final String viewerRole; // 'teacher' or 'student'
 
@@ -33,7 +33,19 @@ class RequestDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RequestDetailScreen> createState() =>
+      _RequestDetailScreenState();
+}
+
+class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
+  int? _preselectedSlot;
+
+  String get viewerRole => widget.viewerRole;
+  String get requestId => widget.requestId;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final requestAsync = ref.watch(unifiedRequestByIdProvider(requestId));
     final eventsAsync = ref.watch(requestEventsProvider(requestId));
     final studentNames = ref.watch(studentNameMapProvider);
@@ -114,6 +126,7 @@ class RequestDetailScreen extends ConsumerWidget {
                 request: request,
                 events: events,
                 viewerRole: viewerRole,
+                initialSelectedSlot: _preselectedSlot,
                 opponentName: opponentName,
                 onAccept: (slotIndex, message) =>
                     _handleAccept(context, ref, request, slotIndex, message),
@@ -140,6 +153,7 @@ class RequestDetailScreen extends ConsumerWidget {
     String? academyName,
   ) {
     return AppBar(
+      titleSpacing: 0,
       title: GestureDetector(
         onTap: () => _showProfileBottomSheet(
           context,
@@ -704,16 +718,11 @@ class RequestDetailScreen extends ConsumerWidget {
       final actions = UnifiedLessonRequestActions(ref);
 
       if (result.acceptedSlotIndex != null) {
-        // Accept student's preferred slot directly
-        await actions.approveRequest(
-          request.id,
-          request.teacherId,
-          request.studentId,
-          selectedSlotIndex: result.acceptedSlotIndex,
-        );
-        if (context.mounted) {
-          showSuccessSnackBar(context, AppStrings.scheduleConfirmed);
-        }
+        // Return to chat with slot pre-selected (user can add message then accept)
+        setState(() {
+          _preselectedSlot = result.acceptedSlotIndex;
+        });
+        return;
       } else if (result.slots.isEmpty) {
         // Reject (from reject bottom sheet inside schedule screen)
         await actions.rejectRequest(
