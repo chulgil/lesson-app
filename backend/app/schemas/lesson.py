@@ -134,6 +134,8 @@ class LessonResponse(BaseModel):
     id: str
     teacher_id: str
     student_id: str
+    student_name: str | None = None
+    teacher_name: str | None = None
     instrument: str | None = None
     date: _dt.date | None = None
     start_time: str | None = None
@@ -144,6 +146,7 @@ class LessonResponse(BaseModel):
     key_points: list[str] | None = None
     practice_tips: str | None = None
     location_name: str | None = None
+    location_address: str | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 

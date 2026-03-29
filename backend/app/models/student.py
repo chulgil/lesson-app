@@ -98,6 +98,12 @@ class Student(UUIDMixin, TimestampMixin, Base):
     break_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     expected_return_date: Mapped[date | None] = mapped_column(Date, nullable=True)
 
+    # Address (private to connected teachers)
+    postal_code: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    address_detail: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    district: Mapped[str | None] = mapped_column(String(50), nullable=True)
+
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 

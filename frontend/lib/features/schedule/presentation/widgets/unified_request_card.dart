@@ -311,7 +311,7 @@ class UnifiedRequestCard extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: onCounterPropose,
               icon: const Icon(Icons.schedule, size: 16),
-              label: const Text('다른 시간 제안'),
+              label: Text(AppStrings.counterPropose),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textSecondaryLight,
                 side: BorderSide(color: AppColors.borderLight),

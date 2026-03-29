@@ -71,6 +71,7 @@ class LessonRequestResponse(BaseModel):
     expires_at: _dt.datetime | None = None
     proposal_id: str | None = None
     decline_reason: str | None = None
+    academy_id: str | None = None
     status_updated_at: _dt.datetime | None = None
     confirmed_at: _dt.datetime | None = None
     cancelled_at: _dt.datetime | None = None

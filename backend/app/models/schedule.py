@@ -169,6 +169,7 @@ class LessonRequest(UUIDMixin, Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     proposal_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     decline_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    academy_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     status_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

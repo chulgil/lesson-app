@@ -400,6 +400,7 @@ class UnifiedLessonRequest extends HiveObject {
   final DateTime? cancelledAt;
 
   @HiveField(18)
+  @JsonKey(name: 'decline_reason')
   final String? rejectionReason;
 
   // Price reference

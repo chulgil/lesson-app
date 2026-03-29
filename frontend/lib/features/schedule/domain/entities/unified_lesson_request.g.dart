@@ -667,7 +667,7 @@ UnifiedLessonRequest _$UnifiedLessonRequestFromJson(
       cancelledAt: json['cancelled_at'] == null
           ? null
           : DateTime.parse(json['cancelled_at'] as String),
-      rejectionReason: json['rejection_reason'] as String?,
+      rejectionReason: json['decline_reason'] as String?,
       suggestedPrice: (json['suggested_price'] as num?)?.toInt(),
       preferredSlots: (json['preferred_slots'] as List<dynamic>?)
               ?.map(
@@ -699,7 +699,7 @@ Map<String, dynamic> _$UnifiedLessonRequestToJson(
       'created_at': instance.createdAt.toIso8601String(),
       'confirmed_at': instance.confirmedAt?.toIso8601String(),
       'cancelled_at': instance.cancelledAt?.toIso8601String(),
-      'rejection_reason': instance.rejectionReason,
+      'decline_reason': instance.rejectionReason,
       'suggested_price': instance.suggestedPrice,
       'preferred_slots':
           instance.preferredSlots.map((e) => e.toJson()).toList(),

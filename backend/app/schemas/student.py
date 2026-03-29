@@ -38,6 +38,10 @@ class StudentResponse(BaseModel):
     practice_level: str | None = None
     break_reason: str | None = None
     expected_return_date: _dt.date | None = None
+    postal_code: str | None = None
+    address: str | None = None
+    address_detail: str | None = None
+    district: str | None = None
     notes: str | None = None
     is_active: bool = True
     created_at: _dt.datetime | None = None

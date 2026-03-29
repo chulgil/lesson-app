@@ -32,8 +32,22 @@ class SubscriptionResponse(BaseModel):
     amount: int | None = None
     start_date: _dt.date | None = None
     end_date: _dt.date | None = None
+    lessons_per_month: int | None = None
+    bonus_count: int = 0
+    billing_type: str | None = None
+    billing_day: int | None = None
+    fifth_week_policy: str | None = None
+    bonus_reason: str | None = None
+    total_reschedule_allowance: int = 2
+    used_reschedule_count: int = 0
+    payment_confirmed: bool = True
     payment_status: str | None = None
     payment_method: str | None = None
+    paid_at: _dt.datetime | None = None
+    payment_confirmed_at: _dt.datetime | None = None
+    discount_amount: int | None = None
+    discount_reason: str | None = None
+    original_amount: int | None = None
     created_at: _dt.datetime | None = None
     updated_at: _dt.datetime | None = None
 

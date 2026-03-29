@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_unified_lesson_request_repository.dart';
+import '../../data/repositories/remote_unified_lesson_request_repository.dart';
 import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../../domain/repositories/unified_lesson_request_repository.dart';
@@ -23,10 +25,15 @@ final academyNameMapProvider = Provider<Map<String, String>>((ref) => {
       'academy_2': '강남아트스쿨',
     });
 
-/// Repository provider — currently Mock only (Remote in backend integration phase).
+/// Repository provider — switches between Mock and Remote.
 final unifiedLessonRequestRepositoryProvider =
     Provider<UnifiedLessonRequestRepository>(
-  (ref) => MockUnifiedLessonRequestRepository(),
+  (ref) => createRepository<UnifiedLessonRequestRepository>(
+    ref: ref,
+    mock: () => MockUnifiedLessonRequestRepository(),
+    remote: (apiClient) =>
+        RemoteUnifiedLessonRequestRepository(apiClient),
+  ),
 );
 
 /// Get all unified lesson requests for a teacher
