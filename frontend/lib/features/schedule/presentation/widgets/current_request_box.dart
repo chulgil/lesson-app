@@ -293,8 +293,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         const SizedBox(height: AppSpacing.space4),
         Row(
           children: [
-            // Teacher approved → show "결정 변경" instead of cancel
-            if (isApproved && isTeacher) ...[
+            // Both teacher and student: show "결정 변경" when they made the last action
+            if (isApproved || isPending) ...[
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: widget.onWithdraw,
@@ -316,53 +316,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   ),
                 ),
               ),
-            ] else if (!isTeacher) ...[
-              // Student waiting: modify (if pending) + cancel
-              if (isPending) ...[
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: widget.onModify,
-                    style: OutlinedButton.styleFrom(
-                      minimumSize:
-                          const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                      side: const BorderSide(color: AppColors.borderLight),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
-                      ),
-                    ),
-                    child: Text(
-                      AppStrings.modify,
-                      style: AppTypography.buttonSmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-              ],
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: widget.onCancel,
-                  style: OutlinedButton.styleFrom(
-                    minimumSize:
-                        const Size.fromHeight(AppSpacing.buttonHeightSmall),
-                    side: const BorderSide(color: AppColors.error),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
-                    ),
-                  ),
-                  child: Text(
-                    AppStrings.cancel,
-                    style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.error,
-                    ),
-                  ),
-                ),
-              ),
             ],
-            // Teacher waiting (not approved): no buttons — teacher rejects via 역제안 screen
+            // Other states (negotiating etc): no buttons — just waiting
           ],
         ),
       ],

@@ -262,18 +262,20 @@ class UnifiedLessonRequestActions {
     return result;
   }
 
-  /// Withdraw approval — revert to pending so teacher can change decision.
+  /// Withdraw approval — revert to pending so actor can change decision.
   /// Records the previously selected slot index for history display.
   Future<UnifiedLessonRequest> withdrawApprovalRequest(
     String requestId,
     String teacherId,
-    String studentId,
-  ) async {
-    // Find the previous approve event's selectedSlotIndex
+    String studentId, {
+    ProposerRole actorRole = ProposerRole.teacher,
+  }) async {
+    // Find the previous approve/acceptAlternative event's selectedSlotIndex
     final events = await _repository.getEventsByRequestId(requestId);
     int? prevSlotIndex;
     for (int i = events.length - 1; i >= 0; i--) {
-      if (events[i].eventType == RequestEventType.approve &&
+      if ((events[i].eventType == RequestEventType.approve ||
+              events[i].eventType == RequestEventType.acceptAlternative) &&
           events[i].selectedSlotIndex != null) {
         prevSlotIndex = events[i].selectedSlotIndex;
         break;
@@ -285,8 +287,8 @@ class UnifiedLessonRequestActions {
     await _repository.addEvent(RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
       requestId: requestId,
-      actorType: ProposerRole.teacher,
-      actorId: teacherId,
+      actorType: actorRole,
+      actorId: actorRole == ProposerRole.teacher ? teacherId : studentId,
       eventType: RequestEventType.withdrawApproval,
       selectedSlotIndex: prevSlotIndex,
       createdAt: DateTime.now(),

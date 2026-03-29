@@ -631,6 +631,9 @@ class RequestDetailScreen extends ConsumerWidget {
         request.id,
         request.teacherId,
         request.studentId,
+        actorRole: viewerRole == 'teacher'
+            ? ProposerRole.teacher
+            : ProposerRole.student,
       );
       if (context.mounted) {
         showInfoSnackBar(context, AppStrings.withdrawApprovalSuccess);
