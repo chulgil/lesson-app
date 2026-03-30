@@ -100,7 +100,7 @@
 | # | 작업 | 스펙 | 우선순위 |
 |---|------|------|:--------:|
 | 4-1 | 학원 웹 대시보드 | 스펙 미작성 | MEDIUM |
-| 4-2 | 영상 피드백 (녹화 비교) | recording_comparison_spec.md | MEDIUM |
+| 4-2 | **녹음 비교 재생** | recording_comparison_spec.md | ⚠️ Phase 1 완료, Phase 2 대기 |
 | 4-3 | 게이미피케이션 Phase 3 (포인트 상점) | gamification_spec.md Phase 3 | LOW |
 | 4-4 | AI 연습 분석 (피치/리듬) | 스펙 미작성 | LOW |
 | 4-5 | 결제 시스템 연동 (PG) | 스펙 미작성 | LOW |
