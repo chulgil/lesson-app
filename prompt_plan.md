@@ -50,20 +50,24 @@
 - [x] 하드코딩 UI 텍스트 → AppStrings (30+ 건)
 - [x] 리스트 여백 카드형 통일 (3개 화면)
 
+### 스케줄 변경 UX (2026-03-30)
+- [x] Phase 1: 도메인 확장 — 이벤트 타입 4개 + 필드 3개 + 액션 메서드 4개
+- [x] Phase 2: 변경 유형 BottomSheet + 단일 변경 슬롯 선택 + request_detail 연결
+- [x] Phase 3: 응답 BottomSheet + 타임라인 렌더링 + CurrentRequestBox pending 감지
+- [x] Phase 4: 정규 스케줄 변경 (앞으로 모두) — RegularScheduleChangeScreen
+- [x] Phase 5: 엣지 케이스 — 중복 제안 방지 + bulkChange 타임라인
+
 ## 미완료 항목
 
 - [ ] 무한 스크롤 페이지네이션 (서버 API 필요)
 - [ ] 푸시 알림 + 만료 타이머 (서버 필요)
-- [ ] 학생 전체 화면 라우팅 (AllLessonRequestsScreen 학생용)
+- [x] 학생 전체 화면 라우팅 (AllLessonRequestsScreen 학생용)
 - [x] AppBar 이름 탭 → 프로필 바텀시트 (메트로놈 스타일)
 - [x] 채팅 아바타 탭 → 프로필 바텀시트
 - [x] 수락 시 메시지 입력 → 히스토리 기록
 - [x] 거절 메시지 부드럽게 → "요청이 종료되었습니다"
 - [x] 종료 상태 하단바 회색 통일
 - [x] 첫 진입 가이드 (시스템 메시지 + 슬롯 힌트)
-- [ ] 무한 스크롤 페이지네이션 (서버 API 필요)
-- [ ] 푸시 알림 + 만료 타이머 (서버 필요)
-- [ ] 학생 전체 화면 라우팅 (AllLessonRequestsScreen 학생용)
 
 ## 백엔드 통합 (2026-03-29)
 

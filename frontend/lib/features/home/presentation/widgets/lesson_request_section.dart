@@ -85,7 +85,9 @@ class LessonRequestSection extends ConsumerWidget {
               Center(
                 child: TextButton(
                   onPressed: () => context.push(
-                    '${AppRoutes.lessonRequests}?teacherId=$userId',
+                    viewerRole == 'student'
+                        ? '${AppRoutes.myLessonRequests}?studentId=$userId'
+                        : '${AppRoutes.lessonRequests}?teacherId=$userId',
                   ),
                   child: Text(
                     AppStrings.moreRequests(requests.length - 3),
@@ -169,7 +171,9 @@ class LessonRequestSection extends ConsumerWidget {
         if (totalCount > 3)
           TextButton.icon(
             onPressed: () => context.push(
-              '${AppRoutes.lessonRequests}?teacherId=$userId',
+              viewerRole == 'student'
+                  ? '${AppRoutes.myLessonRequests}?studentId=$userId'
+                  : '${AppRoutes.lessonRequests}?teacherId=$userId',
             ),
             icon: const Icon(Icons.list, size: AppSpacing.iconXS),
             label: const Text('전체보기'),
