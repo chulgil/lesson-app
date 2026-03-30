@@ -269,16 +269,38 @@ class AuthService:
             }
 
     async def _apple_user_info(self, request: OAuthRequest) -> dict[str, Any]:
-        """Validate Apple identity token and extract user info."""
-        import jwt
+        """Validate Apple identity token and extract user info.
 
-        try:
-            payload = jwt.decode(
-                request.identity_token,
-                options={"verify_signature": False},
-            )
-        except Exception:
-            raise HTTPException(status_code=401, detail="Invalid Apple identity token")
+        Uses JWKS verification when APPLE_CLIENT_ID is configured,
+        falls back to unverified decode for development.
+        """
+        from app.core.config import settings
+
+        payload: dict[str, Any]
+
+        if not request.identity_token:
+            raise HTTPException(status_code=400, detail="identity_token is required for Apple login")
+
+        if settings.APPLE_CLIENT_ID:
+            # Production: verify JWT signature via Apple's JWKS
+            from app.core.security import verify_apple_identity_token
+
+            try:
+                verified = await verify_apple_identity_token(request.identity_token)
+                payload = {"sub": verified["id"], "email": verified.get("email")}
+            except Exception:
+                raise HTTPException(status_code=401, detail="Invalid Apple identity token")
+        else:
+            # Development: decode without verification (APPLE_CLIENT_ID not set)
+            import jwt
+
+            try:
+                payload = jwt.decode(
+                    request.identity_token,
+                    options={"verify_signature": False},
+                )
+            except Exception:
+                raise HTTPException(status_code=401, detail="Invalid Apple identity token")
 
         user_data = request.user or {}
         name_data = user_data.get("name", {})
