@@ -90,7 +90,7 @@
 | 3-2 | **게이미피케이션 Phase 2** (뱃지 + 리더보드) | gamification_spec.md Phase 2 | L | ✅ done |
 | 3-3 | 학생 연습 현황 상세 조회 | practice_master.md | M | ✅ done |
 | 3-4 | **알림 시스템 고도화 (FCM)** | notification_master.md | L | ⚠️ 코드 완료, Firebase 설정 대기 |
-| 3-5 | **팔로우/소식 피드** | follow_master.md Phase 3 | M | ⚠️ 팔로우 목록 완료, 소식 피드 미구현 |
+| 3-5 | **팔로우/소식 피드** | follow_master.md Phase 3 | M | ✅ done |
 | 3-6 | 인앱 메시징 (기본) | 스펙 미작성 | XL | LOW |
 
 ### Phase 4: 확장 (12주+)

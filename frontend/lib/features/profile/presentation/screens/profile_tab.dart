@@ -182,6 +182,12 @@ class ProfileTab extends ConsumerWidget {
                 subtitle: '팔로우한 선생님·학원 관리',
                 onTap: () => context.push(AppRoutes.followList),
               ),
+              _MenuItem(
+                icon: Icons.article_outlined,
+                label: '소식',
+                subtitle: '팔로우한 선생님의 공지·이벤트',
+                onTap: () => context.push(AppRoutes.followFeed),
+              ),
             ],
           ),
 

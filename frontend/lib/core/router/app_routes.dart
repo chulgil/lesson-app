@@ -94,6 +94,7 @@ class AppRoutes {
 
   // Follow routes
   static const followList = '/profile/following';
+  static const followFeed = '/follow/feed';
 
   // Schedule routes
   static const selectTeacher = '/schedule/teachers';
