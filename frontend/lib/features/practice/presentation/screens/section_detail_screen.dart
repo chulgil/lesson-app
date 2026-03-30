@@ -13,6 +13,7 @@ import '../widgets/metronome/metronome.dart';
 import '../widgets/notes/note_preview_card.dart';
 import '../widgets/practice_tools_modal.dart';
 import '../widgets/section_detail/section_detail_widgets.dart';
+import '../widgets/recording_comparison_sheet.dart';
 import 'section_detail_recording_mixin.dart';
 
 /// Section detail screen showing section info and recordings
@@ -183,9 +184,30 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           const SizedBox(height: AppSpacing.space4),
 
           // Recording section
-          Text(
-            '녹음',
-            style: AppTypography.headingSmall,
+          Row(
+            children: [
+              Text(
+                '녹음',
+                style: AppTypography.headingSmall,
+              ),
+              const Spacer(),
+              if (sortedRecordings.length >= 2)
+                TextButton.icon(
+                  onPressed: () {
+                    final chronological = List.of(sortedRecordings)
+                      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+                    showRecordingComparisonSheet(context, chronological);
+                  },
+                  icon: Icon(Icons.compare_arrows, size: 18, color: AppColors.primary),
+                  label: Text(
+                    '비교',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: AppSpacing.space3),
 
