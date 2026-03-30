@@ -133,11 +133,15 @@ class _SuggestAlternativeScreenState
     );
   }
 
+  String get _effectiveTeacherId =>
+      widget.teacherId ?? ref.read(currentUserIdProvider) ?? 'teacher_1';
+
   @override
   Widget build(BuildContext context) {
-    final teacherId =
-        widget.teacherId ?? ref.watch(currentUserIdProvider) ?? 'teacher_1';
-    final weekLessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
+    final teacherId = _effectiveTeacherId;
+    final weekLessonsAsync = ref.watch(weekLessonsWithPreviewProvider(
+      (weekStart: _weekStart, teacherId: teacherId),
+    ));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -407,7 +411,9 @@ class _SuggestAlternativeScreenState
           // Action buttons
           _isAcceptMode
               ? _buildAcceptButton(
-                  ref.watch(weekLessonsProvider(_weekStart)).valueOrNull ?? [],
+                  ref.watch(weekLessonsWithPreviewProvider(
+                    (weekStart: _weekStart, teacherId: _effectiveTeacherId),
+                  )).valueOrNull ?? [],
                 )
               : _buildProposeButtons(),
         ],
@@ -581,7 +587,9 @@ class _SuggestAlternativeScreenState
     }
 
     final weekLessons =
-        ref.read(weekLessonsProvider(_weekStart)).valueOrNull ?? [];
+        ref.read(weekLessonsWithPreviewProvider(
+            (weekStart: _weekStart, teacherId: _effectiveTeacherId),
+          )).valueOrNull ?? [];
     final startMinutes = hour * 60 + minute;
     final endMinutes = startMinutes + widget.durationMinutes;
 
@@ -727,7 +735,9 @@ class _SuggestAlternativeScreenState
 
     // Duplicate check
     final weekLessons =
-        ref.read(weekLessonsProvider(_getWeekStart(newDate))).valueOrNull ??
+        ref.read(weekLessonsWithPreviewProvider(
+          (weekStart: _getWeekStart(newDate), teacherId: _effectiveTeacherId),
+        )).valueOrNull ??
             [];
     for (final lesson in weekLessons) {
       if (lesson.date.year == newDate.year &&

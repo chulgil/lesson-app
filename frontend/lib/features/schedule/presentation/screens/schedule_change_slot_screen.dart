@@ -69,7 +69,9 @@ class _ScheduleChangeSlotScreenState
 
   @override
   Widget build(BuildContext context) {
-    final lessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
+    final lessonsAsync = ref.watch(weekLessonsWithPreviewProvider(
+      (weekStart: _weekStart, teacherId: params.teacherId),
+    ));
 
     return Scaffold(
       appBar: AppBar(
