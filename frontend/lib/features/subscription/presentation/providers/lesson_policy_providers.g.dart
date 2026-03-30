@@ -7,9 +7,9 @@ part of 'lesson_policy_providers.dart';
 // **************************************************************************
 
 String _$lessonPolicyRepositoryHash() =>
-    r'3ed5761d1ff93d7d84827b297359d90bcf7af393';
+    r'1d03a3ec705bb2e2cced2e2cf977a932e1a00059';
 
-/// Provider for the lesson policy repository.
+/// Provider for the lesson policy repository — switches between Mock and Remote.
 ///
 /// Copied from [lessonPolicyRepository].
 @ProviderFor(lessonPolicyRepository)

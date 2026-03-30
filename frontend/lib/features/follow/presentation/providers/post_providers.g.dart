@@ -6,9 +6,9 @@ part of 'post_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$postRepositoryHash() => r'db6c4efd2308131d42f6f7cf8e460dc9ffb48b9d';
+String _$postRepositoryHash() => r'72cd299ef44b4125cc6fe9ee6db88cbb15ea54fa';
 
-/// Repository provider for posts.
+/// Repository provider for posts — switches between Mock and Remote.
 ///
 /// Copied from [postRepository].
 @ProviderFor(postRepository)

@@ -7,9 +7,9 @@ part of 'manual_teacher_provider.dart';
 // **************************************************************************
 
 String _$manualTeacherRepositoryHash() =>
-    r'9d3d4084365ff42d62f29baa4626ca12f02decf4';
+    r'e52915a31fb10e51034b12833f23330337444918';
 
-/// Repository provider for manual teachers.
+/// Repository provider for manual teachers — switches between Mock and Remote.
 ///
 /// Copied from [manualTeacherRepository].
 @ProviderFor(manualTeacherRepository)

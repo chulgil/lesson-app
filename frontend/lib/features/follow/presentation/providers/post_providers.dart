@@ -1,15 +1,22 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_post_repository.dart';
+import '../../data/repositories/remote_post_repository.dart';
 import '../../domain/entities/teacher_post.dart';
 import '../../domain/repositories/post_repository.dart';
 import 'follow_providers.dart';
 
 part 'post_providers.g.dart';
 
-/// Repository provider for posts.
+/// Repository provider for posts — switches between Mock and Remote.
 @Riverpod(keepAlive: true)
-PostRepository postRepository(PostRepositoryRef ref) => MockPostRepository();
+PostRepository postRepository(PostRepositoryRef ref) =>
+    createRepository<PostRepository>(
+      ref: ref,
+      mock: () => MockPostRepository(),
+      remote: (api) => RemotePostRepository(api),
+    );
 
 /// Get feed posts for a user's followed accounts.
 ///

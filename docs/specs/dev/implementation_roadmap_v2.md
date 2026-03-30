@@ -65,7 +65,7 @@
 | 1-3 | 기존 정기레슨 앱 전환 플로우 | #59 | flow_with_app.md | M | done |
 | 1-4 | 약관 동의 화면 | - | terms_agreement | S | ✅ done |
 | 1-5 | Google SSO 연동 마무리 | - | google_sso_setup_guide.md | M | ✅ done |
-| 1-6 | Mock → Backend 전환 준비 | - | architecture.md | L | todo |
+| 1-6 | Mock → Backend 전환 준비 | - | architecture.md | L | ✅ done |
 
 ### Phase 2: 핵심 차별화 (2~6주)
 

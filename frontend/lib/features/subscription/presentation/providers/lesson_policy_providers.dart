@@ -1,22 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/config/environment.dart';
+import '../../../../core/providers/repository_provider.dart';
 import '../../data/repositories/mock_lesson_policy_repository.dart';
+import '../../data/repositories/remote_lesson_policy_repository.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/repositories/lesson_policy_repository.dart';
 
 part 'lesson_policy_providers.g.dart';
 
-/// Provider for the lesson policy repository.
+/// Provider for the lesson policy repository — switches between Mock and Remote.
 @Riverpod(keepAlive: true)
-LessonPolicyRepository lessonPolicyRepository(Ref ref) {
-  if (EnvironmentConfig.useMockData) {
-    return MockLessonPolicyRepository();
-  }
-  // Backend API 미구현 — 레슨 정책 엔드포인트 필요
-  return MockLessonPolicyRepository();
-}
+LessonPolicyRepository lessonPolicyRepository(Ref ref) =>
+    createRepository<LessonPolicyRepository>(
+      ref: ref,
+      mock: () => MockLessonPolicyRepository(),
+      remote: (api) => RemoteLessonPolicyRepository(api),
+    );
 
 /// Provider for teacher's default policy.
 @riverpod
