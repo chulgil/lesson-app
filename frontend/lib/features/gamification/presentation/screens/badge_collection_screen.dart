@@ -3,13 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/gamification.dart';
 import '../providers/gamification_provider.dart';
+import '../widgets/challenges_card.dart';
 
 /// Badge collection and gamification detail screen.
 class BadgeCollectionScreen extends ConsumerWidget {
@@ -44,6 +43,11 @@ class BadgeCollectionScreen extends ConsumerWidget {
       children: [
         // Level info card
         _buildLevelCard(data),
+
+        const SizedBox(height: AppSpacing.space5),
+
+        // Challenges section
+        ChallengesCard(studentId: studentId),
 
         const SizedBox(height: AppSpacing.space5),
 
@@ -270,7 +274,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
         children: history.asMap().entries.map((entry) {
           final item = entry.value;
           final isLast = entry.key == history.length - 1;
-          final timeFormat = DateFormat('M/d HH:mm');
+          final d = item.earnedAt;
 
           return Column(
             children: [
@@ -304,7 +308,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          timeFormat.format(item.earnedAt),
+                          '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
                           style: AppTypography.caption.copyWith(
                             color: AppColors.textTertiaryLight,
                           ),
@@ -335,7 +339,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
       case BadgeRarity.rare:
         return AppColors.primary;
       case BadgeRarity.epic:
-        return const Color(0xFF9333EA);
+        return AppColors.primaryDark;
       case BadgeRarity.legendary:
         return AppColors.warning;
     }

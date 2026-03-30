@@ -423,6 +423,9 @@ class AppStrings {
   static const scheduleChangePropose = '시간 변경 제안';
   static const scheduleChangeInProgress = '시간 변경 진행 중';
   static const scheduleChangeRequestArrived = '시간 변경 요청이 도착했습니다';
+
+  // Profile card
+  static const studentMessage = '학생 메시지';
   static const scheduleChangeAccept = '수락';
   static const scheduleChangeReject = '거절';
   static const scheduleChangeCounter = '역제안';
