@@ -63,7 +63,7 @@
 | 1-1 | 학생 탭 클래스별 그룹화 | #42 | student_class_system.md | S | done |
 | 1-2 | 프로필 탭 미수금 관리 | #43 | subscription_master.md | M | done |
 | 1-3 | 기존 정기레슨 앱 전환 플로우 | #59 | flow_with_app.md | M | done |
-| 1-4 | 약관 동의 화면 | - | terms_agreement | S | in-progress |
+| 1-4 | 약관 동의 화면 | - | terms_agreement | S | ✅ done |
 | 1-5 | Google SSO 연동 마무리 | - | google_sso_setup_guide.md | M | in-progress |
 | 1-6 | Mock → Backend 전환 준비 | - | architecture.md | L | todo |
 
