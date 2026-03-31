@@ -130,6 +130,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     // Completed chapter summaries (collapsed)
                     ..._buildChapterSummaries(request, events),
 
+                    // Phase 2 notice banner (time confirmed → need subscription)
+                    if (request.isWaitingForProposal)
+                      _buildPhaseNoticeBanner(request),
+
                     // Chat history (chronological, newest at bottom)
                     RequestHistoryChat(
                       events: _eventsForCurrentPhase(request, events),
@@ -204,6 +208,39 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           ),
         );
       },
+    );
+  }
+
+  /// Phase 2 notice banner — text-only, announcement style.
+  Widget _buildPhaseNoticeBanner(UnifiedLessonRequest request) {
+    final noticeText = viewerRole == 'teacher'
+        ? AppStrings.timeConfirmedNotice
+        : AppStrings.timeConfirmedNoticeStudent;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space3,
+      ),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Text(
+        noticeText,
+        style: AppTypography.bodyMedium.copyWith(
+          color: AppColors.primary,
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 

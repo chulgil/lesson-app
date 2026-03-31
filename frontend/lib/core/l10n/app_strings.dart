@@ -337,6 +337,10 @@ class AppStrings {
   /// 제안 작성
   static const proposalNeeded = '제안 작성';
 
+  /// Phase 2 공지 배너
+  static const timeConfirmedNotice = '시간이 확정되었습니다. 수강권을 발급해주세요.';
+  static const timeConfirmedNoticeStudent = '시간이 확정되었습니다. 선생님의 수강권 안내를 기다려주세요.';
+
   /// 시간확정
   static const statusTimeConfirmed = '시간확정';
 
