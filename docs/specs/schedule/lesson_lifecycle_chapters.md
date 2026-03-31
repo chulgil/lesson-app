@@ -159,25 +159,31 @@ RequestPhase get currentPhase {
 ```
 timeConfirmed (시간 확정됨)
     │
-    ├─ 경로 A: 무료 발급
-    │   조건: type==trial && suggestedPrice==0 (또는 선생님 무료 설정)
-    │   흐름: timeConfirmed → subscriptionIssued (즉시)
-    │   결제: 없음
+    │  선생님이 3가지 발급 방법 중 선택 (카드형 UI)
     │
-    ├─ 경로 B: 선불 (기본)
-    │   조건: type!=trial || suggestedPrice>0
+    ├─ 경로 A: 결제 후 발급 (선불, 기본)
+    │   UI: "결제 후 발급 (선불)" 카드
     │   흐름: timeConfirmed → proposalSent → proposalAccepted
     │         → paymentNotified → (학생 입금) → (선생님 확인)
     │         → subscriptionIssued
     │   결제: 수강권 발급 전 완료
     │
-    └─ 경로 C: 후불
-        조건: 선생님이 "후불" 선택
-        흐름: timeConfirmed → subscriptionIssued (paymentConfirmed=false)
-              → (레슨 진행 중) → paymentRequested → paymentConfirmed
-        결제: 수강권 발급 후 나중에 안내
-        ⚠️ 미수금으로 관리 (대시보드 미수금 목록 표시)
+    ├─ 경로 B: 먼저 발급 (후불)
+    │   UI: "먼저 발급 (후불)" 카드
+    │   흐름: timeConfirmed → subscriptionIssued (paymentConfirmed=false)
+    │         → (레슨 진행 중) → paymentRequested → paymentConfirmed
+    │   결제: 수강권 발급 후 나중에 안내
+    │   ⚠️ 미수금으로 관리 (대시보드 미수금 목록 표시)
+    │
+    └─ 경로 C: 무료 발급
+        UI: "무료 발급" 카드
+        조건: 모든 레슨 타입에서 선택 가능 (체험/정규/회차)
+        흐름: timeConfirmed → subscriptionIssued (amount=0, paymentConfirmed=true)
+        결제: 없음. 즉시 수강권 발급
 ```
+
+> **v2 변경 (2026-04-01)**: 무료 발급이 체험레슨에만 한정되지 않고, 모든 레슨 타입에서
+> 선생님이 선택할 수 있도록 변경. 3가지 경로를 설명 카드형 UI로 통합 제공.
 
 ### 경로별 상태 전이 테이블
 
@@ -281,7 +287,7 @@ timeConfirmed (시간 확정됨)
 
 ### 후불 미수금 관리
 
-후불(경로 C)로 발급된 수강권은 `paymentConfirmed=false` 상태입니다.
+후불(경로 B)로 발급된 수강권은 `paymentConfirmed=false` 상태입니다.
 
 - **대시보드**: 미수금 N건 뱃지 표시
 - **미수금 목록**: 학생별 미수금 수강권 리스트
@@ -292,9 +298,9 @@ timeConfirmed (시간 확정됨)
 
 | 순서 | 항목 | 복잡도 |
 |------|------|--------|
-| 1 | 체험레슨 무료 발급 경로 (경로 A) | Low |
-| 2 | 선불 결제 안내 BottomSheet (경로 B) | Medium |
-| 3 | 후불 즉시 발급 (경로 C) | Low |
+| 1 | 선불 결제 안내 카드 (경로 A) | Medium |
+| 2 | 후불 즉시 발급 카드 (경로 B) | Low |
+| 3 | 무료 발급 카드 (경로 C) | Low |
 | 4 | 2단계 입금 확인 (학생→선생님) | Medium |
 | 5 | 미수금 대시보드 | Medium |
 

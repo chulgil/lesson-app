@@ -468,26 +468,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 체험레슨 무료 — 단일 버튼
-    final isTrial = request.type == LessonRequestType.trial;
-    final isFree = isTrial && (request.suggestedPrice == null || request.suggestedPrice == 0);
-
-    if (isFree) {
-      return _buildActionRow(
-        icon: Icons.card_giftcard,
-        iconColor: AppColors.success,
-        message: AppStrings.phase2TimeConfirmedTrial,
-        primaryLabel: AppStrings.actionIssueFree,
-        primaryIcon: Icons.check_circle,
-        onPrimary: widget.onIssueFree,
-      );
-    }
-
-    // 일반/유료 — 선불 + 후불 선택지
+    // 선불/후불/무료 3가지 선택지
     return _buildPhase2PaymentChoice();
   }
 
-  /// 선불/후불 선택 UI — 설명 카드형 (시간 확정 후)
+  /// 선불/후불/무료 선택 UI — 설명 카드형 (시간 확정 후)
   Widget _buildPhase2PaymentChoice() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,6 +497,14 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           title: AppStrings.methodPostpaidTitle,
           description: AppStrings.methodPostpaidDesc,
           onTap: widget.onIssuePostpaid,
+          isPrimary: false,
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        // 무료 카드: 무료 발급
+        _PaymentMethodCard(
+          title: AppStrings.methodFreeTitle,
+          description: AppStrings.methodFreeDesc,
+          onTap: widget.onIssueFree,
           isPrimary: false,
         ),
       ],

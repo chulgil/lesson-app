@@ -510,6 +510,10 @@ class AppStrings {
   static const methodPostpaidTitle = '먼저 발급 (후불)';
   static const methodPostpaidDesc = '수강권을 바로 발급하고, 결제는 나중에 받습니다';
 
+  /// Phase 2: 무료 카드
+  static const methodFreeTitle = '무료 발급';
+  static const methodFreeDesc = '결제 없이 수강권을 바로 발급합니다';
+
   /// Phase 2: Teacher → 결제 안내 전송 (선불)
   static const actionSendPaymentGuide = '결제 안내 보내기';
 
