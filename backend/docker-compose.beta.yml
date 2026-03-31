@@ -28,6 +28,7 @@ services:
       DEBUG: "true"
     volumes:
       - beta-logs:/app/logs
+      - ./keys:/app/keys:ro
     networks:
       - traefiknet
       - data_internal

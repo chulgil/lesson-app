@@ -13,7 +13,7 @@
 ## 2. iOS 앱 등록
 
 1. Firebase Console > 프로젝트 설정 > "앱 추가" > iOS
-2. **Bundle ID**: `com.lessonaza.app` (Xcode에서 확인)
+2. **Bundle ID**: `app.lessonaza` (Xcode에서 확인)
 3. 앱 닉네임: `Lessonaza iOS`
 4. `GoogleService-Info.plist` 다운로드
 5. 파일 배치: `frontend/ios/Runner/GoogleService-Info.plist`
@@ -29,7 +29,7 @@
 ## 3. Android 앱 등록
 
 1. Firebase Console > "앱 추가" > Android
-2. **패키지 이름**: `com.lessonaza.app` (AndroidManifest.xml에서 확인)
+2. **패키지 이름**: `app.lessonaza` (build.gradle에서 확인)
 3. 앱 닉네임: `Lessonaza Android`
 4. `google-services.json` 다운로드
 5. 파일 배치: `frontend/android/app/google-services.json`
@@ -50,16 +50,20 @@ buildscript {
 apply plugin: 'com.google.gms.google-services'
 ```
 
-## 4. 백엔드 서비스 계정
+## 4. 백엔드 서비스 계정 (Admin SDK)
 
-1. Firebase Console > 프로젝트 설정 > 서비스 계정
-2. "새 비공개 키 생성" 클릭
-3. JSON 파일 다운로드
-4. 서버에 배치 (예: `/etc/secrets/firebase-service-account.json`)
-5. 환경변수 설정:
+1. Firebase Console > 프로젝트 설정 > **서비스 계정** 탭
+2. Admin SDK 구성 스니펫: **Python** 선택 (FastAPI 백엔드)
+3. "새 비공개 키 생성" 클릭 → JSON 파일 다운로드
+4. 파일명 변경: `firebase-service-account.json`
+5. 로컬 개발: `backend/` 폴더에 배치 (`.gitignore`에 등록 확인)
+6. 서버 배포: `/etc/secrets/firebase-service-account.json`에 배치
+7. 환경변수 설정:
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="/etc/secrets/firebase-service-account.json"
 ```
+
+> ⚠️ 이 JSON 파일은 **절대 git에 커밋 금지**. 노출 시 Firebase 프로젝트 전체 접근 가능
 
 ## 5. 설정 파일 확인 체크리스트
 
