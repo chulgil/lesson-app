@@ -31,6 +31,7 @@ class LessonRequestSection extends ConsumerWidget {
         ? ref.watch(todayRequestsProvider(userId))
         : ref.watch(studentTodayRequestsProvider(userId));
     final studentNames = ref.watch(studentNameMapProvider);
+    final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
 
     return requestsAsync.when(
@@ -67,7 +68,9 @@ class LessonRequestSection extends ConsumerWidget {
                     RequestListItem(
                       request: displayRequests[i],
                       studentName: studentNames[displayRequests[i].studentId] ?? AppStrings.student,
+                      teacherName: teacherNames[displayRequests[i].teacherId],
                       academyName: academyNames[displayRequests[i].academyId],
+                      viewerRole: viewerRole,
                       onTap: () => context.push(
                         AppRoutes.requestDetail
                             .replaceFirst(':id', displayRequests[i].id),

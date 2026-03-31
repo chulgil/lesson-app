@@ -661,6 +661,68 @@ class UnifiedLessonRequest extends HiveObject {
     }
   }
 
+  /// Action-oriented chip label for student's list view.
+  /// Shows what student should do next or current status from student's perspective.
+  String get studentActionLabel {
+    switch (status) {
+      case UnifiedRequestStatus.pending:
+        return AppStrings.studentRequestSent;
+      case UnifiedRequestStatus.approved:
+        return AppStrings.statusApproved;
+      case UnifiedRequestStatus.negotiating:
+        return isTeacherTurn
+            ? AppStrings.studentResponseWaiting
+            : AppStrings.studentResponseRequired;
+      case UnifiedRequestStatus.timeConfirmed:
+        return AppStrings.studentWaitingProposal;
+      case UnifiedRequestStatus.proposalSent:
+        return AppStrings.studentProposalArrived;
+      case UnifiedRequestStatus.proposalAccepted:
+        return AppStrings.statusProposalAccepted;
+      case UnifiedRequestStatus.paymentNotified:
+        return AppStrings.studentPaymentWaiting;
+      case UnifiedRequestStatus.completed:
+        return AppStrings.statusCompleted;
+      case UnifiedRequestStatus.rejected:
+        return AppStrings.statusRejected;
+      case UnifiedRequestStatus.cancelled:
+        return AppStrings.statusCancelled;
+      case UnifiedRequestStatus.expired:
+        return AppStrings.statusExpiredFull;
+      case UnifiedRequestStatus.subscriptionIssued:
+        return AppStrings.statusSubscriptionIssued;
+      case UnifiedRequestStatus.inProgress:
+        return AppStrings.statusInProgress;
+    }
+  }
+
+  /// Color key for student action chip.
+  String get studentActionColorKey {
+    switch (status) {
+      case UnifiedRequestStatus.pending:
+        return 'wait';
+      case UnifiedRequestStatus.negotiating:
+        return isTeacherTurn ? 'wait' : 'action';
+      case UnifiedRequestStatus.timeConfirmed:
+        return 'wait';
+      case UnifiedRequestStatus.proposalSent:
+        return 'action';
+      case UnifiedRequestStatus.proposalAccepted:
+      case UnifiedRequestStatus.approved:
+      case UnifiedRequestStatus.completed:
+      case UnifiedRequestStatus.subscriptionIssued:
+        return 'success';
+      case UnifiedRequestStatus.inProgress:
+        return 'action';
+      case UnifiedRequestStatus.paymentNotified:
+        return 'wait';
+      case UnifiedRequestStatus.rejected:
+      case UnifiedRequestStatus.cancelled:
+      case UnifiedRequestStatus.expired:
+        return 'warning';
+    }
+  }
+
   /// Color key for action chip: 'action', 'wait', 'success', 'error', 'warning'.
   String get teacherActionColorKey {
     switch (status) {

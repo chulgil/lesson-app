@@ -24,6 +24,7 @@ class MyLessonRequestsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final requestsAsync = ref.watch(studentUnifiedRequestsProvider(studentId));
+    final teacherNames = ref.watch(teacherNameMapProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -72,6 +73,8 @@ class MyLessonRequestsScreen extends ConsumerWidget {
                 child: RequestListItem(
                   request: request,
                   studentName: AppStrings.student,
+                  teacherName: teacherNames[request.teacherId],
+                  viewerRole: 'student',
                   onTap: () => context.push(
                     AppRoutes.requestDetail.replaceFirst(':id', request.id),
                     extra: {'viewerRole': 'student'},

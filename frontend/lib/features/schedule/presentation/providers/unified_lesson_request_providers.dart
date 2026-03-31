@@ -20,6 +20,14 @@ final studentNameMapProvider = Provider<Map<String, String>>((ref) => {
       'student_5': '정하은',
     });
 
+/// Teacher name lookup — Mock only (Remote: fetch from API).
+/// Returns teacher name by teacherId.
+final teacherNameMapProvider = Provider<Map<String, String>>((ref) => {
+      'teacher_1': '김선아',
+      'teacher_2': '박지영',
+      'teacher_3': '이현우',
+    });
+
 /// Academy name lookup — Mock only.
 final academyNameMapProvider = Provider<Map<String, String>>((ref) => {
       'academy_1': '서울음악학원',

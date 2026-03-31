@@ -17,6 +17,7 @@ import 'proposal_chat_card.dart';
 class RequestHistoryChat extends StatelessWidget {
   final List<RequestEvent> events;
   final String viewerId;
+  final String viewerRole;
   final String studentName;
   final String? studentProfileUrl;
   final UnifiedLessonRequest? request;
@@ -34,6 +35,7 @@ class RequestHistoryChat extends StatelessWidget {
     super.key,
     required this.events,
     required this.viewerId,
+    this.viewerRole = 'teacher',
     required this.studentName,
     this.studentProfileUrl,
     this.request,
@@ -383,7 +385,9 @@ class RequestHistoryChat extends StatelessWidget {
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
-                AppStrings.requestGuideMessage,
+                viewerRole == 'student'
+                    ? AppStrings.studentRequestGuideMessage
+                    : AppStrings.requestGuideMessage,
                 style: AppTypography.caption.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),

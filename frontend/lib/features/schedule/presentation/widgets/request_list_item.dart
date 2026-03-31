@@ -9,22 +9,34 @@ import '../../domain/entities/unified_lesson_request.dart';
 
 /// List item for lesson requests — triage card layout.
 ///
-/// Layout optimized for teacher's decision priority:
-/// Left: who/what (identity)  |  Right: what to do / how urgent (action)
-/// [Avatar] [source·type | name·instrument·level | 1st slot] [StatusChip + elapsed]
+/// Supports both teacher and student perspectives via [viewerRole].
+/// Teacher view: shows student name, avatar, teacher action label.
+/// Student view: shows teacher name, avatar, student action label.
 class RequestListItem extends StatelessWidget {
   final UnifiedLessonRequest request;
   final String studentName;
+  final String? teacherName;
   final String? academyName;
+  final String viewerRole;
   final VoidCallback? onTap;
 
   const RequestListItem({
     super.key,
     required this.request,
     required this.studentName,
+    this.teacherName,
     this.academyName,
+    this.viewerRole = 'teacher',
     this.onTap,
   });
+
+  bool get _isStudentView => viewerRole == 'student';
+
+  /// Display name: teacher view shows student, student view shows teacher.
+  String get _displayName =>
+      _isStudentView
+          ? AppStrings.teacherDisplayName(teacherName ?? AppStrings.teacher)
+          : studentName;
 
   @override
   Widget build(BuildContext context) {
@@ -49,15 +61,15 @@ class RequestListItem extends StatelessWidget {
     );
   }
 
-  /// Student avatar with urgency dot overlay.
-  /// Academy badge removed — source is shown in Line 1 text.
+  /// Avatar with urgency dot overlay.
   Widget _buildAvatar() {
     final urgent = isRequestUrgent(request.createdAt);
+    final initial = _displayName.isNotEmpty ? _displayName[0] : '?';
     final avatar = CircleAvatar(
       radius: AppSpacing.avatarSmall / 2,
       backgroundColor: AppColors.primary.withValues(alpha: 0.08),
       child: Text(
-        studentName.isNotEmpty ? studentName[0] : '?',
+        initial,
         style: AppTypography.bodyMedium.copyWith(
           fontWeight: FontWeight.w700,
           color: AppColors.primary,
@@ -98,7 +110,7 @@ class RequestListItem extends StatelessWidget {
 
         // Line 2: name · instrument · level
         Text(
-          '$studentName · ${request.instrument} · ${request.experience.label}',
+          '$_displayName · ${request.instrument} · ${request.experience.label}',
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w500,
           ),
@@ -173,9 +185,10 @@ class RequestListItem extends StatelessWidget {
   }
 
   /// Right column: status chip + elapsed time (vertically stacked).
-  /// Grouped so teacher scans one area for "what to do + how urgent".
   Widget _buildRightColumn() {
-    final label = request.teacherActionLabel;
+    final label = _isStudentView
+        ? request.studentActionLabel
+        : request.teacherActionLabel;
     final color = _actionColor;
     final urgent = isRequestUrgent(request.createdAt);
 
@@ -212,7 +225,10 @@ class RequestListItem extends StatelessWidget {
   }
 
   Color get _actionColor {
-    return switch (request.teacherActionColorKey) {
+    final colorKey = _isStudentView
+        ? request.studentActionColorKey
+        : request.teacherActionColorKey;
+    return switch (colorKey) {
       'action' => AppColors.warning,
       'wait' => AppColors.info,
       'success' => AppColors.success,

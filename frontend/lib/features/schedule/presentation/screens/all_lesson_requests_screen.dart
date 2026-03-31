@@ -51,6 +51,7 @@ class _AllLessonRequestsScreenState
             ? ref.watch(teacherUnifiedRequestsProvider(widget.teacherId))
             : ref.watch(studentUnifiedRequestsProvider(widget.teacherId));
     final studentNames = ref.watch(studentNameMapProvider);
+    final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
 
     return Scaffold(
@@ -131,7 +132,9 @@ class _AllLessonRequestsScreenState
                             child: RequestListItem(
                               request: request,
                               studentName: studentNames[request.studentId] ?? AppStrings.student,
+                              teacherName: teacherNames[request.teacherId],
                               academyName: academyNames[request.academyId],
+                              viewerRole: widget.viewerRole,
                               onTap: () => context.push(
                                 AppRoutes.requestDetail
                                     .replaceFirst(':id', request.id),
