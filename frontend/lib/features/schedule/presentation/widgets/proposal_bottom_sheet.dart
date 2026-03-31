@@ -281,81 +281,86 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
   Widget _buildBankAccountSelector(
     AsyncValue<TeacherProfile?> profileAsync,
   ) {
-    return profileAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
-      data: (profile) {
-        if (profile == null) return const SizedBox.shrink();
+    final profile = profileAsync.valueOrNull;
+    if (profile == null) {
+      return profileAsync.isLoading
+          ? const SizedBox.shrink()
+          : const SizedBox.shrink();
+    }
 
-        final accounts = profile.bankAccounts;
-        if (accounts.isEmpty && profile.bankAccount == null) {
-          return Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
-              borderRadius:
-                  BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
-            ),
+    final accounts = profile.bankAccounts;
+    if (accounts.isEmpty && profile.bankAccount == null) {
+      return Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundLight,
+          borderRadius:
+              BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Text(
+          AppStrings.proposalNoBankAccount,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+      );
+    }
+
+    // Build list of all available accounts
+    final allAccounts = <BankAccount>[
+      ...accounts,
+      if (profile.bankAccount != null &&
+          !accounts.any(
+              (a) => a.accountNumber ==
+                  profile.bankAccount!.accountNumber))
+        profile.bankAccount!,
+    ];
+
+    // Auto-select default
+    _selectedBankAccountId ??=
+        profile.defaultBankAccount?.id ?? allAccounts.first.id;
+
+    // Validate selected ID still exists in accounts
+    if (!allAccounts.any((a) => a.id == _selectedBankAccountId)) {
+      _selectedBankAccountId =
+          profile.defaultBankAccount?.id ?? allAccounts.first.id;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space1,
+      ),
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: DropdownButton<String>(
+        value: _selectedBankAccountId,
+        isExpanded: true,
+        underline: const SizedBox.shrink(),
+        style: AppTypography.bodySmall,
+        items: allAccounts.map((account) {
+          final isDefault = account.isDefault;
+          return DropdownMenuItem(
+            value: account.id,
             child: Text(
-              AppStrings.proposalNoBankAccount,
+              '${account.bankName} ${account.accountNumber}'
+              '${isDefault ? ' (기본)' : ''}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                fontWeight: isDefault
+                    ? FontWeight.w600
+                    : FontWeight.normal,
               ),
             ),
           );
-        }
-
-        // Build list of all available accounts
-        final allAccounts = <BankAccount>[
-          ...accounts,
-          if (profile.bankAccount != null &&
-              !accounts.any(
-                  (a) => a.accountNumber ==
-                      profile.bankAccount!.accountNumber))
-            profile.bankAccount!,
-        ];
-
-        // Auto-select default
-        _selectedBankAccountId ??=
-            profile.defaultBankAccount?.id ?? allAccounts.first.id;
-
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space3,
-            vertical: AppSpacing.space1,
-          ),
-          decoration: BoxDecoration(
-            borderRadius:
-                BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.borderLight),
-          ),
-          child: DropdownButton<String>(
-            value: _selectedBankAccountId,
-            isExpanded: true,
-            underline: const SizedBox.shrink(),
-            style: AppTypography.bodySmall,
-            items: allAccounts.map((account) {
-              final isDefault = account.isDefault;
-              return DropdownMenuItem(
-                value: account.id,
-                child: Text(
-                  '${account.bankName} ${account.accountNumber}'
-                  '${isDefault ? ' (기본)' : ''}',
-                  style: AppTypography.bodySmall.copyWith(
-                    fontWeight: isDefault
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() => _selectedBankAccountId = value);
-            },
-          ),
-        );
-      },
+        }).toList(),
+        onChanged: (value) {
+          setState(() => _selectedBankAccountId = value);
+        },
+      ),
     );
   }
 
