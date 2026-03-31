@@ -1,7 +1,7 @@
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, Enum, Index, Integer, JSON, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -87,6 +87,14 @@ class Payment(UUIDMixin, TimestampMixin, Base):
     # Parent notification
     parent_notified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     parent_notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # PG (Payment Gateway) integration fields
+    pg_provider: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    pg_transaction_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    pg_order_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    pg_payment_key: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    pg_response: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    pg_failure_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
         Index("idx_payment_student", "student_id"),
