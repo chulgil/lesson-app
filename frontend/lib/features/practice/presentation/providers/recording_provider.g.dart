@@ -78,7 +78,7 @@ final microphonePermissionProvider = AutoDisposeFutureProvider<bool>.internal(
 );
 
 typedef MicrophonePermissionRef = AutoDisposeFutureProviderRef<bool>;
-String _$recordingNotifierHash() => r'1fb08fa49cba9e8d6623057f3637e27df60de6e0';
+String _$recordingNotifierHash() => r'0e33ba035efc1e3bc8cde63239e596de12f0003b';
 
 /// Copied from Dart SDK
 class _SystemHash {

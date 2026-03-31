@@ -15,9 +15,8 @@ import 'tuner_fish_indicator.dart';
 class TunerColors {
   TunerColors._();
 
-  // Effects (no AppColors equivalent)
-  static const glowPerfect = Color(0x6690EE90);
-  static const circleStroke = Color(0x33808080);
+  static const glowPerfect = AppColors.tunerGlowPerfect;
+  static const circleStroke = AppColors.tunerCircleStroke;
 }
 
 /// Circular 12-note tuner indicator widget.

@@ -1,0 +1,267 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
+import '../../../students/domain/entities/student.dart';
+import '../../domain/entities/unified_lesson_request.dart';
+
+/// Profile card for lesson request detail — branches by viewer role and type.
+///
+/// Extracted from request_detail_screen.dart to reduce file size.
+class RequestProfileCard extends StatelessWidget {
+  final UnifiedLessonRequest request;
+  final String viewerRole;
+  final String studentName;
+  final String? academyName;
+  final Student? student;
+
+  const RequestProfileCard({
+    super.key,
+    required this.request,
+    required this.viewerRole,
+    required this.studentName,
+    this.academyName,
+    this.student,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (viewerRole == 'student') {
+      return _buildStudentViewCard();
+    }
+    return request.type == LessonRequestType.trial
+        ? _buildTrialCard()
+        : _buildRegularCard();
+  }
+
+  Widget _buildTrialCard() {
+    final urgent = isRequestUrgent(request.createdAt);
+
+    return _buildCardContainer(
+      children: [
+        _buildTopInfoRow(urgent),
+        const SizedBox(height: AppSpacing.space3),
+        _buildStudentInfoRow(studentName, AppColors.primary),
+      ],
+    );
+  }
+
+  Widget _buildRegularCard() {
+    final urgent = isRequestUrgent(request.createdAt);
+
+    return _buildCardContainer(
+      children: [
+        _buildTopInfoRow(urgent),
+        const SizedBox(height: AppSpacing.space3),
+        _buildStudentInfoRow(studentName, AppColors.primary),
+        if (student != null) ...[
+          const SizedBox(height: AppSpacing.space3),
+          Row(
+            children: [
+              Icon(
+                Icons.bar_chart,
+                size: AppSpacing.iconSM,
+                color: AppColors.textTertiaryLight,
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '${AppStrings.lessonCount(student!.totalLessons)} · ${AppStrings.practiceRate(student!.practiceRate)}',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildStudentViewCard() {
+    final urgent = isRequestUrgent(request.createdAt);
+
+    return _buildCardContainer(
+      children: [
+        _buildTopInfoRow(urgent),
+        const SizedBox(height: AppSpacing.space3),
+        _buildStudentInfoRow(AppStrings.teacher, AppColors.info),
+      ],
+    );
+  }
+
+  Widget _buildCardContainer({required List<Widget> children}) {
+    return Container(
+      margin: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildStudentInfoRow(String name, Color avatarColor) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: AppSpacing.avatarMedium / 2,
+          backgroundColor: avatarColor.withValues(alpha: 0.08),
+          child: Text(
+            name.isNotEmpty ? name[0] : '?',
+            style: AppTypography.headingSmall.copyWith(
+              fontWeight: FontWeight.w700,
+              color: avatarColor,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space3),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${request.instrument} · ${request.experience.label} · ${request.goal.label}',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+        _buildStatusBadge(),
+      ],
+    );
+  }
+
+  Widget _buildTopInfoRow(bool urgent) {
+    return Row(
+      children: [
+        if (request.isAcademy && academyName != null) ...[
+          const Text('🏫', style: TextStyle(fontSize: 12)),
+          const SizedBox(width: 3),
+          Flexible(
+            child: Text(
+              academyName!,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+        ] else ...[
+          Text(
+            AppStrings.individualLesson,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+        ],
+        _buildTypeBadge(),
+        if (request.isReturningStudent) ...[
+          const SizedBox(width: AppSpacing.space1),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space1 + 2,
+              vertical: 2,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            ),
+            child: Text(
+              AppStrings.returning,
+              style: AppTypography.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.success,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+        const Spacer(),
+        Text(
+          formatRelativeTime(request.createdAt),
+          style: AppTypography.caption.copyWith(
+            color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+            fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTypeBadge() {
+    final typeColor = request.type == LessonRequestType.trial
+        ? AppColors.info
+        : AppColors.primary;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: typeColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+      ),
+      child: Text(
+        request.typeDisplayLabel,
+        style: AppTypography.caption.copyWith(
+          fontWeight: FontWeight.w600,
+          color: typeColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    final color = _statusColor(request.status);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+      ),
+      child: Text(
+        request.statusChipLabel,
+        style: AppTypography.caption.copyWith(
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Color _statusColor(UnifiedRequestStatus status) {
+    return switch (status) {
+      UnifiedRequestStatus.completed => AppColors.success,
+      UnifiedRequestStatus.paymentNotified => AppColors.error,
+      UnifiedRequestStatus.cancelled => AppColors.warning,
+      UnifiedRequestStatus.expired => AppColors.warning,
+      UnifiedRequestStatus.rejected => AppColors.warning,
+      _ => AppColors.textPrimaryLight,
+    };
+  }
+}

@@ -103,7 +103,7 @@ class _ResourceChip extends StatelessWidget {
   Color get _chipColor {
     switch (resource.type) {
       case TeachingResourceType.youtube:
-        return const Color(0xFFFF0000); // YouTube red
+        return AppColors.youtubeRed;
       case TeachingResourceType.teacherRecording:
         return AppColors.primary;
       case TeachingResourceType.externalLink:
@@ -342,7 +342,7 @@ class _AddResourceButton extends ConsumerWidget {
                 ctx,
                 icon: Icons.play_circle_outline,
                 label: '유튜브 링크 추가',
-                color: const Color(0xFFFF0000),
+                color: AppColors.youtubeRed,
                 onTap: () {
                   Navigator.pop(ctx);
                   _showAddYoutube(context);

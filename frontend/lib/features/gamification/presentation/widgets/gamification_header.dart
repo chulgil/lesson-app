@@ -185,15 +185,15 @@ class GamificationHeader extends ConsumerWidget {
       case 1:
         return [AppColors.primary, AppColors.primaryLight];
       case 2:
-        return [const Color(0xFF5B8C5A), const Color(0xFF78AB78)];
+        return [AppColors.levelSilverStart, AppColors.levelSilverEnd];
       case 3:
-        return [const Color(0xFF4A7FB5), const Color(0xFF6BA3D6)];
+        return [AppColors.levelPlatinumStart, AppColors.levelPlatinumEnd];
       case 4:
-        return [const Color(0xFFB8860B), const Color(0xFFDAA520)];
+        return [AppColors.levelGoldStart, AppColors.levelGoldEnd];
       case 5:
-        return [const Color(0xFF8B4513), const Color(0xFFCD853F)];
+        return [AppColors.levelBronzeStart, AppColors.levelBronzeEnd];
       default:
-        return [const Color(0xFF6B21A8), const Color(0xFF9333EA)];
+        return [AppColors.levelDiamondStart, AppColors.levelDiamondEnd];
     }
   }
 }

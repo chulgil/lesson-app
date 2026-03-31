@@ -129,4 +129,23 @@ class AppColors {
   static const googleBackground = Color(0xFFFFFFFF);
   static const kakaoBackground = Color(0xFFFEE500);
   static const appleBackground = Color(0xFF000000);
+
+  // Brand colors
+  static const youtubeRed = Color(0xFFFF0000);
+
+  // Gamification level gradients
+  static const levelBronzeStart = Color(0xFF8B4513);
+  static const levelBronzeEnd = Color(0xFFCD853F);
+  static const levelSilverStart = Color(0xFF5B8C5A);
+  static const levelSilverEnd = Color(0xFF78AB78);
+  static const levelGoldStart = Color(0xFFB8860B);
+  static const levelGoldEnd = Color(0xFFDAA520);
+  static const levelPlatinumStart = Color(0xFF4A7FB5);
+  static const levelPlatinumEnd = Color(0xFF6BA3D6);
+  static const levelDiamondStart = Color(0xFF6B21A8);
+  static const levelDiamondEnd = Color(0xFF9333EA);
+
+  // Tuner
+  static const tunerGlowPerfect = Color(0x6690EE90);
+  static const tunerCircleStroke = Color(0x33808080);
 }
