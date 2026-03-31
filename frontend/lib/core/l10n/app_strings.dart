@@ -337,6 +337,36 @@ class AppStrings {
   /// 제안 작성
   static const proposalNeeded = '제안 작성';
 
+  // ── Student Action Labels ────────────────────────────────
+
+  /// 요청 전송됨
+  static const studentRequestSent = '요청 전송됨';
+
+  /// 선생님 확인 중
+  static const studentWaitingTeacher = '선생님 확인 중';
+
+  /// 응답 필요 (학생 턴)
+  static const studentResponseRequired = '응답 필요';
+
+  /// 선생님 응답 대기
+  static const studentResponseWaiting = '선생님 응답 대기';
+
+  /// 수강권 대기
+  static const studentWaitingProposal = '수강권 대기';
+
+  /// 수강권 도착
+  static const studentProposalArrived = '수강권 도착';
+
+  /// 입금 확인 중
+  static const studentPaymentWaiting = '입금 확인 중';
+
+  /// 학생용 가이드 메시지
+  static const studentRequestGuideMessage =
+      '선생님이 제안한 일정 중 하나를 선택하여 수락하거나, 다른 시간을 제안할 수 있습니다.';
+
+  /// 선생님 이름 포맷
+  static String teacherDisplayName(String name) => '$name 선생님';
+
   /// Phase 2 공지 배너
   static const timeConfirmedNotice = '시간이 확정되었습니다. 수강권을 발급해주세요.';
   static const timeConfirmedNoticeStudent = '시간이 확정되었습니다. 선생님의 수강권 안내를 기다려주세요.';
@@ -550,13 +580,19 @@ class AppStrings {
   static const paymentMessageHint = '추가 안내 메시지 (선택)';
   static const sendPaymentGuide = '안내 보내기';
 
-  /// Proposal BottomSheet
-  static const proposalTitle = '수강권 제안';
+  /// Proposal BottomSheet (v8 통합)
+  static const proposalTitle = '수강권 발급';
+  static const proposalPaymentMethod = '결제 방법';
   static const proposalSelectTemplates = '수강권 선택 (최대 3개)';
   static const proposalBankAccount = '입금 계좌';
   static const proposalSend = '제안 보내기';
   static const proposalNoTemplates = '등록된 수강권 템플릿이 없습니다';
   static const proposalNoBankAccount = '등록된 계좌가 없습니다';
+
+  /// Payment method chips
+  static const methodPrepaidChip = '선불';
+  static const methodPostpaidChip = '후불';
+  static const methodFreeChip = '무료';
 
   /// Phase 3: Teacher → 레슨 완료
   static const actionLessonComplete = '레슨 완료';

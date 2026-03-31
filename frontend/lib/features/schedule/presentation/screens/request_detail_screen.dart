@@ -61,6 +61,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final requestAsync = ref.watch(unifiedRequestByIdProvider(requestId));
     final eventsAsync = ref.watch(requestEventsProvider(requestId));
     final studentNames = ref.watch(studentNameMapProvider);
+    final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
 
     return requestAsync.when(
@@ -107,9 +108,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             .watch(activeTeacherTemplatesProvider(request.teacherId))
             .valueOrNull ?? [];
 
+        final teacherName =
+            teacherNames[request.teacherId] ?? AppStrings.teacher;
         final opponentName = viewerRole == 'teacher'
             ? studentName
-            : AppStrings.teacher;
+            : AppStrings.teacherDisplayName(teacherName);
 
         return Scaffold(
           appBar: _buildChatAppBar(
@@ -138,6 +141,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       viewerId: viewerRole == 'teacher'
                           ? request.teacherId
                           : request.studentId,
+                      viewerRole: viewerRole,
                       studentName: studentName,
                       proposalTemplates: proposalTemplates,
                       onOpponentAvatarTap: () => _showProfileBottomSheet(
@@ -606,12 +610,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   // ── Phase 2 handlers ────────────────────────────────────
 
+  /// Unified handler: opens proposal BottomSheet, then dispatches
+  /// based on selected payment method (prepaid / postpaid / free).
   Future<void> _handleSendPaymentGuide(
     BuildContext context,
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    // Open proposal bottom sheet with template selection
     final result = await showProposalBottomSheet(
       context,
       teacherId: request.teacherId,
@@ -621,57 +626,74 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     try {
       final actions = UnifiedLessonRequestActions(ref);
 
-      // Build message with template names and bank account
-      final templates =
-          await ref.read(activeTeacherTemplatesProvider(request.teacherId).future);
-      final selectedTemplates = templates
-          .where((t) => result.templateIds.contains(t.id))
-          .toList();
+      switch (result.paymentMethod) {
+        case PaymentMethod.prepaid:
+          // Build message with template names + bank account
+          final templates = await ref.read(
+            activeTeacherTemplatesProvider(request.teacherId).future,
+          );
+          final selectedTemplates = templates
+              .where((t) => result.templateIds.contains(t.id))
+              .toList();
 
-      final templateSummary = selectedTemplates
-          .map((t) => '${t.name} ${t.totalLessons}${AppStrings.lessonsUnit} · ${t.formattedPrice}')
-          .join('\n');
+          final templateSummary = selectedTemplates
+              .map((t) =>
+                  '${t.name} ${t.totalLessons}${AppStrings.lessonsUnit} · ${t.formattedPrice}')
+              .join('\n');
 
-      final message = [
-        templateSummary,
-        if (result.bankAccountDisplay != null)
-          '입금계좌: ${result.bankAccountDisplay}',
-        if (result.message != null) result.message,
-      ].join('\n');
+          final message = [
+            templateSummary,
+            if (result.bankAccountDisplay != null)
+              '${AppStrings.proposalBankAccount}: ${result.bankAccountDisplay}',
+            if (result.message != null) result.message,
+          ].join('\n');
 
-      await actions.sendPaymentGuide(
-        request.id,
-        request.teacherId,
-        request.studentId,
-        message: message,
-      );
-      if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.proposalSend);
+          await actions.sendPaymentGuide(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            message: message,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.proposalSend);
+          }
+
+        case PaymentMethod.postpaid:
+          await actions.issueSubscription(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            paymentConfirmed: false,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.actionIssuePostpaid);
+          }
+
+        case PaymentMethod.free:
+          await actions.issueSubscription(
+            request.id,
+            request.teacherId,
+            request.studentId,
+            paymentConfirmed: true,
+          );
+          if (context.mounted) {
+            showSuccessSnackBar(context, AppStrings.actionIssueFree);
+          }
       }
     } catch (e) {
       if (context.mounted) showErrorSnackBar(context);
     }
   }
 
+  // _handleIssuePostpaid and _handleIssueFree are now handled
+  // inside _handleSendPaymentGuide via PaymentMethod switch.
   Future<void> _handleIssuePostpaid(
     BuildContext context,
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-      await actions.issueSubscription(
-        request.id,
-        request.teacherId,
-        request.studentId,
-        paymentConfirmed: false,
-      );
-      if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionIssuePostpaid);
-      }
-    } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
-    }
+    // Redirect to unified handler
+    await _handleSendPaymentGuide(context, ref, request);
   }
 
   Future<void> _handleIssueFree(
@@ -679,20 +701,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    try {
-      final actions = UnifiedLessonRequestActions(ref);
-      await actions.issueSubscription(
-        request.id,
-        request.teacherId,
-        request.studentId,
-        paymentConfirmed: true,
-      );
-      if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionIssueFree);
-      }
-    } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
-    }
+    // Redirect to unified handler
+    await _handleSendPaymentGuide(context, ref, request);
   }
 
   Future<void> _handleConfirmPayment(

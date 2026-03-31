@@ -472,42 +472,15 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     return _buildPhase2PaymentChoice();
   }
 
-  /// 선불/후불/무료 선택 UI — 설명 카드형 (시간 확정 후)
+  /// Single button → opens unified proposal BottomSheet
   Widget _buildPhase2PaymentChoice() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.phase2SelectMethod,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space3),
-        // 선불 카드: 결제 후 발급
-        _PaymentMethodCard(
-          title: AppStrings.methodPrepaidTitle,
-          description: AppStrings.methodPrepaidDesc,
-          onTap: widget.onSendPaymentGuide,
-          isPrimary: true,
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // 후불 카드: 먼저 발급
-        _PaymentMethodCard(
-          title: AppStrings.methodPostpaidTitle,
-          description: AppStrings.methodPostpaidDesc,
-          onTap: widget.onIssuePostpaid,
-          isPrimary: false,
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // 무료 카드: 무료 발급
-        _PaymentMethodCard(
-          title: AppStrings.methodFreeTitle,
-          description: AppStrings.methodFreeDesc,
-          onTap: widget.onIssueFree,
-          isPrimary: false,
-        ),
-      ],
+    return _buildActionRow(
+      icon: Icons.card_membership,
+      iconColor: AppColors.primary,
+      message: AppStrings.phase2SelectMethod,
+      primaryLabel: AppStrings.proposalTitle,
+      primaryIcon: Icons.arrow_forward,
+      onPrimary: widget.onSendPaymentGuide,
     );
   }
 

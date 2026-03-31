@@ -11,14 +11,19 @@ import '../../../subscription/domain/entities/subscription_template.dart';
 import '../../../subscription/presentation/providers/subscription_template_providers.dart';
 import '../../../subscription/presentation/widgets/selectable_template_card.dart';
 
-/// Result from the proposal bottom sheet.
+/// Payment method for subscription issuance.
+enum PaymentMethod { prepaid, postpaid, free }
+
+/// Result from the unified proposal bottom sheet.
 class ProposalResult {
+  final PaymentMethod paymentMethod;
   final List<String> templateIds;
   final String? bankAccountId;
-  final String? bankAccountDisplay; // "은행명 계좌번호" for chat message
+  final String? bankAccountDisplay;
   final String? message;
 
   const ProposalResult({
+    required this.paymentMethod,
     required this.templateIds,
     this.bankAccountId,
     this.bankAccountDisplay,
@@ -26,9 +31,10 @@ class ProposalResult {
   });
 }
 
-/// Bottom sheet for teacher to select subscription templates and send proposal.
+/// Unified bottom sheet for subscription issuance.
 ///
-/// Uses existing SelectableTemplateCard and BankAccount from teacher profile.
+/// Combines payment method selection, template selection, and bank account
+/// into a single flow. Bank account is only shown for prepaid method.
 Future<ProposalResult?> showProposalBottomSheet(
   BuildContext context, {
   required String teacherId,
@@ -51,6 +57,7 @@ class _ProposalSheet extends ConsumerStatefulWidget {
 }
 
 class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
+  PaymentMethod _paymentMethod = PaymentMethod.prepaid;
   final Set<String> _selectedIds = {};
   String? _selectedBankAccountId;
   final _messageController = TextEditingController();
@@ -98,7 +105,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           ),
           const SizedBox(height: AppSpacing.space3),
 
-          // Title
+          // Title + close
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
@@ -129,37 +136,28 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Template selection
-                  Text(
-                    AppStrings.proposalSelectTemplates,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  // 1. Payment method selection
+                  _buildSectionLabel(AppStrings.proposalPaymentMethod),
+                  const SizedBox(height: AppSpacing.space2),
+                  _buildPaymentMethodSelector(),
+                  const SizedBox(height: AppSpacing.space4),
+
+                  // 2. Template selection
+                  _buildSectionLabel(AppStrings.proposalSelectTemplates),
                   const SizedBox(height: AppSpacing.space2),
                   _buildTemplateList(templatesAsync),
                   const SizedBox(height: AppSpacing.space4),
 
-                  // Bank account selection
-                  Text(
-                    AppStrings.proposalBankAccount,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.space2),
-                  _buildBankAccountSelector(profileAsync),
-                  const SizedBox(height: AppSpacing.space4),
+                  // 3. Bank account (prepaid only)
+                  if (_paymentMethod == PaymentMethod.prepaid) ...[
+                    _buildSectionLabel(AppStrings.proposalBankAccount),
+                    const SizedBox(height: AppSpacing.space2),
+                    _buildBankAccountSelector(profileAsync),
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
 
-                  // Optional message
-                  Text(
-                    AppStrings.paymentMessageHint,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
+                  // 4. Optional message
+                  _buildSectionLabel(AppStrings.paymentMessageHint),
                   const SizedBox(height: AppSpacing.space1),
                   TextField(
                     controller: _messageController,
@@ -170,16 +168,16 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                         color: AppColors.textTertiaryLight,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium),
-                        borderSide: const BorderSide(
-                            color: AppColors.borderLight),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderSide:
+                            const BorderSide(color: AppColors.borderLight),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMedium),
-                        borderSide: const BorderSide(
-                            color: AppColors.borderLight),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderSide:
+                            const BorderSide(color: AppColors.borderLight),
                       ),
                       contentPadding:
                           const EdgeInsets.all(AppSpacing.space3),
@@ -203,7 +201,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                         ),
                       ),
                       child: Text(
-                        AppStrings.proposalSend,
+                        _submitLabel,
                         style: AppTypography.buttonSmall.copyWith(
                           color: Colors.white,
                         ),
@@ -219,6 +217,80 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       ),
     );
   }
+
+  String get _submitLabel {
+    return switch (_paymentMethod) {
+      PaymentMethod.prepaid => AppStrings.actionSendPaymentGuide,
+      PaymentMethod.postpaid => AppStrings.actionIssuePostpaid,
+      PaymentMethod.free => AppStrings.actionIssueFree,
+    };
+  }
+
+  Widget _buildSectionLabel(String text) {
+    return Text(
+      text,
+      style: AppTypography.bodySmall.copyWith(
+        color: AppColors.textSecondaryLight,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  // ── Payment Method Selector ────────────────────────────────
+
+  Widget _buildPaymentMethodSelector() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          _buildMethodChip(
+            label: AppStrings.methodPrepaidChip,
+            method: PaymentMethod.prepaid,
+          ),
+          _buildMethodChip(
+            label: AppStrings.methodPostpaidChip,
+            method: PaymentMethod.postpaid,
+          ),
+          _buildMethodChip(
+            label: AppStrings.methodFreeChip,
+            method: PaymentMethod.free,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMethodChip({
+    required String label,
+    required PaymentMethod method,
+  }) {
+    final isSelected = _paymentMethod == method;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _paymentMethod = method),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium - 1),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppTypography.bodySmall.copyWith(
+              color: isSelected ? Colors.white : AppColors.textSecondaryLight,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Template List ──────────────────────────────────────────
 
   Widget _buildTemplateList(
     AsyncValue<List<SubscriptionTemplate>> templatesAsync,
@@ -278,15 +350,13 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     );
   }
 
+  // ── Bank Account Selector ──────────────────────────────────
+
   Widget _buildBankAccountSelector(
     AsyncValue<TeacherProfile?> profileAsync,
   ) {
     final profile = profileAsync.valueOrNull;
-    if (profile == null) {
-      return profileAsync.isLoading
-          ? const SizedBox.shrink()
-          : const SizedBox.shrink();
-    }
+    if (profile == null) return const SizedBox.shrink();
 
     final accounts = profile.bankAccounts;
     if (accounts.isEmpty && profile.bankAccount == null) {
@@ -327,6 +397,11 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           profile.defaultBankAccount?.id ?? allAccounts.first.id;
     }
 
+    // Find selected account for display
+    final selectedAccount = allAccounts
+        .where((a) => a.id == _selectedBankAccountId)
+        .firstOrNull;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space3,
@@ -341,7 +416,23 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         value: _selectedBankAccountId,
         isExpanded: true,
         underline: const SizedBox.shrink(),
-        style: AppTypography.bodySmall,
+        style: AppTypography.bodySmall.copyWith(
+          color: AppColors.textPrimaryLight,
+        ),
+        selectedItemBuilder: (context) {
+          return allAccounts.map((account) {
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '${account.bankName} ${account.accountNumber}'
+                '${account.isDefault ? ' (기본)' : ''}',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
+            );
+          }).toList();
+        },
         items: allAccounts.map((account) {
           final isDefault = account.isDefault;
           return DropdownMenuItem(
@@ -364,6 +455,8 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     );
   }
 
+  // ── Actions ────────────────────────────────────────────────
+
   void _toggleTemplate(String id) {
     setState(() {
       if (_selectedIds.contains(id)) {
@@ -375,27 +468,35 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
   }
 
   void _submit() {
-    // Get bank account display for chat message
-    final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
     String? bankDisplay;
-    if (profile != null && _selectedBankAccountId != null) {
-      final allAccounts = [
-        ...profile.bankAccounts,
-        if (profile.bankAccount != null) profile.bankAccount!,
-      ];
-      final selected = allAccounts
-          .where((a) => a.id == _selectedBankAccountId)
-          .firstOrNull;
-      if (selected != null) {
-        bankDisplay =
-            '${selected.bankName} ${selected.accountNumber} ${selected.accountHolder}';
+    if (_paymentMethod == PaymentMethod.prepaid &&
+        _selectedBankAccountId != null) {
+      final profile =
+          ref.read(teacherExtendedProfileProvider).valueOrNull;
+      if (profile != null) {
+        final allAccounts = [
+          ...profile.bankAccounts,
+          if (profile.bankAccount != null) profile.bankAccount!,
+        ];
+        final selected = allAccounts
+            .where((a) => a.id == _selectedBankAccountId)
+            .firstOrNull;
+        if (selected != null) {
+          bankDisplay =
+              '${selected.bankName} ${selected.accountNumber} ${selected.accountHolder}';
+        }
       }
     }
 
     Navigator.of(context).pop(ProposalResult(
+      paymentMethod: _paymentMethod,
       templateIds: _selectedIds.toList(),
-      bankAccountId: _selectedBankAccountId,
-      bankAccountDisplay: bankDisplay,
+      bankAccountId: _paymentMethod == PaymentMethod.prepaid
+          ? _selectedBankAccountId
+          : null,
+      bankAccountDisplay: _paymentMethod == PaymentMethod.prepaid
+          ? bankDisplay
+          : null,
       message: _messageController.text.isEmpty
           ? null
           : _messageController.text,

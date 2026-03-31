@@ -2,7 +2,7 @@
 
 > 작성일: 2026-01-27
 > 최종 수정: 2026-03-12
-> 상태: 스펙 확정 (v7 - 제안/발급 통합, Template-First UX)
+> 상태: 스펙 확정 (v8 - 통합 발급 BottomSheet, 결제방법 선택 통합)
 > 관련 문서: [subscription_system_spec.md](./subscription_system_spec.md), [teacher_availability_spec.md](../schedule/teacher_availability_spec.md)
 
 ---
@@ -25,6 +25,7 @@
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| v8 | 2026-04-01 | **통합 발급 BottomSheet**: 카드 3개 → 버튼 1개 진입, 결제방법(선불/후불/무료) + 템플릿 + 계좌를 하나의 Sheet에 통합, 악기별 디폴트 템플릿 자동 선택, 입금계좌는 선불일 때만 노출, 무료 발급 모든 레슨 타입 허용 |
 | v7 | 2026-03-12 | **제안/발급 통합 (Template-First UX)**: 수강권 발급 화면 제거 → 제안 플로우로 통합, Selectable Card UI 도입 (최대 3개), "즉시 발급" 옵션 추가 |
 | v6 | 2026-02-01 | 제안 상세 헤더 UI 개선 (정사각형→직사각형), "N개 중 선택" 표현 제거 |
 | v5 | 2026-01-30 | 앱 전환 플로우 추가 (섹션 8.5), 자동 스케줄 로직 보완 |
