@@ -499,6 +499,17 @@ class AppStrings {
 
   // ── Action Box Phase 2,3,4 ─────────────────────────────────
 
+  /// Phase 2: 수강권 발급 방법 선택 헤더
+  static const phase2SelectMethod = '수강권 발급 방법을 선택하세요';
+
+  /// Phase 2: 선불 카드
+  static const methodPrepaidTitle = '결제 후 발급 (선불)';
+  static const methodPrepaidDesc = '학생에게 결제 안내를 보내고, 입금 확인 후 수강권이 발급됩니다';
+
+  /// Phase 2: 후불 카드
+  static const methodPostpaidTitle = '먼저 발급 (후불)';
+  static const methodPostpaidDesc = '수강권을 바로 발급하고, 결제는 나중에 받습니다';
+
   /// Phase 2: Teacher → 결제 안내 전송 (선불)
   static const actionSendPaymentGuide = '결제 안내 보내기';
 

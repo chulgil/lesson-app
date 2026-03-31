@@ -487,44 +487,32 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     return _buildPhase2PaymentChoice();
   }
 
-  /// 선불/후불 선택 UI (시간 확정 후)
+  /// 선불/후불 선택 UI — 설명 카드형 (시간 확정 후)
   Widget _buildPhase2PaymentChoice() {
-    return _buildSection(
-      icon: Icons.payment,
-      iconColor: AppColors.info,
-      message: AppStrings.phase2TimeConfirmedTeacher,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: AppSpacing.space2),
-        // 선불: 결제 안내 보내기 (primary)
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: widget.onSendPaymentGuide,
-            icon: const Icon(Icons.send, size: 16),
-            label: const Text(AppStrings.actionSendPaymentGuide),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-            ),
+        Text(
+          AppStrings.phase2SelectMethod,
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textPrimaryLight,
           ),
         ),
+        const SizedBox(height: AppSpacing.space3),
+        // 선불 카드: 결제 후 발급
+        _PaymentMethodCard(
+          title: AppStrings.methodPrepaidTitle,
+          description: AppStrings.methodPrepaidDesc,
+          onTap: widget.onSendPaymentGuide,
+          isPrimary: true,
+        ),
         const SizedBox(height: AppSpacing.space2),
-        // 후불: 수강권 먼저 발급 (secondary)
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: widget.onIssuePostpaid,
-            icon: const Icon(Icons.card_membership, size: 16),
-            label: const Text(AppStrings.actionIssuePostpaid),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.borderLight),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-            ),
-          ),
+        // 후불 카드: 먼저 발급
+        _PaymentMethodCard(
+          title: AppStrings.methodPostpaidTitle,
+          description: AppStrings.methodPostpaidDesc,
+          onTap: widget.onIssuePostpaid,
+          isPrimary: false,
         ),
       ],
     );
@@ -1007,3 +995,65 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 }
 
 enum _TurnState { myTurn, theirTurn, terminal }
+
+/// Selectable card for payment method (prepaid / postpaid).
+class _PaymentMethodCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final VoidCallback? onTap;
+  final bool isPrimary;
+
+  const _PaymentMethodCard({
+    required this.title,
+    required this.description,
+    required this.onTap,
+    required this.isPrimary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isPrimary
+          ? AppColors.primary.withValues(alpha: 0.04)
+          : AppColors.surfaceLight,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.space3),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            border: Border.all(
+              color: isPrimary
+                  ? AppColors.primary.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: isPrimary
+                      ? AppColors.primary
+                      : AppColors.textPrimaryLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.space1),
+              Text(
+                description,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
