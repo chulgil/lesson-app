@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../providers/recording_comparison_provider.dart';
+import 'waveform/zoomable_waveform.dart';
 
 /// Shows the recording comparison bottom sheet.
 /// [recordings] must be sorted by createdAt ascending.
@@ -58,6 +59,8 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
   bool _playingA = false;
   bool _playingB = false;
   bool _alternateMode = false;
+  bool _parallelMode = false; // Phase 2: parallel waveform mode
+  double _playbackRate = 1.0; // Phase 2: speed control
   Duration _positionA = Duration.zero;
   Duration _durationA = Duration.zero;
   Duration _positionB = Duration.zero;
@@ -308,29 +311,35 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       controller: widget.scrollController,
       padding: const EdgeInsets.all(AppSpacing.space4),
       children: [
-        // Recording A player
-        _buildPlayerCard(
-          label: 'A 이전 녹음 ($dateA)',
-          recording: _recordingA!,
-          isPlaying: _playingA,
-          position: _positionA,
-          duration: _durationA,
-          onPlay: _playA,
-          onStop: () => _playerA.stop(),
-        ),
-
+        // Mode toggle: sequential vs parallel
+        _buildModeToggle(),
         const SizedBox(height: AppSpacing.space4),
 
-        // Recording B player
-        _buildPlayerCard(
-          label: 'B 현재 녹음 ($dateB)',
-          recording: _recordingB!,
-          isPlaying: _playingB,
-          position: _positionB,
-          duration: _durationB,
-          onPlay: _playB,
-          onStop: () => _playerB.stop(),
-        ),
+        if (_parallelMode) ...[
+          // Parallel waveform view (Phase 2)
+          _buildParallelWaveformView(dateA, dateB),
+        ] else ...[
+          // Sequential player cards (Phase 1)
+          _buildPlayerCard(
+            label: 'A ($dateA)',
+            recording: _recordingA!,
+            isPlaying: _playingA,
+            position: _positionA,
+            duration: _durationA,
+            onPlay: _playA,
+            onStop: () => _playerA.stop(),
+          ),
+          const SizedBox(height: AppSpacing.space4),
+          _buildPlayerCard(
+            label: 'B ($dateB)',
+            recording: _recordingB!,
+            isPlaying: _playingB,
+            position: _positionB,
+            duration: _durationB,
+            onPlay: _playB,
+            onStop: () => _playerB.stop(),
+          ),
+        ],
 
         const SizedBox(height: AppSpacing.space6),
 
@@ -339,25 +348,297 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
 
         const SizedBox(height: AppSpacing.space4),
 
-        // Alternate listen toggle
-        Center(
-          child: FilterChip(
-            label: Text(
-              '번갈아 듣기',
-              style: AppTypography.bodyMedium.copyWith(
-                color: _alternateMode ? Colors.white : AppColors.textPrimaryLight,
+        // Speed control (Phase 2)
+        _buildSpeedControl(),
+
+        const SizedBox(height: AppSpacing.space3),
+
+        // Alternate listen toggle (sequential mode only)
+        if (!_parallelMode)
+          Center(
+            child: FilterChip(
+              label: Text(
+                '번갈아 듣기',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: _alternateMode ? Colors.white : AppColors.textPrimaryLight,
+                ),
               ),
+              selected: _alternateMode,
+              selectedColor: AppColors.primary,
+              avatar: Icon(
+                Icons.repeat,
+                size: 18,
+                color: _alternateMode ? Colors.white : AppColors.textSecondaryLight,
+              ),
+              onSelected: (v) => setState(() => _alternateMode = v),
             ),
-            selected: _alternateMode,
-            selectedColor: AppColors.primary,
-            avatar: Icon(
-              Icons.repeat,
-              size: 18,
-              color: _alternateMode ? Colors.white : AppColors.textSecondaryLight,
-            ),
-            onSelected: (v) => setState(() => _alternateMode = v),
+          ),
+      ],
+    );
+  }
+
+  /// Toggle between sequential and parallel mode.
+  Widget _buildModeToggle() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildModeChip(
+            icon: Icons.swap_vert,
+            label: '순차 재생',
+            isSelected: !_parallelMode,
+            onTap: () {
+              _stopAll();
+              setState(() => _parallelMode = false);
+            },
           ),
         ),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: _buildModeChip(
+            icon: Icons.vertical_split,
+            label: '병렬 파형',
+            isSelected: _parallelMode,
+            onTap: () {
+              _stopAll();
+              setState(() {
+                _parallelMode = true;
+                _alternateMode = false;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModeChip({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.08)
+              : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+            ),
+            const SizedBox(width: AppSpacing.space1),
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Parallel waveform comparison (Phase 2).
+  Widget _buildParallelWaveformView(String dateA, String dateB) {
+    final progressA = _durationA.inMilliseconds > 0
+        ? _positionA.inMilliseconds / _durationA.inMilliseconds
+        : 0.0;
+    final progressB = _durationB.inMilliseconds > 0
+        ? _positionB.inMilliseconds / _durationB.inMilliseconds
+        : 0.0;
+
+    return Column(
+      children: [
+        // Waveform A
+        _buildWaveformCard(
+          label: 'A ($dateA)',
+          isPlaying: _playingA,
+          progress: progressA,
+          duration: _durationA,
+          position: _positionA,
+          bpmText: _recordingA!.bpmText,
+          onSeek: (p) => _playerA.seek(
+            Duration(milliseconds: (p * _durationA.inMilliseconds).round()),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        // Waveform B
+        _buildWaveformCard(
+          label: 'B ($dateB)',
+          isPlaying: _playingB,
+          progress: progressB,
+          duration: _durationB,
+          position: _positionB,
+          bpmText: _recordingB!.bpmText,
+          onSeek: (p) => _playerB.seek(
+            Duration(milliseconds: (p * _durationB.inMilliseconds).round()),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+        // Sync play/stop controls
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              onPressed: _playSynced,
+              icon: Icon(
+                _playingA || _playingB ? Icons.stop : Icons.play_arrow,
+                color: Colors.white,
+              ),
+              label: Text(
+                _playingA || _playingB ? '정지' : '동시 재생',
+                style: AppTypography.buttonSmall.copyWith(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWaveformCard({
+    required String label,
+    required bool isPlaying,
+    required double progress,
+    required Duration duration,
+    required Duration position,
+    required String? bpmText,
+    required ValueChanged<double> onSeek,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        border: Border.all(
+          color: isPlaying ? AppColors.primary : AppColors.borderLight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                label,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${_formatDuration(position)} / ${_formatDuration(duration)}',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
+              ),
+              if (bpmText != null) ...[
+                const SizedBox(width: AppSpacing.space2),
+                Text(
+                  bpmText,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          ZoomableWaveformProgressBar(
+            progress: progress.clamp(0.0, 1.0),
+            duration: duration,
+            onSeek: onSeek,
+            height: 50,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Synchronized playback: play both A and B simultaneously.
+  Future<void> _playSynced() async {
+    if (_playingA || _playingB) {
+      await _stopAll();
+      return;
+    }
+    await _playerA.setPlaybackRate(_playbackRate);
+    await _playerB.setPlaybackRate(_playbackRate);
+    await _playerA.play(DeviceFileSource(_recordingA!.filePath));
+    await _playerB.play(DeviceFileSource(_recordingB!.filePath));
+  }
+
+  /// Speed control widget.
+  Widget _buildSpeedControl() {
+    const speeds = [0.5, 0.75, 1.0, 1.25, 1.5];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.speed, size: 16, color: AppColors.textTertiaryLight),
+        const SizedBox(width: AppSpacing.space2),
+        ...speeds.map((speed) {
+          final isSelected = (_playbackRate - speed).abs() < 0.01;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: GestureDetector(
+              onTap: () async {
+                setState(() => _playbackRate = speed);
+                await _playerA.setPlaybackRate(speed);
+                await _playerB.setPlaybackRate(speed);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space2,
+                  vertical: AppSpacing.space1,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.primary.withValues(alpha: 0.1)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.borderLight,
+                  ),
+                ),
+                child: Text(
+                  '${speed}x',
+                  style: AppTypography.caption.copyWith(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
       ],
     );
   }
