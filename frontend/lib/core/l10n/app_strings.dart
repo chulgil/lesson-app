@@ -396,7 +396,7 @@ class AppStrings {
   static const eventExpire = '기간 만료';
   static const eventProposalSent = '수강권 제안';
   static const eventProposalAccepted = '수강권 수락';
-  static const eventPaymentNotified = '결제 완료';
+  static const eventPaymentNotified = '입금 알림';
   static const eventCompleted = '발급 완료';
   static const eventWithdrawApproval = '결정 변경';
   static const eventPaymentRequested = '결제 안내';
@@ -420,11 +420,11 @@ class AppStrings {
   static const chatExpire = '요청이 만료되었습니다';
   static const chatProposalSent = '수강권 안내를 보냈습니다';
   static const chatProposalAccepted = '수강권을 수락했습니다';
-  static const chatPaymentNotified = '입금 완료를 알렸습니다';
+  static const chatPaymentNotified = '입금했습니다';
   static const chatCompleted = '수강권이 발급되었습니다';
   static const chatWithdrawApproval = '결정을 변경했습니다';
   static const chatPaymentRequested = '결제 안내를 보냈습니다';
-  static const chatPaymentConfirmed = '입금이 확인되었습니다';
+  static const chatPaymentConfirmed = '입금을 확인했습니다';
   static const chatSubscriptionIssued = '수강권이 발행되었습니다';
   static const chatLessonCompleted = '레슨이 완료되었습니다';
   static const chatLessonCancelled = '레슨이 취소되었습니다';

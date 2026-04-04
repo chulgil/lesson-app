@@ -367,8 +367,12 @@ class RequestHistoryChat extends StatelessWidget {
     );
   }
 
-  /// System guide message at the top of chat
+  /// Status-specific guide at the top of chat history.
+  /// Returns SizedBox.shrink() when no action is required (wait state).
   Widget _buildSystemGuide() {
+    final guide = _getPhaseGuide();
+    if (guide == null) return const SizedBox.shrink();
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space4),
       child: Container(
@@ -384,13 +388,26 @@ class RequestHistoryChat extends StatelessWidget {
                 size: 18, color: AppColors.info),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
-              child: Text(
-                viewerRole == 'student'
-                    ? AppStrings.studentRequestGuideMessage
-                    : AppStrings.requestGuideMessage,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    guide.situation,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  if (guide.action != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      guide.action!,
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textPrimaryLight,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],
