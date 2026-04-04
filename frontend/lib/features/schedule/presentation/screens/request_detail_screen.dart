@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,7 +9,6 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../core/utils/date_format_utils.dart';
-import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../students/domain/entities/student.dart';
@@ -51,9 +52,43 @@ class RequestDetailScreen extends ConsumerStatefulWidget {
 class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   int? _preselectedSlot;
   final Set<RequestPhase> _expandedChapters = {};
+  String? _eventMessage;
+  Color _eventColor = AppColors.success;
+  IconData _eventIcon = Icons.check_circle;
+  Timer? _eventTimer;
 
   String get viewerRole => widget.viewerRole;
   String get requestId => widget.requestId;
+
+  @override
+  void dispose() {
+    _eventTimer?.cancel();
+    super.dispose();
+  }
+
+  void _showEventMessage(String message, {
+    Color color = AppColors.success,
+    IconData icon = Icons.check_circle,
+  }) {
+    _eventTimer?.cancel();
+    setState(() {
+      _eventMessage = message;
+      _eventColor = color;
+      _eventIcon = icon;
+    });
+    _eventTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _eventMessage = null);
+    });
+  }
+
+  void _showSuccess(String message) =>
+      _showEventMessage(message, color: AppColors.success, icon: Icons.check_circle);
+
+  void _showError([String message = '오류가 발생했습니다']) =>
+      _showEventMessage(message, color: AppColors.error, icon: Icons.error_outline);
+
+  void _showInfo(String message) =>
+      _showEventMessage(message, color: AppColors.textSecondaryLight, icon: Icons.info_outline);
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +190,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 ),
               ),
 
+              // Event feedback strip (above action bar)
+              _buildEventStrip(),
+
               // Bottom action bar (phase-aware)
               CurrentRequestBox(
                 request: request,
@@ -213,6 +251,42 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   /// Simple AppBar: "< 스케줄요청 박지호 (정규레슨)"
   /// Tap name → bottom sheet profile
+  Widget _buildEventStrip() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _eventMessage != null
+          ? Container(
+              key: ValueKey(_eventMessage),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space2,
+              ),
+              color: _eventColor.withValues(alpha: 0.12),
+              child: Row(
+                children: [
+                  Icon(_eventIcon, size: 16, color: _eventColor),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      _eventMessage!,
+                      style: AppTypography.caption.copyWith(
+                        color: _eventColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => setState(() => _eventMessage = null),
+                    child: Icon(Icons.close, size: 14, color: _eventColor),
+                  ),
+                ],
+              ),
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
   AppBar _buildChatAppBar(
     BuildContext context,
     UnifiedLessonRequest request,
@@ -395,9 +469,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppStrings.acceptError)),
-        );
+        _showError(AppStrings.acceptError);
       }
     }
   }
@@ -444,7 +516,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           reason: result.message,
         );
         if (context.mounted) {
-          showInfoSnackBar(context, AppStrings.requestUnavailable);
+          _showInfo(AppStrings.requestUnavailable);
         }
       } else {
         // Propose alternatives
@@ -466,12 +538,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           message: result.message,
         );
         if (context.mounted) {
-          showSuccessSnackBar(context, AppStrings.alternativeProposeSent);
+          _showSuccess(AppStrings.alternativeProposeSent);
         }
       }
     } catch (e) {
       if (context.mounted) {
-        showErrorSnackBar(context);
+        _showError();
       }
     }
   }
@@ -570,7 +642,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           reason: result.message,
         );
         if (context.mounted) {
-          showInfoSnackBar(context, AppStrings.requestUnavailable);
+          _showInfo(AppStrings.requestUnavailable);
         }
       } else {
         // Propose alternatives — withdraw + propose
@@ -598,12 +670,12 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           message: result.message,
         );
         if (context.mounted) {
-          showSuccessSnackBar(context, AppStrings.alternativeProposeSent);
+          _showSuccess(AppStrings.alternativeProposeSent);
         }
       }
     } catch (e) {
       if (context.mounted) {
-        showErrorSnackBar(context);
+        _showError();
       }
     }
   }
@@ -655,7 +727,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             message: message,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.proposalSend);
+            _showSuccess(AppStrings.proposalSend);
           }
 
         case PaymentMethod.postpaid:
@@ -666,7 +738,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             paymentConfirmed: false,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.actionIssuePostpaid);
+            _showSuccess(AppStrings.actionIssuePostpaid);
           }
 
         case PaymentMethod.free:
@@ -677,11 +749,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             paymentConfirmed: true,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.actionIssueFree);
+            _showSuccess(AppStrings.actionIssueFree);
           }
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -718,10 +790,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.studentId,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionConfirmPayment);
+        _showSuccess(AppStrings.actionConfirmPayment);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -740,10 +812,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         message: '입금이 확인되어 수강권이 발급되었습니다',
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionVerifyPayment);
+        _showSuccess(AppStrings.actionVerifyPayment);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -762,10 +834,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         selectedTemplateId: selectedTemplateId,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.eventProposalAccepted);
+        _showSuccess(AppStrings.eventProposalAccepted);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -784,10 +856,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         reason: reason,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.eventReject);
+        _showSuccess(AppStrings.eventReject);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -806,10 +878,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.studentId,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionLessonComplete);
+        _showSuccess(AppStrings.actionLessonComplete);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -835,10 +907,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.studentId,
       );
       if (context.mounted) {
-        showInfoSnackBar(context, AppStrings.actionLessonCancel);
+        _showInfo(AppStrings.actionLessonCancel);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -899,10 +971,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           message: result.message.isEmpty ? null : result.message,
         );
         if (context.mounted) {
-          showSuccessSnackBar(context, AppStrings.scheduleChangePropose);
+          _showSuccess(AppStrings.scheduleChangePropose);
         }
       } catch (e) {
-        if (context.mounted) showErrorSnackBar(context);
+        if (context.mounted) _showError();
       }
     } else {
       // Step 2b: Bulk change — navigate to regular schedule change screen
@@ -942,10 +1014,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               : regularResult.message,
         );
         if (context.mounted) {
-          showSuccessSnackBar(context, AppStrings.scheduleChangePropose);
+          _showSuccess(AppStrings.scheduleChangePropose);
         }
       } catch (e) {
-        if (context.mounted) showErrorSnackBar(context);
+        if (context.mounted) _showError();
       }
     }
   }
@@ -1000,7 +1072,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             message: result.message.isEmpty ? null : result.message,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.scheduleChangeConfirmed);
+            _showSuccess(AppStrings.scheduleChangeConfirmed);
           }
 
         case ScheduleChangeResponseAction.reject:
@@ -1013,7 +1085,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             message: result.message.isEmpty ? null : result.message,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.scheduleChangeReject);
+            _showSuccess(AppStrings.scheduleChangeReject);
           }
 
         case ScheduleChangeResponseAction.counter:
@@ -1037,11 +1109,11 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             message: result.message.isEmpty ? null : result.message,
           );
           if (context.mounted) {
-            showSuccessSnackBar(context, AppStrings.scheduleChangeCounter);
+            _showSuccess(AppStrings.scheduleChangeCounter);
           }
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -1058,10 +1130,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.studentId,
       );
       if (context.mounted) {
-        showSuccessSnackBar(context, AppStrings.actionAddNote);
+        _showSuccess(AppStrings.actionAddNote);
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -1089,15 +1161,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.studentId,
       );
       if (context.mounted) {
-        showSuccessSnackBar(
-          context,
+        _showSuccess(
           viewerRole == 'teacher'
               ? AppStrings.actionProposeRenewal
               : AppStrings.actionRequestRenewal,
         );
       }
     } catch (e) {
-      if (context.mounted) showErrorSnackBar(context);
+      if (context.mounted) _showError();
     }
   }
 
@@ -1290,9 +1361,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   void _handleModify(BuildContext context, UnifiedLessonRequest request) {
     // TODO: Navigate to edit screen (requires request edit flow)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppStrings.modifyRequestPreparing)),
-    );
+    _showError(AppStrings.modifyRequestPreparing);
   }
 
   void _handleCancel(
