@@ -619,78 +619,116 @@ class RequestHistoryChat extends StatelessWidget {
 
     final isTeacher = viewerId == request!.teacherId;
 
-    // ── Guide message design rule ───────────────────────────────
+    // ── Guide design rule (v3) ──────────────────────────────────
     //
-    // 1. situation = "현재 상태" (과거 이벤트 X, 히스토리에 이미 있음)
-    // 2. action    = "내가 해야 할 일" (볼드) — null이면 대기 상태
-    // 3. 상대방 행동은 말풍선으로 이미 보이므로 가이드에서 반복하지 않음
-    //
-    // ─────────────────────────────────────────────────────────────
-
-    // ── Guide visibility rule ─────────────────────────────────
-    //
-    // Show guide ONLY when the viewer has an action to take.
-    // Wait states (no action) → null (no guide shown).
-    // The opponent's past actions are already visible as chat bubbles.
+    // 모든 상태에서 가���드를 표시한다.
+    // title  = 리스트 상태 라벨과 일치 (현재 단계 인지)
+    // situation = 현재 상태 설명
+    // action = 내가 해야 할 일 (볼드) — 대기 시에도 대기 상태를 안내
     //
     // ─────────────────────────────────────────────────────────────
 
     return switch (request!.status) {
-      // ── Phase 1: 신청 ──
+      // ── Phase 1: 대기 ──
       UnifiedRequestStatus.pending => isTeacher
           ? const _PhaseGuide(
-              title: '신청 접수',
+              title: '대기',
               situation: '새로운 레슨 신청이 도착했습니다',
               action: '희망 시간을 확인하고 수락 또는 다른 시간을 제안해주세요',
             )
-          : null, // 대기 — 선생님 응답은 말풍선으로 확인
+          : const _PhaseGuide(
+              title: '대기',
+              situation: '선생님의 응답을 기다리고 있습니다',
+            ),
 
       // ── Phase 1: 시간 조율 ──
       UnifiedRequestStatus.approved ||
       UnifiedRequestStatus.negotiating => isTeacher
           ? const _PhaseGuide(
-              title: '시간 조율 중',
+              title: '시간 조율',
               situation: '레슨 시간을 조율하고 있습니다',
               action: '시간을 수락하거나 다른 시간을 역제안해주세요',
             )
           : const _PhaseGuide(
-              title: '시간 조율 중',
+              title: '시간 조율',
               situation: '새로운 시간이 제안되었습니다',
               action: '제안된 시간을 확인하고 수락해주세요',
             ),
 
-      // ── Phase 2: 시간 확정 → 수강권 발급 ──
+      // ── Phase 2: 시간 확정 ──
       UnifiedRequestStatus.timeConfirmed => isTeacher
           ? const _PhaseGuide(
-              title: '수강권 발급',
+              title: '시간확정',
               situation: '레슨 시간이 확정되었습니다',
               action: '수강권 종류와 결제 방법을 선택해 발급해주세요',
             )
-          : null, // 대기 — 선생님의 수강권 안내는 말풍선으로 확인
-
-      // ── Phase 2: 결제 대기 ──
-      UnifiedRequestStatus.proposalSent ||
-      UnifiedRequestStatus.proposalAccepted => isTeacher
-          ? null // 대기 — 학생의 결제 알림은 말풍선으로 확인
           : const _PhaseGuide(
-              title: '결제',
-              situation: '수강권 안내를 확인하고 결제를 완료해주세요',
+              title: '시간확정',
+              situation: '레슨 시간이 확정되었습니다',
+              action: '선생님이 수강권 안내를 보내면 알림을 드립니다',
             ),
 
-      // ── Phase 2: 입금 확인 ──
-      // 학생 말풍선 "입금했습니다" + 하단 액션 박스에 확인 버튼이 이미 있음
-      UnifiedRequestStatus.paymentNotified => null,
+      // ── Phase 2: 수강권 제안 ──
+      UnifiedRequestStatus.proposalSent => isTeacher
+          ? const _PhaseGuide(
+              title: '제안완료',
+              situation: '수강권 안내를 보냈습니다',
+              action: '학생이 수락하면 알림을 드립니다',
+            )
+          : const _PhaseGuide(
+              title: '제안완료',
+              situation: '수강권 안내가 도착했습니다',
+              action: '안내를 확인하고 수락 또는 거절해주세요',
+            ),
+
+      // ── Phase 2: 수강권 수락 ──
+      UnifiedRequestStatus.proposalAccepted => isTeacher
+          ? const _PhaseGuide(
+              title: '수강권수락',
+              situation: '학생이 수강권을 수락했습니다',
+              action: '학생의 입금을 기다리고 있습니다',
+            )
+          : const _PhaseGuide(
+              title: '수강권수락',
+              situation: '수강권을 수락했습니다',
+              action: '결제를 완료해주세요',
+            ),
+
+      // ── Phase 2: 입금 완료 ──
+      UnifiedRequestStatus.paymentNotified => isTeacher
+          ? const _PhaseGuide(
+              title: '입금완료',
+              situation: '학생이 입금을 완료했습니다',
+              action: '입금을 확인하고 수강권을 발급해주세요',
+            )
+          : const _PhaseGuide(
+              title: '입금완료',
+              situation: '입금 완료를 알렸습니다',
+              action: '선생님이 확인하면 수강권이 발급됩니다',
+            ),
+
+      // ── Phase 2: 수강권 발행 ──
+      UnifiedRequestStatus.subscriptionIssued => isTeacher
+          ? const _PhaseGuide(
+              title: '수강권발행',
+              situation: '수강권이 발행되었습니다',
+              action: '레슨을 시작할 준비가 완료되었습니다',
+            )
+          : const _PhaseGuide(
+              title: '수강권발행',
+              situation: '수강권이 발행되었습니다',
+              action: '레슨 일정에 맞춰 참석해주세요',
+            ),
 
       // ── Phase 3: 레슨 진행 ──
-      UnifiedRequestStatus.subscriptionIssued ||
       UnifiedRequestStatus.inProgress => isTeacher
           ? const _PhaseGuide(
-              title: '레슨 진행 중',
+              title: '레슨진행',
               situation: '레슨이 진행 중입니다',
               action: '레슨 후 출석 처리와 기록을 남겨주세요',
             )
           : const _PhaseGuide(
-              title: '레슨 진행 중',
+              title: '레슨진행',
               situation: '레슨이 진행 중입니다',
               action: '레슨 일정에 맞춰 참석해주세요',
             ),
@@ -698,31 +736,42 @@ class RequestHistoryChat extends StatelessWidget {
       // ── Phase 4: 수강 완료 ──
       UnifiedRequestStatus.completed => isTeacher
           ? const _PhaseGuide(
-              title: '수강 완료',
+              title: '수강완료',
               situation: '모든 레슨 수강이 완료되었습니다',
               action: '새 수강권을 발급하려면 학생에게 안내해주세요',
             )
           : const _PhaseGuide(
-              title: '수강 완료',
+              title: '수강완료',
               situation: '모든 레슨 수강이 완료되었습니다',
               action: '계속 수업을 원하시면 새로 신청해주세요',
             ),
 
       // ── 종료: 거절 ──
       UnifiedRequestStatus.rejected => isTeacher
-          ? null // 선생님이 거절한 것 — 말풍선에서 이미 확인
+          ? const _PhaseGuide(
+              title: '거절',
+              situation: '이 레슨 요청을 거절했습니다',
+            )
           : const _PhaseGuide(
-              title: '거절됨',
+              title: '��절',
               situation: '레슨 요청이 거절되었습니다',
               action: '다른 선생님이나 시간을 변경해 다시 신청할 수 있습니다',
             ),
 
-      // ── 종료: 취소/만료 ──
-      UnifiedRequestStatus.cancelled => null,
+      // ── 종료: 취소 ──
+      UnifiedRequestStatus.cancelled => const _PhaseGuide(
+              title: '취소',
+              situation: '이 레슨 요청이 취소되었습니다',
+            ),
+
+      // ── 종료: 기간만료 ──
       UnifiedRequestStatus.expired => isTeacher
-          ? null
+          ? const _PhaseGuide(
+              title: '기간만료',
+              situation: '응답 기간이 지나 자동 종료되었습니다',
+            )
           : const _PhaseGuide(
-              title: '기간 만료',
+              title: '기간만료',
               situation: '응답 기간이 지나 자동 종료되었습니다',
               action: '다시 신청하시면 선생님에게 알림이 전송됩니다',
             ),
