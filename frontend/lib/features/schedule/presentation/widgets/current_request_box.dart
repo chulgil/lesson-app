@@ -679,117 +679,53 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       _pendingScheduleChangeOwner == 'self';
 
   Widget _buildPhase3Lessons() {
-    // Show response UI if there's a pending schedule change for this viewer
-    if (_hasPendingScheduleChange) {
-      return _buildActionRow(
-        icon: Icons.schedule,
-        iconColor: AppColors.warning,
-        message: AppStrings.scheduleChangeRequestArrived,
-        primaryLabel: AppStrings.scheduleChangeAccept,
-        primaryIcon: Icons.reply,
-        onPrimary: widget.onScheduleChangeResponse,
-      );
-    }
-
-    // Show "in progress" if viewer's own proposal is pending
-    if (_hasOwnPendingScheduleChange) {
-      return _buildActionRow(
-        icon: Icons.schedule,
-        iconColor: AppColors.info,
-        message: AppStrings.scheduleChangeInProgress,
-        primaryLabel: AppStrings.actionScheduleChange,
-        primaryIcon: Icons.schedule,
-        onPrimary: null, // Disabled — waiting for opponent response
-      );
-    }
-
-    if (_isTeacher) {
-      return _buildTeacherLessonActions();
-    }
-
-    // Student: only schedule change
-    return _buildActionRow(
-      icon: Icons.music_note,
-      iconColor: AppColors.primary,
-      message: AppStrings.chapterLessons,
-      primaryLabel: AppStrings.actionRequestScheduleChange,
-      primaryIcon: Icons.schedule,
-      onPrimary: widget.onScheduleChange,
-    );
-  }
-
-  /// Teacher gets multiple action buttons for lesson management.
-  Widget _buildTeacherLessonActions() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Primary row: Lesson Complete + Lesson Cancel
-        Row(
-          children: [
-            Expanded(
-              child: _buildPrimaryButton(
-                label: AppStrings.actionLessonComplete,
-                icon: Icons.check_circle,
-                onPressed: widget.onLessonComplete,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: _buildOutlinedButton(
-                label: AppStrings.actionLessonCancel,
-                icon: Icons.cancel_outlined,
-                onPressed: widget.onLessonCancel,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.space2),
-        // Secondary row: Schedule Change + Add Note
-        Row(
-          children: [
-            Expanded(
-              child: _buildOutlinedButton(
-                label: AppStrings.actionScheduleChange,
-                icon: Icons.schedule,
-                onPressed: widget.onScheduleChange,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: _buildOutlinedButton(
-                label: AppStrings.actionAddNote,
-                icon: Icons.note_add,
-                onPressed: widget.onAddNote,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+    // Subscription summary card + message input only.
+    // Lesson management (attendance, schedule change) is handled in
+    // the subscription detail screen and calendar.
+    return _buildSubscriptionSummary();
   }
 
   // ── Phase 4: Completed ─────────────────────────────────────
 
   Widget _buildPhase4Completed() {
-    if (_isTeacher) {
-      return _buildActionRow(
-        icon: Icons.check_circle,
-        iconColor: AppColors.success,
-        message: AppStrings.eventSubscriptionCompleted,
-        primaryLabel: AppStrings.actionProposeRenewal,
-        primaryIcon: Icons.autorenew,
-        onPrimary: widget.onProposeRenewal,
-      );
-    }
+    return _buildSubscriptionSummary();
+  }
 
-    // Student
-    return _buildActionRow(
-      icon: Icons.check_circle,
-      iconColor: AppColors.success,
-      message: AppStrings.eventSubscriptionCompleted,
-      primaryLabel: AppStrings.actionRequestRenewal,
-      primaryIcon: Icons.replay,
-      onPrimary: widget.onRequestRenewal,
+  /// Subscription summary card — shown in Phase 3 and Phase 4.
+  /// Minimal info: subscription name + progress + link to detail.
+  Widget _buildSubscriptionSummary() {
+    return Row(
+      children: [
+        Icon(Icons.card_membership,
+            size: 18, color: AppColors.primary),
+        const SizedBox(width: AppSpacing.space2),
+        Expanded(
+          child: Text(
+            AppStrings.subscriptionSummaryMessage,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+        TextButton(
+          onPressed: widget.onProposeRenewal,
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+            ),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            AppStrings.subscriptionDetailLink,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

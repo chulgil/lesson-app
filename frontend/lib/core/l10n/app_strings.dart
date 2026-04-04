@@ -588,6 +588,14 @@ class AppStrings {
   /// 학생: 입금 확인 대기
   static const actionBoxWaitingVerify = '선생님의 입금 확인을 기다리고 있습니다';
 
+  // ── Subscription Summary (Phase 3/4 chat) ──────────────────
+
+  /// 수강권 요약 메시지
+  static const subscriptionSummaryMessage = '수강권이 발행되었습니다';
+
+  /// 수강권 상세 보기 링크
+  static const subscriptionDetailLink = '상세 보기';
+
   /// 결제 안내 BottomSheet
   static const paymentGuideTitle = '결제 안내 보내기';
   static const subscriptionTypeMonthly = '월정액';
