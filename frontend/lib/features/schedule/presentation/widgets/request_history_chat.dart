@@ -678,13 +678,8 @@ class RequestHistoryChat extends StatelessWidget {
             ),
 
       // ── Phase 2: 입금 확인 ──
-      // 학생 말풍선에 입금 완료 메시지가 이미 표시됨
-      UnifiedRequestStatus.paymentNotified => isTeacher
-          ? const _PhaseGuide(
-              title: '입금 확인',
-              situation: '입금 확인 후 수강권을 발급해주세요',
-            )
-          : null, // 대기 — 선생님의 확인은 말풍선으로 확인
+      // 학생 말풍선 "입금했습니다" + 하단 액션 박스에 확인 버튼이 이미 있음
+      UnifiedRequestStatus.paymentNotified => null,
 
       // ── Phase 3: 레슨 진행 ──
       UnifiedRequestStatus.subscriptionIssued ||
