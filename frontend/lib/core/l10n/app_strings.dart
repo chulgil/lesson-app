@@ -596,6 +596,9 @@ class AppStrings {
   /// 수강권 상세 보기 링크
   static const subscriptionDetailLink = '상세 보기';
 
+  /// 입금 확인 후 수강권 발급 메시지 (이벤트 기록용)
+  static const paymentVerifiedMessage = '입금이 확인되어 수강권이 발급되었습니다';
+
   /// 결제 안내 BottomSheet
   static const paymentGuideTitle = '결제 안내 보내기';
   static const subscriptionTypeMonthly = '월정액';

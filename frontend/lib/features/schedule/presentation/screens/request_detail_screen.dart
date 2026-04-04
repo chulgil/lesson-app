@@ -809,7 +809,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.teacherId,
         request.studentId,
         paymentConfirmed: true,
-        message: '입금이 확인되어 수강권이 발급되었습니다',
+        message: AppStrings.paymentVerifiedMessage,
       );
       if (context.mounted) {
         _showSuccess(AppStrings.actionVerifyPayment);
