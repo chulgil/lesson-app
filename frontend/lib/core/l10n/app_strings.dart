@@ -385,10 +385,10 @@ class AppStrings {
   // ── Phase 2, 3 Status Labels ──────────────────────────────
 
   /// 수강권 발행됨
-  static const statusSubscriptionIssued = '수강권발행';
+  static const statusSubscriptionIssued = '수강권 발행';
 
   /// 레슨 진행중
-  static const statusInProgress = '레슨진행';
+  static const statusInProgress = '레슨 진행';
 
   // ── Event Labels (for RequestEventType.label) ─────────────
 
@@ -572,7 +572,7 @@ class AppStrings {
   static const phase2WaitingPaymentStudent =
       '결제를 완료해주세요';
   static const phase2PaymentReceivedTeacher =
-      '입금을 확인하고 수강권을 발급해주세요';
+      '학생이 입금을 완료했습니다';
 
   // ── Action Box Messages (Phase 2 대기 상태) ─────────────────
 

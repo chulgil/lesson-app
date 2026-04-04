@@ -633,7 +633,6 @@ class UnifiedLessonRequest extends HiveObject {
       case UnifiedRequestStatus.pending:
         return AppStrings.actionRequired;        // 확인 필요
       case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;         // 승인
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
             ? AppStrings.responseRequired          // 응답 필요
@@ -668,7 +667,6 @@ class UnifiedLessonRequest extends HiveObject {
       case UnifiedRequestStatus.pending:
         return AppStrings.studentRequestSent;      // 요청 전송됨
       case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
             ? AppStrings.studentResponseWaiting    // 선생님 응답 대기

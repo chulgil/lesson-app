@@ -325,6 +325,24 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   ];
 
   String? _selectedDropdownValue;
+  bool _consentChecked = false;
+
+  static const _consentContent = '''
+[개인정보(계좌정보) 수집·이용 동의]
+
+1. 수집 항목
+  - 은행명, 계좌번호, 예금주
+
+2. 수집 목적
+  - 수강료 입금 안내를 위해 학생에게 계좌 정보를 표시
+
+3. 보유 기간
+  - 회원탈퇴 시까지 (탈퇴 후 30일 이내 파기)
+  - 계좌 변경이력: 전자상거래법에 따라 5년 보관
+
+4. 동의 거부 시 불이익
+  - 동의를 거부할 수 있으나, 계좌 등록이 불가합니다.
+''';
 
   @override
   void initState() {
@@ -371,8 +389,49 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
     }
   }
 
+  void _showConsentContent(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.5,
+        maxChildSize: 0.8,
+        minChildSize: 0.3,
+        expand: false,
+        builder: (context, scrollController) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              child: Text(
+                '개인정보 수집·이용 동의',
+                style: AppTypography.headingSmall,
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Text(
+                  _consentContent,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                    height: 1.6,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_consentChecked || !_formKey.currentState!.validate()) return;
 
     final account = BankAccount(
       id: 'ba_${DateTime.now().millisecondsSinceEpoch}',
@@ -403,6 +462,79 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             Text('계좌 추가', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space4),
 
+            // Consent checkbox
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.space3),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: _consentChecked
+                      ? AppColors.primary.withValues(alpha: 0.5)
+                      : AppColors.borderLight,
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(
+                      value: _consentChecked,
+                      onChanged: (v) =>
+                          setState(() => _consentChecked = v ?? false),
+                      activeColor: AppColors.primary,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () =>
+                          setState(() => _consentChecked = !_consentChecked),
+                      child: Text(
+                        '개인정보(계좌정보) 수집·이용 동의',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '필수',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
+                  GestureDetector(
+                    onTap: () => _showConsentContent(context),
+                    child: Text(
+                      '내용보기',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textTertiaryLight,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.space4),
+
             // Bank name (dropdown + text input)
             Text('은행명 *', style: AppTypography.buttonSmall),
             const SizedBox(height: AppSpacing.space2),
@@ -413,7 +545,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 SizedBox(
                   width: 140,
                   child: DropdownButtonFormField<String>(
-                    value: _selectedDropdownValue,
+                    initialValue: _selectedDropdownValue,
                     isExpanded: true,
                     decoration: InputDecoration(
                       hintText: '은행 선택',
@@ -517,7 +649,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _submit,
+                onPressed: _consentChecked ? _submit : null,
                 child: const Text('추가'),
               ),
             ),
