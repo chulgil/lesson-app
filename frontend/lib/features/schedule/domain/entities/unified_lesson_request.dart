@@ -631,21 +631,21 @@ class UnifiedLessonRequest extends HiveObject {
   String get teacherActionLabel {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return AppStrings.actionRequired;
+        return AppStrings.actionRequired;        // 확인 필요
       case UnifiedRequestStatus.approved:
-        return AppStrings.statusApproved;
+        return AppStrings.statusApproved;         // 승인
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
-            ? AppStrings.responseRequired
-            : AppStrings.responseWaiting;
+            ? AppStrings.responseRequired          // 응답 필요
+            : AppStrings.responseWaiting;          // 응답 대기
       case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.proposalNeeded;
+        return AppStrings.proposalNeeded;          // 제안 작성
       case UnifiedRequestStatus.proposalSent:
-        return AppStrings.statusProposalSent;
+        return '수락 대기';                        // 학생 수락 대기
       case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.statusProposalAccepted;
+        return '입금 대기';                        // 학생 입금 대기
       case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.statusPaymentDone;
+        return '입금 확인';                        // 입금 확인 필요
       case UnifiedRequestStatus.completed:
         return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:
@@ -666,21 +666,21 @@ class UnifiedLessonRequest extends HiveObject {
   String get studentActionLabel {
     switch (status) {
       case UnifiedRequestStatus.pending:
-        return AppStrings.studentRequestSent;
+        return AppStrings.studentRequestSent;      // 요청 전송됨
       case UnifiedRequestStatus.approved:
         return AppStrings.statusApproved;
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn
-            ? AppStrings.studentResponseWaiting
-            : AppStrings.studentResponseRequired;
+            ? AppStrings.studentResponseWaiting    // 선생님 응답 대기
+            : AppStrings.studentResponseRequired;  // 응답 필요
       case UnifiedRequestStatus.timeConfirmed:
-        return AppStrings.studentWaitingProposal;
+        return AppStrings.studentWaitingProposal;  // 수강권 대기
       case UnifiedRequestStatus.proposalSent:
-        return AppStrings.studentProposalArrived;
+        return AppStrings.studentProposalArrived;  // 수강권 도착
       case UnifiedRequestStatus.proposalAccepted:
-        return AppStrings.statusProposalAccepted;
+        return '결제 필요';                        // 결제 완료해야 함
       case UnifiedRequestStatus.paymentNotified:
-        return AppStrings.studentPaymentWaiting;
+        return AppStrings.studentPaymentWaiting;   // 입금 확인 중
       case UnifiedRequestStatus.completed:
         return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:
