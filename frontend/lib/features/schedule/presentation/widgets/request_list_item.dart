@@ -229,12 +229,8 @@ class RequestListItem extends StatelessWidget {
         ? request.studentActionColorKey
         : request.teacherActionColorKey;
     return switch (colorKey) {
-      'action' => AppColors.warning,
-      'wait' => AppColors.info,
-      'success' => AppColors.success,
-      'error' => AppColors.error,
-      'warning' => AppColors.warning,
-      _ => AppColors.textPrimaryLight,
+      'action' => AppColors.primary,
+      _ => AppColors.textTertiaryLight,
     };
   }
 }

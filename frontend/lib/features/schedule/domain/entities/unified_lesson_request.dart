@@ -697,55 +697,48 @@ class UnifiedLessonRequest extends HiveObject {
   }
 
   /// Color key for student action chip.
+  /// Color key: 'action' (내 차례), 'wait' (대기/종료)
   String get studentActionColorKey {
     switch (status) {
-      case UnifiedRequestStatus.pending:
-        return 'wait';
-      case UnifiedRequestStatus.negotiating:
-        return isTeacherTurn ? 'wait' : 'action';
-      case UnifiedRequestStatus.timeConfirmed:
-        return 'wait';
       case UnifiedRequestStatus.proposalSent:
-        return 'action';
       case UnifiedRequestStatus.proposalAccepted:
-      case UnifiedRequestStatus.approved:
-      case UnifiedRequestStatus.completed:
-      case UnifiedRequestStatus.subscriptionIssued:
-        return 'success';
       case UnifiedRequestStatus.inProgress:
         return 'action';
+      case UnifiedRequestStatus.negotiating:
+        return isTeacherTurn ? 'wait' : 'action';
+      case UnifiedRequestStatus.pending:
+      case UnifiedRequestStatus.approved:
+      case UnifiedRequestStatus.timeConfirmed:
       case UnifiedRequestStatus.paymentNotified:
-        return 'wait';
+      case UnifiedRequestStatus.subscriptionIssued:
+      case UnifiedRequestStatus.completed:
       case UnifiedRequestStatus.rejected:
       case UnifiedRequestStatus.cancelled:
       case UnifiedRequestStatus.expired:
-        return 'warning';
+        return 'wait';
     }
   }
 
   /// Color key for action chip: 'action', 'wait', 'success', 'error', 'warning'.
+  /// Color key: 'action' (내 차례), 'wait' (대기/종료)
   String get teacherActionColorKey {
     switch (status) {
       case UnifiedRequestStatus.pending:
       case UnifiedRequestStatus.timeConfirmed:
+      case UnifiedRequestStatus.paymentNotified:
+      case UnifiedRequestStatus.inProgress:
         return 'action';
       case UnifiedRequestStatus.negotiating:
         return isTeacherTurn ? 'action' : 'wait';
+      case UnifiedRequestStatus.approved:
       case UnifiedRequestStatus.proposalSent:
       case UnifiedRequestStatus.proposalAccepted:
-        return 'wait';
-      case UnifiedRequestStatus.approved:
-      case UnifiedRequestStatus.completed:
       case UnifiedRequestStatus.subscriptionIssued:
-        return 'success';
-      case UnifiedRequestStatus.inProgress:
-        return 'action';
-      case UnifiedRequestStatus.paymentNotified:
-        return 'error';
+      case UnifiedRequestStatus.completed:
       case UnifiedRequestStatus.rejected:
       case UnifiedRequestStatus.cancelled:
       case UnifiedRequestStatus.expired:
-        return 'warning';
+        return 'wait';
     }
   }
 
