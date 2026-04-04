@@ -49,7 +49,8 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onAddNote;
   final VoidCallback? onScheduleChangeResponse;
 
-  // Phase 4 (completed) callbacks
+  // Phase 3/4 callbacks
+  final VoidCallback? onViewSubscription;  // 수강권 상세 보기
   final VoidCallback? onProposeRenewal;
   final VoidCallback? onRequestRenewal;
 
@@ -78,6 +79,7 @@ class CurrentRequestBox extends StatefulWidget {
     this.onScheduleChange,
     this.onAddNote,
     this.onScheduleChangeResponse,
+    this.onViewSubscription,
     this.onProposeRenewal,
     this.onRequestRenewal,
   });
@@ -709,7 +711,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         ),
         const SizedBox(width: AppSpacing.space2),
         TextButton(
-          onPressed: widget.onProposeRenewal,
+          onPressed: widget.onViewSubscription,
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.space2,

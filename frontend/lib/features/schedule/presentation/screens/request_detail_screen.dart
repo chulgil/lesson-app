@@ -236,7 +236,9 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     _handleScheduleChangeResponse(context, ref, request),
                 onAddNote: () =>
                     _handleAddNote(context, ref, request),
-                // Phase 4
+                // Phase 3/4
+                onViewSubscription: () =>
+                    _handleViewSubscription(context, request),
                 onProposeRenewal: () =>
                     _handleRenewal(context, ref, request),
                 onRequestRenewal: () =>
@@ -1138,6 +1140,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   }
 
   // ── Phase 4 handler ─────────────────────────────────────
+
+  void _handleViewSubscription(
+    BuildContext context,
+    UnifiedLessonRequest request,
+  ) {
+    // TODO: Navigate to subscription detail screen
+    _showInfo('수강권 상세 화면은 준비 중입니다');
+  }
 
   Future<void> _handleRenewal(
     BuildContext context,
