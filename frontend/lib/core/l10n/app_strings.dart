@@ -49,7 +49,7 @@ class AppStrings {
   static const requestAccepted = '레슨 요청을 수락했습니다';
 
   /// 다음에 처리 완료
-  static const requestUnavailable = '안내를 전달했습니다';
+  static const requestUnavailable = '레슨 불가 안내를 전달했습니다';
 
   /// 체험레슨(무료) 예약 완료
   static const trialComplete = '체험레슨 예약이 완료되었습니다';
@@ -368,8 +368,8 @@ class AppStrings {
   static String teacherDisplayName(String name) => '$name 선생님';
 
   /// Phase 2 공지 배너
-  static const timeConfirmedNotice = '시간이 확정되었습니다. 수강권을 발급해주세요.';
-  static const timeConfirmedNoticeStudent = '시간이 확정되었습니다. 선생님의 수강권 안내를 기다려주세요.';
+  static const timeConfirmedNotice = '수강권 발급 방법을 선택해주세요';
+  static const timeConfirmedNoticeStudent = '선생님이 수강권 안내를 보내면 알림을 드립니다';
 
   /// 시간확정
   static const statusTimeConfirmed = '시간확정';
@@ -413,14 +413,14 @@ class AppStrings {
 
   static const chatInitialRequest = '레슨을 요청했습니다';
   static const chatApprove = '요청을 수락했습니다';
-  static const chatReject = '요청이 종료되었습니다';
+  static const chatReject = '레슨 요청을 거절했습니다';
   static const chatProposeAlternative = '다른 시간을 제안했습니다';
   static const chatAcceptAlternative = '제안한 시간을 수락했습니다';
   static const chatCancel = '요청을 취소했습니다';
   static const chatExpire = '요청이 만료되었습니다';
-  static const chatProposalSent = '수강권을 제안했습니다';
+  static const chatProposalSent = '수강권 안내를 보냈습니다';
   static const chatProposalAccepted = '수강권을 수락했습니다';
-  static const chatPaymentNotified = '결제가 완료되었습니다';
+  static const chatPaymentNotified = '입금 완료를 알렸습니다';
   static const chatCompleted = '수강권이 발급되었습니다';
   static const chatWithdrawApproval = '결정을 변경했습니다';
   static const chatPaymentRequested = '결제 안내를 보냈습니다';
@@ -481,8 +481,8 @@ class AppStrings {
   static const phaseFilterRequest = '신청';
   static const phaseFilterSubscription = '수강권';
   static const phaseFilterInProgress = '진행중';
-  static const phaseFilterCompleted = '완료';
-  static const phaseFilterTerminal = '종료';
+  static const phaseFilterCompleted = '수강완료';
+  static const phaseFilterTerminal = '거절/취소';
 
   // ── Chapter Titles ────────────────────────────────────────
 
@@ -561,13 +561,13 @@ class AppStrings {
 
   /// Phase 2: 시간 확정 후 안내 메시지
   static const phase2TimeConfirmedTeacher =
-      '시간이 확정되었습니다. 수강권을 발급해주세요.';
+      '수강권 발급 방법을 선택해주세요';
   static const phase2TimeConfirmedTrial =
-      '체험레슨이 확정되었습니다.';
+      '체험레슨이 확정되었습니다';
   static const phase2WaitingPaymentStudent =
-      '결제 안내를 확인해주세요.';
+      '결제를 완료해주세요';
   static const phase2PaymentReceivedTeacher =
-      '학생이 입금 완료를 알렸습니다.';
+      '입금을 확인하고 수강권을 발급해주세요';
 
   /// 결제 안내 BottomSheet
   static const paymentGuideTitle = '결제 안내 보내기';

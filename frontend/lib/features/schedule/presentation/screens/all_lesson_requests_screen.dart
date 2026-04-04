@@ -99,7 +99,7 @@ class _AllLessonRequestsScreenState
               _buildSubHeader(filtered.length),
 
               // 3. Secondary filters (single row)
-              _buildSecondaryFilters(),
+              _buildSecondaryFilters(allRequests),
 
               // 4. Request list
               Expanded(
@@ -194,7 +194,8 @@ class _AllLessonRequestsScreenState
       phaseCounts[phase] = (phaseCounts[phase] ?? 0) + 1;
     }
 
-    final tabs = <(RequestPhase?, String)>[
+    // Step indicator phases (connected by lines)
+    final steps = <(RequestPhase?, String)>[
       (null, AppStrings.phaseFilterAll),
       (RequestPhase.request, AppStrings.phaseFilterRequest),
       (RequestPhase.subscription, AppStrings.phaseFilterSubscription),
@@ -204,54 +205,78 @@ class _AllLessonRequestsScreenState
     ];
 
     return Container(
-      height: 40,
       margin: const EdgeInsets.only(top: AppSpacing.space2),
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.screenPadding,
-        ),
-        itemCount: tabs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.space1),
-        itemBuilder: (context, index) {
-          final (phase, label) = tabs[index];
-          final count = phaseCounts[phase] ?? 0;
-          final isSelected = _phaseFilter == phase;
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+      ),
+      child: Row(
+        children: [
+          for (int i = 0; i < steps.length; i++) ...[
+            // Connecting line before (skip first)
+            if (i > 0)
+              Expanded(
+                child: Container(
+                  height: 1.5,
+                  color: AppColors.borderLight,
+                ),
+              ),
+            // Step node
+            _buildStepNode(
+              phase: steps[i].$1,
+              label: steps[i].$2,
+              count: phaseCounts[steps[i].$1] ?? 0,
+              isSelected: _phaseFilter == steps[i].$1,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 
-          return GestureDetector(
-            onTap: () => _onPhaseSelected(phase),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space1,
-              ),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-                border: Border.all(
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.borderLight,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  count > 0 ? '$label $count' : label,
-                  style: AppTypography.caption.copyWith(
-                    color: isSelected
-                        ? Colors.white
-                        : AppColors.textSecondaryLight,
-                    fontWeight: isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
+  Widget _buildStepNode({
+    required RequestPhase? phase,
+    required String label,
+    required int count,
+    required bool isSelected,
+  }) {
+    final color = isSelected ? AppColors.primary : AppColors.textTertiaryLight;
+    final displayLabel = count > 0 ? '$label $count' : label;
+
+    return GestureDetector(
+      onTap: () => _onPhaseSelected(phase),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Circle
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? AppColors.primary : Colors.transparent,
+              border: Border.all(
+                color: color,
+                width: isSelected ? 2 : 1.5,
               ),
             ),
-          );
-        },
+            child: isSelected
+                ? const Icon(Icons.check, size: 12, color: Colors.white)
+                : null,
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          // Label
+          Text(
+            displayLabel,
+            style: AppTypography.caption.copyWith(
+              color: isSelected
+                  ? AppColors.primary
+                  : AppColors.textTertiaryLight,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontSize: 10,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -307,7 +332,12 @@ class _AllLessonRequestsScreenState
   // Secondary filters (single row: source + sort + period)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  Widget _buildSecondaryFilters() {
+  Widget _buildSecondaryFilters(List<UnifiedLessonRequest> allRequests) {
+    // Hide source filter when only one type exists
+    final hasAcademy = allRequests.any((r) => r.isAcademy);
+    final hasIndividual = allRequests.any((r) => !r.isAcademy);
+    final showSourceFilter = hasAcademy && hasIndividual;
+
     return Padding(
       padding: const EdgeInsets.only(
         left: AppSpacing.screenPadding,
@@ -318,14 +348,16 @@ class _AllLessonRequestsScreenState
         spacing: AppSpacing.space1,
         runSpacing: AppSpacing.space1,
         children: [
-          // Source filters
-          ..._buildSourceChips(),
-          _buildDivider(),
-          // Sort toggle
-          _buildSortChip(),
-          _buildDivider(),
-          // Period presets
+          // Period presets (date range)
           ..._buildPeriodChips(),
+          _buildDivider(),
+          // Sort toggle (time order)
+          _buildSortChip(),
+          // Source filters (academy/individual) — only if both exist
+          if (showSourceFilter) ...[
+            _buildDivider(),
+            ..._buildSourceChips(),
+          ],
         ],
       ),
     );

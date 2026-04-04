@@ -63,7 +63,6 @@ class _ScheduleChangeResponseBottomSheet extends StatefulWidget {
 
 class _ScheduleChangeResponseBottomSheetState
     extends State<_ScheduleChangeResponseBottomSheet> {
-  final _messageController = TextEditingController();
   int? _selectedSlotIndex;
 
   @override
@@ -73,12 +72,6 @@ class _ScheduleChangeResponseBottomSheetState
     if (widget.proposedSlots.length == 1) {
       _selectedSlotIndex = 0;
     }
-  }
-
-  @override
-  void dispose() {
-    _messageController.dispose();
-    super.dispose();
   }
 
   @override
@@ -134,19 +127,6 @@ class _ScheduleChangeResponseBottomSheetState
                     ),
                 const SizedBox(height: AppSpacing.space4),
               ],
-
-              // Message input
-              TextField(
-                controller: _messageController,
-                maxLines: 3,
-                maxLength: 200,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: AppStrings.messageHint,
-                  counterText: '',
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space4),
 
               // CTA buttons: Accept | Reject | Counter-propose
               Row(
@@ -272,12 +252,11 @@ class _ScheduleChangeResponseBottomSheetState
   }
 
   void _accept() {
-    final message = _messageController.text.trim();
     Navigator.pop<ScheduleChangeResponseResult>(
       context,
       (
         action: ScheduleChangeResponseAction.accept,
-        message: message,
+        message: '',
         counterSlots: <TimeSlot>[],
         acceptedSlotIndex: _selectedSlotIndex,
       ),
@@ -285,14 +264,11 @@ class _ScheduleChangeResponseBottomSheetState
   }
 
   void _reject() {
-    final message = _messageController.text.trim();
     Navigator.pop<ScheduleChangeResponseResult>(
       context,
       (
         action: ScheduleChangeResponseAction.reject,
-        message: message.isEmpty
-            ? AppStrings.scheduleChangeReject
-            : message,
+        message: AppStrings.scheduleChangeReject,
         counterSlots: <TimeSlot>[],
         acceptedSlotIndex: null,
       ),
@@ -300,16 +276,11 @@ class _ScheduleChangeResponseBottomSheetState
   }
 
   Future<void> _counterPropose() async {
-    final currentText = _messageController.text.trim();
-    final message = currentText.isEmpty
-        ? AppStrings.scheduleChangeCounter
-        : currentText;
-
     final result = await Navigator.push<({String message, List<TimeSlot> slots})>(
       context,
       MaterialPageRoute(
         builder: (context) => SuggestAlternativeScreen(
-          message: message,
+          message: AppStrings.scheduleChangeCounter,
           durationMinutes: widget.durationMinutes,
           teacherId: widget.teacherId,
         ),

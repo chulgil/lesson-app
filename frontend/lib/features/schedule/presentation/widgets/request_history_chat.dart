@@ -527,35 +527,51 @@ class RequestHistoryChat extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space3),
 
-            // Guide messages as system chat bubbles
-            for (final line in guide.messages) ...[
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.8,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.space3,
-                    vertical: AppSpacing.space2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                  child: Text(
-                    line,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                      height: 1.4,
+            // Guide — single bubble with situation + action
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.8,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2 + 2,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Situation line
+                    Text(
+                      guide.situation,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
+                    // Action line (if present)
+                    if (guide.action != null) ...[
+                      const SizedBox(height: AppSpacing.space1),
+                      Text(
+                        guide.action!,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textPrimaryLight,
+                          fontWeight: FontWeight.w600,
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.space1),
-            ],
+            ),
 
             // Dashed separator
             Padding(
@@ -586,129 +602,141 @@ class RequestHistoryChat extends StatelessWidget {
 
     final isTeacher = viewerId == request!.teacherId;
 
+    // ── Guide message design rule ───────────────────────────────
+    //
+    // 1. situation = "현재 상태" (과거 이벤트 X, 히스토리에 이미 있음)
+    // 2. action    = "내가 해야 할 일" (볼드) — null이면 대기 상태
+    // 3. 상대방 행동은 말풍선으로 이미 보이므로 가이드에서 반복하지 않음
+    //
+    // ─────────────────────────────────────────────────────────────
+
+    // ── Guide visibility rule ─────────────────────────────────
+    //
+    // Show guide ONLY when the viewer has an action to take.
+    // Wait states (no action) → null (no guide shown).
+    // The opponent's past actions are already visible as chat bubbles.
+    //
+    // ─────────────────────────────────────────────────────────────
+
     return switch (request!.status) {
-      // Phase 1: 신청
+      // ── Phase 1: 신청 ──
       UnifiedRequestStatus.pending => isTeacher
           ? const _PhaseGuide(
-              title: '신청',
-              messages: [
-                '학생이 레슨을 신청했습니다',
-                '희망 시간을 확인하고 수락하거나, 다른 시간을 제안해주세요',
-              ],
+              title: '신청 접수',
+              situation: '새로운 레슨 신청이 도착했습니다',
+              action: '희망 시간을 확인하고 수락 또는 다른 시간을 제안해주세요',
             )
-          : const _PhaseGuide(
-              title: '신청',
-              messages: [
-                '레슨 신청이 완료되었습니다',
-                '선생님이 시간을 확인하면 알림을 보내드립니다',
-              ],
-            ),
+          : null, // 대기 — 선생님 응답은 말풍선으로 확인
 
-      // Phase 1: 협상 중
+      // ── Phase 1: 시간 조율 ──
       UnifiedRequestStatus.approved ||
       UnifiedRequestStatus.negotiating => isTeacher
           ? const _PhaseGuide(
-              title: '시간 조율',
-              messages: [
-                '학생과 시간을 조율하고 있습니다',
-                '시간이 맞지 않으면 다른 시간을 제안할 수 있습니다',
-              ],
+              title: '시간 조율 중',
+              situation: '레슨 시간을 조율하고 있습니다',
+              action: '시간을 수락하거나 다른 시간을 역제안해주세요',
             )
           : const _PhaseGuide(
-              title: '시간 조율',
-              messages: [
-                '선생님과 시간을 조율하고 있습니다',
-                '제안된 시간을 확인해주세요',
-              ],
+              title: '시간 조율 중',
+              situation: '새로운 시간이 제안되었습니다',
+              action: '제안된 시간을 확인하고 수락해주세요',
             ),
 
-      // Phase 2: 시간 확정 → 결제/수강권
+      // ── Phase 2: 시간 확정 → 수강권 발급 ──
       UnifiedRequestStatus.timeConfirmed => isTeacher
           ? const _PhaseGuide(
               title: '수강권 발급',
-              messages: [
-                '시간이 확정되었습니다',
-                '아래에서 수강권 발급 방법을 선택해주세요',
-              ],
+              situation: '레슨 시간이 확정되었습니다',
+              action: '수강권 종류와 결제 방법을 선택해 발급해주세요',
             )
-          : const _PhaseGuide(
-              title: '수강권 발급',
-              messages: [
-                '시간이 확정되었습니다',
-                '선생님이 수강권 안내를 보내면 알림을 드립니다',
-              ],
-            ),
+          : null, // 대기 — 선생님의 수강권 안내는 말풍선으로 확인
 
-      // Phase 2: 제안 발송됨
+      // ── Phase 2: 결제 대기 ──
       UnifiedRequestStatus.proposalSent ||
       UnifiedRequestStatus.proposalAccepted => isTeacher
-          ? const _PhaseGuide(
-              title: '결제 대기',
-              messages: [
-                '수강권 안내를 보냈습니다',
-                '학생이 결제를 완료하면 알림을 드립니다',
-              ],
-            )
+          ? null // 대기 — 학생의 결제 알림은 말풍선으로 확인
           : const _PhaseGuide(
               title: '결제',
-              messages: [
-                '선생님이 보낸 수강권 안내를 확인하고 결제를 완료해주세요',
-              ],
+              situation: '수강권 안내를 확인하고 결제를 완료해주세요',
             ),
 
-      // Phase 2: 입금 완료 알림
+      // ── Phase 2: 입금 확인 ──
+      // 학생 말풍선에 입금 완료 메시지가 이미 표시됨
       UnifiedRequestStatus.paymentNotified => isTeacher
           ? const _PhaseGuide(
               title: '입금 확인',
-              messages: [
-                '학생이 입금 완료를 알렸습니다',
-                '입금을 확인하고 수강권을 발급해주세요',
-              ],
+              situation: '입금 확인 후 수강권을 발급해주세요',
             )
-          : const _PhaseGuide(
-              title: '입금 확인 대기',
-              messages: [
-                '입금 완료를 알렸습니다',
-                '선생님이 확인하면 수강권이 발급됩니다',
-              ],
-            ),
+          : null, // 대기 — 선생님의 확인은 말풍선으로 확인
 
-      // Phase 3: 수강권 발급 → 레슨 진행
+      // ── Phase 3: 레슨 진행 ──
       UnifiedRequestStatus.subscriptionIssued ||
       UnifiedRequestStatus.inProgress => isTeacher
           ? const _PhaseGuide(
-              title: '레슨 진행',
-              messages: [
-                '수강권이 발급되었습니다',
-                '레슨을 진행하고 완료 후 기록을 남겨주세요',
-              ],
+              title: '레슨 진행 중',
+              situation: '레슨이 진행 중입니다',
+              action: '레슨 후 출석 처리와 기록을 남겨주세요',
             )
           : const _PhaseGuide(
-              title: '레슨 진행',
-              messages: [
-                '수강권이 발급되었습니다',
-                '레슨 일정에 맞춰 참석해주세요',
-              ],
+              title: '레슨 진행 중',
+              situation: '레슨이 진행 중입니다',
+              action: '레슨 일정에 맞춰 참석해주세요',
             ),
 
-      // Phase 4: 완료
-      UnifiedRequestStatus.completed => const _PhaseGuide(
-              title: '완료',
-              messages: ['모든 레슨이 완료되었습니다'],
+      // ── Phase 4: 수강 완료 ──
+      UnifiedRequestStatus.completed => isTeacher
+          ? const _PhaseGuide(
+              title: '수강 완료',
+              situation: '모든 레슨 수강이 완료되었습니다',
+              action: '새 수강권을 발급하려면 학생에게 안내해주세요',
+            )
+          : const _PhaseGuide(
+              title: '수강 완료',
+              situation: '모든 레슨 수강이 완료되었습니다',
+              action: '계속 수업을 원하시면 새로 신청해주세요',
             ),
 
-      // 종료 상태
-      _ => null,
+      // ── 종료: 거절 ──
+      UnifiedRequestStatus.rejected => isTeacher
+          ? null // 선생님이 거절한 것 — 말풍선에서 이미 확인
+          : const _PhaseGuide(
+              title: '거절됨',
+              situation: '레슨 요청이 거절되었습니다',
+              action: '다른 선생님이나 시간을 변경해 다시 신청할 수 있습니다',
+            ),
+
+      // ── 종료: 취소/만료 ──
+      UnifiedRequestStatus.cancelled => null,
+      UnifiedRequestStatus.expired => isTeacher
+          ? null
+          : const _PhaseGuide(
+              title: '기간 만료',
+              situation: '응답 기간이 지나 자동 종료되었습니다',
+              action: '다시 신청하시면 선생님에게 알림이 전송됩니다',
+            ),
     };
   }
 }
 
-/// Phase guide data — chat-style system messages
+/// Phase guide data — single bubble with situation + action.
+///
+/// UX Rule: Each guide follows a consistent pattern:
+///   [title chip]  — phase name (e.g. "시간 조율 중")
+///   [situation]   — what happened / current state (grey text)
+///   [action]      — what to do next (darker, actionable text)
+///
+/// Both lines render inside ONE bubble for quick scanning.
+/// If [action] is null, the phase requires no user action (wait state).
 class _PhaseGuide {
   final String title;
-  final List<String> messages;
+  final String situation;
+  final String? action;
 
-  const _PhaseGuide({required this.title, required this.messages});
+  const _PhaseGuide({
+    required this.title,
+    required this.situation,
+    this.action,
+  });
 }
 
 /// Dashed horizontal line
