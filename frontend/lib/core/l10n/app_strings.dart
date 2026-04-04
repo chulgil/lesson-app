@@ -175,10 +175,6 @@ class AppStrings {
   /// 종료됨 (terminal 상태 하단바)
   static const requestClosed = '요청이 종료되었습니다';
 
-  /// 시스템 가이드 메시지 (채팅 상단)
-  static const requestGuideMessage =
-      '학생이 제안한 일정 중 하나를 선택하여 수락하거나, 일정 비교로 다른 시간을 제안할 수 있습니다.';
-
   /// 슬롯 선택 힌트
   static const slotSelectionHint = '일정을 탭하여 선택하세요';
 
@@ -372,10 +368,6 @@ class AppStrings {
   /// 결제 필요 (학생이 결제해야 함)
   static const studentPaymentRequired = '결제 필요';
 
-  /// 학생용 가이드 메시지
-  static const studentRequestGuideMessage =
-      '선생님이 제안한 일정 중 하나를 선택하여 수락하거나, 다른 시간을 제안할 수 있습니다.';
-
   /// 선생님 이름 포맷
   static String teacherDisplayName(String name) => '$name 선생님';
 
@@ -388,6 +380,7 @@ class AppStrings {
 
   /// 시간협상 N
   static String statusNegotiating(int round) => '시간협상 $round';
+  static const statusNegotiatingShort = '시간조율';
 
   // ── Phase 2, 3 Status Labels ──────────────────────────────
 

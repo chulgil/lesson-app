@@ -316,6 +316,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
   final _accountNumberController = TextEditingController();
   final _accountHolderController = TextEditingController();
 
+  static const _directInputLabel = '직접입력';
   static const _bankNames = [
     '국민은행', '신한은행', '우리은행', '하나은행', '농협은행',
     'SC제일은행', '한국씨티은행', '기업은행', '카카오뱅크', '토스뱅크',
@@ -323,56 +324,51 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
     '대구은행', '부산은행', '경남은행', '광주은행', '전북은행', '제주은행',
   ];
 
+  String? _selectedDropdownValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _bankNameController.addListener(_onBankNameChanged);
+  }
+
   @override
   void dispose() {
+    _bankNameController.removeListener(_onBankNameChanged);
     _bankNameController.dispose();
     _accountNumberController.dispose();
     _accountHolderController.dispose();
     super.dispose();
   }
 
-  void _selectBank() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        maxChildSize: 0.9,
-        minChildSize: 0.3,
-        expand: false,
-        builder: (context, scrollController) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Text('은행 선택', style: AppTypography.headingSmall),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: _bankNames.length,
-                itemBuilder: (context, index) {
-                  final bankName = _bankNames[index];
-                  return ListTile(
-                    title: Text(bankName),
-                    trailing: _bankNameController.text == bankName
-                        ? Icon(Icons.check, color: AppColors.primary)
-                        : null,
-                    onTap: () {
-                      setState(() => _bankNameController.text = bankName);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _onBankNameChanged() {
+    final text = _bankNameController.text.trim();
+    if (_bankNames.contains(text)) {
+      if (_selectedDropdownValue != text) {
+        setState(() => _selectedDropdownValue = text);
+      }
+    } else {
+      if (_selectedDropdownValue != _directInputLabel) {
+        setState(() => _selectedDropdownValue = text.isEmpty ? null : _directInputLabel);
+      }
+    }
+  }
+
+  void _onDropdownChanged(String? value) {
+    if (value == null) return;
+    if (value == _directInputLabel) {
+      setState(() {
+        _selectedDropdownValue = _directInputLabel;
+        _bankNameController.clear();
+      });
+      // Focus the text field for manual input
+      FocusScope.of(context).nextFocus();
+    } else {
+      setState(() {
+        _selectedDropdownValue = value;
+        _bankNameController.text = value;
+      });
+    }
   }
 
   void _submit() {
@@ -407,24 +403,69 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
             Text('계좌 추가', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space4),
 
-            // Bank name
+            // Bank name (dropdown + text input)
             Text('은행명 *', style: AppTypography.buttonSmall),
             const SizedBox(height: AppSpacing.space2),
-            TextFormField(
-              controller: _bankNameController,
-              readOnly: true,
-              onTap: _selectBank,
-              decoration: InputDecoration(
-                hintText: '은행을 선택하세요',
-                suffixIcon: const Icon(Icons.arrow_drop_down),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left: dropdown select
+                SizedBox(
+                  width: 140,
+                  child: DropdownButtonFormField<String>(
+                    value: _selectedDropdownValue,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      hintText: '은행 선택',
+                      hintStyle: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                        vertical: AppSpacing.space3,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: _directInputLabel,
+                        child: Text(
+                          _directInputLabel,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                      ..._bankNames.map((name) => DropdownMenuItem(
+                        value: name,
+                        child: Text(name, style: AppTypography.bodySmall),
+                      )),
+                    ],
+                    onChanged: _onDropdownChanged,
+                  ),
                 ),
-              ),
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) return '은행을 선택해주세요';
-                return null;
-              },
+                const SizedBox(width: AppSpacing.space2),
+                // Right: manual text input
+                Expanded(
+                  child: TextFormField(
+                    controller: _bankNameController,
+                    decoration: InputDecoration(
+                      hintText: '은행명 입력',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return '은행명을 입력해주세요';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.space4),
 

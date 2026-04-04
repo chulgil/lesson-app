@@ -31,6 +31,9 @@ class RequestHistoryChat extends StatelessWidget {
   /// so this widget can be placed inside another scrollable.
   final bool shrinkWrap;
 
+  /// When false, hides the top guide box (for collapsed chapter history).
+  final bool showGuide;
+
   const RequestHistoryChat({
     super.key,
     required this.events,
@@ -43,6 +46,7 @@ class RequestHistoryChat extends StatelessWidget {
     this.proposalTemplates = const [],
     this.recommendedTemplateId,
     this.shrinkWrap = false,
+    this.showGuide = true,
   });
 
   @override
@@ -68,14 +72,15 @@ class RequestHistoryChat extends StatelessWidget {
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space4,
       ),
-      itemCount: chronological.length + 1, // +1 for guide message
+      itemCount: showGuide ? chronological.length + 1 : chronological.length,
       itemBuilder: (context, index) {
-        // First item: system guide message
-        if (index == 0) {
+        // First item: system guide message (only when showGuide is true)
+        if (showGuide && index == 0) {
           return _buildSystemGuide();
         }
 
-        final event = chronological[index - 1];
+        final eventIndex = showGuide ? index - 1 : index;
+        final event = chronological[eventIndex];
 
         // Skip withdraw events where the same slot was re-approved
         if (hiddenWithdrawIds.contains(event.id)) {
@@ -84,9 +89,6 @@ class RequestHistoryChat extends StatelessWidget {
 
         final isMyMessage = event.actorId == viewerId;
         final isMessageOnly = messageOnlyApproveIds.contains(event.id);
-
-        // Date separator (show if first event or different day from previous)
-        final eventIndex = index - 1;
         Widget? dateSeparator;
         if (eventIndex == 0 ||
             !_isSameDay(chronological[eventIndex - 1].createdAt, event.createdAt)) {

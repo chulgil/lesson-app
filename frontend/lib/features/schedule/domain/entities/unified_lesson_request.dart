@@ -133,7 +133,7 @@ enum UnifiedRequestStatus {
       case UnifiedRequestStatus.approved:
         return AppStrings.statusApproved;
       case UnifiedRequestStatus.negotiating:
-        return AppStrings.statusTimeConfirmed;
+        return AppStrings.statusNegotiatingShort;
       case UnifiedRequestStatus.timeConfirmed:
         return AppStrings.statusTimeConfirmed;
       case UnifiedRequestStatus.proposalSent:

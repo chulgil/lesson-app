@@ -1132,6 +1132,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 events: _eventsForPhase(events, RequestPhase.request),
                 request: request,
                 shrinkWrap: true,
+                showGuide: false,
                 viewerId: viewerRole == 'teacher'
                     ? request.teacherId
                     : request.studentId,
