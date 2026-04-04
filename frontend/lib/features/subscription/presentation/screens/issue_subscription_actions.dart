@@ -41,6 +41,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
   DateTime? get startDate;
   int get finalAmount;
   int get rescheduleAllowance;
+  int get rescheduleDeadlineHours;
   String? get selectedLocationId;
   int get travelTimeMinutes;
 
@@ -106,6 +107,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
           discountPercent > 0 ? (originalAmount - finalAmount) : null,
       discountReason: discountPercent > 0 ? '$discountPercent% 할인' : null,
       totalRescheduleAllowance: rescheduleAllowance,
+      rescheduleDeadlineHours: rescheduleDeadlineHours,
     );
 
     try {
@@ -443,6 +445,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
             discountReason:
                 discountPercent > 0 ? '$discountPercent% 할인' : null,
             totalRescheduleAllowance: rescheduleAllowance,
+            rescheduleDeadlineHours: rescheduleDeadlineHours,
           );
           await repository.create(subscription);
 

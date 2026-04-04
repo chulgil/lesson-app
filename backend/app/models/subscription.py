@@ -97,6 +97,7 @@ class Subscription(UUIDMixin, TimestampMixin, Base):
     bonus_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     total_reschedule_allowance: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
     used_reschedule_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    reschedule_deadline_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=12)
 
     # Payment
     payment_confirmed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)

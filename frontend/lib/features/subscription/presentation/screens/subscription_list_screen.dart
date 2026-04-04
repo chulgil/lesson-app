@@ -12,7 +12,7 @@ import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/subscription_card.dart';
+import '../widgets/subscription_ticket_card.dart';
 
 /// Screen showing list of student's subscriptions.
 class SubscriptionListScreen extends ConsumerWidget {
@@ -78,7 +78,7 @@ class SubscriptionListScreen extends ConsumerWidget {
         .toList();
 
     return ListView(
-      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.screenPadding),
       children: [
         // Active subscriptions
         if (activeSubscriptions.isNotEmpty) ...[
@@ -147,10 +147,13 @@ class SubscriptionListScreen extends ConsumerWidget {
   }
 
   Widget _buildSectionHeader(String title, {Color? color}) {
-    return Text(
-      title,
-      style: AppTypography.headingSmall.copyWith(
-        color: color ?? AppColors.textPrimaryLight,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Text(
+        title,
+        style: AppTypography.headingSmall.copyWith(
+          color: color ?? AppColors.textPrimaryLight,
+        ),
       ),
     );
   }
@@ -291,27 +294,24 @@ class _SubscriptionCardWithClass extends StatelessWidget {
   Widget build(BuildContext context) {
     final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-      child: lessonClassAsync.when(
-        data: (lessonClass) => SubscriptionCard(
-          subscription: subscription,
-          className: lessonClass?.name ?? '개인레슨',
-          instrument: membership.instrument,
-          onTap: onTap,
-        ),
-        loading: () => SubscriptionCard(
-          subscription: subscription,
-          className: '...',
-          instrument: membership.instrument,
-          onTap: onTap,
-        ),
-        error: (_, __) => SubscriptionCard(
-          subscription: subscription,
-          className: '레슨',
-          instrument: membership.instrument,
-          onTap: onTap,
-        ),
+    return lessonClassAsync.when(
+      data: (lessonClass) => SubscriptionTicketCard(
+        subscription: subscription,
+        className: lessonClass?.name ?? '개인레슨',
+        instrument: membership.instrument,
+        onTap: onTap,
+      ),
+      loading: () => SubscriptionTicketCard(
+        subscription: subscription,
+        className: '...',
+        instrument: membership.instrument,
+        onTap: onTap,
+      ),
+      error: (_, __) => SubscriptionTicketCard(
+        subscription: subscription,
+        className: '레슨',
+        instrument: membership.instrument,
+        onTap: onTap,
       ),
     );
   }

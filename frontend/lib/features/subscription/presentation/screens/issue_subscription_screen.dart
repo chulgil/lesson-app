@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -67,6 +68,7 @@ class _IssueSubscriptionScreenState
   String _customBonusReason = '';
   DateTime? _startDate;
   int _rescheduleAllowance = 2;
+  int _rescheduleDeadlineHours = 12;
   String? _selectedLocationId;
   int _travelTimeMinutes = 0;
 
@@ -116,6 +118,8 @@ class _IssueSubscriptionScreenState
   DateTime? get startDate => _startDate;
   @override
   int get rescheduleAllowance => _rescheduleAllowance;
+  @override
+  int get rescheduleDeadlineHours => _rescheduleDeadlineHours;
   @override
   String? get selectedLocationId => _selectedLocationId;
   @override
@@ -535,6 +539,52 @@ class _IssueSubscriptionScreenState
               ),
           ],
         ),
+        if (_rescheduleAllowance > 0) ...[
+          const SizedBox(height: AppSpacing.space4),
+          Text(AppStrings.rescheduleDeadlineLabel, style: AppTypography.headingSmall),
+          const SizedBox(height: 4),
+          Text(
+            AppStrings.rescheduleDeadlineDescription,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Row(
+            children: [
+              for (final hours in [6, 12, 24, 48])
+                Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.space2),
+                  child: ChoiceChip(
+                    label: Text('$hours${AppStrings.hoursUnit}'),
+                    selected: _rescheduleDeadlineHours == hours,
+                    onSelected: (_) =>
+                        setState(() => _rescheduleDeadlineHours = hours),
+                    selectedColor: AppColors.primary,
+                    backgroundColor: AppColors.surfaceLight,
+                    labelStyle: AppTypography.bodySmall.copyWith(
+                      color: _rescheduleDeadlineHours == hours
+                          ? Colors.white
+                          : AppColors.textPrimaryLight,
+                      fontWeight: _rescheduleDeadlineHours == hours
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                    side: BorderSide(
+                      color: _rescheduleDeadlineHours == hours
+                          ? AppColors.primary
+                          : AppColors.borderLight,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ],
     );
   }

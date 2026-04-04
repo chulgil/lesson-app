@@ -720,6 +720,201 @@ class AppStrings {
   /// 변경 1회 남음 경고
   static const rescheduleLastOne = '변경 1회 남음';
 
+  /// 변경/취소 기준시간 설정 라벨
+  static const rescheduleDeadlineLabel = '변경/취소 기준시간';
+
+  /// 변경/취소 기준시간 설명
+  static const rescheduleDeadlineDescription =
+      '레슨 시작 전 이 시간 이내에 변경하면 변경취소권이 소진됩니다.';
+
+  /// 시간 단위
+  static const hoursUnit = '시간';
+
+  /// 잔여 횟수 접미사
+  static const remainingCountSuffix = '회 남음';
+
+  /// 변경취소 라벨
+  static const rescheduleLabel = '변경취소';
+
+  /// 횟수 접미사
+  static const countSuffix = '회';
+
+  /// 변경취소권 소진 안내
+  static String rescheduleDeadlineWarning(int hours) =>
+      '레슨 시작 $hours시간 이내 변경 시 변경취소권 1회 소진';
+
+  /// 무료 변경 안내
+  static String rescheduleDeadlineFree(int hours) =>
+      '레슨 시작 $hours시간 전이므로 무료 변경';
+
+  // === Subscription detail chapter strings ===
+
+  /// 수강권 유형
+  static const subscriptionType = '유형';
+
+  /// 금액
+  static const amount = '금액';
+
+  /// 원
+  static const wonUnit = '원';
+
+  /// 할인
+  static const discount = '할인';
+
+  /// 시작일
+  static const startDate = '시작일';
+
+  /// 만료일
+  static const endDate = '만료일';
+
+  // === Reschedule / Cancel bottom sheet strings ===
+
+  /// N회차 시간 변경
+  static String sessionRescheduleTitle(int n) => '$n회차 시간 변경';
+
+  /// N회차 취소
+  static String sessionCancelTitle(int n) => '$n회차 취소';
+
+  /// 변경 요청
+  static const rescheduleRequest = '변경 요청';
+
+  /// 변경 요청 (변경취소권 1회 사용)
+  static const rescheduleRequestWithCredit = '변경 요청 (변경취소권 1회 사용)';
+
+  /// 취소 요청
+  static const cancelRequest = '취소 요청';
+
+  /// 취소 사유 선택 안내
+  static const cancelReasonPrompt = '취소 사유를 선택해주세요';
+
+  /// 학생 사정 (일정 변경)
+  static const cancelReasonStudentSchedule = '학생 사정 (일정 변경)';
+
+  /// 학생 사정 (컨디션)
+  static const cancelReasonStudentSick = '학생 사정 (컨디션)';
+
+  /// 선생님 사정
+  static const cancelReasonTeacher = '선생님 사정';
+
+  /// 상호 합의
+  static const cancelReasonMutual = '상호 합의';
+
+  /// 레슨 횟수 1회 차감 경고
+  static const lessonDeductWarning = '레슨 횟수 1회 차감';
+
+  /// 보강/변경 가능 안내
+  static const makeupAvailable = '보강/변경 가능 (횟수 유지)';
+
+  /// 학생 취소 차감 안내
+  static const studentCancelDeductNotice = '학생 사정으로 인한 취소는 레슨 횟수가 1회 차감됩니다.';
+
+  /// 변경취소권 소진 안내
+  static const rescheduleCreditsExhausted = '변경취소권이 모두 소진되었습니다';
+
+  /// 잔여 변경취소권 변화 표시
+  static String rescheduleCreditsChange(int from, int to) =>
+      '잔여 변경취소권: $from회 → $to회';
+
+  /// 변경할 날짜 선택
+  static const selectDatePlaceholder = '변경할 날짜 선택';
+
+  /// 변경할 시간 선택
+  static const selectTimePlaceholder = '변경할 시간 선택';
+
+  /// 현재
+  static const current = '현재';
+
+  /// 시간 변경 버튼
+  static const rescheduleAction = '시간 변경';
+
+  /// 변경 불가 버튼
+  static const rescheduleDisabled = '변경 불가';
+
+  // === Chapter titles ===
+
+  /// 수강권 정보 챕터
+  static const chapterSubscriptionInfo = '수강권 정보';
+
+  /// 결제 내역 챕터
+  static const chapterPaymentHistory = '결제 내역';
+
+  /// 레슨 진행 챕터
+  static String chapterLessonProgress(int used, int total) =>
+      '레슨 진행 ($used/$total회)';
+
+  // === Chapter payment detail strings ===
+
+  /// 결제 상태
+  static const paymentStatus = '결제 상태';
+
+  /// 결제완료
+  static const paymentCompleted = '결제완료';
+
+  /// 미결제
+  static const paymentPending = '미결제';
+
+  /// 결제 방법
+  static const paymentMethod = '결제 방법';
+
+  /// 결제일
+  static const paymentDate = '결제일';
+
+  /// 확인일
+  static const confirmationDate = '확인일';
+
+  /// 원래 금액
+  static const originalAmount = '원래 금액';
+
+  // === Chapter lessons strings ===
+
+  /// 아직 레슨 기록이 없습니다
+  static const noLessonRecords = '아직 레슨 기록이 없습니다';
+
+  /// N회차 완료
+  static String sessionCompleted(int n, String date) => '$n회차 $date 완료';
+
+  /// N회차 예정
+  static String sessionScheduled(int n) => '$n회차 예정';
+
+  /// N회차 미정
+  static String sessionPending(int n) => '$n회차 미정';
+
+  // === Common UI strings ===
+
+  /// 수강권 상세 AppBar 제목
+  static const subscriptionDetailTitle = '수강권 상세';
+
+  /// 수강권을 찾을 수 없습니다
+  static const subscriptionNotFound = '수강권을 찾을 수 없습니다';
+
+  /// 오류가 발생했습니다
+  static const errorOccurred = '오류가 발생했습니다';
+
+  /// 레슨 정보를 찾을 수 없습니다
+  static const lessonInfoNotFound = '레슨 정보를 찾을 수 없습니다';
+
+  /// 악기 (fallback)
+  static const instrumentFallback = '악기';
+
+  /// 사용 N회 / 전체 N회
+  static String usageProgress(int used, int total) =>
+      '사용 $used회 / 전체 $total회';
+
+  /// N회 남음
+  static String remainingCount(int count) => '$count회 남음';
+
+  /// 변경 요청 완료
+  static const rescheduleRequestCompleted = '변경 요청 완료';
+
+  /// 변경 요청 완료 (변경취소권 1회 사용)
+  static const rescheduleRequestCompletedWithCredit = '변경 요청 완료 (변경취소권 1회 사용)';
+
+  /// 취소 요청 완료 (레슨 횟수 1회 차감)
+  static const cancelRequestCompletedDeducted = '취소 요청 완료 (레슨 횟수 1회 차감)';
+
+  /// 취소 요청 완료 (횟수 유지)
+  static const cancelRequestCompletedKept = '취소 요청 완료 (횟수 유지)';
+
   /// 잔여 횟수 경고
   static String remainingLessonsWarning(int count) =>
       '잔여 ${count}회 - 갱신 권장';

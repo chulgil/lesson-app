@@ -30,3 +30,40 @@ String formatRelativeTime(DateTime dateTime) {
 bool isRequestUrgent(DateTime createdAt, {int days = 5}) {
   return DateTime.now().difference(createdAt).inDays >= days;
 }
+
+/// Format date as M/d(요일) (e.g., 4/5(토))
+String formatDateMDWithDay(DateTime date) {
+  const dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+  return '${date.month}/${date.day}(${dayNames[date.weekday]})';
+}
+
+/// Format date as M/d (e.g., 4/5)
+String formatDateMD(DateTime date) {
+  return '${date.month}/${date.day}';
+}
+
+/// Format time as HH:mm (e.g., 14:00)
+String formatTimeHM(DateTime date) {
+  return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+}
+
+/// Format date as M/d(요일) HH:mm (e.g., 4/5(토) 14:00)
+String formatDateTimeMDHM(DateTime date) {
+  return '${formatDateMDWithDay(date)} ${formatTimeHM(date)}';
+}
+
+/// Format date as yyyy년 M월 d일 (요일) (e.g., 2026년 4월 5일 (토))
+String formatDateYMDLong(DateTime date) {
+  const dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+  return '${date.year}년 ${date.month}월 ${date.day}일 (${dayNames[date.weekday]})';
+}
+
+/// Format date as yyyy.M.d (e.g., 2026.4.5)
+String formatDateYMDShort(DateTime date) {
+  return '${date.year}.${date.month}.${date.day}';
+}
+
+/// Format date as yyyy.M.d HH:mm (e.g., 2026.4.5 14:00)
+String formatDateTimeYMDHM(DateTime date) {
+  return '${formatDateYMDShort(date)} ${formatTimeHM(date)}';
+}

@@ -45,13 +45,14 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       discountAmount: fields[25] as int?,
       discountReason: fields[26] as String?,
       originalAmount: fields[27] as int?,
+      rescheduleDeadlineHours: fields[28] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(28)
+      ..writeByte(29)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -107,7 +108,9 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..writeByte(26)
       ..write(obj.discountReason)
       ..writeByte(27)
-      ..write(obj.originalAmount);
+      ..write(obj.originalAmount)
+      ..writeByte(28)
+      ..write(obj.rescheduleDeadlineHours);
   }
 
   @override
@@ -400,6 +403,8 @@ Subscription _$SubscriptionFromJson(Map<String, dynamic> json) => Subscription(
       discountAmount: (json['discount_amount'] as num?)?.toInt(),
       discountReason: json['discount_reason'] as String?,
       originalAmount: (json['original_amount'] as num?)?.toInt(),
+      rescheduleDeadlineHours:
+          (json['reschedule_deadline_hours'] as num?)?.toInt() ?? 12,
     );
 
 Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
@@ -433,6 +438,7 @@ Map<String, dynamic> _$SubscriptionToJson(Subscription instance) =>
       'discount_amount': instance.discountAmount,
       'discount_reason': instance.discountReason,
       'original_amount': instance.originalAmount,
+      'reschedule_deadline_hours': instance.rescheduleDeadlineHours,
     };
 
 const _$SubscriptionTypeEnumMap = {

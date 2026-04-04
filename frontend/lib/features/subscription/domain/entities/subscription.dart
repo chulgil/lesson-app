@@ -190,6 +190,10 @@ class Subscription extends HiveObject {
   @HiveField(27)
   final int? originalAmount;
 
+  /// Reschedule deadline hours — changes within this window consume a reschedule credit.
+  @HiveField(28)
+  final int rescheduleDeadlineHours;
+
   Subscription({
     required this.id,
     required this.studentId,
@@ -219,6 +223,7 @@ class Subscription extends HiveObject {
     this.discountAmount,
     this.discountReason,
     this.originalAmount,
+    this.rescheduleDeadlineHours = 12, // 기본값: 12시간
   });
 
   factory Subscription.fromJson(Map<String, dynamic> json) =>
