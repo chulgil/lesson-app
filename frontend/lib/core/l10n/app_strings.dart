@@ -337,6 +337,15 @@ class AppStrings {
   /// 제안 작성
   static const proposalNeeded = '제안 작성';
 
+  /// 수락 대기 (학생 수락 대기)
+  static const teacherWaitingAccept = '수락 대기';
+
+  /// 입금 대기 (학생 입금 대기)
+  static const teacherWaitingPayment = '입금 대기';
+
+  /// 입금 확인 (선생님이 입금 확인 필요)
+  static const teacherVerifyPayment = '입금 확인';
+
   // ── Student Action Labels ────────────────────────────────
 
   /// 요청 전송됨
@@ -359,6 +368,9 @@ class AppStrings {
 
   /// 입금 확인 중
   static const studentPaymentWaiting = '입금 확인 중';
+
+  /// 결제 필요 (학생이 결제해야 함)
+  static const studentPaymentRequired = '결제 필요';
 
   /// 학생용 가이드 메시지
   static const studentRequestGuideMessage =
@@ -568,6 +580,20 @@ class AppStrings {
       '결제를 완료해주세요';
   static const phase2PaymentReceivedTeacher =
       '입금을 확인하고 수강권을 발급해주세요';
+
+  // ── Action Box Messages (Phase 2 대기 상태) ─────────────────
+
+  /// 선생님: 학생 수강권 수락 대기
+  static const actionBoxWaitingAccept = '학생의 수강권 수락을 기다리고 있습니다';
+
+  /// 선생님: 학생 결제 대기
+  static const actionBoxWaitingPayment = '학생의 결제를 기다리고 있습니다';
+
+  /// 선생님: 수강권 발행 완료
+  static const actionBoxSubscriptionReady = '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.';
+
+  /// 학생: 입금 확인 대기
+  static const actionBoxWaitingVerify = '선생님의 입금 확인을 기다리고 있습니다';
 
   /// 결제 안내 BottomSheet
   static const paymentGuideTitle = '결제 안내 보내기';

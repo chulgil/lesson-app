@@ -625,22 +625,12 @@ class RequestHistoryChat extends StatelessWidget {
   }
 }
 
-/// Phase guide data — single bubble with situation + action.
-///
-/// UX Rule: Each guide follows a consistent pattern:
-///   [title chip]  — phase name (e.g. "시간 조율 중")
-///   [situation]   — what happened / current state (grey text)
-///   [action]      — what to do next (darker, actionable text)
-///
-/// Both lines render inside ONE bubble for quick scanning.
-/// If [action] is null, the phase requires no user action (wait state).
+/// Phase guide: [title chip] + [situation text] in a single info box.
+/// title = actionLabel (리스트와 동일), situation = 한 줄 안내.
 class _PhaseGuide {
   final String title;
   final String situation;
 
-  const _PhaseGuide({
-    required this.title,
-    required this.situation,
-  });
+  const _PhaseGuide({required this.title, required this.situation});
 }
 

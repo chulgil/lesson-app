@@ -641,11 +641,11 @@ class UnifiedLessonRequest extends HiveObject {
       case UnifiedRequestStatus.timeConfirmed:
         return AppStrings.proposalNeeded;          // 제안 작성
       case UnifiedRequestStatus.proposalSent:
-        return '수락 대기';                        // 학생 수락 대기
+        return AppStrings.teacherWaitingAccept;
       case UnifiedRequestStatus.proposalAccepted:
-        return '입금 대기';                        // 학생 입금 대기
+        return AppStrings.teacherWaitingPayment;
       case UnifiedRequestStatus.paymentNotified:
-        return '입금 확인';                        // 입금 확인 필요
+        return AppStrings.teacherVerifyPayment;
       case UnifiedRequestStatus.completed:
         return AppStrings.statusCompleted;
       case UnifiedRequestStatus.rejected:
@@ -678,7 +678,7 @@ class UnifiedLessonRequest extends HiveObject {
       case UnifiedRequestStatus.proposalSent:
         return AppStrings.studentProposalArrived;  // 수강권 도착
       case UnifiedRequestStatus.proposalAccepted:
-        return '결제 필요';                        // 결제 완료해야 함
+        return AppStrings.studentPaymentRequired;
       case UnifiedRequestStatus.paymentNotified:
         return AppStrings.studentPaymentWaiting;   // 입금 확인 중
       case UnifiedRequestStatus.completed:

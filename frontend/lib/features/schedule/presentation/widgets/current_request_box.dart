@@ -447,7 +447,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
         iconColor: AppColors.info,
-        message: '학생의 수강권 수락을 기다리고 있습니다',
+        message: AppStrings.actionBoxWaitingAccept,
       );
     }
 
@@ -456,7 +456,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
         iconColor: AppColors.info,
-        message: '학생의 결제를 기다리고 있습니다',
+        message: AppStrings.actionBoxWaitingPayment,
       );
     }
 
@@ -477,7 +477,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return _buildMessageOnly(
         icon: Icons.card_membership,
         iconColor: AppColors.success,
-        message: '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.',
+        message: AppStrings.actionBoxSubscriptionReady,
       );
     }
 
@@ -523,7 +523,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
         iconColor: AppColors.info,
-        message: '선생님의 입금 확인을 기다리고 있습니다',
+        message: AppStrings.actionBoxWaitingVerify,
       );
     }
 
