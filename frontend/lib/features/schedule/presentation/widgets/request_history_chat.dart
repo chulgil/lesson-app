@@ -520,10 +520,8 @@ class RequestHistoryChat extends StatelessWidget {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  /// Empty state with phase-specific guide + dashed separator + "no history"
+  /// Empty state: same guide box as chat top + "no history" text.
   Widget _buildEmptyWithGuide(BuildContext context) {
-    final guide = _getPhaseGuide();
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
@@ -531,84 +529,10 @@ class RequestHistoryChat extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Phase guide — chat system message style
-          if (guide != null) ...[
-            // Title as date-like system label
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space1,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                ),
-                child: Text(
-                  guide.title,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space3),
+          // Same guide box as _buildSystemGuide
+          _buildSystemGuide(),
 
-            // Guide — single bubble with situation + action
-            Align(
-              alignment: Alignment.center,
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.8,
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                  vertical: AppSpacing.space2 + 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Situation line
-                    Text(
-                      guide.situation,
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
-                        height: 1.4,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    // Action line (if present)
-                    if (guide.action != null) ...[
-                      const SizedBox(height: AppSpacing.space1),
-                      Text(
-                        guide.action!,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textPrimaryLight,
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-
-            // Dashed separator
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              child: _DashedLine(color: AppColors.borderLight),
-            ),
-          ],
-
-          // Empty history message (centered)
+          // Empty history message
           Center(
             child: Text(
               AppStrings.noHistory,
@@ -713,45 +637,10 @@ class RequestHistoryChat extends StatelessWidget {
 class _PhaseGuide {
   final String title;
   final String situation;
-  final String? action;
 
   const _PhaseGuide({
     required this.title,
     required this.situation,
-    this.action,
   });
 }
 
-/// Dashed horizontal line
-class _DashedLine extends StatelessWidget {
-  final Color color;
-
-  const _DashedLine({required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const dashWidth = 4.0;
-        const dashSpace = 4.0;
-        final dashCount =
-            (constraints.constrainWidth() / (dashWidth + dashSpace)).floor();
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(dashCount, (_) {
-            return SizedBox(
-              width: dashWidth,
-              height: 1,
-              child: DecoratedBox(
-                decoration: BoxDecoration(color: color),
-              ),
-            );
-          })
-              .expand((w) => [w, const SizedBox(width: dashSpace)])
-              .toList()
-            ..removeLast(),
-        );
-      },
-    );
-  }
-}
