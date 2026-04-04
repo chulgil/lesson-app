@@ -448,7 +448,7 @@ class UnifiedRequestCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        request.status.label,
+        request.teacherActionLabel,
         style: AppTypography.caption.copyWith(
           color: color,
           fontWeight: FontWeight.w600,
