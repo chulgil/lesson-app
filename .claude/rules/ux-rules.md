@@ -70,4 +70,15 @@ grep -rn "label: '[가-힣]\|hint.*'[가-힣]" --include="*.dart" features/
 # NO-OP 콜백
 grep -rn "onTap: () {}" --include="*.dart" features/
 grep -rn "onPressed: null" --include="*.dart" features/
+
+# 액션 박스 하드코딩 메시지 (AppStrings 미사용)
+grep -rn "message: '[가-힣]" --include="*.dart" features/
 ```
+
+## 상태별 가이드 메시지 규칙
+
+- **상단 가이드 title = 리스트 actionLabel** — 리스트↔챗 일관성 (#25)
+- **가이드 색상 2색** — action(primary) / wait(grey). 5색 이상 금지 (#25)
+- **과거 챕터 펼침 시 가이드 숨김** — `showGuide: false` 전달 (#25)
+- **상태 라벨은 역할별** — 선생님: 행동 중심 (입금 대기), 학생: 상태 중심 (결제 필요) (#25)
+- **가이드 스펙**: `docs/specs/schedule/chat_guide_message_spec.md`
