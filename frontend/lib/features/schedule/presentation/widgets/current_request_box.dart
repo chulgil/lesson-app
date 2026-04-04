@@ -437,7 +437,30 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     UnifiedLessonRequest request,
     UnifiedRequestStatus status,
   ) {
-    // 입금 확인 대기 (학생이 입금 완료 알림)
+    // 1. 수강권 안내 전 (proposalSent 이전) → 발급 방법 선택
+    if (status == UnifiedRequestStatus.timeConfirmed) {
+      return _buildPhase2PaymentChoice();
+    }
+
+    // 2. 수강권 안내 발송됨 → 학생 수락 대기
+    if (status == UnifiedRequestStatus.proposalSent) {
+      return _buildMessageOnly(
+        icon: Icons.hourglass_top,
+        iconColor: AppColors.info,
+        message: '학생의 수강권 수락을 기다리고 있습니다',
+      );
+    }
+
+    // 3. 학생이 수강권 수락 → 결제 대기
+    if (status == UnifiedRequestStatus.proposalAccepted) {
+      return _buildMessageOnly(
+        icon: Icons.hourglass_top,
+        iconColor: AppColors.info,
+        message: '학생의 결제를 기다리고 있습니다',
+      );
+    }
+
+    // 4. 입금 확인 대기 (학생이 입금 완료 알림)
     if (status == UnifiedRequestStatus.paymentNotified) {
       return _buildActionRow(
         icon: Icons.account_balance,
@@ -449,26 +472,16 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       );
     }
 
-    // 수강권 발행 후 (Phase 2 완료 상태) — 레슨 시작 대기
-    // 실제 레슨이 진행되기 전이므로 "레슨 완료" 버튼을 표시하지 않음
+    // 5. 수강권 발행 완료 → 레슨 시작 대기
     if (status == UnifiedRequestStatus.subscriptionIssued) {
-      return Row(
-        children: [
-          Icon(Icons.card_membership, color: AppColors.success, size: 18),
-          const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: Text(
-              '${AppStrings.chatSubscriptionIssued}\n레슨을 시작할 준비가 완료되었습니다.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ),
-        ],
+      return _buildMessageOnly(
+        icon: Icons.card_membership,
+        iconColor: AppColors.success,
+        message: '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.',
       );
     }
 
-    // 선불/후불/무료 3가지 선택지
+    // fallback — 발급 방법 선택
     return _buildPhase2PaymentChoice();
   }
 
@@ -510,7 +523,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
         iconColor: AppColors.info,
-        message: AppStrings.phase2PaymentReceivedTeacher,
+        message: '선생님의 입금 확인을 기다리고 있습니다',
       );
     }
 
