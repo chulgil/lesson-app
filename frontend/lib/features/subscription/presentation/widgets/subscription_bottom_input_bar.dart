@@ -106,21 +106,18 @@ class SubscriptionBottomInputBar extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
-        SizedBox(
-          height: 40,
-          child: OutlinedButton.icon(
-            onPressed: onScheduleChange,
-            icon: const Icon(Icons.schedule, size: 16),
-            label: Text(AppStrings.scheduleChangeButton),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-              ),
-              textStyle: AppTypography.bodySmall.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+        TextButton.icon(
+          onPressed: onScheduleChange,
+          icon: const Icon(Icons.schedule, size: 16),
+          label: Text(AppStrings.scheduleChangeButton),
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space2,
+            ),
+            textStyle: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
