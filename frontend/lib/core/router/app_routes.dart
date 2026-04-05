@@ -125,6 +125,7 @@ class AppRoutes {
   static const lessonPolicy = '/subscriptions/policy';
   static const subscriptionTemplates = '/subscriptions/templates';
   static const teacherSubscriptions = '/subscriptions/teacher';
+  static const scheduleChangeRequests = '/schedule-change-requests';
 
   // Proposal routes
   static const proposalCreate = '/proposals/create';

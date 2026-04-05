@@ -11,6 +11,7 @@ import '../../../features/subscription/presentation/screens/proposal_detail_scre
 import '../../../features/subscription/presentation/screens/proposal_confirm_screen.dart';
 import '../../../features/subscription/presentation/screens/renewal_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/student_proposal_accept_screen.dart';
+import '../../../features/subscription/presentation/screens/schedule_change_request_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_template_list_screen.dart';
 
 /// Subscription-related routes.
@@ -40,6 +41,14 @@ List<RouteBase> subscriptionRoutes = [
   GoRoute(
     path: AppRoutes.expiringSubscriptions,
     builder: (context, state) => const ExpiringSubscriptionsScreen(),
+  ),
+  // Schedule change requests route
+  GoRoute(
+    path: AppRoutes.scheduleChangeRequests,
+    builder: (context, state) {
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      return ScheduleChangeRequestListScreen(teacherId: teacherId);
+    },
   ),
   // Issue route must come before detail route
   GoRoute(

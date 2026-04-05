@@ -904,6 +904,17 @@ class AppStrings {
   /// N회차 미정
   static String sessionPending(int n) => '$n회차 미정';
 
+  /// Collapsed session headers for chat layout
+  static String sessionCollapsedCompleted(int n, String dateTime) =>
+      '$n회차 · $dateTime 완료';
+  static String sessionCollapsedScheduled(int n, String dateTime) =>
+      '$n회차 · $dateTime 예정';
+  static String sessionCollapsedFuture(int n) => '$n회차 · 미정';
+
+  /// Bottom input bar
+  static const subscriptionMessageHint = '메시지를 입력하세요';
+  static const scheduleChangeButton = '일정 변경';
+
   // === Common UI strings ===
 
   /// 수강권 상세 AppBar 제목
@@ -1047,6 +1058,15 @@ class AppStrings {
   /// 변경요청 N건
   static String pendingChangeRequests(int count) => '변경요청 $count건';
 
+  /// 스케줄 변경요청
+  static const scheduleChangeRequests = '스케줄 변경요청';
+
+  /// 변경
+  static const changeTypeLabel = '변경';
+
+  /// 취소
+  static const cancelTypeLabel = '취소';
+
   /// 시간변경
   static const sessionChangeRequest = '시간변경';
 
@@ -1055,4 +1075,83 @@ class AppStrings {
 
   /// N회차
   static String sessionNumberLabel(int n) => '$n회차';
+
+  // ── Session Progress Bar ────────────────────────────────────
+
+  /// 전체 일괄 변경 버튼
+  static const bulkChangeAll = '전체';
+
+  // ── Subscription Issued Card (D-4) ──────────────────────────
+
+  /// 수강권 발급 메시지
+  static const subscriptionIssuedMessage = '수강권이 발급되었습니다';
+
+  /// 유효기간
+  static const validityPeriod = '유효기간';
+
+  /// 기준시간
+  static const deadlineHoursLabel = '기준시간';
+
+  /// 변경취소권
+  static const rescheduleCreditsLabel = '변경취소권';
+
+  // ── Schedule Change Request List (D-6) ─────────────────────
+
+  /// 스케줄 변경요청 화면 제목
+  static const scheduleChangeRequestTitle = '스케줄 변경요청';
+
+  /// 대기중 탭
+  static const tabPending = '대기중';
+
+  /// 완료 탭
+  static const tabCompleted = '완료';
+
+  /// 전체 탭
+  static const tabAll = '전체';
+
+  /// 변경요청이 없습니다
+  static const noChangeRequests = '변경요청이 없습니다';
+
+  // ── Schedule Guide Info Box (D-7) ──────────────────────────
+
+  /// 기본 가이드 메시지 (회차 터치 안내)
+  static const guideDefaultMessage = '회차를 터치하여 일정을 변경할 수 있습니다';
+
+  /// 전체 모드 가이드 메시지
+  static const guideBulkModeMessage = '앞으로의 전체 스케줄을 변경합니다';
+
+  // ── Schedule Change Chat Bubble (D-5) ─────────────────────
+
+  /// N회차 시간 변경을 요청합니다
+  static String sessionChangeRequested(int n) => '$n회차 시간 변경을 요청합니다';
+
+  /// N회차 일정 변경을 제안했습니다
+  static String sessionChangeProposed(int n) => '$n회차 일정 변경을 제안했습니다';
+
+  /// 전체 회차(from~to) 일정 변경을 제안했습니다
+  static String bulkChangeProposed(int from, int to) =>
+      '전체 회차($from~$to) 일정 변경을 제안했습니다';
+
+  /// $slot을 선택했습니다
+  static String slotAccepted(String slot) => '$slot을 선택했습니다';
+
+  /// 일정 변경을 거절했습니다
+  static const changeRejected = '일정 변경을 거절했습니다';
+
+  /// 다른 시간을 제안합니다
+  static const counterProposed = '다른 시간을 제안합니다';
+
+  /// N순위
+  static String slotPriority(int n) => '$n순위';
+
+  /// N회차 → dateTime 확정
+  static String sessionConfirmed(int n, String dateTime) =>
+      '$n회차 → $dateTime 확정';
+
+  /// 사유:
+  static const reasonPrefix = '사유: ';
+
+  /// 변경취소권 N회 사용 (잔여 M회)
+  static String rescheduleCreditsUsed(int used, int remaining) =>
+      '변경취소권 $used회 사용 (잔여 $remaining회)';
 }

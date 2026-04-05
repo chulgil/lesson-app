@@ -19,7 +19,7 @@ import 'assignment_summary_section.dart';
 import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
-import 'teacher_subscription_section.dart';
+import 'schedule_change_request_section.dart';
 import 'urgent_alert_zone.dart';
 
 /// Dashboard Tab - information hierarchy: urgent → today → trends → tools.
@@ -112,7 +112,7 @@ class DashboardTab extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space6),
 
-            TeacherSubscriptionSection(teacherId: teacherId),
+            ScheduleChangeRequestSection(teacherId: teacherId),
 
             const SizedBox(height: AppSpacing.space6),
 

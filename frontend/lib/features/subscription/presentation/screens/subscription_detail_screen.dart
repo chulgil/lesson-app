@@ -1,33 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/instrument_colors.dart';
-import '../../../../core/widgets/chapter_summary.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../utils/subscription_status_colors.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/reschedule_bottom_sheet.dart';
-import '../widgets/subscription_action_box.dart';
-import '../widgets/subscription_chapter_info.dart';
-import '../widgets/subscription_chapter_lessons.dart';
-import '../widgets/subscription_chapter_payment.dart';
+import '../widgets/session_progress_bar.dart';
+import '../widgets/subscription_detail_chat_list.dart';
 
-/// Screen showing subscription detail with chapter model layout.
+/// Screen showing subscription detail with progress bar + chat layout.
 ///
-/// Chapter 1: 수강권 정보 (collapsed)
-/// Chapter 2: 결제 내역 (collapsed)
-/// Chapter 3: 레슨 진행 (expanded — primary)
+/// Layout:
+/// - AppBar: student/teacher name + instrument
+/// - SessionProgressBar (fixed at top)
+/// - Scrollable chat area (per-session events)
+/// - Bottom input bar (message + schedule change)
 class SubscriptionDetailScreen extends ConsumerWidget {
   final String subscriptionId;
   final String viewerRole;
@@ -45,13 +41,16 @@ class SubscriptionDetailScreen extends ConsumerWidget {
     return subscriptionAsync.when(
       data: (subscription) {
         if (subscription == null) return _buildNotFoundScaffold();
-        return _SubscriptionChapterDetail(
+        return _SubscriptionDetailBody(
           subscription: subscription,
           viewerRole: viewerRole,
         );
       },
       loading: () => Scaffold(
-        appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
+        appBar: AppBar(
+          title: Text(AppStrings.subscriptionDetailTitle),
+          centerTitle: true,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (error, _) => _buildErrorScaffold(error.toString()),
@@ -60,12 +59,19 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
   Widget _buildNotFoundScaffold() {
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
+      appBar: AppBar(
+        title: Text(AppStrings.subscriptionDetailTitle),
+        centerTitle: true,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: AppColors.textTertiaryLight),
+            Icon(
+              Icons.search_off,
+              size: 64,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               AppStrings.subscriptionNotFound,
@@ -81,7 +87,10 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
   Widget _buildErrorScaffold(String error) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
+      appBar: AppBar(
+        title: Text(AppStrings.subscriptionDetailTitle),
+        centerTitle: true,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space6),
@@ -107,115 +116,92 @@ class SubscriptionDetailScreen extends ConsumerWidget {
   }
 }
 
-/// Stateful chapter detail with expand/collapse state.
-class _SubscriptionChapterDetail extends ConsumerStatefulWidget {
+/// Stateful body with session selection, chat scroll, and bottom input.
+class _SubscriptionDetailBody extends ConsumerStatefulWidget {
   final Subscription subscription;
   final String viewerRole;
 
-  const _SubscriptionChapterDetail({
+  const _SubscriptionDetailBody({
     required this.subscription,
-    this.viewerRole = 'student',
+    required this.viewerRole,
   });
 
   @override
-  ConsumerState<_SubscriptionChapterDetail> createState() =>
-      _SubscriptionChapterDetailState();
+  ConsumerState<_SubscriptionDetailBody> createState() =>
+      _SubscriptionDetailBodyState();
 }
 
-class _SubscriptionChapterDetailState
-    extends ConsumerState<_SubscriptionChapterDetail> {
-  // Chapter 3 (lessons) starts expanded, others collapsed
-  bool _infoExpanded = false;
-  bool _paymentExpanded = false;
-  bool _lessonsExpanded = true;
+class _SubscriptionDetailBodyState
+    extends ConsumerState<_SubscriptionDetailBody> {
+  late int _selectedSession;
+  final TextEditingController _messageController = TextEditingController();
 
   Subscription get subscription => widget.subscription;
   bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
+  void initState() {
+    super.initState();
+    _selectedSession = (subscription.usedLessons + 1).clamp(
+      1,
+      subscription.totalLessonsForDisplay ?? 1,
+    );
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final membershipAsync = ref.watch(membershipProvider(subscription.membershipId));
+    final membershipAsync =
+        ref.watch(membershipProvider(subscription.membershipId));
 
     return membershipAsync.when(
       data: (membership) {
-        final instrument = membership?.instrument ?? AppStrings.instrumentFallback;
+        final instrument =
+            membership?.instrument ?? AppStrings.instrumentFallback;
         final lessonClassAsync = membership != null
             ? ref.watch(lessonClassProvider(membership.lessonClassId))
             : null;
 
         return Scaffold(
           appBar: _buildAppBar(instrument, lessonClassAsync),
-          bottomNavigationBar: SubscriptionActionBox(
-            subscription: subscription,
-            viewerRole: widget.viewerRole,
-            onReschedule: () => _handleReschedule(context),
-            onCancel: _isTeacher ? null : () => _handleCancel(context),
-            onLessonComplete: _isTeacher ? () => _handleLessonComplete(context) : null,
+          body: Column(
+            children: [
+              // SessionProgressBar (fixed at top)
+              _buildProgressBarSection(),
+
+              // Guide info box (fixed)
+              _buildGuideBox(),
+
+              // Scrollable chat area
+              Expanded(
+                child: SubscriptionDetailChatList(
+                  subscription: subscription,
+                  selectedSession: _selectedSession,
+                  instrument: instrument,
+                ),
+              ),
+            ],
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                // Summary header
-                _buildSummaryHeader(instrument),
-
-                // Chapter 1: 수강권 정보
-                ChapterSummary(
-                  icon: Icons.confirmation_number_outlined,
-                  title: AppStrings.chapterSubscriptionInfo,
-                  completedDate: subscription.startDate != null
-                      ? formatDateMD(subscription.startDate!)
-                      : null,
-                  summary: _infoSummary,
-                  isExpanded: _infoExpanded,
-                  isActive: false,
-                  onTap: () => setState(() => _infoExpanded = !_infoExpanded),
-                  child: SubscriptionChapterInfo(subscription: subscription),
-                ),
-
-                // Chapter 2: 결제 내역
-                ChapterSummary(
-                  icon: Icons.payment,
-                  title: AppStrings.chapterPaymentHistory,
-                  completedDate: subscription.paidAt != null
-                      ? formatDateMD(subscription.paidAt!)
-                      : null,
-                  summary: _paymentSummary,
-                  isExpanded: _paymentExpanded,
-                  isActive: false,
-                  onTap: () => setState(() => _paymentExpanded = !_paymentExpanded),
-                  child: SubscriptionChapterPayment(subscription: subscription),
-                ),
-
-                // Chapter 3: 레슨 진행 (primary — expanded by default)
-                ChapterSummary(
-                  icon: Icons.music_note,
-                  title: AppStrings.chapterLessonProgress(subscription.usedLessons, subscription.totalLessonsForDisplay ?? 0),
-                  isExpanded: _lessonsExpanded,
-                  isActive: true,
-                  onTap: () => setState(() => _lessonsExpanded = !_lessonsExpanded),
-                  child: SubscriptionChapterLessons(subscription: subscription),
-                ),
-
-                // Bottom divider
-                Container(
-                  width: double.infinity,
-                  height: 1,
-                  color: AppColors.borderLight,
-                ),
-
-                // Bottom safe area padding
-                const SizedBox(height: AppSpacing.space6),
-              ],
-            ),
-          ),
+          bottomNavigationBar: _buildBottomInputBar(context),
         );
       },
       loading: () => Scaffold(
-        appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
+        appBar: AppBar(
+          title: Text(AppStrings.subscriptionDetailTitle),
+          centerTitle: true,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       ),
       error: (_, __) => Scaffold(
-        appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
+        appBar: AppBar(
+          title: Text(AppStrings.subscriptionDetailTitle),
+          centerTitle: true,
+        ),
         body: Center(
           child: Text(
             AppStrings.lessonInfoNotFound,
@@ -228,7 +214,10 @@ class _SubscriptionChapterDetailState
     );
   }
 
-  AppBar _buildAppBar(String instrument, AsyncValue<LessonClass?>? lessonClassAsync) {
+  AppBar _buildAppBar(
+    String instrument,
+    AsyncValue<LessonClass?>? lessonClassAsync,
+  ) {
     final className = lessonClassAsync?.valueOrNull?.name;
     final title = className != null ? '$instrument · $className' : instrument;
 
@@ -238,99 +227,56 @@ class _SubscriptionChapterDetailState
     );
   }
 
-  Widget _buildSummaryHeader(String instrument) {
-    final colors = InstrumentColors.getColor(instrument);
-    final statusColor = SubscriptionStatusColors.getColor(subscription);
-    final remaining = subscription.remainingLessons ?? 0;
+  Widget _buildProgressBarSection() {
     final total = subscription.totalLessonsForDisplay ?? 0;
 
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: colors.background,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space3,
       ),
-      child: Column(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        border: Border(
+          bottom: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: SessionProgressBar(
+        totalSessions: total,
+        completedSessions: subscription.usedLessons,
+        selectedSession: _selectedSession,
+        isMonthly: subscription.type == SubscriptionType.monthly,
+        onSessionTap: (session) {
+          setState(() => _selectedSession = session);
+        },
+        onBulkChangeTap: () => _handleReschedule(context),
+      ),
+    );
+  }
+
+  Widget _buildGuideBox() {
+    final isPackage = subscription.type == SubscriptionType.package;
+    final message = isPackage
+        ? AppStrings.packageGuideMessage
+        : AppStrings.monthlyGuideMessage;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      color: AppColors.info.withValues(alpha: 0.06),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status badge
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space1,
-            ),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
+          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.info),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
             child: Text(
-              SubscriptionStatusColors.getLabel(subscription),
-              style: AppTypography.bodySmall.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // Big remaining count
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                '$remaining',
-                style: AppTypography.displayLarge.copyWith(
-                  color: colors.accent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 48,
-                ),
-              ),
-              Text(
-                ' / $total회',
-                style: AppTypography.headingMedium.copyWith(
-                  color: colors.accent.withValues(alpha: 0.6),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.space1),
-
-          // Progress bar
-          SizedBox(
-            width: 200,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: total > 0 ? (total - remaining) / total : 0,
-                minHeight: 8,
-                backgroundColor: colors.accent.withValues(alpha: 0.15),
-                valueColor: AlwaysStoppedAnimation<Color>(colors.accent),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: AppSpacing.space3),
-
-          // Reschedule credits badge
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space1,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            ),
-            child: Text(
-              '${AppStrings.rescheduleLabel} ${AppStrings.rescheduleCount(subscription.remainingReschedule, subscription.totalRescheduleAllowance)}',
+              message,
               style: AppTypography.caption.copyWith(
-                color: subscription.canReschedule
-                    ? colors.accent
-                    : AppColors.textTertiaryLight,
-                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondaryLight,
               ),
             ),
           ),
@@ -339,16 +285,143 @@ class _SubscriptionChapterDetailState
     );
   }
 
+  Widget _buildBottomInputBar(BuildContext context) {
+    if (subscription.isExpired || subscription.isDepleted) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        border: Border(
+          top: BorderSide(color: AppColors.borderLight),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Message input row
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: AppStrings.subscriptionMessageHint,
+                      hintStyle: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                        vertical: AppSpacing.space2,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusRound),
+                        borderSide:
+                            BorderSide(color: AppColors.borderLight),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusRound),
+                        borderSide:
+                            BorderSide(color: AppColors.borderLight),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusRound),
+                        borderSide:
+                            const BorderSide(color: AppColors.primary),
+                      ),
+                    ),
+                    style: AppTypography.bodySmall,
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.space2),
+                // Schedule change button
+                OutlinedButton.icon(
+                  onPressed: () => _handleReschedule(context),
+                  icon: const Icon(Icons.schedule, size: 16),
+                  label: Text(AppStrings.scheduleChangeButton),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space3,
+                      vertical: AppSpacing.space2,
+                    ),
+                    textStyle: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            // Action buttons row (role-specific)
+            _isTeacher
+                ? _buildTeacherActions(context)
+                : _buildStudentActions(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeacherActions(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => _handleLessonComplete(context),
+            icon: const Icon(Icons.check_circle_outline, size: 18),
+            label: Text(AppStrings.lessonComplete),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStudentActions(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => _handleCancel(context),
+            icon: const Icon(Icons.cancel_outlined, size: 18),
+            label: Text(AppStrings.cancelRequest),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.error,
+              side: BorderSide(
+                color: AppColors.error.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // Action Handlers
+  // ═══════════════════════════════════════════════════════════════
+
   void _handleReschedule(BuildContext context) async {
-    // Use a placeholder lesson time for now (next scheduled lesson)
-    // In production, this would come from the actual scheduled lesson data
-    final nextLessonTime = DateTime.now().add(const Duration(days: 3, hours: 14));
+    final nextLessonTime =
+        DateTime.now().add(const Duration(days: 3, hours: 14));
 
     final result = await showRescheduleBottomSheet(
       context,
       subscription: subscription,
       currentLessonDateTime: nextLessonTime,
-      sessionNumber: subscription.usedLessons + 1,
+      sessionNumber: _selectedSession,
     );
 
     if (result != null && context.mounted) {
@@ -367,13 +440,14 @@ class _SubscriptionChapterDetailState
   }
 
   void _handleCancel(BuildContext context) async {
-    final nextLessonTime = DateTime.now().add(const Duration(days: 3, hours: 14));
+    final nextLessonTime =
+        DateTime.now().add(const Duration(days: 3, hours: 14));
 
     final result = await showCancelLessonBottomSheet(
       context,
       subscription: subscription,
       lessonDateTime: nextLessonTime,
-      sessionNumber: subscription.usedLessons + 1,
+      sessionNumber: _selectedSession,
     );
 
     if (result != null && context.mounted) {
@@ -393,7 +467,7 @@ class _SubscriptionChapterDetailState
         title: Text(AppStrings.lessonComplete),
         content: Text(
           AppStrings.sessionCompleted(
-            subscription.usedLessons + 1,
+            _selectedSession,
             formatDateMDWithDay(DateTime.now()),
           ),
         ),
@@ -415,26 +489,5 @@ class _SubscriptionChapterDetailState
         SnackBar(content: Text(AppStrings.lessonCompleted)),
       );
     }
-  }
-
-  String get _infoSummary {
-    final parts = <String>[
-      subscription.typeLabel,
-      '${NumberFormat('#,###').format(subscription.amount)}${AppStrings.wonUnit}',
-    ];
-    if (subscription.endDate != null) {
-      parts.add('~${formatDateMD(subscription.endDate!)}');
-    }
-    return parts.join(' · ');
-  }
-
-  String get _paymentSummary {
-    final parts = <String>[
-      subscription.paymentConfirmed ? AppStrings.paymentCompleted : AppStrings.paymentPending,
-    ];
-    if (subscription.paymentMethod != null) {
-      parts.add(subscription.paymentMethod!.label);
-    }
-    return parts.join(' · ');
   }
 }
