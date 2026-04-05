@@ -5,16 +5,19 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Result from the reschedule bottom sheet.
 class RescheduleResult {
   final DateTime newDateTime;
   final bool usedRescheduleCredit;
+  final ScheduleChangeType changeType;
 
   const RescheduleResult({
     required this.newDateTime,
     required this.usedRescheduleCredit,
+    required this.changeType,
   });
 }
 
@@ -56,12 +59,16 @@ class _RescheduleBottomSheet extends StatefulWidget {
 class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+  ScheduleChangeType _changeType = ScheduleChangeType.singleLesson;
 
   bool get _isWithinDeadline {
     final hoursUntilLesson =
         widget.currentLessonDateTime.difference(DateTime.now()).inHours;
     return hoursUntilLesson < widget.subscription.rescheduleDeadlineHours;
   }
+
+  bool get _isMonthly =>
+      widget.subscription.type == SubscriptionType.monthly;
 
   bool get _canSubmit => _selectedDate != null && _selectedTime != null;
 
@@ -118,6 +125,12 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               ),
 
               const SizedBox(height: AppSpacing.space4),
+
+              // Change type selector (monthly only)
+              if (_isMonthly) ...[
+                _buildChangeTypeSelector(),
+                const SizedBox(height: AppSpacing.space4),
+              ],
 
               // Date picker
               _buildDatePicker(context),
@@ -249,6 +262,92 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
     );
   }
 
+  Widget _buildChangeTypeSelector() {
+    final sessionNumber = widget.sessionNumber;
+    final total = widget.subscription.totalLessonsForDisplay ?? 0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildChangeTypeCard(
+          type: ScheduleChangeType.singleLesson,
+          label: AppStrings.changeTypeSingleLabel,
+          description: AppStrings.changeTypeSingleDesc(sessionNumber),
+          icon: Icons.event,
+        ),
+        const SizedBox(height: AppSpacing.space2),
+        _buildChangeTypeCard(
+          type: ScheduleChangeType.bulkChange,
+          label: AppStrings.changeTypeBulkLabel,
+          description: AppStrings.changeTypeBulkDesc(sessionNumber, total),
+          icon: Icons.date_range,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChangeTypeCard({
+    required ScheduleChangeType type,
+    required String label,
+    required String description,
+    required IconData icon,
+  }) {
+    final isSelected = _changeType == type;
+
+    return GestureDetector(
+      onTap: () => setState(() => _changeType = type),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.05)
+              : AppColors.surfaceLight,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle, size: 20, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDeadlineNotice() {
     final deadlineHours = widget.subscription.rescheduleDeadlineHours;
     final remaining = widget.subscription.remainingReschedule;
@@ -328,6 +427,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       RescheduleResult(
         newDateTime: _newDateTime!,
         usedRescheduleCredit: _isWithinDeadline,
+        changeType: _changeType,
       ),
     );
   }

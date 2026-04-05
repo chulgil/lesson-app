@@ -29,13 +29,15 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       scheduleChangeType: fields[9] as ScheduleChangeType?,
       proposedDayOfWeek: fields[10] as int?,
       proposedTime: fields[11] as String?,
+      subscriptionId: fields[12] as String?,
+      sessionNumber: fields[13] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, RequestEvent obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,7 +61,11 @@ class RequestEventAdapter extends TypeAdapter<RequestEvent> {
       ..writeByte(10)
       ..write(obj.proposedDayOfWeek)
       ..writeByte(11)
-      ..write(obj.proposedTime);
+      ..write(obj.proposedTime)
+      ..writeByte(12)
+      ..write(obj.subscriptionId)
+      ..writeByte(13)
+      ..write(obj.sessionNumber);
   }
 
   @override
@@ -253,6 +259,8 @@ RequestEvent _$RequestEventFromJson(Map<String, dynamic> json) => RequestEvent(
           _$ScheduleChangeTypeEnumMap, json['schedule_change_type']),
       proposedDayOfWeek: (json['proposed_day_of_week'] as num?)?.toInt(),
       proposedTime: json['proposed_time'] as String?,
+      subscriptionId: json['subscription_id'] as String?,
+      sessionNumber: (json['session_number'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$RequestEventToJson(RequestEvent instance) =>
@@ -271,6 +279,8 @@ Map<String, dynamic> _$RequestEventToJson(RequestEvent instance) =>
           _$ScheduleChangeTypeEnumMap[instance.scheduleChangeType],
       'proposed_day_of_week': instance.proposedDayOfWeek,
       'proposed_time': instance.proposedTime,
+      'subscription_id': instance.subscriptionId,
+      'session_number': instance.sessionNumber,
     };
 
 const _$ProposerRoleEnumMap = {

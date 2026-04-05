@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/chapter_summary.dart';
+import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
@@ -29,10 +30,12 @@ import '../widgets/subscription_chapter_payment.dart';
 /// Chapter 3: 레슨 진행 (expanded — primary)
 class SubscriptionDetailScreen extends ConsumerWidget {
   final String subscriptionId;
+  final String viewerRole;
 
   const SubscriptionDetailScreen({
     super.key,
     required this.subscriptionId,
+    this.viewerRole = 'student',
   });
 
   @override
@@ -42,7 +45,10 @@ class SubscriptionDetailScreen extends ConsumerWidget {
     return subscriptionAsync.when(
       data: (subscription) {
         if (subscription == null) return _buildNotFoundScaffold();
-        return _SubscriptionChapterDetail(subscription: subscription);
+        return _SubscriptionChapterDetail(
+          subscription: subscription,
+          viewerRole: viewerRole,
+        );
       },
       loading: () => Scaffold(
         appBar: AppBar(title: Text(AppStrings.subscriptionDetailTitle), centerTitle: true),
@@ -104,8 +110,12 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 /// Stateful chapter detail with expand/collapse state.
 class _SubscriptionChapterDetail extends ConsumerStatefulWidget {
   final Subscription subscription;
+  final String viewerRole;
 
-  const _SubscriptionChapterDetail({required this.subscription});
+  const _SubscriptionChapterDetail({
+    required this.subscription,
+    this.viewerRole = 'student',
+  });
 
   @override
   ConsumerState<_SubscriptionChapterDetail> createState() =>
@@ -120,6 +130,7 @@ class _SubscriptionChapterDetailState
   bool _lessonsExpanded = true;
 
   Subscription get subscription => widget.subscription;
+  bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
   Widget build(BuildContext context) {
@@ -136,8 +147,10 @@ class _SubscriptionChapterDetailState
           appBar: _buildAppBar(instrument, lessonClassAsync),
           bottomNavigationBar: SubscriptionActionBox(
             subscription: subscription,
+            viewerRole: widget.viewerRole,
             onReschedule: () => _handleReschedule(context),
-            onCancel: () => _handleCancel(context),
+            onCancel: _isTeacher ? null : () => _handleCancel(context),
+            onLessonComplete: _isTeacher ? () => _handleLessonComplete(context) : null,
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -339,9 +352,14 @@ class _SubscriptionChapterDetailState
     );
 
     if (result != null && context.mounted) {
-      final message = result.usedRescheduleCredit
-          ? AppStrings.rescheduleRequestCompletedWithCredit
-          : AppStrings.rescheduleRequestCompleted;
+      final String message;
+      if (result.changeType == ScheduleChangeType.bulkChange) {
+        message = AppStrings.bulkScheduleChangeCompleted;
+      } else if (result.usedRescheduleCredit) {
+        message = AppStrings.rescheduleRequestCompletedWithCredit;
+      } else {
+        message = AppStrings.rescheduleRequestCompleted;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -364,6 +382,37 @@ class _SubscriptionChapterDetailState
           : AppStrings.cancelRequestCompletedKept;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  void _handleLessonComplete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppStrings.lessonComplete),
+        content: Text(
+          AppStrings.sessionCompleted(
+            subscription.usedLessons + 1,
+            formatDateMDWithDay(DateTime.now()),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppStrings.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppStrings.confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.lessonCompleted)),
       );
     }
   }

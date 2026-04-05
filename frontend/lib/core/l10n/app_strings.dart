@@ -143,6 +143,28 @@ class AppStrings {
   /// 요청 더보기
   static String moreRequests(int count) => '$count개 요청 더보기';
 
+  /// 수강권 더보기
+  static String moreSubscriptions(int count) => '$count개 수강권 더보기';
+
+  /// 전체보기
+  static const viewAll = '전체보기';
+
+  /// 소진임박
+  static const statusExpiringSoon = '소진임박';
+
+  /// 발급 수강권 (선생님 전체 목록 제목)
+  static const issuedSubscriptions = '발급 수강권';
+
+  /// 수강권 요약: 이용중
+  static const summaryActive = '이용중';
+
+  /// 수강권 요약: 대기중 요청
+  static const pendingRequests = '대기중 요청';
+
+  /// 해당 상태의 수강권이 없습니다
+  static String noSubscriptionsForStatus(String status) =>
+      '$status 수강권이 없습니다';
+
   // ── Request List Item (Redesign) ──────────────────────────
 
   /// 희망 시간 외 N건
@@ -657,6 +679,9 @@ class AppStrings {
 
   static const lessonConfirmation = '레슨 확인';
   static const lessonCompleted = '레슨 완료';
+
+  /// 레슨 완료 (버튼 라벨)
+  static const lessonComplete = '레슨 완료';
   static const lessonNotCompleted = '레슨 미진행';
   static const deductOne = '수강권 1회 차감';
   static const selectReason = '사유 선택 필요';
@@ -972,4 +997,62 @@ class AppStrings {
 
   /// 주간 포인트 값 표시
   static String weeklyPointsValue(int points) => '${points}pt';
+
+  // ── Subscription Chapter Lessons (C-3) ──────────────────────
+
+  /// 고정 스케줄 자동 생성 안내 (정규권)
+  static const monthlyGuideMessage =
+      '고정 스케줄이 자동 생성되었습니다. 변경이 필요하면 해당 회차를 탭하세요.';
+
+  /// 다음 레슨 예약 안내 (회차권)
+  static const packageGuideMessage =
+      '다음 레슨 시간을 선생님의 빈 시간대에서 선택하세요.';
+
+  /// 변경 이력 없음
+  static const noChangeHistory = '변경 이력 없음';
+
+  /// 예약 필요
+  static const bookingRequired = '예약 필요';
+
+  /// N~M회차 (더보기)
+  static String moreSessionsLabel(int from, int to) => '$from~$to회차';
+
+  /// 더보기
+  static const showMore = '더보기';
+
+  /// 매주 dayTime
+  static String fixedScheduleLabel(String dayTime) => '매주 $dayTime';
+
+  // ── Schedule Change Type Selection (C-4) ─────────────────
+
+  /// 이번 회차만 변경
+  static const changeTypeSingleLabel = '이번 회차만 변경';
+
+  /// N회차만 다른 시간으로
+  static String changeTypeSingleDesc(int session) =>
+      '$session회차만 다른 시간으로';
+
+  /// 앞으로 전체 변경
+  static const changeTypeBulkLabel = '앞으로 전체 변경';
+
+  /// N~M회차 새로운 고정 시간
+  static String changeTypeBulkDesc(int from, int to) =>
+      '$from~$to회차 새로운 고정 시간';
+
+  /// 전체 스케줄 변경 요청 완료
+  static const bulkScheduleChangeCompleted = '전체 스케줄 변경 요청 완료';
+
+  // ── Schedule Change Requests (C-5) ────────────────────────
+
+  /// 변경요청 N건
+  static String pendingChangeRequests(int count) => '변경요청 $count건';
+
+  /// 시간변경
+  static const sessionChangeRequest = '시간변경';
+
+  /// 취소요청
+  static const sessionCancelRequest = '취소요청';
+
+  /// N회차
+  static String sessionNumberLabel(int n) => '$n회차';
 }

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../app_routes.dart';
 import '../../../features/subscription/presentation/screens/expiring_subscriptions_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_list_screen.dart';
+import '../../../features/subscription/presentation/screens/teacher_subscription_list_screen.dart';
 import '../../../features/subscription/presentation/screens/subscription_detail_screen.dart';
 import '../../../features/subscription/presentation/screens/issue_subscription_screen.dart';
 import '../../../features/subscription/presentation/screens/lesson_policy_screen.dart';
@@ -29,6 +30,11 @@ List<RouteBase> subscriptionRoutes = [
       final studentId = state.uri.queryParameters['studentId'];
       return SubscriptionListScreen(studentId: studentId);
     },
+  ),
+  // Teacher subscription list route must come before detail route
+  GoRoute(
+    path: AppRoutes.teacherSubscriptions,
+    builder: (context, state) => const TeacherSubscriptionListScreen(),
   ),
   // Expiring subscriptions route must come before detail route
   GoRoute(
@@ -111,7 +117,12 @@ List<RouteBase> subscriptionRoutes = [
     path: AppRoutes.subscriptionDetail,
     builder: (context, state) {
       final id = state.pathParameters['id']!;
-      return SubscriptionDetailScreen(subscriptionId: id);
+      final extra = state.extra as Map<String, dynamic>?;
+      final viewerRole = extra?['viewerRole'] as String? ?? 'student';
+      return SubscriptionDetailScreen(
+        subscriptionId: id,
+        viewerRole: viewerRole,
+      );
     },
   ),
   // Student proposal accept (must come before proposalDetail)

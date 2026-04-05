@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -80,9 +81,20 @@ class SubscriptionListScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.screenPadding),
       children: [
+        // Summary stat cards
+        _buildSummarySection(
+          activeCount: activeSubscriptions.length,
+          expiringCount: expiringSoonSubscriptions.length,
+          expiredCount: expiredSubscriptions.length,
+        ),
+        const SizedBox(height: AppSpacing.space4),
+
+        // Pending requests section
+        _buildPendingSection(ref, studentId),
+
         // Active subscriptions
         if (activeSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader('이용중인 수강권'),
+          _buildSectionHeader(AppStrings.summaryActive),
           const SizedBox(height: AppSpacing.space3),
           ...activeSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
@@ -101,7 +113,7 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expiring soon
         if (expiringSoonSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader('만료 임박', color: AppColors.warning),
+          _buildSectionHeader(AppStrings.statusExpiringSoon, color: AppColors.warning),
           const SizedBox(height: AppSpacing.space3),
           ...expiringSoonSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
@@ -120,7 +132,7 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expired
         if (expiredSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader('만료된 수강권', color: AppColors.textTertiaryLight),
+          _buildSectionHeader(AppStrings.statusExpired, color: AppColors.textTertiaryLight),
           const SizedBox(height: AppSpacing.space3),
           ...expiredSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
@@ -143,6 +155,88 @@ class SubscriptionListScreen extends ConsumerWidget {
           _buildNoSubscriptionsState(context, memberships),
         ],
       ],
+    );
+  }
+
+  Widget _buildSummarySection({
+    required int activeCount,
+    required int expiringCount,
+    required int expiredCount,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Row(
+        children: [
+          Expanded(
+            child: _SummaryStatCard(
+              label: AppStrings.summaryActive,
+              count: activeCount,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: _SummaryStatCard(
+              label: AppStrings.statusExpiringSoon,
+              count: expiringCount,
+              color: AppColors.warning,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space3),
+          Expanded(
+            child: _SummaryStatCard(
+              label: AppStrings.statusExpired,
+              count: expiredCount,
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPendingSection(WidgetRef ref, String studentId) {
+    final pendingAsync = ref.watch(
+      pendingScheduleChangeRequestsProvider(studentId),
+    );
+
+    return pendingAsync.when(
+      data: (requests) {
+        if (requests.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(
+            left: AppSpacing.screenPadding,
+            right: AppSpacing.screenPadding,
+            bottom: AppSpacing.space4,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.pendingRequests,
+                style: AppTypography.headingSmall,
+              ),
+              const SizedBox(height: AppSpacing.space2),
+              ...requests.map(
+                (r) => Card(
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.schedule,
+                      color: AppColors.warning,
+                    ),
+                    title: Text(
+                      r.message ?? AppStrings.pendingRequests,
+                      style: AppTypography.bodyMedium,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
     );
   }
 
@@ -312,6 +406,51 @@ class _SubscriptionCardWithClass extends StatelessWidget {
         className: '레슨',
         instrument: membership.instrument,
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+/// Summary stat card for subscription count by status.
+class _SummaryStatCard extends StatelessWidget {
+  final String label;
+  final int count;
+  final Color color;
+
+  const _SummaryStatCard({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space4,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.space3),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: AppTypography.caption.copyWith(
+              color: color,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            '$count',
+            style: AppTypography.headingLarge.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -124,6 +124,7 @@ class AppRoutes {
   static const issueSubscription = '/subscriptions/issue';
   static const lessonPolicy = '/subscriptions/policy';
   static const subscriptionTemplates = '/subscriptions/templates';
+  static const teacherSubscriptions = '/subscriptions/teacher';
 
   // Proposal routes
   static const proposalCreate = '/proposals/create';

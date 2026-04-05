@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../schedule/domain/entities/request_event.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
@@ -312,4 +313,31 @@ Future<bool> canBookLesson(
   );
 
   return subscription != null && (subscription.remainingLessons ?? 0) > 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Subscription Session Event Providers
+// ═══════════════════════════════════════════════════════════════════
+
+/// Get events for a specific subscription session.
+@riverpod
+Future<List<RequestEvent>> subscriptionSessionEvents(
+  SubscriptionSessionEventsRef ref, {
+  required String subscriptionId,
+  required int sessionNumber,
+}) async {
+  // For now, return empty list — will be populated when events are created
+  // TODO: Implement actual query by subscriptionId + sessionNumber
+  return [];
+}
+
+/// Get pending schedule change requests for badge count.
+@riverpod
+Future<List<RequestEvent>> pendingScheduleChangeRequests(
+  PendingScheduleChangeRequestsRef ref,
+  String teacherId,
+) async {
+  // For now, return empty list — will be populated with actual data
+  // TODO: Query events where eventType is scheduleChangeRequested and unresolved
+  return [];
 }

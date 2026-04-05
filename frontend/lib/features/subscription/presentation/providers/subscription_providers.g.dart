@@ -1600,6 +1600,321 @@ class _CanBookLessonProviderElement
   bool get isTrialLesson => (origin as CanBookLessonProvider).isTrialLesson;
 }
 
+String _$subscriptionSessionEventsHash() =>
+    r'9e0017522c1a24cdf83e8e6c7416b266139ccf03';
+
+/// Get events for a specific subscription session.
+///
+/// Copied from [subscriptionSessionEvents].
+@ProviderFor(subscriptionSessionEvents)
+const subscriptionSessionEventsProvider = SubscriptionSessionEventsFamily();
+
+/// Get events for a specific subscription session.
+///
+/// Copied from [subscriptionSessionEvents].
+class SubscriptionSessionEventsFamily
+    extends Family<AsyncValue<List<RequestEvent>>> {
+  /// Get events for a specific subscription session.
+  ///
+  /// Copied from [subscriptionSessionEvents].
+  const SubscriptionSessionEventsFamily();
+
+  /// Get events for a specific subscription session.
+  ///
+  /// Copied from [subscriptionSessionEvents].
+  SubscriptionSessionEventsProvider call({
+    required String subscriptionId,
+    required int sessionNumber,
+  }) {
+    return SubscriptionSessionEventsProvider(
+      subscriptionId: subscriptionId,
+      sessionNumber: sessionNumber,
+    );
+  }
+
+  @override
+  SubscriptionSessionEventsProvider getProviderOverride(
+    covariant SubscriptionSessionEventsProvider provider,
+  ) {
+    return call(
+      subscriptionId: provider.subscriptionId,
+      sessionNumber: provider.sessionNumber,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'subscriptionSessionEventsProvider';
+}
+
+/// Get events for a specific subscription session.
+///
+/// Copied from [subscriptionSessionEvents].
+class SubscriptionSessionEventsProvider
+    extends AutoDisposeFutureProvider<List<RequestEvent>> {
+  /// Get events for a specific subscription session.
+  ///
+  /// Copied from [subscriptionSessionEvents].
+  SubscriptionSessionEventsProvider({
+    required String subscriptionId,
+    required int sessionNumber,
+  }) : this._internal(
+          (ref) => subscriptionSessionEvents(
+            ref as SubscriptionSessionEventsRef,
+            subscriptionId: subscriptionId,
+            sessionNumber: sessionNumber,
+          ),
+          from: subscriptionSessionEventsProvider,
+          name: r'subscriptionSessionEventsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$subscriptionSessionEventsHash,
+          dependencies: SubscriptionSessionEventsFamily._dependencies,
+          allTransitiveDependencies:
+              SubscriptionSessionEventsFamily._allTransitiveDependencies,
+          subscriptionId: subscriptionId,
+          sessionNumber: sessionNumber,
+        );
+
+  SubscriptionSessionEventsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.subscriptionId,
+    required this.sessionNumber,
+  }) : super.internal();
+
+  final String subscriptionId;
+  final int sessionNumber;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<RequestEvent>> Function(SubscriptionSessionEventsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: SubscriptionSessionEventsProvider._internal(
+        (ref) => create(ref as SubscriptionSessionEventsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        subscriptionId: subscriptionId,
+        sessionNumber: sessionNumber,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<RequestEvent>> createElement() {
+    return _SubscriptionSessionEventsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is SubscriptionSessionEventsProvider &&
+        other.subscriptionId == subscriptionId &&
+        other.sessionNumber == sessionNumber;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, subscriptionId.hashCode);
+    hash = _SystemHash.combine(hash, sessionNumber.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin SubscriptionSessionEventsRef
+    on AutoDisposeFutureProviderRef<List<RequestEvent>> {
+  /// The parameter `subscriptionId` of this provider.
+  String get subscriptionId;
+
+  /// The parameter `sessionNumber` of this provider.
+  int get sessionNumber;
+}
+
+class _SubscriptionSessionEventsProviderElement
+    extends AutoDisposeFutureProviderElement<List<RequestEvent>>
+    with SubscriptionSessionEventsRef {
+  _SubscriptionSessionEventsProviderElement(super.provider);
+
+  @override
+  String get subscriptionId =>
+      (origin as SubscriptionSessionEventsProvider).subscriptionId;
+  @override
+  int get sessionNumber =>
+      (origin as SubscriptionSessionEventsProvider).sessionNumber;
+}
+
+String _$pendingScheduleChangeRequestsHash() =>
+    r'a65594cd67556bbd73d1b67e0a86e88ef089de58';
+
+/// Get pending schedule change requests for badge count.
+///
+/// Copied from [pendingScheduleChangeRequests].
+@ProviderFor(pendingScheduleChangeRequests)
+const pendingScheduleChangeRequestsProvider =
+    PendingScheduleChangeRequestsFamily();
+
+/// Get pending schedule change requests for badge count.
+///
+/// Copied from [pendingScheduleChangeRequests].
+class PendingScheduleChangeRequestsFamily
+    extends Family<AsyncValue<List<RequestEvent>>> {
+  /// Get pending schedule change requests for badge count.
+  ///
+  /// Copied from [pendingScheduleChangeRequests].
+  const PendingScheduleChangeRequestsFamily();
+
+  /// Get pending schedule change requests for badge count.
+  ///
+  /// Copied from [pendingScheduleChangeRequests].
+  PendingScheduleChangeRequestsProvider call(
+    String teacherId,
+  ) {
+    return PendingScheduleChangeRequestsProvider(
+      teacherId,
+    );
+  }
+
+  @override
+  PendingScheduleChangeRequestsProvider getProviderOverride(
+    covariant PendingScheduleChangeRequestsProvider provider,
+  ) {
+    return call(
+      provider.teacherId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'pendingScheduleChangeRequestsProvider';
+}
+
+/// Get pending schedule change requests for badge count.
+///
+/// Copied from [pendingScheduleChangeRequests].
+class PendingScheduleChangeRequestsProvider
+    extends AutoDisposeFutureProvider<List<RequestEvent>> {
+  /// Get pending schedule change requests for badge count.
+  ///
+  /// Copied from [pendingScheduleChangeRequests].
+  PendingScheduleChangeRequestsProvider(
+    String teacherId,
+  ) : this._internal(
+          (ref) => pendingScheduleChangeRequests(
+            ref as PendingScheduleChangeRequestsRef,
+            teacherId,
+          ),
+          from: pendingScheduleChangeRequestsProvider,
+          name: r'pendingScheduleChangeRequestsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$pendingScheduleChangeRequestsHash,
+          dependencies: PendingScheduleChangeRequestsFamily._dependencies,
+          allTransitiveDependencies:
+              PendingScheduleChangeRequestsFamily._allTransitiveDependencies,
+          teacherId: teacherId,
+        );
+
+  PendingScheduleChangeRequestsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.teacherId,
+  }) : super.internal();
+
+  final String teacherId;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<RequestEvent>> Function(
+            PendingScheduleChangeRequestsRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PendingScheduleChangeRequestsProvider._internal(
+        (ref) => create(ref as PendingScheduleChangeRequestsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        teacherId: teacherId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<RequestEvent>> createElement() {
+    return _PendingScheduleChangeRequestsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PendingScheduleChangeRequestsProvider &&
+        other.teacherId == teacherId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, teacherId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin PendingScheduleChangeRequestsRef
+    on AutoDisposeFutureProviderRef<List<RequestEvent>> {
+  /// The parameter `teacherId` of this provider.
+  String get teacherId;
+}
+
+class _PendingScheduleChangeRequestsProviderElement
+    extends AutoDisposeFutureProviderElement<List<RequestEvent>>
+    with PendingScheduleChangeRequestsRef {
+  _PendingScheduleChangeRequestsProviderElement(super.provider);
+
+  @override
+  String get teacherId =>
+      (origin as PendingScheduleChangeRequestsProvider).teacherId;
+}
+
 String _$subscriptionNotifierHash() =>
     r'03fca4a3bb48fcf5bad1ba660640dbbca8d4cc7e';
 

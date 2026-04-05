@@ -199,6 +199,14 @@ class RequestEvent {
   @HiveField(11)
   final String? proposedTime;
 
+  /// Links this event to a subscription.
+  @HiveField(12)
+  final String? subscriptionId;
+
+  /// Which session of the subscription (1-based).
+  @HiveField(13)
+  final int? sessionNumber;
+
   const RequestEvent({
     required this.id,
     required this.requestId,
@@ -212,6 +220,8 @@ class RequestEvent {
     this.scheduleChangeType,
     this.proposedDayOfWeek,
     this.proposedTime,
+    this.subscriptionId,
+    this.sessionNumber,
   });
 
   factory RequestEvent.fromJson(Map<String, dynamic> json) =>
@@ -232,6 +242,8 @@ class RequestEvent {
     ScheduleChangeType? scheduleChangeType,
     int? proposedDayOfWeek,
     String? proposedTime,
+    String? subscriptionId,
+    int? sessionNumber,
   }) {
     return RequestEvent(
       id: id ?? this.id,
@@ -246,6 +258,8 @@ class RequestEvent {
       scheduleChangeType: scheduleChangeType ?? this.scheduleChangeType,
       proposedDayOfWeek: proposedDayOfWeek ?? this.proposedDayOfWeek,
       proposedTime: proposedTime ?? this.proposedTime,
+      subscriptionId: subscriptionId ?? this.subscriptionId,
+      sessionNumber: sessionNumber ?? this.sessionNumber,
     );
   }
 

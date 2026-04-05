@@ -11,14 +11,14 @@ import '../utils/subscription_status_colors.dart';
 /// Concert ticket-style card for subscription display.
 ///
 /// Inspired by classical concert ticket design with:
-/// - Top section: instrument icon + class name + teacher name
+/// - Top section: instrument icon + class name + person name
 /// - Dashed tear line separator
 /// - Bottom section: remaining count + progress + status
 class SubscriptionTicketCard extends StatelessWidget {
   final Subscription subscription;
   final String? className;
   final String? instrument;
-  final String? teacherName;
+  final String? personName;
   final VoidCallback? onTap;
 
   const SubscriptionTicketCard({
@@ -26,7 +26,7 @@ class SubscriptionTicketCard extends StatelessWidget {
     required this.subscription,
     this.className,
     this.instrument,
-    this.teacherName,
+    this.personName,
     this.onTap,
   });
 
@@ -101,7 +101,7 @@ class SubscriptionTicketCard extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.space3),
 
-          // Class name + teacher
+          // Class name + person
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,9 +113,9 @@ class SubscriptionTicketCard extends StatelessWidget {
                     color: accentColor,
                   ),
                 ),
-                if (teacherName != null)
+                if (personName != null)
                   Text(
-                    teacherName!,
+                    personName!,
                     style: AppTypography.bodySmall.copyWith(
                       color: accentColor.withValues(alpha: 0.7),
                     ),
