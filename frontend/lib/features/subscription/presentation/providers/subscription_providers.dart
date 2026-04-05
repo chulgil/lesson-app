@@ -1,7 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/providers/repository_provider.dart';
+import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/remote_subscription_repository.dart';
 import '../../domain/entities/subscription.dart';
@@ -337,7 +339,69 @@ Future<List<RequestEvent>> pendingScheduleChangeRequests(
   PendingScheduleChangeRequestsRef ref,
   String teacherId,
 ) async {
-  // For now, return empty list — will be populated with actual data
-  // TODO: Query events where eventType is scheduleChangeRequested and unresolved
-  return [];
+  // Mock data for UI verification — replace with actual API query later
+  final now = DateTime.now();
+  return [
+    // 시간 변경 요청 (학생 → 선생님)
+    RequestEvent(
+      id: 'sce_mock_1',
+      requestId: '',
+      actorType: ProposerRole.student,
+      actorId: 'student_1',
+      eventType: RequestEventType.scheduleChanged,
+      message: '개인 일정이 변경되어 시간 변경을 요청합니다',
+      createdAt: now.subtract(const Duration(hours: 2)),
+      subscriptionId: 'sub_pkg_01',
+      sessionNumber: 6,
+    ),
+    // 취소 요청
+    RequestEvent(
+      id: 'sce_mock_2',
+      requestId: '',
+      actorType: ProposerRole.student,
+      actorId: 'student_3',
+      eventType: RequestEventType.lessonCancelled,
+      message: '컨디션이 좋지 않아 취소 요청드립니다',
+      createdAt: now.subtract(const Duration(minutes: 30)),
+      subscriptionId: 'sub_pkg_02',
+      sessionNumber: 3,
+    ),
+    // 전체 스케줄 변경 요청
+    RequestEvent(
+      id: 'sce_mock_3',
+      requestId: '',
+      actorType: ProposerRole.student,
+      actorId: 'student_1',
+      eventType: RequestEventType.scheduleChanged,
+      message: '학교 시간표가 바뀌어서 전체 변경 부탁드립니다',
+      createdAt: now.subtract(const Duration(days: 1)),
+      subscriptionId: 'sub_mon_01',
+      sessionNumber: 4,
+      scheduleChangeType: ScheduleChangeType.bulkChange,
+    ),
+    // 시간 변경 제안 완료 (선생님이 이미 응답)
+    RequestEvent(
+      id: 'sce_mock_4',
+      requestId: '',
+      actorType: ProposerRole.teacher,
+      actorId: 'teacher_1',
+      eventType: RequestEventType.scheduleChangeProposed,
+      message: '아래 시간 중 선택해주세요',
+      createdAt: now.subtract(const Duration(hours: 5)),
+      subscriptionId: 'sub_mon_02',
+      sessionNumber: 5,
+    ),
+    // 수락 완료
+    RequestEvent(
+      id: 'sce_mock_5',
+      requestId: '',
+      actorType: ProposerRole.student,
+      actorId: 'student_5',
+      eventType: RequestEventType.scheduleChangeAccepted,
+      message: '1순위 시간으로 확정합니다',
+      createdAt: now.subtract(const Duration(days: 2)),
+      subscriptionId: 'sub_mon_03',
+      sessionNumber: 2,
+    ),
+  ];
 }

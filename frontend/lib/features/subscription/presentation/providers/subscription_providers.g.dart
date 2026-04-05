@@ -1766,7 +1766,7 @@ class _SubscriptionSessionEventsProviderElement
 }
 
 String _$pendingScheduleChangeRequestsHash() =>
-    r'a65594cd67556bbd73d1b67e0a86e88ef089de58';
+    r'b69f6bf79e6405a59b5969d99525aa6ae9593a08';
 
 /// Get pending schedule change requests for badge count.
 ///

@@ -8,14 +8,15 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
 
 /// Home dashboard section showing pending schedule change requests.
 ///
-/// Replaces TeacherSubscriptionSection — shows pending change/cancel requests.
-/// Max 3 items + "더보기" button. Hidden when 0 items.
+/// Uses the same card layout pattern as LessonRequestSection / RequestListItem:
+/// Avatar + info lines + status chip + elapsed time.
 class ScheduleChangeRequestSection extends ConsumerWidget {
   final String teacherId;
 
@@ -42,15 +43,12 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: "스케줄 변경요청 (N)"
             _buildHeader(context, requests.length),
             const SizedBox(height: AppSpacing.space1),
-
-            // Mini stats: 변경 N · 취소 N
             _buildChangeStats(requests),
             const SizedBox(height: AppSpacing.space2),
 
-            // Request list items
+            // Request list (same card container as LessonRequestSection)
             Container(
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
@@ -62,17 +60,24 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                   for (int i = 0; i < displayRequests.length; i++) ...[
                     if (i > 0)
                       const Divider(height: 1, indent: AppSpacing.space4),
-                    _buildRequestItem(
-                      context,
-                      displayRequests[i],
-                      studentNames,
+                    _ScheduleChangeListItem(
+                      event: displayRequests[i],
+                      studentName: studentNames[displayRequests[i].actorId] ??
+                          AppStrings.student,
+                      onTap: displayRequests[i].subscriptionId != null
+                          ? () => context.push(
+                                AppRoutes.subscriptionDetail.replaceFirst(
+                                    ':id',
+                                    displayRequests[i].subscriptionId!),
+                                extra: {'viewerRole': 'teacher'},
+                              )
+                          : null,
                     ),
                   ],
                 ],
               ),
             ),
 
-            // "더보기" button
             if (requests.length > 3) ...[
               const SizedBox(height: AppSpacing.space2),
               Center(
@@ -81,7 +86,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
                     '${AppRoutes.scheduleChangeRequests}?teacherId=$teacherId',
                   ),
                   child: Text(
-                    AppStrings.moreRequests(requests.length - 3),
+                    AppStrings.moreSubscriptions(requests.length - 3),
                     style: AppTypography.bodySmall.copyWith(
                       color: AppColors.primary,
                     ),
@@ -97,10 +102,16 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
 
   Widget _buildChangeStats(List<RequestEvent> requests) {
     final changeCount = requests
-        .where((r) => r.eventType == RequestEventType.scheduleChangeProposed)
+        .where((r) =>
+            r.eventType == RequestEventType.scheduleChanged ||
+            r.eventType == RequestEventType.scheduleChangeProposed ||
+            r.eventType == RequestEventType.scheduleChangeCountered)
         .length;
     final cancelCount = requests
         .where((r) => r.eventType == RequestEventType.lessonCancelled)
+        .length;
+    final completedCount = requests
+        .where((r) => r.eventType == RequestEventType.scheduleChangeAccepted)
         .length;
 
     final parts = <String>[];
@@ -109,6 +120,9 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
     }
     if (cancelCount > 0) {
       parts.add(AppStrings.phaseStatLabel(AppStrings.cancelTypeLabel, cancelCount));
+    }
+    if (completedCount > 0) {
+      parts.add(AppStrings.phaseStatLabel(AppStrings.tabCompleted, completedCount));
     }
 
     if (parts.isEmpty) return const SizedBox.shrink();
@@ -130,7 +144,7 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
         Expanded(
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.schedule,
                 size: AppSpacing.iconSM,
                 color: AppColors.textSecondaryLight,
@@ -161,69 +175,194 @@ class ScheduleChangeRequestSection extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildRequestItem(
-    BuildContext context,
-    RequestEvent event,
-    Map<String, String> studentNames,
-  ) {
-    final studentName = studentNames[event.actorId] ?? '';
-    final sessionLabel = event.sessionNumber != null
-        ? AppStrings.sessionNumberLabel(event.sessionNumber!)
-        : '';
-    final typeLabel =
-        event.eventType == RequestEventType.scheduleChangeProposed
-            ? AppStrings.sessionChangeRequest
-            : AppStrings.sessionCancelRequest;
-    final relativeTime = formatRelativeTime(event.createdAt);
+/// List item for schedule change requests — same layout as RequestListItem.
+/// Avatar + info column + right column (status chip + elapsed time).
+class _ScheduleChangeListItem extends StatelessWidget {
+  final RequestEvent event;
+  final String studentName;
+  final VoidCallback? onTap;
 
-    final isChange =
-        event.eventType == RequestEventType.scheduleChangeProposed;
+  const _ScheduleChangeListItem({
+    required this.event,
+    required this.studentName,
+    this.onTap,
+  });
 
-    return GestureDetector(
-      onTap: event.subscriptionId != null
-          ? () => context.push(
-                AppRoutes.subscriptionDetail
-                    .replaceFirst(':id', event.subscriptionId!),
-                extra: {'viewerRole': 'teacher'},
-              )
-          : null,
-      child: Padding(
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
         ),
         child: Row(
           children: [
-            // Type indicator dot
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: isChange ? AppColors.primary : AppColors.error,
-                shape: BoxShape.circle,
-              ),
-            ),
+            _buildAvatar(),
             const SizedBox(width: AppSpacing.space3),
-            // Content
-            Expanded(
-              child: Text(
-                '$studentName $sessionLabel $typeLabel',
-                style: AppTypography.bodyMedium,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            // Relative time
-            Text(
-              relativeTime,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
+            Expanded(child: _buildInfo()),
+            const SizedBox(width: AppSpacing.space3),
+            _buildRightColumn(),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildAvatar() {
+    final initial = studentName.isNotEmpty ? studentName[0] : '?';
+    final isUrgent = DateTime.now().difference(event.createdAt).inHours >= 24;
+
+    final avatar = CircleAvatar(
+      radius: AppSpacing.avatarSmall / 2,
+      backgroundColor: _statusColor.withValues(alpha: 0.08),
+      child: Text(
+        initial,
+        style: AppTypography.bodyMedium.copyWith(
+          fontWeight: FontWeight.w700,
+          color: _statusColor,
+        ),
+      ),
+    );
+
+    if (!isUrgent) return avatar;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        avatar,
+        Positioned(
+          top: -2,
+          right: -2,
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: AppColors.error,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.surfaceLight, width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Line 1: student name
+        Text(
+          studentName,
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        // Line 2: session + type
+        Text(
+          _descriptionText,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRightColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // Status chip
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space2,
+            vertical: 2,
+          ),
+          decoration: BoxDecoration(
+            color: _statusColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+          ),
+          child: Text(
+            _statusLabel,
+            style: AppTypography.caption.copyWith(
+              color: _statusColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        // Elapsed time
+        Text(
+          formatRelativeTime(event.createdAt),
+          style: AppTypography.caption.copyWith(
+            color: AppColors.textTertiaryLight,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String get _descriptionText {
+    final sessionText = event.sessionNumber != null
+        ? AppStrings.sessionNumberLabel(event.sessionNumber!)
+        : '';
+    final isBulk = event.scheduleChangeType == ScheduleChangeType.bulkChange;
+
+    switch (event.eventType) {
+      case RequestEventType.scheduleChanged:
+        return isBulk
+            ? '$sessionText ${AppStrings.changeTypeBulkLabel}'
+            : '$sessionText ${AppStrings.sessionChangeRequest}';
+      case RequestEventType.lessonCancelled:
+        return '$sessionText ${AppStrings.sessionCancelRequest}';
+      case RequestEventType.scheduleChangeProposed:
+        return '$sessionText ${AppStrings.rescheduleRequest}';
+      case RequestEventType.scheduleChangeAccepted:
+        return '$sessionText ${AppStrings.tabCompleted}';
+      default:
+        return '$sessionText ${AppStrings.sessionChangeRequest}';
+    }
+  }
+
+  String get _statusLabel {
+    switch (event.eventType) {
+      case RequestEventType.scheduleChanged:
+      case RequestEventType.lessonCancelled:
+        return AppStrings.tabPending;
+      case RequestEventType.scheduleChangeProposed:
+      case RequestEventType.scheduleChangeCountered:
+        return AppStrings.rescheduleRequest;
+      case RequestEventType.scheduleChangeAccepted:
+        return AppStrings.tabCompleted;
+      default:
+        return AppStrings.tabPending;
+    }
+  }
+
+  Color get _statusColor {
+    switch (event.eventType) {
+      case RequestEventType.scheduleChanged:
+        return AppColors.primary;
+      case RequestEventType.lessonCancelled:
+        return AppColors.error;
+      case RequestEventType.scheduleChangeProposed:
+      case RequestEventType.scheduleChangeCountered:
+        return AppColors.warning;
+      case RequestEventType.scheduleChangeAccepted:
+        return AppColors.success;
+      default:
+        return AppColors.primary;
+    }
   }
 }
