@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -443,14 +444,8 @@ class ScheduleChangeEventBubble extends StatelessWidget {
 
   /// Timestamp widget: "오후 2:32".
   Widget _buildTimestamp(DateTime time) {
-    final hour = time.hour;
-    final minute = time.minute;
-    final period = hour < 12 ? '오전' : '오후';
-    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    final minuteStr = minute.toString().padLeft(2, '0');
-
     return Text(
-      '$period $displayHour:$minuteStr',
+      formatTimeAMPM(time),
       style: AppTypography.caption.copyWith(
         color: AppColors.textTertiaryLight,
       ),

@@ -9,6 +9,7 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
+import '../../../schedule/domain/entities/request_event.dart';
 import 'subscription_issued_card.dart';
 
 /// Scrollable chat-style list showing per-session events.
@@ -332,10 +333,10 @@ class _SessionSection extends ConsumerWidget {
   }
 
   /// Render events as chat bubbles: student left, teacher right.
-  Widget _buildEventBubbles(List<dynamic> events) {
+  Widget _buildEventBubbles(List<RequestEvent> events) {
     return Column(
       children: events.map<Widget>((event) {
-        final isTeacher = event.actorType?.name == 'teacher';
+        final isTeacher = event.actorType.name == 'teacher';
 
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -361,7 +362,7 @@ class _SessionSection extends ConsumerWidget {
                 ),
               ),
               child: Text(
-                event.message ?? event.chatDisplayMessage ?? '',
+                event.message ?? event.chatDisplayMessage,
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.textPrimaryLight,
                 ),

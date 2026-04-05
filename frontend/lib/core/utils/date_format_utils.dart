@@ -2,6 +2,8 @@
 /// All date displays should use these functions for consistency
 library;
 
+import '../l10n/app_strings.dart';
+
 /// Format date as YYYY.MM.DD (e.g., 2026.03.11)
 String formatDateYMD(DateTime date) {
   return '${date.year}.${date.month.toString().padLeft(2, '0')}.${date.day.toString().padLeft(2, '0')}';
@@ -66,4 +68,13 @@ String formatDateYMDShort(DateTime date) {
 /// Format date as yyyy.M.d HH:mm (e.g., 2026.4.5 14:00)
 String formatDateTimeYMDHM(DateTime date) {
   return '${formatDateYMDShort(date)} ${formatTimeHM(date)}';
+}
+
+/// Format time as 오전/오후 H:mm (e.g., 오후 2:30)
+String formatTimeAMPM(DateTime date) {
+  final hour = date.hour;
+  final minute = date.minute.toString().padLeft(2, '0');
+  final period = hour < 12 ? AppStrings.timeAM : AppStrings.timePM;
+  final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+  return '$period $displayHour:$minute';
 }

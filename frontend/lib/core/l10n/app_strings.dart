@@ -170,6 +170,12 @@ class AppStrings {
   /// 희망 시간 외 N건
   static String slotsRemaining(int count) => '외 $count건';
 
+  /// 오전
+  static const timeAM = '오전';
+
+  /// 오후
+  static const timePM = '오후';
+
   /// 시간 미지정
   static const noTimeSpecified = '시간 미지정';
 

@@ -14,7 +14,9 @@ import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
 import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/reschedule_bottom_sheet.dart';
+import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
+import '../widgets/subscription_bottom_input_bar.dart';
 import '../widgets/subscription_detail_chat_list.dart';
 
 /// Screen showing subscription detail with progress bar + chat layout.
@@ -137,7 +139,6 @@ class _SubscriptionDetailBodyState
   final TextEditingController _messageController = TextEditingController();
 
   Subscription get subscription => widget.subscription;
-  bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
   void initState() {
@@ -175,7 +176,11 @@ class _SubscriptionDetailBodyState
               _buildProgressBarSection(),
 
               // Guide info box (fixed)
-              _buildGuideBox(),
+              ScheduleGuideInfoBox(
+                subscription: subscription,
+                isBulkMode: false,
+                viewerRole: widget.viewerRole,
+              ),
 
               // Scrollable chat area
               Expanded(
@@ -187,7 +192,14 @@ class _SubscriptionDetailBodyState
               ),
             ],
           ),
-          bottomNavigationBar: _buildBottomInputBar(context),
+          bottomNavigationBar: SubscriptionBottomInputBar(
+            subscription: subscription,
+            viewerRole: widget.viewerRole,
+            messageController: _messageController,
+            onScheduleChange: () => _handleReschedule(context),
+            onLessonComplete: () => _handleLessonComplete(context),
+            onCancel: () => _handleCancel(context),
+          ),
         );
       },
       loading: () => Scaffold(
@@ -251,161 +263,6 @@ class _SubscriptionDetailBodyState
         },
         onBulkChangeTap: () => _handleReschedule(context),
       ),
-    );
-  }
-
-  Widget _buildGuideBox() {
-    final isPackage = subscription.type == SubscriptionType.package;
-    final message = isPackage
-        ? AppStrings.packageGuideMessage
-        : AppStrings.monthlyGuideMessage;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space2,
-      ),
-      color: AppColors.info.withValues(alpha: 0.06),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.info),
-          const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: Text(
-              message,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomInputBar(BuildContext context) {
-    if (subscription.isExpired || subscription.isDepleted) {
-      return const SizedBox.shrink();
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space2,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Message input row
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: AppStrings.subscriptionMessageHint,
-                      hintStyle: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textTertiaryLight,
-                      ),
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space3,
-                        vertical: AppSpacing.space2,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusRound),
-                        borderSide:
-                            BorderSide(color: AppColors.borderLight),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusRound),
-                        borderSide:
-                            BorderSide(color: AppColors.borderLight),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusRound),
-                        borderSide:
-                            const BorderSide(color: AppColors.primary),
-                      ),
-                    ),
-                    style: AppTypography.bodySmall,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                // Schedule change button
-                OutlinedButton.icon(
-                  onPressed: () => _handleReschedule(context),
-                  icon: const Icon(Icons.schedule, size: 16),
-                  label: Text(AppStrings.scheduleChangeButton),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.space3,
-                      vertical: AppSpacing.space2,
-                    ),
-                    textStyle: AppTypography.bodySmall.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            // Action buttons row (role-specific)
-            _isTeacher
-                ? _buildTeacherActions(context)
-                : _buildStudentActions(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTeacherActions(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: () => _handleLessonComplete(context),
-            icon: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text(AppStrings.lessonComplete),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStudentActions(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => _handleCancel(context),
-            icon: const Icon(Icons.cancel_outlined, size: 18),
-            label: Text(AppStrings.cancelRequest),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.error,
-              side: BorderSide(
-                color: AppColors.error.withValues(alpha: 0.5),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
