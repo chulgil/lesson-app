@@ -245,7 +245,7 @@ class _SubscriptionDetailBodyState
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space3,
+        vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,

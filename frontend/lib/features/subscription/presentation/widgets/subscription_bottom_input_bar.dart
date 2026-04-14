@@ -8,7 +8,9 @@ import '../../domain/entities/subscription.dart';
 
 /// Bottom input bar for the subscription detail screen.
 ///
-/// Shows message input, schedule change button, and role-specific actions.
+/// Matches [CurrentRequestBox] layout pattern:
+/// - Message input (multi-line, border radius medium)
+/// - Action buttons row (outlined + filled, button height small)
 /// Hidden when the subscription is expired or depleted.
 class SubscriptionBottomInputBar extends StatelessWidget {
   final Subscription subscription;
@@ -41,9 +43,11 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space2,
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.space3,
+        AppSpacing.space3,
+        AppSpacing.space3,
+        MediaQuery.of(context).padding.bottom + AppSpacing.space3,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -51,88 +55,108 @@ class SubscriptionBottomInputBar extends StatelessWidget {
           top: BorderSide(color: AppColors.borderLight),
         ),
       ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildMessageInputRow(),
-            const SizedBox(height: AppSpacing.space2),
-            _isTeacher
-                ? _buildTeacherActions()
-                : _buildStudentActions(),
-          ],
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Message input (matches CurrentRequestBox style)
+          _buildMessageInput(),
+          const SizedBox(height: AppSpacing.space2),
+
+          // Action buttons row
+          _isTeacher ? _buildTeacherActions() : _buildStudentActions(),
+        ],
       ),
     );
   }
 
-  Widget _buildMessageInputRow() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: messageController,
-            decoration: InputDecoration(
-              hintText: AppStrings.subscriptionMessageHint,
-              hintStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space3,
-                vertical: AppSpacing.space2,
-              ),
-              border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusRound),
-                borderSide:
-                    BorderSide(color: AppColors.borderLight),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusRound),
-                borderSide:
-                    BorderSide(color: AppColors.borderLight),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusRound),
-                borderSide:
-                    const BorderSide(color: AppColors.primary),
-              ),
-            ),
-            style: AppTypography.bodySmall,
-          ),
+  Widget _buildMessageInput() {
+    return TextField(
+      controller: messageController,
+      maxLines: 4,
+      minLines: 1,
+      maxLength: 200,
+      style: AppTypography.bodySmall,
+      decoration: InputDecoration(
+        hintText: AppStrings.subscriptionMessageHint,
+        hintStyle: AppTypography.bodySmall.copyWith(
+          color: AppColors.textTertiaryLight,
         ),
-        const SizedBox(width: AppSpacing.space2),
-        TextButton.icon(
-          onPressed: onScheduleChange,
-          icon: const Icon(Icons.schedule, size: 16),
-          label: Text(AppStrings.scheduleChangeButton),
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space2,
-            ),
-            textStyle: AppTypography.bodySmall.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+        counterText: '',
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space3,
+          vertical: AppSpacing.space2,
         ),
-      ],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderSide: BorderSide(color: AppColors.borderLight),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderSide: BorderSide(color: AppColors.borderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+      ),
     );
   }
 
   Widget _buildTeacherActions() {
     return Row(
       children: [
+        // Schedule change button (outlined)
         Expanded(
-          child: FilledButton.icon(
-            onPressed: onLessonComplete,
-            icon: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text(AppStrings.lessonComplete),
+          child: SizedBox(
+            height: AppSpacing.buttonHeightSmall,
+            child: OutlinedButton.icon(
+              onPressed: onScheduleChange,
+              icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+              label: Text(
+                AppStrings.scheduleChangeButton,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.borderLight),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+
+        // Lesson complete button (filled primary)
+        Expanded(
+          child: SizedBox(
+            height: AppSpacing.buttonHeightSmall,
+            child: ElevatedButton.icon(
+              onPressed: onLessonComplete,
+              icon: const Icon(Icons.check_circle_outline, size: 16),
+              label: Text(
+                AppStrings.lessonComplete,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                ),
+              ),
+            ),
           ),
         ),
       ],
@@ -142,15 +166,58 @@ class SubscriptionBottomInputBar extends StatelessWidget {
   Widget _buildStudentActions() {
     return Row(
       children: [
+        // Schedule change button (outlined)
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: onCancel,
-            icon: const Icon(Icons.cancel_outlined, size: 18),
-            label: Text(AppStrings.cancelRequest),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.error,
-              side: BorderSide(
-                color: AppColors.error.withValues(alpha: 0.5),
+          child: SizedBox(
+            height: AppSpacing.buttonHeightSmall,
+            child: OutlinedButton.icon(
+              onPressed: onScheduleChange,
+              icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+              label: Text(
+                AppStrings.scheduleChangeButton,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.borderLight),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.space2),
+
+        // Cancel request button (outlined error)
+        Expanded(
+          child: SizedBox(
+            height: AppSpacing.buttonHeightSmall,
+            child: OutlinedButton.icon(
+              onPressed: onCancel,
+              icon: const Icon(Icons.cancel_outlined, size: 16),
+              label: Text(
+                AppStrings.cancelRequest,
+                style: AppTypography.buttonSmall.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(
+                  color: AppColors.error.withValues(alpha: 0.5),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                ),
               ),
             ),
           ),

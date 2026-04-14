@@ -75,6 +75,23 @@ grep -rn "onPressed: null" --include="*.dart" features/
 grep -rn "message: '[가-힣]" --include="*.dart" features/
 ```
 
+## 상세 화면 일관성 규칙 (HARD-GATE)
+
+> 프로그레스바+챗+하단액션 구조의 상세 화면은 반드시 공통 템플릿을 따른다.
+> 스펙: `docs/specs/design/detail_screen_template.md`
+
+- **프로그레스바 패턴 통일** — 점선 커넥터 + 가운데 정렬 필수. `_DashedLinePainter` + `MainAxisAlignment.center` (#26)
+- **하단 액션바 패턴 통일** — `buttonHeightSmall` + `radiusMedium` + `buttonSmall` 폰트. `CurrentRequestBox` 참조 (#26)
+- **아이콘 통일** — 일정 변경: `swap_horiz_rounded`, 레슨 완료: `check_circle_outline`. 화면별 다른 아이콘 금지 (#26)
+- **새 상세 화면 추가 전** — `detail_screen_template.md` 체크리스트 통과 필수
+
+```bash
+# 상세 화면 프로그레스바 일관성 검증
+grep -rn "MainAxisAlignment.center" --include="*.dart" features/ | grep -i "progress\|session"
+# 하단 바 버튼 높이 통일 검증
+grep -rn "buttonHeightSmall" --include="*.dart" features/ | grep -i "bottom\|input\|action"
+```
+
 ## 상태별 가이드 메시지 규칙
 
 - **상단 가이드 title = 리스트 actionLabel** — 리스트↔챗 일관성 (#25)

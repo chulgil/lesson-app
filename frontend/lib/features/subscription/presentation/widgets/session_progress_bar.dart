@@ -7,8 +7,13 @@ import '../../../../core/theme/app_typography.dart';
 
 /// Visual progress bar showing session completion status.
 ///
-/// Displays up to 8 indicators per row with optional [전체] button.
-/// Each indicator shows completion state: completed, selected, or future.
+/// Matches the [LessonProgressBar] visual pattern:
+/// - Dot indicators connected by dashed/solid lines
+/// - Center-aligned layout
+/// - Completed: filled circle + checkmark
+/// - Selected: filled circle + outer ring
+/// - Future: hollow circle (border only)
+/// - Change-requested: warning dot badge
 class SessionProgressBar extends StatelessWidget {
   final int totalSessions;
   final int completedSessions;
@@ -29,62 +34,67 @@ class SessionProgressBar extends StatelessWidget {
     this.onBulkChangeTap,
   });
 
-  static const double _indicatorSize = 32;
+  static const double _dotSize = 20.0;
+  static const double _ringSize = 28.0;
   static const int _maxPerRow = 8;
 
   @override
   Widget build(BuildContext context) {
-    final indicators = List.generate(
-      totalSessions,
-      (index) => index + 1,
-    );
-
-    final rows = _buildRows(indicators);
+    final sessions = List.generate(totalSessions, (index) => index + 1);
+    final rows = _splitRows(sessions);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (int i = 0; i < rows.length; i++) ...[
           if (i > 0) const SizedBox(height: AppSpacing.space2),
-          rows[i],
+          _buildConnectedRow(rows[i], showBulkButton: i == 0 && isMonthly),
         ],
       ],
     );
   }
 
-  List<Widget> _buildRows(List<int> sessionNumbers) {
-    final rows = <Widget>[];
-    final firstRowCount =
-        isMonthly ? _maxPerRow - 1 : _maxPerRow;
-    final firstRowSessions = sessionNumbers.take(firstRowCount).toList();
-    final remaining = sessionNumbers.skip(firstRowCount).toList();
+  List<List<int>> _splitRows(List<int> sessions) {
+    final rows = <List<int>>[];
+    final firstRowCount = isMonthly ? _maxPerRow - 1 : _maxPerRow;
+    final firstRow = sessions.take(firstRowCount).toList();
+    final remaining = sessions.skip(firstRowCount).toList();
 
-    rows.add(_buildRow(firstRowSessions, showBulkButton: isMonthly));
+    rows.add(firstRow);
 
     for (int i = 0; i < remaining.length; i += _maxPerRow) {
-      final end =
-          (i + _maxPerRow < remaining.length) ? i + _maxPerRow : remaining.length;
-      rows.add(_buildRow(remaining.sublist(i, end)));
+      final end = (i + _maxPerRow < remaining.length)
+          ? i + _maxPerRow
+          : remaining.length;
+      rows.add(remaining.sublist(i, end));
     }
 
     return rows;
   }
 
-  Widget _buildRow(
+  /// Build a row of session dots connected by dashed/solid lines.
+  /// Matches LessonProgressBar's connector pattern.
+  Widget _buildConnectedRow(
     List<int> sessions, {
     bool showBulkButton = false,
   }) {
+    final itemCount = sessions.length * 2 - 1;
+
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        for (int i = 0; i < sessions.length; i++) ...[
-          if (i > 0) const SizedBox(width: AppSpacing.space2),
-          _SessionIndicator(
-            sessionNumber: sessions[i],
-            state: _getSessionState(sessions[i]),
-            isSelected: sessions[i] == selectedSession,
-            hasChangeRequest: changeRequestedSessions.contains(sessions[i]),
-            onTap: () => onSessionTap(sessions[i]),
-          ),
+        for (int i = 0; i < itemCount; i++) ...[
+          if (i.isOdd)
+            // Connector line between dots
+            _buildConnector(sessions[i ~/ 2]),
+          if (i.isEven)
+            _SessionDot(
+              sessionNumber: sessions[i ~/ 2],
+              state: _getState(sessions[i ~/ 2]),
+              isSelected: sessions[i ~/ 2] == selectedSession,
+              hasChangeRequest:
+                  changeRequestedSessions.contains(sessions[i ~/ 2]),
+              onTap: () => onSessionTap(sessions[i ~/ 2]),
+            ),
         ],
         if (showBulkButton) ...[
           const SizedBox(width: AppSpacing.space2),
@@ -94,27 +104,48 @@ class SessionProgressBar extends StatelessWidget {
     );
   }
 
-  _SessionState _getSessionState(int sessionNumber) {
-    if (sessionNumber <= completedSessions) {
-      return _SessionState.completed;
-    }
-    if (sessionNumber == selectedSession) {
-      return _SessionState.scheduled;
-    }
+  /// Connector line: solid if session is completed, dashed otherwise.
+  /// Uses fixed width (space3) instead of Expanded because session counts
+  /// vary per row and center-alignment requires predictable widths.
+  Widget _buildConnector(int sessionNumber) {
+    final isCompleted = sessionNumber <= completedSessions;
+    const connectorWidth = AppSpacing.space3;
+
+    return SizedBox(
+      width: connectorWidth,
+      height: 2,
+      child: isCompleted
+          ? Container(color: AppColors.primary)
+          : CustomPaint(
+              size: const Size(connectorWidth, 2),
+              painter: _DashedLinePainter(
+                color: AppColors.borderLight,
+                strokeWidth: 1.5,
+                dashWidth: 4,
+                dashGap: 3,
+              ),
+            ),
+    );
+  }
+
+  _SessionState _getState(int sessionNumber) {
+    if (sessionNumber <= completedSessions) return _SessionState.completed;
+    if (sessionNumber == selectedSession) return _SessionState.scheduled;
     return _SessionState.future;
   }
 }
 
 enum _SessionState { completed, scheduled, future }
 
-class _SessionIndicator extends StatelessWidget {
+/// Single session dot with label — matches LessonProgressBar's _PhaseDot style.
+class _SessionDot extends StatelessWidget {
   final int sessionNumber;
   final _SessionState state;
   final bool isSelected;
   final bool hasChangeRequest;
   final VoidCallback onTap;
 
-  const _SessionIndicator({
+  const _SessionDot({
     required this.sessionNumber,
     required this.state,
     required this.isSelected,
@@ -127,18 +158,24 @@ class _SessionIndicator extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: SessionProgressBar._indicatorSize,
+        width: SessionProgressBar._ringSize,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildCircle(),
+            SizedBox(
+              width: SessionProgressBar._ringSize,
+              height: SessionProgressBar._ringSize,
+              child: Center(child: _buildDot()),
+            ),
             const SizedBox(height: AppSpacing.space1),
             Text(
-              '$sessionNumber',
+              AppStrings.sessionNumberLabel(sessionNumber),
               style: AppTypography.caption.copyWith(
-                color: _numberColor,
-                fontWeight:
-                    isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: _textColor,
+                fontWeight: state == _SessionState.scheduled || isSelected
+                    ? FontWeight.w600
+                    : FontWeight.normal,
+                fontSize: 10,
               ),
             ),
           ],
@@ -147,23 +184,11 @@ class _SessionIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildCircle() {
+  Widget _buildDot() {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Container(
-          width: SessionProgressBar._indicatorSize,
-          height: SessionProgressBar._indicatorSize,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: _fillColor,
-            border: Border.all(
-              color: _borderColor,
-              width: isSelected ? 2.0 : 1.0,
-            ),
-          ),
-          child: Center(child: _buildContent()),
-        ),
+        _buildDotContent(),
         if (hasChangeRequest)
           Positioned(
             top: -2,
@@ -181,55 +206,76 @@ class _SessionIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildDotContent() {
     switch (state) {
       case _SessionState.completed:
-        return const Icon(
-          Icons.check,
-          size: AppSpacing.iconXS,
-          color: Colors.white,
+        return Container(
+          width: SessionProgressBar._dotSize,
+          height: SessionProgressBar._dotSize,
+          decoration: const BoxDecoration(
+            color: AppColors.success,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check,
+            size: 12,
+            color: Colors.white,
+          ),
         );
+
       case _SessionState.scheduled:
-        return const Icon(
-          Icons.calendar_today,
-          size: AppSpacing.iconXS - 2,
-          color: Colors.white,
+        // Filled dot + outer ring (matches LessonProgressBar active state)
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: SessionProgressBar._ringSize,
+              height: SessionProgressBar._ringSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primaryLight,
+                  width: 2,
+                ),
+              ),
+            ),
+            Container(
+              width: SessionProgressBar._dotSize,
+              height: SessionProgressBar._dotSize,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
         );
+
       case _SessionState.future:
-        return Text(
-          '$sessionNumber',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
-            fontWeight: FontWeight.w500,
+        return Container(
+          width: SessionProgressBar._dotSize,
+          height: SessionProgressBar._dotSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              width: 1.5,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              '$sessionNumber',
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textTertiaryLight,
+                fontWeight: FontWeight.w500,
+                fontSize: 9,
+              ),
+            ),
           ),
         );
     }
   }
 
-  Color get _fillColor {
-    switch (state) {
-      case _SessionState.completed:
-        return AppColors.success;
-      case _SessionState.scheduled:
-        return AppColors.primary;
-      case _SessionState.future:
-        return Colors.transparent;
-    }
-  }
-
-  Color get _borderColor {
-    if (isSelected) return AppColors.primary;
-    switch (state) {
-      case _SessionState.completed:
-        return AppColors.success;
-      case _SessionState.scheduled:
-        return AppColors.primary;
-      case _SessionState.future:
-        return AppColors.textTertiaryLight;
-    }
-  }
-
-  Color get _numberColor {
+  Color get _textColor {
     if (isSelected) return AppColors.primary;
     switch (state) {
       case _SessionState.completed:
@@ -242,6 +288,44 @@ class _SessionIndicator extends StatelessWidget {
   }
 }
 
+/// Dashed line painter for future/incomplete connector segments.
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double dashWidth;
+  final double dashGap;
+
+  _DashedLinePainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.dashWidth,
+    required this.dashGap,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final y = size.height / 2;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset((x + dashWidth).clamp(0, size.width), y),
+        paint,
+      );
+      x += dashWidth + dashGap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
+}
+
 class _BulkChangeButton extends StatelessWidget {
   final VoidCallback? onTap;
 
@@ -252,7 +336,7 @@ class _BulkChangeButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: SessionProgressBar._indicatorSize,
+        height: SessionProgressBar._ringSize,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space3,
         ),
