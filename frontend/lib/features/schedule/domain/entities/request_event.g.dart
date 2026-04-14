@@ -138,6 +138,8 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         return RequestEventType.scheduleChangeRejected;
       case 25:
         return RequestEventType.scheduleChangeCountered;
+      case 26:
+        return RequestEventType.message;
       default:
         return RequestEventType.initialRequest;
     }
@@ -223,6 +225,9 @@ class RequestEventTypeAdapter extends TypeAdapter<RequestEventType> {
         break;
       case RequestEventType.scheduleChangeCountered:
         writer.writeByte(25);
+        break;
+      case RequestEventType.message:
+        writer.writeByte(26);
         break;
     }
   }
@@ -315,6 +320,7 @@ const _$RequestEventTypeEnumMap = {
   RequestEventType.scheduleChangeAccepted: 'scheduleChangeAccepted',
   RequestEventType.scheduleChangeRejected: 'scheduleChangeRejected',
   RequestEventType.scheduleChangeCountered: 'scheduleChangeCountered',
+  RequestEventType.message: 'message',
 };
 
 const _$ScheduleChangeTypeEnumMap = {

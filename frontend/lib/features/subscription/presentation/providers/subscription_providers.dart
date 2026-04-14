@@ -321,6 +321,28 @@ Future<bool> canBookLesson(
 // Subscription Session Event Providers
 // ═══════════════════════════════════════════════════════════════════
 
+/// In-memory store for subscription session events (Mock).
+/// Key: "$subscriptionId:$sessionNumber"
+/// Will be replaced with API calls when backend is ready.
+final _subscriptionSessionEventStore = <String, List<RequestEvent>>{};
+
+/// Add an event to a subscription session and invalidate the provider.
+void addSubscriptionSessionEvent(
+  dynamic ref,
+  String subscriptionId,
+  int sessionNumber,
+  RequestEvent event,
+) {
+  final key = '$subscriptionId:$sessionNumber';
+  _subscriptionSessionEventStore.putIfAbsent(key, () => []).add(event);
+
+  // Invalidate provider to trigger UI refresh
+  ref.invalidate(subscriptionSessionEventsProvider(
+    subscriptionId: subscriptionId,
+    sessionNumber: sessionNumber,
+  ));
+}
+
 /// Get events for a specific subscription session.
 @riverpod
 Future<List<RequestEvent>> subscriptionSessionEvents(
@@ -328,9 +350,8 @@ Future<List<RequestEvent>> subscriptionSessionEvents(
   required String subscriptionId,
   required int sessionNumber,
 }) async {
-  // For now, return empty list — will be populated when events are created
-  // TODO: Implement actual query by subscriptionId + sessionNumber
-  return [];
+  final key = '$subscriptionId:$sessionNumber';
+  return _subscriptionSessionEventStore[key] ?? [];
 }
 
 /// Get pending schedule change requests for badge count.

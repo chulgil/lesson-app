@@ -6,6 +6,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
+import '../../../schedule/domain/entities/request_event.dart';
+import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../schedule/presentation/screens/regular_schedule_change_screen.dart';
 import '../../../schedule/presentation/screens/schedule_change_slot_screen.dart';
@@ -267,11 +269,24 @@ class _SubscriptionDetailBodyState
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    // TODO: Send message to student via provider
-    _messageController.clear();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppStrings.messageSentSuccess)),
+    // Record message event in chat
+    final event = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
+      actorId: subscription.studentId,
+      eventType: RequestEventType.message,
+      message: text,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
     );
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      event,
+    );
+    _messageController.clear();
   }
 
   /// Schedule change — same flow as RequestDetailScreen._handleScheduleChange:
@@ -294,15 +309,17 @@ class _SubscriptionDetailBodyState
               studentId: subscription.studentId,
               durationMinutes: 60,
               currentScheduleLabel:
-                  '${_selectedSession}${AppStrings.sessionNumberLabel(_selectedSession)}',
+                  AppStrings.sessionNumberLabel(_selectedSession),
             ),
           ),
         ),
       );
       if (result == null || !context.mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.scheduleChangePropose)),
+      // Record schedule change event in chat
+      _recordScheduleChangeEvent(
+        changeType: changeType,
+        message: result.message.isEmpty ? null : result.message,
       );
     } else {
       // Step 2b: Bulk change — regular schedule change screen
@@ -318,6 +335,45 @@ class _SubscriptionDetailBodyState
       );
       if (regularResult == null || !context.mounted) return;
 
+      // Record schedule change event in chat
+      _recordScheduleChangeEvent(
+        changeType: changeType,
+        message: regularResult.message.isEmpty ? null : regularResult.message,
+        proposedDayOfWeek: regularResult.dayOfWeek,
+        proposedTime: regularResult.time,
+      );
+    }
+  }
+
+  /// Record a schedule change proposed event and show it in the chat.
+  void _recordScheduleChangeEvent({
+    required ScheduleChangeType changeType,
+    String? message,
+    int? proposedDayOfWeek,
+    String? proposedTime,
+  }) {
+    final event = RequestEvent(
+      id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
+      requestId: subscription.id,
+      actorType: _isTeacher ? ProposerRole.teacher : ProposerRole.student,
+      actorId: subscription.studentId,
+      eventType: RequestEventType.scheduleChangeProposed,
+      scheduleChangeType: changeType,
+      proposedDayOfWeek: proposedDayOfWeek,
+      proposedTime: proposedTime,
+      message: message,
+      sessionNumber: _selectedSession,
+      createdAt: DateTime.now(),
+    );
+
+    addSubscriptionSessionEvent(
+      ref,
+      subscription.id,
+      _selectedSession,
+      event,
+    );
+
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppStrings.scheduleChangePropose)),
       );

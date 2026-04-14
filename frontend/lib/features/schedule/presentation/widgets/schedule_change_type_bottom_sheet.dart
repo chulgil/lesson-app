@@ -14,7 +14,10 @@ Future<ScheduleChangeType?> showScheduleChangeTypeBottomSheet(
   return showModalBottomSheet<ScheduleChangeType>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: Colors.transparent,
+    backgroundColor: AppColors.backgroundLight,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
     builder: (context) => const _ScheduleChangeTypeBottomSheet(),
   );
 }
@@ -24,57 +27,51 @@ class _ScheduleChangeTypeBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.screenPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Drag handle
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                decoration: BoxDecoration(
+                  color: AppColors.borderLight,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Title
-              Text(
-                AppStrings.scheduleChangeTypeTitle,
-                style: AppTypography.headingSmall,
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              // Single lesson option
-              _ChangeTypeCard(
-                icon: Icons.today_outlined,
-                label: AppStrings.scheduleChangeSingleLabel,
-                description: AppStrings.scheduleChangeSingleDesc,
-                onTap: () =>
-                    Navigator.pop(context, ScheduleChangeType.singleLesson),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              // Bulk change option
-              _ChangeTypeCard(
-                icon: Icons.date_range_outlined,
-                label: AppStrings.scheduleChangeBulkLabel,
-                description: AppStrings.scheduleChangeBulkDesc,
-                onTap: () =>
-                    Navigator.pop(context, ScheduleChangeType.bulkChange),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-            ],
-          ),
+            ),
+            // Title
+            Text(
+              AppStrings.scheduleChangeTypeTitle,
+              style: AppTypography.headingSmall,
+            ),
+            const SizedBox(height: AppSpacing.space4),
+            // Single lesson option
+            _ChangeTypeCard(
+              icon: Icons.today_outlined,
+              label: AppStrings.scheduleChangeSingleLabel,
+              description: AppStrings.scheduleChangeSingleDesc,
+              onTap: () =>
+                  Navigator.pop(context, ScheduleChangeType.singleLesson),
+            ),
+            const SizedBox(height: AppSpacing.space3),
+            // Bulk change option
+            _ChangeTypeCard(
+              icon: Icons.date_range_outlined,
+              label: AppStrings.scheduleChangeBulkLabel,
+              description: AppStrings.scheduleChangeBulkDesc,
+              onTap: () =>
+                  Navigator.pop(context, ScheduleChangeType.bulkChange),
+            ),
+            const SizedBox(height: AppSpacing.space2),
+          ],
         ),
       ),
     );

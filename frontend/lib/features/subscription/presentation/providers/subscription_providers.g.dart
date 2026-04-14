@@ -1601,7 +1601,7 @@ class _CanBookLessonProviderElement
 }
 
 String _$subscriptionSessionEventsHash() =>
-    r'9e0017522c1a24cdf83e8e6c7416b266139ccf03';
+    r'2a93258b595f78e474b4f021676a354a3f1eb29f';
 
 /// Get events for a specific subscription session.
 ///

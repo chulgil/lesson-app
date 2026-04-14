@@ -89,7 +89,11 @@ enum RequestEventType {
   scheduleChangeRejected,
 
   @HiveField(25)
-  scheduleChangeCountered;
+  scheduleChangeCountered,
+
+  /// General text message (subscription detail chat)
+  @HiveField(26)
+  message;
 
   String get label {
     switch (this) {
@@ -144,6 +148,8 @@ enum RequestEventType {
         return AppStrings.eventScheduleChangeRejected;
       case RequestEventType.scheduleChangeCountered:
         return AppStrings.eventScheduleChangeCountered;
+      case RequestEventType.message:
+        return '';
     }
   }
 
@@ -320,6 +326,8 @@ class RequestEvent {
         return AppStrings.chatScheduleChangeRejected;
       case RequestEventType.scheduleChangeCountered:
         return AppStrings.chatScheduleChangeCountered;
+      case RequestEventType.message:
+        return message ?? '';
     }
   }
 
