@@ -8,9 +8,12 @@ import '../../domain/entities/subscription.dart';
 
 /// Bottom input bar for the subscription detail screen.
 ///
-/// Matches [CurrentRequestBox] layout pattern:
-/// - Message input (multi-line, border radius medium)
-/// - Action buttons row (outlined + filled, button height small)
+/// Pixel-exact match with [CurrentRequestBox] layout:
+/// - Container: surfaceLight + borderLight top + space3 padding + SafeArea
+/// - TextField: bodySmall, radiusMedium, maxLength 200, counterText ''
+/// - Buttons: buttonHeightSmall (40), radiusMedium, buttonSmall font
+/// - Row: Outlined(일정 변경) + Filled(메시지 전송)
+///
 /// Hidden when the subscription is expired or depleted.
 class SubscriptionBottomInputBar extends StatelessWidget {
   final Subscription subscription;
@@ -42,6 +45,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    // Matches CurrentRequestBox.build() container exactly
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.space3,
@@ -56,173 +60,99 @@ class SubscriptionBottomInputBar extends StatelessWidget {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Message input (matches CurrentRequestBox style)
-          _buildMessageInput(),
+          // Message input — matches CurrentRequestBox TextField exactly
+          TextField(
+            controller: messageController,
+            maxLines: 8,
+            minLines: 1,
+            maxLength: 200,
+            style: AppTypography.bodySmall,
+            decoration: InputDecoration(
+              hintText: AppStrings.subscriptionMessageHint,
+              hintStyle: AppTypography.bodySmall.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+              counterText: '',
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
+              border: OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderSide: BorderSide(color: AppColors.borderLight),
+              ),
+            ),
+          ),
           const SizedBox(height: AppSpacing.space2),
 
-          // Action buttons row
-          _isTeacher ? _buildTeacherActions() : _buildStudentActions(),
+          // Action buttons — matches CurrentRequestBox Row exactly
+          Row(
+            children: [
+              // Schedule change (outlined) — secondary action
+              Expanded(
+                child: SizedBox(
+                  height: AppSpacing.buttonHeightSmall,
+                  child: OutlinedButton(
+                    onPressed: onScheduleChange,
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.borderLight),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMedium),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                      ),
+                    ),
+                    child: Text(
+                      AppStrings.scheduleChangeButton,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+
+              // Send message (filled primary) — primary action
+              Expanded(
+                child: SizedBox(
+                  height: AppSpacing.buttonHeightSmall,
+                  child: ElevatedButton(
+                    onPressed: onSendMessage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusMedium),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                      ),
+                    ),
+                    child: Text(
+                      AppStrings.subscriptionSendMessage,
+                      style: AppTypography.buttonSmall.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildMessageInput() {
-    return TextField(
-      controller: messageController,
-      maxLines: 4,
-      minLines: 1,
-      maxLength: 200,
-      style: AppTypography.bodySmall,
-      decoration: InputDecoration(
-        hintText: AppStrings.subscriptionMessageHint,
-        hintStyle: AppTypography.bodySmall.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
-        counterText: '',
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space2,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: BorderSide(color: AppColors.borderLight),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: BorderSide(color: AppColors.borderLight),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTeacherActions() {
-    return Row(
-      children: [
-        // Schedule change button (outlined)
-        Expanded(
-          child: SizedBox(
-            height: AppSpacing.buttonHeightSmall,
-            child: OutlinedButton.icon(
-              onPressed: onScheduleChange,
-              icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-              label: Text(
-                AppStrings.scheduleChangeButton,
-                style: AppTypography.buttonSmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.borderLight),
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space2),
-
-        // Lesson complete button (filled primary)
-        Expanded(
-          child: SizedBox(
-            height: AppSpacing.buttonHeightSmall,
-            child: ElevatedButton.icon(
-              onPressed: onLessonComplete,
-              icon: const Icon(Icons.check_circle_outline, size: 16),
-              label: Text(
-                AppStrings.lessonComplete,
-                style: AppTypography.buttonSmall.copyWith(
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStudentActions() {
-    return Row(
-      children: [
-        // Schedule change button (outlined)
-        Expanded(
-          child: SizedBox(
-            height: AppSpacing.buttonHeightSmall,
-            child: OutlinedButton.icon(
-              onPressed: onScheduleChange,
-              icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-              label: Text(
-                AppStrings.scheduleChangeButton,
-                style: AppTypography.buttonSmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.borderLight),
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.space2),
-
-        // Cancel request button (outlined error)
-        Expanded(
-          child: SizedBox(
-            height: AppSpacing.buttonHeightSmall,
-            child: OutlinedButton.icon(
-              onPressed: onCancel,
-              icon: const Icon(Icons.cancel_outlined, size: 16),
-              label: Text(
-                AppStrings.cancelRequest,
-                style: AppTypography.buttonSmall.copyWith(
-                  color: AppColors.error,
-                ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: AppColors.error.withValues(alpha: 0.5),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space3,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

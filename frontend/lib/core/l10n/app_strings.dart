@@ -918,7 +918,9 @@ class AppStrings {
   static String sessionCollapsedFuture(int n) => '$n회차 · 미정';
 
   /// Bottom input bar
-  static const subscriptionMessageHint = '메시지를 입력하세요';
+  static const subscriptionMessageHint = '학생에게 전달할 메시지를 입력하세요';
+  static const subscriptionSendMessage = '메시지 전송';
+  static const messageSentSuccess = '메시지를 전송했습니다';
   static const scheduleChangeButton = '일정 변경';
 
   // === Common UI strings ===

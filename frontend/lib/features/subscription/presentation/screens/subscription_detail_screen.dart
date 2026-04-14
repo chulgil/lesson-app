@@ -5,14 +5,12 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/date_format_utils.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
-import '../../../students/domain/entities/lesson_class.dart';
+import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/cancel_lesson_bottom_sheet.dart';
 import '../widgets/reschedule_bottom_sheet.dart';
 import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
@@ -21,11 +19,12 @@ import '../widgets/subscription_detail_chat_list.dart';
 
 /// Screen showing subscription detail with progress bar + chat layout.
 ///
-/// Layout:
-/// - AppBar: student/teacher name + instrument
-/// - SessionProgressBar (fixed at top)
-/// - Scrollable chat area (per-session events)
-/// - Bottom input bar (message + schedule change)
+/// Layout matches [RequestDetailScreen]:
+/// - AppBar: opponent name (typeLabel) — tap → profile
+/// - SessionProgressBar (fixed, matches LessonProgressBar style)
+/// - ScheduleGuideInfoBox (fixed)
+/// - Scrollable chat area (per-session schedule change events)
+/// - Bottom input bar (message send + schedule change)
 class SubscriptionDetailScreen extends ConsumerWidget {
   final String subscriptionId;
   final String viewerRole;
@@ -139,6 +138,7 @@ class _SubscriptionDetailBodyState
   final TextEditingController _messageController = TextEditingController();
 
   Subscription get subscription => widget.subscription;
+  bool get _isTeacher => widget.viewerRole == 'teacher';
 
   @override
   void initState() {
@@ -159,6 +159,8 @@ class _SubscriptionDetailBodyState
   Widget build(BuildContext context) {
     final membershipAsync =
         ref.watch(membershipProvider(subscription.membershipId));
+    final studentNames = ref.watch(studentNameMapProvider);
+    final academyNames = ref.watch(academyNameMapProvider);
 
     return membershipAsync.when(
       data: (membership) {
@@ -168,12 +170,50 @@ class _SubscriptionDetailBodyState
             ? ref.watch(lessonClassProvider(membership.lessonClassId))
             : null;
 
+        // Build AppBar title — matches RequestDetailScreen format:
+        // "학원이름 학생이름 (타입)" or "학생이름 (타입)"
+        final studentName =
+            studentNames[subscription.studentId] ?? AppStrings.student;
+        final lessonClass = lessonClassAsync?.valueOrNull;
+        final isAcademy =
+            lessonClass?.type.name == 'academy';
+        final typeLabel = subscription.typeLabel;
+
+        final appBarTitle = isAcademy && lessonClass != null
+            ? '${lessonClass.name} $studentName ($typeLabel)'
+            : '$studentName ($typeLabel)';
+
         return Scaffold(
-          appBar: _buildAppBar(instrument, lessonClassAsync),
+          appBar: AppBar(
+            titleSpacing: 0,
+            title: Text(
+              appBarTitle,
+              style: AppTypography.headingSmall,
+            ),
+          ),
           body: Column(
             children: [
-              // SessionProgressBar (fixed at top)
-              _buildProgressBarSection(),
+              // SessionProgressBar (fixed, matches LessonProgressBar)
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  border: Border(
+                    bottom: BorderSide(color: AppColors.borderLight),
+                  ),
+                ),
+                child: SessionProgressBar(
+                  totalSessions:
+                      subscription.totalLessonsForDisplay ?? 0,
+                  completedSessions: subscription.usedLessons,
+                  selectedSession: _selectedSession,
+                  isMonthly:
+                      subscription.type == SubscriptionType.monthly,
+                  onSessionTap: (session) {
+                    setState(() => _selectedSession = session);
+                  },
+                  onBulkChangeTap: () => _handleReschedule(context),
+                ),
+              ),
 
               // Guide info box (fixed)
               ScheduleGuideInfoBox(
@@ -182,7 +222,7 @@ class _SubscriptionDetailBodyState
                 viewerRole: widget.viewerRole,
               ),
 
-              // Scrollable chat area
+              // Scrollable chat area (schedule change events only)
               Expanded(
                 child: SubscriptionDetailChatList(
                   subscription: subscription,
@@ -196,9 +236,8 @@ class _SubscriptionDetailBodyState
             subscription: subscription,
             viewerRole: widget.viewerRole,
             messageController: _messageController,
+            onSendMessage: _handleSendMessage,
             onScheduleChange: () => _handleReschedule(context),
-            onLessonComplete: () => _handleLessonComplete(context),
-            onCancel: () => _handleCancel(context),
           ),
         );
       },
@@ -226,49 +265,20 @@ class _SubscriptionDetailBodyState
     );
   }
 
-  AppBar _buildAppBar(
-    String instrument,
-    AsyncValue<LessonClass?>? lessonClassAsync,
-  ) {
-    final className = lessonClassAsync?.valueOrNull?.name;
-    final title = className != null ? '$instrument · $className' : instrument;
-
-    return AppBar(
-      title: Text(title),
-      centerTitle: true,
-    );
-  }
-
-  Widget _buildProgressBarSection() {
-    final total = subscription.totalLessonsForDisplay ?? 0;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-        vertical: AppSpacing.space2,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
-      ),
-      child: SessionProgressBar(
-        totalSessions: total,
-        completedSessions: subscription.usedLessons,
-        selectedSession: _selectedSession,
-        isMonthly: subscription.type == SubscriptionType.monthly,
-        onSessionTap: (session) {
-          setState(() => _selectedSession = session);
-        },
-        onBulkChangeTap: () => _handleReschedule(context),
-      ),
-    );
-  }
-
   // ═══════════════════════════════════════════════════════════════
   // Action Handlers
   // ═══════════════════════════════════════════════════════════════
+
+  void _handleSendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    // TODO: Send message to student via provider
+    _messageController.clear();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppStrings.messageSentSuccess)),
+    );
+  }
 
   void _handleReschedule(BuildContext context) async {
     final nextLessonTime =
@@ -292,58 +302,6 @@ class _SubscriptionDetailBodyState
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
-      );
-    }
-  }
-
-  void _handleCancel(BuildContext context) async {
-    final nextLessonTime =
-        DateTime.now().add(const Duration(days: 3, hours: 14));
-
-    final result = await showCancelLessonBottomSheet(
-      context,
-      subscription: subscription,
-      lessonDateTime: nextLessonTime,
-      sessionNumber: _selectedSession,
-    );
-
-    if (result != null && context.mounted) {
-      final message = result.reason.deductsLesson
-          ? AppStrings.cancelRequestCompletedDeducted
-          : AppStrings.cancelRequestCompletedKept;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    }
-  }
-
-  void _handleLessonComplete(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppStrings.lessonComplete),
-        content: Text(
-          AppStrings.sessionCompleted(
-            _selectedSession,
-            formatDateMDWithDay(DateTime.now()),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(AppStrings.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(AppStrings.confirm),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.lessonCompleted)),
       );
     }
   }

@@ -7,13 +7,13 @@ import '../../../../core/theme/app_typography.dart';
 
 /// Visual progress bar showing session completion status.
 ///
-/// Matches the [LessonProgressBar] visual pattern:
-/// - Dot indicators connected by dashed/solid lines
-/// - Center-aligned layout
-/// - Completed: filled circle + checkmark
-/// - Selected: filled circle + outer ring
-/// - Future: hollow circle (border only)
-/// - Change-requested: warning dot badge
+/// Pixel-exact match with [LessonProgressBar]:
+/// - Expanded connectors (dashed/solid) filling available width
+/// - Center-aligned dots (20px) with outer ring (28px) for active
+/// - Completed: primary filled + checkmark
+/// - Active: primary filled + primaryLight ring
+/// - Future: hollow circle (borderLight)
+/// - Labels below each dot (fontSize: 10)
 class SessionProgressBar extends StatelessWidget {
   final int totalSessions;
   final int completedSessions;
@@ -34,6 +34,7 @@ class SessionProgressBar extends StatelessWidget {
     this.onBulkChangeTap,
   });
 
+  // Matches LessonProgressBar._dotSize / _ringSize exactly
   static const double _dotSize = 20.0;
   static const double _ringSize = 28.0;
   static const int _maxPerRow = 8;
@@ -43,13 +44,19 @@ class SessionProgressBar extends StatelessWidget {
     final sessions = List.generate(totalSessions, (index) => index + 1);
     final rows = _splitRows(sessions);
 
-    return Column(
-      children: [
-        for (int i = 0; i < rows.length; i++) ...[
-          if (i > 0) const SizedBox(height: AppSpacing.space2),
-          _buildConnectedRow(rows[i], showBulkButton: i == 0 && isMonthly),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space2,
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < rows.length; i++) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.space2),
+            _buildConnectedRow(rows[i], showBulkButton: i == 0 && isMonthly),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -71,8 +78,8 @@ class SessionProgressBar extends StatelessWidget {
     return rows;
   }
 
-  /// Build a row of session dots connected by dashed/solid lines.
-  /// Matches LessonProgressBar's connector pattern.
+  /// Build a row of session dots connected by Expanded dashed/solid lines.
+  /// Matches LessonProgressBar's Row(children: [dot, Expanded(line), dot, ...])
   Widget _buildConnectedRow(
     List<int> sessions, {
     bool showBulkButton = false,
@@ -80,11 +87,10 @@ class SessionProgressBar extends StatelessWidget {
     final itemCount = sessions.length * 2 - 1;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (int i = 0; i < itemCount; i++) ...[
           if (i.isOdd)
-            // Connector line between dots
+            // Expanded connector — matches LessonProgressBar exactly
             _buildConnector(sessions[i ~/ 2]),
           if (i.isEven)
             _SessionDot(
@@ -104,20 +110,16 @@ class SessionProgressBar extends StatelessWidget {
     );
   }
 
-  /// Connector line: solid if session is completed, dashed otherwise.
-  /// Uses fixed width (space3) instead of Expanded because session counts
-  /// vary per row and center-alignment requires predictable widths.
+  /// Expanded connector: solid (primary) if completed, dashed (borderLight) otherwise.
+  /// Exactly matches LessonProgressBar's connector pattern.
   Widget _buildConnector(int sessionNumber) {
     final isCompleted = sessionNumber <= completedSessions;
-    const connectorWidth = AppSpacing.space3;
 
-    return SizedBox(
-      width: connectorWidth,
-      height: 2,
+    return Expanded(
       child: isCompleted
-          ? Container(color: AppColors.primary)
+          ? Container(height: 2, color: AppColors.primary)
           : CustomPaint(
-              size: const Size(connectorWidth, 2),
+              size: const Size(double.infinity, 2),
               painter: _DashedLinePainter(
                 color: AppColors.borderLight,
                 strokeWidth: 1.5,
@@ -137,7 +139,7 @@ class SessionProgressBar extends StatelessWidget {
 
 enum _SessionState { completed, scheduled, future }
 
-/// Single session dot with label — matches LessonProgressBar's _PhaseDot style.
+/// Session dot — pixel-exact match with LessonProgressBar._PhaseDot.
 class _SessionDot extends StatelessWidget {
   final int sessionNumber;
   final _SessionState state;
@@ -208,12 +210,13 @@ class _SessionDot extends StatelessWidget {
 
   Widget _buildDotContent() {
     switch (state) {
+      // Completed: primary filled + checkmark (matches LessonProgressBar)
       case _SessionState.completed:
         return Container(
           width: SessionProgressBar._dotSize,
           height: SessionProgressBar._dotSize,
           decoration: const BoxDecoration(
-            color: AppColors.success,
+            color: AppColors.primary,
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -223,8 +226,8 @@ class _SessionDot extends StatelessWidget {
           ),
         );
 
+      // Active: outer ring (primaryLight) + inner filled (primary)
       case _SessionState.scheduled:
-        // Filled dot + outer ring (matches LessonProgressBar active state)
         return Stack(
           alignment: Alignment.center,
           children: [
@@ -250,6 +253,7 @@ class _SessionDot extends StatelessWidget {
           ],
         );
 
+      // Future: hollow circle (no text inside, matches LessonProgressBar)
       case _SessionState.future:
         return Container(
           width: SessionProgressBar._dotSize,
@@ -257,18 +261,8 @@ class _SessionDot extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: AppColors.borderLight,
               width: 1.5,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              '$sessionNumber',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-                fontWeight: FontWeight.w500,
-                fontSize: 9,
-              ),
             ),
           ),
         );
@@ -276,19 +270,17 @@ class _SessionDot extends StatelessWidget {
   }
 
   Color get _textColor {
-    if (isSelected) return AppColors.primary;
     switch (state) {
       case _SessionState.completed:
-        return AppColors.success;
       case _SessionState.scheduled:
         return AppColors.primary;
       case _SessionState.future:
-        return AppColors.textTertiaryLight;
+        return isSelected ? AppColors.primary : AppColors.textTertiaryLight;
     }
   }
 }
 
-/// Dashed line painter for future/incomplete connector segments.
+/// Dashed line painter — identical to LessonProgressBar._DashedLinePainter.
 class _DashedLinePainter extends CustomPainter {
   final Color color;
   final double strokeWidth;

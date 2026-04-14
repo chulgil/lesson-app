@@ -10,13 +10,11 @@ import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
 import '../../../schedule/domain/entities/request_event.dart';
-import 'subscription_issued_card.dart';
-
-/// Scrollable chat-style list showing per-session events.
+/// Scrollable chat-style list showing per-session schedule change events.
 ///
 /// Each session has a collapsed/expanded header.
 /// Past sessions are collapsed by default; selected session is expanded.
-/// Session 1 always starts with [SubscriptionIssuedCard].
+/// Shows only schedule change history (no subscription issued card).
 class SubscriptionDetailChatList extends ConsumerStatefulWidget {
   final Subscription subscription;
   final int selectedSession;
@@ -280,17 +278,7 @@ class _SessionSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Session 1 always shows SubscriptionIssuedCard
-          if (sessionNumber == 1)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: SubscriptionIssuedCard(
-                subscription: subscription,
-                instrument: instrument,
-              ),
-            ),
-
-          // Events for this session
+          // Schedule change events for this session
           eventsAsync.when(
             data: (events) {
               if (events.isEmpty) return _buildNoEvents();
