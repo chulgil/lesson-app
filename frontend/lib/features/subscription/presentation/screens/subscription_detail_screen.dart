@@ -7,11 +7,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
+import '../../../schedule/presentation/screens/regular_schedule_change_screen.dart';
+import '../../../schedule/presentation/screens/schedule_change_slot_screen.dart';
+import '../../../schedule/presentation/widgets/schedule_change_type_bottom_sheet.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_providers.dart';
-import '../widgets/reschedule_bottom_sheet.dart';
 import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
 import '../widgets/subscription_bottom_input_bar.dart';
@@ -204,7 +206,7 @@ class _SubscriptionDetailBodyState
                 onSessionTap: (session) {
                   setState(() => _selectedSession = session);
                 },
-                onBulkChangeTap: () => _handleReschedule(context),
+                onBulkChangeTap: () => _handleScheduleChange(context),
               ),
 
               // Guide info box (fixed)
@@ -229,7 +231,7 @@ class _SubscriptionDetailBodyState
             viewerRole: widget.viewerRole,
             messageController: _messageController,
             onSendMessage: _handleSendMessage,
-            onScheduleChange: () => _handleReschedule(context),
+            onScheduleChange: () => _handleScheduleChange(context),
           ),
         );
       },
@@ -272,28 +274,52 @@ class _SubscriptionDetailBodyState
     );
   }
 
-  void _handleReschedule(BuildContext context) async {
-    final nextLessonTime =
-        DateTime.now().add(const Duration(days: 3, hours: 14));
+  /// Schedule change — same flow as RequestDetailScreen._handleScheduleChange:
+  /// 1. showScheduleChangeTypeBottomSheet → type selection
+  /// 2a. ScheduleChangeSlotScreen (single)
+  /// 2b. RegularScheduleChangeScreen (bulk)
+  void _handleScheduleChange(BuildContext context) async {
+    // Step 1: Choose change type
+    final changeType = await showScheduleChangeTypeBottomSheet(context);
+    if (changeType == null || !context.mounted) return;
 
-    final result = await showRescheduleBottomSheet(
-      context,
-      subscription: subscription,
-      currentLessonDateTime: nextLessonTime,
-      sessionNumber: _selectedSession,
-    );
+    if (changeType == ScheduleChangeType.singleLesson) {
+      // Step 2a: Navigate to slot selection screen
+      final result =
+          await Navigator.of(context).push<ScheduleChangeSlotResult>(
+        MaterialPageRoute(
+          builder: (_) => ScheduleChangeSlotScreen(
+            params: ScheduleChangeSlotParams(
+              teacherId: subscription.membershipId, // TODO: resolve teacherId
+              studentId: subscription.studentId,
+              durationMinutes: 60,
+              currentScheduleLabel:
+                  '${_selectedSession}${AppStrings.sessionNumberLabel(_selectedSession)}',
+            ),
+          ),
+        ),
+      );
+      if (result == null || !context.mounted) return;
 
-    if (result != null && context.mounted) {
-      final String message;
-      if (result.changeType == ScheduleChangeType.bulkChange) {
-        message = AppStrings.bulkScheduleChangeCompleted;
-      } else if (result.usedRescheduleCredit) {
-        message = AppStrings.rescheduleRequestCompletedWithCredit;
-      } else {
-        message = AppStrings.rescheduleRequestCompleted;
-      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(AppStrings.scheduleChangePropose)),
+      );
+    } else {
+      // Step 2b: Bulk change — regular schedule change screen
+      final regularResult =
+          await Navigator.of(context).push<RegularScheduleChangeResult>(
+        MaterialPageRoute(
+          builder: (_) => const RegularScheduleChangeScreen(
+            params: RegularScheduleChangeParams(
+              currentScheduleLabel: '-',
+            ),
+          ),
+        ),
+      );
+      if (regularResult == null || !context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.scheduleChangePropose)),
       );
     }
   }
