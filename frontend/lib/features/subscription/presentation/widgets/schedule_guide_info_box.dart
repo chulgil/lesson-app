@@ -9,6 +9,12 @@ import '../../domain/entities/subscription.dart';
 /// Guide info box displayed between progress bar and chat area
 /// in the subscription detail screen.
 ///
+/// Matches [RequestHistoryChat._buildSystemGuide] style:
+/// - Icon: lightbulb_outline (18px)
+/// - Color: AppColors.info
+/// - Background: info.withValues(alpha: 0.06)
+/// - Structure: [title chip] + [situation text]
+///
 /// Shows contextual guidance based on subscription state:
 /// 1. Reschedule credits exhausted (student only)
 /// 2. Bulk mode active
@@ -30,29 +36,58 @@ class ScheduleGuideInfoBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final guide = _resolveGuide();
 
-    return Container(
+    return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      decoration: BoxDecoration(
-        color: guide.color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(guide.icon, size: 18, color: guide.color),
-          const SizedBox(width: AppSpacing.space2),
-          Expanded(
-            child: Text(
-              guide.message,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        decoration: BoxDecoration(
+          color: guide.color.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.lightbulb_outline, size: 18, color: guide.color),
+            const SizedBox(width: AppSpacing.space2),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title chip — matches RequestHistoryChat guide style
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space2,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: guide.color.withValues(alpha: 0.12),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusSmall),
+                    ),
+                    child: Text(
+                      guide.title,
+                      style: AppTypography.caption.copyWith(
+                        color: guide.color,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space1),
+                  // Situation text
+                  Text(
+                    guide.message,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -61,7 +96,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     // Priority 1: Reschedule credits exhausted (student only)
     if (subscription.remainingReschedule <= 0 && viewerRole == 'student') {
       return const _GuideContent(
-        icon: Icons.warning_amber,
+        title: AppStrings.scheduleChangeTitle,
         color: AppColors.error,
         message: AppStrings.rescheduleCreditsExhausted,
       );
@@ -70,7 +105,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     // Priority 2: Bulk mode active
     if (isBulkMode) {
       return const _GuideContent(
-        icon: Icons.date_range,
+        title: AppStrings.scheduleChangeTitle,
         color: AppColors.primary,
         message: AppStrings.guideBulkModeMessage,
       );
@@ -80,7 +115,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     if (subscription.type == SubscriptionType.package &&
         _hasUnbookedSessions) {
       return const _GuideContent(
-        icon: Icons.event_available,
+        title: AppStrings.scheduleChangeTitle,
         color: AppColors.info,
         message: AppStrings.packageGuideMessage,
       );
@@ -88,27 +123,25 @@ class ScheduleGuideInfoBox extends StatelessWidget {
 
     // Priority 4: Default
     return const _GuideContent(
-      icon: Icons.touch_app,
-      color: AppColors.textSecondaryLight,
+      title: AppStrings.scheduleChangeTitle,
+      color: AppColors.info,
       message: AppStrings.guideDefaultMessage,
     );
   }
 
-  /// Package subscription has unbooked sessions when remaining lessons > 0.
   bool get _hasUnbookedSessions {
     final remaining = subscription.remainingLessons;
     return remaining != null && remaining > 0;
   }
 }
 
-/// Internal data class for guide content resolution.
 class _GuideContent {
-  final IconData icon;
+  final String title;
   final Color color;
   final String message;
 
   const _GuideContent({
-    required this.icon,
+    required this.title,
     required this.color,
     required this.message,
   });

@@ -193,26 +193,18 @@ class _SubscriptionDetailBodyState
           ),
           body: Column(
             children: [
-              // SessionProgressBar (fixed, matches LessonProgressBar)
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.borderLight),
-                  ),
-                ),
-                child: SessionProgressBar(
-                  totalSessions:
-                      subscription.totalLessonsForDisplay ?? 0,
-                  completedSessions: subscription.usedLessons,
-                  selectedSession: _selectedSession,
-                  isMonthly:
-                      subscription.type == SubscriptionType.monthly,
-                  onSessionTap: (session) {
-                    setState(() => _selectedSession = session);
-                  },
-                  onBulkChangeTap: () => _handleReschedule(context),
-                ),
+              // SessionProgressBar (fixed, no wrapper — matches request_detail)
+              SessionProgressBar(
+                totalSessions:
+                    subscription.totalLessonsForDisplay ?? 0,
+                completedSessions: subscription.usedLessons,
+                selectedSession: _selectedSession,
+                isMonthly:
+                    subscription.type == SubscriptionType.monthly,
+                onSessionTap: (session) {
+                  setState(() => _selectedSession = session);
+                },
+                onBulkChangeTap: () => _handleReschedule(context),
               ),
 
               // Guide info box (fixed)
