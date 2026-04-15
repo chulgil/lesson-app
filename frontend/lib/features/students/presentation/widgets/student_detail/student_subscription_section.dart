@@ -16,36 +16,44 @@ import '../../providers/membership_providers.dart';
 class StudentSubscriptionSection extends ConsumerWidget {
   final String studentId;
 
-  const StudentSubscriptionSection({
-    super.key,
-    required this.studentId,
-  });
+  const StudentSubscriptionSection({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final membershipsAsync = ref.watch(studentMembershipsProvider(studentId));
-    final subscriptionsAsync = ref.watch(studentSubscriptionsProvider(studentId));
+    final subscriptionsAsync = ref.watch(
+      studentSubscriptionsProvider(studentId),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        // Header (바깥)
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('수강권 현황', style: AppTypography.headingMedium),
             TextButton.icon(
               onPressed: () {
-                context.push('${AppRoutes.issueSubscription}?studentId=$studentId');
+                context.push(
+                  '${AppRoutes.issueSubscription}?studentId=$studentId',
+                );
               },
               icon: const Icon(Icons.add, size: 18),
               label: const Text('발급'),
             ),
           ],
         ),
+
+        // Status summary (바깥)
+        subscriptionsAsync.when(
+          data: (subs) => _buildStatusSummary(subs),
+          loading: () => const SizedBox.shrink(),
+          error: (_, __) => const SizedBox.shrink(),
+        ),
         const SizedBox(height: AppSpacing.space3),
 
-        // Content
+        // Content (카드들만)
         membershipsAsync.when(
           data: (memberships) {
             if (memberships.isEmpty) {
@@ -53,12 +61,9 @@ class StudentSubscriptionSection extends ConsumerWidget {
             }
 
             return subscriptionsAsync.when(
-              data: (subscriptions) => _buildContent(
-                context,
-                ref,
-                memberships,
-                subscriptions,
-              ),
+              data:
+                  (subscriptions) =>
+                      _buildContent(context, ref, memberships, subscriptions),
               loading: () => _buildLoadingState(),
               error: (_, __) => _buildErrorState(),
             );
@@ -81,32 +86,37 @@ class StudentSubscriptionSection extends ConsumerWidget {
     }
 
     return Column(
-      children: memberships.map((membership) {
-        // Find subscription for this membership
-        final subscription = subscriptions.firstWhere(
-          (s) => s.membershipId == membership.id,
-          orElse: () => _createEmptySubscription(membership),
-        );
+      children:
+          memberships.map((membership) {
+            // Find subscription for this membership
+            final subscription = subscriptions.firstWhere(
+              (s) => s.membershipId == membership.id,
+              orElse: () => _createEmptySubscription(membership),
+            );
 
-        if (subscription.id.isEmpty) {
-          return const SizedBox.shrink();
-        }
+            if (subscription.id.isEmpty) {
+              return const SizedBox.shrink();
+            }
 
-        final lessonClassAsync =
-            ref.watch(lessonClassProvider(membership.lessonClassId));
-        final className = lessonClassAsync.valueOrNull?.name;
+            final lessonClassAsync = ref.watch(
+              lessonClassProvider(membership.lessonClassId),
+            );
+            final className = lessonClassAsync.valueOrNull?.name;
 
-        return SubscriptionTicketCard(
-          subscription: subscription,
-          className: className,
-          instrument: membership.instrument,
-          onTap: () => context.push(
-            AppRoutes.subscriptionDetail
-                .replaceFirst(':id', subscription.id),
-            extra: {'viewerRole': 'teacher'},
-          ),
-        );
-      }).toList(),
+            return SubscriptionTicketCard(
+              subscription: subscription,
+              className: className,
+              instrument: membership.instrument,
+              onTap:
+                  () => context.push(
+                    AppRoutes.subscriptionDetail.replaceFirst(
+                      ':id',
+                      subscription.id,
+                    ),
+                    extra: {'viewerRole': 'teacher'},
+                  ),
+            );
+          }).toList(),
     );
   }
 
@@ -157,7 +167,10 @@ class StudentSubscriptionSection extends ConsumerWidget {
     );
   }
 
-  Widget _buildNoSubscriptionState(BuildContext context, ClassMembership membership) {
+  Widget _buildNoSubscriptionState(
+    BuildContext context,
+    ClassMembership membership,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -167,11 +180,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.warning_amber,
-            color: AppColors.warning,
-            size: 32,
-          ),
+          Icon(Icons.warning_amber, color: AppColors.warning, size: 32),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -220,9 +229,33 @@ class StudentSubscriptionSection extends ConsumerWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _buildStatusSummary(List<Subscription> subscriptions) {
+    if (subscriptions.isEmpty) return const SizedBox.shrink();
+
+    final activeCount =
+        subscriptions
+            .where((s) => s.status == SubscriptionStatus.active)
+            .length;
+    final expiringCount = subscriptions.where((s) => s.isExpiringSoon).length;
+    final expiredCount =
+        subscriptions
+            .where((s) => s.status == SubscriptionStatus.expired)
+            .length;
+
+    final parts = <String>[];
+    if (activeCount > 0) parts.add('활성 $activeCount');
+    if (expiringCount > 0) parts.add('만료예정 $expiringCount');
+    if (expiredCount > 0) parts.add('만료 $expiredCount');
+
+    if (parts.isEmpty) return const SizedBox.shrink();
+
+    return Text(
+      parts.join(' · '),
+      style: AppTypography.caption.copyWith(color: AppColors.textTertiaryLight),
     );
   }
 
@@ -242,4 +275,3 @@ class StudentSubscriptionSection extends ConsumerWidget {
     );
   }
 }
-

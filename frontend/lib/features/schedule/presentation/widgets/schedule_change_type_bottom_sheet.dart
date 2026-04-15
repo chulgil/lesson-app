@@ -15,6 +15,7 @@ Future<ScheduleChangeType?> showScheduleChangeTypeBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppColors.backgroundLight,
+    barrierColor: Colors.black.withValues(alpha: 0.3),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),

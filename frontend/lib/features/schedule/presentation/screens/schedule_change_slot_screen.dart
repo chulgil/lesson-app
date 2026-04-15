@@ -24,11 +24,16 @@ class ScheduleChangeSlotParams {
   final int durationMinutes;
   final String currentScheduleLabel;
 
+  /// When true, selected slots represent recurring weekly schedules
+  /// (e.g., "매주 일 10:00"). Accepted slot becomes the new fixed schedule.
+  final bool isBulkChange;
+
   const ScheduleChangeSlotParams({
     required this.teacherId,
     required this.studentId,
     required this.durationMinutes,
     required this.currentScheduleLabel,
+    this.isBulkChange = false,
   });
 }
 
@@ -75,12 +80,18 @@ class _ScheduleChangeSlotScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppStrings.scheduleChangeSlotTitle),
+        title: Text(
+          params.isBulkChange
+              ? AppStrings.scheduleChangeRegularTitle
+              : AppStrings.scheduleChangeSlotTitle,
+        ),
       ),
       body: Column(
         children: [
           // Current schedule info
           _buildCurrentScheduleInfo(),
+          // Bulk change info banner
+          if (params.isBulkChange) _buildBulkChangeInfo(),
           // Week navigation
           _buildWeekNavigation(),
           // Grid
@@ -95,6 +106,35 @@ class _ScheduleChangeSlotScreenState
           if (_suggestedSlots.isNotEmpty) _buildSuggestedSlotsList(),
           // Message + Submit
           _buildBottomSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBulkChangeInfo() {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenPadding,
+        vertical: AppSpacing.space1,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: Text(
+              AppStrings.bulkChangeSlotGuide,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -225,7 +265,9 @@ class _ScheduleChangeSlotScreenState
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
-                      slot.displayLabel,
+                      params.isBulkChange
+                          ? '${AppStrings.everyWeek} ${slot.displayLabel}'
+                          : slot.displayLabel,
                       style: AppTypography.bodyMedium,
                     ),
                   ),
@@ -272,7 +314,9 @@ class _ScheduleChangeSlotScreenState
               maxLines: 2,
               maxLength: 200,
               decoration: InputDecoration(
-                hintText: AppStrings.scheduleChangeSingleDesc,
+                hintText: params.isBulkChange
+                    ? AppStrings.scheduleChangeBulkDesc
+                    : AppStrings.scheduleChangeSingleDesc,
                 hintStyle: AppTypography.bodySmall.copyWith(
                   color: AppColors.textTertiaryLight,
                 ),

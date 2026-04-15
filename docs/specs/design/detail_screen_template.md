@@ -39,7 +39,7 @@ Scaffold
 | 완료 상태 | `AppColors.primary` filled + checkmark (12px, white) | |
 | 활성 상태 | primary filled + primaryLight outer ring (width 2) | |
 | 미래 상태 | hollow circle (borderLight, width 1.5, 내부 비어있음) | |
-| 커넥터 (완료) | `Container(height: 2, color: primary)` | 실선 |
+| 커넥터 (완료) | `_DashedLinePainter(primary, 1.5, dash 4, gap 3)` | 점선 |
 | 커넥터 (미완료) | `_DashedLinePainter(borderLight, 1.5, dash 4, gap 3)` | 점선 |
 | 라벨 | caption, fontSize 10, 점 아래 | |
 | 라벨 색상 | completed/active=primary, future=textTertiaryLight | |
@@ -129,7 +129,7 @@ Row(
 ## 새 상세 화면 추가 시 체크리스트
 
 - [ ] AppBar: titleSpacing 0 + headingSmall + "상대방 (타입)" 포맷
-- [ ] 프로그레스바: Expanded 커넥터 + primary 색상 + 점선/실선
+- [ ] 프로그레스바: Expanded 커넥터 + 점선 통일 (완료=primary, 미완료=borderLight)
 - [ ] 프로그레스바 배경: surfaceLight + borderLight 하단
 - [ ] 하단 바: space3 패딩 + SafeArea + borderLight 상단
 - [ ] 버튼: buttonHeightSmall + radiusMedium + buttonSmall 폰트

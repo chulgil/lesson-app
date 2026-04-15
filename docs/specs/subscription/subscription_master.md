@@ -1060,6 +1060,12 @@ class LessonRequest extends HiveObject {
 | 상태별 색상 유틸리티 | 구현 완료 | `features/subscription/presentation/utils/subscription_status_colors.dart` |
 | SubscriptionUsage 엔티티 | 구현 완료 | `features/subscription/domain/entities/subscription_usage.dart` |
 | SubscriptionSettings 엔티티 | 구현 완료 | `features/subscription/domain/entities/subscription_settings.dart` |
+| 만료 예정 수강권 화면 | 구현 완료 | `features/subscription/presentation/screens/expiring_subscriptions_screen.dart` |
+| 스케줄 변경 요청 목록 화면 | 구현 완료 | `features/subscription/presentation/screens/schedule_change_request_list_screen.dart` |
+| 학생 수강권 제안 수락 화면 | 구현 완료 | `features/subscription/presentation/screens/student_proposal_accept_screen.dart` |
+| 갱신 상세 화면 | 구현 완료 | `features/subscription/presentation/screens/renewal_detail_screen.dart` |
+| 선생님 수강권 목록 화면 | 구현 완료 | `features/subscription/presentation/screens/teacher_subscription_list_screen.dart` |
+| 발급 액션 (바텀시트) | 구현 완료 | `features/subscription/presentation/screens/issue_subscription_actions.dart` |
 | 학원 모드 (Organization) | 설계 완료 | 구현 대기 |
 | 교차 수강권 (SubscriptionScope) | 설계 완료 | 구현 대기 |
 | 부가 서비스 옵션 | 설계 완료 | 구현 대기 |

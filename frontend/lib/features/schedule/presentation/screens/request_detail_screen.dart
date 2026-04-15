@@ -18,7 +18,6 @@ import '../../domain/entities/request_event.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../providers/unified_lesson_request_providers.dart';
 import '../widgets/schedule_change_response_bottom_sheet.dart';
-import 'regular_schedule_change_screen.dart';
 import '../widgets/schedule_change_type_bottom_sheet.dart';
 import 'schedule_change_slot_screen.dart';
 import '../../../subscription/presentation/providers/subscription_template_providers.dart';
@@ -932,95 +931,51 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final changeType = await showScheduleChangeTypeBottomSheet(context);
     if (changeType == null || !context.mounted) return;
 
-    if (changeType == ScheduleChangeType.singleLesson) {
-      // Step 2a: Navigate to slot selection screen
-      final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
-        MaterialPageRoute(
-          builder: (_) => ScheduleChangeSlotScreen(
-            params: ScheduleChangeSlotParams(
-              teacherId: request.teacherId,
-              studentId: request.studentId,
-              durationMinutes: 60, // TODO: get from subscription
-              currentScheduleLabel: request.preferredSlots.isNotEmpty
-                  ? request.preferredSlots.first.displayLabel
-                  : '-',
-            ),
+    // Both single and bulk use the same ScheduleChangeSlotScreen
+    final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
+      MaterialPageRoute(
+        builder: (_) => ScheduleChangeSlotScreen(
+          params: ScheduleChangeSlotParams(
+            teacherId: request.teacherId,
+            studentId: request.studentId,
+            durationMinutes: 60, // TODO: get from subscription
+            currentScheduleLabel: request.preferredSlots.isNotEmpty
+                ? request.preferredSlots.first.displayLabel
+                : '-',
+            isBulkChange: changeType == ScheduleChangeType.bulkChange,
           ),
         ),
-      );
-      if (result == null || !context.mounted) return;
+      ),
+    );
+    if (result == null || !context.mounted) return;
 
-      // Step 3: Record schedule change proposed event
-      try {
-        final actions = UnifiedLessonRequestActions(ref);
-        await actions.recordScheduleChangeProposed(
-          request.id,
-          actorId,
-          actorRole,
-          request.teacherId,
-          request.studentId,
-          changeType: changeType,
-          suggestedSlots: result.slots
-              .map((s) => TimeSlotOption(
-                    id: s.id,
-                    dayOfWeek: s.dayOfWeek,
-                    startTime:
-                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                    endTime:
-                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                  ))
-              .toList(),
-          message: result.message.isEmpty ? null : result.message,
-        );
-        if (context.mounted) {
-          _showSuccess(AppStrings.scheduleChangePropose);
-        }
-      } catch (e) {
-        if (context.mounted) _showError();
-      }
-    } else {
-      // Step 2b: Bulk change — navigate to regular schedule change screen
-      final regularResult =
-          await Navigator.of(context).push<RegularScheduleChangeResult>(
-        MaterialPageRoute(
-          builder: (_) => RegularScheduleChangeScreen(
-            params: RegularScheduleChangeParams(
-              currentScheduleLabel: request.preferredSlots.isNotEmpty
-                  ? request.preferredSlots.first.displayLabel
-                  : '-',
-              currentDayOfWeek: request.preferredSlots.isNotEmpty
-                  ? request.preferredSlots.first.dayOfWeek
-                  : null,
-              currentTime: request.preferredSlots.isNotEmpty
-                  ? request.preferredSlots.first.startTime
-                  : null,
-            ),
-          ),
-        ),
+    // Record schedule change proposed event
+    try {
+      final actions = UnifiedLessonRequestActions(ref);
+      await actions.recordScheduleChangeProposed(
+        request.id,
+        actorId,
+        actorRole,
+        request.teacherId,
+        request.studentId,
+        changeType: changeType,
+        suggestedSlots: result.slots
+            .map((s) => TimeSlotOption(
+                  id: s.id,
+                  dayOfWeek: s.dayOfWeek,
+                  startTime:
+                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                  endTime:
+                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                ))
+            .toList(),
+        message: result.message.isEmpty ? null : result.message,
       );
-      if (regularResult == null || !context.mounted) return;
-
-      try {
-        final actions = UnifiedLessonRequestActions(ref);
-        await actions.recordScheduleChangeProposed(
-          request.id,
-          actorId,
-          actorRole,
-          request.teacherId,
-          request.studentId,
-          changeType: changeType,
-          proposedDayOfWeek: regularResult.dayOfWeek,
-          proposedTime: regularResult.time,
-          message: regularResult.message.isEmpty
-              ? null
-              : regularResult.message,
-        );
-        if (context.mounted) {
-          _showSuccess(AppStrings.scheduleChangePropose);
-        }
-      } catch (e) {
-        if (context.mounted) _showError();
+      if (context.mounted) {
+        _showSuccess(AppStrings.scheduleChangePropose);
       }
+    } catch (e) {
+      if (context.mounted) _showError();
     }
   }
 

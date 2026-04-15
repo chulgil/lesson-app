@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,7 +11,6 @@ import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
-import '../../../schedule/presentation/screens/regular_schedule_change_screen.dart';
 import '../../../schedule/presentation/screens/schedule_change_slot_screen.dart';
 import '../../../schedule/presentation/widgets/schedule_change_type_bottom_sheet.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
@@ -141,6 +142,12 @@ class _SubscriptionDetailBodyState
   late int _selectedSession;
   final TextEditingController _messageController = TextEditingController();
 
+  // Event strip state — matches RequestDetailScreen pattern exactly
+  String? _eventMessage;
+  Color _eventColor = AppColors.success;
+  IconData _eventIcon = Icons.check_circle;
+  Timer? _eventTimer;
+
   Subscription get subscription => widget.subscription;
   bool get _isTeacher => widget.viewerRole == 'teacher';
 
@@ -155,8 +162,64 @@ class _SubscriptionDetailBodyState
 
   @override
   void dispose() {
+    _eventTimer?.cancel();
     _messageController.dispose();
     super.dispose();
+  }
+
+  void _showEventMessage(String message, {
+    Color color = AppColors.success,
+    IconData icon = Icons.check_circle,
+  }) {
+    _eventTimer?.cancel();
+    setState(() {
+      _eventMessage = message;
+      _eventColor = color;
+      _eventIcon = icon;
+    });
+    _eventTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) setState(() => _eventMessage = null);
+    });
+  }
+
+  void _showSuccess(String message) =>
+      _showEventMessage(message, color: AppColors.success, icon: Icons.check_circle);
+
+  /// Event strip widget — pixel-exact match with RequestDetailScreen._buildEventStrip()
+  Widget _buildEventStrip() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _eventMessage != null
+          ? Container(
+              key: ValueKey(_eventMessage),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+                vertical: AppSpacing.space2,
+              ),
+              color: _eventColor.withValues(alpha: 0.12),
+              child: Row(
+                children: [
+                  Icon(_eventIcon, size: 16, color: _eventColor),
+                  const SizedBox(width: AppSpacing.space2),
+                  Expanded(
+                    child: Text(
+                      _eventMessage!,
+                      style: AppTypography.caption.copyWith(
+                        color: _eventColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => setState(() => _eventMessage = null),
+                    child: Icon(Icons.close, size: 14, color: _eventColor),
+                  ),
+                ],
+              ),
+            )
+          : const SizedBox.shrink(),
+    );
   }
 
   @override
@@ -208,7 +271,6 @@ class _SubscriptionDetailBodyState
                 onSessionTap: (session) {
                   setState(() => _selectedSession = session);
                 },
-                onBulkChangeTap: () => _handleScheduleChange(context),
               ),
 
               // Guide info box (fixed)
@@ -226,6 +288,9 @@ class _SubscriptionDetailBodyState
                   instrument: instrument,
                 ),
               ),
+
+              // Event feedback strip (above bottom bar) — matches RequestDetailScreen
+              _buildEventStrip(),
             ],
           ),
           bottomNavigationBar: SubscriptionBottomInputBar(
@@ -287,70 +352,59 @@ class _SubscriptionDetailBodyState
       event,
     );
     _messageController.clear();
+    _showSuccess(AppStrings.messageSentSuccess);
   }
 
   /// Schedule change — same flow as RequestDetailScreen._handleScheduleChange:
   /// 1. showScheduleChangeTypeBottomSheet → type selection
-  /// 2a. ScheduleChangeSlotScreen (single)
-  /// 2b. RegularScheduleChangeScreen (bulk)
+  /// 2. ScheduleChangeSlotScreen (single & bulk share same UI)
   void _handleScheduleChange(BuildContext context) async {
     // Step 1: Choose change type
     final changeType = await showScheduleChangeTypeBottomSheet(context);
     if (changeType == null || !context.mounted) return;
 
-    if (changeType == ScheduleChangeType.singleLesson) {
-      // Step 2a: Navigate to slot selection screen
-      final result =
-          await Navigator.of(context).push<ScheduleChangeSlotResult>(
-        MaterialPageRoute(
-          builder: (_) => ScheduleChangeSlotScreen(
-            params: ScheduleChangeSlotParams(
-              teacherId: subscription.membershipId, // TODO: resolve teacherId
-              studentId: subscription.studentId,
-              durationMinutes: 60,
-              currentScheduleLabel:
-                  AppStrings.sessionNumberLabel(_selectedSession),
-            ),
+    // Both single and bulk use the same ScheduleChangeSlotScreen
+    final result =
+        await Navigator.of(context).push<ScheduleChangeSlotResult>(
+      MaterialPageRoute(
+        builder: (_) => ScheduleChangeSlotScreen(
+          params: ScheduleChangeSlotParams(
+            teacherId: subscription.membershipId, // TODO: resolve teacherId
+            studentId: subscription.studentId,
+            durationMinutes: 60,
+            currentScheduleLabel:
+                AppStrings.sessionNumberLabel(_selectedSession),
+            isBulkChange: changeType == ScheduleChangeType.bulkChange,
           ),
         ),
-      );
-      if (result == null || !context.mounted) return;
+      ),
+    );
+    if (result == null || !context.mounted) return;
 
-      // Record schedule change event in chat
-      _recordScheduleChangeEvent(
-        changeType: changeType,
-        message: result.message.isEmpty ? null : result.message,
-      );
-    } else {
-      // Step 2b: Bulk change — regular schedule change screen
-      final regularResult =
-          await Navigator.of(context).push<RegularScheduleChangeResult>(
-        MaterialPageRoute(
-          builder: (_) => const RegularScheduleChangeScreen(
-            params: RegularScheduleChangeParams(
-              currentScheduleLabel: '-',
-            ),
-          ),
-        ),
-      );
-      if (regularResult == null || !context.mounted) return;
+    // Record schedule change event in chat (with slot data, same as RequestDetailScreen)
+    final suggestedSlots = result.slots
+        .map((s) => TimeSlotOption(
+              id: s.id,
+              dayOfWeek: s.dayOfWeek,
+              startTime:
+                  '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+              endTime:
+                  '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+            ))
+        .toList();
 
-      // Record schedule change event in chat
-      _recordScheduleChangeEvent(
-        changeType: changeType,
-        message: regularResult.message.isEmpty ? null : regularResult.message,
-        proposedDayOfWeek: regularResult.dayOfWeek,
-        proposedTime: regularResult.time,
-      );
-    }
+    _recordScheduleChangeEvent(
+      changeType: changeType,
+      suggestedSlots: suggestedSlots,
+      message: result.message.isEmpty ? null : result.message,
+    );
   }
 
   /// Record a schedule change proposed event and show it in the chat.
   void _recordScheduleChangeEvent({
     required ScheduleChangeType changeType,
+    List<TimeSlotOption> suggestedSlots = const [],
     String? message,
-    int? proposedDayOfWeek,
-    String? proposedTime,
   }) {
     final event = RequestEvent(
       id: 'evt_${DateTime.now().millisecondsSinceEpoch}',
@@ -359,8 +413,7 @@ class _SubscriptionDetailBodyState
       actorId: subscription.studentId,
       eventType: RequestEventType.scheduleChangeProposed,
       scheduleChangeType: changeType,
-      proposedDayOfWeek: proposedDayOfWeek,
-      proposedTime: proposedTime,
+      suggestedSlots: suggestedSlots,
       message: message,
       sessionNumber: _selectedSession,
       createdAt: DateTime.now(),
@@ -374,9 +427,7 @@ class _SubscriptionDetailBodyState
     );
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppStrings.scheduleChangePropose)),
-      );
+      _showSuccess(AppStrings.scheduleChangePropose);
     }
   }
 }

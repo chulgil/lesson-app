@@ -93,11 +93,7 @@ class SubscriptionTicketCard extends StatelessWidget {
               color: accentColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(
-              _instrumentIcon,
-              size: 24,
-              color: accentColor,
-            ),
+            child: Icon(_instrumentIcon, size: 24, color: accentColor),
           ),
           const SizedBox(width: AppSpacing.space3),
 
@@ -206,7 +202,8 @@ class SubscriptionTicketCard extends StatelessWidget {
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w700,
                   color: SubscriptionStatusColors.getSummaryTextColor(
-                      subscription),
+                    subscription,
+                  ),
                 ),
               ),
             ],
@@ -237,8 +234,7 @@ class SubscriptionTicketCard extends StatelessWidget {
               if (subscription.startDate != null &&
                   subscription.endDate != null)
                 Text(
-                  _formatPeriod(
-                      subscription.startDate!, subscription.endDate!),
+                  _formatPeriod(subscription.startDate!, subscription.endDate!),
                   style: AppTypography.caption.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
@@ -251,18 +247,19 @@ class SubscriptionTicketCard extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: subscription.canReschedule
-                      ? accentColor.withValues(alpha: 0.1)
-                      : AppColors.borderLight.withValues(alpha: 0.5),
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusSmall),
+                  color:
+                      subscription.canReschedule
+                          ? accentColor.withValues(alpha: 0.1)
+                          : AppColors.borderLight.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   '${AppStrings.rescheduleLabel} ${subscription.remainingReschedule}${AppStrings.countSuffix}',
                   style: AppTypography.caption.copyWith(
-                    color: subscription.canReschedule
-                        ? accentColor
-                        : AppColors.textTertiaryLight,
+                    color:
+                        subscription.canReschedule
+                            ? accentColor
+                            : AppColors.textTertiaryLight,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -282,17 +279,19 @@ class SubscriptionTicketCard extends StatelessWidget {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        color: isActive
-            ? accentColor.withValues(alpha: 0.15)
-            : SubscriptionStatusColors.getBadgeBackground(subscription),
+        color:
+            isActive
+                ? accentColor.withValues(alpha: 0.15)
+                : SubscriptionStatusColors.getBadgeBackground(subscription),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         SubscriptionStatusColors.getLabel(subscription),
         style: AppTypography.caption.copyWith(
-          color: isActive
-              ? accentColor
-              : SubscriptionStatusColors.getColor(subscription),
+          color:
+              isActive
+                  ? accentColor
+                  : SubscriptionStatusColors.getColor(subscription),
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -330,9 +329,10 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = 1;
 
     const dashWidth = 6.0;
     const dashSpace = 4.0;

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
-import '../../../students/domain/entities/lesson_class.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../subscription/subscription_facade.dart';
@@ -25,8 +25,12 @@ class StudentSubscriptionSummary extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final membershipsAsync = ref.watch(activeStudentMembershipsProvider(studentId));
-    final subscriptionsAsync = ref.watch(activeStudentSubscriptionsProvider(studentId));
+    final membershipsAsync = ref.watch(
+      activeStudentMembershipsProvider(studentId),
+    );
+    final subscriptionsAsync = ref.watch(
+      activeStudentSubscriptionsProvider(studentId),
+    );
 
     return membershipsAsync.when(
       data: (memberships) {
@@ -35,12 +39,9 @@ class StudentSubscriptionSummary extends ConsumerWidget {
         }
 
         return subscriptionsAsync.when(
-          data: (subscriptions) => _buildContent(
-            context,
-            ref,
-            memberships,
-            subscriptions,
-          ),
+          data:
+              (subscriptions) =>
+                  _buildContent(context, ref, memberships, subscriptions),
           loading: () => _buildLoadingState(),
           error: (_, __) => _buildErrorState(),
         );
@@ -65,10 +66,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
           children: [
             Text('내 수강권', style: AppTypography.headingMedium),
             if (onViewAll != null)
-              TextButton(
-                onPressed: onViewAll,
-                child: const Text('전체 보기'),
-              ),
+              TextButton(onPressed: onViewAll, child: const Text('전체 보기')),
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -85,13 +83,17 @@ class StudentSubscriptionSummary extends ConsumerWidget {
             child: _SubscriptionMiniCard(
               membership: membership,
               subscription: subscription,
-              onTap: subscription.id.isNotEmpty
-                  ? () {
-                      context.push(
-                        AppRoutes.subscriptionDetail.replaceFirst(':id', subscription.id),
-                      );
-                    }
-                  : null,
+              onTap:
+                  subscription.id.isNotEmpty
+                      ? () {
+                        context.push(
+                          AppRoutes.subscriptionDetail.replaceFirst(
+                            ':id',
+                            subscription.id,
+                          ),
+                        );
+                      }
+                      : null,
             ),
           );
         }),
@@ -152,9 +154,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -175,7 +175,8 @@ class StudentSubscriptionSummary extends ConsumerWidget {
   }
 }
 
-/// Mini card showing subscription info for a membership.
+/// Enhanced card showing subscription info with progress bar, session count,
+/// and quick schedule-change action. Toss card pattern: biggest info first.
 class _SubscriptionMiniCard extends ConsumerWidget {
   final ClassMembership membership;
   final Subscription subscription;
@@ -189,162 +190,181 @@ class _SubscriptionMiniCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Get lesson class info
-    final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
+    final lessonClassAsync = ref.watch(
+      lessonClassProvider(membership.lessonClassId),
+    );
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.space3),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: subscription.isExpiringSoon
-                ? AppColors.warning
-                : AppColors.borderLight,
+            color:
+                subscription.isExpiringSoon
+                    ? AppColors.warning
+                    : AppColors.borderLight,
             width: subscription.isExpiringSoon ? 2 : 1,
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Class type icon
-            lessonClassAsync.when(
-              data: (lessonClass) => _buildClassIcon(lessonClass),
-              loading: () => _buildClassIconPlaceholder(),
-              error: (_, __) => _buildClassIconPlaceholder(),
-            ),
-            const SizedBox(width: AppSpacing.space3),
-
-            // Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Class name and instrument
-                  Row(
-                    children: [
-                      lessonClassAsync.when(
-                        data: (lessonClass) => Text(
-                          lessonClass?.icon ?? '👤',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: lessonClassAsync.when(
-                          data: (lessonClass) => Text(
-                            lessonClass?.name ?? '개인레슨',
-                            style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+            // Row 1: Badge + Name + Instrument
+            Row(
+              children: [
+                _buildStatusBadge(),
+                const SizedBox(width: AppSpacing.space2),
+                Expanded(
+                  child: lessonClassAsync.when(
+                    data:
+                        (lessonClass) => Text(
+                          '${lessonClass?.name ?? '개인레슨'} · ${membership.instrument}',
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
-                          loading: () => const Text('...'),
-                          error: (_, __) => const Text('레슨'),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    loading: () => const Text('...'),
+                    error: (_, __) => Text(membership.instrument),
+                  ),
+                ),
+                if (_daysRemaining != null)
+                  Text(
+                    'D-${_daysRemaining}',
+                    style: AppTypography.caption.copyWith(
+                      color:
+                          _daysRemaining! <= 7
+                              ? AppColors.warning
+                              : AppColors.textTertiaryLight,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.space3),
+
+            // Row 2: Progress bar + Session count (big number)
+            if (_totalSessions > 0) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
+                      child: LinearProgressIndicator(
+                        value: _progressValue,
+                        minHeight: 6,
+                        backgroundColor: AppColors.borderLight,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _progressColor,
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(width: AppSpacing.space3),
                   Text(
-                    '${membership.instrument} · ${membership.level ?? ''}',
+                    '${subscription.usedLessons}/$_totalSessions',
+                    style: AppTypography.headingSmall.copyWith(
+                      color: AppColors.textPrimaryLight,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    AppStrings.sessionUnit,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.textTertiaryLight,
                     ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: AppSpacing.space3),
+            ],
 
-            // Subscription status
-            _buildSubscriptionBadge(),
+            // Row 3: Detail link only (schedule change is in subscription detail)
+            if (subscription.id.isNotEmpty)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (onTap != null)
+                    TextButton(
+                      onPressed: onTap,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            AppStrings.viewDetail,
+                            style: AppTypography.buttonSmall.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildClassIcon(LessonClass? lessonClass) {
-    final isAcademy = lessonClass?.type == LessonClassType.academy;
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: (isAcademy ? AppColors.info : AppColors.primary)
-            .withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-      child: Center(
-        child: Text(
-          isAcademy ? '🏫' : '👤',
-          style: const TextStyle(fontSize: 20),
-        ),
-      ),
-    );
+  int get _totalSessions => subscription.totalLessonsForDisplay ?? 0;
+
+  double get _progressValue {
+    if (_totalSessions == 0) return 0;
+    return (subscription.usedLessons / _totalSessions).clamp(0.0, 1.0);
   }
 
-  Widget _buildClassIconPlaceholder() {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-      ),
-    );
+  Color get _progressColor {
+    if (subscription.isExpiringSoon) return AppColors.warning;
+    if (_progressValue >= 0.9) return AppColors.warning;
+    return AppColors.primary;
   }
 
-  Widget _buildSubscriptionBadge() {
+  int? get _daysRemaining {
+    if (subscription.endDate == null) return null;
+    final days = subscription.endDate!.difference(DateTime.now()).inDays;
+    return days >= 0 ? days : null;
+  }
+
+  Widget _buildStatusBadge() {
     if (subscription.id.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space2,
-          vertical: AppSpacing.space1,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.textTertiaryLight.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        ),
-        child: Text(
-          '미등록',
-          style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
+      return _badge(AppStrings.unregistered, AppColors.textTertiaryLight);
     }
-
-    Color backgroundColor;
-    Color textColor;
-
     if (subscription.status == SubscriptionStatus.expired) {
-      backgroundColor = AppColors.error.withValues(alpha: 0.1);
-      textColor = AppColors.error;
-    } else if (subscription.isExpiringSoon) {
-      backgroundColor = AppColors.warning.withValues(alpha: 0.1);
-      textColor = AppColors.warning;
-    } else {
-      backgroundColor = AppColors.success.withValues(alpha: 0.1);
-      textColor = AppColors.success;
+      return _badge(AppStrings.expired, AppColors.error);
     }
+    if (subscription.isExpiringSoon) {
+      return _badge(AppStrings.expiringSoon, AppColors.warning);
+    }
+    return _badge(AppStrings.active, AppColors.success);
+  }
 
+  Widget _badge(String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,
-        vertical: AppSpacing.space1,
+        vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
-        subscription.summaryText,
+        label,
         style: AppTypography.caption.copyWith(
-          color: textColor,
+          color: color,
           fontWeight: FontWeight.w600,
         ),
       ),

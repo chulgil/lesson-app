@@ -298,8 +298,10 @@ enum StudentTab {
 | 녹음 파일 관리 이동 | 구현 완료 |
 | 녹음 백업 설정 이동 | 구현 완료 |
 | 로그아웃 | 구현 완료 |
-| 프로필 수정 | 미구현 (TODO) |
-| 내 선생님 상세 | 미구현 (TODO) |
+| 프로필 수정 | 구현 완료 | `student_profile_edit_screen.dart` |
+| 내 선생님 목록 | 구현 완료 | `my_teachers_screen.dart` — 앱 연결/직접 등록 선생님 목록 |
+| 수동 선생님 등록 | 구현 완료 | `add_manual_teacher_screen.dart` — 학생이 직접 강사 등록/편집 |
+| 법적 문서 화면 | 구현 완료 | `legal_document_screen.dart` — 이용약관/개인정보처리방침 |
 | 피드백 전체 보기 | 미구현 (TODO) |
 | 실제 연습 통계 연동 | 미구현 (하드코딩) |
 | 실제 프로필 데이터 연동 | 미구현 (하드코딩) |

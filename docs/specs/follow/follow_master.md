@@ -1,6 +1,6 @@
 # 팔로우 시스템 Master Spec
 
-> 구현 상태: ⚠️ 부분 구현 — Provider만 존재, 화면 전무
+> 구현 상태: ✅ 구현 완료 — FollowFeedScreen, FollowListScreen 추가 (2026-03)
 > Last updated: 2026-03-07
 
 ## 1. 개요
@@ -280,7 +280,8 @@ Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
 | Mock Repository | `follow/data/repositories/mock_follow_repository.dart` | 완료 |
 | Remote Repository | `follow/data/repositories/remote_follow_repository.dart` | 완료 |
 | Providers | `follow/presentation/providers/follow_providers.dart` | 완료 |
-| 전용 UI 화면 | - | 미구현 |
+| FollowFeedScreen | `follow/presentation/screens/follow_feed_screen.dart` | 완료 |
+| FollowListScreen | `follow/presentation/screens/follow_list_screen.dart` | 완료 |
 
 ### Mock 데이터
 
@@ -299,7 +300,7 @@ Future<List<Follow>> followingByType(Ref ref, FollowTargetType type) async {
 |-------|------|:----:|
 | **Phase 1 (MVP)** | Follow 엔티티, Repository (Mock/Remote), 기본 Provider | 완료 |
 | **Phase 2** | FollowButton 위젯, 선생님 프로필/검색에서 팔로우 기능 통합 | 미구현 |
-| **Phase 3** | FollowListScreen, FollowFeedScreen, FollowCard, 피드 시스템 | 미구현 |
+| **Phase 3** | FollowListScreen, FollowFeedScreen, FollowCard, 피드 시스템 | ✅ 구현 완료 |
 
 **Phase 2 선행 조건**: 선생님 프로필 화면 완성
 **Phase 3 선행 조건**: 선생님/학원의 소식(Post) 엔티티 및 작성 기능 구현

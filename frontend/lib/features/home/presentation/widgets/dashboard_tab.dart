@@ -26,10 +26,7 @@ import 'urgent_alert_zone.dart';
 class DashboardTab extends ConsumerWidget {
   final VoidCallback onViewAllLessons;
 
-  const DashboardTab({
-    super.key,
-    required this.onViewAllLessons,
-  });
+  const DashboardTab({super.key, required this.onViewAllLessons});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -37,7 +34,9 @@ class DashboardTab extends ConsumerWidget {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final teacherId = ref.watch(currentUserIdProvider);
     final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
-    final needsConfirmationAsync = ref.watch(lessonsNeedingConfirmationProvider);
+    final needsConfirmationAsync = ref.watch(
+      lessonsNeedingConfirmationProvider,
+    );
 
     // Get today's lessons
     final now = DateTime.now();
@@ -107,7 +106,7 @@ class DashboardTab extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.space6),
 
-            // ── 3순위: 진행 현황 ────────────────────────────
+            // ── 이벤트: 대응 필요 (오늘 레슨 바로 아래) ──────────
             LessonRequestSection(userId: teacherId),
 
             const SizedBox(height: AppSpacing.space6),
@@ -211,7 +210,11 @@ class DashboardTab extends ConsumerWidget {
         Expanded(
           child: Row(
             children: [
-              Icon(Icons.schedule, size: 20, color: AppColors.textSecondaryLight),
+              Icon(
+                Icons.schedule,
+                size: 20,
+                color: AppColors.textSecondaryLight,
+              ),
               const SizedBox(width: AppSpacing.space2),
               Text('오늘의 레슨', style: AppTypography.headingMedium),
               const SizedBox(width: AppSpacing.space2),
@@ -229,9 +232,7 @@ class DashboardTab extends ConsumerWidget {
             onPressed: () => context.push(AppRoutes.bulkFeedback),
             child: Text(
               '일괄 피드백',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.primary,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
             ),
           ),
         if (lessonCount > 3)
@@ -274,7 +275,9 @@ class DashboardTab extends ConsumerWidget {
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('레슨 추가'),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+                  side: BorderSide(
+                    color: AppColors.primary.withValues(alpha: 0.5),
+                  ),
                   foregroundColor: AppColors.primary,
                 ),
               ),
@@ -294,7 +297,10 @@ class DashboardTab extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.space3),
             child: LessonCard(
               lesson: lesson,
-              onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
+              onTap:
+                  () => context.push(
+                    AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+                  ),
             ),
           );
         }),
@@ -326,9 +332,7 @@ class DashboardTab extends ConsumerWidget {
         icon: Icon(Icons.bar_chart, size: 18, color: AppColors.primary),
         label: Text(
           '통계 더보기',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.primary,
-          ),
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.primary),
         ),
       ),
     );

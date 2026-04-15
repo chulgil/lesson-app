@@ -112,12 +112,10 @@ class AppStrings {
   static const no = '아니요';
 
   /// 상대방 시간 제안 알림
-  static String opponentProposed(String name) =>
-      '$name님이 시간을 제안했습니다';
+  static String opponentProposed(String name) => '$name님이 시간을 제안했습니다';
 
   /// 상대방 응답 대기
-  static String waitingForResponse(String name) =>
-      '$name님의 응답을 기다리고 있습니다';
+  static String waitingForResponse(String name) => '$name님의 응답을 기다리고 있습니다';
 
   /// 히스토리 없음
   static const noHistory = '아직 히스토리가 없습니다';
@@ -162,8 +160,7 @@ class AppStrings {
   static const pendingRequests = '대기중 요청';
 
   /// 해당 상태의 수강권이 없습니다
-  static String noSubscriptionsForStatus(String status) =>
-      '$status 수강권이 없습니다';
+  static String noSubscriptionsForStatus(String status) => '$status 수강권이 없습니다';
 
   // ── Request List Item (Redesign) ──────────────────────────
 
@@ -487,6 +484,8 @@ class AppStrings {
   static const scheduleChangeRegularTitle = '정규 시간 변경';
   static const scheduleChangeCurrentSchedule = '현재 스케줄';
   static const scheduleChangeNewSchedule = '변경할 스케줄';
+  static const everyWeek = '매주';
+  static const bulkChangeSlotGuide = '선택한 시간이 매주 반복되는 고정 스케줄로 적용됩니다';
   static const scheduleChangePropose = '시간 변경 제안';
   static const scheduleChangeInProgress = '시간 변경 진행 중';
   static const scheduleChangeRequestArrived = '시간 변경 요청이 도착했습니다';
@@ -543,8 +542,7 @@ class AppStrings {
   static const acceptMessageHint = '학생에게 전할 메시지 (선택)';
 
   /// 거절 시 디폴트 메시지
-  static const declineDefaultMessage =
-      '현재 가능한 시간이 없어 이번에는 어렵습니다.';
+  static const declineDefaultMessage = '현재 가능한 시간이 없어 이번에는 어렵습니다.';
 
   /// 대안 제안 시 디폴트 메시지
   static const proposeDefaultMessage = '다른 시간을 제안드립니다.';
@@ -593,14 +591,10 @@ class AppStrings {
   static const actionVerifyPayment = '입금 확인';
 
   /// Phase 2: 시간 확정 후 안내 메시지
-  static const phase2TimeConfirmedTeacher =
-      '수강권 발급 방법을 선택해주세요';
-  static const phase2TimeConfirmedTrial =
-      '체험레슨이 확정되었습니다';
-  static const phase2WaitingPaymentStudent =
-      '결제를 완료해주세요';
-  static const phase2PaymentReceivedTeacher =
-      '학생이 입금을 완료했습니다';
+  static const phase2TimeConfirmedTeacher = '수강권 발급 방법을 선택해주세요';
+  static const phase2TimeConfirmedTrial = '체험레슨이 확정되었습니다';
+  static const phase2WaitingPaymentStudent = '결제를 완료해주세요';
+  static const phase2PaymentReceivedTeacher = '학생이 입금을 완료했습니다';
 
   // ── Action Box Messages (Phase 2 대기 상태) ─────────────────
 
@@ -611,7 +605,8 @@ class AppStrings {
   static const actionBoxWaitingPayment = '학생의 결제를 기다리고 있습니다';
 
   /// 선생님: 수강권 발행 완료
-  static const actionBoxSubscriptionReady = '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.';
+  static const actionBoxSubscriptionReady =
+      '수강권이 발행되었습니다. 레슨을 시작할 준비가 완료되었습니다.';
 
   /// 학생: 입금 확인 대기
   static const actionBoxWaitingVerify = '선생님의 입금 확인을 기다리고 있습니다';
@@ -671,8 +666,7 @@ class AppStrings {
   static const actionRequestRenewal = '재수강 신청';
 
   /// Phase 2 waiting message
-  static String waitingForPayment(String name) =>
-      '$name의 입금을 기다리고 있습니다';
+  static String waitingForPayment(String name) => '$name의 입금을 기다리고 있습니다';
 
   /// Phase 3 progress message
   static String lessonProgressStatus(int completed, int total) =>
@@ -693,8 +687,7 @@ class AppStrings {
   static const selectReason = '사유 선택 필요';
   static const nonCompletionReason = '레슨 미진행 사유';
   static const optionalNote = '추가 메모를 입력하세요 (선택)';
-  static String lessonsNeedConfirmation(int count) =>
-      '미확인 레슨 ${count}건';
+  static String lessonsNeedConfirmation(int count) => '미확인 레슨 ${count}건';
 
   // ── Day of Week ────────────────────────────────────────
 
@@ -718,26 +711,21 @@ class AppStrings {
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청
-  static String lessonRequestPending(int count) =>
-      '레슨 요청 ${count}건 대기';
+  static String lessonRequestPending(int count) => '레슨 요청 ${count}건 대기';
 
   /// 대기 중인 입금 확인
-  static String paymentConfirmPending(int count) =>
-      '입금 확인 ${count}건 대기';
+  static String paymentConfirmPending(int count) => '입금 확인 ${count}건 대기';
 
   // ── Urgent Alert Zone (Dashboard) ──────────────────────────
 
   /// 만료된 수강권
-  static String subscriptionExpired(int count) =>
-      '만료 수강권 ${count}건';
+  static String subscriptionExpired(int count) => '만료 수강권 ${count}건';
 
   /// 임박한 수강권
-  static String subscriptionExpiringSoon(int count) =>
-      '수강권 임박 ${count}건';
+  static String subscriptionExpiringSoon(int count) => '수강권 임박 ${count}건';
 
   /// 예약 승인 대기
-  static String pendingBookings(int count) =>
-      '예약 승인 대기 ${count}건';
+  static String pendingBookings(int count) => '예약 승인 대기 ${count}건';
 
   // ── Subscription Card ─────────────────────────────────────
 
@@ -922,6 +910,13 @@ class AppStrings {
   static const subscriptionSendMessage = '메시지 전송';
   static const messageSentSuccess = '메시지를 전송했습니다';
   static const scheduleChangeButton = '일정 변경';
+  static const scheduleChange = '일정 변경';
+  static const viewDetail = '상세 보기';
+  static const sessionUnit = '회';
+  static const unregistered = '미등록';
+  static const active = '수강 중';
+  static const expiringSoon = '만료 예정';
+  static const expired = '만료됨';
 
   // === Common UI strings ===
 
@@ -941,8 +936,7 @@ class AppStrings {
   static const instrumentFallback = '악기';
 
   /// 사용 N회 / 전체 N회
-  static String usageProgress(int used, int total) =>
-      '사용 $used회 / 전체 $total회';
+  static String usageProgress(int used, int total) => '사용 $used회 / 전체 $total회';
 
   /// N회 남음
   static String remainingCount(int count) => '$count회 남음';
@@ -960,8 +954,7 @@ class AppStrings {
   static const cancelRequestCompletedKept = '취소 요청 완료 (횟수 유지)';
 
   /// 잔여 횟수 경고
-  static String remainingLessonsWarning(int count) =>
-      '잔여 ${count}회 - 갱신 권장';
+  static String remainingLessonsWarning(int count) => '잔여 ${count}회 - 갱신 권장';
 
   /// 마지막 1회 경고
   static const lastLessonWarning = '마지막 1회!';
@@ -1024,8 +1017,7 @@ class AppStrings {
       '고정 스케줄이 자동 생성되었습니다. 변경이 필요하면 해당 회차를 탭하세요.';
 
   /// 다음 레슨 예약 안내 (회차권)
-  static const packageGuideMessage =
-      '다음 레슨 시간을 선생님의 빈 시간대에서 선택하세요.';
+  static const packageGuideMessage = '다음 레슨 시간을 선생님의 빈 시간대에서 선택하세요.';
 
   /// 변경 이력 없음
   static const noChangeHistory = '변경 이력 없음';
@@ -1048,15 +1040,13 @@ class AppStrings {
   static const changeTypeSingleLabel = '이번 회차만 변경';
 
   /// N회차만 다른 시간으로
-  static String changeTypeSingleDesc(int session) =>
-      '$session회차만 다른 시간으로';
+  static String changeTypeSingleDesc(int session) => '$session회차만 다른 시간으로';
 
   /// 앞으로 전체 변경
   static const changeTypeBulkLabel = '앞으로 전체 변경';
 
   /// N~M회차 새로운 고정 시간
-  static String changeTypeBulkDesc(int from, int to) =>
-      '$from~$to회차 새로운 고정 시간';
+  static String changeTypeBulkDesc(int from, int to) => '$from~$to회차 새로운 고정 시간';
 
   /// 전체 스케줄 변경 요청 완료
   static const bulkScheduleChangeCompleted = '전체 스케줄 변경 요청 완료';
@@ -1162,4 +1152,12 @@ class AppStrings {
   /// 변경취소권 N회 사용 (잔여 M회)
   static String rescheduleCreditsUsed(int used, int remaining) =>
       '변경취소권 $used회 사용 (잔여 $remaining회)';
+
+  // ── Schedule Change Chat Labels (D-8) ─────────────────────
+
+  /// 전체일정변경
+  static const chatBulkScheduleChange = '전체일정변경';
+
+  /// 이번회차 스케줄 변경
+  static const chatSingleScheduleChange = '이번회차 스케줄 변경';
 }

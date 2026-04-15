@@ -1449,7 +1449,19 @@ enum ScheduleCardStatus {
 | MyLessonRequestsScreen (학생) | 완료 | `presentation/screens/my_lesson_requests_screen.dart` |
 | LessonRequestProviders | 완료 | `presentation/providers/lesson_request_providers.dart` |
 
-### 13.8 미완료 / 향후 개선
+### 13.8 통합 레슨 요청 + 스케줄 변경 (2026-03 추가)
+
+| 기능 | 상태 | 파일 |
+|------|:----:|------|
+| AllLessonRequestsScreen | 완료 | `presentation/screens/all_lesson_requests_screen.dart` — 전체 요청 조회 (달력/페이즈탭/필터) |
+| RequestDetailScreen | 완료 | `presentation/screens/request_detail_screen.dart` — 요청 상세 (프로그레스바+챗 패턴) |
+| RequestCompletionScreen | 완료 | `presentation/screens/request_completion_screen.dart` — 신청 완료 5단계 가이드 |
+| UnifiedLessonRequestScreen | 완료 | `presentation/screens/unified_lesson_request_screen.dart` — 통합 레슨 신청 |
+| SuggestAlternativeScreen | 완료 | `presentation/screens/suggest_alternative_screen.dart` — 역제안 슬롯 선택 |
+| ScheduleChangeSlotScreen | 완료 | `presentation/screens/schedule_change_slot_screen.dart` — 스케줄 변경 슬롯 선택 (주간 그리드) |
+| ScheduleTab | 완료 | `presentation/screens/schedule_tab.dart` — 스케줄 탭 |
+
+### 13.9 미완료 / 향후 개선
 
 | 항목 | 우선순위 | 상태 |
 |------|:--------:|:----:|

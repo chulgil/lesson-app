@@ -9,7 +9,9 @@ import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/entities/subscription_usage.dart';
 import '../providers/subscription_providers.dart';
+import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../../schedule/domain/entities/request_event.dart';
+
 /// Scrollable chat-style list showing per-session schedule change events.
 ///
 /// Each session has a collapsed/expanded header.
@@ -78,14 +80,15 @@ class _SubscriptionDetailChatListState
     return usageHistoryAsync.when(
       data: (usages) => _buildSessionListView(usages),
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => Center(
-        child: Text(
-          AppStrings.noLessonRecords,
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+      error:
+          (_, __) => Center(
+            child: Text(
+              AppStrings.noLessonRecords,
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiaryLight,
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -97,12 +100,16 @@ class _SubscriptionDetailChatListState
         usages.where((u) => u.usageType == UsageType.normal).toList();
     final completedCount = completedUsages.length;
 
+    // Show only up to the current (next scheduled) session.
+    // Future undetermined sessions are hidden.
+    final visibleCount = (completedCount + 1).clamp(1, total);
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      itemCount: total,
+      itemCount: visibleCount,
       itemBuilder: (context, index) {
         final sessionNumber = index + 1;
         final isCompleted = sessionNumber <= completedCount;
@@ -140,11 +147,7 @@ class _SubscriptionDetailChatListState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.music_note,
-            size: 40,
-            color: AppColors.textTertiaryLight,
-          ),
+          Icon(Icons.music_note, size: 40, color: AppColors.textTertiaryLight),
           const SizedBox(height: AppSpacing.space2),
           Text(
             AppStrings.noLessonRecords,
@@ -204,9 +207,10 @@ class _SessionSection extends ConsumerWidget {
             Expanded(
               child: Container(
                 height: 0.5,
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.3)
-                    : AppColors.borderLight,
+                color:
+                    isSelected
+                        ? AppColors.primary.withValues(alpha: 0.3)
+                        : AppColors.borderLight,
               ),
             ),
             // Session label
@@ -217,11 +221,11 @@ class _SessionSection extends ConsumerWidget {
               child: Text(
                 _headerLabel,
                 style: AppTypography.caption.copyWith(
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.textTertiaryLight,
-                  fontWeight:
-                      isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color:
+                      isSelected
+                          ? AppColors.primary
+                          : AppColors.textTertiaryLight,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
@@ -229,16 +233,15 @@ class _SessionSection extends ConsumerWidget {
             Expanded(
               child: Container(
                 height: 0.5,
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.3)
-                    : AppColors.borderLight,
+                color:
+                    isSelected
+                        ? AppColors.primary.withValues(alpha: 0.3)
+                        : AppColors.borderLight,
               ),
             ),
             // Expand/collapse icon
             Icon(
-              isExpanded
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down,
+              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
               size: 16,
               color: AppColors.textTertiaryLight,
             ),
@@ -284,16 +287,17 @@ class _SessionSection extends ConsumerWidget {
               if (events.isEmpty) return _buildNoEvents();
               return _buildEventBubbles(events);
             },
-            loading: () => const Padding(
-              padding: EdgeInsets.all(AppSpacing.space2),
-              child: Center(
-                child: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+            loading:
+                () => const Padding(
+                  padding: EdgeInsets.all(AppSpacing.space2),
+                  child: Center(
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
-              ),
-            ),
             error: (_, __) => _buildNoEvents(),
           ),
         ],
@@ -321,44 +325,110 @@ class _SessionSection extends ConsumerWidget {
   }
 
   /// Render events as chat bubbles: student left, teacher right.
+  /// Schedule change events show change type label + proposed slot info,
+  /// matching RequestHistoryChat's slot display pattern.
   Widget _buildEventBubbles(List<RequestEvent> events) {
     return Column(
-      children: events.map<Widget>((event) {
-        final isTeacher = event.actorType.name == 'teacher';
+      children:
+          events.map<Widget>((event) {
+            final isTeacher = event.actorType.name == 'teacher';
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-          child: Align(
-            alignment:
-                isTeacher ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 280),
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: isTeacher
-                    ? AppColors.primary.withValues(alpha: 0.08)
-                    : AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(AppSpacing.radiusLarge),
-                  topRight: const Radius.circular(AppSpacing.radiusLarge),
-                  bottomLeft: Radius.circular(
-                    isTeacher ? AppSpacing.radiusLarge : 4,
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: Align(
+                alignment:
+                    isTeacher ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 280),
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color:
+                        isTeacher
+                            ? AppColors.primary.withValues(alpha: 0.08)
+                            : AppColors.surfaceSecondaryLight,
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(AppSpacing.radiusLarge),
+                      topRight: const Radius.circular(AppSpacing.radiusLarge),
+                      bottomLeft: Radius.circular(
+                        isTeacher ? AppSpacing.radiusLarge : 4,
+                      ),
+                      bottomRight: Radius.circular(
+                        isTeacher ? 4 : AppSpacing.radiusLarge,
+                      ),
+                    ),
                   ),
-                  bottomRight: Radius.circular(
-                    isTeacher ? 4 : AppSpacing.radiusLarge,
+                  child: _buildBubbleContent(event),
+                ),
+              ),
+            );
+          }).toList(),
+    );
+  }
+
+  /// Build bubble content: for schedule change events, show type label + slots.
+  Widget _buildBubbleContent(RequestEvent event) {
+    final isScheduleChange =
+        event.eventType == RequestEventType.scheduleChangeProposed ||
+        event.eventType == RequestEventType.scheduleChangeCountered;
+
+    if (!isScheduleChange) {
+      return Text(
+        event.message ?? event.chatDisplayMessage,
+        style: AppTypography.bodySmall.copyWith(
+          color: AppColors.textPrimaryLight,
+        ),
+      );
+    }
+
+    // Schedule change: show change type label + proposed slots
+    final isBulk = event.scheduleChangeType == ScheduleChangeType.bulkChange;
+    final changeLabel =
+        isBulk
+            ? AppStrings.chatBulkScheduleChange
+            : AppStrings.chatSingleScheduleChange;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Change type label (bold, primary color)
+        Text(
+          changeLabel,
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        // Proposed slots — matches RequestHistoryChat pattern: "1순위 슬롯라벨"
+        if (event.suggestedSlots.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          ...event.suggestedSlots
+              .take(3)
+              .toList()
+              .asMap()
+              .entries
+              .map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    '${AppStrings.slotPriority(entry.key + 1)} ${isBulk ? '${AppStrings.everyWeek} ' : ''}${entry.value.displayLabel}',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
                   ),
                 ),
               ),
-              child: Text(
-                event.message ?? event.chatDisplayMessage,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimaryLight,
-                ),
-              ),
+        ],
+        // Optional message
+        if (event.message != null && event.message!.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space2),
+          Text(
+            event.message!,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textPrimaryLight,
             ),
           ),
-        );
-      }).toList(),
+        ],
+      ],
     );
   }
 }

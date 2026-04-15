@@ -70,9 +70,10 @@ class StudentDashboardTab extends ConsumerWidget {
           // Gamification header
           GamificationHeader(
             studentId: currentStudentId,
-            onTap: () => context.push(
-              '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
-            ),
+            onTap:
+                () => context.push(
+                  '${AppRoutes.badgeCollection}?studentId=$currentStudentId',
+                ),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -82,11 +83,25 @@ class StudentDashboardTab extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.space4),
 
-          // Lesson request section (student view)
-          LessonRequestSection(
-            userId: currentStudentId,
-            viewerRole: 'student',
+          // ── 1순위: 다음 레슨 (가장 궁금한 것) ──────────
+          NextLessonCard(studentId: currentStudentId),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── 2순위: 수강권 (잔여 횟수) ─────────────────
+          StudentSubscriptionSummary(
+            studentId: currentStudentId,
+            onViewAll: () {
+              context.push(
+                '${AppRoutes.subscriptions}?studentId=$currentStudentId',
+              );
+            },
           ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // ── 3순위: 이벤트 (대응 필요, 있을 때만 표시) ──
+          LessonRequestSection(userId: currentStudentId, viewerRole: 'student'),
 
           const SizedBox(height: AppSpacing.space4),
 
@@ -96,21 +111,6 @@ class StudentDashboardTab extends ConsumerWidget {
 
           // Schedule confirmation cards
           _ScheduleConfirmationSection(studentId: currentStudentId),
-
-          // Next lesson
-          NextLessonCard(studentId: currentStudentId),
-
-          const SizedBox(height: AppSpacing.space4),
-
-          // Subscription summary
-          StudentSubscriptionSummary(
-            studentId: currentStudentId,
-            onViewAll: () {
-              context.push(
-                '${AppRoutes.subscriptions}?studentId=$currentStudentId',
-              );
-            },
-          ),
 
           const SizedBox(height: AppSpacing.space4),
 

@@ -39,17 +39,15 @@ class LessonProgressBar extends StatelessWidget {
             final phaseIndex = index ~/ 2;
             final isCompleted = phaseIndex < _currentIndex;
             return Expanded(
-              child: isCompleted
-                  ? Container(height: 2, color: AppColors.primary)
-                  : CustomPaint(
-                      size: const Size(double.infinity, 2),
-                      painter: _DashedLinePainter(
-                        color: AppColors.borderLight,
-                        strokeWidth: 1.5,
-                        dashWidth: 4,
-                        dashGap: 3,
-                      ),
-                    ),
+              child: CustomPaint(
+                size: const Size(double.infinity, 2),
+                painter: _DashedLinePainter(
+                  color: isCompleted ? AppColors.primary : AppColors.borderLight,
+                  strokeWidth: 1.5,
+                  dashWidth: 4,
+                  dashGap: 3,
+                ),
+              ),
             );
           }
 

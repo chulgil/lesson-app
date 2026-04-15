@@ -32,7 +32,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_pkg_01',
         studentId: 'student_1',
-        membershipId: 'membership_1',
+        membershipId: 'cm_001',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 5,
@@ -52,7 +52,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_pkg_02',
         studentId: 'student_3',
-        membershipId: 'membership_3',
+        membershipId: 'cm_003',
         type: SubscriptionType.package,
         totalLessons: 12,
         usedLessons: 2,
@@ -72,7 +72,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_pkg_03',
         studentId: 'student_5',
-        membershipId: 'membership_5',
+        membershipId: 'cm_006',
         type: SubscriptionType.package,
         totalLessons: 4,
         usedLessons: 3,
@@ -93,7 +93,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_pkg_04',
         studentId: 'student_12',
-        membershipId: 'membership_12',
+        membershipId: 'cm_012',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 1,
@@ -115,7 +115,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_mon_01',
         studentId: 'student_2',
-        membershipId: 'membership_2',
+        membershipId: 'cm_002',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 4,
         usedLessons: 2,
@@ -137,7 +137,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_mon_02',
         studentId: 'student_11',
-        membershipId: 'membership_11',
+        membershipId: 'cm_010',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 4,
         usedLessons: 1,
@@ -159,7 +159,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_mon_03',
         studentId: 'student_11',
-        membershipId: 'membership_11',
+        membershipId: 'cm_010',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 2,
         usedLessons: 0,
@@ -185,7 +185,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_trial_01',
         studentId: 'student_4',
-        membershipId: 'membership_4',
+        membershipId: 'cm_004',
         type: SubscriptionType.trial,
         totalLessons: 1,
         usedLessons: 0,
@@ -200,7 +200,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_trial_02',
         studentId: 'student_4',
-        membershipId: 'membership_4',
+        membershipId: 'cm_004',
         type: SubscriptionType.trial,
         totalLessons: 1,
         usedLessons: 1,
@@ -223,7 +223,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_paused_01',
         studentId: 'student_6',
-        membershipId: 'membership_6',
+        membershipId: 'cm_007',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 3,
@@ -243,7 +243,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_paused_02',
         studentId: 'student_7',
-        membershipId: 'membership_7',
+        membershipId: 'cm_008',
         type: SubscriptionType.package,
         totalLessons: 4,
         usedLessons: 1,
@@ -268,7 +268,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_exp_01',
         studentId: 'student_8',
-        membershipId: 'membership_8',
+        membershipId: 'cm_009',
         type: SubscriptionType.package,
         totalLessons: 12,
         usedLessons: 12,
@@ -288,7 +288,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_exp_02',
         studentId: 'student_9',
-        membershipId: 'membership_9',
+        membershipId: 'cm_013',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 5,
@@ -308,7 +308,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_exp_03',
         studentId: 'student_1',
-        membershipId: 'membership_1',
+        membershipId: 'cm_001',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 8,
@@ -332,7 +332,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_bonus_01',
         studentId: 'student_1',
-        membershipId: 'membership_1',
+        membershipId: 'cm_001',
         type: SubscriptionType.package,
         totalLessons: 4,
         usedLessons: 5,
@@ -354,7 +354,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_discount_01',
         studentId: 'student_3',
-        membershipId: 'membership_3',
+        membershipId: 'cm_003',
         type: SubscriptionType.package,
         totalLessons: 8,
         usedLessons: 8,
@@ -382,9 +382,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<List<Subscription>> getByStudentId(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _subscriptions
-        .where((s) => s.studentId == studentId)
-        .toList()
+    return _subscriptions.where((s) => s.studentId == studentId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
@@ -439,7 +437,12 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
-  Future<Subscription> useLesson(String id, {String? lessonId, String? teacherName, String? instrument}) async {
+  Future<Subscription> useLesson(
+    String id, {
+    String? lessonId,
+    String? teacherName,
+    String? instrument,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 100));
     final index = _subscriptions.indexWhere((s) => s.id == id);
     if (index == -1) {
@@ -465,7 +468,8 @@ class MockSubscriptionRepository implements SubscriptionRepository {
     } else if (subscription.type == SubscriptionType.monthly &&
         subscription.lessonsPerMonth != null) {
       // Monthly: check lessons per month + bonus
-      final remaining = subscription.lessonsPerMonth! +
+      final remaining =
+          subscription.lessonsPerMonth! +
           subscription.bonusCount -
           newUsedLessons;
       if (remaining <= 0) {
@@ -596,7 +600,10 @@ class MockSubscriptionRepository implements SubscriptionRepository {
 
   /// Add bonus to a subscription.
   Future<Subscription> addBonus(
-      String id, int bonusCount, String reason) async {
+    String id,
+    int bonusCount,
+    String reason,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 100));
     final index = _subscriptions.indexWhere((s) => s.id == id);
     if (index == -1) {
@@ -622,8 +629,9 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       }
     });
     return _controller.stream.map(
-      (list) => list.where((s) => s.studentId == studentId).toList()
-        ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
+      (list) =>
+          list.where((s) => s.studentId == studentId).toList()
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   }
 
@@ -956,19 +964,14 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<List<SubscriptionUsage>> getUsageHistory(String subscriptionId) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    return _usages
-        .where((u) => u.subscriptionId == subscriptionId)
-        .toList()
+    return _usages.where((u) => u.subscriptionId == subscriptionId).toList()
       ..sort((a, b) => b.usedAt.compareTo(a.usedAt)); // Newest first
   }
 
   @override
   Future<SubscriptionUsage> addUsage(SubscriptionUsage usage) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    final newUsage = usage.copyWith(
-      id: _uuid.v4(),
-      createdAt: DateTime.now(),
-    );
+    final newUsage = usage.copyWith(id: _uuid.v4(), createdAt: DateTime.now());
     _usages.add(newUsage);
     return newUsage;
   }

@@ -1225,6 +1225,10 @@ frontend/lib/features/schedule/
 | **보강 추적** | 설계 완료 | 30% | MakeupLesson 엔티티 존재, UI 미구현 |
 | **선생님 가용시간** | 구현 완료 | 100% | TeacherAvailabilityScreen, WeeklyScheduleScreen, TimeExceptionScreen |
 | **레슨 노트** | 구현 완료 | 95% | Phase 1 완료 (피드백/포인트/팁/녹음) |
+| **출석 관리** | 구현 완료 | - | `TeacherAttendanceScreen` — 전체 출석률 + 학생별 현황 |
+| **일괄 피드백** | 구현 완료 | - | `BulkFeedbackScreen` — 여러 학생에게 3단계 위저드로 피드백 전송 |
+| **레슨 노트 히스토리** | 구현 완료 | - | `LessonNoteHistoryScreen` — 과거 노트 타임라인 |
+| **빠른 피드백** | 구현 완료 | - | `QuickFeedbackScreen` + `QuickFeedbackStudentList` |
 | **레슨 장소** | 설계 완료 | 10% | 엔티티/Provider 존재, UI 미구현 |
 | **빠른 레슨 등록** | 스펙 완료 | 0% | 구현 대기 |
 | **그룹 레슨** | 설계 완료 | 30% | 엔티티 + 기본 화면 존재 |

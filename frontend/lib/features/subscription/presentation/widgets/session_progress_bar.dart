@@ -21,7 +21,6 @@ class SessionProgressBar extends StatelessWidget {
   final Set<int> changeRequestedSessions;
   final bool isMonthly;
   final ValueChanged<int> onSessionTap;
-  final VoidCallback? onBulkChangeTap;
 
   const SessionProgressBar({
     super.key,
@@ -31,7 +30,6 @@ class SessionProgressBar extends StatelessWidget {
     this.changeRequestedSessions = const {},
     this.isMonthly = false,
     required this.onSessionTap,
-    this.onBulkChangeTap,
   });
 
   // Matches LessonProgressBar._dotSize / _ringSize exactly
@@ -41,70 +39,59 @@ class SessionProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sessions = List.generate(totalSessions, (index) => index + 1);
-    final rows = _splitRows(sessions);
-
+    // 항상 8칸 고정 레이아웃
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      child: Column(
-        children: [
-          for (int i = 0; i < rows.length; i++) ...[
-            if (i > 0) const SizedBox(height: AppSpacing.space2),
-            _buildConnectedRow(rows[i], showBulkButton: i == 0 && isMonthly),
-          ],
-        ],
-      ),
+      child: _buildFixedEightRow(),
     );
   }
 
-  List<List<int>> _splitRows(List<int> sessions) {
-    final rows = <List<int>>[];
-    final firstRowCount = isMonthly ? _maxPerRow - 1 : _maxPerRow;
-    final firstRow = sessions.take(firstRowCount).toList();
-    final remaining = sessions.skip(firstRowCount).toList();
+  /// 항상 8칸 고정 레이아웃.
+  /// - 1~12회차: 실제 회차에 번호 표기, 나머지 빈 칸도 dot으로 표기
+  /// - 12회차 초과: 슬라이딩 윈도우, 빈 칸은 번호 미표기
+  Widget _buildFixedEightRow() {
+    final List<int?> displaySlots = List.filled(_maxPerRow, null);
 
-    rows.add(firstRow);
-
-    for (int i = 0; i < remaining.length; i += _maxPerRow) {
-      final end = (i + _maxPerRow < remaining.length)
-          ? i + _maxPerRow
-          : remaining.length;
-      rows.add(remaining.sublist(i, end));
+    if (totalSessions <= 12) {
+      // 1~12회차: 실제 세션만 번호 표기, 나머지 칸은 빈 dot
+      for (int i = 0; i < _maxPerRow && i < totalSessions; i++) {
+        displaySlots[i] = i + 1;
+      }
+    } else {
+      // 12회차 초과: 현재 위치 기준 슬라이딩 윈도우
+      final activeSession = selectedSession.clamp(1, totalSessions);
+      final maxStart = totalSessions - _maxPerRow + 1;
+      int windowStart = (activeSession - 4).clamp(1, maxStart > 0 ? maxStart : 1);
+      for (int i = 0; i < _maxPerRow; i++) {
+        final sessionNum = windowStart + i;
+        if (sessionNum <= totalSessions) {
+          displaySlots[i] = sessionNum;
+        }
+      }
     }
-
-    return rows;
-  }
-
-  /// Build a row of session dots connected by Expanded dashed/solid lines.
-  /// Matches LessonProgressBar's Row(children: [dot, Expanded(line), dot, ...])
-  Widget _buildConnectedRow(
-    List<int> sessions, {
-    bool showBulkButton = false,
-  }) {
-    final itemCount = sessions.length * 2 - 1;
 
     return Row(
       children: [
-        for (int i = 0; i < itemCount; i++) ...[
-          if (i.isOdd)
-            // Expanded connector — matches LessonProgressBar exactly
-            _buildConnector(sessions[i ~/ 2]),
-          if (i.isEven)
-            _SessionDot(
-              sessionNumber: sessions[i ~/ 2],
-              state: _getState(sessions[i ~/ 2]),
-              isSelected: sessions[i ~/ 2] == selectedSession,
-              hasChangeRequest:
-                  changeRequestedSessions.contains(sessions[i ~/ 2]),
-              onTap: () => onSessionTap(sessions[i ~/ 2]),
-            ),
-        ],
-        if (showBulkButton) ...[
-          const SizedBox(width: AppSpacing.space2),
-          _BulkChangeButton(onTap: onBulkChangeTap),
+        for (int i = 0; i < _maxPerRow; i++) ...[
+          if (i > 0)
+            _buildConnector(displaySlots[i] ?? (displaySlots[i - 1] ?? 0) + 1),
+          _SessionDot(
+            sessionNumber: displaySlots[i] ?? 0,
+            state: displaySlots[i] != null
+                ? _getState(displaySlots[i]!)
+                : _SessionState.future,
+            isSelected: displaySlots[i] == selectedSession,
+            hasChangeRequest: displaySlots[i] != null &&
+                changeRequestedSessions.contains(displaySlots[i]),
+            onTap: () {
+              if (displaySlots[i] != null) onSessionTap(displaySlots[i]!);
+            },
+            // 실제 세션이 할당된 칸만 번호 표기, 빈 칸(null)은 번호 없음
+            showLabel: displaySlots[i] != null,
+          ),
         ],
       ],
     );
@@ -116,17 +103,15 @@ class SessionProgressBar extends StatelessWidget {
     final isCompleted = sessionNumber <= completedSessions;
 
     return Expanded(
-      child: isCompleted
-          ? Container(height: 2, color: AppColors.primary)
-          : CustomPaint(
-              size: const Size(double.infinity, 2),
-              painter: _DashedLinePainter(
-                color: AppColors.borderLight,
-                strokeWidth: 1.5,
-                dashWidth: 4,
-                dashGap: 3,
-              ),
-            ),
+      child: CustomPaint(
+        size: const Size(double.infinity, 2),
+        painter: _DashedLinePainter(
+          color: isCompleted ? AppColors.primary : AppColors.borderLight,
+          strokeWidth: 1.5,
+          dashWidth: 4,
+          dashGap: 3,
+        ),
+      ),
     );
   }
 
@@ -146,6 +131,7 @@ class _SessionDot extends StatelessWidget {
   final bool isSelected;
   final bool hasChangeRequest;
   final VoidCallback onTap;
+  final bool showLabel;
 
   const _SessionDot({
     required this.sessionNumber,
@@ -153,6 +139,7 @@ class _SessionDot extends StatelessWidget {
     required this.isSelected,
     required this.hasChangeRequest,
     required this.onTap,
+    this.showLabel = true,
   });
 
   @override
@@ -171,7 +158,9 @@ class _SessionDot extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.space1),
             Text(
-              AppStrings.sessionNumberLabel(sessionNumber),
+              showLabel && sessionNumber > 0
+                  ? AppStrings.sessionNumberLabel(sessionNumber)
+                  : '',
               style: AppTypography.caption.copyWith(
                 color: _textColor,
                 fontWeight: state == _SessionState.scheduled || isSelected
@@ -318,34 +307,3 @@ class _DashedLinePainter extends CustomPainter {
       color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
 }
 
-class _BulkChangeButton extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const _BulkChangeButton({this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: SessionProgressBar._ringSize,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-          border: Border.all(color: AppColors.primary),
-        ),
-        child: Center(
-          child: Text(
-            AppStrings.bulkChangeAll,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -1,7 +1,8 @@
 # Document Index
 
-> 최종 업데이트: 2026-03-12
+> 최종 업데이트: 2026-04-15
 > 목적: Claude가 작업 시작 시 이 파일을 읽고 필요한 문서를 빠르게 찾기 위한 인덱스
+> 정리: 2026-04-15 — 마스터에 통합된 56개 개별 스펙을 old/로 이동 (144→88개)
 
 ---
 
@@ -84,154 +85,61 @@
 
 ---
 
-## 도메인별 개별 스펙
+## 도메인별 활성 스펙 (마스터 외)
 
-### 레슨 (specs/lesson/)
+> 마스터에 통합된 56개 개별 스펙은 old/로 이동됨 (2026-04-15)
 
-| 문서 | 내용 |
-|------|------|
-| [lesson_note_spec.md](specs/lesson/lesson_note_spec.md) | 레슨 노트 스펙 |
-| [lesson_note_history_spec.md](specs/lesson/lesson_note_history_spec.md) | 레슨 노트 히스토리 |
-| [quick_add_lesson.md](specs/lesson/quick_add_lesson.md) | 빠른 레슨 추가 |
-| [quick_feedback_spec.md](specs/lesson/quick_feedback_spec.md) | 빠른 피드백 |
-| [feedback_presets_spec.md](specs/lesson/feedback_presets_spec.md) | 피드백 프리셋 |
-| [attendance_spec.md](specs/lesson/attendance_spec.md) | 출석 관리 |
-| [assignment_dashboard_spec.md](specs/lesson/assignment_dashboard_spec.md) | 과제 대시보드 |
-| [assignment_ui_simplification.md](specs/lesson/assignment_ui_simplification.md) | 과제 UI 간소화 |
-| [ai_lesson_notes_spec.md](specs/lesson/ai_lesson_notes_spec.md) | AI 레슨 노트 |
-| [teaching_resources_spec.md](specs/lesson/teaching_resources_spec.md) | 교육 자료 |
-| [group_lesson_spec.md](specs/lesson/group_lesson_spec.md) | 그룹 레슨 |
-| [three_party_relationship_spec.md](specs/lesson/three_party_relationship_spec.md) | 3자 관계 |
-| [Unified_Lesson_Booking_Spec.md](specs/lesson/Unified_Lesson_Booking_Spec.md) | 통합 레슨 예약 |
-| [lesson_schedule.md](specs/lesson/lesson_schedule.md) | 레슨 스케줄 |
-| [lesson_location_selection.md](specs/lesson/lesson_location_selection.md) | 레슨 장소 선택 |
-| [practice_type_unification.md](specs/lesson/practice_type_unification.md) | 연습 유형 통합 |
-| [flow_*.md](specs/lesson/) | 레슨 플로우 (connection, trial, regular, package, cancel, payment, with_app, without_app) |
-| [flow_test_checklist.md](specs/lesson/flow_test_checklist.md) | 플로우 테스트 체크리스트 |
+### 레슨 (specs/lesson/) — 마스터 + 6개
 
-### 연습 (specs/practice/)
+| 문서 | 내용 | 비고 |
+|------|------|------|
+| [group_lesson_spec.md](specs/lesson/group_lesson_spec.md) | 그룹 레슨 | 마스터 미통합 (복잡) |
+| [three_party_relationship_spec.md](specs/lesson/three_party_relationship_spec.md) | 3자 관계 (학원) | 마스터 미통합 (복잡) |
+| [Unified_Lesson_Booking_Spec.md](specs/lesson/Unified_Lesson_Booking_Spec.md) | 통합 레슨 예약 | 활성 참조 |
+| [assignment_dashboard_spec.md](specs/lesson/assignment_dashboard_spec.md) | 과제 대시보드 | 최근 구현 |
+| [quick_add_lesson.md](specs/lesson/quick_add_lesson.md) | 빠른 레슨 추가 | 설계 중 |
+| [flow_test_checklist.md](specs/lesson/flow_test_checklist.md) | 플로우 테스트 체크리스트 | 테스트용 |
+
+### 연습 (specs/practice/) — 마스터 + 2개
 
 | 문서 | 내용 |
 |------|------|
-| [Practice_System_Spec.md](specs/practice/Practice_System_Spec.md) | 연습 시스템 전체 스펙 |
 | [practice_screen_spec.md](specs/practice/practice_screen_spec.md) | 연습 화면 스펙 |
-| [practice_goal_spec.md](specs/practice/practice_goal_spec.md) | 연습 목표 |
-| [practice_note_spec.md](specs/practice/practice_note_spec.md) | 연습 노트 |
-| [practice_streak_spec.md](specs/practice/practice_streak_spec.md) | 연습 스트릭 |
-| [practice_report_spec.md](specs/practice/practice_report_spec.md) | 연습 리포트 |
-| [practice_sharing_spec.md](specs/practice/practice_sharing_spec.md) | 연습 공유 |
-| [gamification_spec.md](specs/practice/gamification_spec.md) | 게이미피케이션 시스템 (포인트/레벨/뱃지) |
-| [central_practice_button.md](specs/practice/central_practice_button.md) | 중앙 연습 버튼 |
-| [section_detail_spec.md](specs/practice/section_detail_spec.md) | 섹션 상세 |
-| [repertoire_detail_spec.md](specs/practice/repertoire_detail_spec.md) | 레퍼토리 상세 |
-| [repertoire_quick_edit_spec.md](specs/practice/repertoire_quick_edit_spec.md) | 레퍼토리 빠른 편집 |
-| [repertoire_history_spec.md](specs/practice/repertoire_history_spec.md) | 레퍼토리 히스토리 |
-| [smart_recording_spec.md](specs/practice/smart_recording_spec.md) | 스마트 녹음 |
-| [quick_recording_spec.md](specs/practice/quick_recording_spec.md) | 빠른 녹음 |
-| [recording_comparison_spec.md](specs/practice/recording_comparison_spec.md) | 녹음 비교 |
-| [recording_player_ui.md](specs/practice/recording_player_ui.md) | 녹음 플레이어 UI |
-| [recording_requirement.md](specs/practice/recording_requirement.md) | 녹음 요구사항 |
 | [backup_implementation_spec.md](specs/practice/backup_implementation_spec.md) | 백업 구현 |
 
-### 분석 (specs/analytics/)
+### 수강권 (specs/subscription/) — 마스터 + 5개
+
+| 문서 | 내용 | 비고 |
+|------|------|------|
+| [subscription_schedule_change_ux_spec.md](specs/subscription/subscription_schedule_change_ux_spec.md) | 스케줄 변경 UX | 2026-04 활성 |
+| [subscription_schedule_management_spec.md](specs/subscription/subscription_schedule_management_spec.md) | 스케줄 관리 | 2026-04 활성 |
+| [subscription_renewal_spec.md](specs/subscription/subscription_renewal_spec.md) | 수강권 갱신 | 설계 중 |
+| [lesson_policy_settings.md](specs/subscription/lesson_policy_settings.md) | 레슨 정책 설정 | 설계 중 |
+| [privacy_policy.md](specs/subscription/privacy_policy.md) + [terms_of_service.md](specs/subscription/terms_of_service.md) | 법적 문서 | 출시 필수 |
+
+### 스케줄 (specs/schedule/) — 마스터 + 10개
 
 | 문서 | 내용 |
 |------|------|
-| [analytics_dashboard_spec.md](specs/analytics/analytics_dashboard_spec.md) | 선생님 분석 대시보드 스펙 |
+| [teacher_availability_spec.md](specs/schedule/teacher_availability_spec.md) | 선생님 가용시간 |
+| [chat_guide_message_spec.md](specs/schedule/chat_guide_message_spec.md) | 챗 가이드 메시지 |
+| [lesson_lifecycle_chapters.md](specs/schedule/lesson_lifecycle_chapters.md) | 레슨 라이프사이클 |
+| [lesson_request_api_spec.md](specs/schedule/lesson_request_api_spec.md) | API 스펙 |
+| 기타 6개 | 장소관리, 이동시간, 빠른선택, 확인카드, 가용시간 리디자인, 뷰 UX |
 
-### 수강권 (specs/subscription/)
+### 기타 활성 도메인
 
-| 문서 | 내용 |
-|------|------|
-| [subscription_system_spec.md](specs/subscription/subscription_system_spec.md) | 수강권 시스템 스펙 |
-| [subscription_proposal_spec.md](specs/subscription/subscription_proposal_spec.md) | 수강권 제안 스펙 |
-| [subscription_status_colors.md](specs/subscription/subscription_status_colors.md) | 수강권 상태 색상 |
-| [lesson_cancellation_policy.md](specs/subscription/lesson_cancellation_policy.md) | 레슨 취소 정책 |
-| [lesson_policy_settings.md](specs/subscription/lesson_policy_settings.md) | 레슨 정책 설정 |
-| [lesson_request_system.md](specs/subscription/lesson_request_system.md) | 레슨 요청 시스템 |
-| [terms_of_service.md](specs/subscription/terms_of_service.md) | 이용약관 |
-| [privacy_policy.md](specs/subscription/privacy_policy.md) | 개인정보처리방침 |
-
-### 스케줄 (specs/schedule/)
-
-| 문서 | 내용 |
-|------|------|
-| [teacher_availability_spec.md](specs/schedule/teacher_availability_spec.md) | 선생님 가용시간 스펙 |
-| [schedule_confirmation_card_spec.md](specs/schedule/schedule_confirmation_card_spec.md) | 스케줄 확인 카드 스펙 |
-
-### 사용자 (specs/user/)
-
-| 문서 | 내용 |
-|------|------|
-| [parent_system.md](specs/user/parent_system.md) | 학부모 시스템 |
-| [parent_login_flow.md](specs/user/parent_login_flow.md) | 학부모 로그인 플로우 |
-| [parent_dashboard_spec.md](specs/user/parent_dashboard_spec.md) | 학부모 대시보드 스펙 |
-| [teacher_registration.md](specs/user/teacher_registration.md) | 선생님 등록 |
-
-### 학생 홈 (specs/student_home/)
-
-| 문서 | 내용 |
-|------|------|
-| [student_profile_settings.md](specs/student_home/student_profile_settings.md) | 학생 프로필 설정 |
-| [unimplemented_menus_spec.md](specs/student_home/unimplemented_menus_spec.md) | 미구현 메뉴 스펙 |
-
-### 알림 (specs/notification/)
-
-| 문서 | 내용 |
-|------|------|
-| [notification_system.md](specs/notification/notification_system.md) | 알림 시스템 스펙 |
-
-### 초대 (specs/invite/)
-
-| 문서 | 내용 |
-|------|------|
-| [invite_system_v2.md](specs/invite/invite_system_v2.md) | 초대 시스템 v2 |
-| [subscription_based_relationship.md](specs/invite/subscription_based_relationship.md) | 수강권 기반 관계 |
-
-### 메트로놈 (specs/metronome/)
-
-| 문서 | 내용 |
-|------|------|
-| [metronome_system.md](specs/metronome/metronome_system.md) | 메트로놈 시스템 |
-| [metronome_sound.md](specs/metronome/metronome_sound.md) | 메트로놈 사운드 |
-| [avaudioengine_guide.md](specs/metronome/avaudioengine_guide.md) | AVAudioEngine 가이드 |
-| [subdivision_ui_design.md](specs/metronome/subdivision_ui_design.md) | 서브디비전 UI 디자인 |
-
-### 튜너 (specs/tuner/)
-
-| 문서 | 내용 |
-|------|------|
-| [README.md](specs/tuner/README.md) | 튜너 스펙 개요 |
-
-### 인증 (specs/auth/)
-
-| 문서 | 내용 |
-|------|------|
-| [google_sso_setup_guide.md](specs/auth/google_sso_setup_guide.md) | Google SSO 설정 가이드 |
-
-### 결제 (specs/payment/)
-
-| 문서 | 내용 |
-|------|------|
-| [payment_unified_spec.md](specs/payment/payment_unified_spec.md) | 통합 결제 스펙 |
-
-### 리뷰 (specs/review/)
-
-| 문서 | 내용 |
-|------|------|
-| [review_system.md](specs/review/review_system.md) | 리뷰 시스템 |
-
-### 학생 (specs/student/)
-
-| 문서 | 내용 |
-|------|------|
-| [student_class_system.md](specs/student/student_class_system.md) | 학생 클래스 시스템 |
-
-### 체험 (specs/trial/)
-
-| 문서 | 내용 |
-|------|------|
-| [trial_lesson_system.md](specs/trial/trial_lesson_system.md) | 체험 레슨 시스템 |
+| 도메인 | 파일 수 | 주요 파일 |
+|--------|:------:|----------|
+| design/ | 11개 | 마스터 + UX 가이드 + 경쟁분석 + 화면설계 + 템플릿 |
+| user/ | 5개 | 마스터 + 학부모(3) + 선생님 등록 |
+| metronome/ | 2개 | 마스터 + AVAudioEngine 가이드 |
+| notification/ | 3개 | 마스터 + 시스템 스펙 + Firebase 가이드 |
+| profile/ | 4개 | 마스터 + 사진업로드 + 이미지 + 선생님 편집 |
+| student/ | 2개 | 클래스 시스템 + 일일 레슨 시간 |
+| booking/ | 2개 | 통합 예약 스펙 + 체크리스트 |
+| analytics/ | 1개 | 분석 대시보드 |
+| 기타 (6개 마스터만) | 6개 | calendar, onboarding, student_home, follow, settings, gamification, home, relationship, tuner |
 
 ---
 
