@@ -48,6 +48,27 @@ class MockSubscriptionRepository implements SubscriptionRepository {
         paymentConfirmedAt: now.subtract(const Duration(days: 35)),
       ),
 
+      // sub_mon_04: student_1 (김민준, active) - 피아노 월 4회, 2/4 사용 (개인레슨 병행)
+      Subscription(
+        id: 'sub_mon_04',
+        studentId: 'student_1',
+        membershipId: 'cm_005',
+        type: SubscriptionType.monthly,
+        lessonsPerMonth: 4,
+        usedLessons: 2,
+        startDate: now.subtract(const Duration(days: 20)),
+        endDate: now.add(const Duration(days: 10)),
+        amount: 240000,
+        status: SubscriptionStatus.active,
+        billingType: BillingType.monthly,
+        billingDay: 1,
+        createdAt: now.subtract(const Duration(days: 20)),
+        paymentConfirmed: true,
+        paymentMethod: SubscriptionPaymentMethod.bankTransfer,
+        paidAt: now.subtract(const Duration(days: 21)),
+        paymentConfirmedAt: now.subtract(const Duration(days: 20)),
+      ),
+
       // sub_pkg_02: student_3 (박지호, active 고급) - 첼로 12회 패키지, 2/12 사용 (시작 직후)
       Subscription(
         id: 'sub_pkg_02',
@@ -159,7 +180,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
       Subscription(
         id: 'sub_mon_03',
         studentId: 'student_11',
-        membershipId: 'cm_010',
+        membershipId: 'cm_011',
         type: SubscriptionType.monthly,
         lessonsPerMonth: 2,
         usedLessons: 0,
