@@ -82,8 +82,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             ),
 
             // Reserve space for bottom bar when selections exist
-            if (_selectedStudentIds.isNotEmpty)
-              const SizedBox(height: 72),
+            if (_selectedStudentIds.isNotEmpty) const SizedBox(height: 72),
           ],
         ),
 
@@ -352,32 +351,38 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Text('정렬 기준', style: AppTypography.headingSmall),
-            ),
-            ...StudentSortOption.values.map((option) {
-              final isSelected = _sortOption == option;
-              return ListTile(
-                leading: Icon(
-                  isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                  color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+      builder:
+          (context) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(AppSpacing.space4),
+                  child: Text('정렬 기준', style: AppTypography.headingSmall),
                 ),
-                title: Text(option.label),
-                onTap: () {
-                  setState(() => _sortOption = option);
-                  Navigator.pop(context);
-                },
-              );
-            }),
-            const SizedBox(height: AppSpacing.space2),
-          ],
-        ),
-      ),
+                ...StudentSortOption.values.map((option) {
+                  final isSelected = _sortOption == option;
+                  return ListTile(
+                    leading: Icon(
+                      isSelected
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.textTertiaryLight,
+                    ),
+                    title: Text(option.label),
+                    onTap: () {
+                      setState(() => _sortOption = option);
+                      Navigator.pop(context);
+                    },
+                  );
+                }),
+                const SizedBox(height: AppSpacing.space2),
+              ],
+            ),
+          ),
     );
   }
 
@@ -390,10 +395,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         case StudentSortOption.instrument:
           sorted.sort((a, b) => a.instrument.compareTo(b.instrument));
       }
-      return StudentGroup(
-        lessonClass: group.lessonClass,
-        students: sorted,
-      );
+      return StudentGroup(lessonClass: group.lessonClass, students: sorted);
     }).toList();
   }
 
@@ -440,12 +442,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     return EmptyStateWidget(
       icon: Icons.people_outline,
       title: query.isNotEmpty ? '검색 결과가 없습니다' : '아직 등록된 학생이 없습니다',
-      subtitle: query.isEmpty
-          ? '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요'
-          : null,
+      subtitle: query.isEmpty ? '학생을 초대하면 정보가 자동으로\n등록되어 편리하게 관리할 수 있어요' : null,
       actionLabel: query.isEmpty ? '학생 추가' : null,
       actionIcon: query.isEmpty ? Icons.person_add : null,
-      onAction: query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
+      onAction:
+          query.isEmpty ? () => context.push(AppRoutes.addStudentMethod) : null,
     );
   }
 
@@ -633,13 +634,15 @@ class _StudentCard extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.05)
-            : Theme.of(context).colorScheme.surface,
+        color:
+            isSelected
+                ? AppColors.primary.withValues(alpha: 0.05)
+                : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: isSelected
-            ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
-            : null,
+        border:
+            isSelected
+                ? Border.all(color: AppColors.primary.withValues(alpha: 0.3))
+                : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -649,13 +652,15 @@ class _StudentCard extends ConsumerWidget {
         ],
       ),
       child: InkWell(
-        onTap: isSelectionMode
-            ? () => onSelectionChanged(!isSelected)
-            : () {
-                context.push(
-                  AppRoutes.studentDetail.replaceFirst(':id', swm.studentId),
-                );
-              },
+        onTap:
+            isSelectionMode
+                ? () => onSelectionChanged(!isSelected)
+                : () {
+                  context.push(
+                    AppRoutes.studentDetail.replaceFirst(':id', swm.studentId),
+                    extra: {'membershipId': swm.membership?.id},
+                  );
+                },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -718,9 +723,10 @@ class _StudentCard extends ConsumerWidget {
                         Icon(
                           swm.isAppConnected ? Icons.link : Icons.edit_note,
                           size: 14,
-                          color: swm.isAppConnected
-                              ? AppColors.success
-                              : AppColors.textTertiaryLight,
+                          color:
+                              swm.isAppConnected
+                                  ? AppColors.success
+                                  : AppColors.textTertiaryLight,
                         ),
                       ],
                     ),
@@ -762,8 +768,9 @@ class _StudentCard extends ConsumerWidget {
     WidgetRef ref,
     String studentId,
   ) {
-    final subscriptionsAsync =
-        ref.watch(activeStudentSubscriptionsProvider(studentId));
+    final subscriptionsAsync = ref.watch(
+      activeStudentSubscriptionsProvider(studentId),
+    );
 
     return subscriptionsAsync.when(
       data: (subscriptions) {
@@ -773,14 +780,12 @@ class _StudentCard extends ConsumerWidget {
           return SizedBox(
             width: 56,
             child: GestureDetector(
-              onTap: () => context.push(
-                '${AppRoutes.issueSubscription}?studentId=$studentId',
-              ),
+              onTap:
+                  () => context.push(
+                    '${AppRoutes.issueSubscription}?studentId=$studentId',
+                  ),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
@@ -807,14 +812,12 @@ class _StudentCard extends ConsumerWidget {
           return SizedBox(
             width: 56,
             child: GestureDetector(
-              onTap: () => context.push(
-                '${AppRoutes.issueSubscription}?studentId=$studentId',
-              ),
+              onTap:
+                  () => context.push(
+                    '${AppRoutes.issueSubscription}?studentId=$studentId',
+                  ),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
@@ -863,16 +866,17 @@ class _PracticeDots extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 3),
           child: Row(
             children: [
-              ...days.map((done) => Padding(
-                    padding: const EdgeInsets.only(right: 3),
-                    child: Icon(
-                      Icons.circle,
-                      size: 7,
-                      color: done
-                          ? AppColors.practiceGood
-                          : AppColors.borderLight,
-                    ),
-                  )),
+              ...days.map(
+                (done) => Padding(
+                  padding: const EdgeInsets.only(right: 3),
+                  child: Icon(
+                    Icons.circle,
+                    size: 7,
+                    color:
+                        done ? AppColors.practiceGood : AppColors.borderLight,
+                  ),
+                ),
+              ),
               const SizedBox(width: 4),
               Text(
                 '$practiced/${days.length}일',

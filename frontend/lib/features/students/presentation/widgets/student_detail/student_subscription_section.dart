@@ -13,10 +13,18 @@ import '../../providers/lesson_class_providers.dart';
 import '../../providers/membership_providers.dart';
 
 /// Section showing student's subscriptions for teacher view.
+///
+/// When [membershipId] is provided, shows only the subscription for that
+/// specific membership (단일 수강 컨텍스트). Otherwise, shows all memberships.
 class StudentSubscriptionSection extends ConsumerWidget {
   final String studentId;
+  final String? membershipId;
 
-  const StudentSubscriptionSection({super.key, required this.studentId});
+  const StudentSubscriptionSection({
+    super.key,
+    required this.studentId,
+    this.membershipId,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,9 +43,11 @@ class StudentSubscriptionSection extends ConsumerWidget {
             Text('수강권 현황', style: AppTypography.headingMedium),
             TextButton.icon(
               onPressed: () {
-                context.push(
-                  '${AppRoutes.issueSubscription}?studentId=$studentId',
-                );
+                final query =
+                    membershipId != null
+                        ? '?studentId=$studentId&membershipId=$membershipId'
+                        : '?studentId=$studentId';
+                context.push('${AppRoutes.issueSubscription}$query');
               },
               icon: const Icon(Icons.add, size: 18),
               label: const Text('발급'),
@@ -45,25 +55,36 @@ class StudentSubscriptionSection extends ConsumerWidget {
           ],
         ),
 
-        // Status summary (바깥)
-        subscriptionsAsync.when(
-          data: (subs) => _buildStatusSummary(subs),
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-        ),
+        // Status summary (바깥) — 멤버십 필터링 시 숨김
+        if (membershipId == null)
+          subscriptionsAsync.when(
+            data: (subs) => _buildStatusSummary(subs),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
         const SizedBox(height: AppSpacing.space3),
 
         // Content (카드들만)
         membershipsAsync.when(
           data: (memberships) {
-            if (memberships.isEmpty) {
+            // 멤버십 필터링: membershipId가 있으면 해당 멤버십만
+            final filteredMemberships =
+                membershipId != null
+                    ? memberships.where((m) => m.id == membershipId).toList()
+                    : memberships;
+
+            if (filteredMemberships.isEmpty) {
               return _buildEmptyMembershipState(context);
             }
 
             return subscriptionsAsync.when(
               data:
-                  (subscriptions) =>
-                      _buildContent(context, ref, memberships, subscriptions),
+                  (subscriptions) => _buildContent(
+                    context,
+                    ref,
+                    filteredMemberships,
+                    subscriptions,
+                  ),
               loading: () => _buildLoadingState(),
               error: (_, __) => _buildErrorState(),
             );
@@ -88,14 +109,21 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Column(
       children:
           memberships.map((membership) {
-            // Find subscription for this membership
-            final subscription = subscriptions.firstWhere(
-              (s) => s.membershipId == membership.id,
-              orElse: () => _createEmptySubscription(membership),
-            );
+            // Find subscriptions for this membership, sorted by createdAt desc
+            final membershipSubs =
+                subscriptions
+                    .where((s) => s.membershipId == membership.id)
+                    .toList()
+                  ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+            // Show only the latest (most recent) subscription
+            final subscription =
+                membershipSubs.isNotEmpty
+                    ? membershipSubs.first
+                    : _createEmptySubscription(membership);
 
             if (subscription.id.isEmpty) {
-              return const SizedBox.shrink();
+              return _buildNoSubscriptionState(context, membership);
             }
 
             final lessonClassAsync = ref.watch(

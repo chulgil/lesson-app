@@ -7,8 +7,9 @@ import 'student_detail_widgets.dart';
 /// Tab content showing student profile info, stats, and subscription status
 class StudentInfoTab extends StatelessWidget {
   final Student student;
+  final String? membershipId;
 
-  const StudentInfoTab({super.key, required this.student});
+  const StudentInfoTab({super.key, required this.student, this.membershipId});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +21,11 @@ class StudentInfoTab extends StatelessWidget {
 
         const SizedBox(height: AppSpacing.space6),
 
-        // Subscription status
-        StudentSubscriptionSection(studentId: student.id),
+        // Subscription status (filtered by membershipId if provided)
+        StudentSubscriptionSection(
+          studentId: student.id,
+          membershipId: membershipId,
+        ),
 
         const SizedBox(height: AppSpacing.space8),
       ],

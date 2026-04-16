@@ -61,9 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
             label: '스케줄',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            activeIcon: Icon(Icons.people),
-            label: '학생',
+            icon: Icon(Icons.confirmation_number_outlined),
+            activeIcon: Icon(Icons.confirmation_number),
+            label: '수강관리',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),

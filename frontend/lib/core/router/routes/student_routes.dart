@@ -30,27 +30,32 @@ List<GoRoute> studentRoutes = [
   GoRoute(
     path: AppRoutes.studentDetail,
     name: 'studentDetail',
-    builder: (context, state) => StudentDetailScreen(
-      studentId: state.pathParameters['id'] ?? '',
-    ),
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>?;
+      return StudentDetailScreen(
+        studentId: state.pathParameters['id'] ?? '',
+        membershipId: extra?['membershipId'] as String?,
+      );
+    },
   ),
 
   // Student Lesson Notes History
   GoRoute(
     path: AppRoutes.studentNotes,
     name: 'studentNotes',
-    builder: (context, state) => LessonNoteHistoryScreen(
-      studentId: state.pathParameters['id'] ?? '',
-    ),
+    builder:
+        (context, state) => LessonNoteHistoryScreen(
+          studentId: state.pathParameters['id'] ?? '',
+        ),
   ),
 
   // Edit Student
   GoRoute(
     path: AppRoutes.editStudent,
     name: 'editStudent',
-    builder: (context, state) => EditStudentScreen(
-      studentId: state.pathParameters['id'] ?? '',
-    ),
+    builder:
+        (context, state) =>
+            EditStudentScreen(studentId: state.pathParameters['id'] ?? ''),
   ),
 
   // Badge Collection
