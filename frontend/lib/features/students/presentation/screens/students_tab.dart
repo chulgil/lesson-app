@@ -226,88 +226,138 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     );
   }
 
+  /// 1줄 세그먼트 (학원/개인/전체) + 필터 버튼 (바텀시트로 연습상태)
+  /// ux_guidelines §2.6 (Progressive Disclosure) 적용
   Widget _buildFilterChips() {
     final classTypeFilter = ref.watch(classTypeFilterNotifierProvider);
+    final hasActiveFilter = _currentFilter != StudentFilter.all;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space3,
       ),
       child: Row(
         children: [
-          // Class type filters
-          ...ClassTypeFilter.values.map((filter) {
-            final isSelected = classTypeFilter == filter;
-            return Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.space2),
-              child: FilterChip(
-                avatar:
-                    filter == ClassTypeFilter.academy
-                        ? const Text('🏫', style: TextStyle(fontSize: 12))
-                        : filter == ClassTypeFilter.private
-                        ? const Text('👤', style: TextStyle(fontSize: 12))
-                        : null,
-                label: Text(filter.label),
-                selected: isSelected,
-                onSelected:
-                    (_) => ref
-                        .read(classTypeFilterNotifierProvider.notifier)
-                        .set(filter),
-                backgroundColor: AppColors.surfaceLight,
-                selectedColor: AppColors.info.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.info,
-                side: BorderSide(
-                  color: isSelected ? AppColors.info : AppColors.borderLight,
-                ),
-                labelStyle: AppTypography.bodySmall.copyWith(
-                  color:
-                      isSelected
-                          ? AppColors.info
-                          : AppColors.textSecondaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
+          // Segmented button (학원 / 개인 / 전체)
+          Expanded(
+            child: SegmentedButton<ClassTypeFilter>(
+              segments:
+                  ClassTypeFilter.values
+                      .map(
+                        (filter) => ButtonSegment<ClassTypeFilter>(
+                          value: filter,
+                          label: Text(
+                            filter.label,
+                            style: AppTypography.bodySmall,
+                          ),
+                        ),
+                      )
+                      .toList(),
+              selected: {classTypeFilter},
+              onSelectionChanged: (selection) {
+                ref
+                    .read(classTypeFilterNotifierProvider.notifier)
+                    .set(selection.first);
+              },
+              showSelectedIcon: false,
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-            );
-          }),
-
-          // Divider
-          Container(
-            width: 1,
-            height: 24,
-            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
-            color: AppColors.borderLight,
+            ),
           ),
+          const SizedBox(width: AppSpacing.space2),
 
-          // Practice status filters
-          ...StudentFilter.values.map((filter) {
-            final isSelected = _currentFilter == filter;
-            return Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.space2),
-              child: FilterChip(
-                label: Text(filter.label),
-                selected: isSelected,
-                onSelected: (_) => setState(() => _currentFilter = filter),
-                backgroundColor: AppColors.surfaceLight,
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                checkmarkColor: AppColors.primary,
-                side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
-                ),
-                labelStyle: AppTypography.bodySmall.copyWith(
+          // 필터 버튼 (연습상태) → 바텀시트
+          IconButton(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.tune,
                   color:
-                      isSelected
+                      hasActiveFilter
                           ? AppColors.primary
                           : AppColors.textSecondaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
-              ),
-            );
-          }),
+                if (hasActiveFilter)
+                  Positioned(
+                    top: -2,
+                    right: -2,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            onPressed: _showPracticeFilterSheet,
+            tooltip: '연습상태 필터',
+          ),
         ],
       ),
     );
+  }
+
+  /// 연습상태 필터 바텀시트 (전체/우수/보통/부족/휴강)
+  Future<void> _showPracticeFilterSheet() async {
+    final selected = await showModalBottomSheet<StudentFilter>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppSpacing.radiusLarge),
+              ),
+            ),
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            child: SafeArea(
+              top: false,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('연습상태로 필터', style: AppTypography.headingSmall),
+                  const SizedBox(height: AppSpacing.space3),
+                  ...StudentFilter.values.map((filter) {
+                    final isSelected = _currentFilter == filter;
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.textTertiaryLight,
+                      ),
+                      title: Text(
+                        filter.label,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                      onTap: () => Navigator.of(context).pop(filter),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+    );
+
+    if (selected != null) {
+      setState(() => _currentFilter = selected);
+    }
   }
 
   Widget _buildCountAndSort(AsyncValue<List<StudentGroup>> groupedAsync) {
