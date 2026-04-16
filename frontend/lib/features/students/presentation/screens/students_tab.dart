@@ -16,6 +16,7 @@ import '../../domain/entities/student_with_membership.dart';
 import '../providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/widgets/unified_subscription_sheet.dart';
 import '../../../subscription/subscription_facade.dart';
+import '../widgets/practice_sparkline.dart';
 import '../widgets/student_subscription_badge.dart';
 
 /// Students management tab with Riverpod state management
@@ -406,6 +407,15 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       return _buildEmptyState();
     }
 
+    // Count subjects (memberships) per student across all groups.
+    // Used for `N과목` badge when student has multiple subjects.
+    final subjectCounts = <String, int>{};
+    for (final group in filtered) {
+      for (final swm in group.students) {
+        subjectCounts[swm.studentId] = (subjectCounts[swm.studentId] ?? 0) + 1;
+      }
+    }
+
     return RefreshIndicator(
       onRefresh: () async {
         final teacherId = ref.read(currentUserIdProvider);
@@ -421,6 +431,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
             group: filtered[index],
             isSelectionMode: _isSelectionMode,
             selectedStudentIds: _selectedStudentIds,
+            studentSubjectCounts: subjectCounts,
             onSelectionChanged: (studentId, isSelected) {
               setState(() {
                 if (isSelected) {
@@ -547,11 +558,16 @@ class _ClassGroupSection extends StatefulWidget {
   final Set<String> selectedStudentIds;
   final void Function(String studentId, bool isSelected) onSelectionChanged;
 
+  /// Map of studentId → subject count across all groups.
+  /// Used to show `N과목` badge next to name.
+  final Map<String, int> studentSubjectCounts;
+
   const _ClassGroupSection({
     required this.group,
     required this.isSelectionMode,
     required this.selectedStudentIds,
     required this.onSelectionChanged,
+    this.studentSubjectCounts = const {},
   });
 
   @override
@@ -607,6 +623,7 @@ class _ClassGroupSectionState extends State<_ClassGroupSection> {
                 onSelectionChanged: (isSelected) {
                   widget.onSelectionChanged(swm.studentId, isSelected);
                 },
+                subjectCount: widget.studentSubjectCounts[swm.studentId] ?? 1,
               ),
             ),
           ),
@@ -621,11 +638,16 @@ class _StudentCard extends ConsumerWidget {
   final bool isSelected;
   final ValueChanged<bool> onSelectionChanged;
 
+  /// Number of subjects (memberships) this student has across all groups.
+  /// Shows `[N]` badge next to name when subjectCount > 1.
+  final int subjectCount;
+
   const _StudentCard({
     required this.studentWithMembership,
     required this.isSelectionMode,
     required this.isSelected,
     required this.onSelectionChanged,
+    this.subjectCount = 1,
   });
 
   @override
@@ -706,7 +728,7 @@ class _StudentCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1: Name · Instrument + connection badge
+                    // Row 1: Name · Instrument + connection badge + [N] badge
                     Row(
                       children: [
                         Flexible(
@@ -719,6 +741,30 @@ class _StudentCard extends ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        // Subject count badge (복수 과목 힌트)
+                        if (subjectCount > 1) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
+                              ),
+                            ),
+                            child: Text(
+                              '$subjectCount과목',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
                         const SizedBox(width: 4),
                         Icon(
                           swm.isAppConnected ? Icons.link : Icons.edit_note,
@@ -850,6 +896,9 @@ class _StudentCard extends ConsumerWidget {
 }
 
 /// Weekly practice dot pattern (●●●●●○○ style).
+/// Practice trend sparkline for student list (ux_guidelines §2.7).
+///
+/// Replaces old _PracticeDots with 7-day bar sparkline.
 class _PracticeDots extends ConsumerWidget {
   final String studentId;
 
@@ -861,25 +910,28 @@ class _PracticeDots extends ConsumerWidget {
 
     return weeklyAsync.when(
       data: (days) {
+        // Convert bool[] → double[] (1.0 if practiced, 0.0 otherwise)
+        final values = days.map((d) => d ? 1.0 : 0.0).toList();
+        if (values.length != 7) {
+          // Pad or trim to 7 values
+          while (values.length < 7) {
+            values.insert(0, 0.0);
+          }
+          if (values.length > 7) {
+            values.removeRange(0, values.length - 7);
+          }
+        }
+
         final practiced = days.where((d) => d).length;
+
         return Padding(
           padding: const EdgeInsets.only(top: 3),
           child: Row(
             children: [
-              ...days.map(
-                (done) => Padding(
-                  padding: const EdgeInsets.only(right: 3),
-                  child: Icon(
-                    Icons.circle,
-                    size: 7,
-                    color:
-                        done ? AppColors.practiceGood : AppColors.borderLight,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
+              PracticeSparkline(values: values),
+              const SizedBox(width: AppSpacing.space2),
               Text(
-                '$practiced/${days.length}일',
+                '$practiced/7일',
                 style: AppTypography.caption.copyWith(
                   color: AppColors.textTertiaryLight,
                   fontSize: 10,

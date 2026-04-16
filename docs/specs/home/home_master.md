@@ -1,37 +1,145 @@
 # 선생님 홈 마스터 스펙
 
-> 마지막 업데이트: 2026-03-12
-> 구현 상태: ✅ 구현 완료
+> 마지막 업데이트: 2026-04-16
+> 구현 상태: ✅ 구현 완료 (UX 개선 진행 중)
 > 관련 코드: `features/home/`
 
 ---
 
 ## 1. 개요
 
-선생님 메인 대시보드. 오늘 레슨, 긴급 액션, 시작 가이드, 과제 현황 요약 표시.
-탭 기반 네비게이션(홈/캘린더/학생/프로필)의 진입점.
+선생님 메인 대시보드. 긴급 알림, 오늘 레슨, 대응 필요 이벤트, 과제 현황을 3초 안에 파악 가능하도록 설계.
+탭 기반 네비게이션(홈/스케줄/수강관리/프로필)의 진입점.
 
-## 2. 주요 화면
+**핵심 설계 원칙**: 정보 밀도 최소화 + Progressive Disclosure + 시간 한정 정보 우선.
 
-### 2.1 DashboardTab
-- 오늘 레슨 카드 (시간순 정렬)
-- 긴급 액션 섹션 (미확인 레슨, 승인 대기 등)
-- 시작 가이드 카드 (신규 선생님용)
-- 과제 요약 섹션
+---
 
-### 2.2 과제 대시보드 (#101)
-- 전체 학생 주간 과제 현황
-- 학생별 완료율 표시
+## 2. 화면 구조 (DashboardTab)
 
-## 3. 코드 위치
+### 2.1 섹션 순서 (상단 → 하단)
+
+| 순서 | 섹션 | 우선순위 | 조건부 표시 |
+|:---:|------|:---:|:---:|
+| 1 | Header (Lessonaza + 알림 벨) | - | 항상 |
+| 2 | GettingStartedCard (신규 사용자) | 안내 | 학생 0명일 때만 |
+| 3 | UrgentAlertZone (긴급 알림) | **긴급** | 긴급 1+건 있을 때 |
+| 4 | StatsRow (오늘/이번달) | 요약 | 항상 |
+| 5 | TodayLessons (오늘 레슨) | **시간 한정** | 오늘 1+건 있을 때 |
+| 6 | LessonRequestSection (레슨 요청) | 대응 필요 | 요청 1+건 있을 때 |
+| 7 | ScheduleChangeRequestSection (스케줄 변경) | 대응 필요 | 변경 1+건 있을 때 |
+| 8 | AssignmentSummarySection (과제) | 참고 | 과제 1+건 있을 때 |
+| 9 | Analytics Link | 참고 | 항상 |
+
+> **수강권 섹션 제거** (2026-04): 수강권 관리는 "수강관리" 탭에서 수행. 홈은 오늘·이벤트 중심.
+
+---
+
+## 3. UX 정책
+
+### 3.1 긴급 알림 정책 (Top 1 + Expandable)
+
+**원칙**: "가장 시급한 1건"을 배너로 표시. 나머지는 펼침(Expandable) 버튼으로 접근.
+
+#### 긴급 알림 우선순위
+
+| 순위 | 알림 | 색상 | 기준 |
+|:---:|------|:----:|------|
+| 1 | 미수금 | error (red) | 입금 기한 초과 |
+| 2 | 수강권 만료 | error | 만료됨 (expired) |
+| 3 | 수강권 갱신 예정 | warning | 7일 이내 만료 |
+| 4 | 레슨 확인 필요 | warning | 완료 후 미확인 |
+| 5 | 대기 중 예약 | info | 승인 대기 |
+
+#### 표시 규칙
+
+- **1건**: 단일 카드로 표시
+- **2건 이상**: 최상위 1건만 표시 + "외 N건 ▼" 버튼
+- 펼침 버튼 탭 → 나머지 알림 슬라이드 다운
+- 각 알림 탭 → 해당 상세 화면 이동
+
+#### 참고 벤치마크
+
+> 토스 홈 긴급 알림 패턴 — "Top 1 + 알림함"을 차용.
+
+---
+
+### 3.2 오늘 레슨 Progressive Disclosure
+
+**원칙**: 기본 5개 노출. 초과 시 "전체보기" 버튼으로 확장.
+
+| 오늘 레슨 수 | 표시 방식 |
+|:---:|------|
+| 0건 | "레슨 추가" CTA (빈 상태) |
+| 1~5건 | 전체 표시 |
+| 6건 이상 | 최대 5건 + "전체보기 (N건 더)" |
+
+- "전체보기" 탭 → 오늘 레슨 전체 화면으로 이동
+- 카드당 정보: 시간, 학생명, 악기, [노트 →] 버튼
+
+#### 참고 벤치마크
+
+> 네이버 예약 "다가오는 예약" — 상단 5건 + "전체보기" 패턴.
+
+---
+
+### 3.3 이벤트 섹션 (레슨 요청 + 스케줄 변경)
+
+각 섹션 최대 3건 표시. 4건 이상 시 "더보기" 버튼.
+
+- 레슨 요청: 신규 체험/재등록 요청
+- 스케줄 변경 요청: 수강권 기반 변경 요청
+
+> 향후 Phase 2: 두 섹션 통합 검토 ("대응 필요" 단일 섹션).
+
+---
+
+### 3.4 StatsRow
+
+**표시 항목**: 오늘 N건 · 이번달 N건
+
+- 오늘 탭 → 오늘 레슨 전체
+- 이번달 탭 → Analytics
+
+> 향후 "과제 완료율" 추가 검토 (백엔드 연동 후).
+
+---
+
+## 4. 코드 위치
 
 | 레이어 | 파일 |
 |--------|------|
 | Provider | `features/home/presentation/providers/assignment_summary_provider.dart` |
 | 화면 | `features/home/presentation/screens/home_screen.dart`, `assignment_dashboard_screen.dart` |
-| 위젯 | `features/home/presentation/widgets/` (dashboard_tab, lesson_card, getting_started_card 등) |
+| 위젯 | `features/home/presentation/widgets/` (dashboard_tab, urgent_alert_zone, lesson_card, lesson_request_section, schedule_change_request_section, assignment_summary_section) |
 
-## 4. 관련 마스터 스펙
+---
+
+## 5. 구현 현황
+
+| 기능 | 상태 | 비고 |
+|------|:----:|------|
+| 기본 섹션 구조 | 완료 | 2026-04 배치 순서 재정렬 |
+| 긴급 알림 Top 1 + Expandable | 진행 중 | 2026-04-16 업데이트 |
+| 오늘 레슨 Progressive Disclosure | 진행 중 | 2026-04-16 업데이트 |
+| 과제 대시보드 (#101) | 완료 | 전체 학생 주간 현황 |
+| 시간대 인식 홈 (10x Vision) | 미착수 | 향후 Phase |
+| 이벤트 섹션 통합 | 미착수 | 향후 Phase |
+
+---
+
+## 6. 관련 마스터 스펙
 
 - 레슨 카드: [lesson_master.md](../lesson/lesson_master.md)
-- 디자인: [design_master.md](../design/design_master.md) §선생님 화면
+- 수강관리 (탭): [user_master.md §4.3](../user/user_master.md)
+- 디자인: [design_master.md](../design/design_master.md)
+- UX 원칙: [ux_guidelines.md](../design/ux_guidelines.md)
+
+---
+
+## 7. 변경 이력
+
+| 날짜 | 변경 |
+|------|------|
+| 2026-04-16 | UX 개선 스펙 추가 — 긴급 알림 Top 1 정책, 오늘 레슨 Progressive Disclosure, 섹션 순서 확정, 수강권 섹션 제거 명시 |
+| 2026-03-12 | 초기 스펙 작성 |

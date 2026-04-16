@@ -235,7 +235,7 @@ class DashboardTab extends ConsumerWidget {
               style: AppTypography.bodySmall.copyWith(color: AppColors.primary),
             ),
           ),
-        if (lessonCount > 3)
+        if (lessonCount > 5)
           TextButton.icon(
             onPressed: onViewAllLessons,
             icon: const Icon(Icons.calendar_today, size: 16),
@@ -287,8 +287,9 @@ class DashboardTab extends ConsumerWidget {
       );
     }
 
-    final hasMore = lessons.length > 3;
-    final displayLessons = hasMore ? lessons.take(3).toList() : lessons;
+    // Progressive Disclosure (ux_guidelines §2.6): 5건 + 전체보기
+    final hasMore = lessons.length > 5;
+    final displayLessons = hasMore ? lessons.take(5).toList() : lessons;
 
     return Column(
       children: [
@@ -314,7 +315,7 @@ class DashboardTab extends ConsumerWidget {
                 side: BorderSide(color: AppColors.borderLight),
               ),
               child: Text(
-                '${lessons.length - 3}개 레슨 더보기',
+                '${lessons.length - 5}개 레슨 더보기',
                 style: AppTypography.bodySmall.copyWith(
                   color: AppColors.primary,
                 ),
