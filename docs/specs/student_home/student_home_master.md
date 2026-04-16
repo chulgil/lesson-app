@@ -28,7 +28,30 @@
 
 ### 2.2 대시보드 탭 (StudentDashboardTab)
 
-스크롤 가능한 단일 페이지에 7개 섹션을 순서대로 배치:
+> **UX 재설계 (2026-04-16, 10x Vision)**:
+> - 12개 섹션 → 8개로 축소 (정보 과부하 해소)
+> - 4개 배너(레슨요청/갱신/제안/확인)를 "대응 필요" 그룹으로 통합
+> - TimeContextBanner 추가 (시간대별 메시지)
+> - GettingStarted 조건부 표시 (선생님 0명일 때만)
+> - TeacherFeedback 위치 상단으로 이동 (학생이 가장 궁금)
+> - PracticeSummary 강화 (주간 히트맵 + 마일스톤)
+
+**신규 섹션 순서** (상단→하단):
+
+| 순서 | 섹션 | 조건 | 비고 |
+|:---:|------|:---:|------|
+| 1 | Header (날짜 + 인사말) | 항상 | |
+| 2 | ⭐ TimeContextBanner | 정보 있을 때 | 학생 전용 메시지 |
+| 3 | Gamification (레벨/포인트/배지) | 항상 | |
+| 4 | GettingStarted | 선생님 0명 | 조건부 |
+| 5 | NextLessonCard (다음 레슨) | 항상 | 최상단 데이터 |
+| 6 | SubscriptionSummary (수강권) | 항상 | Enhanced 카드 |
+| 7 | EventsGroup (대응 필요 통합) | 이벤트 있을 때 | 4개 배너 그룹화 |
+| 8 | TeacherFeedback | 피드백 있을 때 | 상단 이동 (AS-IS 맨 하단) |
+| 9 | PracticeSummary (강화) | 항상 | 히트맵 + 마일스톤 |
+| 10 | TrialBookings | 체험 있을 때 | 하단으로 이동 |
+
+**AS-IS 12섹션**:
 
 #### 섹션 1: 헤더
 - 날짜 표시 (`M월 d일 EEEE` 형식)

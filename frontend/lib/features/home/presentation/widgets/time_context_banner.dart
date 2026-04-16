@@ -5,19 +5,27 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 
+/// Viewer role for time-aware banner messages.
+enum TimeBannerRole { teacher, student }
+
 /// 시간대 인식 컨텍스트 배너 (home_master.md §3.5).
 ///
-/// 선생님의 일일 루틴(아침/낮/저녁)에 맞춰 다른 메시지 표시.
-/// - 06~10시: 오늘 레슨 N건 안내
-/// - 10~18시: 다음 레슨 카운트다운
-/// - 18~22시: 완료 요약 + 노트 미작성 알림
-/// - 22~06시: 내일 레슨 안내
+/// 사용자의 일일 루틴(아침/낮/저녁)에 맞춰 다른 메시지 표시.
 ///
 /// 표시할 정보가 없으면 SizedBox.shrink로 자동 숨김.
 class TimeContextBanner extends StatelessWidget {
   final List<Lesson> todayLessons;
+  final TimeBannerRole role;
 
-  const TimeContextBanner({super.key, required this.todayLessons});
+  /// 학생 전용: 현재 연속 연습 일수 (학생일 때만 사용)
+  final int? streakDays;
+
+  const TimeContextBanner({
+    super.key,
+    required this.todayLessons,
+    this.role = TimeBannerRole.teacher,
+    this.streakDays,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +79,13 @@ class TimeContextBanner extends StatelessWidget {
 
   /// 시간대별 메시지 생성. null 반환 시 배너 숨김.
   String? _buildMessage(DateTime now, int hour) {
+    return role == TimeBannerRole.student
+        ? _buildStudentMessage(now, hour)
+        : _buildTeacherMessage(now, hour);
+  }
+
+  /// 선생님 메시지
+  String? _buildTeacherMessage(DateTime now, int hour) {
     // 아침 (06~10시): 오늘 레슨 안내
     if (hour >= 6 && hour < 10) {
       if (todayLessons.isEmpty) return null;
@@ -91,7 +106,6 @@ class TimeContextBanner extends StatelessWidget {
         final hoursUntil = (minutesUntil / 60).floor();
         return '다음 레슨: ${next.startTime} (약 $hoursUntil시간 후)';
       }
-      // 오늘 남은 레슨 없음
       if (todayLessons.isNotEmpty) {
         return '오늘 모든 레슨이 끝났어요. 수고하셨어요';
       }
@@ -119,9 +133,67 @@ class TimeContextBanner extends StatelessWidget {
       return '오늘 $completed건 완료. 수고하셨어요';
     }
 
-    // 밤 (22~06시): 내일 안내 — 데이터 없으므로 일반 메시지
+    // 밤 (22~06시)
     if (hour >= 22 || hour < 6) {
       return '편안한 밤 되세요. 내일도 좋은 레슨 되시길 바랍니다';
+    }
+
+    return null;
+  }
+
+  /// 학생 메시지 (연습 중심 + 격려)
+  String? _buildStudentMessage(DateTime now, int hour) {
+    final streak = streakDays ?? 0;
+
+    // 아침 (06~10시)
+    if (hour >= 6 && hour < 10) {
+      if (todayLessons.isNotEmpty) {
+        return '좋은 아침이에요. 오늘 레슨이 있어요!';
+      }
+      if (streak > 0) {
+        return '좋은 아침이에요. $streak일 연속 연습 중이에요!';
+      }
+      return '좋은 아침이에요. 오늘 연습해볼까요?';
+    }
+
+    // 낮~오후 (10~18시): 다음 레슨 카운트다운
+    if (hour >= 10 && hour < 18) {
+      final next = _findNextLesson(now);
+      if (next != null) {
+        final minutesUntil = next.dateTime.difference(now).inMinutes;
+        if (minutesUntil <= 0) {
+          return '${next.startTime} 레슨 시간이에요!';
+        }
+        if (minutesUntil < 60) {
+          return '다음 레슨: ${next.startTime} ($minutesUntil분 후)';
+        }
+        final hoursUntil = (minutesUntil / 60).floor();
+        return '다음 레슨: ${next.startTime} (약 $hoursUntil시간 후)';
+      }
+      // 오후 연습 독려
+      if (streak > 0) {
+        return '오늘도 $streak일째 이어가요!';
+      }
+      return null;
+    }
+
+    // 저녁 (18~22시): 연습 독려 / 스트릭 축하
+    if (hour >= 18 && hour < 22) {
+      if (streak >= 7) {
+        return '🔥 $streak일 연속 연습! 멋져요!';
+      }
+      if (streak > 0) {
+        return '$streak일 연속 연습 중이에요. 오늘도 이어가세요!';
+      }
+      return '오늘 연습 어땠나요?';
+    }
+
+    // 밤 (22~06시)
+    if (hour >= 22 || hour < 6) {
+      if (streak > 0) {
+        return '오늘도 수고하셨어요. $streak일째 멋져요!';
+      }
+      return '편안한 밤 되세요. 내일 파이팅!';
     }
 
     return null;
