@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -11,7 +12,7 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../../features/home/presentation/widgets/lesson_request_section.dart';
 import '../../../../features/home/presentation/widgets/time_context_banner.dart';
 import '../../../lessons/domain/entities/lesson.dart';
-import '../../../lessons/presentation/providers/booking_providers.dart';
+import '../../../practice/domain/entities/practice_log.dart';
 import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../../gamification/presentation/widgets/gamification_header.dart';
 import '../../../schedule/presentation/providers/schedule_confirmation_card_providers.dart';
@@ -50,7 +51,10 @@ class StudentDashboardTab extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space1),
-                  Text('오늘도 화이팅!', style: AppTypography.headingLarge),
+                  Text(
+                    AppStrings.studentHomeGreeting,
+                    style: AppTypography.headingLarge,
+                  ),
                 ],
               ),
               Row(
@@ -58,11 +62,12 @@ class StudentDashboardTab extends ConsumerWidget {
                   IconButton(
                     onPressed: () => context.push(AppRoutes.invite),
                     icon: const Icon(Icons.person_add_outlined),
-                    tooltip: '선생님 연결',
+                    tooltip: AppStrings.inviteTeacher,
                   ),
                   IconButton(
                     onPressed: () => context.push(AppRoutes.notifications),
                     icon: const Icon(Icons.notifications_outlined),
+                    tooltip: AppStrings.notifications,
                   ),
                 ],
               ),
@@ -171,53 +176,35 @@ class _StudentTimeBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookingsAsync = ref.watch(studentBookingsProvider(studentId));
     final practiceLogsAsync = ref.watch(practiceLogsProvider(studentId));
 
-    // 오늘 레슨 필터 (booking → Lesson처럼 사용 불가. 임시로 빈 리스트)
-    // TODO: 학생 booking → Lesson 변환 필요. 현재는 빈 리스트로도 streak 기반 메시지 동작
-    final todayLessons =
-        bookingsAsync.valueOrNull != null
-            ? _filterTodayBookings(bookingsAsync.value!)
-            : <Lesson>[];
-
-    // 연속 연습일 계산
+    // 학생은 streak 중심 메시지로 충분 — booking→Lesson 매핑 생략.
     final streakDays =
         practiceLogsAsync.valueOrNull != null
             ? _calculateStreak(practiceLogsAsync.value!)
             : 0;
 
     return TimeContextBanner(
-      todayLessons: todayLessons,
+      todayLessons: const <Lesson>[],
       role: TimeBannerRole.student,
       streakDays: streakDays,
     );
   }
 
-  /// studentBookings를 Lesson 리스트로 변환 (오늘만).
-  /// Booking 엔티티는 Lesson과 다르므로, 빈 리스트 반환.
-  /// 학생 시간대 배너는 streak + 일반 메시지 중심.
-  List<Lesson> _filterTodayBookings(List<dynamic> bookings) {
-    // 현재 Lesson 엔티티로 매핑 불가 — streak 중심 메시지로 대체
-    return const [];
-  }
-
-  int _calculateStreak(List<dynamic> logs) {
+  /// 최근 연속 연습일 계산 (오늘부터 역순으로 연속된 연습일).
+  int _calculateStreak(List<PracticeLog> logs) {
     if (logs.isEmpty) return 0;
     final now = DateTime.now();
     final practicedDates = <String>{};
     for (final log in logs) {
-      final totalMinutes = log.totalMinutes as int? ?? 0;
-      if (totalMinutes > 0) {
-        final d = log.date as DateTime;
-        practicedDates.add('${d.year}-${d.month}-${d.day}');
+      if (log.totalMinutes > 0) {
+        practicedDates.add(_dateKey(log.date));
       }
     }
     var streak = 0;
     var checkDate = DateTime(now.year, now.month, now.day);
     for (var i = 0; i < 100; i++) {
-      final key = '${checkDate.year}-${checkDate.month}-${checkDate.day}';
-      if (practicedDates.contains(key)) {
+      if (practicedDates.contains(_dateKey(checkDate))) {
         streak++;
         checkDate = checkDate.subtract(const Duration(days: 1));
       } else {
@@ -226,6 +213,9 @@ class _StudentTimeBanner extends ConsumerWidget {
     }
     return streak;
   }
+
+  String _dateKey(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
 /// 학생용 이벤트 그룹 (4개 배너 시각 통합).

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -89,7 +90,7 @@ class TimeContextBanner extends StatelessWidget {
     // 아침 (06~10시): 오늘 레슨 안내
     if (hour >= 6 && hour < 10) {
       if (todayLessons.isEmpty) return null;
-      return '좋은 아침이에요. 오늘 ${todayLessons.length}건의 레슨이 있어요';
+      return AppStrings.timeBannerTeacherMorning(todayLessons.length);
     }
 
     // 낮~오후 (10~18시): 다음 레슨 카운트다운
@@ -98,16 +99,19 @@ class TimeContextBanner extends StatelessWidget {
       if (next != null) {
         final minutesUntil = next.dateTime.difference(now).inMinutes;
         if (minutesUntil <= 0) {
-          return '${next.startTime} 레슨 진행 중이에요';
+          return AppStrings.timeBannerNextLessonInProgress(next.startTime);
         }
         if (minutesUntil < 60) {
-          return '다음 레슨: ${next.startTime} ($minutesUntil분 후)';
+          return AppStrings.timeBannerNextLessonMinutes(
+            next.startTime,
+            minutesUntil,
+          );
         }
         final hoursUntil = (minutesUntil / 60).floor();
-        return '다음 레슨: ${next.startTime} (약 $hoursUntil시간 후)';
+        return AppStrings.timeBannerNextLessonHours(next.startTime, hoursUntil);
       }
       if (todayLessons.isNotEmpty) {
-        return '오늘 모든 레슨이 끝났어요. 수고하셨어요';
+        return AppStrings.timeBannerTeacherDayDone;
       }
       return null;
     }
@@ -128,14 +132,14 @@ class TimeContextBanner extends StatelessWidget {
               .length;
 
       if (notesNeeded > 0) {
-        return '오늘 $completed건 완료. 노트 미작성 $notesNeeded건';
+        return AppStrings.timeBannerTeacherEveningNotes(completed, notesNeeded);
       }
-      return '오늘 $completed건 완료. 수고하셨어요';
+      return AppStrings.timeBannerTeacherEveningDone(completed);
     }
 
     // 밤 (22~06시)
     if (hour >= 22 || hour < 6) {
-      return '편안한 밤 되세요. 내일도 좋은 레슨 되시길 바랍니다';
+      return AppStrings.timeBannerTeacherNight;
     }
 
     return null;
@@ -148,12 +152,12 @@ class TimeContextBanner extends StatelessWidget {
     // 아침 (06~10시)
     if (hour >= 6 && hour < 10) {
       if (todayLessons.isNotEmpty) {
-        return '좋은 아침이에요. 오늘 레슨이 있어요!';
+        return AppStrings.timeBannerStudentMorningLesson;
       }
       if (streak > 0) {
-        return '좋은 아침이에요. $streak일 연속 연습 중이에요!';
+        return AppStrings.timeBannerStudentMorningStreak(streak);
       }
-      return '좋은 아침이에요. 오늘 연습해볼까요?';
+      return AppStrings.timeBannerStudentMorningPractice;
     }
 
     // 낮~오후 (10~18시): 다음 레슨 카운트다운
@@ -162,17 +166,20 @@ class TimeContextBanner extends StatelessWidget {
       if (next != null) {
         final minutesUntil = next.dateTime.difference(now).inMinutes;
         if (minutesUntil <= 0) {
-          return '${next.startTime} 레슨 시간이에요!';
+          return AppStrings.timeBannerStudentLessonTime(next.startTime);
         }
         if (minutesUntil < 60) {
-          return '다음 레슨: ${next.startTime} ($minutesUntil분 후)';
+          return AppStrings.timeBannerNextLessonMinutes(
+            next.startTime,
+            minutesUntil,
+          );
         }
         final hoursUntil = (minutesUntil / 60).floor();
-        return '다음 레슨: ${next.startTime} (약 $hoursUntil시간 후)';
+        return AppStrings.timeBannerNextLessonHours(next.startTime, hoursUntil);
       }
       // 오후 연습 독려
       if (streak > 0) {
-        return '오늘도 $streak일째 이어가요!';
+        return AppStrings.timeBannerStudentStreakKeep(streak);
       }
       return null;
     }
@@ -180,20 +187,20 @@ class TimeContextBanner extends StatelessWidget {
     // 저녁 (18~22시): 연습 독려 / 스트릭 축하
     if (hour >= 18 && hour < 22) {
       if (streak >= 7) {
-        return '🔥 $streak일 연속 연습! 멋져요!';
+        return AppStrings.timeBannerStudentStreakGreat(streak);
       }
       if (streak > 0) {
-        return '$streak일 연속 연습 중이에요. 오늘도 이어가세요!';
+        return AppStrings.timeBannerStudentStreakContinue(streak);
       }
-      return '오늘 연습 어땠나요?';
+      return AppStrings.timeBannerStudentEveningAsk;
     }
 
     // 밤 (22~06시)
     if (hour >= 22 || hour < 6) {
       if (streak > 0) {
-        return '오늘도 수고하셨어요. $streak일째 멋져요!';
+        return AppStrings.timeBannerStudentNightStreak(streak);
       }
-      return '편안한 밤 되세요. 내일 파이팅!';
+      return AppStrings.timeBannerStudentNight;
     }
 
     return null;

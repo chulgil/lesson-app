@@ -918,6 +918,45 @@ class AppStrings {
   static const expiringSoon = '만료 예정';
   static const expired = '만료됨';
 
+  // === TimeContextBanner (Home) strings ===
+  // 선생님 메시지
+  static String timeBannerTeacherMorning(int count) =>
+      '좋은 아침이에요. 오늘 $count건의 레슨이 있어요';
+  static String timeBannerNextLessonInProgress(String time) =>
+      '$time 레슨 진행 중이에요';
+  static String timeBannerNextLessonMinutes(String time, int minutes) =>
+      '다음 레슨: $time ($minutes분 후)';
+  static String timeBannerNextLessonHours(String time, int hours) =>
+      '다음 레슨: $time (약 $hours시간 후)';
+  static const timeBannerTeacherDayDone = '오늘 모든 레슨이 끝났어요. 수고하셨어요';
+  static String timeBannerTeacherEveningNotes(int completed, int needed) =>
+      '오늘 $completed건 완료. 노트 미작성 $needed건';
+  static String timeBannerTeacherEveningDone(int completed) =>
+      '오늘 $completed건 완료. 수고하셨어요';
+  static const timeBannerTeacherNight = '편안한 밤 되세요. 내일도 좋은 레슨 되시길 바랍니다';
+
+  // 학생 메시지
+  static const timeBannerStudentMorningLesson = '좋은 아침이에요. 오늘 레슨이 있어요!';
+  static String timeBannerStudentMorningStreak(int streak) =>
+      '좋은 아침이에요. $streak일 연속 연습 중이에요!';
+  static const timeBannerStudentMorningPractice = '좋은 아침이에요. 오늘 연습해볼까요?';
+  static String timeBannerStudentLessonTime(String time) => '$time 레슨 시간이에요!';
+  static String timeBannerStudentStreakKeep(int streak) =>
+      '오늘도 $streak일째 이어가요!';
+  static String timeBannerStudentStreakGreat(int streak) =>
+      '$streak일 연속 연습! 멋져요!';
+  static String timeBannerStudentStreakContinue(int streak) =>
+      '$streak일 연속 연습 중이에요. 오늘도 이어가세요!';
+  static const timeBannerStudentEveningAsk = '오늘 연습 어땠나요?';
+  static String timeBannerStudentNightStreak(int streak) =>
+      '오늘도 수고하셨어요. $streak일째 멋져요!';
+  static const timeBannerStudentNight = '편안한 밤 되세요. 내일 파이팅!';
+
+  // 학생 홈 헤더
+  static const studentHomeGreeting = '오늘도 화이팅!';
+  static const inviteTeacher = '선생님 연결';
+  static const notifications = '알림';
+
   // === Common UI strings ===
 
   /// 수강권 상세 AppBar 제목
