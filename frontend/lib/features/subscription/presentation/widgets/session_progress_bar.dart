@@ -64,7 +64,10 @@ class SessionProgressBar extends StatelessWidget {
       // 12회차 초과: 현재 위치 기준 슬라이딩 윈도우
       final activeSession = selectedSession.clamp(1, totalSessions);
       final maxStart = totalSessions - _maxPerRow + 1;
-      int windowStart = (activeSession - 4).clamp(1, maxStart > 0 ? maxStart : 1);
+      int windowStart = (activeSession - 4).clamp(
+        1,
+        maxStart > 0 ? maxStart : 1,
+      );
       for (int i = 0; i < _maxPerRow; i++) {
         final sessionNum = windowStart + i;
         if (sessionNum <= totalSessions) {
@@ -77,14 +80,19 @@ class SessionProgressBar extends StatelessWidget {
       children: [
         for (int i = 0; i < _maxPerRow; i++) ...[
           if (i > 0)
-            _buildConnector(displaySlots[i] ?? (displaySlots[i - 1] ?? 0) + 1),
+            _buildConnector(
+              displaySlots[i] ?? (displaySlots[i - 1] ?? 0) + 1,
+              isEmpty: displaySlots[i] == null,
+            ),
           _SessionDot(
             sessionNumber: displaySlots[i] ?? 0,
-            state: displaySlots[i] != null
-                ? _getState(displaySlots[i]!)
-                : _SessionState.future,
+            state:
+                displaySlots[i] != null
+                    ? _getState(displaySlots[i]!)
+                    : _SessionState.future,
             isSelected: displaySlots[i] == selectedSession,
-            hasChangeRequest: displaySlots[i] != null &&
+            hasChangeRequest:
+                displaySlots[i] != null &&
                 changeRequestedSessions.contains(displaySlots[i]),
             onTap: () {
               if (displaySlots[i] != null) onSessionTap(displaySlots[i]!);
@@ -97,16 +105,24 @@ class SessionProgressBar extends StatelessWidget {
     );
   }
 
-  /// Expanded connector: solid (primary) if completed, dashed (borderLight) otherwise.
-  /// Exactly matches LessonProgressBar's connector pattern.
-  Widget _buildConnector(int sessionNumber) {
-    final isCompleted = sessionNumber <= completedSessions;
+  /// Expanded connector: primary if completed, borderLight if assigned, lighter grey if empty slot.
+  Widget _buildConnector(int sessionNumber, {bool isEmpty = false}) {
+    final isCompleted = !isEmpty && sessionNumber <= completedSessions;
+
+    final Color color;
+    if (isCompleted) {
+      color = AppColors.primary;
+    } else if (isEmpty) {
+      color = AppColors.borderLight.withValues(alpha: 0.4);
+    } else {
+      color = AppColors.borderLight;
+    }
 
     return Expanded(
       child: CustomPaint(
         size: const Size(double.infinity, 2),
         painter: _DashedLinePainter(
-          color: isCompleted ? AppColors.primary : AppColors.borderLight,
+          color: color,
           strokeWidth: 1.5,
           dashWidth: 4,
           dashGap: 3,
@@ -163,9 +179,10 @@ class _SessionDot extends StatelessWidget {
                   : '',
               style: AppTypography.caption.copyWith(
                 color: _textColor,
-                fontWeight: state == _SessionState.scheduled || isSelected
-                    ? FontWeight.w600
-                    : FontWeight.normal,
+                fontWeight:
+                    state == _SessionState.scheduled || isSelected
+                        ? FontWeight.w600
+                        : FontWeight.normal,
                 fontSize: 10,
               ),
             ),
@@ -208,11 +225,7 @@ class _SessionDot extends StatelessWidget {
             color: AppColors.primary,
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.check,
-            size: 12,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.check, size: 12, color: Colors.white),
         );
 
       // Active: outer ring (primaryLight) + inner filled (primary)
@@ -225,10 +238,7 @@ class _SessionDot extends StatelessWidget {
               height: SessionProgressBar._ringSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primaryLight,
-                  width: 2,
-                ),
+                border: Border.all(color: AppColors.primaryLight, width: 2),
               ),
             ),
             Container(
@@ -249,10 +259,7 @@ class _SessionDot extends StatelessWidget {
           height: SessionProgressBar._dotSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.borderLight,
-              width: 1.5,
-            ),
+            border: Border.all(color: AppColors.borderLight, width: 1.5),
           ),
         );
     }
@@ -285,10 +292,11 @@ class _DashedLinePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke;
 
     final y = size.height / 2;
     var x = 0.0;
@@ -306,4 +314,3 @@ class _DashedLinePainter extends CustomPainter {
   bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
       color != oldDelegate.color || strokeWidth != oldDelegate.strokeWidth;
 }
-
