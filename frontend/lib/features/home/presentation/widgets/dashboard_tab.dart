@@ -20,6 +20,7 @@ import 'getting_started_card.dart';
 import 'lesson_card.dart';
 import 'lesson_request_section.dart';
 import 'schedule_change_request_section.dart';
+import 'time_context_banner.dart';
 import 'urgent_alert_zone.dart';
 
 /// Dashboard Tab - information hierarchy: urgent → today → trends → tools.
@@ -72,6 +73,13 @@ class DashboardTab extends ConsumerWidget {
             _buildHeader(context, ref),
 
             const SizedBox(height: AppSpacing.space5),
+
+            // ── 0순위: 시간대 인식 컨텍스트 배너 ─────────────
+            // (home_master.md §3.5)
+            todayLessons.maybeWhen(
+              data: (lessons) => TimeContextBanner(todayLessons: lessons),
+              orElse: () => const SizedBox.shrink(),
+            ),
 
             // Getting Started Guide (shown when 0 students)
             const GettingStartedCard(),
