@@ -347,7 +347,8 @@ class _StudentDetailContent extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.space4),
+              // TabBar와 겹침 방지 여백 (TabBar 높이 ~48px)
+              const SizedBox(height: AppSpacing.space8),
             ],
           ),
         ),

@@ -20,31 +20,31 @@ class StudentPracticeTab extends ConsumerWidget {
 
     return overviewAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
-        child: Text(
-          '연습 데이터를 불러올 수 없습니다',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-      ),
-      data: (overview) => ListView(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        children: [
-          _WeeklySummaryCard(overview: overview),
-          const SizedBox(height: AppSpacing.space4),
-          _WeeklyPracticeGrid(entries: overview.weeklyEntries),
-          if (overview.sharedRecordings.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.space4),
-            _SharedRecordingsSection(
-              recordings: overview.sharedRecordings,
+      error:
+          (error, _) => Center(
+            child: Text(
+              '연습 데이터를 불러올 수 없습니다',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
             ),
-          ],
-          const SizedBox(height: AppSpacing.space4),
-          _DetailStatsButton(studentId: studentId),
-          const SizedBox(height: AppSpacing.space8),
-        ],
-      ),
+          ),
+      data:
+          (overview) => ListView(
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            children: [
+              _WeeklySummaryCard(overview: overview),
+              const SizedBox(height: AppSpacing.space4),
+              _WeeklyPracticeGrid(entries: overview.weeklyEntries),
+              if (overview.sharedRecordings.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.space4),
+                _SharedRecordingsSection(recordings: overview.sharedRecordings),
+              ],
+              const SizedBox(height: AppSpacing.space4),
+              _DetailStatsButton(studentId: studentId),
+              const SizedBox(height: AppSpacing.space8),
+            ],
+          ),
     );
   }
 }
@@ -67,10 +67,7 @@ class _WeeklySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '이번 주 연습 요약',
-            style: AppTypography.headingSmall,
-          ),
+          Text('이번 주 연습 요약', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
           Row(
             children: [
@@ -78,7 +75,8 @@ class _WeeklySummaryCard extends StatelessWidget {
                 child: _SummaryItem(
                   icon: Icons.calendar_today_outlined,
                   label: '연습 일수',
-                  value: '${overview.practiceDaysThisWeek}/${overview.totalDaysInWeek}일',
+                  value:
+                      '${overview.practiceDaysThisWeek}/${overview.totalDaysInWeek}일',
                   color: _practiceRateColor(overview.practiceRate),
                 ),
               ),
@@ -132,10 +130,7 @@ class _SummaryItem extends StatelessWidget {
       children: [
         Icon(icon, size: 20, color: color),
         const SizedBox(height: AppSpacing.space1),
-        Text(
-          value,
-          style: AppTypography.headingSmall.copyWith(color: color),
-        ),
+        Text(value, style: AppTypography.headingSmall.copyWith(color: color)),
         const SizedBox(height: AppSpacing.space1),
         Text(
           label,
@@ -171,24 +166,23 @@ class _WeeklyPracticeGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '주간 연습 현황',
-            style: AppTypography.headingSmall,
-          ),
+          Text('주간 연습 현황', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
           Row(
-            children: entries.map((entry) {
-              final isToday = entry.date.year == today.year &&
-                  entry.date.month == today.month &&
-                  entry.date.day == today.day;
-              return Expanded(
-                child: _DayColumn(
-                  entry: entry,
-                  maxMinutes: maxMinutes,
-                  isToday: isToday,
-                ),
-              );
-            }).toList(),
+            children:
+                entries.map((entry) {
+                  final isToday =
+                      entry.date.year == today.year &&
+                      entry.date.month == today.month &&
+                      entry.date.day == today.day;
+                  return Expanded(
+                    child: _DayColumn(
+                      entry: entry,
+                      maxMinutes: maxMinutes,
+                      isToday: isToday,
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -213,17 +207,20 @@ class _DayColumn extends StatelessWidget {
     // Bar height proportional to max minutes, min height for practiced days
     const maxBarHeight = 60.0;
     const minBarHeight = 6.0;
-    final barHeight = maxMinutes > 0 && entry.practiceMinutes > 0
-        ? (entry.practiceMinutes / maxMinutes * maxBarHeight)
-            .clamp(minBarHeight, maxBarHeight)
-        : minBarHeight;
+    final barHeight =
+        maxMinutes > 0 && entry.practiceMinutes > 0
+            ? (entry.practiceMinutes / maxMinutes * maxBarHeight).clamp(
+              minBarHeight,
+              maxBarHeight,
+            )
+            : minBarHeight;
 
-    final barColor = entry.hasPracticed
-        ? AppColors.practiceGood
-        : AppColors.scheduleMutedBackground;
+    final barColor =
+        entry.hasPracticed
+            ? AppColors.practiceGood
+            : AppColors.scheduleMutedBackground;
 
-    final dayLabel =
-        LessonDateUtils.getWeekdayNameKorean(entry.date.weekday);
+    final dayLabel = LessonDateUtils.getWeekdayNameKorean(entry.date.weekday);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
@@ -233,20 +230,27 @@ class _DayColumn extends StatelessWidget {
           Text(
             entry.hasPracticed ? '${entry.practiceMinutes}' : '-',
             style: AppTypography.caption.copyWith(
-              color: entry.hasPracticed
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+              color:
+                  entry.hasPracticed
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textTertiaryLight,
               fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
-          // Bar
-          Container(
-            height: barHeight,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: barColor,
-              borderRadius: BorderRadius.circular(AppSpacing.space1),
+          // Bar area: 고정 높이(maxBarHeight) 내에서 실제 막대를 하단 정렬
+          SizedBox(
+            height: maxBarHeight,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: barHeight,
+                width: 14, // 고정 막대 너비 (seconds-level readability)
+                decoration: BoxDecoration(
+                  color: barColor,
+                  borderRadius: BorderRadius.circular(AppSpacing.space1),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -256,18 +260,20 @@ class _DayColumn extends StatelessWidget {
               horizontal: AppSpacing.space1,
               vertical: 2,
             ),
-            decoration: isToday
-                ? BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppSpacing.space1),
-                  )
-                : null,
+            decoration:
+                isToday
+                    ? BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(AppSpacing.space1),
+                    )
+                    : null,
             child: Text(
               dayLabel,
               style: AppTypography.caption.copyWith(
-                color: isToday
-                    ? AppColors.surfaceLight
-                    : AppColors.textSecondaryLight,
+                color:
+                    isToday
+                        ? AppColors.surfaceLight
+                        : AppColors.textSecondaryLight,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -298,16 +304,9 @@ class _SharedRecordingsSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.mic_outlined,
-                size: 18,
-                color: AppColors.info,
-              ),
+              const Icon(Icons.mic_outlined, size: 18, color: AppColors.info),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '공유된 녹음',
-                style: AppTypography.headingSmall,
-              ),
+              Text('공유된 녹음', style: AppTypography.headingSmall),
               const Spacer(),
               Text(
                 '${recordings.length}개',
