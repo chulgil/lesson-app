@@ -16,9 +16,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../features/parent_home/domain/entities/parent.dart';
 import '../../../../features/students/domain/entities/student.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../parent_home/presentation/providers/parent_crud_provider.dart';
-import '../../../practice/presentation/providers/practice_crud_provider.dart';
 import '../../presentation/providers/student_crud_provider.dart';
 import '../providers/student_image_provider.dart';
 import '../widgets/student_detail/student_detail_widgets.dart';
@@ -171,7 +169,7 @@ class _StudentDetailContent extends ConsumerWidget {
             .valueOrNull;
 
     return SliverAppBar(
-      expandedHeight: 240,
+      expandedHeight: 270,
       pinned: true,
       forceElevated: innerBoxIsScrolled,
       leading: IconButton(
