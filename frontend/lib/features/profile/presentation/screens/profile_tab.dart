@@ -11,9 +11,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
-import '../../../follow/presentation/providers/follow_providers.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
+import '../../../subscription/presentation/providers/subscription_providers.dart';
 import '../providers/teacher_extended_profile_provider.dart';
 
 /// Profile tab with user info and settings — redesigned for 1-tap access.
@@ -50,96 +50,27 @@ class ProfileTab extends ConsumerWidget {
           // Profile header with key info
           _buildProfileHeader(name, email, introduction, instruments),
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space3),
 
-          // Stats section
+          // ⭐ 프로필 미리보기 CTA (profile_master.md §2.1 #2)
+          _buildPreviewCta(context),
+
+          const SizedBox(height: AppSpacing.space5),
+
+          // Stats section (팔로워 → 미수금)
           _buildStatsSection(ref, teacherId),
 
-          const SizedBox(height: AppSpacing.space6),
+          const SizedBox(height: AppSpacing.space5),
 
-          // 내 소개
-          _buildMenuSection(
-            title: '내 소개',
-            items: [
-              _MenuItem(
-                icon: Icons.person_outline,
-                label: '기본 정보 수정',
-                subtitle: '이름, 사진, 소개, 교수 스타일, 활동 지역',
-                onTap: () => context.push(AppRoutes.basicInfoEdit),
-              ),
-              _MenuItem(
-                icon: Icons.music_note,
-                label: '악기 관리',
-                subtitle: '가르치는 악기 추가/관리',
-                onTap: () => context.push(AppRoutes.instrumentManagement),
-              ),
-              _MenuItem(
-                icon: Icons.school_outlined,
-                label: '학력·경력·자격증',
-                subtitle: '교육 배경 및 경력 사항',
-                onTap: () => context.push(AppRoutes.extendedProfile),
-              ),
-              _MenuItem(
-                icon: Icons.visibility_outlined,
-                label: '프로필 미리보기',
-                subtitle: '학생에게 보이는 내 프로필',
-                onTap: () => context.push(AppRoutes.profilePreview),
-              ),
-            ],
-          ),
+          // ⭐ 프로필 완성도 게이지 (profile_master.md §2.2)
+          _buildCompletionGauge(context, ref, profile, teacherId),
 
-          const SizedBox(height: AppSpacing.space4),
+          // ⭐ 자주 쓰는 설정 (profile_master.md §2.3)
+          _buildQuickShortcuts(context, teacherId),
 
-          // 레슨 운영
-          _buildMenuSection(
-            title: '레슨 운영',
-            items: [
-              _MenuItem(
-                icon: Icons.assignment,
-                label: AppStrings.lessonRequestManagement,
-                subtitle: AppStrings.lessonRequestManagementDesc,
-                onTap: () => context.push(
-                  '${AppRoutes.lessonRequests}?teacherId=$teacherId',
-                ),
-              ),
-              _MenuItem(
-                icon: Icons.access_time,
-                label: '레슨 시간 설정',
-                subtitle: '시간 길이, 쉬는시간, 시작 간격',
-                onTap: () => context.push(AppRoutes.lessonTimeSettings),
-              ),
-              _MenuItem(
-                icon: Icons.calendar_month,
-                label: '가용 시간 관리',
-                subtitle: '주간 스케줄, 휴무, 예외 시간',
-                onTap: () => context.push(AppRoutes.teacherAvailability),
-              ),
-              _MenuItem(
-                icon: Icons.shield_outlined,
-                label: '취소/노쇼 정책',
-                subtitle: '변경 횟수, 취소 기한, 노쇼 처리',
-                onTap: () => context.push(
-                  '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
-                ),
-              ),
-              _MenuItem(
-                icon: Icons.library_music,
-                label: '레퍼토리 관리',
-                subtitle: '교재 및 곡 목록',
-                onTap: () => context.push(AppRoutes.repertoireManagement),
-              ),
-              _MenuItem(
-                icon: Icons.chat_outlined,
-                label: '피드백 템플릿',
-                subtitle: '자주 쓰는 레슨 피드백 문구',
-                onTap: () => context.push(AppRoutes.tipTemplateManagement),
-              ),
-            ],
-          ),
+          const SizedBox(height: AppSpacing.space5),
 
-          const SizedBox(height: AppSpacing.space4),
-
-          // 수강권·결제
+          // 💳 수강권·결제 (상단 이동 — 자주 쓰는 것 먼저)
           _buildMenuSection(
             title: '수강권·결제',
             items: [
@@ -166,6 +97,84 @@ class ProfileTab extends ConsumerWidget {
                 label: '입금 계좌',
                 subtitle: '수강료 입금받을 계좌 설정',
                 onTap: () => context.push(AppRoutes.bankAccountEdit),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // 내 소개
+          _buildMenuSection(
+            title: '내 소개',
+            items: [
+              _MenuItem(
+                icon: Icons.person_outline,
+                label: '기본 정보 수정',
+                subtitle: '이름, 사진, 소개, 교수 스타일, 활동 지역',
+                onTap: () => context.push(AppRoutes.basicInfoEdit),
+              ),
+              _MenuItem(
+                icon: Icons.music_note,
+                label: '악기 관리',
+                subtitle: '가르치는 악기 추가/관리',
+                onTap: () => context.push(AppRoutes.instrumentManagement),
+              ),
+              _MenuItem(
+                icon: Icons.school_outlined,
+                label: '학력·경력·자격증',
+                subtitle: '교육 배경 및 경력 사항',
+                onTap: () => context.push(AppRoutes.extendedProfile),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.space4),
+
+          // 레슨 운영
+          _buildMenuSection(
+            title: '레슨 운영',
+            items: [
+              _MenuItem(
+                icon: Icons.assignment,
+                label: AppStrings.lessonRequestManagement,
+                subtitle: AppStrings.lessonRequestManagementDesc,
+                onTap:
+                    () => context.push(
+                      '${AppRoutes.lessonRequests}?teacherId=$teacherId',
+                    ),
+              ),
+              _MenuItem(
+                icon: Icons.access_time,
+                label: '레슨 시간 설정',
+                subtitle: '시간 길이, 쉬는시간, 시작 간격',
+                onTap: () => context.push(AppRoutes.lessonTimeSettings),
+              ),
+              _MenuItem(
+                icon: Icons.calendar_month,
+                label: '가용 시간 관리',
+                subtitle: '주간 스케줄, 휴무, 예외 시간',
+                onTap: () => context.push(AppRoutes.teacherAvailability),
+              ),
+              _MenuItem(
+                icon: Icons.shield_outlined,
+                label: '취소/노쇼 정책',
+                subtitle: '변경 횟수, 취소 기한, 노쇼 처리',
+                onTap:
+                    () => context.push(
+                      '${AppRoutes.lessonPolicy}?teacherId=$teacherId',
+                    ),
+              ),
+              _MenuItem(
+                icon: Icons.library_music,
+                label: '레퍼토리 관리',
+                subtitle: '교재 및 곡 목록',
+                onTap: () => context.push(AppRoutes.repertoireManagement),
+              ),
+              _MenuItem(
+                icon: Icons.chat_outlined,
+                label: '피드백 템플릿',
+                subtitle: '자주 쓰는 레슨 피드백 문구',
+                onTap: () => context.push(AppRoutes.tipTemplateManagement),
               ),
             ],
           ),
@@ -266,7 +275,10 @@ class ProfileTab extends ConsumerWidget {
             ],
           ),
 
-          SizedBox(height: AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32),
+          SizedBox(
+            height:
+                AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32,
+          ),
         ],
       ),
     );
@@ -321,19 +333,27 @@ class ProfileTab extends ConsumerWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space1,
-              children: instruments.map((inst) => Chip(
-                label: Text(
-                  inst,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
-                  ),
-                ),
-                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-                side: BorderSide.none,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-              )).toList(),
+              children:
+                  instruments
+                      .map(
+                        (inst) => Chip(
+                          label: Text(
+                            inst,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.08,
+                          ),
+                          side: BorderSide.none,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                        ),
+                      )
+                      .toList(),
             ),
           ],
           // Introduction
@@ -353,12 +373,187 @@ class ProfileTab extends ConsumerWidget {
     );
   }
 
+  /// 프로필 미리보기 CTA (최상단 버튼).
+  Widget _buildPreviewCta(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          onPressed: () => context.push(AppRoutes.profilePreview),
+          icon: const Icon(Icons.visibility_outlined, size: 18),
+          label: const Text('내 프로필 미리보기'),
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.4)),
+            foregroundColor: AppColors.primary,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 프로필 완성도 게이지 (profile_master.md §2.2).
+  ///
+  /// 100% 미만일 때만 표시. 7가지 항목의 가중치 합산으로 완성도 계산.
+  Widget _buildCompletionGauge(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic profile,
+    String teacherId,
+  ) {
+    final extendedState = ref.watch(teacherExtendedProfileProvider);
+    final extended = extendedState.valueOrNull;
+
+    final percent = _calculateCompletion(profile, extended);
+    if (percent >= 100) return const SizedBox.shrink();
+
+    final nextStep = _nextCompletionStep(profile, extended);
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: AppSpacing.screenPadding,
+        right: AppSpacing.screenPadding,
+        bottom: AppSpacing.space4,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.space4),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '프로필 완성도',
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '$percent%',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.space2),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              child: LinearProgressIndicator(
+                value: percent / 100,
+                minHeight: 6,
+                backgroundColor: AppColors.borderLight,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            ),
+            if (nextStep != null) ...[
+              const SizedBox(height: AppSpacing.space2),
+              Text(
+                '다음: $nextStep',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 완성도 계산 (100%). profile_master.md §2.2 가중치 참조.
+  int _calculateCompletion(dynamic profile, dynamic extended) {
+    var score = 0;
+    if (profile?.profileImageUrl != null) score += 20;
+    final intro = profile?.introduction as String?;
+    if (intro != null && intro.length >= 20) score += 20;
+    final instruments = profile?.instruments as List?;
+    if (instruments != null && instruments.isNotEmpty) score += 15;
+    // 가용시간/수강권템플릿/입금계좌는 별도 Provider 필요 — 단순 버전에서 생략
+    // 확장 프로필 (경력 또는 학력 또는 자격증 중 하나 이상)
+    if (extended != null) {
+      final hasCareer = (extended.careers as List?)?.isNotEmpty ?? false;
+      final hasEducation = (extended.educations as List?)?.isNotEmpty ?? false;
+      final hasCert = (extended.certifications as List?)?.isNotEmpty ?? false;
+      if (hasCareer || hasEducation || hasCert) score += 10;
+    }
+    // 최대 65% (나머지 3개 항목은 추후)
+    // 사용자 체감상 0~65% 구간을 0~100% 스케일로 정규화
+    return (score * 100 / 65).round().clamp(0, 100);
+  }
+
+  /// 다음 완성 단계 안내 메시지.
+  String? _nextCompletionStep(dynamic profile, dynamic extended) {
+    if (profile?.profileImageUrl == null) return '프로필 사진을 등록해보세요';
+    final intro = profile?.introduction as String?;
+    if (intro == null || intro.length < 20) return '자기소개를 20자 이상 작성해보세요';
+    final instruments = profile?.instruments as List?;
+    if (instruments == null || instruments.isEmpty) {
+      return '가르치는 악기를 추가해보세요';
+    }
+    if (extended != null) {
+      final hasAny =
+          ((extended.careers as List?)?.isNotEmpty ?? false) ||
+          ((extended.educations as List?)?.isNotEmpty ?? false) ||
+          ((extended.certifications as List?)?.isNotEmpty ?? false);
+      if (!hasAny) return '경력·학력·자격증을 등록해보세요';
+    }
+    return null;
+  }
+
+  /// 자주 쓰는 설정 3개 카드 (가용시간 · 미수금 · 수강권 템플릿).
+  Widget _buildQuickShortcuts(BuildContext context, String teacherId) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ShortcutCard(
+              icon: Icons.calendar_month,
+              label: '가용시간',
+              onTap: () => context.push(AppRoutes.teacherAvailability),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: _ShortcutCard(
+              icon: Icons.warning_amber_outlined,
+              label: '미수금',
+              onTap: () => context.push(AppRoutes.outstandingPayments),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.space2),
+          Expanded(
+            child: _ShortcutCard(
+              icon: Icons.card_membership,
+              label: '수강권',
+              onTap: () => context.push(AppRoutes.subscriptionTemplates),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatsSection(WidgetRef ref, String teacherId) {
     final lessonStatsAsync = ref.watch(lessonStatsProvider);
     final groupsAsync = ref.watch(groupedStudentsProvider(teacherId));
-    final followerCountAsync = ref.watch(followerCountProvider(teacherId));
+    // 팔로워 → 미수금으로 교체 (profile_master.md §2.4)
+    final unpaidSummaryAsync = ref.watch(unpaidSummaryProvider(teacherId));
 
-    final studentCountValue = groupsAsync.whenOrNull(
+    final studentCountValue =
+        groupsAsync.whenOrNull(
           data: (groups) {
             final total = groups.fold(0, (sum, g) => sum + g.students.length);
             return '$total명';
@@ -370,8 +565,9 @@ class ProfileTab extends ConsumerWidget {
           data: (stats) => '${stats['completed'] ?? 0}회',
         ) ??
         '-';
-    final followerCountValue = followerCountAsync.whenOrNull(
-          data: (count) => '$count명',
+    final unpaidValue =
+        unpaidSummaryAsync.whenOrNull(
+          data: (summary) => '${summary.studentCount}건',
         ) ??
         '-';
 
@@ -393,7 +589,7 @@ class ProfileTab extends ConsumerWidget {
             _buildStatDivider(),
             _buildStatItem('이번 달 레슨', lessonCountValue),
             _buildStatDivider(),
-            _buildStatItem('팔로워', followerCountValue),
+            _buildStatItem('미수금', unpaidValue),
           ],
         ),
       ),
@@ -458,23 +654,24 @@ class ProfileTab extends ConsumerWidget {
               ],
             ),
             child: Column(
-              children: items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                final isLast = index == items.length - 1;
+              children:
+                  items.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    final isLast = index == items.length - 1;
 
-                return Column(
-                  children: [
-                    _buildMenuItem(item),
-                    if (!isLast)
-                      Divider(
-                        height: 1,
-                        indent: AppSpacing.space4 + 24 + AppSpacing.space3,
-                        color: AppColors.borderLight,
-                      ),
-                  ],
-                );
-              }).toList(),
+                    return Column(
+                      children: [
+                        _buildMenuItem(item),
+                        if (!isLast)
+                          Divider(
+                            height: 1,
+                            indent: AppSpacing.space4 + 24 + AppSpacing.space3,
+                            color: AppColors.borderLight,
+                          ),
+                      ],
+                    );
+                  }).toList(),
             ),
           ),
         ],
@@ -530,24 +727,25 @@ class ProfileTab extends ConsumerWidget {
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('로그아웃'),
-        content: const Text('정말 로그아웃 하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('로그아웃'),
+            content: const Text('정말 로그아웃 하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  await ref.read(authNotifierProvider.notifier).logout();
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('로그아웃'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await ref.read(authNotifierProvider.notifier).logout();
-            },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('로그아웃'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -568,4 +766,48 @@ class _MenuItem {
     this.trailing,
     required this.onTap,
   });
+}
+
+/// 프로필 탭 자주 쓰는 설정 바로가기 카드.
+class _ShortcutCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ShortcutCard({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.space4,
+          horizontal: AppSpacing.space2,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 22, color: AppColors.primary),
+            const SizedBox(height: AppSpacing.space2),
+            Text(
+              label,
+              style: AppTypography.bodySmall.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
