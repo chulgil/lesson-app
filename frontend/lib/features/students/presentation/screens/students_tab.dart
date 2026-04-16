@@ -29,7 +29,8 @@ class StudentsTab extends ConsumerStatefulWidget {
 
 enum StudentSortOption {
   name('이름순'),
-  instrument('악기순');
+  instrument('악기순'),
+  practiceStatus('연습상태별');
 
   final String label;
   const StudentSortOption(this.label);
@@ -445,6 +446,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           sorted.sort((a, b) => a.name.compareTo(b.name));
         case StudentSortOption.instrument:
           sorted.sort((a, b) => a.instrument.compareTo(b.instrument));
+        case StudentSortOption.practiceStatus:
+          // 부족한 학생이 위로 (선생님이 우선 챙겨야 할 순)
+          sorted.sort(
+            (a, b) => a.student.practiceRate.compareTo(b.student.practiceRate),
+          );
       }
       return StudentGroup(lessonClass: group.lessonClass, students: sorted);
     }).toList();

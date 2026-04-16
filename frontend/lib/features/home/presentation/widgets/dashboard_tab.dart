@@ -107,11 +107,7 @@ class DashboardTab extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space6),
 
             // ── 이벤트: 대응 필요 (오늘 레슨 바로 아래) ──────────
-            LessonRequestSection(userId: teacherId),
-
-            const SizedBox(height: AppSpacing.space6),
-
-            ScheduleChangeRequestSection(teacherId: teacherId),
+            _buildEventsGroup(context, teacherId),
 
             const SizedBox(height: AppSpacing.space6),
 
@@ -197,6 +193,19 @@ class DashboardTab extends ConsumerWidget {
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
+  }
+
+  /// 이벤트 그룹: 레슨 요청 + 스케줄 변경을 시각적으로 묶음.
+  /// 두 섹션 모두 빈 경우 자식이 SizedBox.shrink → 그룹 헤더도 자연 숨김.
+  Widget _buildEventsGroup(BuildContext context, String teacherId) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LessonRequestSection(userId: teacherId),
+        const SizedBox(height: AppSpacing.space4),
+        ScheduleChangeRequestSection(teacherId: teacherId),
+      ],
+    );
   }
 
   Widget _buildTodayLessonsHeader(
