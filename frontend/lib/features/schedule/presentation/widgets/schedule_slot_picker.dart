@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
 
@@ -21,7 +23,7 @@ class ScheduleSlotPicker extends ConsumerStatefulWidget {
 
   /// Callback when a slot is selected
   final ValueChanged<({int dayOfWeek, String startTime, String endTime})>
-      onSlotSelected;
+  onSlotSelected;
 
   /// First visible hour (inclusive, default 9)
   final int startHour;
@@ -40,8 +42,7 @@ class ScheduleSlotPicker extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ScheduleSlotPicker> createState() =>
-      _ScheduleSlotPickerState();
+  ConsumerState<ScheduleSlotPicker> createState() => _ScheduleSlotPickerState();
 }
 
 class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
@@ -58,19 +59,21 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
 
     return availabilityAsync.when(
       data: (availability) => _buildContent(availability),
-      loading: () => const SizedBox(
-        height: 200,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => SizedBox(
-        height: 200,
-        child: Center(
-          child: Text(
-            '스케줄을 불러올 수 없습니다',
-            style: TextStyle(color: AppColors.textSecondaryLight),
+      loading:
+          () => const SizedBox(
+            height: 200,
+            child: Center(child: CircularProgressIndicator()),
           ),
-        ),
-      ),
+      error:
+          (e, _) => SizedBox(
+            height: 200,
+            child: Center(
+              child: Text(
+                '스케줄을 불러올 수 없습니다',
+                style: TextStyle(color: AppColors.textSecondaryLight),
+              ),
+            ),
+          ),
     );
   }
 
@@ -103,17 +106,13 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
       height: _headerHeight,
       child: Row(
         children: [
-          SizedBox(
-            width: _timeColumnWidth,
-            child: const SizedBox.shrink(),
-          ),
+          SizedBox(width: _timeColumnWidth, child: const SizedBox.shrink()),
           ..._dayLabels.map(
             (label) => Expanded(
               child: Center(
                 child: Text(
                   label,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: AppTypography.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondaryLight,
                   ),
@@ -141,13 +140,12 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
           SizedBox(
             width: _timeColumnWidth,
             child: Padding(
-              padding: const EdgeInsets.only(right: 4),
+              padding: const EdgeInsets.only(right: AppSpacing.space1),
               child: Align(
                 alignment: Alignment.topRight,
                 child: Text(
                   timeLabel,
-                  style: const TextStyle(
-                    fontSize: 10,
+                  style: AppTypography.caption.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
                 ),
@@ -174,32 +172,32 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
     TeacherAvailability availability,
   ) {
     final isSelected =
-        widget.selectedDay == dayOfWeek && _matchesHour(widget.selectedTime, hour);
+        widget.selectedDay == dayOfWeek &&
+        _matchesHour(widget.selectedTime, hour);
 
     final cellConfig = _getCellConfig(slotState, isSelected);
     final isTappable = slotState == _SlotState.available;
 
     return GestureDetector(
-      onTap: isTappable
-          ? () => _handleSlotTap(dayOfWeek, hour, availability)
-          : null,
+      onTap:
+          isTappable
+              ? () => _handleSlotTap(dayOfWeek, hour, availability)
+              : null,
       child: Container(
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: cellConfig.backgroundColor,
           borderRadius: BorderRadius.circular(4),
-          border: isSelected
-              ? Border.all(color: AppColors.primary, width: 1.5)
-              : null,
+          border:
+              isSelected
+                  ? Border.all(color: AppColors.primary, width: 1.5)
+                  : null,
         ),
         child: Center(
-          child: cellConfig.icon != null
-              ? Icon(
-                  cellConfig.icon,
-                  size: 14,
-                  color: cellConfig.textColor,
-                )
-              : const SizedBox.shrink(),
+          child:
+              cellConfig.icon != null
+                  ? Icon(cellConfig.icon, size: 14, color: cellConfig.textColor)
+                  : const SizedBox.shrink(),
         ),
       ),
     );
@@ -299,20 +297,14 @@ class _SlotKey {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _SlotKey &&
-          dayOfWeek == other.dayOfWeek &&
-          hour == other.hour;
+      other is _SlotKey && dayOfWeek == other.dayOfWeek && hour == other.hour;
 
   @override
   int get hashCode => dayOfWeek.hashCode ^ (hour.hashCode << 3);
 }
 
 /// Visual state of a slot cell
-enum _SlotState {
-  available,
-  booked,
-  unavailable,
-}
+enum _SlotState { available, booked, unavailable }
 
 /// Configuration for rendering a cell
 class _CellConfig {
