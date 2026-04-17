@@ -12,10 +12,7 @@ import '../providers/subscription_template_providers.dart';
 class ProposalSettingsScreen extends ConsumerStatefulWidget {
   final String teacherId;
 
-  const ProposalSettingsScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const ProposalSettingsScreen({super.key, required this.teacherId});
 
   @override
   ConsumerState<ProposalSettingsScreen> createState() =>
@@ -68,10 +65,7 @@ class _ProposalSettingsScreenState
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('자동 제안 설정'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('자동 제안 설정'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -109,16 +103,18 @@ class _ProposalSettingsScreenState
 
   Widget _buildMainToggle() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: _autoProposalEnabled
-            ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        color:
+            _autoProposalEnabled
+                ? AppColors.success.withValues(alpha: 0.1)
+                : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: _autoProposalEnabled
-              ? AppColors.success.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+          color:
+              _autoProposalEnabled
+                  ? AppColors.success.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -136,7 +132,7 @@ class _ProposalSettingsScreenState
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Text(
                       '체험레슨 완료 시 수강권을 자동으로 제안합니다',
                       style: AppTypography.bodySmall.copyWith(
@@ -158,21 +154,27 @@ class _ProposalSettingsScreenState
             ],
           ),
           if (_autoProposalEnabled) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space3),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.info.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 16, color: AppColors.info),
-                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: AppColors.info,
+                  ),
+                  const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '체험 후 즉시 제안하여 전환율을 높이세요',
-                      style: AppTypography.caption.copyWith(color: AppColors.info),
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.info,
+                      ),
                     ),
                   ),
                 ],
@@ -185,17 +187,16 @@ class _ProposalSettingsScreenState
   }
 
   Widget _buildTemplateSelection() {
-    final templatesAsync =
-        ref.watch(activeTeacherTemplatesProvider(widget.teacherId));
+    final templatesAsync = ref.watch(
+      activeTeacherTemplatesProvider(widget.teacherId),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           '제안할 수강권',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
@@ -219,8 +220,11 @@ class _ProposalSettingsScreenState
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline,
-                        size: 20, color: AppColors.textSecondaryLight),
+                    const Icon(
+                      Icons.info_outline,
+                      size: 20,
+                      color: AppColors.textSecondaryLight,
+                    ),
                     const SizedBox(width: 12),
                     Text(
                       '수강권 템플릿이 없습니다',
@@ -234,142 +238,161 @@ class _ProposalSettingsScreenState
             }
 
             return Column(
-              children: templates.map((template) {
-                final isSelected = _selectedTemplateIds.isEmpty ||
-                    _selectedTemplateIds.contains(template.id);
-                final isRecommended = _recommendedTemplateId == template.id;
+              children:
+                  templates.map((template) {
+                    final isSelected =
+                        _selectedTemplateIds.isEmpty ||
+                        _selectedTemplateIds.contains(template.id);
+                    final isRecommended = _recommendedTemplateId == template.id;
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        if (_selectedTemplateIds.isEmpty) {
-                          // First selection: start with this template
-                          _selectedTemplateIds = {template.id};
-                        } else if (isSelected) {
-                          _selectedTemplateIds.remove(template.id);
-                          if (_recommendedTemplateId == template.id) {
-                            _recommendedTemplateId = _selectedTemplateIds.isNotEmpty
-                                ? _selectedTemplateIds.first
-                                : null;
-                          }
-                        } else {
-                          _selectedTemplateIds.add(template.id);
-                        }
-                        // Clear selection = use all
-                        if (_selectedTemplateIds.length == templates.length) {
-                          _selectedTemplateIds.clear();
-                          _recommendedTemplateId = null;
-                        }
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.05)
-                            : AppColors.surfaceLight,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            if (_selectedTemplateIds.isEmpty) {
+                              // First selection: start with this template
+                              _selectedTemplateIds = {template.id};
+                            } else if (isSelected) {
+                              _selectedTemplateIds.remove(template.id);
+                              if (_recommendedTemplateId == template.id) {
+                                _recommendedTemplateId =
+                                    _selectedTemplateIds.isNotEmpty
+                                        ? _selectedTemplateIds.first
+                                        : null;
+                              }
+                            } else {
+                              _selectedTemplateIds.add(template.id);
+                            }
+                            // Clear selection = use all
+                            if (_selectedTemplateIds.length ==
+                                templates.length) {
+                              _selectedTemplateIds.clear();
+                              _recommendedTemplateId = null;
+                            }
+                          });
+                        },
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.borderLight,
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Checkbox
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.borderLight,
-                                width: 2,
-                              ),
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : Colors.transparent,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color:
+                                isSelected
+                                    ? AppColors.primary.withValues(alpha: 0.05)
+                                    : AppColors.surfaceLight,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  isSelected
+                                      ? AppColors.primary
+                                      : AppColors.borderLight,
+                              width: isSelected ? 2 : 1,
                             ),
-                            child: isSelected
-                                ? const Icon(Icons.check,
-                                    size: 14, color: Colors.white)
-                                : null,
                           ),
-                          const SizedBox(width: 12),
+                          child: Row(
+                            children: [
+                              // Checkbox
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? AppColors.primary
+                                            : AppColors.borderLight,
+                                    width: 2,
+                                  ),
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                ),
+                                child:
+                                    isSelected
+                                        ? const Icon(
+                                          Icons.check,
+                                          size: 14,
+                                          color: Colors.white,
+                                        )
+                                        : null,
+                              ),
+                              const SizedBox(width: 12),
 
-                          // Template info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                              // Template info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          template.name,
+                                          style: AppTypography.bodyMedium
+                                              .copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        if (isRecommended) ...[
+                                          const SizedBox(width: 4),
+                                          const Text(
+                                            '⭐',
+                                            style: TextStyle(fontSize: 12),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
                                     Text(
-                                      template.name,
-                                      style: AppTypography.bodyMedium.copyWith(
-                                        fontWeight: FontWeight.w600,
+                                      '${template.totalLessons}회 · ${template.formattedPrice}',
+                                      style: AppTypography.caption.copyWith(
+                                        color: AppColors.textSecondaryLight,
                                       ),
                                     ),
-                                    if (isRecommended) ...[
-                                      const SizedBox(width: 4),
-                                      const Text('⭐',
-                                          style: TextStyle(fontSize: 12)),
-                                    ],
                                   ],
                                 ),
-                                Text(
-                                  '${template.totalLessons}회 · ${template.formattedPrice}',
-                                  style: AppTypography.caption.copyWith(
-                                    color: AppColors.textSecondaryLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Recommend button
-                          if (isSelected && _selectedTemplateIds.isNotEmpty)
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _recommendedTemplateId = template.id;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isRecommended
-                                      ? AppColors.warning.withValues(alpha: 0.2)
-                                      : AppColors.surfaceSecondaryLight,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  isRecommended ? '추천' : '추천',
-                                  style: AppTypography.caption.copyWith(
-                                    color: isRecommended
-                                        ? AppColors.warning
-                                        : AppColors.textTertiaryLight,
-                                    fontSize: 10,
-                                  ),
-                                ),
                               ),
-                            ),
-                        ],
+
+                              // Recommend button
+                              if (isSelected && _selectedTemplateIds.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _recommendedTemplateId = template.id;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isRecommended
+                                              ? AppColors.warning.withValues(
+                                                alpha: 0.2,
+                                              )
+                                              : AppColors.surfaceSecondaryLight,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      isRecommended ? '추천' : '추천',
+                                      style: AppTypography.caption.copyWith(
+                                        color:
+                                            isRecommended
+                                                ? AppColors.warning
+                                                : AppColors.textTertiaryLight,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
             );
           },
         ),
@@ -438,12 +461,13 @@ class _ProposalSettingsScreenState
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
-                      items: [0, 5, 10, 15, 20].map((v) {
-                        return DropdownMenuItem(
-                          value: v,
-                          child: Text('$v%'),
-                        );
-                      }).toList(),
+                      items:
+                          [0, 5, 10, 15, 20].map((v) {
+                            return DropdownMenuItem(
+                              value: v,
+                              child: Text('$v%'),
+                            );
+                          }).toList(),
                       onChanged: (value) {
                         setState(() {
                           _discountPercent = value ?? 10;
@@ -468,12 +492,13 @@ class _ProposalSettingsScreenState
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
-                      items: [12, 24, 48, 72].map((v) {
-                        return DropdownMenuItem(
-                          value: v,
-                          child: Text('$v시간'),
-                        );
-                      }).toList(),
+                      items:
+                          [12, 24, 48, 72].map((v) {
+                            return DropdownMenuItem(
+                              value: v,
+                              child: Text('$v시간'),
+                            );
+                          }).toList(),
                       onChanged: (value) {
                         setState(() {
                           _discountHours = value ?? 24;
@@ -493,8 +518,11 @@ class _ProposalSettingsScreenState
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.local_offer,
-                          size: 16, color: AppColors.warning),
+                      const Icon(
+                        Icons.local_offer,
+                        size: 16,
+                        color: AppColors.warning,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -521,9 +549,7 @@ class _ProposalSettingsScreenState
       children: [
         Text(
           '자동 리마인더',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         Text(
@@ -546,10 +572,7 @@ class _ProposalSettingsScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '자동 리마인더',
-                      style: AppTypography.bodyMedium,
-                    ),
+                    Text('자동 리마인더', style: AppTypography.bodyMedium),
                     Text(
                       '24시간, 48시간, 72시간 후 알림',
                       style: AppTypography.caption.copyWith(
@@ -585,13 +608,14 @@ class _ProposalSettingsScreenState
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: _isSaving
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Text('저장'),
+        child:
+            _isSaving
+                ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+                : const Text('저장'),
       ),
     );
   }
@@ -602,8 +626,7 @@ class _ProposalSettingsScreenState
     });
 
     try {
-      final notifier =
-          ref.read(proposalSettingsNotifierProvider.notifier);
+      final notifier = ref.read(proposalSettingsNotifierProvider.notifier);
 
       final updatedSettings = _settings.copyWith(
         autoProposalEnabled: _autoProposalEnabled,
