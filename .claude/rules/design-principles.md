@@ -13,3 +13,15 @@
 
 - **이벤트 경로 단일화** — stream과 callback 이중 경로 금지 (#2)
 - **의존성 방향 명확화** — 도메인 간 참조는 단방향. 순환 의존 금지
+
+## 이중 안전장치 (규칙 + 훅)
+
+재발이 잦은 3개 패턴은 규칙 + PostToolUse 훅으로 이중 감지한다. 훅은 경고만 내고 편집을 막지 않는다 (stderr, exit 0).
+
+| 재발 패턴 | 훅 | 감지 시점 |
+|-----------|-----|-----------|
+| enum/entity 정의만 있고 미사용 (#18 설정 필드 미사용) | `.claude/hooks/check-unused-enum.sh` | `features/*/domain/entities/` 또는 `models/` 파일 편집 후 |
+| 스펙 `- [x]` 체크했으나 코드에 심볼/파일 부재 | `.claude/hooks/check-spec-claim.sh` | `docs/specs/*.md` 편집 후 |
+| 버전 전환(v6→v7) 후 이전 버전 문자열 잔존 | `.claude/hooks/check-version-leftover.sh` | 스펙/코드 편집 시 `v[0-9]+ → v[0-9]+` 패턴 감지 |
+
+훅은 **단순 경고 도구**이고, **근본 원칙은 이 파일에 남긴다**. 훅이 경고를 내면 같은 편집 세션에서 원인(미사용 정의, 허위 체크, 잔재 문자열) 정리 필수.
