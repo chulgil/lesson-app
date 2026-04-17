@@ -1,39 +1,5 @@
 // Student dashboard domain entities
 
-/// Student tab type for navigation
-enum StudentTab {
-  home,
-  lessons,
-  practice,
-  profile;
-
-  String get label {
-    switch (this) {
-      case StudentTab.home:
-        return '홈';
-      case StudentTab.lessons:
-        return '레슨';
-      case StudentTab.practice:
-        return '연습';
-      case StudentTab.profile:
-        return '프로필';
-    }
-  }
-
-  int get tabIndex {
-    switch (this) {
-      case StudentTab.home:
-        return 0;
-      case StudentTab.lessons:
-        return 1;
-      case StudentTab.practice:
-        return 2;
-      case StudentTab.profile:
-        return 3;
-    }
-  }
-}
-
 /// Weekly practice status for bar chart display
 class WeeklyPracticeStatus {
   final List<String> dayLabels;
