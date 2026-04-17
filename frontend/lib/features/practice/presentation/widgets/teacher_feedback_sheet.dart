@@ -62,11 +62,16 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
     if (text.isEmpty || _submitting) return;
 
     setState(() => _submitting = true);
-    ref
+    await ref
         .read(
           recordingFeedbackListProvider(widget.recording.recordingId).notifier,
         )
-        .add(teacherId: widget.teacherId, content: text);
+        .add(
+          teacherId: widget.teacherId,
+          content: text,
+          studentId: widget.studentId,
+          repertoireName: widget.recording.repertoireName,
+        );
 
     if (!mounted) return;
     _controller.clear();

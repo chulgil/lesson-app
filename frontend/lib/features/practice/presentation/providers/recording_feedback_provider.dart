@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../notifications/domain/entities/notification.dart';
+import '../../../notifications/presentation/providers/notification_providers.dart';
 import '../../domain/entities/recording_feedback.dart';
 
 part 'recording_feedback_provider.g.dart';
@@ -12,7 +14,12 @@ class RecordingFeedbackList extends _$RecordingFeedbackList {
   @override
   List<RecordingFeedback> build(String recordingId) => const [];
 
-  void add({required String teacherId, required String content}) {
+  Future<void> add({
+    required String teacherId,
+    required String content,
+    String? studentId,
+    String? repertoireName,
+  }) async {
     final feedback = RecordingFeedback(
       id: 'fb_${DateTime.now().microsecondsSinceEpoch}',
       recordingId: recordingId,
@@ -21,6 +28,37 @@ class RecordingFeedbackList extends _$RecordingFeedbackList {
       createdAt: DateTime.now(),
     );
     state = [...state, feedback];
+
+    if (studentId != null) {
+      await _notifyStudent(
+        studentId: studentId,
+        repertoireName: repertoireName,
+      );
+    }
+  }
+
+  Future<void> _notifyStudent({
+    required String studentId,
+    String? repertoireName,
+  }) async {
+    final service = ref.read(notificationServiceProvider);
+    final body =
+        repertoireName != null && repertoireName.isNotEmpty
+            ? '$repertoireName 녹음에 새 피드백이 도착했어요'
+            : '공유한 녹음에 새 피드백이 도착했어요';
+    await service.showNotification(
+      AppNotification(
+        id: 'notif_feedback_${DateTime.now().microsecondsSinceEpoch}',
+        userId: studentId,
+        type: NotificationType.recordingFeedbackReceived,
+        priority: NotificationPriority.normal,
+        title: '선생님 피드백이 도착했어요',
+        body: body,
+        createdAt: DateTime.now(),
+        actionUrl: '/recordings/$recordingId',
+        actionLabel: '피드백 보기',
+      ),
+    );
   }
 }
 

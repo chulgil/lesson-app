@@ -171,7 +171,7 @@ class _RecordingFeedbackCountProviderElement
 }
 
 String _$recordingFeedbackListHash() =>
-    r'aad78894360da66eded29426405fc89de906f953';
+    r'82ff35c9e57da8d3ddba59c1760b469191ae00d9';
 
 abstract class _$RecordingFeedbackList
     extends BuildlessNotifier<List<RecordingFeedback>> {

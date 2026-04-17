@@ -18,7 +18,7 @@ enum NotificationType {
   streakMilestone,
   practiceAssigned,
   weeklyGoalAchieved,
-
+  recordingFeedbackReceived, // Teacher left feedback on shared recording
   // Payment notifications
   paymentRequested,
   paymentReminder,
@@ -64,11 +64,9 @@ enum NotificationType {
   proposalReminder72h, // 72h final reminder (golden time ending)
   proposalAccepted, // Student accepted proposal
   proposalExpired, // Proposal expired without action
-
   // Subscription expiry notifications
   subscriptionExpiringSoon, // D-7/D-3/D-1 before expiry
   subscriptionExpired, // Subscription has expired
-
   // Reschedule allowance notifications
   rescheduleAllowanceUsed, // Student used reschedule allowance
   rescheduleAllowanceDepleted, // All reschedule allowances used
@@ -192,7 +190,8 @@ class AppNotification {
 
   bool get isRead => readAt != null;
   bool get isSent => sentAt != null;
-  bool get isScheduled => scheduledAt != null && scheduledAt!.isAfter(DateTime.now());
+  bool get isScheduled =>
+      scheduledAt != null && scheduledAt!.isAfter(DateTime.now());
 
   AppNotification copyWith({
     String? id,
