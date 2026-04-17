@@ -29,6 +29,10 @@ class LessonPolicyAdapter extends TypeAdapter<LessonPolicy> {
       allowCarryover: fields[9] as bool,
       maxCarryoverLessons: fields[10] as int,
       carryoverPeriodMonths: fields[11] as int,
+      fullRefundDays: fields[14] as int,
+      partialRefundRatio: fields[15] as double,
+      halfwayRefundRatio: fields[16] as double,
+      noShowRefundRatio: fields[17] as double,
       createdAt: fields[12] as DateTime,
       updatedAt: fields[13] as DateTime?,
     );
@@ -37,7 +41,7 @@ class LessonPolicyAdapter extends TypeAdapter<LessonPolicy> {
   @override
   void write(BinaryWriter writer, LessonPolicy obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,6 +66,14 @@ class LessonPolicyAdapter extends TypeAdapter<LessonPolicy> {
       ..write(obj.maxCarryoverLessons)
       ..writeByte(11)
       ..write(obj.carryoverPeriodMonths)
+      ..writeByte(14)
+      ..write(obj.fullRefundDays)
+      ..writeByte(15)
+      ..write(obj.partialRefundRatio)
+      ..writeByte(16)
+      ..write(obj.halfwayRefundRatio)
+      ..writeByte(17)
+      ..write(obj.noShowRefundRatio)
       ..writeByte(12)
       ..write(obj.createdAt)
       ..writeByte(13)
@@ -98,6 +110,13 @@ LessonPolicy _$LessonPolicyFromJson(Map<String, dynamic> json) => LessonPolicy(
           (json['max_carryover_lessons'] as num?)?.toInt() ?? 1,
       carryoverPeriodMonths:
           (json['carryover_period_months'] as num?)?.toInt() ?? 1,
+      fullRefundDays: (json['full_refund_days'] as num?)?.toInt() ?? 1,
+      partialRefundRatio:
+          (json['partial_refund_ratio'] as num?)?.toDouble() ?? 0.67,
+      halfwayRefundRatio:
+          (json['halfway_refund_ratio'] as num?)?.toDouble() ?? 0.0,
+      noShowRefundRatio:
+          (json['no_show_refund_ratio'] as num?)?.toDouble() ?? 0.67,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
@@ -118,6 +137,10 @@ Map<String, dynamic> _$LessonPolicyToJson(LessonPolicy instance) =>
       'allow_carryover': instance.allowCarryover,
       'max_carryover_lessons': instance.maxCarryoverLessons,
       'carryover_period_months': instance.carryoverPeriodMonths,
+      'full_refund_days': instance.fullRefundDays,
+      'partial_refund_ratio': instance.partialRefundRatio,
+      'halfway_refund_ratio': instance.halfwayRefundRatio,
+      'no_show_refund_ratio': instance.noShowRefundRatio,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

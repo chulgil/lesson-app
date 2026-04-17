@@ -59,6 +59,24 @@ class LessonPolicy extends HiveObject {
   @HiveField(11)
   final int carryoverPeriodMonths;
 
+  // ===== 환불 정책 (§4.7 subscription_master) =====
+
+  /// 전액 환불 가능 일수 (첫 수업 전). 기본 1일.
+  @HiveField(14)
+  final int fullRefundDays;
+
+  /// 첫 수업 후 환불 비율 (0.0 ~ 1.0). 기본 0.67 (2/3).
+  @HiveField(15)
+  final double partialRefundRatio;
+
+  /// 1/2 경과 후 환불 비율. 기본 0.0.
+  @HiveField(16)
+  final double halfwayRefundRatio;
+
+  /// 노쇼 시 환불 비율. 기본 0.67.
+  @HiveField(17)
+  final double noShowRefundRatio;
+
   // ===== 메타 =====
 
   @HiveField(12)
@@ -80,6 +98,10 @@ class LessonPolicy extends HiveObject {
     this.allowCarryover = true,
     this.maxCarryoverLessons = 1,
     this.carryoverPeriodMonths = 1,
+    this.fullRefundDays = 1,
+    this.partialRefundRatio = 0.67,
+    this.halfwayRefundRatio = 0.0,
+    this.noShowRefundRatio = 0.67,
     required this.createdAt,
     this.updatedAt,
   });
@@ -120,6 +142,10 @@ class LessonPolicy extends HiveObject {
     bool? allowCarryover,
     int? maxCarryoverLessons,
     int? carryoverPeriodMonths,
+    int? fullRefundDays,
+    double? partialRefundRatio,
+    double? halfwayRefundRatio,
+    double? noShowRefundRatio,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -135,7 +161,12 @@ class LessonPolicy extends HiveObject {
       gracePeriodMinutes: gracePeriodMinutes ?? this.gracePeriodMinutes,
       allowCarryover: allowCarryover ?? this.allowCarryover,
       maxCarryoverLessons: maxCarryoverLessons ?? this.maxCarryoverLessons,
-      carryoverPeriodMonths: carryoverPeriodMonths ?? this.carryoverPeriodMonths,
+      carryoverPeriodMonths:
+          carryoverPeriodMonths ?? this.carryoverPeriodMonths,
+      fullRefundDays: fullRefundDays ?? this.fullRefundDays,
+      partialRefundRatio: partialRefundRatio ?? this.partialRefundRatio,
+      halfwayRefundRatio: halfwayRefundRatio ?? this.halfwayRefundRatio,
+      noShowRefundRatio: noShowRefundRatio ?? this.noShowRefundRatio,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
