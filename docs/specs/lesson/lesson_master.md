@@ -674,18 +674,30 @@ final List<LessonRecording>? recordings;  // 레슨 녹음
 
 ### 6.5 UI 배치
 
-AddLessonScreen 기존 섹션 사이에 장소 선택 추가:
+AddLessonScreen 기존 섹션 사이에 장소 선택 추가 (구현 완료, Phase 1):
 ```
 1. 학생 선택 (기존)
 2. 날짜/시간 (기존)
 3. 레슨 시간 (기존)
-4. 레슨 장소 (신규)
+4. 레슨 장소 (구현 완료) — LessonLocationSection 위젯
 5. 반복 설정 (기존)
 6. 곡명/노트 (기존)
 7. 알림 설정 (기존)
 ```
 
 장소는 **선택 사항** (필수 아님). 학생 선택 전에는 비활성 상태.
+
+**Phase 1 구현 범위 (현행)**:
+- 선생님 소유 장소(`teacherLocationsProvider`) ChoiceChip 목록 표시
+- 기본 장소(`isDefault`) 자동 프리필
+- 선택 결과를 `LessonLocationInfo`(name/address)로 변환하여 `Lesson.location`에 저장
+
+**Phase 2 이후 (미구현)**:
+- §6.3 1단계 `Student.defaultLocationId` 기반 프리필 — 엔티티 필드 추가 필요
+- §6.3 2단계 `LessonClass.defaultLocation` 기반 프리필
+- §6.4 "이번만" vs "기본으로 저장" 다이얼로그
+- §6.6 온라인 레슨 미팅 링크 입력 UI
+- §6.7 장소 변경 알림
 
 ### 6.6 온라인 레슨 특수 처리
 

@@ -7,11 +7,13 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../features/students/domain/entities/student.dart';
+import '../../../../features/students/domain/entities/lesson_location.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../providers/lesson_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 import '../widgets/lesson_form_widgets.dart';
+import '../widgets/lesson_form/lesson_location_section.dart';
 
 /// Screen for adding a new lesson
 class AddLessonScreen extends ConsumerStatefulWidget {
@@ -45,6 +47,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   final Set<int> _recurringDays = {};
   bool _enableReminder = true;
   int _reminderMinutes = 30;
+  LessonLocation? _selectedLocation;
 
   @override
   void initState() {
@@ -169,28 +172,47 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
               const SizedBox(height: AppSpacing.space6),
 
-              // Recurring lesson (hidden in record mode — past lessons can't recur)
-              if (!_isRecordMode) LessonRecurringSection(
-                isRecurring: _isRecurring,
-                onRecurringChanged: (value) {
-                  setState(() {
-                    _isRecurring = value;
-                    if (!value) {
-                      _recurringDays.clear();
-                    }
-                  });
+              // Lesson location (selected from teacher's registered locations)
+              const LessonFormSectionTitle('레슨 장소'),
+              const SizedBox(height: AppSpacing.space3),
+              LessonLocationSection(
+                teacherId: 'teacher_1',
+                selectedLocationId: _selectedLocation?.id,
+                onSelected: (loc) {
+                  setState(() => _selectedLocation = loc);
                 },
-                selectedDays: _recurringDays,
-                onDayToggle: (index) {
-                  setState(() {
-                    if (_recurringDays.contains(index)) {
-                      _recurringDays.remove(index);
-                    } else {
-                      _recurringDays.add(index);
-                    }
-                  });
+                onAutoPrefill: (loc) {
+                  if (_selectedLocation == null) {
+                    setState(() => _selectedLocation = loc);
+                  }
                 },
               ),
+
+              const SizedBox(height: AppSpacing.space6),
+
+              // Recurring lesson (hidden in record mode — past lessons can't recur)
+              if (!_isRecordMode)
+                LessonRecurringSection(
+                  isRecurring: _isRecurring,
+                  onRecurringChanged: (value) {
+                    setState(() {
+                      _isRecurring = value;
+                      if (!value) {
+                        _recurringDays.clear();
+                      }
+                    });
+                  },
+                  selectedDays: _recurringDays,
+                  onDayToggle: (index) {
+                    setState(() {
+                      if (_recurringDays.contains(index)) {
+                        _recurringDays.remove(index);
+                      } else {
+                        _recurringDays.add(index);
+                      }
+                    });
+                  },
+                ),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -226,11 +248,13 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: _saveLesson,
-                  child: Text(_isRecurring
-                      ? '정기 레슨 예약하기'
-                      : _isRecordMode
-                          ? '레슨 기록하기'
-                          : '레슨 추가하기'),
+                  child: Text(
+                    _isRecurring
+                        ? '정기 레슨 예약하기'
+                        : _isRecordMode
+                        ? '레슨 기록하기'
+                        : '레슨 추가하기',
+                  ),
                 ),
               ),
 
@@ -261,12 +285,11 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       }
     }
 
-    final recentStudents = List<Student>.from(students)
-      ..sort((a, b) {
-        final aDate = studentLastLesson[a.id] ?? DateTime(2000);
-        final bDate = studentLastLesson[b.id] ?? DateTime(2000);
-        return bDate.compareTo(aDate);
-      });
+    final recentStudents = List<Student>.from(students)..sort((a, b) {
+      final aDate = studentLastLesson[a.id] ?? DateTime(2000);
+      final bDate = studentLastLesson[b.id] ?? DateTime(2000);
+      return bDate.compareTo(aDate);
+    });
 
     final topStudents = recentStudents.take(5).toList();
 
@@ -301,11 +324,14 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                   color: isSelected ? Colors.white : null,
                 ),
               ),
-              backgroundColor: isSelected
-                  ? student.profileColor
-                  : student.profileColor.withValues(alpha: 0.08),
+              backgroundColor:
+                  isSelected
+                      ? student.profileColor
+                      : student.profileColor.withValues(alpha: 0.08),
               side: BorderSide(
-                color: student.profileColor.withValues(alpha: isSelected ? 1 : 0.3),
+                color: student.profileColor.withValues(
+                  alpha: isSelected ? 1 : 0.3,
+                ),
               ),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onPressed: () {
@@ -390,8 +416,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline,
-                    color: AppColors.info, size: 18),
+                Icon(Icons.info_outline, color: AppColors.info, size: 18),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
@@ -416,59 +441,62 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   Future<bool> _showPastDateConfirmDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.history, color: AppColors.warning, size: 24),
-            const SizedBox(width: 8),
-            const Text('과거 레슨 기록'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('선택한 시간은 이미 지난 시간입니다.'),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.space3),
-              decoration: BoxDecoration(
-                color: AppColors.infoLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '레슨 기록 시:',
-                    style: AppTypography.caption.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.info,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.info,
-                    ),
-                  ),
-                ],
-              ),
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                Icon(Icons.history, color: AppColors.warning, size: 24),
+                const SizedBox(width: 8),
+                const Text('과거 레슨 기록'),
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('선택한 시간은 이미 지난 시간입니다.'),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
+                    color: AppColors.infoLight,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '레슨 기록 시:',
+                        style: AppTypography.caption.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.info,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.info,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('레슨 기록'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('레슨 기록'),
-          ),
-        ],
-      ),
     );
     return result ?? false;
   }
@@ -519,22 +547,23 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   Future<bool> _showConflictDialog(String conflictInfo) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('시간 충돌'),
-        content: Text(
-          '해당 시간에 기존 레슨이 있습니다:\n$conflictInfo\n\n그래도 계속 진행하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('시간 충돌'),
+            content: Text(
+              '해당 시간에 기존 레슨이 있습니다:\n$conflictInfo\n\n그래도 계속 진행하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('계속'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('계속'),
-          ),
-        ],
-      ),
     );
     return result ?? false;
   }
@@ -577,7 +606,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       const dayNames = ['월', '화', '수', '목', '금', '토', '일'];
       final conflictDays = <String>[];
       for (final dayIndex in _recurringDays) {
-        final weekday = dayIndex + 1; // Convert 0-based to DateTime.weekday (1=Mon)
+        final weekday =
+            dayIndex + 1; // Convert 0-based to DateTime.weekday (1=Mon)
         final now = DateTime.now();
         var daysUntil = weekday - now.weekday;
         if (daysUntil <= 0) daysUntil += 7;
@@ -589,7 +619,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
           existingLessons,
         );
         if (conflict != null) {
-          final dayLabel = dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
+          final dayLabel =
+              dayIndex < dayNames.length ? dayNames[dayIndex] : '?';
           conflictDays.add('$dayLabel요일 ($conflict)');
         }
       }
@@ -625,22 +656,31 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
     // Past date → completed status (record mode), future → scheduled
     final isPastLesson = isLessonDateTimeInPast(_selectedDate, _selectedTime);
-    final lessonStatus = isPastLesson && !_isRecurring
-        ? LessonStatus.completed
-        : LessonStatus.scheduled;
+    final lessonStatus =
+        isPastLesson && !_isRecurring
+            ? LessonStatus.completed
+            : LessonStatus.scheduled;
 
     // Create the lesson object
     final lesson = Lesson(
       id: '', // Will be set by repository
       studentId: _selectedStudent!.id,
       studentName: _selectedStudent!.name,
-      teacherName: ref.read(teacherExtendedProfileProvider).valueOrNull?.name ?? '선생님',
+      teacherName:
+          ref.read(teacherExtendedProfileProvider).valueOrNull?.name ?? '선생님',
       instrument: _selectedStudent!.instrument,
       date: _selectedDate,
       startTime: formatLessonTime(_selectedTime),
       duration: _lessonDuration,
       status: lessonStatus,
       pieces: pieces,
+      location:
+          _selectedLocation == null
+              ? null
+              : LessonLocationInfo(
+                name: _selectedLocation!.name,
+                address: _selectedLocation!.address,
+              ),
       createdAt: DateTime.now(),
     );
 
@@ -658,14 +698,18 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             // Calculate target date for this weekday and week offset
             var daysUntil = weekday - today.weekday;
             if (daysUntil <= 0) daysUntil += 7;
-            final targetDate = today.add(Duration(days: daysUntil + (week * 7)));
+            final targetDate = today.add(
+              Duration(days: daysUntil + (week * 7)),
+            );
 
             final recurringLesson = lesson.copyWith(
               id: '', // Will be set by repository
               date: targetDate,
               createdAt: DateTime.now(),
             );
-            await ref.read(lessonsNotifierProvider.notifier).addLesson(recurringLesson);
+            await ref
+                .read(lessonsNotifierProvider.notifier)
+                .addLesson(recurringLesson);
             createdCount++;
           }
         }
@@ -698,9 +742,10 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
 
         if (!mounted) return;
 
-        final message = isPastLesson
-            ? '${_selectedStudent!.name} 학생의 레슨이 기록되었습니다'
-            : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다';
+        final message =
+            isPastLesson
+                ? '${_selectedStudent!.name} 학생의 레슨이 기록되었습니다'
+                : '${_selectedStudent!.name} 학생의 레슨이 추가되었습니다';
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -761,7 +806,8 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
       final slot = student.primarySlot;
       if (slot != null) {
         // Auto-fill lesson day
-        final weekday = slot.dayOfWeek + 1; // 0-based → DateTime.weekday (1=Mon)
+        final weekday =
+            slot.dayOfWeek + 1; // 0-based → DateTime.weekday (1=Mon)
         final now = DateTime.now();
         var daysUntil = weekday - now.weekday;
         if (daysUntil <= 0) daysUntil += 7;
@@ -789,35 +835,40 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
   Future<bool> _showRecurringConflictDialog(List<String> conflictDays) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('반복 레슨 시간 충돌'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('다음 요일에 기존 레슨과 시간이 겹칩니다:'),
-            const SizedBox(height: 8),
-            ...conflictDays.map((d) => Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 4),
-              child: Text('• $d', style: const TextStyle(fontWeight: FontWeight.w600)),
-            )),
-            const SizedBox(height: 8),
-            const Text('그래도 계속 진행하시겠습니까?'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('반복 레슨 시간 충돌'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('다음 요일에 기존 레슨과 시간이 겹칩니다:'),
+                const SizedBox(height: 8),
+                ...conflictDays.map(
+                  (d) => Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 4),
+                    child: Text(
+                      '• $d',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text('그래도 계속 진행하시겠습니까?'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('계속'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('계속'),
-          ),
-        ],
-      ),
     );
     return result ?? false;
   }
-
 }
