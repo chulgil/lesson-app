@@ -2,9 +2,12 @@
 // Moved from lib/models/review.dart for Clean Architecture
 
 /// Review author type - who wrote the review
+/// TeacherReview.authorType 필드 타입 + copyWith/displayAuthorName/isParentReview에 배선됨.
+/// 리뷰 작성 UI 미구현 — 학생/학부모 리뷰 플로우 구현 시 활용.
+// ignore: unused-enum
 enum ReviewAuthorType {
   student, // Student wrote the review
-  parent;  // Parent wrote the review
+  parent; // Parent wrote the review
 
   String get label {
     switch (this) {
@@ -17,8 +20,10 @@ enum ReviewAuthorType {
 }
 
 /// Review visibility - who can see the review
+/// TeacherReview.visibility 필드 타입. 리뷰 작성 폼 미구현 — 공개 범위 선택 UI 구현 시 활용.
+// ignore: unused-enum
 enum ReviewVisibility {
-  public,    // Anyone can see
+  public, // Anyone can see
   teacherOnly; // Only the teacher can see
 
   String get label {

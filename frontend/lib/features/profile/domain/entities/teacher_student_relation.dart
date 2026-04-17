@@ -9,18 +9,25 @@ import '../../../../core/theme/app_colors.dart';
 enum RelationStatus {
   /// No prior history - first time meeting
   none,
+
   /// Currently in regular lessons
   active,
+
   /// Had lessons before but currently inactive
   inactive,
 }
 
 /// Available lesson types based on relationship
+/// TeacherStudentRelation에서 관계 기반 레슨 타입 필터링에 예약됨.
+/// 첫 체험→정기→1회 추가 플로우 UI 구현 시 활용.
+// ignore: unused-enum
 enum RelationLessonType {
   /// Trial lesson for first meeting
   trial,
+
   /// Regular recurring lessons
   regular,
+
   /// One-time additional lesson
   oneTime,
 }

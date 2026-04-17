@@ -26,6 +26,10 @@ enum ChildProfileStatus {
 /// - connected: Full features with teacher
 /// - pending: Waiting for teacher connection
 /// - unconnected: Practice/metronome only (no lessons, no repertoire)
+///
+/// ChildProfile.connectionStatus 필드 + isConnected/isPending/isUnconnected getter에 배선.
+/// 선생님 초대 → 연결 플로우 UI 구현 시 외부 세팅 활성화.
+// ignore: unused-enum
 enum ChildConnectionStatus {
   connected,
   pending,
@@ -114,7 +118,8 @@ class ChildProfile {
   bool get isPending => connectionStatus == ChildConnectionStatus.pending;
 
   /// Check if child is unconnected (practice/metronome only)
-  bool get isUnconnected => connectionStatus == ChildConnectionStatus.unconnected;
+  bool get isUnconnected =>
+      connectionStatus == ChildConnectionStatus.unconnected;
 
   /// Check if child has a teacher assigned
   bool get hasTeacher => teacherId != null;

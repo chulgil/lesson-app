@@ -20,7 +20,7 @@
 
 | 재발 패턴 | 훅 | 감지 시점 |
 |-----------|-----|-----------|
-| enum/entity 정의만 있고 미사용 (#18 설정 필드 미사용) | `.claude/hooks/check-unused-enum.sh` | `features/*/domain/entities/` 또는 `models/` 파일 편집 후 |
+| enum/entity 정의만 있고 미사용 (#18 설정 필드 미사용) | `.claude/hooks/check-unused-enum.sh` | `features/*/domain/entities/` 또는 `models/` 파일 편집 후. **의도적 예약 enum은 정의 앞 줄에 `// ignore: unused-enum` 주석 + 사유 기록** |
 | 스펙 `- [x]` 체크했으나 코드에 심볼/파일 부재 | `.claude/hooks/check-spec-claim.sh` | `docs/specs/*.md` 편집 후 |
 | 버전 전환(v6→v7) 후 이전 버전 문자열 잔존 | `.claude/hooks/check-version-leftover.sh` | 스펙/코드 편집 시 `v[0-9]+ → v[0-9]+` 패턴 감지 |
 

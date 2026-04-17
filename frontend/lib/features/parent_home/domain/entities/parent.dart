@@ -6,11 +6,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
 /// V2: Parent permission level enum
+/// 학부모 권한 세분화(V2 계획). 현재 Parent 엔티티의 permission 필드에만 예약됨.
+/// 권한 제어 UI(설정에서 학부모별 권한 조정) 구현 시 활용.
+// ignore: unused-enum
 enum ParentPermission {
-  viewOnly,       // 열람만 가능
+  viewOnly, // 열람만 가능
   managePayments, // 결제 관리
-  manageLessons,  // 레슨 관리 (일정 변경 등)
-  fullAccess;     // 전체 권한
+  manageLessons, // 레슨 관리 (일정 변경 등)
+  fullAccess; // 전체 권한
 
   String get label {
     switch (this) {

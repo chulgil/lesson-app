@@ -44,8 +44,18 @@ if [[ ! -d "$SEARCH_ROOT" ]]; then
     exit 0
 fi
 
-# 편집 파일에서 enum 이름들 추출
-ENUMS=$(grep -E "^enum [A-Z][a-zA-Z0-9]+ " "$FILE_PATH" 2>/dev/null | awk '{print $2}')
+# 편집 파일에서 enum 이름들 추출 (suppressed 제외)
+# "// ignore: unused-enum" 주석이 enum 정의 바로 앞 줄에 있으면 스킵
+ENUMS=$(awk '
+  /\/\/ ignore: unused-enum/ { suppress = 1; next }
+  /^enum [A-Z][a-zA-Z0-9]+ / {
+    if (!suppress) print $2
+    suppress = 0
+    next
+  }
+  /^[[:space:]]*$/ { next }
+  { suppress = 0 }
+' "$FILE_PATH" 2>/dev/null)
 
 if [[ -z "$ENUMS" ]]; then
     exit 0
@@ -57,10 +67,11 @@ while IFS= read -r ENUM_NAME; do
     [[ -z "$ENUM_NAME" ]] && continue
 
     # 자기 자신 파일 제외한 사용 카운트
-    USAGE=$(grep -rn --include="*.dart" -E "\\b${ENUM_NAME}\\." "$SEARCH_ROOT" 2>/dev/null | grep -v "$FILE_PATH" | wc -l | tr -d ' ')
+    # .value 리터럴(EnumName.foo) + 타입 참조(: EnumName, <EnumName>, EnumName?) 모두 탐지
+    USAGE=$(grep -rn --include="*.dart" -E "\\b${ENUM_NAME}(\\.|[[:space:]]|\\?|,|\\)|>|\\])" "$SEARCH_ROOT" 2>/dev/null | grep -v "$FILE_PATH" | wc -l | tr -d ' ')
 
     if [[ "$USAGE" == "0" ]]; then
-        WARNINGS+=("[unused-enum] enum $ENUM_NAME: 정의만 있고 외부 사용처 0건. 로직 구현 누락 가능")
+        WARNINGS+=("[unused-enum] enum $ENUM_NAME: 정의만 있고 외부 사용처 0건. 로직 구현 누락 가능 (의도적이면 정의 앞 줄에 '// ignore: unused-enum' 주석)")
     fi
 done <<< "$ENUMS"
 

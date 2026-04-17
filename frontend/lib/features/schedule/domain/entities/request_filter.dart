@@ -2,10 +2,7 @@ import '../../../../core/l10n/app_strings.dart';
 import 'unified_lesson_request.dart';
 
 /// Sort options for lesson request lists.
-enum RequestSortBy {
-  createdAtDesc,
-  studentNameAsc,
-}
+enum RequestSortBy { createdAtDesc, studentNameAsc }
 
 /// Preset date range options for the filter UI.
 enum RequestFilterPreset {
@@ -25,13 +22,12 @@ enum RequestFilterPreset {
 }
 
 /// Source filter: academy or individual.
-enum RequestSourceFilter {
-  all,
-  academy,
-  individual,
-}
+enum RequestSourceFilter { all, academy, individual }
 
 /// Status group for filter UI (color-based grouping).
+/// 외부에서 statusGroup 필드를 세팅하는 UI가 아직 없으나, apply()에 분기 로직이
+/// 있어 필터 UI 구현 시 바로 활용 가능. 제거 금지.
+// ignore: unused-enum
 enum RequestStatusGroup {
   all,
   active, // pending, approved, negotiating, timeConfirmed — normal color
@@ -82,8 +78,11 @@ class RequestFilter {
     if (days == 0) return const RequestFilter();
 
     return RequestFilter(
-      startDate: DateTime(now.year, now.month, now.day)
-          .subtract(Duration(days: days)),
+      startDate: DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: days)),
       endDate: today,
     );
   }
@@ -94,18 +93,24 @@ class RequestFilter {
 
     // Filter by specific date (calendar click)
     if (specificDate != null) {
-      result = result.where((r) {
-        final d = DateTime(r.createdAt.year, r.createdAt.month, r.createdAt.day);
-        return d == specificDate;
-      }).toList();
+      result =
+          result.where((r) {
+            final d = DateTime(
+              r.createdAt.year,
+              r.createdAt.month,
+              r.createdAt.day,
+            );
+            return d == specificDate;
+          }).toList();
     }
 
     // Filter by date range
     if (startDate != null && endDate != null) {
-      result = result.where((r) {
-        return !r.createdAt.isBefore(startDate!) &&
-            !r.createdAt.isAfter(endDate!);
-      }).toList();
+      result =
+          result.where((r) {
+            return !r.createdAt.isBefore(startDate!) &&
+                !r.createdAt.isAfter(endDate!);
+          }).toList();
     }
 
     // Filter by source (academy/individual)
@@ -133,21 +138,27 @@ class RequestFilter {
       case RequestStatusGroup.active:
         result = result.where((r) => r.status.isActive).toList();
       case RequestStatusGroup.success:
-        result = result
-            .where((r) => [
-                  UnifiedRequestStatus.completed,
-                  UnifiedRequestStatus.proposalAccepted,
-                  UnifiedRequestStatus.paymentNotified,
-                ].contains(r.status))
-            .toList();
+        result =
+            result
+                .where(
+                  (r) => [
+                    UnifiedRequestStatus.completed,
+                    UnifiedRequestStatus.proposalAccepted,
+                    UnifiedRequestStatus.paymentNotified,
+                  ].contains(r.status),
+                )
+                .toList();
       case RequestStatusGroup.warning:
-        result = result
-            .where((r) => [
-                  UnifiedRequestStatus.cancelled,
-                  UnifiedRequestStatus.expired,
-                  UnifiedRequestStatus.rejected,
-                ].contains(r.status))
-            .toList();
+        result =
+            result
+                .where(
+                  (r) => [
+                    UnifiedRequestStatus.cancelled,
+                    UnifiedRequestStatus.expired,
+                    UnifiedRequestStatus.rejected,
+                  ].contains(r.status),
+                )
+                .toList();
       case RequestStatusGroup.all:
         break;
     }
