@@ -40,6 +40,21 @@
                     },
                     {
                         "type": "command",
+                        "command": ".claude/hooks/check-unused-enum.sh",
+                        "timeout": 5000
+                    },
+                    {
+                        "type": "command",
+                        "command": ".claude/hooks/check-spec-claim.sh",
+                        "timeout": 5000
+                    },
+                    {
+                        "type": "command",
+                        "command": ".claude/hooks/check-version-leftover.sh",
+                        "timeout": 5000
+                    },
+                    {
+                        "type": "command",
                         "command": ".claude/scripts/post-edit-check.sh",
                         "timeout": 5000
                     }
