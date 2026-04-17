@@ -11,8 +11,15 @@ class RemoteGamificationRepository implements GamificationRepository {
   @override
   Future<StudentGamification> getStudentGamification(String studentId) async {
     final response = await _apiClient.get('/gamification/$studentId');
-    return StudentGamification.fromJson(
-      response.data as Map<String, dynamic>,
+    return StudentGamification.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<void> awardBadges(String studentId, List<PracticeBadge> badges) async {
+    if (badges.isEmpty) return;
+    await _apiClient.post(
+      '/gamification/$studentId/badges',
+      data: {'badges': badges.map((b) => b.toJson()).toList()},
     );
   }
 }

@@ -4,11 +4,17 @@ import '../../domain/entities/gamification.dart';
 import '../../domain/repositories/gamification_repository.dart';
 
 class MockGamificationRepository implements GamificationRepository {
+  /// In-memory store of dynamically awarded badges keyed by studentId.
+  /// Supplements the hardcoded seed badges returned by [getStudentGamification].
+  static final Map<String, List<PracticeBadge>> _awarded = {};
+
   @override
   Future<StudentGamification> getStudentGamification(String studentId) async {
     await Future.delayed(const Duration(milliseconds: 200));
 
     final now = DateTime.now();
+
+    final awarded = _awarded[studentId] ?? const [];
 
     return StudentGamification(
       studentId: studentId,
@@ -19,6 +25,7 @@ class MockGamificationRepository implements GamificationRepository {
       currentLevelMinPoints: 300,
       nextLevelMinPoints: 600,
       earnedBadges: [
+        ...awarded,
         PracticeBadge(
           id: 'badge_1',
           name: '첫 연습',
@@ -106,5 +113,17 @@ class MockGamificationRepository implements GamificationRepository {
         ),
       ],
     );
+  }
+
+  @override
+  Future<void> awardBadges(String studentId, List<PracticeBadge> badges) async {
+    if (badges.isEmpty) return;
+    final existing = _awarded.putIfAbsent(studentId, () => []);
+    final existingIds = existing.map((b) => b.id).toSet();
+    for (final badge in badges) {
+      if (!existingIds.contains(badge.id)) {
+        existing.add(badge);
+      }
+    }
   }
 }

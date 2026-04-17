@@ -7,7 +7,7 @@ part of 'point_award_service.dart';
 // **************************************************************************
 
 String _$pointAwardNotifierHash() =>
-    r'3140a57565e0eace3fb2c4bf4c7cdcfbb2015aa2';
+    r'a291c7e682363ded71ad001ca7e8eda7a9806fce';
 
 /// See also [PointAwardNotifier].
 @ProviderFor(PointAwardNotifier)

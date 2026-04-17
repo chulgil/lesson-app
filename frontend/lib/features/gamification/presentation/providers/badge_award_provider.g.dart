@@ -191,5 +191,181 @@ class _CheckBadgeEligibilityProviderElement
   @override
   String get studentId => (origin as CheckBadgeEligibilityProvider).studentId;
 }
+
+String _$recentlyAwardedBadgesHash() =>
+    r'f28928d0f95a4d5cc3636bc7990f4e631e0bf5e5';
+
+abstract class _$RecentlyAwardedBadges
+    extends BuildlessNotifier<List<PracticeBadge>> {
+  late final String studentId;
+
+  List<PracticeBadge> build(
+    String studentId,
+  );
+}
+
+/// Queue of badges newly awarded in the current session, keyed by studentId.
+///
+/// UI listens to this to show badge-earned toasts/animations. Callers invoke
+/// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+///
+/// Copied from [RecentlyAwardedBadges].
+@ProviderFor(RecentlyAwardedBadges)
+const recentlyAwardedBadgesProvider = RecentlyAwardedBadgesFamily();
+
+/// Queue of badges newly awarded in the current session, keyed by studentId.
+///
+/// UI listens to this to show badge-earned toasts/animations. Callers invoke
+/// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+///
+/// Copied from [RecentlyAwardedBadges].
+class RecentlyAwardedBadgesFamily extends Family<List<PracticeBadge>> {
+  /// Queue of badges newly awarded in the current session, keyed by studentId.
+  ///
+  /// UI listens to this to show badge-earned toasts/animations. Callers invoke
+  /// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+  ///
+  /// Copied from [RecentlyAwardedBadges].
+  const RecentlyAwardedBadgesFamily();
+
+  /// Queue of badges newly awarded in the current session, keyed by studentId.
+  ///
+  /// UI listens to this to show badge-earned toasts/animations. Callers invoke
+  /// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+  ///
+  /// Copied from [RecentlyAwardedBadges].
+  RecentlyAwardedBadgesProvider call(
+    String studentId,
+  ) {
+    return RecentlyAwardedBadgesProvider(
+      studentId,
+    );
+  }
+
+  @override
+  RecentlyAwardedBadgesProvider getProviderOverride(
+    covariant RecentlyAwardedBadgesProvider provider,
+  ) {
+    return call(
+      provider.studentId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'recentlyAwardedBadgesProvider';
+}
+
+/// Queue of badges newly awarded in the current session, keyed by studentId.
+///
+/// UI listens to this to show badge-earned toasts/animations. Callers invoke
+/// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+///
+/// Copied from [RecentlyAwardedBadges].
+class RecentlyAwardedBadgesProvider
+    extends NotifierProviderImpl<RecentlyAwardedBadges, List<PracticeBadge>> {
+  /// Queue of badges newly awarded in the current session, keyed by studentId.
+  ///
+  /// UI listens to this to show badge-earned toasts/animations. Callers invoke
+  /// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+  ///
+  /// Copied from [RecentlyAwardedBadges].
+  RecentlyAwardedBadgesProvider(
+    String studentId,
+  ) : this._internal(
+          () => RecentlyAwardedBadges()..studentId = studentId,
+          from: recentlyAwardedBadgesProvider,
+          name: r'recentlyAwardedBadgesProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$recentlyAwardedBadgesHash,
+          dependencies: RecentlyAwardedBadgesFamily._dependencies,
+          allTransitiveDependencies:
+              RecentlyAwardedBadgesFamily._allTransitiveDependencies,
+          studentId: studentId,
+        );
+
+  RecentlyAwardedBadgesProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.studentId,
+  }) : super.internal();
+
+  final String studentId;
+
+  @override
+  List<PracticeBadge> runNotifierBuild(
+    covariant RecentlyAwardedBadges notifier,
+  ) {
+    return notifier.build(
+      studentId,
+    );
+  }
+
+  @override
+  Override overrideWith(RecentlyAwardedBadges Function() create) {
+    return ProviderOverride(
+      origin: this,
+      override: RecentlyAwardedBadgesProvider._internal(
+        () => create()..studentId = studentId,
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        studentId: studentId,
+      ),
+    );
+  }
+
+  @override
+  NotifierProviderElement<RecentlyAwardedBadges, List<PracticeBadge>>
+      createElement() {
+    return _RecentlyAwardedBadgesProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is RecentlyAwardedBadgesProvider &&
+        other.studentId == studentId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, studentId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin RecentlyAwardedBadgesRef on NotifierProviderRef<List<PracticeBadge>> {
+  /// The parameter `studentId` of this provider.
+  String get studentId;
+}
+
+class _RecentlyAwardedBadgesProviderElement
+    extends NotifierProviderElement<RecentlyAwardedBadges, List<PracticeBadge>>
+    with RecentlyAwardedBadgesRef {
+  _RecentlyAwardedBadgesProviderElement(super.provider);
+
+  @override
+  String get studentId => (origin as RecentlyAwardedBadgesProvider).studentId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

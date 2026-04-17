@@ -66,8 +66,8 @@ final List<BadgeCondition> autoBadgeConditions = [
     description: '첫 녹음을 저장했습니다',
     icon: 'mic',
     rarity: BadgeRarity.common,
-    checkFunction: (g) =>
-        g.recentHistory.any((h) => h.description.contains('녹음')),
+    checkFunction:
+        (g) => g.recentHistory.any((h) => h.description.contains('녹음')),
   ),
   BadgeCondition(
     badgeId: 'badge_weekly_all_clear',
@@ -75,8 +75,8 @@ final List<BadgeCondition> autoBadgeConditions = [
     description: '이번 주 과제를 100% 완료했습니다',
     icon: 'task_alt',
     rarity: BadgeRarity.rare,
-    checkFunction: (g) =>
-        g.recentHistory.any((h) => h.type == PointType.goalAchieved),
+    checkFunction:
+        (g) => g.recentHistory.any((h) => h.type == PointType.goalAchieved),
   ),
   BadgeCondition(
     badgeId: 'badge_monthly_champion',
@@ -103,20 +103,19 @@ final List<BadgeCondition> autoBadgeConditions = [
     icon: 'library_music',
     rarity: BadgeRarity.epic,
     // Mock: check via point history for multiple goal achievements
-    checkFunction: (g) =>
-        g.recentHistory
-            .where((h) => h.type == PointType.goalAchieved)
-            .length >=
-        5,
+    checkFunction:
+        (g) =>
+            g.recentHistory
+                .where((h) => h.type == PointType.goalAchieved)
+                .length >=
+            5,
   ),
 ];
 
 /// Check streak bonus from point history.
 bool _hasStreakBonus(StudentGamification g, {required int days}) {
   return g.recentHistory.any(
-    (h) =>
-        h.type == PointType.streakBonus &&
-        h.description.contains('$days일'),
+    (h) => h.type == PointType.streakBonus && h.description.contains('$days일'),
   );
 }
 
@@ -129,13 +128,15 @@ Future<List<PracticeBadge>> checkBadgeEligibility(
   CheckBadgeEligibilityRef ref,
   String studentId,
 ) async {
-  final gamification =
-      await ref.watch(studentGamificationProvider(studentId).future);
+  final gamification = await ref.watch(
+    studentGamificationProvider(studentId).future,
+  );
 
-  final earnedIds = gamification.earnedBadges
-      .where((b) => b.isEarned)
-      .map((b) => b.id)
-      .toSet();
+  final earnedIds =
+      gamification.earnedBadges
+          .where((b) => b.isEarned)
+          .map((b) => b.id)
+          .toSet();
 
   final newlyEligible = <PracticeBadge>[];
 
@@ -158,4 +159,24 @@ Future<List<PracticeBadge>> checkBadgeEligibility(
   }
 
   return newlyEligible;
+}
+
+/// Queue of badges newly awarded in the current session, keyed by studentId.
+///
+/// UI listens to this to show badge-earned toasts/animations. Callers invoke
+/// [RecentlyAwardedBadges.consume] after displaying to clear the queue.
+@Riverpod(keepAlive: true)
+class RecentlyAwardedBadges extends _$RecentlyAwardedBadges {
+  @override
+  List<PracticeBadge> build(String studentId) => const [];
+
+  void push(List<PracticeBadge> badges) {
+    if (badges.isEmpty) return;
+    state = [...state, ...badges];
+  }
+
+  void consume() {
+    if (state.isEmpty) return;
+    state = const [];
+  }
 }

@@ -3,6 +3,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/gamification.dart';
+import 'badge_award_provider.dart';
+import 'gamification_provider.dart';
 
 part 'point_award_service.g.dart';
 
@@ -76,6 +78,7 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       description: '일일 연습 완료',
     );
     state = [...state, entry];
+    _triggerBadgeCheck(studentId);
     return entry;
   }
 
@@ -88,6 +91,7 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       description: '과제 완료: $taskName',
     );
     state = [...state, entry];
+    _triggerBadgeCheck(studentId);
     return entry;
   }
 
@@ -100,6 +104,7 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       description: '연습 목표 달성',
     );
     state = [...state, entry];
+    _triggerBadgeCheck(studentId);
     return entry;
   }
 
@@ -115,6 +120,7 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       description: '${streakDays}일 스트릭 보너스',
     );
     state = [...state, entry];
+    _triggerBadgeCheck(studentId);
     return entry;
   }
 
@@ -127,7 +133,26 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       description: '녹음 등록',
     );
     state = [...state, entry];
+    _triggerBadgeCheck(studentId);
     return entry;
+  }
+
+  /// Evaluate badge conditions and persist any newly eligible badges.
+  ///
+  /// Invalidates [studentGamificationProvider] afterward so UI refreshes.
+  /// Newly awarded badges are exposed via [recentlyAwardedBadgesProvider].
+  Future<void> _triggerBadgeCheck(String studentId) async {
+    final repo = ref.read(gamificationRepositoryProvider);
+    final eligible = await ref.read(
+      checkBadgeEligibilityProvider(studentId).future,
+    );
+    if (eligible.isEmpty) return;
+
+    await repo.awardBadges(studentId, eligible);
+
+    ref.read(recentlyAwardedBadgesProvider(studentId).notifier).push(eligible);
+    ref.invalidate(studentGamificationProvider(studentId));
+    ref.invalidate(checkBadgeEligibilityProvider(studentId));
   }
 
   /// Get total points awarded for a student in current session.
