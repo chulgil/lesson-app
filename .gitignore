@@ -73,6 +73,10 @@ frontend/ios/Flutter/flutter_assets/
 frontend/ios/ServiceDefinitions.json
 frontend/ios/Runner/GeneratedPluginRegistrant.*
 
+# Swift Package Manager (Xcode 자동 생성, 사용자별)
+frontend/ios/**/xcshareddata/swiftpm/
+frontend/macos/**/xcshareddata/swiftpm/
+
 # macOS
 frontend/macos/Flutter/GeneratedPluginRegistrant.swift
 frontend/macos/Flutter/ephemeral
