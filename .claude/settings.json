@@ -5,6 +5,24 @@
         "huggingface-skills@claude-plugins-official": true,
         "bkit@bkit-marketplace": true
     },
+    "permissions": {
+        "allow": [
+            "Bash(adb logcat:*)",
+            "Bash(chmod:*)",
+            "Bash(dart:*)",
+            "Bash(find:*)",
+            "Bash(flutter:*)",
+            "Bash(gh:*)",
+            "Bash(git:*)",
+            "Bash(grep:*)",
+            "Bash(ls:*)",
+            "Bash(open:*)",
+            "Bash(pod install:*)",
+            "Bash(tree:*)",
+            "Bash(wc:*)",
+            "Bash(xcodebuild:*)"
+        ]
+    },
     "hooks": {
         "PostToolUse": [
             {
