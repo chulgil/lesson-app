@@ -15,11 +15,7 @@ class NotificationItem extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback? onTap;
 
-  const NotificationItem({
-    super.key,
-    required this.notification,
-    this.onTap,
-  });
+  const NotificationItem({super.key, required this.notification, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +26,12 @@ class NotificationItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isUnread ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+          color:
+              isUnread
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : Colors.white,
           border: const Border(
-            bottom: BorderSide(
-              color: AppColors.borderLight,
-              width: 0.5,
-            ),
+            bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
           ),
         ),
         child: Row(
@@ -58,7 +54,8 @@ class NotificationItem extends StatelessWidget {
                         child: Text(
                           notification.title,
                           style: AppTypography.bodyMedium.copyWith(
-                            fontWeight: isUnread ? FontWeight.w600 : FontWeight.normal,
+                            fontWeight:
+                                isUnread ? FontWeight.w600 : FontWeight.normal,
                             color: AppColors.textPrimaryLight,
                           ),
                         ),
@@ -95,7 +92,9 @@ class NotificationItem extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         notification.actionLabel!,
@@ -137,10 +136,7 @@ class NotificationItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Center(
-        child: Text(
-          _getIcon(),
-          style: const TextStyle(fontSize: 20),
-        ),
+        child: Text(_getIcon(), style: const TextStyle(fontSize: 20)),
       ),
     );
   }
@@ -168,6 +164,8 @@ class NotificationItem extends StatelessWidget {
         return '🔥';
       case NotificationType.weeklyGoalAchieved:
         return '🏆';
+      case NotificationType.recordingFeedbackReceived:
+        return '📝';
 
       // Payment
       case NotificationType.paymentRequested:
