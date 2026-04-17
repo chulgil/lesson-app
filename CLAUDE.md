@@ -47,6 +47,7 @@ flutter analyze                                              # 분석
 | 파일 | 내용 |
 |------|------|
 | `workflow.md` | 작업 순서, 스펙 우선 개발, 완료 체크리스트 |
+| `doc-sync.md` | 코드 변경 시 스펙 문서 동기화 매핑 (훅 + 규칙 이중 안전장치) |
 | `ux-rules.md` | UX 위반 방지 + HARD-GATE + grep 패턴 |
 | `tech-patterns.md` | 기술 에러 패턴 (Provider/Mock/iOS/CRUD/레이아웃) |
 | `design-principles.md` | 아키텍처 설계 원칙 (SSOT/완전성/데이터모델) |
@@ -55,3 +56,4 @@ flutter analyze                                              # 분석
 | `metronome-guide.md` | 메트로놈 커스텀 플러그인 개발 지침 |
 | `troubleshooting.md` | iOS/Android/Provider 빌드 에러 해결 |
 | `scenario-testing.md` | 백엔드 시나리오 테스트 규칙 |
+| `seed-data.md` | 백엔드 시드 데이터 자동 감지/실행 규칙 |

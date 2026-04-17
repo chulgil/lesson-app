@@ -1,22 +1,32 @@
 {
-  "enabledPlugins": {
-    "zapier@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "huggingface-skills@claude-plugins-official": true,
-    "bkit@bkit-marketplace": true
-  },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/check-hardcoded-strings.sh",
-            "timeout": 5000
-          }
+    "enabledPlugins": {
+        "zapier@claude-plugins-official": true,
+        "frontend-design@claude-plugins-official": true,
+        "huggingface-skills@claude-plugins-official": true,
+        "bkit@bkit-marketplace": true
+    },
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write|MultiEdit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": ".claude/hooks/check-hardcoded-strings.sh",
+                        "timeout": 5000
+                    },
+                    {
+                        "type": "command",
+                        "command": ".claude/hooks/check-doc-sync.sh",
+                        "timeout": 5000
+                    },
+                    {
+                        "type": "command",
+                        "command": ".claude/scripts/post-edit-check.sh",
+                        "timeout": 5000
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  }
+    }
 }
