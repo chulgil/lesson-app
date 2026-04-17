@@ -29,8 +29,9 @@ if [[ -z "$FILE_PATH" ]]; then
     exit 0
 fi
 
-# docs/specs/*.md 만 대상
+# docs/specs/*.md 만 대상 (old/ 아카이브 제외)
 case "$FILE_PATH" in
+    *"/docs/specs/old/"*) exit 0 ;;
     *"/docs/specs/"*.md) ;;
     *) exit 0 ;;
 esac

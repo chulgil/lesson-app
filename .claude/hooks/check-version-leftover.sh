@@ -28,8 +28,9 @@ if [[ -z "$FILE_PATH" ]]; then
     exit 0
 fi
 
-# docs/specs/*.md 또는 .dart 둘 다 대상
+# docs/specs/*.md 또는 .dart 둘 다 대상 (specs/old/ 아카이브 제외)
 case "$FILE_PATH" in
+    *"/docs/specs/old/"*) exit 0 ;;
     *"/docs/specs/"*.md|*.dart) ;;
     *) exit 0 ;;
 esac
