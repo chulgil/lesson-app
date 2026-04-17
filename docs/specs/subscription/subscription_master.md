@@ -724,7 +724,9 @@ pending (입금 대기)
     → paymentConfirmed: true → 미수금 해소
 ```
 
-> 참고: UnpaidPolicy(allowLesson, blockLesson, reminderOnly) 및 D+3/5/7 자동 리마인더는 삭제됨 (푸시 알림 인프라 미구현).
+**입금 알림 (수동):** 선생님이 미수금 카드의 `[알림 보내기]` 버튼으로 학생에게 `NotificationType.paymentReminder` 로컬 알림을 수동 발송한다. 자동 D+3/5/7 리마인더는 구현하지 않음 (백엔드 스케줄러 필요).
+
+> 참고: UnpaidPolicy(allowLesson, blockLesson, reminderOnly)는 삭제됨. 자동 스케줄 리마인더는 백엔드 연동 후 재도입.
 
 ### 4.6 가족(자녀 2명 이상) 수강권 시나리오
 

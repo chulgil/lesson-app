@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
+import '../../../notifications/domain/entities/notification.dart';
+import '../../../notifications/presentation/providers/notification_providers.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 import '../../../subscription/subscription_facade.dart';
 
@@ -38,11 +41,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.check_circle_outline,
-            size: 64,
-            color: AppColors.success,
-          ),
+          Icon(Icons.check_circle_outline, size: 64, color: AppColors.success),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '미수금이 없습니다',
@@ -86,10 +85,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: Text(
-              '미수금 목록',
-              style: AppTypography.headingSmall,
-            ),
+            child: Text('미수금 목록', style: AppTypography.headingSmall),
           ),
           const SizedBox(height: AppSpacing.space3),
 
@@ -134,9 +130,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space2),
             Text(
               '${currencyFormat.format(totalAmount)}원',
-              style: AppTypography.displayMedium.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTypography.displayMedium.copyWith(color: Colors.white),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
@@ -156,17 +150,13 @@ class _UnpaidCard extends ConsumerWidget {
   final Subscription subscription;
   final NumberFormat currencyFormat;
 
-  const _UnpaidCard({
-    required this.subscription,
-    required this.currencyFormat,
-  });
+  const _UnpaidCard({required this.subscription, required this.currencyFormat});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final studentAsync = ref.watch(studentProvider(subscription.studentId));
-    final studentName = studentAsync.whenOrNull(
-      data: (student) => student?.name,
-    ) ?? '학생';
+    final studentName =
+        studentAsync.whenOrNull(data: (student) => student?.name) ?? '학생';
 
     final daysOverdue = _calculateDaysOverdue(subscription);
 
@@ -180,9 +170,10 @@ class _UnpaidCard extends ConsumerWidget {
           color: AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: daysOverdue > 0
-                ? AppColors.error.withValues(alpha: 0.3)
-                : AppColors.borderLight,
+            color:
+                daysOverdue > 0
+                    ? AppColors.error.withValues(alpha: 0.3)
+                    : AppColors.borderLight,
           ),
           boxShadow: [
             BoxShadow(
@@ -216,9 +207,12 @@ class _UnpaidCard extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(studentName, style: AppTypography.bodyLarge.copyWith(
-                          fontWeight: FontWeight.w600,
-                        )),
+                        Text(
+                          studentName,
+                          style: AppTypography.bodyLarge.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         Text(
                           _subscriptionTypeLabel(subscription),
                           style: AppTypography.bodySmall.copyWith(
@@ -250,7 +244,7 @@ class _UnpaidCard extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => _sendReminder(context),
+                      onPressed: () => _sendReminder(context, ref),
                       icon: const Icon(Icons.notifications_outlined, size: 18),
                       label: const Text('알림 보내기'),
                       style: OutlinedButton.styleFrom(
@@ -319,51 +313,89 @@ class _UnpaidCard extends ConsumerWidget {
     }
   }
 
-  void _sendReminder(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('알림을 발송했습니다')),
+  Future<void> _sendReminder(BuildContext context, WidgetRef ref) async {
+    final notificationService = ref.read(notificationServiceProvider);
+    final notification = AppNotification(
+      id:
+          'payment_reminder_${subscription.id}_${DateTime.now().millisecondsSinceEpoch}',
+      userId: subscription.studentId,
+      type: NotificationType.paymentReminder,
+      priority: NotificationPriority.high,
+      title: AppStrings.paymentReminderTitle,
+      body: AppStrings.paymentReminderBody(
+        teacherName: '선생님',
+        amount: subscription.amount,
+      ),
+      createdAt: DateTime.now(),
+      sentAt: DateTime.now(),
+      actionUrl: '/subscriptions/${subscription.id}',
+      actionLabel: AppStrings.viewDetail,
+      data: {
+        'subscriptionId': subscription.id,
+        'studentId': subscription.studentId,
+        'amount': subscription.amount,
+      },
     );
+
+    try {
+      await notificationService.showNotification(notification);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.paymentReminderSent)),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.paymentReminderSendFailed)),
+        );
+      }
+    }
   }
 
   void _confirmPayment(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('입금 확인'),
-        content: Text(
-          '${currencyFormat.format(subscription.amount)}원 입금을 확인하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await ref
-                  .read(
-                    subscriptionNotifierProvider(subscription.studentId)
-                        .notifier,
-                  )
-                  .confirmPayment(subscription.id);
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('입금 확인'),
+            content: Text(
+              '${currencyFormat.format(subscription.amount)}원 입금을 확인하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.pop(dialogContext);
+                  await ref
+                      .read(
+                        subscriptionNotifierProvider(
+                          subscription.studentId,
+                        ).notifier,
+                      )
+                      .confirmPayment(subscription.id);
 
-              // Invalidate unpaid providers
-              final teacherId = ref.read(currentUserIdProvider);
-              ref.invalidate(unpaidSubscriptionsProvider(teacherId));
-              ref.invalidate(unpaidSummaryProvider(teacherId));
+                  // Invalidate unpaid providers
+                  final teacherId = ref.read(currentUserIdProvider);
+                  ref.invalidate(unpaidSubscriptionsProvider(teacherId));
+                  ref.invalidate(unpaidSummaryProvider(teacherId));
 
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('입금이 확인되었습니다')),
-                );
-              }
-            },
-            style: FilledButton.styleFrom(backgroundColor: AppColors.success),
-            child: const Text('확인'),
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('입금이 확인되었습니다')),
+                    );
+                  }
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.success,
+                ),
+                child: const Text('확인'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

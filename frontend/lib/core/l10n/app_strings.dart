@@ -1225,4 +1225,26 @@ class AppStrings {
 
   /// 재생은 실제 녹음 파일이 연동되면 지원됩니다
   static const recordingPlaybackComingSoon = '재생은 실제 녹음 파일이 연동되면 지원됩니다';
+
+  // ── Payment Reminder (미입금 알림) ─────────────────────────
+  /// 입금 알림을 보냈습니다
+  static const paymentReminderSent = '입금 알림을 보냈습니다';
+
+  /// 입금 알림 발송에 실패했어요
+  static const paymentReminderSendFailed = '입금 알림 발송에 실패했어요';
+
+  /// 수강료 입금 안내
+  static const paymentReminderTitle = '수강료 입금 안내';
+
+  /// 수강료 %s원 입금 부탁드려요 (bodyFor 함수로 포맷)
+  static String paymentReminderBody({
+    required String teacherName,
+    required int amount,
+  }) {
+    final formatted = amount.toString().replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+    return '$teacherName 선생님: 수강료 $formatted원 입금을 부탁드려요';
+  }
 }
