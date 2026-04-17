@@ -21,7 +21,7 @@
 
 | 항목 | 결정 |
 |------|------|
-| 탭 구성 | 4탭: 홈, 레슨, 과제, 프로필 |
+| 탭 구성 | 5탭: 홈, 레슨, 과제, 결제, 프로필 |
 | 데이터 소스 | 현재 Mock → Phase 2에서 실데이터 전환 |
 | 자녀 선택 | 바텀시트로 자녀 전환 + 자동 첫 번째 선택 |
 | 프로필 전환 | ProfileSwitcher (부모/자녀/학생 역할) |
@@ -38,7 +38,17 @@
 | 홈 | ParentDashboardTab | `parent_dashboard_tab.dart` | ✅ Mock |
 | 레슨 | ParentLessonsTab | `parent_lessons_tab.dart` | ✅ Mock |
 | 과제 | ParentAssignmentsTab | `parent_assignments_tab.dart` | ✅ Mock |
+| 결제 | ParentPaymentsTab | `parent_payments_tab.dart` | ✅ 실데이터 (#233) |
 | 프로필 | ParentProfileTab | `parent_profile_tab.dart` | ✅ 부분 실데이터 |
+
+#### 결제 탭 (#233 Phase 1)
+
+- 선택된 자녀의 `ChildProfile.linkedStudentId` → `studentSubscriptionsProvider` 조회
+- `SubscriptionTicketCard` 재사용 (활성 / 만료 임박 / 만료 그룹)
+- 상단 요약 카드 (활성/임박/만료 개수) + 자녀 전환 아이콘
+- 탭 시 `AppRoutes.subscriptionDetail` 이동
+- `linkedStudentId`가 `null`이면 "선생님 연결 안 됨" 안내 상태
+- Phase 2: 자녀 프로필 생성 시 `linkedStudentId` 매핑 UX, 결제 액션(#234 환불 등) 연결
 
 ### 2.2 Mock → 실데이터 GAP 분석
 
@@ -72,7 +82,7 @@ sequenceDiagram
 
     P->>App: 앱 열기 (parent 역할)
     App->>App: activeProfileType == parent
-    App->>App: 4탭 BottomNavigationBar 표시
+    App->>App: 5탭 BottomNavigationBar 표시
 
     alt 자녀 있음
         App->>Dash: 첫 번째 자녀 자동 선택
@@ -362,10 +372,11 @@ frontend/lib/features/parent_home/
 │   │   ├── child_profile_provider.dart    ← childProfilesProvider, SelectedChildProfile, ChildProfileManager
 │   │   └── user_profile_provider.dart     ← CurrentUserProfile, activeProfileType, isUnconnectedChildMode
 │   ├── screens/
-│   │   ├── parent_home_screen.dart        ← 루트 4탭 (IndexedStack + BottomNavigationBar)
+│   │   ├── parent_home_screen.dart        ← 루트 5탭 (IndexedStack + BottomNavigationBar)
 │   │   ├── parent_dashboard_tab.dart      ← 홈 탭 (퀵스탯, 다음레슨, 연습캘린더, 과제, 결제)
 │   │   ├── parent_lessons_tab.dart        ← 레슨 탭 (캘린더, 예정/지난 레슨 목록)
 │   │   ├── parent_assignments_tab.dart    ← 과제 탭 (진행률, 미완료/완료 목록)
+│   │   ├── parent_payments_tab.dart       ← 결제 탭 (자녀별 수강권 실데이터, #233)
 │   │   ├── parent_profile_tab.dart        ← 프로필 탭 (자녀 관리, 알림, 설정)
 │   │   └── unconnected_child_dashboard.dart  ← 미연결 자녀 전용
 │   └── widgets/
@@ -446,7 +457,7 @@ bool isUnconnectedChildMode(IsUnconnectedChildModeRef ref) {
 
 ### Phase 1: Mock UI ✅ 완료
 
-- [x] ParentHomeScreen 4탭 네비게이션
+- [x] ParentHomeScreen 5탭 네비게이션 (결제 탭 포함 — #233)
 - [x] ParentDashboardTab (퀵스탯, 다음레슨, 연습캘린더, 과제, 결제)
 - [x] ParentLessonsTab (캘린더, 예정/지난 레슨, 노트 바텀시트)
 - [x] ParentAssignmentsTab (진행률, 미완료/완료 목록)

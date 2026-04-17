@@ -83,6 +83,8 @@ class ChildProfile {
   final String level; // e.g., 'beginner', 'intermediate'
   final String? teacherId; // Connected teacher
   final String? teacherName; // For display
+  final String?
+  linkedStudentId; // Maps to Student.id for subscription/lesson queries
   final Color profileColor;
   final ChildProfileStatus status;
   final ChildConnectionStatus connectionStatus;
@@ -98,6 +100,7 @@ class ChildProfile {
     required this.level,
     this.teacherId,
     this.teacherName,
+    this.linkedStudentId,
     required this.profileColor,
     this.status = ChildProfileStatus.active,
     this.connectionStatus = ChildConnectionStatus.unconnected,
@@ -195,6 +198,7 @@ class ChildProfile {
     String? level,
     String? teacherId,
     String? teacherName,
+    String? linkedStudentId,
     Color? profileColor,
     ChildProfileStatus? status,
     ChildConnectionStatus? connectionStatus,
@@ -210,6 +214,7 @@ class ChildProfile {
       level: level ?? this.level,
       teacherId: teacherId ?? this.teacherId,
       teacherName: teacherName ?? this.teacherName,
+      linkedStudentId: linkedStudentId ?? this.linkedStudentId,
       profileColor: profileColor ?? this.profileColor,
       status: status ?? this.status,
       connectionStatus: connectionStatus ?? this.connectionStatus,

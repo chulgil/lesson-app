@@ -8,6 +8,7 @@ import '../../../../features/parent_home/presentation/providers/user_profile_pro
 import 'parent_dashboard_tab.dart';
 import 'parent_lessons_tab.dart';
 import 'parent_assignments_tab.dart';
+import 'parent_payments_tab.dart';
 import 'parent_profile_tab.dart';
 import 'unconnected_child_dashboard.dart';
 
@@ -63,8 +64,9 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
     if (activeProfile == ProfileType.child) {
       return [
         const ParentDashboardTab(), // Shows child's practice overview
-        const ParentLessonsTab(),   // Shows child's upcoming lessons
+        const ParentLessonsTab(), // Shows child's upcoming lessons
         const ParentAssignmentsTab(), // Shows child's assignments
+        const ParentPaymentsTab(), // Shows child's subscriptions / payments
         const ParentProfileTab(),
       ];
     }
@@ -74,6 +76,7 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
       const ParentDashboardTab(),
       const ParentLessonsTab(),
       const ParentAssignmentsTab(),
+      const ParentPaymentsTab(),
       const ParentProfileTab(),
     ];
   }
@@ -94,6 +97,11 @@ class _ParentHomeScreenState extends ConsumerState<ParentHomeScreen> {
         icon: Icon(Icons.assignment_outlined),
         activeIcon: Icon(Icons.assignment),
         label: '과제',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.credit_card_outlined),
+        activeIcon: Icon(Icons.credit_card),
+        label: '결제',
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_outline),
