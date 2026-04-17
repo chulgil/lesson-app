@@ -18,10 +18,7 @@ import '../widgets/skip_reason_dialog.dart';
 class ProposalDetailScreen extends ConsumerStatefulWidget {
   final String proposalId;
 
-  const ProposalDetailScreen({
-    super.key,
-    required this.proposalId,
-  });
+  const ProposalDetailScreen({super.key, required this.proposalId});
 
   @override
   ConsumerState<ProposalDetailScreen> createState() =>
@@ -35,28 +32,27 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final proposalAsync =
-        ref.watch(subscriptionProposalProvider(widget.proposalId));
+    final proposalAsync = ref.watch(
+      subscriptionProposalProvider(widget.proposalId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('수강권 제안'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('수강권 제안'), centerTitle: true),
       // 처리 중일 때는 provider 상태 변화로 인한 UI 깜빡임 방지
-      body: _isProcessing
-          ? const Center(child: CircularProgressIndicator())
-          : proposalAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-              data: (proposal) {
-                if (proposal == null) {
-                  return const Center(child: Text('제안을 찾을 수 없습니다'));
-                }
+      body:
+          _isProcessing
+              ? const Center(child: CircularProgressIndicator())
+              : proposalAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                data: (proposal) {
+                  if (proposal == null) {
+                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                  }
 
-                return _buildContent(proposal);
-              },
-            ),
+                  return _buildContent(proposal);
+                },
+              ),
       // Fixed bottom action bar
       bottomNavigationBar: proposalAsync.whenOrNull(
         data: (proposal) {
@@ -76,8 +72,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     }
 
     // Single template proposal (original flow)
-    final templateAsync =
-        ref.watch(subscriptionTemplateProvider(proposal.templateId));
+    final templateAsync = ref.watch(
+      subscriptionTemplateProvider(proposal.templateId),
+    );
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -125,7 +122,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
               // Waiting message (for paymentNotified status)
               if (proposal.status == ProposalStatus.paymentNotified) ...[
                 const SizedBox(height: AppSpacing.space6),
-                ProposalWaitingCard(onContactTapped: () => _showContactOptions(proposal)),
+                ProposalWaitingCard(
+                  onContactTapped: () => _showContactOptions(proposal),
+                ),
               ],
 
               // Add bottom padding for fixed action bar
@@ -195,12 +194,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           // Waiting message (for paymentNotified status)
           if (proposal.status == ProposalStatus.paymentNotified) ...[
             const SizedBox(height: AppSpacing.space6),
-            ProposalWaitingCard(onContactTapped: () => _showContactOptions(proposal)),
+            ProposalWaitingCard(
+              onContactTapped: () => _showContactOptions(proposal),
+            ),
           ],
 
           // Add bottom padding for fixed action bar
-          if (proposal.canRespond)
-            const SizedBox(height: AppSpacing.space8),
+          if (proposal.canRespond) const SizedBox(height: AppSpacing.space8),
         ],
       ),
     );
@@ -208,10 +208,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   Widget _buildMultiChoiceHeader(SubscriptionProposal proposal) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
@@ -222,7 +222,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.card_giftcard,
@@ -250,17 +250,20 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.info.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           '자동 발송',
                           style: AppTypography.caption.copyWith(
                             color: AppColors.info,
                             fontWeight: FontWeight.w500,
-                            fontSize: 10,
                           ),
                         ),
                       ),
@@ -274,9 +277,10 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   Text(
                     proposal.formattedExpiration,
                     style: AppTypography.bodySmall.copyWith(
-                      color: proposal.timeUntilExpiration.inDays < 2
-                          ? AppColors.warning
-                          : AppColors.textSecondaryLight,
+                      color:
+                          proposal.timeUntilExpiration.inDays < 2
+                              ? AppColors.warning
+                              : AppColors.textSecondaryLight,
                     ),
                   )
                 else if (!proposal.isAutoProposal)
@@ -296,151 +300,168 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
   Widget _buildTemplateSelection(SubscriptionProposal proposal) {
     return Column(
-      children: proposal.allTemplateIds.map((templateId) {
-        final templateAsync =
-            ref.watch(subscriptionTemplateProvider(templateId));
-        final isSelected = _selectedTemplateId == templateId;
-        final isRecommended = proposal.isRecommended(templateId);
+      children:
+          proposal.allTemplateIds.map((templateId) {
+            final templateAsync = ref.watch(
+              subscriptionTemplateProvider(templateId),
+            );
+            final isSelected = _selectedTemplateId == templateId;
+            final isRecommended = proposal.isRecommended(templateId);
 
-        return templateAsync.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          error: (e, _) => const SizedBox.shrink(),
-          data: (template) {
-            if (template == null) return const SizedBox.shrink();
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedTemplateId = templateId;
-                  });
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.primary.withValues(alpha: 0.05)
-                        : AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color:
-                          isSelected ? AppColors.primary : AppColors.borderLight,
-                      width: isSelected ? 2 : 1,
-                    ),
+            return templateAsync.when(
+              loading:
+                  () => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                  child: Row(
-                    children: [
-                      // Radio indicator
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.borderLight,
-                            width: 2,
-                          ),
-                        ),
-                        child: isSelected
-                            ? Center(
-                                child: Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(width: AppSpacing.space3),
+              error: (e, _) => const SizedBox.shrink(),
+              data: (template) {
+                if (template == null) return const SizedBox.shrink();
 
-                      // Template info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  template.name,
-                                  style: AppTypography.bodyLarge.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                if (isRecommended) ...[
-                                  const SizedBox(width: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          AppColors.warning.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Text('⭐',
-                                            style: TextStyle(fontSize: 10)),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          '추천',
-                                          style: AppTypography.caption.copyWith(
-                                            color: AppColors.warning,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: AppSpacing.space1),
-                            Text(
-                              template.summaryText,
-                              style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondaryLight,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _selectedTemplateId = templateId;
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                    child: Container(
+                      padding: const EdgeInsets.all(AppSpacing.space4),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected
+                                ? AppColors.primary.withValues(alpha: 0.05)
+                                : AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLarge,
+                        ),
+                        border: Border.all(
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderLight,
+                          width: isSelected ? 2 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Radio indicator
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? AppColors.primary
+                                        : AppColors.borderLight,
+                                width: 2,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                            child:
+                                isSelected
+                                    ? Center(
+                                      child: Container(
+                                        width: 12,
+                                        height: 12,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    )
+                                    : null,
+                          ),
+                          const SizedBox(width: AppSpacing.space3),
 
-                      // Price
-                      Text(
-                        template.formattedPrice,
-                        style: AppTypography.headingSmall.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                          // Template info
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      template.name,
+                                      style: AppTypography.bodyLarge.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    if (isRecommended) ...[
+                                      const SizedBox(width: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.warning.withValues(
+                                            alpha: 0.2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            AppSpacing.radiusSmall,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '⭐',
+                                              style: AppTypography.caption,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '추천',
+                                              style: AppTypography.caption
+                                                  .copyWith(
+                                                    color: AppColors.warning,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.space1),
+                                Text(
+                                  template.summaryText,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Price
+                          Text(
+                            template.formattedPrice,
+                            style: AppTypography.headingSmall.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
-          },
-        );
-      }).toList(),
+          }).toList(),
     );
   }
 
   Widget _buildSelectedTemplateDetails(SubscriptionProposal proposal) {
-    final effectiveTemplateId = _selectedTemplateId ?? proposal.effectiveTemplateId;
-    final templateAsync =
-        ref.watch(subscriptionTemplateProvider(effectiveTemplateId));
+    final effectiveTemplateId =
+        _selectedTemplateId ?? proposal.effectiveTemplateId;
+    final templateAsync = ref.watch(
+      subscriptionTemplateProvider(effectiveTemplateId),
+    );
 
     return templateAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -453,9 +474,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   }
 
   Widget _buildMultiChoiceDiscountCard(SubscriptionProposal proposal) {
-    final effectiveTemplateId = _selectedTemplateId ?? proposal.effectiveTemplateId;
-    final templateAsync =
-        ref.watch(subscriptionTemplateProvider(effectiveTemplateId));
+    final effectiveTemplateId =
+        _selectedTemplateId ?? proposal.effectiveTemplateId;
+    final templateAsync = ref.watch(
+      subscriptionTemplateProvider(effectiveTemplateId),
+    );
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -468,9 +491,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   }
 
   Widget _buildMultiChoicePaymentCard(SubscriptionProposal proposal) {
-    final effectiveTemplateId = _selectedTemplateId ?? proposal.effectiveTemplateId;
-    final templateAsync =
-        ref.watch(subscriptionTemplateProvider(effectiveTemplateId));
+    final effectiveTemplateId =
+        _selectedTemplateId ?? proposal.effectiveTemplateId;
+    final templateAsync = ref.watch(
+      subscriptionTemplateProvider(effectiveTemplateId),
+    );
 
     return templateAsync.when(
       loading: () => const SizedBox.shrink(),
@@ -482,42 +507,47 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     );
   }
 
-
   Widget _buildPaymentCard(
-      SubscriptionProposal proposal, SubscriptionTemplate template) {
+    SubscriptionProposal proposal,
+    SubscriptionTemplate template,
+  ) {
     // Get teacher profile for bank account info
-    final teacherProfileAsync = ref.watch(teacherFullProfileProvider(proposal.teacherId));
+    final teacherProfileAsync = ref.watch(
+      teacherFullProfileProvider(proposal.teacherId),
+    );
 
     return teacherProfileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => const ProposalPaymentInfoCard(),
-      data: (profile) => ProposalPaymentInfoCard(
-        bankAccount: profile?.defaultBankAccount,
-        bankAccounts: profile?.bankAccounts ?? [],
-      ),
+      data:
+          (profile) => ProposalPaymentInfoCard(
+            bankAccount: profile?.defaultBankAccount,
+            bankAccounts: profile?.bankAccounts ?? [],
+          ),
     );
   }
-
 
   /// Show contact options dialog (call/message)
   void _showContactOptions(SubscriptionProposal proposal) {
     // Get teacher profile for contact info
-    final teacherProfileAsync = ref.read(teacherFullProfileProvider(proposal.teacherId));
+    final teacherProfileAsync = ref.read(
+      teacherFullProfileProvider(proposal.teacherId),
+    );
 
     teacherProfileAsync.whenOrNull(
       data: (profile) {
         if (profile == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('선생님 정보를 찾을 수 없습니다')));
           return;
         }
 
         final phoneNumber = profile.verification.phoneNumber;
         if (phoneNumber == null || phoneNumber.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('선생님 연락처 정보가 없습니다')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('선생님 연락처 정보가 없습니다')));
           return;
         }
 
@@ -526,60 +556,61 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          builder: (context) => SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${profile.name} 선생님께 연락하기',
-                    style: AppTypography.headingSmall,
+          builder:
+              (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${profile.name} 선생님께 연락하기',
+                        style: AppTypography.headingSmall,
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      ListTile(
+                        leading: const CircleAvatar(
+                          backgroundColor: AppColors.success,
+                          child: Icon(Icons.call, color: Colors.white),
+                        ),
+                        title: const Text('전화하기'),
+                        subtitle: Text(phoneNumber),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _launchPhone(phoneNumber);
+                        },
+                      ),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppColors.info,
+                          child: const Icon(Icons.message, color: Colors.white),
+                        ),
+                        title: const Text('문자 보내기'),
+                        subtitle: Text(phoneNumber),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _launchSms(phoneNumber);
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space4),
-                  ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: AppColors.success,
-                      child: Icon(Icons.call, color: Colors.white),
-                    ),
-                    title: const Text('전화하기'),
-                    subtitle: Text(phoneNumber),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchPhone(phoneNumber);
-                    },
-                  ),
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.info,
-                      child: const Icon(Icons.message, color: Colors.white),
-                    ),
-                    title: const Text('문자 보내기'),
-                    subtitle: Text(phoneNumber),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _launchSms(phoneNumber);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                ],
+                ),
               ),
-            ),
-          ),
         );
       },
     );
 
     // If data is not available, show loading or error
     if (teacherProfileAsync is AsyncLoading) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('선생님 정보를 불러오는 중...')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 불러오는 중...')));
     } else if (teacherProfileAsync is AsyncError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('선생님 정보를 불러올 수 없습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('선생님 정보를 불러올 수 없습니다')));
     }
   }
 
@@ -590,10 +621,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('전화번호가 복사되었습니다: $phoneNumber'),
-          action: SnackBarAction(
-            label: '확인',
-            onPressed: () {},
-          ),
+          action: SnackBarAction(label: '확인', onPressed: () {}),
         ),
       );
     }
@@ -606,10 +634,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('전화번호가 복사되었습니다: $phoneNumber'),
-          action: SnackBarAction(
-            label: '확인',
-            onPressed: () {},
-          ),
+          action: SnackBarAction(label: '확인', onPressed: () {}),
         ),
       );
     }
@@ -618,7 +643,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   /// Fixed bottom action bar for proposal response
   Widget _buildBottomActionBar(SubscriptionProposal proposal) {
     // For multi-choice proposals, check if template is selected
-    final bool canProceed = !proposal.isMultiChoice || _selectedTemplateId != null;
+    final bool canProceed =
+        !proposal.isMultiChoice || _selectedTemplateId != null;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -651,7 +677,11 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.info_outline, size: 16, color: AppColors.warning),
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: AppColors.warning,
+                    ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '수강권을 선택해주세요',
@@ -669,22 +699,26 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: (_isProcessing || !canProceed)
-                    ? null
-                    : () => _notifyPayment(proposal),
+                onPressed:
+                    (_isProcessing || !canProceed)
+                        ? null
+                        : () => _notifyPayment(proposal),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space4,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
-                icon: _isProcessing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.payment),
+                icon:
+                    _isProcessing
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.payment),
                 label: const Text('입금 완료했어요'),
               ),
             ),
@@ -693,7 +727,8 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
 
             // Reject button
             TextButton(
-              onPressed: _isProcessing ? null : () => _showRejectDialog(proposal),
+              onPressed:
+                  _isProcessing ? null : () => _showRejectDialog(proposal),
               child: Text(
                 '이번엔 스킵할게요',
                 style: AppTypography.bodyMedium.copyWith(
@@ -764,7 +799,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
   }
 
   Future<void> _rejectProposal(
-      SubscriptionProposal proposal, String? reason) async {
+    SubscriptionProposal proposal,
+    String? reason,
+  ) async {
     setState(() {
       _isProcessing = true;
     });
@@ -774,11 +811,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       await notifier.reject(proposal.id, reason);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('이번 제안을 스킵했습니다'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('이번 제안을 스킵했습니다')));
         context.pop();
       }
     } catch (e) {
@@ -798,5 +833,4 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
       }
     }
   }
-
 }
