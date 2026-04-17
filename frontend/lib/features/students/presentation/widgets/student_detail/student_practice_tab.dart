@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/utils/date_utils.dart';
 import '../../../../practice/domain/entities/student_practice_overview.dart';
 import '../../../../practice/presentation/providers/practice_overview_provider.dart';
+import '../../../../practice/presentation/providers/recording_feedback_provider.dart';
+import '../../../../practice/presentation/widgets/teacher_feedback_sheet.dart';
 
 /// Tab content showing practice progress and statistics
 class StudentPracticeTab extends ConsumerWidget {
@@ -38,7 +41,10 @@ class StudentPracticeTab extends ConsumerWidget {
               _WeeklyPracticeGrid(entries: overview.weeklyEntries),
               if (overview.sharedRecordings.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space4),
-                _SharedRecordingsSection(recordings: overview.sharedRecordings),
+                _SharedRecordingsSection(
+                  recordings: overview.sharedRecordings,
+                  studentId: studentId,
+                ),
               ],
               const SizedBox(height: AppSpacing.space4),
               _DetailStatsButton(studentId: studentId),
@@ -286,9 +292,13 @@ class _DayColumn extends StatelessWidget {
 
 /// List of shared recordings from the student
 class _SharedRecordingsSection extends StatelessWidget {
-  const _SharedRecordingsSection({required this.recordings});
+  const _SharedRecordingsSection({
+    required this.recordings,
+    required this.studentId,
+  });
 
   final List<SharedRecording> recordings;
+  final String studentId;
 
   @override
   Widget build(BuildContext context) {
@@ -318,7 +328,8 @@ class _SharedRecordingsSection extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space3),
           ...recordings.map(
-            (recording) => _RecordingTile(recording: recording),
+            (recording) =>
+                _RecordingTile(recording: recording, studentId: studentId),
           ),
         ],
       ),
@@ -326,76 +337,149 @@ class _SharedRecordingsSection extends StatelessWidget {
   }
 }
 
-/// Individual recording tile with title, date, duration, play icon
-class _RecordingTile extends StatelessWidget {
-  const _RecordingTile({required this.recording});
+/// Individual recording tile — tap to open feedback sheet.
+class _RecordingTile extends ConsumerWidget {
+  const _RecordingTile({required this.recording, required this.studentId});
 
   final SharedRecording recording;
+  final String studentId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final feedbackCount = ref.watch(
+      recordingFeedbackCountProvider(recording.recordingId),
+    );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+      child: InkWell(
+        onTap:
+            () => TeacherFeedbackSheet.show(
+              context,
+              recording: recording,
+              studentId: studentId,
+              teacherId: 'teacher_current',
+            ),
+        borderRadius: BorderRadius.circular(AppSpacing.space2),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space2,
+            vertical: AppSpacing.space2,
+          ),
+          child: Row(
+            children: [
+              _TileLeading(feedbackCount: feedbackCount),
+              const SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recording.repertoireName,
+                      style: AppTypography.bodyMedium,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            recording.sectionName,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (feedbackCount > 0) ...[
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(
+                            '· ${AppStrings.recordingFeedbackCount(feedbackCount)}',
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.space2),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    recording.formattedDuration,
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
+                  if (recording.bpm != null)
+                    Text(
+                      '${recording.bpm} BPM',
+                      style: AppTypography.caption.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TileLeading extends StatelessWidget {
+  const _TileLeading({required this.feedbackCount});
+
+  final int feedbackCount;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-      child: Row(
-        children: [
-          // Play icon
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(AppSpacing.space2),
-            ),
-            child: const Icon(
-              Icons.play_arrow_rounded,
-              size: 20,
-              color: AppColors.primary,
-            ),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(AppSpacing.space2),
           ),
-          const SizedBox(width: AppSpacing.space3),
-          // Title & section
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  recording.repertoireName,
-                  style: AppTypography.bodyMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  recording.sectionName,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
+          child: const Icon(
+            Icons.chat_bubble_outline,
+            size: 18,
+            color: AppColors.primary,
           ),
-          const SizedBox(width: AppSpacing.space2),
-          // Duration & BPM
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                recording.formattedDuration,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+        ),
+        if (feedbackCount > 0)
+          Positioned(
+            right: -2,
+            top: -2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.surfaceLight, width: 1.5),
+              ),
+              child: Text(
+                '$feedbackCount',
+                style: AppTypography.caption.copyWith(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  height: 1.0,
                 ),
               ),
-              if (recording.bpm != null)
-                Text(
-                  '${recording.bpm} BPM',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
-                  ),
-                ),
-            ],
+            ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -1199,4 +1199,30 @@ class AppStrings {
 
   /// 이번회차 스케줄 변경
   static const chatSingleScheduleChange = '이번회차 스케줄 변경';
+
+  // ── Recording Feedback (선생님 공유 녹음 피드백) ─────────
+
+  /// 공유 녹음 피드백
+  static const recordingFeedbackTitle = '공유 녹음 피드백';
+
+  /// 학생의 연습에 대한 코멘트를 남겨주세요
+  static const recordingFeedbackDescription = '학생의 연습에 대한 코멘트를 남겨주세요';
+
+  /// 예시 힌트
+  static const recordingFeedbackHint = '예: 템포를 조금 더 안정적으로 유지해보세요';
+
+  /// 피드백 저장
+  static const recordingFeedbackSave = '피드백 저장';
+
+  /// 아직 남긴 피드백이 없습니다
+  static const recordingFeedbackEmpty = '아직 남긴 피드백이 없습니다';
+
+  /// 피드백이 저장되었습니다
+  static const recordingFeedbackSaved = '피드백이 저장되었습니다';
+
+  /// 피드백 N개
+  static String recordingFeedbackCount(int n) => '피드백 $n개';
+
+  /// 재생은 실제 녹음 파일이 연동되면 지원됩니다
+  static const recordingPlaybackComingSoon = '재생은 실제 녹음 파일이 연동되면 지원됩니다';
 }
