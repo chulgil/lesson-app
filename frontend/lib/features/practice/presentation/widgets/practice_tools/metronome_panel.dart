@@ -61,18 +61,11 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       vsync: this,
     );
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.9),
-        weight: 40,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 0.9, end: 1.0),
-        weight: 60,
-      ),
-    ]).animate(CurvedAnimation(
-      parent: _tapAnimationController,
-      curve: Curves.easeOut,
-    ));
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.9), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 0.9, end: 1.0), weight: 60),
+    ]).animate(
+      CurvedAnimation(parent: _tapAnimationController, curve: Curves.easeOut),
+    );
 
     _tapAnimationController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -251,15 +244,17 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                 ),
                 // Speech bubble (top left of cat)
                 // Shows audio error, tempo explanation, or tap tempo message
-                if (state.hasAudioError || (!state.isPlaying && !_isBubbleHidden))
+                if (state.hasAudioError ||
+                    (!state.isPlaying && !_isBubbleHidden))
                   Positioned(
                     left: 10,
                     top: 0,
                     child: TapTempoSpeechBubble(
                       tapCount: _tapTimestamps.length,
-                      tempoExplanation: _showTempoExplanation
-                          ? _getTempoExplanation(state.settings.bpm)
-                          : null,
+                      tempoExplanation:
+                          _showTempoExplanation
+                              ? _getTempoExplanation(state.settings.bpm)
+                              : null,
                       audioError: state.audioError,
                     ),
                   ),
@@ -321,20 +316,21 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                 shape: const CircleBorder(),
                 padding: EdgeInsets.zero,
               ),
-              child: state.isPlaying && state.currentBeat > 0
-                  ? Text(
-                      '${state.currentBeat}',
-                      style: AppTypography.displayLarge.copyWith(
-                        fontWeight: FontWeight.bold,
+              child:
+                  state.isPlaying && state.currentBeat > 0
+                      ? Text(
+                        '${state.currentBeat}',
+                        style: AppTypography.displayLarge.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                          fontSize: 36,
+                        ),
+                      )
+                      : Icon(
+                        state.isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 48,
                         color: AppColors.primary,
-                        fontSize: 36,
                       ),
-                    )
-                  : Icon(
-                      state.isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 48,
-                      color: AppColors.primary,
-                    ),
             ),
           ),
           SizedBox(height: AppSpacing.space8),
@@ -357,7 +353,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     state.settings.timeSignature,
                   );
                   if (result != null) {
-                    ref.read(metronomeProvider.notifier).setTimeSignature(result);
+                    ref
+                        .read(metronomeProvider.notifier)
+                        .setTimeSignature(result);
                   }
                 },
                 child: Container(
@@ -375,7 +373,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     children: [
                       Row(
                         children: [
-                          _buildTimeSignatureDisplay(state.settings.timeSignature),
+                          _buildTimeSignatureDisplay(
+                            state.settings.timeSignature,
+                          ),
                           SizedBox(width: AppSpacing.space3),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,8 +459,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             child: Center(
                               child: Text(
                                 state.settings.subdivision.noteSymbol,
-                                style: TextStyle(
-                                  fontSize: 24,
+                                style: AppTypography.headingLarge.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.primary,
                                 ),
@@ -514,11 +513,17 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                     ),
                   ),
                   Switch(
-                    value: state.settings.accentPattern == AccentPattern.firstBeatOnly,
+                    value:
+                        state.settings.accentPattern ==
+                        AccentPattern.firstBeatOnly,
                     onChanged: (value) {
-                      ref.read(metronomeProvider.notifier).setAccentPattern(
-                        value ? AccentPattern.firstBeatOnly : AccentPattern.uniform,
-                      );
+                      ref
+                          .read(metronomeProvider.notifier)
+                          .setAccentPattern(
+                            value
+                                ? AccentPattern.firstBeatOnly
+                                : AccentPattern.uniform,
+                          );
                     },
                     activeColor: AppColors.primary,
                   ),
@@ -550,22 +555,16 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
         children: [
           Text(
             numerator,
-            style: TextStyle(
-              fontSize: 16,
+            style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
               height: 1.0,
             ),
           ),
-          Container(
-            width: 20,
-            height: 1.5,
-            color: AppColors.primary,
-          ),
+          Container(width: 20, height: 1.5, color: AppColors.primary),
           Text(
             denominator,
-            style: TextStyle(
-              fontSize: 16,
+            style: AppTypography.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
               color: AppColors.primary,
               height: 1.0,
@@ -632,7 +631,10 @@ class TapTempoSpeechBubble extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: AppSpacing.space2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: AppSpacing.space2,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
