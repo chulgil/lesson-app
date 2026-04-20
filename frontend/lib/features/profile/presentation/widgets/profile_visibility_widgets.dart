@@ -129,7 +129,7 @@ class ProfileCompletionCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: percentage / 100,
               backgroundColor: levelColor.withValues(alpha: 0.2),
@@ -413,7 +413,7 @@ class PreviewSection extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.textTertiaryLight.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '비공개',
@@ -454,7 +454,7 @@ class BadgeChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
