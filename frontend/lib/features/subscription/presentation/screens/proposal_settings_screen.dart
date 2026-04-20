@@ -198,24 +198,24 @@ class _ProposalSettingsScreenState
           '제안할 수강권',
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '선택하지 않으면 모든 활성 수강권이 제안됩니다',
           style: AppTypography.caption.copyWith(
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         templatesAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, __) => const Text('오류가 발생했습니다.'),
           data: (templates) {
             if (templates.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   border: Border.all(color: AppColors.borderLight),
                 ),
                 child: Row(
@@ -225,7 +225,7 @@ class _ProposalSettingsScreenState
                       size: 20,
                       color: AppColors.textSecondaryLight,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.space3),
                     Text(
                       '수강권 템플릿이 없습니다',
                       style: AppTypography.bodyMedium.copyWith(
@@ -246,7 +246,7 @@ class _ProposalSettingsScreenState
                     final isRecommended = _recommendedTemplateId == template.id;
 
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                       child: InkWell(
                         onTap: () {
                           setState(() {
@@ -272,15 +272,19 @@ class _ProposalSettingsScreenState
                             }
                           });
                         },
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLarge,
+                        ),
                         child: Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(AppSpacing.space3),
                           decoration: BoxDecoration(
                             color:
                                 isSelected
                                     ? AppColors.primary.withValues(alpha: 0.05)
                                     : AppColors.surfaceLight,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusLarge,
+                            ),
                             border: Border.all(
                               color:
                                   isSelected
@@ -296,7 +300,9 @@ class _ProposalSettingsScreenState
                                 width: 20,
                                 height: 20,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSmall,
+                                  ),
                                   border: Border.all(
                                     color:
                                         isSelected
@@ -318,7 +324,7 @@ class _ProposalSettingsScreenState
                                         )
                                         : null,
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: AppSpacing.space3),
 
                               // Template info
                               Expanded(
@@ -335,7 +341,9 @@ class _ProposalSettingsScreenState
                                               ),
                                         ),
                                         if (isRecommended) ...[
-                                          const SizedBox(width: 4),
+                                          const SizedBox(
+                                            width: AppSpacing.space1,
+                                          ),
                                           const Text(
                                             '⭐',
                                             style: TextStyle(fontSize: 12),
@@ -363,8 +371,8 @@ class _ProposalSettingsScreenState
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
+                                      horizontal: AppSpacing.space2,
+                                      vertical: AppSpacing.space1,
                                     ),
                                     decoration: BoxDecoration(
                                       color:
@@ -373,7 +381,9 @@ class _ProposalSettingsScreenState
                                                 alpha: 0.2,
                                               )
                                               : AppColors.surfaceSecondaryLight,
-                                      borderRadius: BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusSmall,
+                                      ),
                                     ),
                                     child: Text(
                                       isRecommended ? '추천' : '추천',
