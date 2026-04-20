@@ -163,7 +163,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Icon(
               Icons.autorenew,
@@ -242,7 +242,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
@@ -250,7 +250,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               isSelected
                   ? AppColors.primary.withValues(alpha: 0.05)
                   : AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
             width: isSelected ? 2 : 1,
@@ -305,7 +305,9 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.warning.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             '추천',
@@ -444,7 +446,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
                 icon:

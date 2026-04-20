@@ -14,10 +14,7 @@ import '../providers/subscription_template_providers.dart';
 class SubscriptionTemplateListScreen extends ConsumerWidget {
   final String teacherId;
 
-  const SubscriptionTemplateListScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const SubscriptionTemplateListScreen({super.key, required this.teacherId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,7 +28,9 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
-              context.push('${AppRoutes.proposalSettings}?teacherId=$teacherId');
+              context.push(
+                '${AppRoutes.proposalSettings}?teacherId=$teacherId',
+              );
             },
             icon: const Icon(Icons.settings_outlined),
             tooltip: '자동 제안 설정',
@@ -112,9 +111,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
               onPressed: () => _showAddTemplateDialog(context, ref),
               icon: const Icon(Icons.add),
               label: const Text('첫 수강권 만들기'),
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
             ),
           ],
         ),
@@ -129,11 +126,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '데이터를 불러올 수 없습니다',
@@ -152,23 +145,24 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _TemplateFormSheet(
-        teacherId: teacherId,
-        onSave: (template) async {
-          await ref
-              .read(subscriptionTemplateNotifierProvider.notifier)
-              .createTemplate(
-                ownerId: template.ownerId,
-                ownerType: template.ownerType,
-                name: template.name,
-                totalLessons: template.totalLessons,
-                lessonDurationMinutes: template.lessonDurationMinutes,
-                validityDays: template.validityDays,
-                price: template.price,
-                description: template.description,
-              );
-        },
-      ),
+      builder:
+          (context) => _TemplateFormSheet(
+            teacherId: teacherId,
+            onSave: (template) async {
+              await ref
+                  .read(subscriptionTemplateNotifierProvider.notifier)
+                  .createTemplate(
+                    ownerId: template.ownerId,
+                    ownerType: template.ownerType,
+                    name: template.name,
+                    totalLessons: template.totalLessons,
+                    lessonDurationMinutes: template.lessonDurationMinutes,
+                    validityDays: template.validityDays,
+                    price: template.price,
+                    description: template.description,
+                  );
+            },
+          ),
     );
   }
 
@@ -181,20 +175,23 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _TemplateFormSheet(
-        teacherId: teacherId,
-        template: template,
-        onSave: (updated) async {
-          await ref
-              .read(subscriptionTemplateNotifierProvider.notifier)
-              .updateTemplate(updated);
-        },
-      ),
+      builder:
+          (context) => _TemplateFormSheet(
+            teacherId: teacherId,
+            template: template,
+            onSave: (updated) async {
+              await ref
+                  .read(subscriptionTemplateNotifierProvider.notifier)
+                  .updateTemplate(updated);
+            },
+          ),
     );
   }
 
   Future<void> _toggleActive(
-      WidgetRef ref, SubscriptionTemplate template) async {
+    WidgetRef ref,
+    SubscriptionTemplate template,
+  ) async {
     await ref
         .read(subscriptionTemplateNotifierProvider.notifier)
         .toggleActive(template);
@@ -207,26 +204,27 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('수강권 삭제'),
-        content: Text('"${template.name}"을(를) 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('수강권 삭제'),
+            content: Text('"${template.name}"을(를) 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await ref
+                      .read(subscriptionTemplateNotifierProvider.notifier)
+                      .deleteTemplate(template);
+                },
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await ref
-                  .read(subscriptionTemplateNotifierProvider.notifier)
-                  .deleteTemplate(template);
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -253,9 +251,10 @@ class _TemplateCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
-          color: template.isActive
-              ? AppColors.borderLight
-              : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+          color:
+              template.isActive
+                  ? AppColors.borderLight
+                  : AppColors.textTertiaryLight.withValues(alpha: 0.3),
         ),
       ),
       color: template.isActive ? Colors.white : AppColors.surfaceSecondaryLight,
@@ -279,9 +278,10 @@ class _TemplateCard extends StatelessWidget {
                             Text(
                               template.name,
                               style: AppTypography.headingSmall.copyWith(
-                                color: template.isActive
-                                    ? AppColors.textPrimaryLight
-                                    : AppColors.textTertiaryLight,
+                                color:
+                                    template.isActive
+                                        ? AppColors.textPrimaryLight
+                                        : AppColors.textTertiaryLight,
                               ),
                             ),
                             if (!template.isActive) ...[
@@ -292,9 +292,12 @@ class _TemplateCard extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.textTertiaryLight
-                                      .withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: AppColors.textTertiaryLight.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSmall,
+                                  ),
                                 ),
                                 child: Text(
                                   '비활성',
@@ -314,8 +317,12 @@ class _TemplateCard extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.success.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: AppColors.success.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSmall,
+                                  ),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -343,9 +350,10 @@ class _TemplateCard extends StatelessWidget {
                         Text(
                           template.summaryText,
                           style: AppTypography.bodyMedium.copyWith(
-                            color: template.isActive
-                                ? AppColors.textSecondaryLight
-                                : AppColors.textTertiaryLight,
+                            color:
+                                template.isActive
+                                    ? AppColors.textSecondaryLight
+                                    : AppColors.textTertiaryLight,
                           ),
                         ),
                       ],
@@ -366,45 +374,51 @@ class _TemplateCard extends StatelessWidget {
                           break;
                       }
                     },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Row(
-                          children: [
-                            Icon(Icons.edit_outlined, size: 20),
-                            SizedBox(width: 8),
-                            Text('수정'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'toggle',
-                        child: Row(
-                          children: [
-                            Icon(
-                              template.isActive
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              size: 20,
+                    itemBuilder:
+                        (context) => [
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit_outlined, size: 20),
+                                SizedBox(width: 8),
+                                Text('수정'),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Text(template.isActive ? '비활성화' : '활성화'),
-                          ],
-                        ),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Row(
-                          children: [
-                            Icon(Icons.delete_outline,
-                                size: 20, color: AppColors.error),
-                            SizedBox(width: 8),
-                            Text('삭제',
-                                style: TextStyle(color: AppColors.error)),
-                          ],
-                        ),
-                      ),
-                    ],
+                          ),
+                          PopupMenuItem(
+                            value: 'toggle',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  template.isActive
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(template.isActive ? '비활성화' : '활성화'),
+                              ],
+                            ),
+                          ),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete_outline,
+                                  size: 20,
+                                  color: AppColors.error,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '삭제',
+                                  style: TextStyle(color: AppColors.error),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                   ),
                 ],
               ),
@@ -473,9 +487,10 @@ class _DetailChip extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.primary.withValues(alpha: 0.1)
-            : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+        color:
+            isActive
+                ? AppColors.primary.withValues(alpha: 0.1)
+                : AppColors.textTertiaryLight.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
@@ -729,23 +744,25 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                       vertical: AppSpacing.space3,
                     ),
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                          : Text(
+                            isEditing ? '수정하기' : '추가하기',
+                            style: AppTypography.bodyLarge.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        )
-                      : Text(
-                          isEditing ? '수정하기' : '추가하기',
-                          style: AppTypography.bodyLarge.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -761,14 +778,16 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: _isAutoProposalEnabled
-            ? AppColors.success.withValues(alpha: 0.05)
-            : AppColors.surfaceLight,
+        color:
+            _isAutoProposalEnabled
+                ? AppColors.success.withValues(alpha: 0.05)
+                : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: _isAutoProposalEnabled
-              ? AppColors.success.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+          color:
+              _isAutoProposalEnabled
+                  ? AppColors.success.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -803,18 +822,20 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                       Icon(
                         Icons.flash_on,
                         size: 18,
-                        color: _isAutoProposalEnabled
-                            ? AppColors.success
-                            : AppColors.textTertiaryLight,
+                        color:
+                            _isAutoProposalEnabled
+                                ? AppColors.success
+                                : AppColors.textTertiaryLight,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '자동 제안 대상',
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: _isAutoProposalEnabled
-                              ? AppColors.textPrimaryLight
-                              : AppColors.textSecondaryLight,
+                          color:
+                              _isAutoProposalEnabled
+                                  ? AppColors.textPrimaryLight
+                                  : AppColors.textSecondaryLight,
                         ),
                       ),
                     ],
@@ -860,9 +881,10 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         lessonDurationMinutes: _lessonDuration,
         validityDays: _validityDays,
         price: int.parse(_priceController.text.trim()),
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
+        description:
+            _descriptionController.text.trim().isNotEmpty
+                ? _descriptionController.text.trim()
+                : null,
         isActive: widget.template?.isActive ?? true,
         displayOrder: widget.template?.displayOrder ?? 0,
         createdAt: widget.template?.createdAt ?? DateTime.now(),
