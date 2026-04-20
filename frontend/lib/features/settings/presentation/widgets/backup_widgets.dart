@@ -77,9 +77,9 @@ class StatusCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.space4),
           const Divider(height: 1, color: AppColors.borderLight),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.space4),
           Row(
             children: [
               Expanded(
@@ -193,7 +193,7 @@ class ProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.space3),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
@@ -264,7 +264,7 @@ class ActionsSection extends ConsumerWidget {
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         // Create backup button
         ActionButton(
           icon: Icons.upload_file,
@@ -272,7 +272,7 @@ class ActionsSection extends ConsumerWidget {
           subtitle: '모든 녹음과 데이터를 ZIP으로 내보냅니다',
           onPressed: isOperating ? null : () => _createBackup(context, ref),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         // Restore button
         ActionButton(
           icon: Icons.download,
@@ -280,7 +280,7 @@ class ActionsSection extends ConsumerWidget {
           subtitle: '이전 백업 파일에서 데이터를 복원합니다',
           onPressed: isOperating ? null : () => _restoreBackup(context, ref),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.space6),
         // Orphan recordings section
         const Text(
           '녹음 관리',
@@ -290,7 +290,7 @@ class ActionsSection extends ConsumerWidget {
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         // Orphan recordings button
         const OrphanRecordingsButton(),
       ],
@@ -522,7 +522,7 @@ class BackupListSection extends ConsumerWidget {
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         backupList.when(
           data: (backups) {
             if (backups.isEmpty) {
@@ -540,7 +540,7 @@ class BackupListSection extends ConsumerWidget {
                         size: 48,
                         color: AppColors.textTertiaryLight,
                       ),
-                      SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.space3),
                       Text(
                         '저장된 백업이 없습니다',
                         style: TextStyle(color: AppColors.textSecondaryLight),

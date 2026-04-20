@@ -445,7 +445,7 @@ class _ScheduleWeeklyGridViewState
             size: 48,
             color: AppColors.textTertiaryLight,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.space3),
           Text(
             '이번 주는 레슨이 없습니다',
             style: AppTypography.bodyMedium.copyWith(

@@ -64,7 +64,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                           size: 64,
                           color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppSpacing.space4),
                         Text(
                           '아카이브된 레퍼토리가 없습니다',
                           style: AppTypography.bodyLarge.copyWith(
@@ -94,14 +94,14 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                       size: 64,
                       color: AppColors.error,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.space4),
                     Text(
                       '오류가 발생했습니다',
                       style: AppTypography.bodyLarge.copyWith(
                         color: AppColors.error,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
                     TextButton(
                       onPressed: () => ref.invalidate(archivedRepertoiresProvider(studentId)),
                       child: const Text('다시 시도'),

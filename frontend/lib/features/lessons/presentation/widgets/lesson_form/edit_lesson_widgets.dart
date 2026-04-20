@@ -153,7 +153,7 @@ void showCancelLessonDialog({
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('이 레슨을 취소하시겠습니까?'),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.space4),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
@@ -178,7 +178,7 @@ void showCancelLessonDialog({
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.space4),
               Text(
                 '학생에게 레슨 취소 알림이 전송됩니다.',
                 style: AppTypography.caption.copyWith(

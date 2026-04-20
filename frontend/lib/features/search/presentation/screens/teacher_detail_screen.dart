@@ -134,7 +134,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.space4),
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
@@ -151,7 +151,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                                 )
                                 : null,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.space3),
                       Text(
                         profile.name ?? '익명 선생님',
                         style: AppTypography.headingMedium.copyWith(

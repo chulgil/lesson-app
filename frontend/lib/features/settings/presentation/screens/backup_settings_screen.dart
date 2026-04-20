@@ -40,12 +40,12 @@ class BackupSettingsScreen extends ConsumerWidget {
                     size: 48,
                     color: AppColors.error,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.space4),
                   const Text(
                     '오류가 발생했습니다.',
                     style: TextStyle(color: AppColors.error),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.space4),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(backupStateProvider),
                     child: const Text('다시 시도'),
@@ -74,12 +74,12 @@ class _BackupContent extends ConsumerWidget {
         children: [
           // Status card
           StatusCard(state: state),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.space6),
 
           // Progress indicator
           if (isOperating) ...[
             ProgressCard(state: state),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.space6),
           ],
 
           // Error message
@@ -89,12 +89,12 @@ class _BackupContent extends ConsumerWidget {
               onDismiss:
                   () => ref.read(backupStateProvider.notifier).clearError(),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppSpacing.space6),
           ],
 
           // Actions
           ActionsSection(isOperating: isOperating),
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.space6),
 
           // Backup list
           const BackupListSection(),

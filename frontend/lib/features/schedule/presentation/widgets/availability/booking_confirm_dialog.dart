@@ -94,7 +94,7 @@ class BookingConfirmDialog extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.space2),
                 Row(
                   children: [
                     Icon(
@@ -124,7 +124,7 @@ class BookingConfirmDialog extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.space4),
 
           // Policy notices (not for trial lessons)
           if (!isTrialLesson) ...[
@@ -136,7 +136,7 @@ class BookingConfirmDialog extends StatelessWidget {
                       : '예약 확정 후 변경 시 변경권이 차감됩니다.',
               color: AppColors.warning,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.space2),
             _buildPolicyNotice(
               icon: Icons.warning_amber_outlined,
               text: '변경권이 없는 경우 레슨 시간 변경이 불가합니다.',
@@ -145,7 +145,7 @@ class BookingConfirmDialog extends StatelessWidget {
 
             // Show remaining reschedules if available
             if (remainingReschedules != null && totalReschedules != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.space3),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 12,

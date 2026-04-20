@@ -126,7 +126,7 @@ class AcademyDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.space4),
                   Container(
                     width: 64,
                     height: 64,
@@ -142,7 +142,7 @@ class AcademyDetailScreen extends ConsumerWidget {
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.space3),
                   Text(
                     academy.name,
                     style: AppTypography.headingMedium.copyWith(

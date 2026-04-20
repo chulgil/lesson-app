@@ -47,7 +47,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.space4),
                 Row(
                   children: [
                     _buildStat(context, '총 이동시간', analytics.formattedTotal),

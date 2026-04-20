@@ -454,7 +454,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('선택한 시간은 이미 지난 시간입니다.'),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.space3),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
@@ -842,7 +842,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('다음 요일에 기존 레슨과 시간이 겹칩니다:'),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.space2),
                 ...conflictDays.map(
                   (d) => Padding(
                     padding: const EdgeInsets.only(left: 8, bottom: 4),
@@ -852,7 +852,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.space2),
                 const Text('그래도 계속 진행하시겠습니까?'),
               ],
             ),

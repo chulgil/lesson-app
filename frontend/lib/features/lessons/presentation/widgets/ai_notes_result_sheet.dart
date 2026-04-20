@@ -98,7 +98,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                   children: [
                     // Feedback section
                     _buildSectionHeader('피드백', Icons.chat_bubble_outline),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
                     TextField(
                       controller: _feedbackController,
                       maxLines: null,
@@ -110,7 +110,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
 
                     // Key points section
                     _buildSectionHeader('핵심 포인트', Icons.flag_outlined),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
                     ...widget.result.keyPoints.asMap().entries.map(
                       (entry) => Padding(
                         padding: const EdgeInsets.only(bottom: 6),
@@ -142,7 +142,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
 
                     // Practice tips section
                     _buildSectionHeader('연습 팁', Icons.lightbulb_outline),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
                     TextField(
                       controller: _tipsController,
                       maxLines: null,
@@ -155,7 +155,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
 
                       // Suggested assignments
                       _buildSectionHeader('과제 제안', Icons.assignment_outlined),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.space2),
                       ...widget.result.suggestedAssignments.map(
                         (a) => Card(
                           margin: const EdgeInsets.only(

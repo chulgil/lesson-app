@@ -138,16 +138,16 @@ class SmartRecordingResultDialog extends StatelessWidget {
             style: AppTypography.bodyLarge,
           ),
           if (hasAnyTrimming) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space3),
             const Divider(),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space3),
             Text(
               '스마트 녹음 적용:',
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.space2),
             if (trimmedStart > Duration.zero)
               Row(
                 children: [

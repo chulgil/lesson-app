@@ -80,7 +80,7 @@ class _TeacherSearchFilterSheetState
                     children: [
                       // Instruments
                       _buildSectionTitle('악기'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.space2),
                       instrumentsAsync.when(
                         loading: () => const CircularProgressIndicator(),
                         error: (_, __) => const Text('오류가 발생했습니다.'),
@@ -99,11 +99,11 @@ class _TeacherSearchFilterSheetState
                             ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.space6),
 
                       // Areas
                       _buildSectionTitle('지역'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.space2),
                       areasAsync.when(
                         loading: () => const CircularProgressIndicator(),
                         error: (_, __) => const Text('오류가 발생했습니다.'),
@@ -121,21 +121,21 @@ class _TeacherSearchFilterSheetState
                             ),
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.space6),
 
                       // Lesson types
                       _buildSectionTitle('레슨 방식'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.space2),
                       _buildLessonTypeOptionSelection(),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.space6),
 
                       // Experience
                       _buildSectionTitle('최소 경력'),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.space2),
                       _buildExperienceSelection(),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.space6),
 
                       // Certificate
                       SwitchListTile(

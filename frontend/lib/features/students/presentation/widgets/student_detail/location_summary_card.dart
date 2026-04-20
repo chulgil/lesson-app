@@ -54,7 +54,7 @@ class LocationSummaryCard extends ConsumerWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.space3),
             if (locationAsync != null)
               locationAsync.when(
                 data:
@@ -111,7 +111,7 @@ class LocationSummaryCard extends ConsumerWidget {
           ),
         ],
         if (travelTime > 0) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.space2),
           _buildTravelChip(context, travelTime),
         ],
       ],

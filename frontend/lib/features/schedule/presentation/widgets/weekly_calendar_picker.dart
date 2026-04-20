@@ -223,7 +223,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         _buildDayHeaders(),
         const Divider(height: 1, color: AppColors.scheduleGridLine),
         ..._buildHourRows(availability),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         _buildSelectionList(),
       ],
     );

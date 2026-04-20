@@ -143,7 +143,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
             CircleButton(label: '+5', onPressed: () => onIncrement(5)),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.space2),
         // Fine-tuning +1/-1 buttons
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

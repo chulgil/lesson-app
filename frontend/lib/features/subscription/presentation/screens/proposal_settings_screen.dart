@@ -447,7 +447,7 @@ class _ProposalSettingsScreenState
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
@@ -487,7 +487,7 @@ class _ProposalSettingsScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.space3),
               // Validity hours
               Row(
                 children: [
@@ -519,7 +519,7 @@ class _ProposalSettingsScreenState
                 ],
               ),
               if (_discountPercent > 0) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.space3),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
@@ -570,7 +570,7 @@ class _ProposalSettingsScreenState
             color: AppColors.textSecondaryLight,
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(

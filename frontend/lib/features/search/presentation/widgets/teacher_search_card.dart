@@ -102,7 +102,7 @@ class TeacherSearchCard extends StatelessWidget {
                     // Experience and fee
                     _buildExperienceAndFee(publicProfile),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
 
                     // Introduction
                     Text(
@@ -112,7 +112,7 @@ class TeacherSearchCard extends StatelessWidget {
                       style: AppTypography.bodySmall,
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.space2),
 
                     // Lesson areas
                     if (publicProfile.lessonAreas != null &&
