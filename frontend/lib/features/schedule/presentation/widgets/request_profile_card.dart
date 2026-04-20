@@ -189,10 +189,9 @@ class RequestProfileCard extends StatelessWidget {
             ),
             child: Text(
               AppStrings.returning,
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.captionSmall.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.success,
-                fontSize: 10,
               ),
             ),
           ),
@@ -210,9 +209,10 @@ class RequestProfileCard extends StatelessWidget {
   }
 
   Widget _buildTypeBadge() {
-    final typeColor = request.type == LessonRequestType.trial
-        ? AppColors.info
-        : AppColors.primary;
+    final typeColor =
+        request.type == LessonRequestType.trial
+            ? AppColors.info
+            : AppColors.primary;
 
     return Container(
       padding: const EdgeInsets.symmetric(
