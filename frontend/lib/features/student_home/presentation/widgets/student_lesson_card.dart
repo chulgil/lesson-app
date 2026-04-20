@@ -12,10 +12,7 @@ import '../../../../features/lessons/domain/entities/lesson.dart';
 class StudentLessonCard extends StatelessWidget {
   final Lesson lesson;
 
-  const StudentLessonCard({
-    super.key,
-    required this.lesson,
-  });
+  const StudentLessonCard({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +59,13 @@ class StudentLessonCard extends StatelessWidget {
                     width: 56,
                     height: 56,
                     decoration: BoxDecoration(
-                      color: isUpcoming
-                          ? AppColors.primaryLight.withValues(alpha: 0.2)
-                          : AppColors.surfaceSecondaryLight,
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      color:
+                          isUpcoming
+                              ? AppColors.primaryLight.withValues(alpha: 0.2)
+                              : AppColors.surfaceSecondaryLight,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -74,18 +73,20 @@ class StudentLessonCard extends StatelessWidget {
                         Text(
                           timeFormat.format(lessonDateTime),
                           style: AppTypography.bodyLarge.copyWith(
-                            color: isUpcoming
-                                ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                            color:
+                                isUpcoming
+                                    ? AppColors.primary
+                                    : AppColors.textSecondaryLight,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           '${lesson.duration}분',
                           style: AppTypography.caption.copyWith(
-                            color: isUpcoming
-                                ? AppColors.primary
-                                : AppColors.textTertiaryLight,
+                            color:
+                                isUpcoming
+                                    ? AppColors.primary
+                                    : AppColors.textTertiaryLight,
                           ),
                         ),
                       ],
@@ -114,9 +115,12 @@ class StudentLessonCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.secondaryLight
-                                    .withValues(alpha: 0.3),
-                                borderRadius: BorderRadius.circular(4),
+                                color: AppColors.secondaryLight.withValues(
+                                  alpha: 0.3,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusSmall,
+                                ),
                               ),
                               child: Text(
                                 lesson.instrument,
@@ -174,21 +178,25 @@ class StudentLessonCard extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: daysUntil <= 1
-                            ? AppColors.primary
-                            : AppColors.surfaceSecondaryLight,
-                        borderRadius: BorderRadius.circular(16),
+                        color:
+                            daysUntil <= 1
+                                ? AppColors.primary
+                                : AppColors.surfaceSecondaryLight,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusXLarge,
+                        ),
                       ),
                       child: Text(
                         daysUntil == 0
                             ? '오늘'
                             : daysUntil == 1
-                                ? '내일'
-                                : 'D-$daysUntil',
+                            ? '내일'
+                            : 'D-$daysUntil',
                         style: AppTypography.caption.copyWith(
-                          color: daysUntil <= 1
-                              ? Colors.white
-                              : AppColors.textSecondaryLight,
+                          color:
+                              daysUntil <= 1
+                                  ? Colors.white
+                                  : AppColors.textSecondaryLight,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -204,10 +212,7 @@ class StudentLessonCard extends StatelessWidget {
 
             // Feedback preview (for past lessons)
             if (!isUpcoming && lesson.hasFeedback) ...[
-              Divider(
-                height: 1,
-                color: AppColors.borderLight,
-              ),
+              Divider(height: 1, color: AppColors.borderLight),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 child: Row(

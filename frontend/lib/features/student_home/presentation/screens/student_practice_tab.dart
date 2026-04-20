@@ -210,8 +210,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   return _buildRepertoireList(sortedRepertoires, studentId);
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
               ),
             ),
           ],
@@ -277,7 +276,10 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                   })
                   .toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.borderLight),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -602,7 +604,7 @@ class _SectionTile extends ConsumerWidget {
                         );
                   },
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,

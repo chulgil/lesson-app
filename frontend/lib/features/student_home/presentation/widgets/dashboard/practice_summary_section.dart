@@ -44,8 +44,7 @@ class PracticeSummarySection extends ConsumerWidget {
 
       var checkDate = DateTime(now.year, now.month, now.day);
       for (var i = 0; i < 100; i++) {
-        final key =
-            '${checkDate.year}-${checkDate.month}-${checkDate.day}';
+        final key = '${checkDate.year}-${checkDate.month}-${checkDate.day}';
         if (practicedDates.contains(key)) {
           streakDays++;
           checkDate = checkDate.subtract(const Duration(days: 1));
@@ -67,17 +66,16 @@ class PracticeSummarySection extends ConsumerWidget {
           }
         }
       }
-      weeklyPracticedDays =
-          weeklyProgress.where((v) => v > 0).length;
+      weeklyPracticedDays = weeklyProgress.where((v) => v > 0).length;
     }
 
     final hours = weeklyTotalMinutes ~/ 60;
     final minutes = weeklyTotalMinutes % 60;
-    final weeklyTimeStr = hours > 0
-        ? (minutes > 0 ? '$hours시간 $minutes분' : '$hours시간')
-        : '$minutes분';
-    final goalPercent =
-        (weeklyPracticedDays / 7 * 100).round();
+    final weeklyTimeStr =
+        hours > 0
+            ? (minutes > 0 ? '$hours시간 $minutes분' : '$hours시간')
+            : '$minutes분';
+    final goalPercent = (weeklyPracticedDays / 7 * 100).round();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +191,7 @@ class PracticeSummarySection extends ConsumerWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.surfaceSecondaryLight,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -210,7 +208,7 @@ class PracticeSummarySection extends ConsumerWidget {
                             : value > 0
                             ? AppColors.practicePoor
                             : AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                 ),
               ),

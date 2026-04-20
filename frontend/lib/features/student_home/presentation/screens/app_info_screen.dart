@@ -127,7 +127,9 @@ class AppInfoScreen extends StatelessWidget {
                                   AppColors.primaryDark,
                                 ],
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusLarge,
+                              ),
                             ),
                             child: const Icon(
                               Icons.music_note,

@@ -75,8 +75,12 @@ class CompactTrialBookingCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryLight.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.secondaryLight.withValues(
+                              alpha: 0.3,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             booking.instrument!,
@@ -102,13 +106,10 @@ class CompactTrialBookingCard extends StatelessWidget {
 
             // Status badge
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: booking.status.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: Text(
                 booking.status.label,
