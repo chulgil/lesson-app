@@ -78,7 +78,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       // Scroll to "now" position with 80px top margin
       final nowMinutes = _now.hour * 60 + _now.minute;
       final offset = _minutesToOffset(nowMinutes) - 80;
-      _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
+      _scrollController.jumpTo(
+        offset.clamp(0, _scrollController.position.maxScrollExtent),
+      );
     } else if (widget.lessons.isNotEmpty) {
       // Scroll to first lesson with 40px top margin
       final sortedLessons = List<Lesson>.from(widget.lessons)
@@ -86,11 +88,15 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final parts = sortedLessons.first.startTime.split(':');
       final minutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final offset = _minutesToOffset(minutes) - 40;
-      _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
+      _scrollController.jumpTo(
+        offset.clamp(0, _scrollController.position.maxScrollExtent),
+      );
     } else {
       // No lessons: scroll to 9am
       final offset = _minutesToOffset(9 * 60) - 40;
-      _scrollController.jumpTo(offset.clamp(0, _scrollController.position.maxScrollExtent));
+      _scrollController.jumpTo(
+        offset.clamp(0, _scrollController.position.maxScrollExtent),
+      );
     }
   }
 
@@ -101,16 +107,15 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
   @override
   Widget build(BuildContext context) {
-    final availabilityAsync =
-        ref.watch(teacherAvailabilityProvider('teacher_1'));
+    final availabilityAsync = ref.watch(
+      teacherAvailabilityProvider('teacher_1'),
+    );
     final availability = availabilityAsync.valueOrNull;
 
     return Column(
       children: [
         // Timeline body
-        Expanded(
-          child: _buildTimeline(availability),
-        ),
+        Expanded(child: _buildTimeline(availability)),
         // Context-aware summary bar
         _buildSummaryBar(),
       ],
@@ -122,8 +127,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
     // Visible range based on teacher's available time for this day
-    final (startHour, endHour) =
-        _getVisibleRange(availability, sortedLessons);
+    final (startHour, endHour) = _getVisibleRange(availability, sortedLessons);
 
     const topPadding = 16.0;
 
@@ -133,7 +137,12 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTapUp: (details) {
-          _onTimelineTap(details.localPosition.dy, startHour, topPadding, sortedLessons);
+          _onTimelineTap(
+            details.localPosition.dy,
+            startHour,
+            topPadding,
+            sortedLessons,
+          );
         },
         child: SizedBox(
           height: ((endHour - startHour + 1) * 2) * _unitHeight + topPadding,
@@ -153,7 +162,12 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
   /// Convert tap Y position to time and navigate to add lesson.
-  void _onTimelineTap(double tapY, int startHour, double topPadding, List<Lesson> lessons) {
+  void _onTimelineTap(
+    double tapY,
+    int startHour,
+    double topPadding,
+    List<Lesson> lessons,
+  ) {
     // Convert Y offset to minutes
     final adjustedY = tapY - topPadding;
     if (adjustedY < 0) return;
@@ -235,8 +249,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
     return ((earliest - 1).clamp(0, 23), (latest + 1).clamp(0, 23));
   }
 
-
-
   List<Widget> _buildHourGrid(int startHour, int endHour, double topPadding) {
     final widgets = <Widget>[];
 
@@ -252,7 +264,6 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             '${hour.toString().padLeft(2, '0')}:00',
             style: AppTypography.caption.copyWith(
               color: AppColors.textTertiaryLight,
-              fontSize: 11,
             ),
             textAlign: TextAlign.right,
           ),
@@ -264,21 +275,24 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           top: top,
           left: 48,
           right: 0,
-          child: Container(
-            height: 0.5,
-            color: AppColors.scheduleGridLine,
-          ),
+          child: Container(height: 0.5, color: AppColors.scheduleGridLine),
         ),
       );
     }
     return widgets;
   }
 
-  List<Widget> _buildLessonBlocks(List<Lesson> lessons, int startHour, double topPadding) {
+  List<Widget> _buildLessonBlocks(
+    List<Lesson> lessons,
+    int startHour,
+    double topPadding,
+  ) {
     final nowMinutes = _now.hour * 60 + _now.minute;
     final todayDate = DateTime(_now.year, _now.month, _now.day);
     final selectedDateOnly = DateTime(
-      widget.selectedDate.year, widget.selectedDate.month, widget.selectedDate.day,
+      widget.selectedDate.year,
+      widget.selectedDate.month,
+      widget.selectedDate.day,
     );
     final isFutureDate = selectedDateOnly.isAfter(todayDate);
 
@@ -303,12 +317,12 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       final parts = lesson.startTime.split(':');
       final lessonMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
       final endMinutes = lessonMinutes + lesson.duration;
-      final top = ((lessonMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+      final top =
+          ((lessonMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
 
       final isPast = _isToday && endMinutes <= nowMinutes;
-      final isNow = _isToday &&
-          lessonMinutes <= nowMinutes &&
-          endMinutes > nowMinutes;
+      final isNow =
+          _isToday && lessonMinutes <= nowMinutes && endMinutes > nowMinutes;
       final isNext = nextLesson?.id == lesson.id && nextMinutesUntil <= 60;
 
       // Lesson block
@@ -338,7 +352,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       // Travel time block BEFORE lesson
       if (lesson.travelTimeMinutes > 0) {
         final travelStartMinutes = lessonMinutes - lesson.travelTimeMinutes;
-        final travelTop = ((travelStartMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+        final travelTop =
+            ((travelStartMinutes - startHour * 60) / 30.0) * _unitHeight +
+            topPadding;
         final travelHeight = (lesson.travelTimeMinutes / 30.0) * _unitHeight;
 
         widgets.add(
@@ -360,7 +376,8 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
 
   Widget _buildNowIndicator(int startHour, double topPadding) {
     final nowMinutes = _now.hour * 60 + _now.minute;
-    final top = ((nowMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
+    final top =
+        ((nowMinutes - startHour * 60) / 30.0) * _unitHeight + topPadding;
 
     return Positioned(
       top: top,
@@ -373,9 +390,8 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
             width: 40,
             child: Text(
               '${_now.hour.toString().padLeft(2, '0')}:${_now.minute.toString().padLeft(2, '0')}',
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.captionSmall.copyWith(
                 color: AppColors.scheduleNowIndicator,
-                fontSize: 10,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.right,
@@ -404,8 +420,10 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   }
 
   Widget _buildSummaryBar() {
-    final totalMinutes =
-        widget.lessons.fold<int>(0, (sum, l) => sum + l.duration);
+    final totalMinutes = widget.lessons.fold<int>(
+      0,
+      (sum, l) => sum + l.duration,
+    );
     final hours = totalMinutes ~/ 60;
     final mins = totalMinutes % 60;
     final timeStr =
@@ -488,39 +506,46 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
   void _showLessonActions(Lesson lesson) {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.check_circle, color: AppColors.success),
-              title: const Text('완료 처리'),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _completeLesson(lesson);
-              },
+      builder:
+          (ctx) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(
+                    Icons.check_circle,
+                    color: AppColors.success,
+                  ),
+                  title: const Text('완료 처리'),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _completeLesson(lesson);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.edit_calendar,
+                    color: AppColors.info,
+                  ),
+                  title: const Text('일정 변경'),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    context.push(
+                      AppRoutes.editLesson.replaceFirst(':id', lesson.id),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.cancel, color: AppColors.error),
+                  title: const Text('취소'),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _cancelLesson(lesson);
+                  },
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.edit_calendar, color: AppColors.info),
-              title: const Text('일정 변경'),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                context.push(
-                  AppRoutes.editLesson.replaceFirst(':id', lesson.id),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.cancel, color: AppColors.error),
-              title: const Text('취소'),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _cancelLesson(lesson);
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -530,9 +555,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('완료 처리 실패: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('완료 처리 실패: $e')));
       }
     }
   }
@@ -542,9 +567,9 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
       await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('취소 실패: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('취소 실패: $e')));
       }
     }
   }
@@ -555,10 +580,7 @@ class _TravelTimeBlock extends StatelessWidget {
   final int travelMinutes;
   final double height;
 
-  const _TravelTimeBlock({
-    required this.travelMinutes,
-    required this.height,
-  });
+  const _TravelTimeBlock({required this.travelMinutes, required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -568,19 +590,15 @@ class _TravelTimeBlock extends StatelessWidget {
         color: AppColors.scheduleTravelBackground,
         borderRadius: BorderRadius.circular(6),
         border: Border(
-          left: BorderSide(
-            color: AppColors.scheduleTravelAccent,
-            width: 3,
-          ),
+          left: BorderSide(color: AppColors.scheduleTravelAccent, width: 3),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       alignment: Alignment.centerLeft,
       child: Text(
         '이동 $travelMinutes분',
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: AppColors.scheduleTravelAccent,
-          fontSize: 10,
           fontWeight: FontWeight.w500,
         ),
         maxLines: 1,
