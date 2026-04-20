@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/tip_template.dart';
 import '../providers/tip_template_providers.dart';
 
@@ -62,17 +63,7 @@ class _TipTemplateBottomSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: 12),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const Center(child: BottomSheetHandle()),
 
               // Header
               Padding(

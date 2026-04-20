@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
 import 'add_youtube_resource_sheet.dart';
@@ -308,15 +309,9 @@ class _AddResourceButton extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // Handle
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                  const Center(
+                    child: BottomSheetHandle(
+                      margin: EdgeInsets.only(bottom: AppSpacing.space4),
                     ),
                   ),
                   Text('학습 자료 추가', style: AppTypography.headingSmall),
@@ -400,16 +395,10 @@ class _AddResourceButton extends ConsumerWidget {
                       padding: const EdgeInsets.all(AppSpacing.screenPadding),
                       child: Column(
                         children: [
-                          Center(
-                            child: Container(
-                              margin: const EdgeInsets.only(
+                          const Center(
+                            child: BottomSheetHandle(
+                              margin: EdgeInsets.only(
                                 bottom: AppSpacing.space4,
-                              ),
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: AppColors.borderLight,
-                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
                           ),

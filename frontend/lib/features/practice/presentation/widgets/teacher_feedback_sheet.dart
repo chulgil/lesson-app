@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/recording_feedback.dart';
 import '../../domain/entities/student_practice_overview.dart';
 import '../providers/recording_feedback_provider.dart';
@@ -107,7 +108,9 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
             padding: EdgeInsets.only(bottom: bottomInset),
             child: Column(
               children: [
-                _DragHandle(),
+                const BottomSheetHandle(
+                  margin: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                ),
                 _Header(recording: widget.recording),
                 const Divider(height: 1, color: AppColors.borderLight),
                 Expanded(
@@ -124,21 +127,6 @@ class _TeacherFeedbackSheetState extends ConsumerState<TeacherFeedbackSheet> {
               ],
             ),
           ),
-    );
-  }
-}
-
-class _DragHandle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 4,
-      margin: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-      decoration: BoxDecoration(
-        color: AppColors.borderLight,
-        borderRadius: BorderRadius.circular(2),
-      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../providers/teacher_availability_providers.dart';
@@ -395,16 +396,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Handle bar
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderLight,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
+                const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
 
                 const SizedBox(height: AppSpacing.space5),
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/teaching_resource.dart';
 import '../providers/teaching_resource_providers.dart';
 
@@ -12,10 +13,7 @@ class AddYoutubeResourceSheet extends ConsumerStatefulWidget {
   /// Called when a resource is successfully created
   final void Function(TeachingResource resource)? onResourceCreated;
 
-  const AddYoutubeResourceSheet({
-    super.key,
-    this.onResourceCreated,
-  });
+  const AddYoutubeResourceSheet({super.key, this.onResourceCreated});
 
   @override
   ConsumerState<AddYoutubeResourceSheet> createState() =>
@@ -79,8 +77,10 @@ class _AddYoutubeResourceSheetState
         if (parsed.startSeconds != null && parsed.startSeconds! > 0) {
           _useTimestamp = true;
           _startMinController.text = '${parsed.startSeconds! ~/ 60}';
-          _startSecController.text =
-              '${parsed.startSeconds! % 60}'.padLeft(2, '0');
+          _startSecController.text = '${parsed.startSeconds! % 60}'.padLeft(
+            2,
+            '0',
+          );
         }
       });
     } else {
@@ -92,7 +92,10 @@ class _AddYoutubeResourceSheetState
     }
   }
 
-  int? _parseTimestamp(TextEditingController minCtrl, TextEditingController secCtrl) {
+  int? _parseTimestamp(
+    TextEditingController minCtrl,
+    TextEditingController secCtrl,
+  ) {
     final min = int.tryParse(minCtrl.text.trim()) ?? 0;
     final sec = int.tryParse(secCtrl.text.trim()) ?? 0;
     final total = min * 60 + sec;
@@ -122,15 +125,9 @@ class _AddYoutubeResourceSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -144,11 +141,11 @@ class _AddYoutubeResourceSheetState
                 keyboardType: TextInputType.url,
                 decoration: InputDecoration(
                   hintText: 'https://youtube.com/watch?v=...',
-                  prefixIcon:
-                      const Icon(Icons.link, size: 20),
+                  prefixIcon: const Icon(Icons.link, size: 20),
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -158,8 +155,9 @@ class _AddYoutubeResourceSheetState
               if (_urlParsed && _parsedThumbnail != null) ...[
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -170,16 +168,17 @@ class _AddYoutubeResourceSheetState
                         child: Image.network(
                           _parsedThumbnail!,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            color: AppColors.surfaceSecondaryLight,
-                            child: Center(
-                              child: Icon(
-                                Icons.play_circle_outline,
-                                size: 48,
-                                color: AppColors.textTertiaryLight,
+                          errorBuilder:
+                              (_, __, ___) => Container(
+                                color: AppColors.surfaceSecondaryLight,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.play_circle_outline,
+                                    size: 48,
+                                    color: AppColors.textTertiaryLight,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                         ),
                       ),
                       Container(
@@ -187,8 +186,11 @@ class _AddYoutubeResourceSheetState
                         color: AppColors.practiceGood.withValues(alpha: 0.1),
                         child: Row(
                           children: [
-                            Icon(Icons.check_circle,
-                                size: 16, color: AppColors.practiceGood),
+                            Icon(
+                              Icons.check_circle,
+                              size: 16,
+                              color: AppColors.practiceGood,
+                            ),
                             const SizedBox(width: AppSpacing.space2),
                             Text(
                               'URL 확인됨',
@@ -213,8 +215,9 @@ class _AddYoutubeResourceSheetState
                 decoration: InputDecoration(
                   hintText: '예: 힐러리 한 - 바흐 파르티타',
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -225,8 +228,9 @@ class _AddYoutubeResourceSheetState
                 children: [
                   Text(
                     '재생 구간',
-                    style: AppTypography.bodySmall
-                        .copyWith(fontWeight: FontWeight.w600),
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const Spacer(),
                   Switch(
@@ -252,7 +256,8 @@ class _AddYoutubeResourceSheetState
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.space2),
+                        horizontal: AppSpacing.space2,
+                      ),
                       child: Text('~', style: AppTypography.headingSmall),
                     ),
                     // End time
@@ -277,8 +282,9 @@ class _AddYoutubeResourceSheetState
                 decoration: InputDecoration(
                   hintText: '예: 1:32~2:05 구간의 보잉 방향 전환을 관찰하세요',
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -289,13 +295,14 @@ class _AddYoutubeResourceSheetState
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isSubmitting ? null : _submit,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('추가'),
+                  child:
+                      _isSubmitting
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text('추가'),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -342,14 +349,17 @@ class _AddYoutubeResourceSheetState
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     hintText: '분',
-                    hintStyle: AppTypography.caption
-                        .copyWith(color: AppColors.textTertiaryLight),
+                    hintStyle: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space2,
-                        vertical: AppSpacing.space2),
+                      horizontal: AppSpacing.space2,
+                      vertical: AppSpacing.space2,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                   style: AppTypography.bodySmall,
@@ -357,8 +367,9 @@ class _AddYoutubeResourceSheetState
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space1,
+              ),
               child: Text(':', style: AppTypography.bodyMedium),
             ),
             Expanded(
@@ -370,14 +381,17 @@ class _AddYoutubeResourceSheetState
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                     hintText: '초',
-                    hintStyle: AppTypography.caption
-                        .copyWith(color: AppColors.textTertiaryLight),
+                    hintStyle: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space2,
-                        vertical: AppSpacing.space2),
+                      horizontal: AppSpacing.space2,
+                      vertical: AppSpacing.space2,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                   style: AppTypography.bodySmall,
@@ -395,35 +409,37 @@ class _AddYoutubeResourceSheetState
     final title = _titleController.text.trim();
 
     if (url.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('유튜브 URL을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('유튜브 URL을 입력해주세요')));
       return;
     }
 
     if (_parsedVideoId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('올바른 유튜브 URL을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('올바른 유튜브 URL을 입력해주세요')));
       return;
     }
 
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('제목을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('제목을 입력해주세요')));
       return;
     }
 
     setState(() => _isSubmitting = true);
 
     try {
-      final startSeconds = _useTimestamp
-          ? _parseTimestamp(_startMinController, _startSecController)
-          : null;
-      final endSeconds = _useTimestamp
-          ? _parseTimestamp(_endMinController, _endSecController)
-          : null;
+      final startSeconds =
+          _useTimestamp
+              ? _parseTimestamp(_startMinController, _startSecController)
+              : null;
+      final endSeconds =
+          _useTimestamp
+              ? _parseTimestamp(_endMinController, _endSecController)
+              : null;
 
       final resource = await ref
           .read(teachingResourceNotifierProvider.notifier)
@@ -434,23 +450,24 @@ class _AddYoutubeResourceSheetState
             youtubeThumbnail: _parsedThumbnail,
             startSeconds: startSeconds,
             endSeconds: endSeconds,
-            description: _memoController.text.trim().isNotEmpty
-                ? _memoController.text.trim()
-                : null,
+            description:
+                _memoController.text.trim().isNotEmpty
+                    ? _memoController.text.trim()
+                    : null,
           );
 
       if (mounted) {
         widget.onResourceCreated?.call(resource);
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('유튜브 영상이 추가되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('유튜브 영상이 추가되었습니다')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
       }
     } finally {
       if (mounted) {

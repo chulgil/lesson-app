@@ -10,6 +10,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/image_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/teacher_onboarding.dart';
 import '../../../../features/profile/domain/entities/teacher_settings.dart';
 import '../../../../features/onboarding/presentation/providers/onboarding_providers.dart';
@@ -70,7 +71,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         introduction: _introController.text,
       );
 
-      ref.read(teacherOnboardingNotifierProvider.notifier).updateProfile(profile);
+      ref
+          .read(teacherOnboardingNotifierProvider.notifier)
+          .updateProfile(profile);
       ref.read(teacherOnboardingNotifierProvider.notifier).submitProfile();
 
       await Future.delayed(const Duration(milliseconds: 500));
@@ -102,36 +105,42 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
       ),
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('갤러리에서 선택'),
-                onTap: () => Navigator.pop(context, ImageSource.gallery),
+      builder:
+          (context) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('갤러리에서 선택'),
+                    onTap: () => Navigator.pop(context, ImageSource.gallery),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('카메라로 촬영'),
+                    onTap: () => Navigator.pop(context, ImageSource.camera),
+                  ),
+                  if (_profileImage != null)
+                    ListTile(
+                      leading: Icon(
+                        Icons.delete_outline,
+                        color: AppColors.error,
+                      ),
+                      title: Text(
+                        '사진 삭제',
+                        style: TextStyle(color: AppColors.error),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() => _profileImage = null);
+                      },
+                    ),
+                ],
               ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('카메라로 촬영'),
-                onTap: () => Navigator.pop(context, ImageSource.camera),
-              ),
-              if (_profileImage != null)
-                ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.error),
-                  title: Text('사진 삭제',
-                      style: TextStyle(color: AppColors.error)),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() => _profileImage = null);
-                  },
-                ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
 
     if (source == null || !mounted) return;
@@ -159,12 +168,13 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
       ),
-      builder: (context) => _InstrumentSelectorSheet(
-        selectedInstruments: _selectedInstruments,
-        onSelectionChanged: (instruments) {
-          setState(() => _selectedInstruments = instruments);
-        },
-      ),
+      builder:
+          (context) => _InstrumentSelectorSheet(
+            selectedInstruments: _selectedInstruments,
+            onSelectionChanged: (instruments) {
+              setState(() => _selectedInstruments = instruments);
+            },
+          ),
     );
   }
 
@@ -193,10 +203,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     const SizedBox(height: AppSpacing.space6),
 
                     // Title
-                    Text(
-                      '프로필 설정',
-                      style: AppTypography.headingLarge,
-                    ),
+                    Text('프로필 설정', style: AppTypography.headingLarge),
                     const SizedBox(height: AppSpacing.space2),
                     Text(
                       '학생들에게 보여질 기본 정보를 설정해주세요',
@@ -233,7 +240,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                         padding: const EdgeInsets.all(AppSpacing.space3),
                         decoration: BoxDecoration(
                           color: AppColors.warning.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -272,22 +281,22 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.borderLight,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          '다음',
-                          style: AppTypography.button,
-                        ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Text('다음', style: AppTypography.button),
                 ),
               ),
             ),
@@ -300,7 +309,12 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   Widget _buildProgressIndicator() {
     return Row(
       children: [
-        _ProgressStep(step: 1, label: '휴대폰 인증', isActive: false, isCompleted: true),
+        _ProgressStep(
+          step: 1,
+          label: '휴대폰 인증',
+          isActive: false,
+          isCompleted: true,
+        ),
         _ProgressDivider(isActive: true),
         _ProgressStep(step: 2, label: '프로필 설정', isActive: true),
         _ProgressDivider(isActive: false),
@@ -322,10 +336,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text(
-              '*',
-              style: TextStyle(color: AppColors.error),
-            ),
+            Text('*', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -340,22 +351,26 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.borderLight,
                     shape: BoxShape.circle,
-                    image: _profileImage != null
-                        ? DecorationImage(
-                            image: _profileImage!.startsWith('http')
-                                ? NetworkImage(_profileImage!) as ImageProvider
-                                : FileImage(File(_profileImage!)),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
+                    image:
+                        _profileImage != null
+                            ? DecorationImage(
+                              image:
+                                  _profileImage!.startsWith('http')
+                                      ? NetworkImage(_profileImage!)
+                                          as ImageProvider
+                                      : FileImage(File(_profileImage!)),
+                              fit: BoxFit.cover,
+                            )
+                            : null,
                   ),
-                  child: _profileImage == null
-                      ? Icon(
-                          Icons.person,
-                          size: 48,
-                          color: AppColors.textTertiaryLight,
-                        )
-                      : null,
+                  child:
+                      _profileImage == null
+                          ? Icon(
+                            Icons.person,
+                            size: 48,
+                            color: AppColors.textTertiaryLight,
+                          )
+                          : null,
                 ),
                 Positioned(
                   right: 0,
@@ -396,10 +411,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text(
-              '*',
-              style: TextStyle(color: AppColors.error),
-            ),
+            Text('*', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -439,10 +451,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text(
-              '*',
-              style: TextStyle(color: AppColors.error),
-            ),
+            Text('*', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -455,45 +464,46 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
               border: Border.all(color: AppColors.borderLight),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: _selectedInstruments.isEmpty
-                ? Row(
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: AppColors.textTertiaryLight,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '악기를 선택해주세요',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textTertiaryLight,
+            child:
+                _selectedInstruments.isEmpty
+                    ? Row(
+                      children: [
+                        Icon(Icons.add, color: AppColors.textTertiaryLight),
+                        const SizedBox(width: AppSpacing.space2),
+                        Text(
+                          '악기를 선택해주세요',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textTertiaryLight,
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                : Wrap(
-                    spacing: AppSpacing.space2,
-                    runSpacing: AppSpacing.space2,
-                    children: _selectedInstruments.map((instrument) {
-                      return Chip(
-                        label: Text(instrument),
-                        labelStyle: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
-                        ),
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        deleteIcon: Icon(
-                          Icons.close,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
-                        onDeleted: () {
-                          setState(() {
-                            _selectedInstruments.remove(instrument);
-                          });
-                        },
-                      );
-                    }).toList(),
-                  ),
+                      ],
+                    )
+                    : Wrap(
+                      spacing: AppSpacing.space2,
+                      runSpacing: AppSpacing.space2,
+                      children:
+                          _selectedInstruments.map((instrument) {
+                            return Chip(
+                              label: Text(instrument),
+                              labelStyle: AppTypography.bodySmall.copyWith(
+                                color: AppColors.primary,
+                              ),
+                              backgroundColor: AppColors.primary.withValues(
+                                alpha: 0.1,
+                              ),
+                              deleteIcon: Icon(
+                                Icons.close,
+                                size: 16,
+                                color: AppColors.primary,
+                              ),
+                              onDeleted: () {
+                                setState(() {
+                                  _selectedInstruments.remove(instrument);
+                                });
+                              },
+                            );
+                          }).toList(),
+                    ),
           ),
         ),
       ],
@@ -519,16 +529,14 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
-                Text(
-                  '*',
-                  style: TextStyle(color: AppColors.error),
-                ),
+                Text('*', style: TextStyle(color: AppColors.error)),
               ],
             ),
             Text(
               '$charCount / 20자 이상',
               style: AppTypography.caption.copyWith(
-                color: isValid ? AppColors.success : AppColors.textTertiaryLight,
+                color:
+                    isValid ? AppColors.success : AppColors.textTertiaryLight,
               ),
             ),
           ],
@@ -583,32 +591,36 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive || isCompleted
-                  ? AppColors.primary
-                  : AppColors.borderLight,
+              color:
+                  isActive || isCompleted
+                      ? AppColors.primary
+                      : AppColors.borderLight,
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: isCompleted
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
-                  : Text(
-                      '$step',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: isActive
-                            ? Colors.white
-                            : AppColors.textTertiaryLight,
-                        fontWeight: FontWeight.w600,
+              child:
+                  isCompleted
+                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      : Text(
+                        '$step',
+                        style: AppTypography.bodySmall.copyWith(
+                          color:
+                              isActive
+                                  ? Colors.white
+                                  : AppColors.textTertiaryLight,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: isActive || isCompleted
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+              color:
+                  isActive || isCompleted
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textTertiaryLight,
             ),
             textAlign: TextAlign.center,
           ),
@@ -665,24 +677,14 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
       child: Column(
         children: [
           // Handle
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(margin: EdgeInsets.zero),
           const SizedBox(height: AppSpacing.space4),
 
           // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '악기 선택',
-                style: AppTypography.headingMedium,
-              ),
+              Text('악기 선택', style: AppTypography.headingMedium),
               TextButton(
                 onPressed: () {
                   widget.onSelectionChanged(_selected);
@@ -711,9 +713,13 @@ class _InstrumentSelectorSheetState extends State<_InstrumentSelectorSheet> {
 
                 return ListTile(
                   title: Text(instrument),
-                  trailing: isSelected
-                      ? Icon(Icons.check_circle, color: AppColors.primary)
-                      : Icon(Icons.circle_outlined, color: AppColors.borderLight),
+                  trailing:
+                      isSelected
+                          ? Icon(Icons.check_circle, color: AppColors.primary)
+                          : Icon(
+                            Icons.circle_outlined,
+                            color: AppColors.borderLight,
+                          ),
                   onTap: () {
                     setState(() {
                       if (isSelected) {

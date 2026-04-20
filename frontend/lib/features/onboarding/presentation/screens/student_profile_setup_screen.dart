@@ -9,6 +9,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../students/domain/entities/student.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 
@@ -116,13 +117,14 @@ class _StudentProfileSetupScreenState
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
       ),
-      builder: (context) => _InstrumentSelectorSheet(
-        instruments: _instruments,
-        selectedInstrument: _selectedInstrument,
-        onSelected: (instrument) {
-          setState(() => _selectedInstrument = instrument);
-        },
-      ),
+      builder:
+          (context) => _InstrumentSelectorSheet(
+            instruments: _instruments,
+            selectedInstrument: _selectedInstrument,
+            onSelected: (instrument) {
+              setState(() => _selectedInstrument = instrument);
+            },
+          ),
     );
   }
 
@@ -153,10 +155,7 @@ class _StudentProfileSetupScreenState
                       const SizedBox(height: AppSpacing.space6),
 
                       // Title
-                      Text(
-                        '프로필 설정',
-                        style: AppTypography.headingLarge,
-                      ),
+                      Text('프로필 설정', style: AppTypography.headingLarge),
                       const SizedBox(height: AppSpacing.space2),
                       Text(
                         '기본 정보를 설정해주세요',
@@ -193,23 +192,22 @@ class _StudentProfileSetupScreenState
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: AppColors.borderLight,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusLarge),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          '다음',
-                          style: AppTypography.button,
-                        ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Text('다음', style: AppTypography.button),
                 ),
               ),
             ),
@@ -242,10 +240,7 @@ class _StudentProfileSetupScreenState
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text(
-              '*',
-              style: TextStyle(color: AppColors.error),
-            ),
+            Text('*', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -291,10 +286,7 @@ class _StudentProfileSetupScreenState
               ),
             ),
             const SizedBox(width: AppSpacing.space1),
-            Text(
-              '*',
-              style: TextStyle(color: AppColors.error),
-            ),
+            Text('*', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -307,42 +299,44 @@ class _StudentProfileSetupScreenState
               border: Border.all(color: AppColors.borderLight),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: _selectedInstrument == null
-                ? Row(
-                    children: [
-                      Icon(
-                        Icons.music_note,
-                        color: AppColors.textTertiaryLight,
-                      ),
-                      const SizedBox(width: AppSpacing.space2),
-                      Text(
-                        '악기를 선택해주세요',
-                        style: AppTypography.bodyMedium.copyWith(
+            child:
+                _selectedInstrument == null
+                    ? Row(
+                      children: [
+                        Icon(
+                          Icons.music_note,
                           color: AppColors.textTertiaryLight,
                         ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Chip(
-                        label: Text(_selectedInstrument!),
-                        labelStyle: AppTypography.bodySmall.copyWith(
-                          color: AppColors.primary,
+                        const SizedBox(width: AppSpacing.space2),
+                        Text(
+                          '악기를 선택해주세요',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textTertiaryLight,
+                          ),
                         ),
-                        backgroundColor:
-                            AppColors.primary.withValues(alpha: 0.1),
-                        deleteIcon: Icon(
-                          Icons.close,
-                          size: 16,
-                          color: AppColors.primary,
+                      ],
+                    )
+                    : Row(
+                      children: [
+                        Chip(
+                          label: Text(_selectedInstrument!),
+                          labelStyle: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                          ),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          deleteIcon: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                          onDeleted: () {
+                            setState(() => _selectedInstrument = null);
+                          },
                         ),
-                        onDeleted: () {
-                          setState(() => _selectedInstrument = null);
-                        },
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
           ),
         ),
       ],
@@ -374,32 +368,36 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: isActive || isCompleted
-                  ? AppColors.primary
-                  : AppColors.borderLight,
+              color:
+                  isActive || isCompleted
+                      ? AppColors.primary
+                      : AppColors.borderLight,
               shape: BoxShape.circle,
             ),
             child: Center(
-              child: isCompleted
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
-                  : Text(
-                      '$step',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: isActive
-                            ? Colors.white
-                            : AppColors.textTertiaryLight,
-                        fontWeight: FontWeight.w600,
+              child:
+                  isCompleted
+                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                      : Text(
+                        '$step',
+                        style: AppTypography.bodySmall.copyWith(
+                          color:
+                              isActive
+                                  ? Colors.white
+                                  : AppColors.textTertiaryLight,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: isActive || isCompleted
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+              color:
+                  isActive || isCompleted
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textTertiaryLight,
             ),
             textAlign: TextAlign.center,
           ),
@@ -444,51 +442,51 @@ class _InstrumentSelectorSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(margin: EdgeInsets.zero),
           const SizedBox(height: AppSpacing.space4),
 
           // Header
-          Text(
-            '악기 선택',
-            style: AppTypography.headingMedium,
-          ),
+          Text('악기 선택', style: AppTypography.headingMedium),
           const SizedBox(height: AppSpacing.space4),
 
           // Choice chips grid
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space3,
-            children: instruments.map((instrument) {
-              final isSelected = instrument == selectedInstrument;
-              return ChoiceChip(
-                label: Text(instrument),
-                selected: isSelected,
-                onSelected: (_) {
-                  onSelected(instrument);
-                  Navigator.pop(context);
-                },
-                selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                backgroundColor: Colors.white,
-                labelStyle: AppTypography.bodyMedium.copyWith(
-                  color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-                  side: BorderSide(
-                    color: isSelected ? AppColors.primary : AppColors.borderLight,
-                  ),
-                ),
-                showCheckmark: false,
-              );
-            }).toList(),
+            children:
+                instruments.map((instrument) {
+                  final isSelected = instrument == selectedInstrument;
+                  return ChoiceChip(
+                    label: Text(instrument),
+                    selected: isSelected,
+                    onSelected: (_) {
+                      onSelected(instrument);
+                      Navigator.pop(context);
+                    },
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                    backgroundColor: Colors.white,
+                    labelStyle: AppTypography.bodyMedium.copyWith(
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.textPrimaryLight,
+                      fontWeight:
+                          isSelected ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusRound,
+                      ),
+                      side: BorderSide(
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.borderLight,
+                      ),
+                    ),
+                    showCheckmark: false,
+                  );
+                }).toList(),
           ),
 
           const SizedBox(height: AppSpacing.space6),

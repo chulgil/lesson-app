@@ -11,6 +11,7 @@ import '../../../../features/practice/presentation/providers/metronome_provider.
 import '../../../../features/practice/presentation/providers/recording_provider.dart';
 import '../../../../core/audio/audio_player_service.dart';
 import '../../../../core/audio/audio_trimmer_service.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import 'recording_waveform.dart' show ABLoop, ZoomableWaveformProgressBar;
 
 /// Playback speed options.
@@ -318,14 +319,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Drag handle
-              Container(
-                width: 40,
-                height: 4,
+              const BottomSheetHandle(
                 margin: EdgeInsets.only(bottom: AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.textTertiaryDark,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                color: AppColors.textTertiaryDark,
               ),
 
               // Title

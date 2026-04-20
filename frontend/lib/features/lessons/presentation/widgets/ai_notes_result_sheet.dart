@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../data/services/ai_notes_service.dart';
 
 /// Bottom sheet showing AI-generated lesson notes with edit/save capability.
@@ -54,14 +55,9 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
           child: Column(
             children: [
               // Handle bar
-              Container(
+              BottomSheetHandle(
                 margin: const EdgeInsets.only(top: AppSpacing.space3),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                color: Colors.grey[300],
               ),
 
               // Header

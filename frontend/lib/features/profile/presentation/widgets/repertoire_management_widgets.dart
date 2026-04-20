@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
 
 /// Get color for difficulty level
@@ -638,15 +639,8 @@ void showPieceDetails({
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Handle
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: AppColors.borderLight,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
+                    const Center(
+                      child: BottomSheetHandle(margin: EdgeInsets.zero),
                     ),
                     const SizedBox(height: AppSpacing.space4),
 

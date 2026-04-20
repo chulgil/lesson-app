@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/tip_template.dart';
 import '../tip_template_bottom_sheet.dart';
 
@@ -57,15 +58,9 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -100,7 +95,9 @@ class _AddTipBottomSheetState extends ConsumerState<AddTipBottomSheet> {
                 decoration: InputDecoration(
                   hintText: '직접 입력하세요...',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
