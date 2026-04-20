@@ -449,10 +449,10 @@ class _ProposalSettingsScreenState
         ),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.borderLight),
           ),
           child: Column(
@@ -521,10 +521,12 @@ class _ProposalSettingsScreenState
               if (_discountPercent > 0) ...[
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -570,10 +572,10 @@ class _ProposalSettingsScreenState
         ),
         const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
             color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.borderLight),
           ),
           child: Row(

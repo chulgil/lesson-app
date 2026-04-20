@@ -58,14 +58,12 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final studentsAsync = ref.watch(studentsProvider);
-    final templatesAsync =
-        ref.watch(activeTeacherTemplatesProvider(widget.teacherId));
+    final templatesAsync = ref.watch(
+      activeTeacherTemplatesProvider(widget.teacherId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('수강권 제안'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('수강권 제안'), centerTitle: true),
       body: studentsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
@@ -95,19 +93,24 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline,
-              size: 64, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.people_outline,
+            size: 64,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '등록된 학생이 없습니다',
-            style: AppTypography.bodyLarge
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '학생을 먼저 추가해주세요',
-            style: AppTypography.bodySmall
-                .copyWith(color: AppColors.textTertiaryLight),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
           ),
         ],
       ),
@@ -119,25 +122,31 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inventory_2_outlined,
-              size: 64, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.inventory_2_outlined,
+            size: 64,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '수강권 템플릿이 없습니다',
-            style: AppTypography.bodyLarge
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '먼저 수강권 템플릿을 생성해주세요',
-            style: AppTypography.bodySmall
-                .copyWith(color: AppColors.textTertiaryLight),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
           ),
           const SizedBox(height: AppSpacing.space6),
           ElevatedButton.icon(
             onPressed: () {
               context.push(
-                  '${AppRoutes.subscriptionTemplates}?teacherId=${widget.teacherId}');
+                '${AppRoutes.subscriptionTemplates}?teacherId=${widget.teacherId}',
+              );
             },
             icon: const Icon(Icons.add),
             label: const Text('템플릿 만들기'),
@@ -203,9 +212,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         const SizedBox(width: AppSpacing.space2),
         Text(
           title,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -214,19 +221,18 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: AppTypography.bodyMedium.copyWith(
-        fontWeight: FontWeight.w600,
-      ),
+      style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
     );
   }
 
   Widget _buildStudentSelector(List students) {
     // Validate selected student exists in list
     final validStudentIds = students.map((s) => s.id as String).toSet();
-    final effectiveSelection = (_selectedStudentId != null &&
-            validStudentIds.contains(_selectedStudentId))
-        ? _selectedStudentId
-        : null;
+    final effectiveSelection =
+        (_selectedStudentId != null &&
+                validStudentIds.contains(_selectedStudentId))
+            ? _selectedStudentId
+            : null;
 
     return Container(
       decoration: BoxDecoration(
@@ -242,33 +248,35 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           hintText: '학생을 선택하세요',
         ),
         isExpanded: true,
-        items: students.map<DropdownMenuItem<String>>((student) {
-          return DropdownMenuItem<String>(
-            value: student.id,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Text(
-                    student.name[0],
-                    style: AppTypography.bodySmall
-                        .copyWith(color: AppColors.primary),
-                  ),
+        items:
+            students.map<DropdownMenuItem<String>>((student) {
+              return DropdownMenuItem<String>(
+                value: student.id,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                      child: Text(
+                        student.name[0],
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.space2),
+                    Flexible(
+                      child: Text(
+                        student.name,
+                        style: AppTypography.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.space2),
-                Flexible(
-                  child: Text(
-                    student.name,
-                    style: AppTypography.bodyMedium,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
         onChanged: (value) {
           setState(() {
             _selectedStudentId = value;
@@ -303,20 +311,21 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.space2),
             child: GestureDetector(
-              onLongPress: isSelected && _selectedTemplateIds.length > 1
-                  ? () {
-                      setState(() {
-                        _recommendedTemplateId = template.id;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${template.name}을 추천으로 지정했습니다'),
-                          duration: const Duration(seconds: 1),
-                          backgroundColor: AppColors.secondary,
-                        ),
-                      );
-                    }
-                  : null,
+              onLongPress:
+                  isSelected && _selectedTemplateIds.length > 1
+                      ? () {
+                        setState(() {
+                          _recommendedTemplateId = template.id;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${template.name}을 추천으로 지정했습니다'),
+                            duration: const Duration(seconds: 1),
+                            backgroundColor: AppColors.secondary,
+                          ),
+                        );
+                      }
+                      : null,
               child: SelectableTemplateCard(
                 template: template,
                 isSelected: isSelected,
@@ -345,11 +354,11 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
   Widget _buildInfoBanner(String text) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(AppSpacing.space3),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.info.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -372,7 +381,9 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         _selectedTemplateIds.remove(templateId);
         if (_recommendedTemplateId == templateId) {
           _recommendedTemplateId =
-              _selectedTemplateIds.isNotEmpty ? _selectedTemplateIds.first : null;
+              _selectedTemplateIds.isNotEmpty
+                  ? _selectedTemplateIds.first
+                  : null;
         }
       } else {
         if (_selectedTemplateIds.length < kMaxTemplateSelections) {
@@ -395,7 +406,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         controller: _messageController,
         maxLines: 3,
         decoration: const InputDecoration(
-          contentPadding: EdgeInsets.all(16),
+          contentPadding: EdgeInsets.all(AppSpacing.space4),
           border: InputBorder.none,
           hintText: '학생에게 전달할 메시지를 입력하세요',
         ),
@@ -407,7 +418,8 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   /// - 1 template: [제안 보내기] + [즉시 발급]
   /// - 2-3 templates: [제안 보내기] only (student must choose)
   Widget _buildActionButtons() {
-    final canSubmit = _selectedStudentId != null &&
+    final canSubmit =
+        _selectedStudentId != null &&
         _selectedTemplateIds.isNotEmpty &&
         !_isSubmitting;
     final isSingleTemplate = _selectedTemplateIds.length == 1;
@@ -418,24 +430,25 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: canSubmit
-                ? () => _submit(ProposalType.proposal)
-                : null,
+            onPressed: canSubmit ? () => _submit(ProposalType.proposal) : null,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: _isSubmitting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(_selectedTemplateIds.length > 1
-                    ? '${_selectedTemplateIds.length}개 수강권 제안 보내기'
-                    : '제안 보내기'),
+            child:
+                _isSubmitting
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(
+                      _selectedTemplateIds.length > 1
+                          ? '${_selectedTemplateIds.length}개 수강권 제안 보내기'
+                          : '제안 보내기',
+                    ),
           ),
         ),
 
@@ -445,9 +458,8 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: canSubmit
-                  ? () => _submit(ProposalType.directIssue)
-                  : null,
+              onPressed:
+                  canSubmit ? () => _submit(ProposalType.directIssue) : null,
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 side: BorderSide(
@@ -514,9 +526,11 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_selectedTemplateIds.length > 1
-                ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
-                : '수강권 제안을 보냈습니다'),
+            content: Text(
+              _selectedTemplateIds.length > 1
+                  ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
+                  : '수강권 제안을 보냈습니다',
+            ),
             backgroundColor: AppColors.success,
           ),
         );

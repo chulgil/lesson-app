@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../providers/notification_providers.dart';
 
 /// 알림 종 아이콘 위젯 (뱃지 포함)
@@ -27,11 +28,7 @@ class NotificationBellIcon extends ConsumerWidget {
   /// 아이콘 크기 (기본: 24)
   final double iconSize;
 
-  const NotificationBellIcon({
-    super.key,
-    this.iconColor,
-    this.iconSize = 24,
-  });
+  const NotificationBellIcon({super.key, this.iconColor, this.iconSize = 24});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,11 +46,7 @@ class NotificationBellIcon extends ConsumerWidget {
           ),
           // Unread badge
           if (unreadCount > 0)
-            Positioned(
-              right: -4,
-              top: -4,
-              child: _buildBadge(unreadCount),
-            ),
+            Positioned(right: -4, top: -4, child: _buildBadge(unreadCount)),
         ],
       ),
       tooltip: '알림',
@@ -69,16 +62,12 @@ class NotificationBellIcon extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.error,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.white,
-          width: 1.5,
-        ),
+        border: Border.all(color: Colors.white, width: 1.5),
       ),
       child: Text(
         displayCount,
-        style: const TextStyle(
+        style: AppTypography.captionSmall.copyWith(
           color: Colors.white,
-          fontSize: 10,
           fontWeight: FontWeight.bold,
         ),
         textAlign: TextAlign.center,

@@ -35,12 +35,13 @@ class SelectableTemplateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: isDisabled && !isSelected
-          ? null
-          : () {
-              HapticFeedback.lightImpact();
-              onTap?.call();
-            },
+      onTap:
+          isDisabled && !isSelected
+              ? null
+              : () {
+                HapticFeedback.lightImpact();
+                onTap?.call();
+              },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
@@ -52,15 +53,16 @@ class SelectableTemplateCard extends StatelessWidget {
             color: isSelected ? AppColors.primary : AppColors.borderLight,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                  : null,
         ),
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 200),
@@ -86,7 +88,6 @@ class SelectableTemplateCard extends StatelessWidget {
                         style: AppTypography.caption.copyWith(
                           color: AppColors.secondary,
                           fontWeight: FontWeight.w600,
-                          fontSize: 11,
                         ),
                       ),
                     ),
@@ -97,9 +98,10 @@ class SelectableTemplateCard extends StatelessWidget {
                       template.name,
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: isSelected
-                            ? AppColors.primary
-                            : AppColors.textPrimaryLight,
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.textPrimaryLight,
                       ),
                     ),
                   ),
@@ -110,17 +112,19 @@ class SelectableTemplateCard extends StatelessWidget {
                     height: 24,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.borderLight,
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.borderLight,
                     ),
-                    child: isSelected
-                        ? const Icon(
-                            Icons.check,
-                            size: 16,
-                            color: Colors.white,
-                          )
-                        : null,
+                    child:
+                        isSelected
+                            ? const Icon(
+                              Icons.check,
+                              size: 16,
+                              color: Colors.white,
+                            )
+                            : null,
                   ),
                 ],
               ),
@@ -142,9 +146,10 @@ class SelectableTemplateCard extends StatelessWidget {
                     template.formattedPrice,
                     style: AppTypography.headingSmall.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textPrimaryLight,
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.textPrimaryLight,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space2),

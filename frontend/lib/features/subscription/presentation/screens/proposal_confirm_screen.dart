@@ -35,14 +35,12 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final proposalsAsync =
-        ref.watch(awaitingConfirmationProposalsProvider(widget.teacherId));
+    final proposalsAsync = ref.watch(
+      awaitingConfirmationProposalsProvider(widget.teacherId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('입금 확인'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('입금 확인'), centerTitle: true),
       body: proposalsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
@@ -68,19 +66,24 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.check_circle_outline,
-              size: 64, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.check_circle_outline,
+            size: 64,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '입금 확인 대기 중인 제안이 없습니다',
-            style: AppTypography.bodyLarge
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '학생이 입금 완료를 알리면 여기에 표시됩니다',
-            style: AppTypography.bodySmall
-                .copyWith(color: AppColors.textTertiaryLight),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
           ),
         ],
       ),
@@ -88,16 +91,17 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   Widget _buildProposalCard(SubscriptionProposal proposal) {
-    final templateAsync =
-        ref.watch(subscriptionTemplateProvider(proposal.templateId));
+    final templateAsync = ref.watch(
+      subscriptionTemplateProvider(proposal.templateId),
+    );
     final studentAsync = ref.watch(studentProvider(proposal.studentId));
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -128,12 +132,14 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                       children: [
                         CircleAvatar(
                           radius: 16,
-                          backgroundColor:
-                              AppColors.primary.withValues(alpha: 0.1),
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.1,
+                          ),
                           child: Text(
                             student.name[0],
-                            style: AppTypography.bodySmall
-                                .copyWith(color: AppColors.primary),
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.primary,
+                            ),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space2),
@@ -193,16 +199,19 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   Widget _buildTemplateInfo(
-      SubscriptionTemplate template, SubscriptionProposal proposal) {
-    final price = proposal.hasDiscount
-        ? template.price - (proposal.discountAmount ?? 0)
-        : template.price;
+    SubscriptionTemplate template,
+    SubscriptionProposal proposal,
+  ) {
+    final price =
+        proposal.hasDiscount
+            ? template.price - (proposal.discountAmount ?? 0)
+            : template.price;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
@@ -253,7 +262,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   Widget _buildActionButtons(
-      SubscriptionProposal proposal, SubscriptionTemplate template) {
+    SubscriptionProposal proposal,
+    SubscriptionTemplate template,
+  ) {
     final isProcessing = _processingProposalId == proposal.id;
 
     return Row(
@@ -278,13 +289,14 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
-            child: isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('입금 확인 → 수강권 발급'),
+            child:
+                isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Text('입금 확인 → 수강권 발급'),
           ),
         ),
       ],
@@ -292,7 +304,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   }
 
   Future<void> _confirmPayment(
-      SubscriptionProposal proposal, SubscriptionTemplate template) async {
+    SubscriptionProposal proposal,
+    SubscriptionTemplate template,
+  ) async {
     setState(() {
       _processingProposalId = proposal.id;
     });
@@ -310,9 +324,10 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
         usedLessons: 0,
         startDate: now,
         endDate: now.add(Duration(days: template.validityDays)),
-        amount: proposal.hasDiscount
-            ? template.price - (proposal.discountAmount ?? 0)
-            : template.price,
+        amount:
+            proposal.hasDiscount
+                ? template.price - (proposal.discountAmount ?? 0)
+                : template.price,
         status: SubscriptionStatus.active,
         createdAt: now,
         bonusCount: 0,
@@ -323,8 +338,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       final createdSubscription = await subscriptionRepo.create(subscription);
 
       // 2. Confirm the proposal with the subscription ID
-      final proposalNotifier =
-          ref.read(subscriptionProposalNotifierProvider.notifier);
+      final proposalNotifier = ref.read(
+        subscriptionProposalNotifierProvider.notifier,
+      );
       await proposalNotifier.confirmPayment(
         proposal.id,
         createdSubscription.id,
@@ -366,31 +382,28 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
   Future<void> _showInquiryDialog(SubscriptionProposal proposal) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('입금 미확인'),
-        content: const Text(
-          '입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('입금 미확인'),
+            content: const Text('입금 내역을 확인할 수 없습니다.\n학생에게 확인 요청 메시지를 보내시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('메시지 보내기'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('메시지 보내기'),
-          ),
-        ],
-      ),
     );
 
     if (result == true && mounted) {
       // TODO: Send inquiry message notification
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('확인 요청 메시지를 보냈습니다'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('확인 요청 메시지를 보냈습니다')));
     }
   }
 

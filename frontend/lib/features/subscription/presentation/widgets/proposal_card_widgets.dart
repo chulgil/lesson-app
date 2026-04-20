@@ -57,11 +57,11 @@ class ProposalStatusBanner extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+      padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
@@ -93,10 +93,10 @@ class ProposalHeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -124,17 +124,19 @@ class ProposalHeaderCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space1),
           Text(
             '선생님 제안',
-            style: AppTypography.bodyMedium
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
           if (proposal.status == ProposalStatus.pending) ...[
             const SizedBox(height: AppSpacing.space2),
             Text(
               proposal.formattedExpiration,
               style: AppTypography.caption.copyWith(
-                color: proposal.timeUntilExpiration.inDays < 2
-                    ? AppColors.warning
-                    : AppColors.textTertiaryLight,
+                color:
+                    proposal.timeUntilExpiration.inDays < 2
+                        ? AppColors.warning
+                        : AppColors.textTertiaryLight,
               ),
             ),
           ],
@@ -153,10 +155,10 @@ class ProposalDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -185,9 +187,7 @@ class ProposalDetailsCard extends StatelessWidget {
         ),
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -203,10 +203,10 @@ class ProposalMessageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -214,8 +214,11 @@ class ProposalMessageCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.chat_bubble_outline,
-                  size: 18, color: AppColors.primary),
+              const Icon(
+                Icons.chat_bubble_outline,
+                size: 18,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '선생님 메시지',
@@ -251,10 +254,10 @@ class ProposalDiscountCard extends StatelessWidget {
     final discountedPrice = originalPrice - (proposal.discountAmount ?? 0);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
       ),
       child: Column(
@@ -279,8 +282,9 @@ class ProposalDiscountCard extends StatelessWidget {
             children: [
               Text(
                 '정가',
-                style: AppTypography.bodySmall
-                    .copyWith(color: AppColors.textSecondaryLight),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
               Text(
                 template.formattedPrice,
@@ -297,8 +301,9 @@ class ProposalDiscountCard extends StatelessWidget {
             children: [
               Text(
                 '할인',
-                style: AppTypography.bodySmall
-                    .copyWith(color: AppColors.textSecondaryLight),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
               Text(
                 '-${_formatPrice(proposal.discountAmount ?? 0)}',
@@ -381,10 +386,10 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
     final hasMultiple = widget.bankAccounts.length > 1;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -392,8 +397,11 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_balance,
-                  size: 18, color: AppColors.primary),
+              const Icon(
+                Icons.account_balance,
+                size: 18,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '결제 정보',
@@ -401,20 +409,13 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (hasMultiple) ...[
-                const Spacer(),
-                _buildAccountSelector(),
-              ],
+              if (hasMultiple) ...[const Spacer(), _buildAccountSelector()],
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
           _PaymentInfoRow(label: '은행', value: bankName),
           const SizedBox(height: AppSpacing.space2),
-          _PaymentInfoRow(
-            label: '계좌번호',
-            value: accountNumber,
-            copyable: true,
-          ),
+          _PaymentInfoRow(label: '계좌번호', value: accountNumber, copyable: true),
           const SizedBox(height: AppSpacing.space2),
           _PaymentInfoRow(label: '예금주', value: accountHolder),
         ],
@@ -425,21 +426,29 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
   Widget _buildAccountSelector() {
     return PopupMenuButton<BankAccount>(
       onSelected: (account) => setState(() => _selectedAccount = account),
-      itemBuilder: (context) => widget.bankAccounts
-          .map((account) => PopupMenuItem<BankAccount>(
-                value: account,
-                child: Row(
-                  children: [
-                    if (account.id == _selectedAccount?.id)
-                      Icon(Icons.check, size: 16, color: AppColors.primary)
-                    else
-                      const SizedBox(width: 16),
-                    const SizedBox(width: 8),
-                    Text('${account.bankName} ${account.accountNumber}'),
-                  ],
-                ),
-              ))
-          .toList(),
+      itemBuilder:
+          (context) =>
+              widget.bankAccounts
+                  .map(
+                    (account) => PopupMenuItem<BankAccount>(
+                      value: account,
+                      child: Row(
+                        children: [
+                          if (account.id == _selectedAccount?.id)
+                            Icon(
+                              Icons.check,
+                              size: 16,
+                              color: AppColors.primary,
+                            )
+                          else
+                            const SizedBox(width: 16),
+                          const SizedBox(width: 8),
+                          Text('${account.bankName} ${account.accountNumber}'),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
@@ -483,8 +492,9 @@ class _PaymentInfoRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTypography.bodyMedium
-              .copyWith(color: AppColors.textSecondaryLight),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
         ),
         Row(
           children: [
@@ -508,8 +518,10 @@ class _PaymentInfoRow extends StatelessWidget {
                 },
                 borderRadius: BorderRadius.circular(4),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
@@ -535,18 +547,15 @@ class _PaymentInfoRow extends StatelessWidget {
 class ProposalWaitingCard extends StatelessWidget {
   final VoidCallback onContactTapped;
 
-  const ProposalWaitingCard({
-    super.key,
-    required this.onContactTapped,
-  });
+  const ProposalWaitingCard({super.key, required this.onContactTapped});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.info.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
       ),
       child: Column(

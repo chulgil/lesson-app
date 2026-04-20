@@ -39,7 +39,6 @@ class SubscriptionBadge extends StatelessWidget {
             style: AppTypography.caption.copyWith(
               color: _getTextColor(),
               fontWeight: FontWeight.w600,
-              fontSize: 11,
             ),
           ),
         ],
