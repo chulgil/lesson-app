@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
@@ -22,7 +23,8 @@ class EditRepertoireScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<EditRepertoireScreen> createState() => _EditRepertoireScreenState();
+  ConsumerState<EditRepertoireScreen> createState() =>
+      _EditRepertoireScreenState();
 }
 
 class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
@@ -59,21 +61,26 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final currentRepertoire = await ref.read(repertoireProvider(widget.repertoireId).future);
+      final currentRepertoire = await ref.read(
+        repertoireProvider(widget.repertoireId).future,
+      );
       if (currentRepertoire == null) throw Exception('Repertoire not found');
 
       final updatedRepertoire = currentRepertoire.copyWith(
         name: _nameController.text.trim(),
-        description: _descriptionController.text.trim().isEmpty
-            ? null
-            : _descriptionController.text.trim(),
+        description:
+            _descriptionController.text.trim().isEmpty
+                ? null
+                : _descriptionController.text.trim(),
         startDate: _startDate,
         endDate: _endDate,
         clearEndDate: _endDate == null,
         updatedAt: DateTime.now(),
       );
 
-      await ref.read(repertoireCrudProvider.notifier).updateRepertoire(updatedRepertoire);
+      await ref
+          .read(repertoireCrudProvider.notifier)
+          .updateRepertoire(updatedRepertoire);
 
       if (mounted) {
         context.pop(true);
@@ -97,20 +104,21 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
   Future<void> _archive() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('아카이브'),
-        content: const Text('이 레퍼토리를 아카이브하시겠습니까?\n아카이브된 레퍼토리는 목록에서 숨겨집니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('아카이브'),
+            content: const Text('이 레퍼토리를 아카이브하시겠습니까?\n아카이브된 레퍼토리는 목록에서 숨겨집니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('아카이브'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('아카이브'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -118,7 +126,9 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final currentRepertoire = await ref.read(repertoireProvider(widget.repertoireId).future);
+      final currentRepertoire = await ref.read(
+        repertoireProvider(widget.repertoireId).future,
+      );
       if (currentRepertoire == null) throw Exception('Repertoire not found');
 
       final archivedRepertoire = currentRepertoire.copyWith(
@@ -127,12 +137,14 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
         updatedAt: DateTime.now(),
       );
 
-      await ref.read(repertoireCrudProvider.notifier).updateRepertoire(archivedRepertoire);
+      await ref
+          .read(repertoireCrudProvider.notifier)
+          .updateRepertoire(archivedRepertoire);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('레퍼토리가 아카이브되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('레퍼토리가 아카이브되었습니다')));
         context.pop(true);
       }
     } catch (e) {
@@ -154,21 +166,24 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
   Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레퍼토리 삭제'),
-        content: const Text('이 레퍼토리를 삭제하시겠습니까?\n연결된 모든 섹션과 녹음이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('레퍼토리 삭제'),
+            content: const Text(
+              '이 레퍼토리를 삭제하시겠습니까?\n연결된 모든 섹션과 녹음이 함께 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -176,15 +191,14 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(repertoireCrudProvider.notifier).deleteRepertoire(
-            widget.repertoireId,
-            widget.studentId,
-          );
+      await ref
+          .read(repertoireCrudProvider.notifier)
+          .deleteRepertoire(widget.repertoireId, widget.studentId);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('레퍼토리가 삭제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('레퍼토리가 삭제되었습니다')));
         // Pop twice to go back to the list
         context.pop();
         context.pop();
@@ -246,9 +260,7 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
     final repertoireAsync = ref.watch(repertoireProvider(widget.repertoireId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('레퍼토리 편집'),
-      ),
+      appBar: AppBar(title: const Text('레퍼토리 편집')),
       body: repertoireAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => const Center(child: Text('오류가 발생했습니다.')),
@@ -329,16 +341,17 @@ class _EditRepertoireScreenState extends ConsumerState<EditRepertoireScreen> {
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _isLoading ? null : _submit,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('변경사항 저장'),
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Text('변경사항 저장'),
                     ),
                   ),
 

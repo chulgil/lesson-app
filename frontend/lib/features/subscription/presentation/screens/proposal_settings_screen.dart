@@ -149,7 +149,7 @@ class _ProposalSettingsScreenState
                     _autoProposalEnabled = value;
                   });
                 },
-                activeColor: AppColors.success,
+                activeThumbColor: AppColors.success,
               ),
             ],
           ),

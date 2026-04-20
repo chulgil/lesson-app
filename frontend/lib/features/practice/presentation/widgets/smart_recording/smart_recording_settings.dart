@@ -64,7 +64,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                         .read(smartRecordingSettingsNotifierProvider.notifier)
                         .toggleEnabled();
                   },
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                 ),
               ],
             ),
@@ -222,7 +222,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                           .read(smartRecordingSettingsNotifierProvider.notifier)
                           .toggleMiddleSilenceSkip();
                     },
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                   ),
                 ],
               ),

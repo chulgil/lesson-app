@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -15,10 +16,7 @@ import '../providers/repertoire_archive_provider.dart';
 class PracticeRepertoireScreen extends ConsumerWidget {
   final String studentId;
 
-  const PracticeRepertoireScreen({
-    super.key,
-    required this.studentId,
-  });
+  const PracticeRepertoireScreen({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,39 +29,53 @@ class PracticeRepertoireScreen extends ConsumerWidget {
           // Archive button
           IconButton(
             icon: const Icon(Icons.inventory_2_outlined),
-            onPressed: () =>
-                context.push('${AppRoutes.practiceArchive}?studentId=$studentId'),
+            onPressed:
+                () => context.push(
+                  '${AppRoutes.practiceArchive}?studentId=$studentId',
+                ),
             tooltip: '아카이브',
           ),
           // Add repertoire button
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () =>
-                context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
+            onPressed:
+                () => context.push(
+                  '${AppRoutes.addRepertoire}?studentId=$studentId',
+                ),
             tooltip: '레퍼토리 추가',
           ),
         ],
       ),
       body: repertoiresAsync.when(
-        data: (repertoires) => repertoires.isEmpty
-            ? _buildEmptyState(context)
-            : _buildRepertoireList(context, ref, repertoires),
+        data:
+            (repertoires) =>
+                repertoires.isEmpty
+                    ? _buildEmptyState(context)
+                    : _buildRepertoireList(context, ref, repertoires),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
-              const SizedBox(height: AppSpacing.space2),
-              TextButton(
-                onPressed: () => ref.invalidate(studentRepertoiresProvider(studentId)),
-                child: const Text('다시 시도'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  const SizedBox(height: AppSpacing.space2),
+                  TextButton(
+                    onPressed:
+                        () => ref.invalidate(
+                          studentRepertoiresProvider(studentId),
+                        ),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -75,7 +87,8 @@ class PracticeRepertoireScreen extends ConsumerWidget {
       subtitle: '레퍼토리를 추가하고\n섹션별로 연습을 시작해보세요',
       actionLabel: '레퍼토리 추가',
       actionIcon: Icons.add,
-      onAction: () => context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
+      onAction:
+          () => context.push('${AppRoutes.addRepertoire}?studentId=$studentId'),
     );
   }
 
@@ -89,10 +102,7 @@ class PracticeRepertoireScreen extends ConsumerWidget {
       itemCount: repertoires.length,
       itemBuilder: (context, index) {
         final repertoire = repertoires[index];
-        return _RepertoireCard(
-          repertoire: repertoire,
-          studentId: studentId,
-        );
+        return _RepertoireCard(repertoire: repertoire, studentId: studentId);
       },
     );
   }
@@ -102,10 +112,7 @@ class _RepertoireCard extends ConsumerWidget {
   final PracticeRepertoire repertoire;
   final String studentId;
 
-  const _RepertoireCard({
-    required this.repertoire,
-    required this.studentId,
-  });
+  const _RepertoireCard({required this.repertoire, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -132,10 +139,7 @@ class _RepertoireCard extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        repertoire.name,
-                        style: AppTypography.headingSmall,
-                      ),
+                      Text(repertoire.name, style: AppTypography.headingSmall),
                       if (repertoire.description != null)
                         Text(
                           repertoire.description!,
@@ -150,9 +154,10 @@ class _RepertoireCard extends ConsumerWidget {
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline),
                   color: AppColors.primary,
-                  onPressed: () => context.push(
-                    '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
-                  ),
+                  onPressed:
+                      () => context.push(
+                        '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
+                      ),
                   tooltip: '섹션 추가',
                 ),
                 // More options
@@ -169,38 +174,46 @@ class _RepertoireCard extends ConsumerWidget {
                       _showDeleteConfirmation(context, ref);
                     }
                   },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit, size: 20),
-                          SizedBox(width: AppSpacing.space2),
-                          Text('수정'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'archive',
-                      child: Row(
-                        children: [
-                          Icon(Icons.inventory_2_outlined, size: 20),
-                          SizedBox(width: AppSpacing.space2),
-                          Text('아카이브'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete, size: 20, color: AppColors.error),
-                          SizedBox(width: AppSpacing.space2),
-                          Text('삭제', style: TextStyle(color: AppColors.error)),
-                        ],
-                      ),
-                    ),
-                  ],
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, size: 20),
+                              SizedBox(width: AppSpacing.space2),
+                              Text('수정'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'archive',
+                          child: Row(
+                            children: [
+                              Icon(Icons.inventory_2_outlined, size: 20),
+                              SizedBox(width: AppSpacing.space2),
+                              Text('아카이브'),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete,
+                                size: 20,
+                                color: AppColors.error,
+                              ),
+                              SizedBox(width: AppSpacing.space2),
+                              Text(
+                                '삭제',
+                                style: TextStyle(color: AppColors.error),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                 ),
               ],
             ),
@@ -227,9 +240,10 @@ class _RepertoireCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: AppSpacing.space2),
                     TextButton.icon(
-                      onPressed: () => context.push(
-                        '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
-                      ),
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutes.addSection}?repertoireId=${repertoire.id}&studentId=$studentId',
+                          ),
                       icon: const Icon(Icons.add, size: 18),
                       label: const Text('섹션 추가'),
                     ),
@@ -292,62 +306,64 @@ class _RepertoireCard extends ConsumerWidget {
   void _showArchiveConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('아카이브'),
-        content: Text(
-            '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('아카이브'),
+            content: Text(
+              '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 나중에 복원할 수 있습니다.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await ref
+                      .read(repertoireArchiveNotifierProvider.notifier)
+                      .archive(repertoire.id, studentId);
+                  ref.invalidate(studentRepertoiresProvider(studentId));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+                    );
+                  }
+                },
+                child: const Text('아카이브'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref
-                  .read(repertoireArchiveNotifierProvider.notifier)
-                  .archive(repertoire.id, studentId);
-              ref.invalidate(studentRepertoiresProvider(studentId));
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
-                );
-              }
-            },
-            child: const Text('아카이브'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('레퍼토리 삭제'),
-        content: Text('\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref.read(repertoireCrudProvider.notifier).deleteRepertoire(
-                    repertoire.id,
-                    studentId,
-                  );
-              ref.invalidate(studentRepertoiresProvider(studentId));
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('레퍼토리 삭제'),
+            content: Text(
+              '\'${repertoire.name}\'을(를) 삭제하시겠습니까?\n모든 섹션과 녹음이 함께 삭제됩니다.',
             ),
-            child: const Text('삭제'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await ref
+                      .read(repertoireCrudProvider.notifier)
+                      .deleteRepertoire(repertoire.id, studentId);
+                  ref.invalidate(studentRepertoiresProvider(studentId));
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -370,9 +386,10 @@ class _SectionListItem extends ConsumerWidget {
     final hasRepeatCount = section.hasRepeatCount;
 
     return InkWell(
-      onTap: () => context.push(
-        '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
-      ),
+      onTap:
+          () => context.push(
+            '${AppRoutes.sectionDetail.replaceFirst(':id', section.id)}?repertoireId=$repertoireId&studentId=$studentId',
+          ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
@@ -464,7 +481,9 @@ class _SectionListItem extends ConsumerWidget {
                 totalCount: section.repeatCount!,
                 completedCount: completedCount,
                 onTap: () async {
-                  await ref.read(sectionCrudProvider.notifier).toggleDailyCompletion(
+                  await ref
+                      .read(sectionCrudProvider.notifier)
+                      .toggleDailyCompletion(
                         section.id,
                         repertoireId,
                         studentId,
@@ -479,7 +498,9 @@ class _SectionListItem extends ConsumerWidget {
                 child: Checkbox(
                   value: section.isCompletedForDate(today),
                   onChanged: (value) async {
-                    await ref.read(sectionCrudProvider.notifier).toggleComplete(
+                    await ref
+                        .read(sectionCrudProvider.notifier)
+                        .toggleComplete(
                           section.id,
                           repertoireId,
                           studentId: studentId,
@@ -492,10 +513,7 @@ class _SectionListItem extends ConsumerWidget {
               ),
 
             // Arrow
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
           ],
         ),
       ),
@@ -529,9 +547,7 @@ class _PawStampRow extends StatelessWidget {
               opacity: isCompleted ? 1.0 : 0.3,
               child: Text(
                 '🐾',
-                style: TextStyle(
-                  fontSize: totalCount <= 5 ? 16 : 12,
-                ),
+                style: TextStyle(fontSize: totalCount <= 5 ? 16 : 12),
               ),
             ),
           );

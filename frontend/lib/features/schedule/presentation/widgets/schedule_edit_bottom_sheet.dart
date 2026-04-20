@@ -163,7 +163,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                   ),
                   value: _isActive,
                   onChanged: (value) => setState(() => _isActive = value),
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   contentPadding: EdgeInsets.zero,
                 ),
 

@@ -565,7 +565,7 @@ class _ToggleSection extends StatelessWidget {
           subtitle: const Text('Perfect 연속 달성 시 콤보 표시'),
           value: showCombo,
           onChanged: (_) => onShowComboChanged(),
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
           contentPadding: EdgeInsets.zero,
         ),
         SwitchListTile(
@@ -573,7 +573,7 @@ class _ToggleSection extends StatelessWidget {
           subtitle: const Text('Perfect 튜닝 시 진동'),
           value: vibrationFeedback,
           onChanged: (_) => onVibrationChanged(),
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
           contentPadding: EdgeInsets.zero,
         ),
       ],

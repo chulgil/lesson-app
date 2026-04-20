@@ -527,7 +527,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                                 : AccentPattern.uniform,
                           );
                     },
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                   ),
                 ],
               ),

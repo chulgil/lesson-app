@@ -107,7 +107,7 @@ class DurationOptionItem extends StatelessWidget {
           Switch(
             value: !isDisabled,
             onChanged: isOnlyActive ? null : (value) => onToggle(value),
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
@@ -264,7 +264,7 @@ class TimeSlotTile extends StatelessWidget {
           Switch(
             value: slot.isActive,
             onChanged: onToggle,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined, size: 20),

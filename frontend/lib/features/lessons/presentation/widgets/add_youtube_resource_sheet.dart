@@ -236,7 +236,7 @@ class _AddYoutubeResourceSheetState
                   Switch(
                     value: _useTimestamp,
                     onChanged: (v) => setState(() => _useTimestamp = v),
-                    activeColor: AppColors.primary,
+                    activeThumbColor: AppColors.primary,
                   ),
                 ],
               ),

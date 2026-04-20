@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -9,10 +10,7 @@ import '../../../domain/entities/entities.dart';
 class NoteEditDialog extends StatefulWidget {
   final PracticeNote? existingNote;
 
-  const NoteEditDialog({
-    super.key,
-    this.existingNote,
-  });
+  const NoteEditDialog({super.key, this.existingNote});
 
   @override
   State<NoteEditDialog> createState() => _NoteEditDialogState();
@@ -134,7 +132,7 @@ class _NoteEditDialogState extends State<NoteEditDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('취소'),
+                  child: const Text(AppStrings.cancel),
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 FilledButton(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/domain/entities/recording.dart';
@@ -206,13 +207,14 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
 
     // Get actual file duration (Android UI timer can be inaccurate)
     final audioDuration = await _getActualFileDuration(filePath);
-    final totalDuration =
-        audioDuration ?? Duration(seconds: recordingSeconds);
+    final totalDuration = audioDuration ?? Duration(seconds: recordingSeconds);
 
     // Apply smart recording trimming if enabled (including middle silence)
     TrimResult? trimResult;
-    final needsTrimming = smartRecordingState.isEnabled &&
-        (smartRecordingState.hasTrimming || smartRecordingState.hasMiddleSilence);
+    final needsTrimming =
+        smartRecordingState.isEnabled &&
+        (smartRecordingState.hasTrimming ||
+            smartRecordingState.hasMiddleSilence);
     if (needsTrimming) {
       trimResult = await AudioTrimmerService.instance.trimAudio(
         inputPath: filePath,
@@ -231,8 +233,10 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
     }
     // Also subtract middle silence periods
     if (smartRecordingState.silencePeriods.isNotEmpty) {
-      final middleSilenceMs = smartRecordingState.silencePeriods
-          .fold<int>(0, (sum, period) => sum + period.duration.inMilliseconds);
+      final middleSilenceMs = smartRecordingState.silencePeriods.fold<int>(
+        0,
+        (sum, period) => sum + period.duration.inMilliseconds,
+      );
       actualDurationMs -= middleSilenceMs;
     }
     // Convert to seconds with rounding, ensure at least 1 second
@@ -240,7 +244,9 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
     if (actualDuration < 1) actualDuration = 1;
 
     try {
-      await ref.read(recordingCrudProvider.notifier).createRecording(
+      await ref
+          .read(recordingCrudProvider.notifier)
+          .createRecording(
             sectionId: sectionId,
             filePath: filePath, // Use actual file path from recorder
             durationSeconds: actualDuration,
@@ -250,17 +256,16 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
           );
 
       // Also increment practice count
-      await ref.read(sectionCrudProvider.notifier).incrementPractice(
-            sectionId,
-            repertoireId,
-            actualDuration,
-          );
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .incrementPractice(sectionId, repertoireId, actualDuration);
 
       ref.invalidate(sectionProvider(sectionId));
       ref.invalidate(studentRepertoiresProvider(studentId));
 
       // Show smart recording result dialog if trimming or middle silence was applied
-      final hasTrimOrSilence = trimResult?.hasTrimming == true ||
+      final hasTrimOrSilence =
+          trimResult?.hasTrimming == true ||
           smartRecordingState.silencePeriods.isNotEmpty;
       if (mounted && hasTrimOrSilence) {
         // Calculate middle silence total duration
@@ -275,22 +280,23 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
           totalDuration: totalDuration,
           middleSilenceCount: smartRecordingState.silencePeriods.length,
           middleSilenceDuration: middleSilenceDuration,
-          onRestore: trimResult?.originalFilePath != null
-              ? () async {
-                  await AudioTrimmerService.instance.restoreOriginal(
-                    originalPath: trimResult!.originalFilePath!,
-                    trimmedPath: filePath,
-                  );
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('원본 파일이 복구되었습니다'),
-                        backgroundColor: AppColors.success,
-                      ),
+          onRestore:
+              trimResult?.originalFilePath != null
+                  ? () async {
+                    await AudioTrimmerService.instance.restoreOriginal(
+                      originalPath: trimResult!.originalFilePath!,
+                      trimmedPath: filePath,
                     );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('원본 파일이 복구되었습니다'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
                   }
-                }
-              : null,
+                  : null,
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -320,11 +326,9 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
 
   Future<void> setRepresentative(String recordingId) async {
     try {
-      await ref.read(recordingCrudProvider.notifier).setRepresentative(
-            sectionId,
-            recordingId,
-            repertoireId,
-          );
+      await ref
+          .read(recordingCrudProvider.notifier)
+          .setRepresentative(sectionId, recordingId, repertoireId);
       ref.invalidate(sectionProvider(sectionId));
 
       if (mounted) {
@@ -350,40 +354,36 @@ mixin SectionDetailRecordingMixin<T extends ConsumerStatefulWidget>
   Future<void> deleteRecording(String recordingId) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('녹음 삭제'),
-        content: const Text('이 녹음을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('녹음 삭제'),
+            content: const Text('이 녹음을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
 
     try {
-      await ref.read(recordingCrudProvider.notifier).deleteRecording(
-            recordingId,
-            sectionId,
-          );
+      await ref
+          .read(recordingCrudProvider.notifier)
+          .deleteRecording(recordingId, sectionId);
       ref.invalidate(sectionProvider(sectionId));
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('녹음이 삭제되었습니다'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음이 삭제되었습니다')));
       }
     } catch (e) {
       if (mounted) {

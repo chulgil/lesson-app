@@ -96,7 +96,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                           (value) => ref
                               .read(practiceReminderProvider.notifier)
                               .toggleEnabled(value),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ],
                 ),

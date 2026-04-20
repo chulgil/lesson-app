@@ -205,7 +205,7 @@ class ProfileNotificationSection extends ConsumerWidget {
           Switch(
             value: value,
             onChanged: isRequired ? null : onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),

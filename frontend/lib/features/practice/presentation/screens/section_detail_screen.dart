@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -38,7 +39,6 @@ class SectionDetailScreen extends ConsumerStatefulWidget {
 
 class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
     with SectionDetailRecordingMixin {
-
   @override
   String get sectionId => widget.sectionId;
 
@@ -80,28 +80,29 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                 _showDeleteConfirmation(context);
               }
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, size: 20),
-                    SizedBox(width: AppSpacing.space2),
-                    Text('수정'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, size: 20, color: AppColors.error),
-                    SizedBox(width: AppSpacing.space2),
-                    Text('삭제', style: TextStyle(color: AppColors.error)),
-                  ],
-                ),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit, size: 20),
+                        SizedBox(width: AppSpacing.space2),
+                        Text('수정'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 20, color: AppColors.error),
+                        SizedBox(width: AppSpacing.space2),
+                        Text('삭제', style: TextStyle(color: AppColors.error)),
+                      ],
+                    ),
+                  ),
+                ],
           ),
         ],
       ),
@@ -116,22 +117,27 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           return _buildContent(context, section);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
-              const SizedBox(height: AppSpacing.space2),
-              TextButton(
-                onPressed: () =>
-                    ref.invalidate(sectionProvider(widget.sectionId)),
-                child: const Text('다시 시도'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  const SizedBox(height: AppSpacing.space2),
+                  TextButton(
+                    onPressed:
+                        () => ref.invalidate(sectionProvider(widget.sectionId)),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -162,15 +168,13 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           const SizedBox(height: AppSpacing.space4),
 
           // Practice stats section (moved above notes)
-          Text(
-            '연습기록',
-            style: AppTypography.headingSmall,
-          ),
+          Text('연습기록', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space2),
           PracticeStatsEditor(
             section: section,
-            onUpdate: (count, seconds) =>
-                _updatePracticeStats(section, count, seconds),
+            onUpdate:
+                (count, seconds) =>
+                    _updatePracticeStats(section, count, seconds),
           ),
 
           const SizedBox(height: AppSpacing.space4),
@@ -186,10 +190,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
           // Recording section
           Row(
             children: [
-              Text(
-                '녹음',
-                style: AppTypography.headingSmall,
-              ),
+              Text('녹음', style: AppTypography.headingSmall),
               const Spacer(),
               if (sortedRecordings.length >= 2)
                 TextButton.icon(
@@ -198,7 +199,11 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
                     showRecordingComparisonSheet(context, chronological);
                   },
-                  icon: Icon(Icons.compare_arrows, size: 18, color: AppColors.primary),
+                  icon: Icon(
+                    Icons.compare_arrows,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   label: Text(
                     '비교',
                     style: AppTypography.bodySmall.copyWith(
@@ -253,14 +258,18 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
       // Use toggleDailyCompletion for N회 반복 sections, toggleComplete for standard
       if (section.hasRepeatCount) {
         final today = widget.selectedDate ?? DateTime.now();
-        await ref.read(sectionCrudProvider.notifier).toggleDailyCompletion(
+        await ref
+            .read(sectionCrudProvider.notifier)
+            .toggleDailyCompletion(
               section.id,
               widget.repertoireId,
               widget.studentId,
               today,
             );
       } else {
-        await ref.read(sectionCrudProvider.notifier).toggleComplete(
+        await ref
+            .read(sectionCrudProvider.notifier)
+            .toggleComplete(
               section.id,
               widget.repertoireId,
               studentId: widget.studentId,
@@ -293,10 +302,9 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
         totalPracticeSeconds: newSeconds,
       );
 
-      await ref.read(sectionCrudProvider.notifier).updateSection(
-            updatedSection,
-            studentId: widget.studentId,
-          );
+      await ref
+          .read(sectionCrudProvider.notifier)
+          .updateSection(updatedSection, studentId: widget.studentId);
 
       ref.invalidate(sectionProvider(widget.sectionId));
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
@@ -351,33 +359,31 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
     final navigator = Navigator.of(context);
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('섹션 삭제'),
-        content: const Text('이 섹션과 모든 녹음을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('취소'),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('섹션 삭제'),
+            content: const Text('이 섹션과 모든 녹음을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+                  await ref
+                      .read(sectionCrudProvider.notifier)
+                      .deleteSection(widget.sectionId, widget.repertoireId);
+                  ref.invalidate(studentRepertoiresProvider(widget.studentId));
+                  if (mounted) {
+                    navigator.pop();
+                  }
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              await ref.read(sectionCrudProvider.notifier).deleteSection(
-                    widget.sectionId,
-                    widget.repertoireId,
-                  );
-              ref.invalidate(studentRepertoiresProvider(widget.studentId));
-              if (mounted) {
-                navigator.pop();
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 }

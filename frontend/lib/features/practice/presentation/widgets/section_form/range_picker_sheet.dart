@@ -74,7 +74,7 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('취소'),
+                  child: const Text(AppStrings.cancel),
                 ),
                 Text(widget.title, style: AppTypography.headingSmall),
                 TextButton(

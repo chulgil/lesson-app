@@ -223,7 +223,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
             item.isRequired
                 ? null
                 : (value) => _handleToggle(category, index, value),
-        activeColor: AppColors.primary,
+        activeThumbColor: AppColors.primary,
       ),
     );
   }

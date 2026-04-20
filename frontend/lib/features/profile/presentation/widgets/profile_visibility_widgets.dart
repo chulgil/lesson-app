@@ -198,7 +198,7 @@ class SearchToggle extends StatelessWidget {
           Switch(
             value: isSearchable,
             onChanged: onChanged,
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),
