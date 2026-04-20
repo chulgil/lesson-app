@@ -59,8 +59,8 @@ class _ScheduleChangeTypeBottomSheet extends StatelessWidget {
               icon: Icons.today_outlined,
               label: AppStrings.scheduleChangeSingleLabel,
               description: AppStrings.scheduleChangeSingleDesc,
-              onTap: () =>
-                  Navigator.pop(context, ScheduleChangeType.singleLesson),
+              onTap:
+                  () => Navigator.pop(context, ScheduleChangeType.singleLesson),
             ),
             const SizedBox(height: AppSpacing.space3),
             // Bulk change option
@@ -68,8 +68,8 @@ class _ScheduleChangeTypeBottomSheet extends StatelessWidget {
               icon: Icons.date_range_outlined,
               label: AppStrings.scheduleChangeBulkLabel,
               description: AppStrings.scheduleChangeBulkDesc,
-              onTap: () =>
-                  Navigator.pop(context, ScheduleChangeType.bulkChange),
+              onTap:
+                  () => Navigator.pop(context, ScheduleChangeType.bulkChange),
             ),
             const SizedBox(height: AppSpacing.space2),
           ],
@@ -96,9 +96,9 @@ class _ChangeTypeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surfaceLight,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -109,7 +109,7 @@ class _ChangeTypeCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 24),
               ),

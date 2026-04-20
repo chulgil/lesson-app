@@ -97,35 +97,44 @@ class ScheduleTab extends ConsumerWidget {
         Expanded(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onHorizontalDragEnd: (viewMode == ScheduleViewMode.list)
-                ? null
-                : (details) {
-                    final velocity = details.primaryVelocity ?? 0;
-                    if (velocity.abs() < 100) return;
-                    final delta = viewMode == ScheduleViewMode.timeline
-                        ? const Duration(days: 1)  // day-by-day for timeline
-                        : const Duration(days: 7); // week-by-week for grid
-                    final newDate = velocity > 0
-                        ? selectedDate.subtract(delta)
-                        : selectedDate.add(delta);
-                    ref.read(teacherSelectedDateProvider.notifier).state = newDate;
-                  },
+            onHorizontalDragEnd:
+                (viewMode == ScheduleViewMode.list)
+                    ? null
+                    : (details) {
+                      final velocity = details.primaryVelocity ?? 0;
+                      if (velocity.abs() < 100) return;
+                      final delta =
+                          viewMode == ScheduleViewMode.timeline
+                              ? const Duration(
+                                days: 1,
+                              ) // day-by-day for timeline
+                              : const Duration(
+                                days: 7,
+                              ); // week-by-week for grid
+                      final newDate =
+                          velocity > 0
+                              ? selectedDate.subtract(delta)
+                              : selectedDate.add(delta);
+                      ref.read(teacherSelectedDateProvider.notifier).state =
+                          newDate;
+                    },
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: viewMode == ScheduleViewMode.weeklyGrid
-                  ? ScheduleWeeklyGridView(
-                      key: const ValueKey(ScheduleViewMode.weeklyGrid),
-                      selectedDate: selectedDate,
-                    )
-                  : _buildViewContent(
-                      key: ValueKey(viewMode),
-                      lessonsAsync: lessonsAsync,
-                      selectedDate: selectedDate,
-                      sortType: sortType,
-                      viewMode: viewMode,
-                      ref: ref,
-                      context: context,
-                    ),
+              child:
+                  viewMode == ScheduleViewMode.weeklyGrid
+                      ? ScheduleWeeklyGridView(
+                        key: const ValueKey(ScheduleViewMode.weeklyGrid),
+                        selectedDate: selectedDate,
+                      )
+                      : _buildViewContent(
+                        key: ValueKey(viewMode),
+                        lessonsAsync: lessonsAsync,
+                        selectedDate: selectedDate,
+                        sortType: sortType,
+                        viewMode: viewMode,
+                        ref: ref,
+                        context: context,
+                      ),
             ),
           ),
         ),
@@ -160,9 +169,7 @@ class ScheduleTab extends ConsumerWidget {
           case LessonSortType.timeAsc:
             dayLessons.sort((a, b) => a.startTime.compareTo(b.startTime));
           case LessonSortType.nameAsc:
-            dayLessons.sort(
-              (a, b) => a.studentName.compareTo(b.studentName),
-            );
+            dayLessons.sort((a, b) => a.studentName.compareTo(b.studentName));
         }
 
         if (viewMode == ScheduleViewMode.timeline) {
@@ -178,14 +185,11 @@ class ScheduleTab extends ConsumerWidget {
           key: key,
           children: [
             // Date header with count and sort
-            _buildDateHeader(
-              ref,
-              selectedDate,
-              dayLessons.length,
-              sortType,
-            ),
+            _buildDateHeader(ref, selectedDate, dayLessons.length, sortType),
             const SizedBox(height: AppSpacing.space3),
-            Expanded(child: _buildLessonList(context, dayLessons, selectedDate)),
+            Expanded(
+              child: _buildLessonList(context, dayLessons, selectedDate),
+            ),
           ],
         );
       },
@@ -193,9 +197,7 @@ class ScheduleTab extends ConsumerWidget {
           () => Column(
             children: [
               _buildDateHeader(ref, selectedDate, 0, sortType),
-              const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              ),
+              const Expanded(child: Center(child: CircularProgressIndicator())),
             ],
           ),
       error:
@@ -351,7 +353,11 @@ class ScheduleTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildLessonList(BuildContext context, List<Lesson> dayLessons, DateTime selectedDate) {
+  Widget _buildLessonList(
+    BuildContext context,
+    List<Lesson> dayLessons,
+    DateTime selectedDate,
+  ) {
     if (dayLessons.isEmpty) {
       return _buildEmptyState();
     }
@@ -408,14 +414,12 @@ class _LessonTimeCard extends ConsumerWidget {
   final Lesson lesson;
   final DateTime selectedDate;
 
-  const _LessonTimeCard({
-    required this.lesson,
-    required this.selectedDate,
-  });
+  const _LessonTimeCard({required this.lesson, required this.selectedDate});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isScheduled = lesson.displayStatus == LessonStatus.scheduled ||
+    final isScheduled =
+        lesson.displayStatus == LessonStatus.scheduled ||
         lesson.displayStatus == LessonStatus.reschedulePending;
 
     final card = _buildCard(context, ref);
@@ -436,7 +440,9 @@ class _LessonTimeCard extends ConsumerWidget {
             confirmColor: AppColors.success,
             onConfirm: () async {
               final updated = lesson.copyWith(status: LessonStatus.completed);
-              await ref.read(lessonsNotifierProvider.notifier).updateLesson(updated);
+              await ref
+                  .read(lessonsNotifierProvider.notifier)
+                  .updateLesson(updated);
             },
           );
         } else {
@@ -449,7 +455,9 @@ class _LessonTimeCard extends ConsumerWidget {
             confirmLabel: '취소',
             confirmColor: AppColors.error,
             onConfirm: () async {
-              await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
+              await ref
+                  .read(lessonsNotifierProvider.notifier)
+                  .cancelLesson(lesson.id);
             },
           );
         }
@@ -465,7 +473,13 @@ class _LessonTimeCard extends ConsumerWidget {
           children: [
             Icon(Icons.check_circle, color: Colors.white),
             SizedBox(width: 8),
-            Text('완료', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            Text(
+              '완료',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
@@ -479,7 +493,13 @@ class _LessonTimeCard extends ConsumerWidget {
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('취소', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            Text(
+              '취소',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             SizedBox(width: 8),
             Icon(Icons.cancel, color: Colors.white),
           ],
@@ -500,21 +520,22 @@ class _LessonTimeCard extends ConsumerWidget {
   }) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('돌아가기'),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text('돌아가기'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: confirmColor),
+                child: Text(confirmLabel),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: confirmColor),
-            child: Text(confirmLabel),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -535,7 +556,11 @@ class _LessonTimeCard extends ConsumerWidget {
   Widget _buildCard(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final selDay = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final selDay = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
     final isPastDay = selDay.isBefore(today);
     final isToday = selDay.isAtSameMomentAs(today);
 
@@ -591,9 +616,11 @@ class _LessonTimeCard extends ConsumerWidget {
                   lesson.startTime,
                   style: AppTypography.headingSmall.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: (isPastDay || lesson.displayStatus == LessonStatus.completed)
-                        ? AppColors.textTertiaryLight
-                        : null,
+                    color:
+                        (isPastDay ||
+                                lesson.displayStatus == LessonStatus.completed)
+                            ? AppColors.textTertiaryLight
+                            : null,
                   ),
                 ),
               ),
@@ -609,9 +636,12 @@ class _LessonTimeCard extends ConsumerWidget {
                       '${lesson.studentName} · ${lesson.instrument}',
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: (isPastDay || lesson.displayStatus == LessonStatus.completed)
-                            ? AppColors.textSecondaryLight
-                            : null,
+                        color:
+                            (isPastDay ||
+                                    lesson.displayStatus ==
+                                        LessonStatus.completed)
+                                ? AppColors.textSecondaryLight
+                                : null,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -762,41 +792,47 @@ class _ViewModeToggle extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.scheduleMutedBackground,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       padding: const EdgeInsets.all(2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: ScheduleViewMode.values.map((mode) {
-          final isSelected = mode == currentMode;
-          return GestureDetector(
-            onTap: () => onChanged(mode),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.white : Colors.transparent,
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Icon(
-                _getIcon(mode),
-                size: 16,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textTertiaryLight,
-              ),
-            ),
-          );
-        }).toList(),
+        children:
+            ScheduleViewMode.values.map((mode) {
+              final isSelected = mode == currentMode;
+              return GestureDetector(
+                onTap: () => onChanged(mode),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected ? Colors.white : Colors.transparent,
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow:
+                        isSelected
+                            ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ]
+                            : null,
+                  ),
+                  child: Icon(
+                    _getIcon(mode),
+                    size: 16,
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textTertiaryLight,
+                  ),
+                ),
+              );
+            }).toList(),
       ),
     );
   }

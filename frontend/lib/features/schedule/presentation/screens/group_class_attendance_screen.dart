@@ -43,8 +43,9 @@ class _GroupClassAttendanceScreenState
 
   @override
   Widget build(BuildContext context) {
-    final bookingsAsync =
-        ref.watch(scheduleBookingsProvider(widget.scheduleId));
+    final bookingsAsync = ref.watch(
+      scheduleBookingsProvider(widget.scheduleId),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -54,13 +55,14 @@ class _GroupClassAttendanceScreenState
           if (_hasChanges)
             TextButton(
               onPressed: _isSaving ? null : _saveAttendance,
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('저장'),
+              child:
+                  _isSaving
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Text('저장'),
             ),
         ],
       ),
@@ -79,12 +81,15 @@ class _GroupClassAttendanceScreenState
               error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
               data: (bookings) {
                 // Filter only confirmed bookings
-                final confirmedBookings = bookings
-                    .where((b) =>
-                        b.status == GroupBookingStatus.confirmed ||
-                        b.status == GroupBookingStatus.attended ||
-                        b.status == GroupBookingStatus.noShow)
-                    .toList();
+                final confirmedBookings =
+                    bookings
+                        .where(
+                          (b) =>
+                              b.status == GroupBookingStatus.confirmed ||
+                              b.status == GroupBookingStatus.attended ||
+                              b.status == GroupBookingStatus.noShow,
+                        )
+                        .toList();
 
                 // Initialize attendance state (default all to attended)
                 if (!_isInitialized) {
@@ -113,12 +118,10 @@ class _GroupClassAttendanceScreenState
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: const BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         children: [
@@ -128,7 +131,7 @@ class _GroupClassAttendanceScreenState
             height: 48,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: const Center(
               child: Text('🎻', style: TextStyle(fontSize: 24)),
@@ -183,10 +186,7 @@ class _GroupClassAttendanceScreenState
 
   Widget _buildHelpText() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       color: AppColors.info.withValues(alpha: 0.05),
       child: Row(
         children: [
@@ -242,27 +242,24 @@ class _GroupClassAttendanceScreenState
     final studentAsync = ref.watch(studentProvider(booking.studentId));
 
     return studentAsync.when(
-      loading: () => const ListTile(
-        leading: CircularProgressIndicator(),
-        title: Text('로딩중...'),
-      ),
-      error: (e, _) => ListTile(
-        title: const Text('오류가 발생했습니다.'),
-      ),
+      loading:
+          () => const ListTile(
+            leading: CircularProgressIndicator(),
+            title: Text('로딩중...'),
+          ),
+      error: (e, _) => ListTile(title: const Text('오류가 발생했습니다.')),
       data: (student) {
         final studentName = student?.name ?? '알 수 없음';
 
         return InkWell(
           onTap: () => _toggleAttendance(booking.id),
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: isAttended
-                  ? Colors.transparent
-                  : AppColors.error.withValues(alpha: 0.05),
+              color:
+                  isAttended
+                      ? Colors.transparent
+                      : AppColors.error.withValues(alpha: 0.05),
               border: const Border(
                 bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
               ),
@@ -274,9 +271,10 @@ class _GroupClassAttendanceScreenState
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: isAttended
-                        ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.error.withValues(alpha: 0.1),
+                    color:
+                        isAttended
+                            ? AppColors.success.withValues(alpha: 0.1)
+                            : AppColors.error.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -300,9 +298,10 @@ class _GroupClassAttendanceScreenState
                           fontWeight: FontWeight.w500,
                           decoration:
                               isAttended ? null : TextDecoration.lineThrough,
-                          color: isAttended
-                              ? AppColors.textPrimaryLight
-                              : AppColors.textSecondaryLight,
+                          color:
+                              isAttended
+                                  ? AppColors.textPrimaryLight
+                                  : AppColors.textSecondaryLight,
                         ),
                       ),
                       if (!isAttended)
@@ -340,9 +339,7 @@ class _GroupClassAttendanceScreenState
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: const Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: const Border(top: BorderSide(color: AppColors.borderLight)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -358,16 +355,17 @@ class _GroupClassAttendanceScreenState
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
           ),
-          child: _isSaving
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : const Text('수업 종료'),
+          child:
+              _isSaving
+                  ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : const Text('수업 종료'),
         ),
       ),
     );
@@ -426,37 +424,38 @@ class _GroupClassAttendanceScreenState
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('수업 종료'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '출석: ${_getAttendedCount()}명\n'
-              '미참석: ${_attendanceState.length - _getAttendedCount()}명',
-              style: AppTypography.bodyMedium,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('수업 종료'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '출석: ${_getAttendedCount()}명\n'
+                  '미참석: ${_attendanceState.length - _getAttendedCount()}명',
+                  style: AppTypography.bodyMedium,
+                ),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  '수업을 종료하시겠습니까?\n출석한 학생의 수강권이 차감됩니다.',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              '수업을 종료하시겠습니까?\n출석한 학생의 수강권이 차감됩니다.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
               ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('수업 종료'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('수업 종료'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;

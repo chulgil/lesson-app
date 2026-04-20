@@ -123,7 +123,7 @@ class _GroupClassDetailScreenState
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(

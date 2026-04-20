@@ -12,10 +12,7 @@ import '../providers/week_lessons_provider.dart';
 import '../widgets/alternative_time_grid.dart';
 
 /// Result from the schedule change slot selection screen.
-typedef ScheduleChangeSlotResult = ({
-  String message,
-  List<TimeSlot> slots,
-});
+typedef ScheduleChangeSlotResult = ({String message, List<TimeSlot> slots});
 
 /// Parameters for navigating to this screen.
 class ScheduleChangeSlotParams {
@@ -74,9 +71,12 @@ class _ScheduleChangeSlotScreenState
 
   @override
   Widget build(BuildContext context) {
-    final lessonsAsync = ref.watch(weekLessonsWithPreviewProvider(
-      (weekStart: _weekStart, teacherId: params.teacherId),
-    ));
+    final lessonsAsync = ref.watch(
+      weekLessonsWithPreviewProvider((
+        weekStart: _weekStart,
+        teacherId: params.teacherId,
+      )),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -121,7 +121,7 @@ class _ScheduleChangeSlotScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         children: [
@@ -130,9 +130,7 @@ class _ScheduleChangeSlotScreenState
           Expanded(
             child: Text(
               AppStrings.bulkChangeSlotGuide,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.primary,
-              ),
+              style: AppTypography.caption.copyWith(color: AppColors.primary),
             ),
           ),
         ],
@@ -150,7 +148,7 @@ class _ScheduleChangeSlotScreenState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Row(
@@ -181,20 +179,24 @@ class _ScheduleChangeSlotScreenState
         children: [
           IconButton(
             icon: const Icon(Icons.chevron_left),
-            onPressed: () => setState(() {
-              _weekStart = _weekStart.subtract(const Duration(days: 7));
-            }),
+            onPressed:
+                () => setState(() {
+                  _weekStart = _weekStart.subtract(const Duration(days: 7));
+                }),
           ),
           Text(
             '${_weekStart.month}/${_weekStart.day} - '
             '${weekEnd.month}/${weekEnd.day}',
-            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.chevron_right),
-            onPressed: () => setState(() {
-              _weekStart = _weekStart.add(const Duration(days: 7));
-            }),
+            onPressed:
+                () => setState(() {
+                  _weekStart = _weekStart.add(const Duration(days: 7));
+                }),
           ),
         ],
       ),
@@ -273,8 +275,8 @@ class _ScheduleChangeSlotScreenState
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 18),
-                    onPressed: () =>
-                        setState(() => _suggestedSlots.removeAt(i)),
+                    onPressed:
+                        () => setState(() => _suggestedSlots.removeAt(i)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(
                       minWidth: 32,
@@ -314,14 +316,15 @@ class _ScheduleChangeSlotScreenState
               maxLines: 2,
               maxLength: 200,
               decoration: InputDecoration(
-                hintText: params.isBulkChange
-                    ? AppStrings.scheduleChangeBulkDesc
-                    : AppStrings.scheduleChangeSingleDesc,
+                hintText:
+                    params.isBulkChange
+                        ? AppStrings.scheduleChangeBulkDesc
+                        : AppStrings.scheduleChangeSingleDesc,
                 hintStyle: AppTypography.bodySmall.copyWith(
                   color: AppColors.textTertiaryLight,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide(color: AppColors.borderLight),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),

@@ -24,10 +24,7 @@ import 'time_exception_screen.dart';
 class TeacherAvailabilityScreen extends ConsumerStatefulWidget {
   final String teacherId;
 
-  const TeacherAvailabilityScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const TeacherAvailabilityScreen({super.key, required this.teacherId});
 
   @override
   ConsumerState<TeacherAvailabilityScreen> createState() =>
@@ -38,8 +35,9 @@ class _TeacherAvailabilityScreenState
     extends ConsumerState<TeacherAvailabilityScreen> {
   @override
   Widget build(BuildContext context) {
-    final availabilityAsync =
-        ref.watch(teacherAvailabilityProvider(widget.teacherId));
+    final availabilityAsync = ref.watch(
+      teacherAvailabilityProvider(widget.teacherId),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -51,33 +49,41 @@ class _TeacherAvailabilityScreenState
       body: availabilityAsync.when(
         data: (availability) => _buildBody(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space3),
-              Text(
-                '데이터를 불러올 수 없습니다',
-                style: AppTypography.bodyMedium
-                    .copyWith(color: AppColors.textSecondaryLight),
+        error:
+            (_, __) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    '데이터를 불러올 수 없습니다',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  TextButton(
+                    onPressed:
+                        () => ref.invalidate(
+                          teacherAvailabilityProvider(widget.teacherId),
+                        ),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.space3),
-              TextButton(
-                onPressed: () => ref.invalidate(
-                  teacherAvailabilityProvider(widget.teacherId),
-                ),
-                child: const Text('다시 시도'),
-              ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
 
   Widget _buildBody(TeacherAvailability? availability) {
-    final avail = availability ??
+    final avail =
+        availability ??
         TeacherAvailability(
           id: '',
           teacherId: widget.teacherId,
@@ -101,20 +107,14 @@ class _TeacherAvailabilityScreenState
           const SizedBox(height: AppSpacing.space8),
 
           // Section 2: Lesson settings
-          _buildSectionHeader(
-            title: '레슨 기본 설정',
-            subtitle: null,
-          ),
+          _buildSectionHeader(title: '레슨 기본 설정', subtitle: null),
           const SizedBox(height: AppSpacing.space3),
           _buildLessonSettings(avail),
 
           const SizedBox(height: AppSpacing.space8),
 
           // Section 3: Preview
-          _buildSectionHeader(
-            title: '이번 주 예상 스케줄',
-            subtitle: '설정한 시간 기반 미리보기',
-          ),
+          _buildSectionHeader(title: '이번 주 예상 스케줄', subtitle: '설정한 시간 기반 미리보기'),
           const SizedBox(height: AppSpacing.space3),
           _buildWeeklyPreview(avail),
 
@@ -149,8 +149,9 @@ class _TeacherAvailabilityScreenState
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: AppTypography.bodySmall
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
         ],
         if (helpText != null) ...[
@@ -168,8 +169,9 @@ class _TeacherAvailabilityScreenState
                 Expanded(
                   child: Text(
                     helpText,
-                    style:
-                        AppTypography.caption.copyWith(color: AppColors.info),
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.info,
+                    ),
                   ),
                 ),
               ],
@@ -218,9 +220,10 @@ class _TeacherAvailabilityScreenState
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: hasSchedules
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : isWeekend
+            color:
+                hasSchedules
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
                     : AppColors.surfaceLight,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -230,29 +233,30 @@ class _TeacherAvailabilityScreenState
               dayName,
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
-                color: hasSchedules
-                    ? AppColors.primary
-                    : isWeekend
+                color:
+                    hasSchedules
+                        ? AppColors.primary
+                        : isWeekend
                         ? AppColors.secondary
                         : AppColors.textSecondaryLight,
               ),
             ),
           ),
         ),
-        title: hasSchedules
-            ? Wrap(
-                spacing: AppSpacing.space2,
-                runSpacing: AppSpacing.space1,
-                children:
-                    schedules.map((s) => _buildTimeChip(s)).toList(),
-              )
-            : Text(
-                '쉬는날',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
-                  fontStyle: FontStyle.italic,
+        title:
+            hasSchedules
+                ? Wrap(
+                  spacing: AppSpacing.space2,
+                  runSpacing: AppSpacing.space1,
+                  children: schedules.map((s) => _buildTimeChip(s)).toList(),
+                )
+                : Text(
+                  '쉬는날',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
-              ),
         trailing: IconButton(
           icon: Icon(
             hasSchedules ? Icons.edit_outlined : Icons.add,
@@ -279,22 +283,25 @@ class _TeacherAvailabilityScreenState
           vertical: 4,
         ),
         decoration: BoxDecoration(
-          color: schedule.isActive
-              ? AppColors.practiceGood.withValues(alpha: 0.1)
-              : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+          color:
+              schedule.isActive
+                  ? AppColors.practiceGood.withValues(alpha: 0.1)
+                  : AppColors.textTertiaryLight.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: schedule.isActive
-                ? AppColors.practiceGood.withValues(alpha: 0.3)
-                : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+            color:
+                schedule.isActive
+                    ? AppColors.practiceGood.withValues(alpha: 0.3)
+                    : AppColors.textTertiaryLight.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
           '${schedule.startTime} - ${schedule.endTime}',
           style: AppTypography.caption.copyWith(
-            color: schedule.isActive
-                ? AppColors.practiceGood
-                : AppColors.textTertiaryLight,
+            color:
+                schedule.isActive
+                    ? AppColors.practiceGood
+                    : AppColors.textTertiaryLight,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -335,7 +342,8 @@ class _TeacherAvailabilityScreenState
               icon: Icons.schedule,
               label: '시작 간격',
               value: '${avail.slotStartInterval}분',
-              help: '${avail.slotStartInterval}분이면 10:00, 10:${avail.slotStartInterval == 30 ? '30, 11:00' : '00 → 11:00'} 시작 가능',
+              help:
+                  '${avail.slotStartInterval}분이면 10:00, 10:${avail.slotStartInterval == 30 ? '30, 11:00' : '00 → 11:00'} 시작 가능',
             ),
             const SizedBox(height: AppSpacing.space2),
             Row(
@@ -343,12 +351,12 @@ class _TeacherAvailabilityScreenState
               children: [
                 Text(
                   '탭하여 변경',
-                  style: AppTypography.caption
-                      .copyWith(color: AppColors.primary),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
                 const SizedBox(width: 4),
-                Icon(Icons.chevron_right,
-                    size: 16, color: AppColors.primary),
+                Icon(Icons.chevron_right, size: 16, color: AppColors.primary),
               ],
             ),
           ],
@@ -375,8 +383,9 @@ class _TeacherAvailabilityScreenState
               const SizedBox(height: 2),
               Text(
                 help,
-                style: AppTypography.caption
-                    .copyWith(color: AppColors.textTertiaryLight),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
               ),
             ],
           ),
@@ -414,8 +423,7 @@ class _TeacherAvailabilityScreenState
           // Day headers
           Row(
             children: List.generate(7, (i) {
-              final hasSchedule =
-                  grouped[i]?.isNotEmpty == true;
+              final hasSchedule = grouped[i]?.isNotEmpty == true;
               return Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -424,9 +432,10 @@ class _TeacherAvailabilityScreenState
                     textAlign: TextAlign.center,
                     style: AppTypography.caption.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: hasSchedule
-                          ? AppColors.primary
-                          : AppColors.textTertiaryLight,
+                      color:
+                          hasSchedule
+                              ? AppColors.primary
+                              : AppColors.textTertiaryLight,
                     ),
                   ),
                 ),
@@ -442,62 +451,71 @@ class _TeacherAvailabilityScreenState
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: schedules.isEmpty
-                      ? Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppColors.textTertiaryLight
-                                .withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '—',
-                              style: AppTypography.caption.copyWith(
-                                color: AppColors.textTertiaryLight,
+                  child:
+                      schedules.isEmpty
+                          ? Container(
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppColors.textTertiaryLight.withValues(
+                                alpha: 0.15,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
                               ),
                             ),
-                          ),
-                        )
-                      : Column(
-                          children: schedules.map((s) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 2),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.3),
+                            child: Center(
+                              child: Text(
+                                '—',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.textTertiaryLight,
                                 ),
                               ),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    s.startTime,
-                                    style: AppTypography.caption.copyWith(
-                                      fontSize: 9,
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w600,
+                            ),
+                          )
+                          : Column(
+                            children:
+                                schedules.map((s) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                      horizontal: 2,
                                     ),
-                                  ),
-                                  Text(
-                                    s.endTime,
-                                    style: AppTypography.caption.copyWith(
-                                      fontSize: 9,
-                                      color: AppColors.primary,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.15,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusSmall,
+                                      ),
+                                      border: Border.all(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          s.startTime,
+                                          style: AppTypography.caption.copyWith(
+                                            fontSize: 9,
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          s.endTime,
+                                          style: AppTypography.caption.copyWith(
+                                            fontSize: 9,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                          ),
                 ),
               );
             }),
@@ -510,10 +528,11 @@ class _TeacherAvailabilityScreenState
   // ─── Section 4: Exceptions ─────────────────────────────────
 
   Widget _buildExceptions(TeacherAvailability avail) {
-    final upcoming = avail.exceptions
-        .where((e) => !e.endDate.isBefore(DateTime.now()))
-        .toList()
-      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+    final upcoming =
+        avail.exceptions
+            .where((e) => !e.endDate.isBefore(DateTime.now()))
+            .toList()
+          ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
     return Column(
       children: [
@@ -528,13 +547,17 @@ class _TeacherAvailabilityScreenState
             ),
             child: Column(
               children: [
-                Icon(Icons.event_available,
-                    size: 32, color: AppColors.textTertiaryLight),
+                Icon(
+                  Icons.event_available,
+                  size: 32,
+                  color: AppColors.textTertiaryLight,
+                ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '설정된 특별 일정이 없습니다',
-                  style: AppTypography.bodySmall
-                      .copyWith(color: AppColors.textTertiaryLight),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
                 ),
               ],
             ),
@@ -545,19 +568,19 @@ class _TeacherAvailabilityScreenState
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const TimeExceptionScreen(),
-              ),
-            ),
+            onPressed:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const TimeExceptionScreen(),
+                  ),
+                ),
             icon: const Icon(Icons.add, size: 18),
             label: const Text('특별 일정 관리'),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
-              side: BorderSide(
-                  color: AppColors.primary.withValues(alpha: 0.3)),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
             ),
           ),
@@ -568,9 +591,10 @@ class _TeacherAvailabilityScreenState
 
   Widget _buildExceptionTile(TimeException exc) {
     final isHoliday = exc.type != ExceptionType.additionalSlot;
-    final dateText = exc.startDate == exc.endDate
-        ? formatDateYMD(exc.startDate)
-        : '${formatDateYMD(exc.startDate)} ~ ${formatDateYMD(exc.endDate)}';
+    final dateText =
+        exc.startDate == exc.endDate
+            ? formatDateYMD(exc.startDate)
+            : '${formatDateYMD(exc.startDate)} ~ ${formatDateYMD(exc.endDate)}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
@@ -586,10 +610,11 @@ class _TeacherAvailabilityScreenState
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: isHoliday
-                  ? AppColors.error.withValues(alpha: 0.1)
-                  : AppColors.practiceGood.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              color:
+                  isHoliday
+                      ? AppColors.error.withValues(alpha: 0.1)
+                      : AppColors.practiceGood.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               isHoliday ? Icons.event_busy : Icons.add_circle_outline,
@@ -613,8 +638,9 @@ class _TeacherAvailabilityScreenState
                       (exc.reason != null && exc.reason!.isNotEmpty
                           ? ' · ${exc.reason}'
                           : ''),
-                  style: AppTypography.caption
-                      .copyWith(color: AppColors.textSecondaryLight),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
               ],
             ),
@@ -634,22 +660,27 @@ class _TeacherAvailabilityScreenState
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => ScheduleEditBottomSheet(
-        preselectedDay: preselectedDay,
-        existingSchedule: existing,
-      ),
+      builder:
+          (context) => ScheduleEditBottomSheet(
+            preselectedDay: preselectedDay,
+            existingSchedule: existing,
+          ),
     );
 
     if (result != null && mounted) {
       if (existing != null && result.id == existing.id) {
         // Update existing schedule
         await ref
-            .read(teacherAvailabilityNotifierProvider(widget.teacherId).notifier)
+            .read(
+              teacherAvailabilityNotifierProvider(widget.teacherId).notifier,
+            )
             .updateWeeklySchedule(result);
       } else {
         // Add new schedule
         await ref
-            .read(teacherAvailabilityNotifierProvider(widget.teacherId).notifier)
+            .read(
+              teacherAvailabilityNotifierProvider(widget.teacherId).notifier,
+            )
             .addWeeklySchedule(result);
       }
     }
@@ -660,11 +691,12 @@ class _TeacherAvailabilityScreenState
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => LessonSettingsBottomSheet(
-        currentLessonDuration: avail.slotDurationMinutes,
-        currentStartInterval: avail.slotStartInterval,
-        currentBreakTime: avail.breakTimeBetweenLessons,
-      ),
+      builder:
+          (context) => LessonSettingsBottomSheet(
+            currentLessonDuration: avail.slotDurationMinutes,
+            currentStartInterval: avail.slotStartInterval,
+            currentBreakTime: avail.breakTimeBetweenLessons,
+          ),
     );
 
     if (result != null && mounted) {
@@ -681,23 +713,24 @@ class _TeacherAvailabilityScreenState
   Future<void> _confirmDeleteSchedule(WeeklySchedule schedule) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('스케줄 삭제'),
-        content: Text(
-          '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('스케줄 삭제'),
+            content: Text(
+              '${schedule.dayName}요일 ${schedule.startTime} - ${schedule.endTime} 스케줄을 삭제하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && mounted) {
