@@ -59,10 +59,7 @@ String getBadgeLabel(VerificationBadge badge) {
 class ProfileCompletionCard extends StatelessWidget {
   final TeacherProfile profile;
 
-  const ProfileCompletionCard({
-    super.key,
-    required this.profile,
-  });
+  const ProfileCompletionCard({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -143,9 +140,7 @@ class ProfileCompletionCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Text(
             levelDescription,
-            style: AppTypography.bodySmall.copyWith(
-              color: levelColor,
-            ),
+            style: AppTypography.bodySmall.copyWith(color: levelColor),
           ),
         ],
       ),
@@ -176,7 +171,8 @@ class SearchToggle extends StatelessWidget {
         children: [
           Icon(
             Icons.search,
-            color: isSearchable ? AppColors.primary : AppColors.textTertiaryLight,
+            color:
+                isSearchable ? AppColors.primary : AppColors.textTertiaryLight,
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -213,18 +209,13 @@ class SearchToggle extends StatelessWidget {
 class VisibilitySectionTitle extends StatelessWidget {
   final String title;
 
-  const VisibilitySectionTitle({
-    super.key,
-    required this.title,
-  });
+  const VisibilitySectionTitle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: AppTypography.headingSmall.copyWith(
-        fontWeight: FontWeight.bold,
-      ),
+      style: AppTypography.headingSmall.copyWith(fontWeight: FontWeight.bold),
     );
   }
 }
@@ -301,26 +292,32 @@ class VisibilityTile extends StatelessWidget {
               ],
             ),
           ),
-          itemBuilder: (context) => ProfileVisibility.values.map((v) {
-            return PopupMenuItem(
-              value: v,
-              child: Row(
-                children: [
-                  Icon(
-                    visibilityIcons[v],
-                    size: 20,
-                    color: getVisibilityColor(v),
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(visibilityLabels[v]!),
-                  if (v == value) ...[
-                    const Spacer(),
-                    Icon(Icons.check, size: 20, color: AppColors.primary),
-                  ],
-                ],
-              ),
-            );
-          }).toList(),
+          itemBuilder:
+              (context) =>
+                  ProfileVisibility.values.map((v) {
+                    return PopupMenuItem(
+                      value: v,
+                      child: Row(
+                        children: [
+                          Icon(
+                            visibilityIcons[v],
+                            size: 20,
+                            color: getVisibilityColor(v),
+                          ),
+                          const SizedBox(width: AppSpacing.space2),
+                          Text(visibilityLabels[v]!),
+                          if (v == value) ...[
+                            const Spacer(),
+                            Icon(
+                              Icons.check,
+                              size: 20,
+                              color: AppColors.primary,
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  }).toList(),
         ),
       ),
     );
@@ -360,9 +357,7 @@ class VisibilityInfoCard extends StatelessWidget {
                   '• 전체 공개: 누구나 볼 수 있습니다\n'
                   '• 연결된 학생만: 연결된 학생/학부모만 볼 수 있습니다\n'
                   '• 비공개: 아무에게도 표시되지 않습니다',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.info,
-                  ),
+                  style: AppTypography.caption.copyWith(color: AppColors.info),
                 ),
               ],
             ),
@@ -392,9 +387,10 @@ class PreviewSection extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: isVisible
-            ? AppColors.surfaceSecondaryLight
-            : AppColors.surfaceSecondaryLight.withValues(alpha: 0.5),
+        color:
+            isVisible
+                ? AppColors.surfaceSecondaryLight
+                : AppColors.surfaceSecondaryLight.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -421,9 +417,8 @@ class PreviewSection extends StatelessWidget {
                   ),
                   child: Text(
                     '비공개',
-                    style: AppTypography.caption.copyWith(
+                    style: AppTypography.captionSmall.copyWith(
                       color: AppColors.textTertiaryLight,
-                      fontSize: 10,
                     ),
                   ),
                 ),
@@ -451,18 +446,12 @@ class PreviewSection extends StatelessWidget {
 class BadgeChip extends StatelessWidget {
   final VerificationBadge badge;
 
-  const BadgeChip({
-    super.key,
-    required this.badge,
-  });
+  const BadgeChip({super.key, required this.badge});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
@@ -470,11 +459,7 @@ class BadgeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            getBadgeIcon(badge),
-            size: 16,
-            color: AppColors.primary,
-          ),
+          Icon(getBadgeIcon(badge), size: 16, color: AppColors.primary),
           const SizedBox(width: 4),
           Text(
             getBadgeLabel(badge),
@@ -499,63 +484,65 @@ void showProfilePreviewSheet({
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      maxChildSize: 0.95,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    builder:
+        (context) => DraggableScrollableSheet(
+          initialChildSize: 0.85,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
+          expand: false,
+          builder:
+              (context, scrollController) => Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  children: [
+                    // Handle bar
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 12),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.borderLight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.visibility, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            '공개 프로필 미리보기',
+                            style: AppTypography.headingSmall,
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(),
+                    Expanded(
+                      child: ListView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.all(AppSpacing.space4),
+                        children: [
+                          ProfilePreviewContent(
+                            profile: profile,
+                            settings: settings,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
         ),
-        child: Column(
-          children: [
-            // Handle bar
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  const Icon(Icons.visibility, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    '공개 프로필 미리보기',
-                    style: AppTypography.headingSmall,
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(),
-            Expanded(
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(16),
-                children: [
-                  ProfilePreviewContent(
-                    profile: profile,
-                    settings: settings,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
   );
 }
 
@@ -583,13 +570,18 @@ class ProfilePreviewContent extends StatelessWidget {
                 CircleAvatar(
                   radius: 50,
                   backgroundColor: AppColors.surfaceSecondaryLight,
-                  backgroundImage: profile.profileImage != null
-                      ? NetworkImage(profile.profileImage!)
-                      : null,
-                  child: profile.profileImage == null
-                      ? Icon(Icons.person,
-                          size: 50, color: AppColors.textSecondaryLight)
-                      : null,
+                  backgroundImage:
+                      profile.profileImage != null
+                          ? NetworkImage(profile.profileImage!)
+                          : null,
+                  child:
+                      profile.profileImage == null
+                          ? Icon(
+                            Icons.person,
+                            size: 50,
+                            color: AppColors.textSecondaryLight,
+                          )
+                          : null,
                 )
               else
                 CircleAvatar(
@@ -603,10 +595,7 @@ class ProfilePreviewContent extends StatelessWidget {
                 ),
               const SizedBox(height: AppSpacing.space3),
               if (settings.nameVisibility == ProfileVisibility.public)
-                Text(
-                  profile.name,
-                  style: AppTypography.headingLarge,
-                )
+                Text(profile.name, style: AppTypography.headingLarge)
               else
                 Text(
                   '비공개',
@@ -635,7 +624,9 @@ class ProfilePreviewContent extends StatelessWidget {
             runSpacing: 8,
             alignment: WrapAlignment.center,
             children:
-                profile.allBadges.map((badge) => BadgeChip(badge: badge)).toList(),
+                profile.allBadges
+                    .map((badge) => BadgeChip(badge: badge))
+                    .toList(),
           ),
           const SizedBox(height: AppSpacing.space4),
         ],
@@ -644,10 +635,7 @@ class ProfilePreviewContent extends StatelessWidget {
         PreviewSection(
           title: '소개',
           isVisible: true,
-          child: Text(
-            profile.introduction,
-            style: AppTypography.bodyMedium,
-          ),
+          child: Text(profile.introduction, style: AppTypography.bodyMedium),
         ),
 
         // Fee
@@ -671,21 +659,25 @@ class ProfilePreviewContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (profile.education != null)
-                  ...profile.education!.map((edu) => Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          '${edu.school} ${edu.major} (${edu.degree})',
-                          style: AppTypography.bodySmall,
-                        ),
-                      )),
+                  ...profile.education!.map(
+                    (edu) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${edu.school} ${edu.major} (${edu.degree})',
+                        style: AppTypography.bodySmall,
+                      ),
+                    ),
+                  ),
                 if (profile.career != null)
-                  ...profile.career!.map((career) => Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          '${career.organization} - ${career.position} (${career.period})',
-                          style: AppTypography.bodySmall,
-                        ),
-                      )),
+                  ...profile.career!.map(
+                    (career) => Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${career.organization} - ${career.position} (${career.period})',
+                        style: AppTypography.bodySmall,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -698,28 +690,31 @@ class ProfilePreviewContent extends StatelessWidget {
                 settings.certificateVisibility == ProfileVisibility.public,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: profile.verification.certificates
-                  .where((c) => c.isApproved)
-                  .map((cert) => Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.verified,
-                              size: 16,
-                              color: AppColors.success,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                cert.name,
-                                style: AppTypography.bodySmall,
+              children:
+                  profile.verification.certificates
+                      .where((c) => c.isApproved)
+                      .map(
+                        (cert) => Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                size: 16,
+                                color: AppColors.success,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  cert.name,
+                                  style: AppTypography.bodySmall,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ))
-                  .toList(),
+                      )
+                      .toList(),
             ),
           ),
 

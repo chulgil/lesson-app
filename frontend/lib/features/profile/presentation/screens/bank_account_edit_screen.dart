@@ -32,9 +32,10 @@ class BankAccountEditScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('계좌 추가'),
       ),
-      body: accounts.isEmpty
-          ? _buildEmptyState(context, ref)
-          : _buildAccountList(context, ref, accounts),
+      body:
+          accounts.isEmpty
+              ? _buildEmptyState(context, ref)
+              : _buildAccountList(context, ref, accounts),
     );
   }
 
@@ -89,8 +90,9 @@ class BankAccountEditScreen extends ConsumerWidget {
               Expanded(
                 child: Text(
                   '기본 계좌가 수강권 제안 시 학생에게 표시됩니다.',
-                  style: AppTypography.bodySmall
-                      .copyWith(color: AppColors.primary),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ],
@@ -102,12 +104,14 @@ class BankAccountEditScreen extends ConsumerWidget {
         ...accounts.map(
           (account) => _BankAccountCard(
             account: account,
-            onSetDefault: account.isDefault
-                ? null
-                : () => _setDefault(ref, accounts, account),
-            onDelete: accounts.length > 1 && !account.isDefault
-                ? () => _deleteAccount(context, ref, accounts, account)
-                : null,
+            onSetDefault:
+                account.isDefault
+                    ? null
+                    : () => _setDefault(ref, accounts, account),
+            onDelete:
+                accounts.length > 1 && !account.isDefault
+                    ? () => _deleteAccount(context, ref, accounts, account)
+                    : null,
           ),
         ),
 
@@ -122,9 +126,10 @@ class BankAccountEditScreen extends ConsumerWidget {
     List<BankAccount> accounts,
     BankAccount target,
   ) async {
-    final updated = accounts.map((a) {
-      return a.copyWith(isDefault: a.id == target.id);
-    }).toList();
+    final updated =
+        accounts.map((a) {
+          return a.copyWith(isDefault: a.id == target.id);
+        }).toList();
 
     await ref
         .read(teacherExtendedProfileProvider.notifier)
@@ -139,21 +144,24 @@ class BankAccountEditScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('계좌 삭제'),
-        content: Text('${target.bankName} ${target.accountNumber}을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('계좌 삭제'),
+            content: Text(
+              '${target.bankName} ${target.accountNumber}을 삭제하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -173,9 +181,9 @@ class BankAccountEditScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => _AddBankAccountSheet(
-        isFirstAccount: existingAccounts.isEmpty,
-      ),
+      builder:
+          (context) =>
+              _AddBankAccountSheet(isFirstAccount: existingAccounts.isEmpty),
     );
 
     if (result != null) {
@@ -211,9 +219,10 @@ class _BankAccountCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: account.isDefault
-            ? BorderSide(color: AppColors.primary, width: 1.5)
-            : BorderSide(color: AppColors.borderLight),
+        side:
+            account.isDefault
+                ? BorderSide(color: AppColors.primary, width: 1.5)
+                : BorderSide(color: AppColors.borderLight),
       ),
       elevation: 0,
       child: Padding(
@@ -226,9 +235,10 @@ class _BankAccountCard extends StatelessWidget {
                 Icon(
                   Icons.account_balance,
                   size: 20,
-                  color: account.isDefault
-                      ? AppColors.primary
-                      : AppColors.textSecondaryLight,
+                  color:
+                      account.isDefault
+                          ? AppColors.primary
+                          : AppColors.textSecondaryLight,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -240,8 +250,10 @@ class _BankAccountCard extends StatelessWidget {
                 if (account.isDefault) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
@@ -259,8 +271,11 @@ class _BankAccountCard extends StatelessWidget {
                 if (onDelete != null)
                   IconButton(
                     onPressed: onDelete,
-                    icon: Icon(Icons.delete_outline,
-                        size: 20, color: AppColors.error),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      size: 20,
+                      color: AppColors.error,
+                    ),
                     visualDensity: VisualDensity.compact,
                   ),
               ],
@@ -318,10 +333,27 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
 
   static const _directInputLabel = '직접입력';
   static const _bankNames = [
-    '국민은행', '신한은행', '우리은행', '하나은행', '농협은행',
-    'SC제일은행', '한국씨티은행', '기업은행', '카카오뱅크', '토스뱅크',
-    '케이뱅크', '새마을금고', '신협', '우체국', '수협은행',
-    '대구은행', '부산은행', '경남은행', '광주은행', '전북은행', '제주은행',
+    '국민은행',
+    '신한은행',
+    '우리은행',
+    '하나은행',
+    '농협은행',
+    'SC제일은행',
+    '한국씨티은행',
+    '기업은행',
+    '카카오뱅크',
+    '토스뱅크',
+    '케이뱅크',
+    '새마을금고',
+    '신협',
+    '우체국',
+    '수협은행',
+    '대구은행',
+    '부산은행',
+    '경남은행',
+    '광주은행',
+    '전북은행',
+    '제주은행',
   ];
 
   String? _selectedDropdownValue;
@@ -367,7 +399,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
       }
     } else {
       if (_selectedDropdownValue != _directInputLabel) {
-        setState(() => _selectedDropdownValue = text.isEmpty ? null : _directInputLabel);
+        setState(
+          () =>
+              _selectedDropdownValue = text.isEmpty ? null : _directInputLabel,
+        );
       }
     }
   }
@@ -396,37 +431,39 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        maxChildSize: 0.8,
-        minChildSize: 0.3,
-        expand: false,
-        builder: (context, scrollController) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.space4),
-              child: Text(
-                '개인정보 수집·이용 동의',
-                style: AppTypography.headingSmall,
-              ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: SingleChildScrollView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(AppSpacing.space4),
-                child: Text(
-                  _consentContent,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                    height: 1.6,
-                  ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.5,
+            maxChildSize: 0.8,
+            minChildSize: 0.3,
+            expand: false,
+            builder:
+                (context, scrollController) => Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.space4),
+                      child: Text(
+                        '개인정보 수집·이용 동의',
+                        style: AppTypography.headingSmall,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.all(AppSpacing.space4),
+                        child: Text(
+                          _consentContent,
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textSecondaryLight,
+                            height: 1.6,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -469,9 +506,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: _consentChecked
-                      ? AppColors.primary.withValues(alpha: 0.5)
-                      : AppColors.borderLight,
+                  color:
+                      _consentChecked
+                          ? AppColors.primary.withValues(alpha: 0.5)
+                          : AppColors.borderLight,
                 ),
               ),
               child: Row(
@@ -482,8 +520,8 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     height: 24,
                     child: Checkbox(
                       value: _consentChecked,
-                      onChanged: (v) =>
-                          setState(() => _consentChecked = v ?? false),
+                      onChanged:
+                          (v) => setState(() => _consentChecked = v ?? false),
                       activeColor: AppColors.primary,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -491,8 +529,10 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _consentChecked = !_consentChecked),
+                      onTap:
+                          () => setState(
+                            () => _consentChecked = !_consentChecked,
+                          ),
                       child: Text(
                         '개인정보(계좌정보) 수집·이용 동의',
                         style: AppTypography.bodySmall.copyWith(
@@ -515,7 +555,6 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                       style: AppTypography.caption.copyWith(
                         color: AppColors.error,
                         fontWeight: FontWeight.w600,
-                        fontSize: 11,
                       ),
                     ),
                   ),
@@ -570,10 +609,12 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                           ),
                         ),
                       ),
-                      ..._bankNames.map((name) => DropdownMenuItem(
-                        value: name,
-                        child: Text(name, style: AppTypography.bodySmall),
-                      )),
+                      ..._bankNames.map(
+                        (name) => DropdownMenuItem(
+                          value: name,
+                          child: Text(name, style: AppTypography.bodySmall),
+                        ),
+                      ),
                     ],
                     onChanged: _onDropdownChanged,
                   ),
@@ -617,7 +658,8 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.trim().isEmpty) return '계좌번호를 입력해주세요';
+                if (value == null || value.trim().isEmpty)
+                  return '계좌번호를 입력해주세요';
                 final digitsOnly = value.replaceAll('-', '');
                 if (digitsOnly.length < 8 || digitsOnly.length > 16) {
                   return '올바른 계좌번호를 입력해주세요';

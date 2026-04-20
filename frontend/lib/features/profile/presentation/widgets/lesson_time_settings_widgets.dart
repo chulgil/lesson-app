@@ -25,10 +25,7 @@ class LessonTimeSettingsSectionTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: AppTypography.headingSmall,
-        ),
+        Text(title, style: AppTypography.headingSmall),
         if (onAddPressed != null)
           TextButton.icon(
             onPressed: onAddPressed,
@@ -75,21 +72,23 @@ class DurationOptionItem extends StatelessWidget {
       title: Text(
         LessonDurations.format(duration),
         style: AppTypography.bodyLarge.copyWith(
-          color: isDisabled
-              ? AppColors.textTertiaryLight
-              : AppColors.textPrimaryLight,
+          color:
+              isDisabled
+                  ? AppColors.textTertiaryLight
+                  : AppColors.textPrimaryLight,
           decoration: isDisabled ? TextDecoration.lineThrough : null,
           fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      subtitle: isCustom
-          ? Text(
-              '커스텀',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            )
-          : null,
+      subtitle:
+          isCustom
+              ? Text(
+                '커스텀',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryLight,
+                ),
+              )
+              : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -132,11 +131,7 @@ class TimeSlotsEmptyState extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            Icon(
-              Icons.schedule,
-              size: 48,
-              color: AppColors.textTertiaryLight,
-            ),
+            Icon(Icons.schedule, size: 48, color: AppColors.textTertiaryLight),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '설정된 시간대가 없습니다',
@@ -176,15 +171,7 @@ class DaySectionCard extends StatelessWidget {
     required this.onAddSlot,
   });
 
-  static const _dayNames = [
-    '월요일',
-    '화요일',
-    '수요일',
-    '목요일',
-    '금요일',
-    '토요일',
-    '일요일'
-  ];
+  static const _dayNames = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
 
   @override
   Widget build(BuildContext context) {
@@ -200,9 +187,7 @@ class DaySectionCard extends StatelessWidget {
         ),
         title: Text(
           dayName,
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           hasSlots ? '${slots.length}개 시간대' : '휴무',
@@ -212,11 +197,13 @@ class DaySectionCard extends StatelessWidget {
         ),
         children: [
           if (hasSlots)
-            ...slots.map((slot) => TimeSlotTile(
-                  slot: slot,
-                  onToggle: (value) => onToggleSlot(slot),
-                  onEdit: () => onEditSlot(slot),
-                ))
+            ...slots.map(
+              (slot) => TimeSlotTile(
+                slot: slot,
+                onToggle: (value) => onToggleSlot(slot),
+                onEdit: () => onEditSlot(slot),
+              ),
+            )
           else
             Padding(
               padding: const EdgeInsets.all(AppSpacing.space4),
@@ -264,9 +251,10 @@ class TimeSlotTile extends StatelessWidget {
       title: Text(
         slot.timeRange,
         style: AppTypography.bodyMedium.copyWith(
-          color: slot.isActive
-              ? AppColors.textPrimaryLight
-              : AppColors.textTertiaryLight,
+          color:
+              slot.isActive
+                  ? AppColors.textPrimaryLight
+                  : AppColors.textTertiaryLight,
           decoration: slot.isActive ? null : TextDecoration.lineThrough,
         ),
       ),
@@ -293,11 +281,7 @@ class TimePickerButton extends StatelessWidget {
   final TimeOfDay time;
   final VoidCallback onTap;
 
-  const TimePickerButton({
-    super.key,
-    required this.time,
-    required this.onTap,
-  });
+  const TimePickerButton({super.key, required this.time, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -350,15 +334,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
   late TimeOfDay _startTime;
   late TimeOfDay _endTime;
 
-  static const _dayNames = [
-    '월요일',
-    '화요일',
-    '수요일',
-    '목요일',
-    '금요일',
-    '토요일',
-    '일요일'
-  ];
+  static const _dayNames = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
 
   @override
   void initState() {
@@ -468,10 +444,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('취소'),
         ),
-        FilledButton(
-          onPressed: _save,
-          child: const Text('저장'),
-        ),
+        FilledButton(onPressed: _save, child: const Text('저장')),
       ],
     );
   }
@@ -500,14 +473,15 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
     final endMinutes = _endTime.hour * 60 + _endTime.minute;
 
     if (endMinutes <= startMinutes) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('종료 시간은 시작 시간 이후여야 합니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('종료 시간은 시작 시간 이후여야 합니다')));
       return;
     }
 
     final slot = TimeSlot(
-      id: widget.existingSlot?.id ??
+      id:
+          widget.existingSlot?.id ??
           DateTime.now().millisecondsSinceEpoch.toString(),
       dayOfWeek: _selectedDay,
       startTime: _startTime,
@@ -570,9 +544,10 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               vertical: AppSpacing.space4,
             ),
             decoration: BoxDecoration(
-              color: _isDuplicate
-                  ? AppColors.error.withValues(alpha: 0.1)
-                  : AppColors.primary.withValues(alpha: 0.1),
+              color:
+                  _isDuplicate
+                      ? AppColors.error.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Column(
@@ -628,7 +603,8 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 value: _sliderValue,
                 min: LessonDurations.minDuration.toDouble(),
                 max: LessonDurations.maxDuration.toDouble(),
-                divisions: (LessonDurations.maxDuration -
+                divisions:
+                    (LessonDurations.maxDuration -
                         LessonDurations.minDuration) ~/
                     5,
                 label: LessonDurations.format(_currentDuration),
@@ -648,36 +624,39 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space2,
               alignment: WrapAlignment.center,
-              children: [35, 50, 75, 100, 150, 180].map((duration) {
-                final isSelected = _currentDuration == duration;
-                final exists = widget.existingDurations.contains(duration);
-                return FilterChip(
-                  label: Text(
-                    LessonDurations.format(duration),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: exists
-                          ? AppColors.textTertiaryLight
-                          : isSelected
-                              ? AppColors.primary
-                              : AppColors.textPrimaryLight,
-                      decoration: exists ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  selected: isSelected && !exists,
-                  onSelected: exists
-                      ? null
-                      : (_) {
-                          setState(() {
-                            _sliderValue = duration.toDouble();
-                          });
-                        },
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  showCheckmark: false,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  visualDensity: VisualDensity.compact,
-                );
-              }).toList(),
+              children:
+                  [35, 50, 75, 100, 150, 180].map((duration) {
+                    final isSelected = _currentDuration == duration;
+                    final exists = widget.existingDurations.contains(duration);
+                    return FilterChip(
+                      label: Text(
+                        LessonDurations.format(duration),
+                        style: AppTypography.bodySmall.copyWith(
+                          color:
+                              exists
+                                  ? AppColors.textTertiaryLight
+                                  : isSelected
+                                  ? AppColors.primary
+                                  : AppColors.textPrimaryLight,
+                          decoration:
+                              exists ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                      selected: isSelected && !exists,
+                      onSelected:
+                          exists
+                              ? null
+                              : (_) {
+                                setState(() {
+                                  _sliderValue = duration.toDouble();
+                                });
+                              },
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      showCheckmark: false,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      visualDensity: VisualDensity.compact,
+                    );
+                  }).toList(),
             ),
 
             const SizedBox(height: AppSpacing.space3),
@@ -741,12 +720,13 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
           child: const Text('취소'),
         ),
         FilledButton(
-          onPressed: _isDuplicate
-              ? null
-              : () {
-                  Navigator.pop(context);
-                  widget.onSave(_currentDuration);
-                },
+          onPressed:
+              _isDuplicate
+                  ? null
+                  : () {
+                    Navigator.pop(context);
+                    widget.onSave(_currentDuration);
+                  },
           child: const Text('추가'),
         ),
       ],
@@ -763,19 +743,20 @@ void showAddCustomDurationDialog({
 }) {
   showDialog(
     context: context,
-    builder: (dialogContext) => DurationPickerDialog(
-      onSave: (duration) async {
-        await onSave(duration);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${LessonDurations.format(duration)} 추가됨'),
-            ),
-          );
-        }
-      },
-      existingDurations: existingDurations,
-    ),
+    builder:
+        (dialogContext) => DurationPickerDialog(
+          onSave: (duration) async {
+            await onSave(duration);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${LessonDurations.format(duration)} 추가됨'),
+                ),
+              );
+            }
+          },
+          existingDurations: existingDurations,
+        ),
   );
 }
 
@@ -787,26 +768,25 @@ void showDeleteDurationDialog({
 }) {
   showDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('레슨 시간 삭제'),
-      content: Text('${LessonDurations.format(duration)}을(를) 삭제하시겠습니까?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('취소'),
+    builder:
+        (dialogContext) => AlertDialog(
+          title: const Text('레슨 시간 삭제'),
+          content: Text('${LessonDurations.format(duration)}을(를) 삭제하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                onConfirm();
+              },
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: const Text('삭제'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(dialogContext);
-            onConfirm();
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.error,
-          ),
-          child: const Text('삭제'),
-        ),
-      ],
-    ),
   );
 }
 
@@ -818,10 +798,9 @@ void showAddTimeSlotDialog({
 }) {
   showDialog(
     context: context,
-    builder: (context) => TimeSlotDialog(
-      preselectedDay: preselectedDay,
-      onSave: onSave,
-    ),
+    builder:
+        (context) =>
+            TimeSlotDialog(preselectedDay: preselectedDay, onSave: onSave),
   );
 }
 
@@ -833,9 +812,6 @@ void showEditTimeSlotDialog({
 }) {
   showDialog(
     context: context,
-    builder: (context) => TimeSlotDialog(
-      existingSlot: slot,
-      onSave: onSave,
-    ),
+    builder: (context) => TimeSlotDialog(existingSlot: slot, onSave: onSave),
   );
 }

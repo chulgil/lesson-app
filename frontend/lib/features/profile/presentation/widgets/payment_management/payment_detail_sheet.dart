@@ -48,9 +48,7 @@ class PaymentDetailSheet extends ConsumerWidget {
           backgroundColor: AppColors.primaryLight,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
-            style: AppTypography.headingSmall.copyWith(
-              color: Colors.white,
-            ),
+            style: AppTypography.headingSmall.copyWith(color: Colors.white),
           ),
         ),
         const SizedBox(width: AppSpacing.space3),
@@ -87,7 +85,8 @@ class PaymentDetailSheet extends ConsumerWidget {
         if (payment.studentConfirmed && payment.studentConfirmedAt != null)
           _DetailRow(
             label: '학생 입금완료',
-            value: '${payment.studentConfirmedAt!.month}/${payment.studentConfirmedAt!.day} ${payment.studentConfirmedAt!.hour}:${payment.studentConfirmedAt!.minute.toString().padLeft(2, '0')}',
+            value:
+                '${payment.studentConfirmedAt!.month}/${payment.studentConfirmedAt!.day} ${payment.studentConfirmedAt!.hour}:${payment.studentConfirmedAt!.minute.toString().padLeft(2, '0')}',
           ),
         if (payment.description != null)
           _DetailRow(label: '메모', value: payment.description!),
@@ -101,8 +100,7 @@ class PaymentDetailSheet extends ConsumerWidget {
       children: [
         if (payment.status == PaymentStatus.pending) ...[
           // Student confirmed indicator
-          if (payment.isAwaitingTeacherConfirmation)
-            _StudentConfirmedBanner(),
+          if (payment.isAwaitingTeacherConfirmation) _StudentConfirmedBanner(),
           // Confirm button
           SizedBox(
             width: double.infinity,
@@ -117,7 +115,9 @@ class PaymentDetailSheet extends ConsumerWidget {
               label: const Text('입금 확인'),
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.practiceGood,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space4,
+                ),
               ),
             ),
           ),
@@ -134,10 +134,15 @@ class PaymentDetailSheet extends ConsumerWidget {
                       .markStudentConfirmed(payment.id);
                 },
                 icon: Icon(Icons.notifications, color: AppColors.info),
-                label: Text('학생 입금완료 알림', style: TextStyle(color: AppColors.info)),
+                label: Text(
+                  '학생 입금완료 알림',
+                  style: TextStyle(color: AppColors.info),
+                ),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: AppColors.info),
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space4,
+                  ),
                 ),
               ),
             ),
@@ -209,7 +214,7 @@ class _StudentConfirmedBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.space3),
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.info.withValues(alpha: 0.1),
@@ -259,23 +264,24 @@ class _DeleteButton extends StatelessWidget {
         Navigator.pop(context);
         final confirmed = await showDialog<bool>(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('결제 삭제'),
-            content: const Text('이 결제 내역을 삭제하시겠습니까?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+          builder:
+              (context) => AlertDialog(
+                title: const Text('결제 삭제'),
+                content: const Text('이 결제 내역을 삭제하시겠습니까?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('취소'),
+                  ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                    ),
+                    child: const Text('삭제'),
+                  ),
+                ],
               ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                ),
-                child: const Text('삭제'),
-              ),
-            ],
-          ),
         );
         if (confirmed == true) {
           await onDelete();
@@ -283,9 +289,7 @@ class _DeleteButton extends StatelessWidget {
       },
       icon: Icon(Icons.delete, color: AppColors.error),
       label: Text('삭제', style: TextStyle(color: AppColors.error)),
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: AppColors.error),
-      ),
+      style: OutlinedButton.styleFrom(side: BorderSide(color: AppColors.error)),
     );
   }
 }

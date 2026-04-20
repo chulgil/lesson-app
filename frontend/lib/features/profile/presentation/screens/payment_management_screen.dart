@@ -47,7 +47,9 @@ class _PaymentManagementScreenState
           onPressed: () => context.pop(),
           icon: const Icon(Icons.arrow_back),
         ),
-        title: Text('수강료 관리 · ${_selectedMonth.year}.${_selectedMonth.month.toString().padLeft(2, '0')}'),
+        title: Text(
+          '수강료 관리 · ${_selectedMonth.year}.${_selectedMonth.month.toString().padLeft(2, '0')}',
+        ),
         actions: [
           IconButton(
             onPressed: _showMonthPicker,
@@ -65,14 +67,16 @@ class _PaymentManagementScreenState
             // Summary section
             SliverToBoxAdapter(
               child: summaryAsync.when(
-                data: (summary) => PaymentSummarySection(
-                  summary: summary,
-                  onViewOverdue: () => _tabController.animateTo(1),
-                ),
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(AppSpacing.space6),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+                data:
+                    (summary) => PaymentSummarySection(
+                      summary: summary,
+                      onViewOverdue: () => _tabController.animateTo(1),
+                    ),
+                loading:
+                    () => const Padding(
+                      padding: EdgeInsets.all(AppSpacing.space6),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                 error: (_, __) => const SizedBox.shrink(),
               ),
             ),
@@ -98,31 +102,36 @@ class _PaymentManagementScreenState
             // Payment list (filtered by selected month)
             paymentsAsync.when(
               data: (payments) {
-                final filtered = payments.where((p) {
-                  return p.createdAt.year == _selectedMonth.year &&
-                      p.createdAt.month == _selectedMonth.month;
-                }).toList();
+                final filtered =
+                    payments.where((p) {
+                      return p.createdAt.year == _selectedMonth.year &&
+                          p.createdAt.month == _selectedMonth.month;
+                    }).toList();
                 return SliverFillRemaining(
                   child: TabBarView(
                     controller: _tabController,
                     children: [
                       _buildPaymentList(filtered),
                       _buildPaymentList(
-                        filtered.where((p) => p.status == PaymentStatus.pending).toList(),
+                        filtered
+                            .where((p) => p.status == PaymentStatus.pending)
+                            .toList(),
                       ),
                       _buildPaymentList(
-                        filtered.where((p) => p.status == PaymentStatus.confirmed).toList(),
+                        filtered
+                            .where((p) => p.status == PaymentStatus.confirmed)
+                            .toList(),
                       ),
                     ],
                   ),
                 );
               },
-              loading: () => const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (error, _) => SliverFillRemaining(
-                child: _buildErrorState(),
-              ),
+              loading:
+                  () => const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+              error:
+                  (error, _) => SliverFillRemaining(child: _buildErrorState()),
             ),
           ],
         ),
@@ -160,7 +169,11 @@ class _PaymentManagementScreenState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.receipt_long, size: 64, color: AppColors.textTertiaryLight),
+          Icon(
+            Icons.receipt_long,
+            size: 64,
+            color: AppColors.textTertiaryLight,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '결제 내역이 없습니다',
@@ -230,11 +243,12 @@ class _PaymentManagementScreenState
                           style: AppTypography.headingSmall,
                         ),
                         IconButton(
-                          onPressed: selectedYear < now.year
-                              ? () {
-                                  setSheetState(() => selectedYear++);
-                                }
-                              : null,
+                          onPressed:
+                              selectedYear < now.year
+                                  ? () {
+                                    setSheetState(() => selectedYear++);
+                                  }
+                                  : null,
                           icon: const Icon(Icons.chevron_right),
                         ),
                       ],
@@ -251,56 +265,67 @@ class _PaymentManagementScreenState
                       mainAxisSpacing: AppSpacing.space2,
                       crossAxisSpacing: AppSpacing.space2,
                       childAspectRatio: 2,
-                      children: months.map((month) {
-                        final isSelected =
-                            selectedYear == _selectedMonth.year &&
+                      children:
+                          months.map((month) {
+                            final isSelected =
+                                selectedYear == _selectedMonth.year &&
                                 month == _selectedMonth.month;
-                        final isFuture = selectedYear > now.year ||
-                            (selectedYear == now.year && month > now.month);
+                            final isFuture =
+                                selectedYear > now.year ||
+                                (selectedYear == now.year && month > now.month);
 
-                        return GestureDetector(
-                          onTap: isFuture
-                              ? null
-                              : () {
-                                  setState(() {
-                                    _selectedMonth =
-                                        DateTime(selectedYear, month);
-                                  });
-                                  Navigator.pop(context);
-                                },
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium),
-                              border: isSelected
-                                  ? null
-                                  : Border.all(
-                                      color: isFuture
-                                          ? AppColors.borderLight
-                                              .withValues(alpha: 0.3)
-                                          : AppColors.borderLight,
-                                    ),
-                            ),
-                            child: Text(
-                              '$month월',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: isSelected
-                                    ? Colors.white
-                                    : isFuture
-                                        ? AppColors.textTertiaryLight
-                                        : AppColors.textPrimaryLight,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
+                            return GestureDetector(
+                              onTap:
+                                  isFuture
+                                      ? null
+                                      : () {
+                                        setState(() {
+                                          _selectedMonth = DateTime(
+                                            selectedYear,
+                                            month,
+                                          );
+                                        });
+                                        Navigator.pop(context);
+                                      },
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color:
+                                      isSelected
+                                          ? AppColors.primary
+                                          : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusMedium,
+                                  ),
+                                  border:
+                                      isSelected
+                                          ? null
+                                          : Border.all(
+                                            color:
+                                                isFuture
+                                                    ? AppColors.borderLight
+                                                        .withValues(alpha: 0.3)
+                                                    : AppColors.borderLight,
+                                          ),
+                                ),
+                                child: Text(
+                                  '$month월',
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    color:
+                                        isSelected
+                                            ? Colors.white
+                                            : isFuture
+                                            ? AppColors.textTertiaryLight
+                                            : AppColors.textPrimaryLight,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ],
@@ -327,53 +352,64 @@ class _PaymentManagementScreenState
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('입금 확인'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${payment.studentName}님의 ${payment.formattedAmount} 입금을 확인하시겠습니까?'),
-            if (isStep2) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.practiceGood.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('입금 확인'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${payment.studentName}님의 ${payment.formattedAmount} 입금을 확인하시겠습니까?',
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, size: 18, color: AppColors.practiceGood),
-                    const SizedBox(width: 8),
-                    Text(
-                      '학생이 입금완료를 알렸습니다',
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.practiceGood,
-                        fontWeight: FontWeight.w600,
+                if (isStep2) ...[
+                  const SizedBox(height: AppSpacing.space3),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.space3),
+                    decoration: BoxDecoration(
+                      color: AppColors.practiceGood.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
                       ),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle,
+                          size: 18,
+                          color: AppColors.practiceGood,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '학생이 입금완료를 알렸습니다',
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.practiceGood,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('확인'),
               ),
             ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('확인'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
-      await ref.read(paymentsNotifierProvider.notifier).markAsCompleted(payment.id);
+      await ref
+          .read(paymentsNotifierProvider.notifier)
+          .markAsCompleted(payment.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -408,11 +444,12 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => tabBar.preferredSize.height;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppColors.backgroundLight,
-      child: tabBar,
-    );
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: AppColors.backgroundLight, child: tabBar);
   }
 
   @override

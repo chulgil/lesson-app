@@ -28,9 +28,10 @@ class PaymentCard extends StatelessWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isOverdue
-              ? AppColors.error.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+          color:
+              isOverdue
+                  ? AppColors.error.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
         boxShadow: [
           BoxShadow(
@@ -72,9 +73,10 @@ class PaymentCard extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: payment.type == PaymentType.trial
-              ? AppColors.info
-              : AppColors.primaryLight,
+          backgroundColor:
+              payment.type == PaymentType.trial
+                  ? AppColors.info
+                  : AppColors.primaryLight,
           child: Text(
             payment.studentName.isNotEmpty ? payment.studentName[0] : '?',
             style: AppTypography.bodyLarge.copyWith(
@@ -123,9 +125,7 @@ class PaymentCard extends StatelessWidget {
           children: [
             Text(
               payment.formattedAmount,
-              style: AppTypography.headingMedium.copyWith(
-                color: statusColor,
-              ),
+              style: AppTypography.headingMedium.copyWith(color: statusColor),
             ),
             Text(
               payment.method.label,
@@ -136,7 +136,9 @@ class PaymentCard extends StatelessWidget {
           ],
         ),
         if (payment.status == PaymentStatus.pending && onConfirm != null)
-          Flexible(child: PaymentActionButton(payment: payment, onConfirm: onConfirm!)),
+          Flexible(
+            child: PaymentActionButton(payment: payment, onConfirm: onConfirm!),
+          ),
       ],
     );
   }
@@ -211,10 +213,9 @@ class PaymentTypeBadge extends StatelessWidget {
       ),
       child: Text(
         type.label,
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: color,
           fontWeight: FontWeight.w600,
-          fontSize: 10,
         ),
       ),
     );
@@ -322,7 +323,6 @@ class PaymentActionButton extends StatelessWidget {
                   style: AppTypography.caption.copyWith(
                     color: AppColors.info,
                     fontWeight: FontWeight.w600,
-                    fontSize: 11,
                   ),
                 ),
               ],
