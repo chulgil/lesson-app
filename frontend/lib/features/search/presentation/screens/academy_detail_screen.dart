@@ -15,10 +15,7 @@ import '../providers/teacher_search_provider.dart';
 class AcademyDetailScreen extends ConsumerWidget {
   final String organizationId;
 
-  const AcademyDetailScreen({
-    super.key,
-    required this.organizationId,
-  });
+  const AcademyDetailScreen({super.key, required this.organizationId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,18 +49,21 @@ class AcademyDetailScreen extends ConsumerWidget {
                 ),
               ),
               teachersAsync.when(
-                loading: () => const SliverToBoxAdapter(
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (error, stack) => SliverToBoxAdapter(
-                  child: Center(
-                    child: Text(
-                      '선생님 목록을 불러올 수 없습니다',
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textSecondaryLight),
+                loading:
+                    () => const SliverToBoxAdapter(
+                      child: Center(child: CircularProgressIndicator()),
                     ),
-                  ),
-                ),
+                error:
+                    (error, stack) => SliverToBoxAdapter(
+                      child: Center(
+                        child: Text(
+                          '선생님 목록을 불러올 수 없습니다',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                    ),
                 data: (teachers) => _buildTeacherList(context, ref, teachers),
               ),
               const SliverToBoxAdapter(
@@ -81,18 +81,20 @@ class AcademyDetailScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             message,
-            style: AppTypography.bodyMedium
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
           const SizedBox(height: AppSpacing.space4),
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('돌아가기'),
-          ),
+          TextButton(onPressed: () => context.pop(), child: const Text('돌아가기')),
         ],
       ),
     );
@@ -130,7 +132,9 @@ class AcademyDetailScreen extends ConsumerWidget {
                     height: 64,
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusXLarge,
+                      ),
                     ),
                     child: const Icon(
                       Icons.school,
@@ -141,8 +145,9 @@ class AcademyDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Text(
                     academy.name,
-                    style: AppTypography.headingMedium
-                        .copyWith(color: Colors.white),
+                    style: AppTypography.headingMedium.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -180,10 +185,7 @@ class AcademyDetailScreen extends ConsumerWidget {
           ],
           // Phone
           if (academy.phone != null) ...[
-            _buildInfoRow(
-              icon: Icons.phone_outlined,
-              text: academy.phone!,
-            ),
+            _buildInfoRow(icon: Icons.phone_outlined, text: academy.phone!),
             const SizedBox(height: AppSpacing.space3),
           ],
           // Instruments
@@ -191,28 +193,29 @@ class AcademyDetailScreen extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.music_note,
-                  size: 20,
-                  color: AppColors.primary,
-                ),
+                Icon(Icons.music_note, size: 20, color: AppColors.primary),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Wrap(
                     spacing: AppSpacing.space2,
                     runSpacing: AppSpacing.space1,
-                    children: academy.instruments
-                        .map((i) => Chip(
-                              label: Text(i),
-                              backgroundColor:
-                                  AppColors.primary.withValues(alpha: 0.1),
-                              labelStyle: AppTypography.bodySmall
-                                  .copyWith(color: AppColors.primary),
-                              visualDensity: VisualDensity.compact,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                            ))
-                        .toList(),
+                    children:
+                        academy.instruments
+                            .map(
+                              (i) => Chip(
+                                label: Text(i),
+                                backgroundColor: AppColors.primary.withValues(
+                                  alpha: 0.1,
+                                ),
+                                labelStyle: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ],
@@ -232,8 +235,9 @@ class AcademyDetailScreen extends ConsumerWidget {
         Expanded(
           child: Text(
             text,
-            style: AppTypography.bodyMedium
-                .copyWith(color: AppColors.textSecondaryLight),
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textSecondaryLight,
+            ),
           ),
         ),
       ],
@@ -245,10 +249,7 @@ class AcademyDetailScreen extends ConsumerWidget {
       children: [
         Icon(Icons.people_outline, size: 20, color: AppColors.primary),
         const SizedBox(width: AppSpacing.space2),
-        Text(
-          '소속 선생님',
-          style: AppTypography.headingSmall,
-        ),
+        Text('소속 선생님', style: AppTypography.headingSmall),
         const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(
@@ -257,7 +258,7 @@ class AcademyDetailScreen extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Text(
             '${academy.teacherCount}명',
@@ -284,8 +285,9 @@ class AcademyDetailScreen extends ConsumerWidget {
             child: Center(
               child: Text(
                 '소속 선생님이 없습니다',
-                style: AppTypography.bodyMedium
-                    .copyWith(color: AppColors.textSecondaryLight),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
             ),
           ),
@@ -294,34 +296,34 @@ class AcademyDetailScreen extends ConsumerWidget {
     }
 
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final teacher = teachers[index];
-          return _AcademyTeacherCard(
-            teacher: teacher,
-            onProfileTap: () {
-              context.push(AppRoutes.teacherDetail.replaceFirst(':id', teacher.id));
-            },
-            onTrialTap: () {
-              final userProfile = ref.read(currentUserProfileProvider);
-              context.push(
-                AppRoutes.lessonBooking,
-                extra: {
-                  'teacherId': teacher.id,
-                  'teacherName': teacher.name ?? '',
-                  'instrument': teacher.instruments.isNotEmpty
-                      ? teacher.instruments.first
-                      : '악기',
-                  'studentId': userProfile.userId,
-                  'studentName': userProfile.userName,
-                  'isTrialLesson': true,
-                },
-              );
-            },
-          );
-        },
-        childCount: teachers.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final teacher = teachers[index];
+        return _AcademyTeacherCard(
+          teacher: teacher,
+          onProfileTap: () {
+            context.push(
+              AppRoutes.teacherDetail.replaceFirst(':id', teacher.id),
+            );
+          },
+          onTrialTap: () {
+            final userProfile = ref.read(currentUserProfileProvider);
+            context.push(
+              AppRoutes.lessonBooking,
+              extra: {
+                'teacherId': teacher.id,
+                'teacherName': teacher.name ?? '',
+                'instrument':
+                    teacher.instruments.isNotEmpty
+                        ? teacher.instruments.first
+                        : '악기',
+                'studentId': userProfile.userId,
+                'studentName': userProfile.userName,
+                'isTrialLesson': true,
+              },
+            );
+          },
+        );
+      }, childCount: teachers.length),
     );
   }
 }
@@ -367,12 +369,14 @@ class _AcademyTeacherCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                backgroundImage: teacher.profileImage != null
-                    ? NetworkImage(teacher.profileImage!)
-                    : null,
-                child: teacher.profileImage == null
-                    ? Icon(Icons.person, color: AppColors.primary, size: 28)
-                    : null,
+                backgroundImage:
+                    teacher.profileImage != null
+                        ? NetworkImage(teacher.profileImage!)
+                        : null,
+                child:
+                    teacher.profileImage == null
+                        ? Icon(Icons.person, color: AppColors.primary, size: 28)
+                        : null,
               ),
               const SizedBox(width: AppSpacing.space3),
               // Info
@@ -419,7 +423,9 @@ class _AcademyTeacherCard extends StatelessWidget {
                     vertical: AppSpacing.space2,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
                 child: const Text('체험 신청'),

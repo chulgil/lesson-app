@@ -28,12 +28,19 @@ class TeacherSearchCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         // Highlight previous teacher with a subtle border
-        side: isPreviousTeacher
-            ? BorderSide(color: AppColors.info.withValues(alpha: 0.5), width: 1.5)
-            : BorderSide.none,
+        side:
+            isPreviousTeacher
+                ? BorderSide(
+                  color: AppColors.info.withValues(alpha: 0.5),
+                  width: 1.5,
+                )
+                : BorderSide.none,
       ),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.teacherDetail.replaceFirst(':id', teacher.id)),
+        onTap:
+            () => context.push(
+              AppRoutes.teacherDetail.replaceFirst(':id', teacher.id),
+            ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space3),
@@ -44,13 +51,18 @@ class TeacherSearchCard extends StatelessWidget {
               CircleAvatar(
                 radius: 35,
                 backgroundColor: AppColors.surfaceSecondaryLight,
-                backgroundImage: publicProfile.profileImage != null
-                    ? NetworkImage(publicProfile.profileImage!)
-                    : null,
-                child: publicProfile.profileImage == null
-                    ? Icon(Icons.person,
-                        size: 35, color: AppColors.textSecondaryLight)
-                    : null,
+                backgroundImage:
+                    publicProfile.profileImage != null
+                        ? NetworkImage(publicProfile.profileImage!)
+                        : null,
+                child:
+                    publicProfile.profileImage == null
+                        ? Icon(
+                          Icons.person,
+                          size: 35,
+                          color: AppColors.textSecondaryLight,
+                        )
+                        : null,
               ),
               const SizedBox(width: AppSpacing.space3),
 
@@ -118,22 +130,15 @@ class TeacherSearchCard extends StatelessWidget {
 
   Widget _buildPreviousTeacherBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.info.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.history,
-            size: 12,
-            color: AppColors.info,
-          ),
+          Icon(Icons.history, size: 12, color: AppColors.info),
           const SizedBox(width: 4),
           Text(
             '이전에 레슨했어요',
@@ -149,22 +154,15 @@ class TeacherSearchCard extends StatelessWidget {
 
   Widget _buildAcademyBadge(String organizationName) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 2,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.school,
-            size: 12,
-            color: AppColors.primary,
-          ),
+          Icon(Icons.school, size: 12, color: AppColors.primary),
           const SizedBox(width: 4),
           Text(
             organizationName,
@@ -207,8 +205,11 @@ class TeacherSearchCard extends StatelessWidget {
     return Row(
       children: [
         if (publicProfile.experienceYears != null) ...[
-          Icon(Icons.work_outline,
-              size: 14, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.work_outline,
+            size: 14,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(width: 4),
           Text(
             '${publicProfile.experienceYears}년',
@@ -219,8 +220,11 @@ class TeacherSearchCard extends StatelessWidget {
           const SizedBox(width: 12),
         ],
         if (publicProfile.feeRange != null) ...[
-          Icon(Icons.payments_outlined,
-              size: 14, color: AppColors.textSecondaryLight),
+          Icon(
+            Icons.payments_outlined,
+            size: 14,
+            color: AppColors.textSecondaryLight,
+          ),
           const SizedBox(width: 4),
           Text(
             publicProfile.feeRange!.formatted,
@@ -237,24 +241,22 @@ class TeacherSearchCard extends StatelessWidget {
     return Wrap(
       spacing: 4,
       runSpacing: 4,
-      children: lessonAreas.take(3).map((area) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 2,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            area,
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
-            ),
-          ),
-        );
-      }).toList(),
+      children:
+          lessonAreas.take(3).map((area) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSecondaryLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+              ),
+              child: Text(
+                area,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 

@@ -65,7 +65,9 @@ class TrialBookingCard extends ConsumerWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.info.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             '체험레슨',
@@ -96,7 +98,7 @@ class TrialBookingCard extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: booking.status.color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -137,10 +139,7 @@ class TrialBookingCard extends ConsumerWidget {
                   color: AppColors.textSecondaryLight,
                 ),
                 const SizedBox(width: AppSpacing.space2),
-                Text(
-                  booking.timeRange,
-                  style: AppTypography.bodyMedium,
-                ),
+                Text(booking.timeRange, style: AppTypography.bodyMedium),
                 if (booking.instrument != null) ...[
                   const Spacer(),
                   Container(
@@ -150,7 +149,9 @@ class TrialBookingCard extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.secondaryLight.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       booking.instrument!,
@@ -173,16 +174,13 @@ class TrialBookingCard extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border:
-                    Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.warning.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.swap_horiz,
-                    size: 16,
-                    color: AppColors.warning,
-                  ),
+                  Icon(Icons.swap_horiz, size: 16, color: AppColors.warning),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '변경 요청: ${booking.formattedRequestedDate} ${booking.requestedTimeRange}',
@@ -244,7 +242,9 @@ class TrialBookingCard extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(color: AppColors.primary),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                      ),
                     ),
                   ),
                 if (booking.status.canRequestChange)
@@ -255,7 +255,9 @@ class TrialBookingCard extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.info,
                       side: const BorderSide(color: AppColors.info),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                      ),
                     ),
                   ),
                 if (booking.status.canCancel)
@@ -266,7 +268,9 @@ class TrialBookingCard extends ConsumerWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.error,
                       side: const BorderSide(color: AppColors.error),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space3,
+                      ),
                     ),
                   ),
               ],
@@ -316,29 +320,29 @@ class TrialBookingCard extends ConsumerWidget {
   Future<void> _onCancel(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('체험레슨 취소'),
-        content: const Text('체험레슨 신청을 취소하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('아니오'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('체험레슨 취소'),
+            content: const Text('체험레슨 신청을 취소하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('아니오'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('취소하기'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('취소하기'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && context.mounted) {
       try {
-        await ref.read(bookingsNotifierProvider.notifier).cancelBooking(
-              booking.id,
-              null,
-            );
+        await ref
+            .read(bookingsNotifierProvider.notifier)
+            .cancelBooking(booking.id, null);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
