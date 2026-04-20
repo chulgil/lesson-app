@@ -51,12 +51,12 @@ class ProfileCompletionCard extends StatelessWidget {
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space1,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Text(
                   levelLabel,
@@ -88,7 +88,9 @@ class ProfileCompletionCard extends StatelessWidget {
                       backgroundColor: Colors.white.withValues(alpha: 0.3),
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                       minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     if (profile.nextSteps.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.space2),
@@ -138,7 +140,10 @@ class ProfileInfoCard extends StatelessWidget {
           color: AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isEmpty ? AppColors.warning.withValues(alpha: 0.3) : AppColors.borderLight,
+            color:
+                isEmpty
+                    ? AppColors.warning.withValues(alpha: 0.3)
+                    : AppColors.borderLight,
           ),
         ),
         child: Row(
@@ -147,13 +152,9 @@ class ProfileInfoCard extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primary,
-                size: 24,
-              ),
+              child: Icon(icon, color: AppColors.primary, size: 24),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -170,18 +171,16 @@ class ProfileInfoCard extends StatelessWidget {
                   Text(
                     value,
                     style: AppTypography.bodyLarge.copyWith(
-                      color: isEmpty
-                          ? AppColors.textTertiaryLight
-                          : AppColors.textPrimaryLight,
+                      color:
+                          isEmpty
+                              ? AppColors.textTertiaryLight
+                              : AppColors.textPrimaryLight,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
           ],
         ),
       ),
@@ -215,13 +214,9 @@ class EducationCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.success.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(
-              Icons.school,
-              color: AppColors.success,
-              size: 24,
-            ),
+            child: Icon(Icons.school, color: AppColors.success, size: 24),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -245,10 +240,7 @@ class EducationCard extends ConsumerWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_vert,
-              color: AppColors.textTertiaryLight,
-            ),
+            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
             onSelected: (value) {
               if (value == 'edit') {
                 context.push('${AppRoutes.educationEdit}?index=$index');
@@ -256,14 +248,17 @@ class EducationCard extends ConsumerWidget {
                 showDeleteConfirmDialog(
                   context,
                   '학력',
-                  () => ref.read(teacherExtendedProfileProvider.notifier).removeEducation(index),
+                  () => ref
+                      .read(teacherExtendedProfileProvider.notifier)
+                      .removeEducation(index),
                 );
               }
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Text('수정')),
-              const PopupMenuItem(value: 'delete', child: Text('삭제')),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(value: 'delete', child: Text('삭제')),
+                ],
           ),
         ],
       ),
@@ -276,11 +271,7 @@ class CareerCard extends ConsumerWidget {
   final Career career;
   final int index;
 
-  const CareerCard({
-    super.key,
-    required this.career,
-    required this.index,
-  });
+  const CareerCard({super.key, required this.career, required this.index});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -297,13 +288,9 @@ class CareerCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(
-              Icons.work,
-              color: AppColors.primary,
-              size: 24,
-            ),
+            child: Icon(Icons.work, color: AppColors.primary, size: 24),
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -328,7 +315,9 @@ class CareerCard extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           '재직중',
@@ -347,7 +336,8 @@ class CareerCard extends ConsumerWidget {
                     color: AppColors.textSecondaryLight,
                   ),
                 ),
-                if (career.description != null && career.description!.isNotEmpty) ...[
+                if (career.description != null &&
+                    career.description!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     career.description!,
@@ -362,10 +352,7 @@ class CareerCard extends ConsumerWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_vert,
-              color: AppColors.textTertiaryLight,
-            ),
+            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
             onSelected: (value) {
               if (value == 'edit') {
                 context.push('${AppRoutes.careerEdit}?index=$index');
@@ -373,14 +360,17 @@ class CareerCard extends ConsumerWidget {
                 showDeleteConfirmDialog(
                   context,
                   '경력',
-                  () => ref.read(teacherExtendedProfileProvider.notifier).removeCareer(index),
+                  () => ref
+                      .read(teacherExtendedProfileProvider.notifier)
+                      .removeCareer(index),
                 );
               }
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Text('수정')),
-              const PopupMenuItem(value: 'delete', child: Text('삭제')),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(value: 'delete', child: Text('삭제')),
+                ],
           ),
         ],
       ),
@@ -411,7 +401,7 @@ class CertificateCard extends ConsumerWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               getCertificateStatusIcon(certificate.status),
@@ -441,7 +431,9 @@ class CertificateCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         getCertificateStatusLabel(certificate.status),
@@ -467,7 +459,8 @@ class CertificateCard extends ConsumerWidget {
                     color: AppColors.textTertiaryLight,
                   ),
                 ),
-                if (certificate.isRejected && certificate.rejectionReason != null) ...[
+                if (certificate.isRejected &&
+                    certificate.rejectionReason != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     '반려 사유: ${certificate.rejectionReason}',
@@ -480,25 +473,27 @@ class CertificateCard extends ConsumerWidget {
             ),
           ),
           PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_vert,
-              color: AppColors.textTertiaryLight,
-            ),
+            icon: Icon(Icons.more_vert, color: AppColors.textTertiaryLight),
             onSelected: (value) {
               if (value == 'edit') {
-                context.push('${AppRoutes.certificateEdit}?id=${certificate.id}');
+                context.push(
+                  '${AppRoutes.certificateEdit}?id=${certificate.id}',
+                );
               } else if (value == 'delete') {
                 showDeleteConfirmDialog(
                   context,
                   '자격증',
-                  () => ref.read(teacherExtendedProfileProvider.notifier).removeCertificate(certificate.id),
+                  () => ref
+                      .read(teacherExtendedProfileProvider.notifier)
+                      .removeCertificate(certificate.id),
                 );
               }
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Text('수정')),
-              const PopupMenuItem(value: 'delete', child: Text('삭제')),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(value: 'delete', child: Text('삭제')),
+                ],
           ),
         ],
       ),
@@ -535,11 +530,7 @@ class ProfileEmptyCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 48,
-            color: AppColors.textTertiaryLight,
-          ),
+          Icon(icon, size: 48, color: AppColors.textTertiaryLight),
           const SizedBox(height: AppSpacing.space3),
           Text(
             message,
@@ -568,11 +559,7 @@ class ProfileAddButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
 
-  const ProfileAddButton({
-    super.key,
-    required this.label,
-    required this.onTap,
-  });
+  const ProfileAddButton({super.key, required this.label, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -585,7 +572,7 @@ class ProfileAddButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: BorderSide(color: AppColors.primary),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
         ),
       ),
     );
