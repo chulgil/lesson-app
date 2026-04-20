@@ -179,7 +179,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               onChanged: _toggleAll,
               activeColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -220,7 +220,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               onChanged: onChanged,
               activeColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
             const SizedBox(width: AppSpacing.space2),
@@ -267,7 +267,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
               children: [
                 // Handle bar
                 Container(
-                  margin: const EdgeInsets.only(top: 12),
+                  margin: const EdgeInsets.only(top: AppSpacing.space3),
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(

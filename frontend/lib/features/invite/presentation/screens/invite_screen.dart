@@ -31,9 +31,9 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   }
 
   Future<void> _createNewInvite() async {
-    await ref.read(inviteCreatorProvider.notifier).createInvite(
-          validity: const Duration(days: 7),
-        );
+    await ref
+        .read(inviteCreatorProvider.notifier)
+        .createInvite(validity: const Duration(days: 7));
   }
 
   @override
@@ -83,15 +83,17 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             const SizedBox(height: AppSpacing.space4),
             Text(
               '초대 링크 생성 중 오류가 발생했습니다',
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondaryLight),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '잠시 후 다시 시도해주세요',
-              style: AppTypography.bodySmall
-                  .copyWith(color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.space4),
@@ -106,8 +108,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
   }
 
   Widget _buildContent(Invite invite, InviteUserRole userRole) {
-    final targetRole =
-        userRole == InviteUserRole.teacher ? '학생' : '선생님';
+    final targetRole = userRole == InviteUserRole.teacher ? '학생' : '선생님';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -182,10 +183,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
       ),
       child: Column(
         children: [
-          Text(
-            'QR 코드',
-            style: AppTypography.headingSmall,
-          ),
+          Text('QR 코드', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
           QrImageView(
             data: invite.qrCodeData,
@@ -291,11 +289,13 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: BorderSide(color: AppColors.primary),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space3,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -310,11 +310,13 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                   foregroundColor: AppColors.textPrimaryLight,
                   backgroundColor: AppColors.kakaoBackground,
                   side: BorderSide.none,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space3,
+                  ),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -350,17 +352,15 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         const SizedBox(height: AppSpacing.space4),
         Text(
           '다른 방법으로 연결하기',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space3),
         ListTile(
           leading: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.secondary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(Icons.qr_code_scanner, color: AppColors.secondary),
           ),
@@ -375,10 +375,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         ),
         ListTile(
           leading: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.info.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(Icons.dialpad, color: AppColors.info),
           ),
@@ -390,10 +390,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
         if (userRole == InviteUserRole.student)
           ListTile(
             leading: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(Icons.search, color: AppColors.primary),
             ),
@@ -432,7 +432,8 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
 
     SharePlus.instance.share(
       ShareParams(
-        text: '레슨앱에서 저와 함께해요!\n\n'
+        text:
+            '레슨앱에서 저와 함께해요!\n\n'
             '초대 코드: ${invite.inviteCode}\n'
             '또는 링크: ${invite.inviteUrl}\n\n'
             '- $roleText 드림',

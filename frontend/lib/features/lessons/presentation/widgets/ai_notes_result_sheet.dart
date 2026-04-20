@@ -55,7 +55,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
             children: [
               // Handle bar
               Container(
-                margin: const EdgeInsets.only(top: 12),
+                margin: const EdgeInsets.only(top: AppSpacing.space3),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
@@ -162,7 +162,9 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                       const SizedBox(height: 8),
                       ...widget.result.suggestedAssignments.map(
                         (a) => Card(
-                          margin: const EdgeInsets.only(bottom: 8),
+                          margin: const EdgeInsets.only(
+                            bottom: AppSpacing.space2,
+                          ),
                           elevation: 0,
                           color: AppColors.surfaceSecondaryLight,
                           shape: RoundedRectangleBorder(

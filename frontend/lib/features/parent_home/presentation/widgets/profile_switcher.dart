@@ -254,7 +254,9 @@ class _ProfileDropdown extends ConsumerWidget {
                           color:
                               option.badgeColor?.withValues(alpha: 0.1) ??
                               AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           option.badge!,
@@ -547,7 +549,9 @@ class _ProfileTile extends StatelessWidget {
                             color:
                                 badgeColor?.withValues(alpha: 0.1) ??
                                 AppColors.surfaceLight,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             badge!,
