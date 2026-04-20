@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -29,9 +30,10 @@ class PracticeNoteListScreen extends ConsumerWidget {
 
     // Get repertoire info when section is available
     final section = sectionAsync.valueOrNull;
-    final repertoireAsync = section != null
-        ? ref.watch(repertoireProvider(section.repertoireId))
-        : null;
+    final repertoireAsync =
+        section != null
+            ? ref.watch(repertoireProvider(section.repertoireId))
+            : null;
     final repertoireName = repertoireAsync?.valueOrNull?.name;
 
     return Scaffold(
@@ -54,9 +56,11 @@ class PracticeNoteListScreen extends ConsumerWidget {
             color: AppColors.surfaceSecondaryLight,
             width: double.infinity,
             child: sectionAsync.when(
-              data: (section) => section != null
-                  ? _buildSectionHeader(section, repertoireName)
-                  : _buildFallbackHeader(),
+              data:
+                  (section) =>
+                      section != null
+                          ? _buildSectionHeader(section, repertoireName)
+                          : _buildFallbackHeader(),
               loading: () => _buildFallbackHeader(),
               error: (_, __) => _buildFallbackHeader(),
             ),
@@ -78,11 +82,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
   Widget _buildSectionHeader(dynamic section, String? repertoireName) {
     return Row(
       children: [
-        Icon(
-          Icons.library_music,
-          color: AppColors.primary,
-          size: 20,
-        ),
+        Icon(Icons.library_music, color: AppColors.primary, size: 20),
         const SizedBox(width: AppSpacing.space3),
         Expanded(
           child: Column(
@@ -127,7 +127,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
     if (section.sectionName != null && section.sectionName.isNotEmpty) {
       parts.add(section.sectionName);
     }
-    if (section.rangeText != null && section.rangeText.isNotEmpty && section.rangeText != '전체') {
+    if (section.rangeText != null &&
+        section.rangeText.isNotEmpty &&
+        section.rangeText != '전체') {
       parts.add(section.rangeText);
     }
     return parts.isEmpty ? '전체' : parts.join(' · ');
@@ -136,11 +138,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
   Widget _buildFallbackHeader() {
     return Row(
       children: [
-        Icon(
-          Icons.library_music,
-          color: AppColors.primary,
-          size: 20,
-        ),
+        Icon(Icons.library_music, color: AppColors.primary, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
@@ -171,8 +169,8 @@ class PracticeNoteListScreen extends ConsumerWidget {
     }
 
     // Sort dates descending (newest first)
-    final sortedDates = groupedNotes.keys.toList()
-      ..sort((a, b) => b.compareTo(a));
+    final sortedDates =
+        groupedNotes.keys.toList()..sort((a, b) => b.compareTo(a));
 
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -210,14 +208,16 @@ class PracticeNoteListScreen extends ConsumerWidget {
             ),
 
             // Notes for this date
-            ...dateNotes.map((note) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-                  child: NoteListItem(
-                    note: note,
-                    onEdit: () => _showEditDialog(context, ref, note),
-                    onDelete: () => _showDeleteDialog(context, ref, note),
-                  ),
-                )),
+            ...dateNotes.map(
+              (note) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+                child: NoteListItem(
+                  note: note,
+                  onEdit: () => _showEditDialog(context, ref, note),
+                  onDelete: () => _showDeleteDialog(context, ref, note),
+                ),
+              ),
+            ),
 
             if (index < sortedDates.length - 1)
               const SizedBox(height: AppSpacing.space2),
@@ -243,17 +243,11 @@ class PracticeNoteListScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            size: 64,
-            color: AppColors.error,
-          ),
+          Icon(Icons.error_outline, size: 64, color: AppColors.error),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '오류가 발생했습니다',
-            style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.error,
-            ),
+            style: AppTypography.bodyLarge.copyWith(color: AppColors.error),
           ),
           const SizedBox(height: AppSpacing.space4),
           TextButton(
@@ -278,15 +272,14 @@ class PracticeNoteListScreen extends ConsumerWidget {
     final content = await NoteEditDialog.show(context);
     if (content == null) return;
 
-    await ref.read(practiceNoteCrudProvider.notifier).createNote(
-          sectionId: sectionId,
-          content: content,
-        );
+    await ref
+        .read(practiceNoteCrudProvider.notifier)
+        .createNote(sectionId: sectionId, content: content);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('연습노트가 추가되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('연습노트가 추가되었습니다')));
     }
   }
 
@@ -302,9 +295,9 @@ class PracticeNoteListScreen extends ConsumerWidget {
     await ref.read(practiceNoteCrudProvider.notifier).updateNote(updatedNote);
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('연습노트가 수정되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('연습노트가 수정되었습니다')));
     }
   }
 
@@ -315,34 +308,32 @@ class PracticeNoteListScreen extends ConsumerWidget {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('노트 삭제'),
-        content: const Text('이 연습노트를 삭제할까요?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('노트 삭제'),
+            content: const Text('이 연습노트를 삭제할까요?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await ref
+                      .read(practiceNoteCrudProvider.notifier)
+                      .deleteNote(note.id, sectionId);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('연습노트가 삭제되었습니다')),
+                    );
+                  }
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref.read(practiceNoteCrudProvider.notifier).deleteNote(
-                    note.id,
-                    sectionId,
-                  );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('연습노트가 삭제되었습니다')),
-                );
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 }
