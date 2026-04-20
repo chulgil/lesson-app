@@ -151,7 +151,9 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                     SizedBox(
                       width: 80,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                         child: LinearProgressIndicator(
                           value: total > 0 ? completed / total : 0,
                           backgroundColor: AppColors.borderLight,
@@ -231,7 +233,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: priority.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -328,7 +330,9 @@ class _PracticeItemTile extends ConsumerWidget {
                           color: _getTypeColor(
                             item.type,
                           ).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           item.type.label,
@@ -408,7 +412,9 @@ class _PracticeItemTile extends ConsumerWidget {
                             item.practiceCount > 0
                                 ? AppColors.primary.withValues(alpha: 0.1)
                                 : AppColors.surfaceSecondaryLight,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLarge,
+                        ),
                       ),
                       child: Text(
                         '${item.practiceCount}회',
