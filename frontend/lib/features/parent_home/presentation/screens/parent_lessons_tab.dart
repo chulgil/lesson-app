@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Parent lessons tab for viewing child's lesson schedule
 class ParentLessonsTab extends ConsumerWidget {
@@ -123,17 +124,9 @@ class ParentLessonsTab extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Handle
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          margin: const EdgeInsets.only(
-                            bottom: AppSpacing.space4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.borderLight,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
+                      const Center(
+                        child: BottomSheetHandle(
+                          margin: EdgeInsets.only(bottom: AppSpacing.space4),
                         ),
                       ),
                       // Header

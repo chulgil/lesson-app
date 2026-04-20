@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting time signature.
@@ -40,15 +41,7 @@ class TimeSignaturePicker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle bar
-            Container(
-              margin: EdgeInsets.only(top: AppSpacing.space3),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const BottomSheetHandle(),
             // Title
             Padding(
               padding: EdgeInsets.all(AppSpacing.space4),

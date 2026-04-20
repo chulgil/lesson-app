@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/practice/domain/entities/metronome_settings.dart';
 import '../../../../../features/practice/presentation/providers/metronome_provider.dart';
 import 'cat_beat_indicator.dart';
@@ -56,7 +57,9 @@ class _MetronomeFullScreenModalState
       child: Column(
         children: [
           // Handle bar
-          const _HandleBar(),
+          const BottomSheetHandle(
+            margin: EdgeInsets.only(top: AppSpacing.space2),
+          ),
 
           // Header
           _Header(onClose: () => Navigator.pop(context)),
@@ -169,23 +172,6 @@ class _MetronomeFullScreenModalState
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _HandleBar extends StatelessWidget {
-  const _HandleBar();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(top: AppSpacing.space2),
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: AppColors.borderLight,
-        borderRadius: BorderRadius.circular(2),
       ),
     );
   }

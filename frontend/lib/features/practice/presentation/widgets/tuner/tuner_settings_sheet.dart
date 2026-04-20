@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../domain/entities/tuner_settings.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_provider.dart';
@@ -40,15 +41,7 @@ class TunerSettingsSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Handle bar
-            Container(
-              margin: const EdgeInsets.only(top: AppSpacing.space3),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const BottomSheetHandle(),
 
             // Title
             Padding(
@@ -74,7 +67,9 @@ class TunerSettingsSheet extends ConsumerWidget {
                     _ReferenceFrequencySection(
                       currentFrequency: settings.referenceFrequency,
                       onChanged: (freq) {
-                        ref.read(tunerProvider.notifier).setReferenceFrequency(freq);
+                        ref
+                            .read(tunerProvider.notifier)
+                            .setReferenceFrequency(freq);
                       },
                     ),
 
@@ -84,7 +79,9 @@ class TunerSettingsSheet extends ConsumerWidget {
                     _TranspositionSection(
                       currentTransposition: settings.transposition,
                       onChanged: (trans) {
-                        ref.read(tunerProvider.notifier).setTransposition(trans);
+                        ref
+                            .read(tunerProvider.notifier)
+                            .setTransposition(trans);
                       },
                     ),
 
@@ -118,7 +115,9 @@ class TunerSettingsSheet extends ConsumerWidget {
                     _EnharmonicSection(
                       currentMode: settings.enharmonicMode,
                       onChanged: (mode) {
-                        ref.read(tunerProvider.notifier).setEnharmonicMode(mode);
+                        ref
+                            .read(tunerProvider.notifier)
+                            .setEnharmonicMode(mode);
                       },
                     ),
 
@@ -132,7 +131,9 @@ class TunerSettingsSheet extends ConsumerWidget {
                         ref.read(tunerProvider.notifier).toggleShowCombo();
                       },
                       onVibrationChanged: () {
-                        ref.read(tunerProvider.notifier).toggleVibrationFeedback();
+                        ref
+                            .read(tunerProvider.notifier)
+                            .toggleVibrationFeedback();
                       },
                     ),
 
@@ -165,9 +166,7 @@ class _ReferenceFrequencySection extends StatelessWidget {
       children: [
         Text(
           '기준 주파수 (A4)',
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -182,19 +181,24 @@ class _ReferenceFrequencySection extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: TunerSettings.frequencyPresets.map((freq) {
-            final isSelected = (currentFrequency - freq).abs() < 0.1;
-            return ChoiceChip(
-              label: Text('${freq.toInt()}Hz'),
-              selected: isSelected,
-              onSelected: (_) => onChanged(freq),
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              TunerSettings.frequencyPresets.map((freq) {
+                final isSelected = (currentFrequency - freq).abs() < 0.1;
+                return ChoiceChip(
+                  label: Text('${freq.toInt()}Hz'),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(freq),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
 
         const SizedBox(height: AppSpacing.space3),
@@ -204,7 +208,9 @@ class _ReferenceFrequencySection extends StatelessWidget {
           children: [
             Text(
               '${TunerSettings.minReferenceFrequency.toInt()}',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
             ),
             Expanded(
               child: Slider(
@@ -219,7 +225,9 @@ class _ReferenceFrequencySection extends StatelessWidget {
             ),
             Text(
               '${TunerSettings.maxReferenceFrequency.toInt()}',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
             ),
           ],
         ),
@@ -254,9 +262,7 @@ class _TranspositionSection extends StatelessWidget {
       children: [
         Text(
           '조옮김 (관악기용)',
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -270,19 +276,24 @@ class _TranspositionSection extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: Transposition.values.map((trans) {
-            final isSelected = currentTransposition == trans;
-            return ChoiceChip(
-              label: Text(trans.label),
-              selected: isSelected,
-              onSelected: (_) => onChanged(trans),
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              Transposition.values.map((trans) {
+                final isSelected = currentTransposition == trans;
+                return ChoiceChip(
+                  label: Text(trans.label),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(trans),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
 
         if (currentTransposition != Transposition.c)
@@ -318,9 +329,7 @@ class _DifficultySection extends StatelessWidget {
       children: [
         Text(
           '판정 난이도',
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -332,24 +341,31 @@ class _DifficultySection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space3),
 
         Row(
-          children: TunerDifficulty.values.map((diff) {
-            final isSelected = currentDifficulty == diff;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
-                child: ChoiceChip(
-                  label: Text(diff.label),
-                  selected: isSelected,
-                  onSelected: (_) => onChanged(diff),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  labelStyle: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          children:
+              TunerDifficulty.values.map((diff) {
+                final isSelected = currentDifficulty == diff;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space1,
+                    ),
+                    child: ChoiceChip(
+                      label: Text(diff.label),
+                      selected: isSelected,
+                      onSelected: (_) => onChanged(diff),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      labelStyle: TextStyle(
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.textSecondaryLight,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
 
         Padding(
@@ -383,9 +399,7 @@ class _EnharmonicSection extends StatelessWidget {
       children: [
         Text(
           '이명동음 표시',
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -399,19 +413,24 @@ class _EnharmonicSection extends StatelessWidget {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: EnharmonicMode.values.map((mode) {
-            final isSelected = currentMode == mode;
-            return ChoiceChip(
-              label: Text('${mode.label} (${mode.example})'),
-              selected: isSelected,
-              onSelected: (_) => onChanged(mode),
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              labelStyle: TextStyle(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              EnharmonicMode.values.map((mode) {
+                final isSelected = currentMode == mode;
+                return ChoiceChip(
+                  label: Text('${mode.label} (${mode.example})'),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(mode),
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -439,9 +458,7 @@ class _ClefSection extends StatelessWidget {
       children: [
         Text(
           '음자리표',
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
@@ -453,24 +470,31 @@ class _ClefSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.space3),
 
         Row(
-          children: ClefType.values.map((clef) {
-            final isSelected = currentClef == clef;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
-                child: ChoiceChip(
-                  label: Text('${clef.symbol} ${clef.label}'),
-                  selected: isSelected,
-                  onSelected: (_) => onChanged(clef),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
-                  labelStyle: TextStyle(
-                    color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          children:
+              ClefType.values.map((clef) {
+                final isSelected = currentClef == clef;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space1,
+                    ),
+                    child: ChoiceChip(
+                      label: Text('${clef.symbol} ${clef.label}'),
+                      selected: isSelected,
+                      onSelected: (_) => onChanged(clef),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                      labelStyle: TextStyle(
+                        color:
+                            isSelected
+                                ? AppColors.primary
+                                : AppColors.textSecondaryLight,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
 
         const SizedBox(height: AppSpacing.space3),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/presentation/providers/metronome_provider.dart';
 import '../providers/tuner_provider.dart';
 import 'practice_tools/metronome_panel.dart';
@@ -127,14 +128,8 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
       child: Column(
         children: [
           // Handle bar
-          Container(
+          const BottomSheetHandle(
             margin: EdgeInsets.only(top: AppSpacing.space2),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
           ),
 
           // Header with tabs

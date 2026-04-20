@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/profile/domain/entities/invite.dart';
 import '../../../../features/profile/presentation/providers/invite_provider.dart';
 
@@ -134,58 +135,49 @@ class MyConnectionsScreen extends ConsumerWidget {
           top: Radius.circular(AppSpacing.radiusLarge),
         ),
       ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
+      builder:
+          (context) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const BottomSheetHandle(margin: EdgeInsets.zero),
+                const SizedBox(height: AppSpacing.space6),
+                Text('선생님과 연결하는 방법', style: AppTypography.headingSmall),
+                const SizedBox(height: AppSpacing.space4),
+                _HelpItem(
+                  icon: Icons.dialpad,
+                  title: '초대 코드 입력',
+                  subtitle: '선생님에게 받은 6자리 코드를 입력하세요',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.inviteCode);
+                  },
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                _HelpItem(
+                  icon: Icons.qr_code_scanner,
+                  title: 'QR 코드 스캔',
+                  subtitle: '선생님의 QR 코드를 카메라로 스캔하세요',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.inviteScan);
+                  },
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                _HelpItem(
+                  icon: Icons.search,
+                  title: '선생님 검색',
+                  subtitle: '이름, 악기, 지역으로 선생님을 검색하세요',
+                  onTap: () {
+                    Navigator.pop(context);
+                    context.push(AppRoutes.teacherSearch);
+                  },
+                ),
+                const SizedBox(height: AppSpacing.space6),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space6),
-            Text(
-              '선생님과 연결하는 방법',
-              style: AppTypography.headingSmall,
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            _HelpItem(
-              icon: Icons.dialpad,
-              title: '초대 코드 입력',
-              subtitle: '선생님에게 받은 6자리 코드를 입력하세요',
-              onTap: () {
-                Navigator.pop(context);
-                context.push(AppRoutes.inviteCode);
-              },
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            _HelpItem(
-              icon: Icons.qr_code_scanner,
-              title: 'QR 코드 스캔',
-              subtitle: '선생님의 QR 코드를 카메라로 스캔하세요',
-              onTap: () {
-                Navigator.pop(context);
-                context.push(AppRoutes.inviteScan);
-              },
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            _HelpItem(
-              icon: Icons.search,
-              title: '선생님 검색',
-              subtitle: '이름, 악기, 지역으로 선생님을 검색하세요',
-              onTap: () {
-                Navigator.pop(context);
-                context.push(AppRoutes.teacherSearch);
-              },
-            ),
-            const SizedBox(height: AppSpacing.space6),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -217,8 +209,13 @@ class MyConnectionsScreen extends ConsumerWidget {
                   connection: connection,
                   userRole: userRole,
                   isActive: true,
-                  onTap: () =>
-                      _showConnectionDetails(context, ref, connection, userRole),
+                  onTap:
+                      () => _showConnectionDetails(
+                        context,
+                        ref,
+                        connection,
+                        userRole,
+                      ),
                 ),
               ),
             ),
@@ -239,8 +236,13 @@ class MyConnectionsScreen extends ConsumerWidget {
                   connection: connection,
                   userRole: userRole,
                   isActive: false,
-                  onTap: () =>
-                      _showConnectionDetails(context, ref, connection, userRole),
+                  onTap:
+                      () => _showConnectionDetails(
+                        context,
+                        ref,
+                        connection,
+                        userRole,
+                      ),
                   onReconnect: () => _handleReconnect(context, ref, connection),
                 ),
               ),
@@ -261,12 +263,13 @@ class MyConnectionsScreen extends ConsumerWidget {
         .reactivateConnection(connection.id);
 
     if (success && context.mounted) {
-      final name = ref.read(currentInviteUserRoleProvider) == InviteUserRole.teacher
-          ? connection.studentName
-          : connection.teacherName;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$name님과 다시 연결되었습니다')),
-      );
+      final name =
+          ref.read(currentInviteUserRoleProvider) == InviteUserRole.teacher
+              ? connection.studentName
+              : connection.teacherName;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$name님과 다시 연결되었습니다')));
     }
   }
 
@@ -276,9 +279,10 @@ class MyConnectionsScreen extends ConsumerWidget {
     Connection connection,
     InviteUserRole userRole,
   ) {
-    final otherName = userRole == InviteUserRole.teacher
-        ? connection.studentName
-        : connection.teacherName;
+    final otherName =
+        userRole == InviteUserRole.teacher
+            ? connection.studentName
+            : connection.teacherName;
 
     showModalBottomSheet(
       context: context,
@@ -287,80 +291,71 @@ class MyConnectionsScreen extends ConsumerWidget {
           top: Radius.circular(AppSpacing.radiusLarge),
         ),
       ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-              child: Text(
-                otherName[0],
-                style: AppTypography.headingLarge.copyWith(
-                  color: AppColors.primary,
+      builder:
+          (context) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.screenPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const BottomSheetHandle(margin: EdgeInsets.zero),
+                const SizedBox(height: AppSpacing.space6),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: Text(
+                    otherName[0],
+                    style: AppTypography.headingLarge.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: AppSpacing.space4),
+                Text(otherName, style: AppTypography.headingMedium),
+                Text(
+                  userRole == InviteUserRole.teacher ? '학생' : '선생님',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '연결일: ${_formatDate(connection.connectedAt)}',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space6),
+                const Divider(),
+                ListTile(
+                  leading: Icon(Icons.calendar_today, color: AppColors.primary),
+                  title: const Text('레슨 일정 보기'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Navigate to schedule
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.message, color: AppColors.info),
+                  title: const Text('메시지 보내기'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pop(context);
+                    // Navigate to messages
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.link_off, color: AppColors.warning),
+                  title: const Text('연결 해제'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _handleDeactivate(context, ref, connection, otherName);
+                  },
+                ),
+                const SizedBox(height: AppSpacing.space4),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              otherName,
-              style: AppTypography.headingMedium,
-            ),
-            Text(
-              userRole == InviteUserRole.teacher ? '학생' : '선생님',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '연결일: ${_formatDate(connection.connectedAt)}',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.space6),
-            const Divider(),
-            ListTile(
-              leading: Icon(Icons.calendar_today, color: AppColors.primary),
-              title: const Text('레슨 일정 보기'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to schedule
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.message, color: AppColors.info),
-              title: const Text('메시지 보내기'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to messages
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.link_off, color: AppColors.warning),
-              title: const Text('연결 해제'),
-              onTap: () {
-                Navigator.pop(context);
-                _handleDeactivate(context, ref, connection, otherName);
-              },
-            ),
-            const SizedBox(height: AppSpacing.space4),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -372,21 +367,22 @@ class MyConnectionsScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('연결 해제'),
-        content: Text('$otherName님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('연결 해제'),
+            content: Text('$otherName님과의 연결을 해제하시겠습니까?\n나중에 다시 연결할 수 있습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+                child: const Text('연결 해제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.warning),
-            child: const Text('연결 해제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && context.mounted) {
@@ -395,9 +391,9 @@ class MyConnectionsScreen extends ConsumerWidget {
           .deactivateConnection(connection.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$otherName님과의 연결이 해제되었습니다')));
       }
     }
   }
@@ -411,10 +407,7 @@ class _SectionHeader extends StatelessWidget {
   final String title;
   final int count;
 
-  const _SectionHeader({
-    required this.title,
-    required this.count,
-  });
+  const _SectionHeader({required this.title, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -517,12 +510,14 @@ class _ConnectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = userRole == InviteUserRole.teacher
-        ? connection.studentName
-        : connection.teacherName;
-    final profileImage = userRole == InviteUserRole.teacher
-        ? connection.studentProfileImage
-        : connection.teacherProfileImage;
+    final name =
+        userRole == InviteUserRole.teacher
+            ? connection.studentName
+            : connection.teacherName;
+    final profileImage =
+        userRole == InviteUserRole.teacher
+            ? connection.studentProfileImage
+            : connection.teacherProfileImage;
 
     return InkWell(
       onTap: onTap,
@@ -530,9 +525,10 @@ class _ConnectionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isActive
-              ? Colors.white
-              : AppColors.textTertiaryLight.withValues(alpha: 0.05),
+          color:
+              isActive
+                  ? Colors.white
+                  : AppColors.textTertiaryLight.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.borderLight),
         ),
@@ -541,21 +537,24 @@ class _ConnectionCard extends StatelessWidget {
             // Profile image
             CircleAvatar(
               radius: 28,
-              backgroundColor: isActive
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+              backgroundColor:
+                  isActive
+                      ? AppColors.primary.withValues(alpha: 0.1)
+                      : AppColors.textTertiaryLight.withValues(alpha: 0.1),
               backgroundImage:
                   profileImage != null ? NetworkImage(profileImage) : null,
-              child: profileImage == null
-                  ? Text(
-                      name.isNotEmpty ? name[0] : '?',
-                      style: AppTypography.headingSmall.copyWith(
-                        color: isActive
-                            ? AppColors.primary
-                            : AppColors.textTertiaryLight,
-                      ),
-                    )
-                  : null,
+              child:
+                  profileImage == null
+                      ? Text(
+                        name.isNotEmpty ? name[0] : '?',
+                        style: AppTypography.headingSmall.copyWith(
+                          color:
+                              isActive
+                                  ? AppColors.primary
+                                  : AppColors.textTertiaryLight,
+                        ),
+                      )
+                      : null,
             ),
             const SizedBox(width: AppSpacing.space3),
             // Info
@@ -570,9 +569,8 @@ class _ConnectionCard extends StatelessWidget {
                           name,
                           style: AppTypography.bodyLarge.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isActive
-                                ? null
-                                : AppColors.textSecondaryLight,
+                            color:
+                                isActive ? null : AppColors.textSecondaryLight,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -598,8 +596,10 @@ class _ConnectionCard extends StatelessWidget {
             if (isActive)
               IconButton(
                 onPressed: onTap,
-                icon:
-                    Icon(Icons.more_vert, color: AppColors.textSecondaryLight),
+                icon: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondaryLight,
+                ),
               )
             else if (onReconnect != null)
               TextButton(
@@ -651,9 +651,10 @@ class _StatusBadge extends StatelessWidget {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: isActive
-            ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+        color:
+            isActive
+                ? AppColors.success.withValues(alpha: 0.1)
+                : AppColors.textTertiaryLight.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(

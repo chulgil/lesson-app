@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../../features/practice/domain/entities/practice_repertoire.dart';
 
 /// Reusable widget for displaying and editing practice count and time
@@ -40,11 +41,7 @@ class PracticeStatsEditor extends StatelessWidget {
               onTap: () => _showCountEditor(context),
             ),
           ),
-          Container(
-            width: 1,
-            height: 32,
-            color: AppColors.borderLight,
-          ),
+          Container(width: 1, height: 32, color: AppColors.borderLight),
           // Total practice time
           Expanded(
             child: _StatItem(
@@ -63,19 +60,21 @@ class PracticeStatsEditor extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _CountEditorSheet(
-        currentCount: section.practiceCount,
-        targetSeconds: section.targetPracticeSeconds,
-        onConfirm: (count) {
-          // Calculate time based on target if available
-          int seconds = section.totalPracticeSeconds;
-          if (section.hasTargetPracticeTime && count > section.practiceCount) {
-            final addedCount = count - section.practiceCount;
-            seconds += section.targetPracticeSeconds! * addedCount;
-          }
-          onUpdate(count, seconds);
-        },
-      ),
+      builder:
+          (context) => _CountEditorSheet(
+            currentCount: section.practiceCount,
+            targetSeconds: section.targetPracticeSeconds,
+            onConfirm: (count) {
+              // Calculate time based on target if available
+              int seconds = section.totalPracticeSeconds;
+              if (section.hasTargetPracticeTime &&
+                  count > section.practiceCount) {
+                final addedCount = count - section.practiceCount;
+                seconds += section.targetPracticeSeconds! * addedCount;
+              }
+              onUpdate(count, seconds);
+            },
+          ),
     );
   }
 
@@ -83,12 +82,13 @@ class PracticeStatsEditor extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => _TimeEditorSheet(
-        currentSeconds: section.totalPracticeSeconds,
-        onConfirm: (seconds) {
-          onUpdate(section.practiceCount, seconds);
-        },
-      ),
+      builder:
+          (context) => _TimeEditorSheet(
+            currentSeconds: section.totalPracticeSeconds,
+            onConfirm: (seconds) {
+              onUpdate(section.practiceCount, seconds);
+            },
+          ),
     );
   }
 }
@@ -181,9 +181,10 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
   @override
   Widget build(BuildContext context) {
     final addedCount = _count - widget.currentCount;
-    final addedMinutes = widget.targetSeconds != null && addedCount > 0
-        ? (widget.targetSeconds! * addedCount / 60).round()
-        : 0;
+    final addedMinutes =
+        widget.targetSeconds != null && addedCount > 0
+            ? (widget.targetSeconds! * addedCount / 60).round()
+            : 0;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -196,20 +197,10 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(margin: EdgeInsets.zero),
           const SizedBox(height: AppSpacing.space4),
 
-          Text(
-            '연습 횟수 설정',
-            style: AppTypography.headingSmall,
-          ),
+          Text('연습 횟수 설정', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space4),
 
           // Count selector
@@ -331,20 +322,10 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(margin: EdgeInsets.zero),
           const SizedBox(height: AppSpacing.space4),
 
-          Text(
-            '총 연습 시간 설정',
-            style: AppTypography.headingSmall,
-          ),
+          Text('총 연습 시간 설정', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space4),
 
           // Time input
@@ -364,8 +345,9 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
                     suffixText: '시간',
                     suffixStyle: AppTypography.bodyMedium,
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                 ),
@@ -384,8 +366,9 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
                     suffixText: '분',
                     suffixStyle: AppTypography.bodyMedium,
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                 ),

@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/practice_repertoire.dart';
 import '../providers/recording_comparison_provider.dart';
 import 'waveform/zoomable_waveform.dart';
@@ -185,15 +186,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
   }
 
   Widget _buildHandle() {
-    return Container(
-      margin: const EdgeInsets.only(top: AppSpacing.space3),
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: AppColors.borderLight,
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
+    return const BottomSheetHandle();
   }
 
   Widget _buildHeader() {

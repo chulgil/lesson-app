@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../students/domain/entities/class_membership.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
@@ -434,16 +435,8 @@ class _ChildSelectorSheet extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.space3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+                const BottomSheetHandle(
+                  margin: EdgeInsets.symmetric(vertical: AppSpacing.space3),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.screenPadding),

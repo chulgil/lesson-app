@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../providers/practice_reminder_provider.dart';
 
 /// Bottom sheet for configuring practice reminder time and days.
@@ -28,9 +29,7 @@ class PracticeReminderSheet extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         child: Padding(
@@ -40,16 +39,7 @@ class PracticeReminderSheet extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle bar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
 
               const SizedBox(height: AppSpacing.space5),
 
@@ -86,9 +76,10 @@ class PracticeReminderSheet extends ConsumerWidget {
                   children: [
                     Icon(
                       Icons.alarm,
-                      color: settings.isEnabled
-                          ? AppColors.primary
-                          : AppColors.textTertiaryLight,
+                      color:
+                          settings.isEnabled
+                              ? AppColors.primary
+                              : AppColors.textTertiaryLight,
                     ),
                     const SizedBox(width: AppSpacing.space3),
                     Expanded(
@@ -101,9 +92,10 @@ class PracticeReminderSheet extends ConsumerWidget {
                     ),
                     Switch(
                       value: settings.isEnabled,
-                      onChanged: (value) => ref
-                          .read(practiceReminderProvider.notifier)
-                          .toggleEnabled(value),
+                      onChanged:
+                          (value) => ref
+                              .read(practiceReminderProvider.notifier)
+                              .toggleEnabled(value),
                       activeColor: AppColors.primary,
                     ),
                   ],
@@ -122,40 +114,51 @@ class PracticeReminderSheet extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.space2),
               GestureDetector(
-                onTap: settings.isEnabled
-                    ? () => _selectTime(context, ref, settings.hour, settings.minute)
-                    : null,
+                onTap:
+                    settings.isEnabled
+                        ? () => _selectTime(
+                          context,
+                          ref,
+                          settings.hour,
+                          settings.minute,
+                        )
+                        : null,
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundLight,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Row(
                     children: [
                       Icon(
                         Icons.access_time,
-                        color: settings.isEnabled
-                            ? AppColors.primary
-                            : AppColors.textTertiaryLight,
+                        color:
+                            settings.isEnabled
+                                ? AppColors.primary
+                                : AppColors.textTertiaryLight,
                       ),
                       const SizedBox(width: AppSpacing.space3),
                       Text(
                         settings.formattedTime,
                         style: AppTypography.headingMedium.copyWith(
-                          color: settings.isEnabled
-                              ? AppColors.textPrimaryLight
-                              : AppColors.textTertiaryLight,
+                          color:
+                              settings.isEnabled
+                                  ? AppColors.textPrimaryLight
+                                  : AppColors.textTertiaryLight,
                         ),
                       ),
                       const Spacer(),
                       Icon(
                         Icons.edit_outlined,
                         size: 20,
-                        color: settings.isEnabled
-                            ? AppColors.textSecondaryLight
-                            : AppColors.textTertiaryLight,
+                        color:
+                            settings.isEnabled
+                                ? AppColors.textSecondaryLight
+                                : AppColors.textTertiaryLight,
                       ),
                     ],
                   ),
@@ -179,37 +182,42 @@ class PracticeReminderSheet extends ConsumerWidget {
                   final days = ['월', '화', '수', '목', '금', '토', '일'];
                   final isSelected = settings.selectedDays.contains(index);
                   return GestureDetector(
-                    onTap: settings.isEnabled
-                        ? () => ref
-                            .read(practiceReminderProvider.notifier)
-                            .toggleDay(index)
-                        : null,
+                    onTap:
+                        settings.isEnabled
+                            ? () => ref
+                                .read(practiceReminderProvider.notifier)
+                                .toggleDay(index)
+                            : null,
                     child: Container(
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isSelected && settings.isEnabled
-                            ? AppColors.primary
-                            : AppColors.backgroundLight,
+                        color:
+                            isSelected && settings.isEnabled
+                                ? AppColors.primary
+                                : AppColors.backgroundLight,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected && settings.isEnabled
-                              ? AppColors.primary
-                              : AppColors.borderLight,
+                          color:
+                              isSelected && settings.isEnabled
+                                  ? AppColors.primary
+                                  : AppColors.borderLight,
                         ),
                       ),
                       child: Center(
                         child: Text(
                           days[index],
                           style: AppTypography.bodySmall.copyWith(
-                            color: isSelected && settings.isEnabled
-                                ? Colors.white
-                                : settings.isEnabled
+                            color:
+                                isSelected && settings.isEnabled
+                                    ? Colors.white
+                                    : settings.isEnabled
                                     ? AppColors.textSecondaryLight
                                     : AppColors.textTertiaryLight,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.normal,
+                            fontWeight:
+                                isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
                           ),
                         ),
                       ),
@@ -270,7 +278,9 @@ class PracticeReminderSheet extends ConsumerWidget {
       },
     );
     if (time != null) {
-      ref.read(practiceReminderProvider.notifier).setTime(time.hour, time.minute);
+      ref
+          .read(practiceReminderProvider.notifier)
+          .setTime(time.hour, time.minute);
     }
   }
 }
