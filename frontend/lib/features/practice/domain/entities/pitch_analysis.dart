@@ -1,6 +1,7 @@
 /// Pitch analysis result for a practice recording.
 ///
 /// Captures frequency data over time and computes summary metrics.
+library;
 
 class FrequencySample {
   const FrequencySample({

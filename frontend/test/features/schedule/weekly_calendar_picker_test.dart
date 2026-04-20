@@ -72,7 +72,7 @@ void main() {
       final dayLabel = days[slot.dayOfWeek.clamp(0, 6)];
 
       if (type == LessonRequestType.regular) {
-        return '매주 ${dayLabel}요일 ${slot.startTime}';
+        return '매주 $dayLabel요일 ${slot.startTime}';
       }
       if (slot.date != null) {
         final d = slot.date!;

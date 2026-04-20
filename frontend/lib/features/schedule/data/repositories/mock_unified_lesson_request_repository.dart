@@ -18,6 +18,7 @@ class MockUnifiedLessonRequestRepository
   // ═══════════════════════════════════════════════════════════════════════════
 
   /// Get all events for a request, sorted by createdAt ascending.
+  @override
   Future<List<RequestEvent>> getEventsByRequestId(String requestId) async {
     await Future.delayed(const Duration(milliseconds: 50));
     final events = _events[requestId] ?? [];
@@ -25,6 +26,7 @@ class MockUnifiedLessonRequestRepository
   }
 
   /// Add a new event to a request's history.
+  @override
   Future<RequestEvent> addEvent(RequestEvent event) async {
     await Future.delayed(const Duration(milliseconds: 50));
     _events.putIfAbsent(event.requestId, () => []);

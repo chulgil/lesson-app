@@ -233,7 +233,7 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                 ),
                 if (_daysRemaining != null)
                   Text(
-                    'D-${_daysRemaining}',
+                    'D-$_daysRemaining',
                     style: AppTypography.caption.copyWith(
                       color:
                           _daysRemaining! <= 7

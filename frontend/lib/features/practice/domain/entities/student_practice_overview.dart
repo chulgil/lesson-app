@@ -7,7 +7,7 @@ class DailyPracticeEntry {
   final int practiceMinutes;
   final bool hasPracticed;
 
-  DailyPracticeEntry({
+  const DailyPracticeEntry({
     required this.date,
     required this.practiceMinutes,
   }) : hasPracticed = practiceMinutes > 0;

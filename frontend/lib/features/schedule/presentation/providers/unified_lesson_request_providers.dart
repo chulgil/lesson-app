@@ -135,9 +135,13 @@ Future<List<UnifiedLessonRequest>> todayRequests(
   // Sort: pending first, then by createdAt desc
   filtered.sort((a, b) {
     if (a.status == UnifiedRequestStatus.pending &&
-        b.status != UnifiedRequestStatus.pending) return -1;
+        b.status != UnifiedRequestStatus.pending) {
+      return -1;
+    }
     if (b.status == UnifiedRequestStatus.pending &&
-        a.status != UnifiedRequestStatus.pending) return 1;
+        a.status != UnifiedRequestStatus.pending) {
+      return 1;
+    }
     return b.createdAt.compareTo(a.createdAt);
   });
 

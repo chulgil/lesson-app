@@ -148,10 +148,12 @@ class TeacherSubscriptionSection extends ConsumerWidget {
 
     final parts = <String>[];
     if (activeCount > 0) parts.add('${AppStrings.statusActive} $activeCount');
-    if (expiringCount > 0)
+    if (expiringCount > 0) {
       parts.add('${AppStrings.statusExpiringSoon} $expiringCount');
-    if (expiredCount > 0)
+    }
+    if (expiredCount > 0) {
       parts.add('${AppStrings.statusExpired} $expiredCount');
+    }
 
     if (parts.isEmpty) return const SizedBox.shrink();
 

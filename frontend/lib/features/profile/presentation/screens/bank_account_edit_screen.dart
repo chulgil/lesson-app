@@ -666,8 +666,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.trim().isEmpty)
+                if (value == null || value.trim().isEmpty) {
                   return '계좌번호를 입력해주세요';
+                }
                 final digitsOnly = value.replaceAll('-', '');
                 if (digitsOnly.length < 8 || digitsOnly.length > 16) {
                   return '올바른 계좌번호를 입력해주세요';

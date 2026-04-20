@@ -1,6 +1,7 @@
 /// Challenge (mission) entity for gamification Phase 3.
 ///
 /// Challenges are time-bound goals that reward points and badges on completion.
+library;
 
 enum ChallengePeriod {
   weekly,

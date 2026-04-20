@@ -117,7 +117,7 @@ class PointAwardNotifier extends _$PointAwardNotifier {
       studentId: studentId,
       points: points,
       type: PointType.streakBonus,
-      description: '${streakDays}일 스트릭 보너스',
+      description: '$streakDays일 스트릭 보너스',
     );
     state = [...state, entry];
     _triggerBadgeCheck(studentId);

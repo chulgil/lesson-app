@@ -456,7 +456,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     if (h == null) return false;
     if (h.date.year != date.year ||
         h.date.month != date.month ||
-        h.date.day != date.day) return false;
+        h.date.day != date.day) {
+      return false;
+    }
     return cellMinutes >= h.startMinutes && cellMinutes < h.endMinutes;
   }
 
@@ -465,7 +467,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     if (h == null) return false;
     if (h.date.year != date.year ||
         h.date.month != date.month ||
-        h.date.day != date.day) return false;
+        h.date.day != date.day) {
+      return false;
+    }
     return cellMinutes == h.startMinutes;
   }
 

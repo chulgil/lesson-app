@@ -687,7 +687,7 @@ class AppStrings {
   static const selectReason = '사유 선택 필요';
   static const nonCompletionReason = '레슨 미진행 사유';
   static const optionalNote = '추가 메모를 입력하세요 (선택)';
-  static String lessonsNeedConfirmation(int count) => '미확인 레슨 ${count}건';
+  static String lessonsNeedConfirmation(int count) => '미확인 레슨 $count건';
 
   // ── Day of Week ────────────────────────────────────────
 
@@ -711,21 +711,21 @@ class AppStrings {
   // ── Urgent Actions (Dashboard) ────────────────────────────
 
   /// 대기 중인 레슨 요청
-  static String lessonRequestPending(int count) => '레슨 요청 ${count}건 대기';
+  static String lessonRequestPending(int count) => '레슨 요청 $count건 대기';
 
   /// 대기 중인 입금 확인
-  static String paymentConfirmPending(int count) => '입금 확인 ${count}건 대기';
+  static String paymentConfirmPending(int count) => '입금 확인 $count건 대기';
 
   // ── Urgent Alert Zone (Dashboard) ──────────────────────────
 
   /// 만료된 수강권
-  static String subscriptionExpired(int count) => '만료 수강권 ${count}건';
+  static String subscriptionExpired(int count) => '만료 수강권 $count건';
 
   /// 임박한 수강권
-  static String subscriptionExpiringSoon(int count) => '수강권 임박 ${count}건';
+  static String subscriptionExpiringSoon(int count) => '수강권 임박 $count건';
 
   /// 예약 승인 대기
-  static String pendingBookings(int count) => '예약 승인 대기 ${count}건';
+  static String pendingBookings(int count) => '예약 승인 대기 $count건';
 
   // ── Subscription Card ─────────────────────────────────────
 
@@ -993,7 +993,7 @@ class AppStrings {
   static const cancelRequestCompletedKept = '취소 요청 완료 (횟수 유지)';
 
   /// 잔여 횟수 경고
-  static String remainingLessonsWarning(int count) => '잔여 ${count}회 - 갱신 권장';
+  static String remainingLessonsWarning(int count) => '잔여 $count회 - 갱신 권장';
 
   /// 마지막 1회 경고
   static const lastLessonWarning = '마지막 1회!';
