@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -71,20 +72,22 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
 
     setState(() => _isLoading = true);
 
-    final startYear = int.tryParse(_startYearController.text) ?? DateTime.now().year;
+    final startYear =
+        int.tryParse(_startYearController.text) ?? DateTime.now().year;
 
     final career = Career(
       organization: _organizationController.text.trim(),
-      position: _positionController.text.trim().isEmpty
-          ? ''
-          : _positionController.text.trim(),
+      position:
+          _positionController.text.trim().isEmpty
+              ? ''
+              : _positionController.text.trim(),
       startYear: startYear,
-      endYear: _isCurrentlyWorking
-          ? null
-          : int.tryParse(_endYearController.text),
-      description: _descriptionController.text.trim().isEmpty
-          ? null
-          : _descriptionController.text.trim(),
+      endYear:
+          _isCurrentlyWorking ? null : int.tryParse(_endYearController.text),
+      description:
+          _descriptionController.text.trim().isEmpty
+              ? null
+              : _descriptionController.text.trim(),
     );
 
     try {
@@ -119,21 +122,22 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('경력 삭제'),
-        content: const Text('이 경력 정보를 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('경력 삭제'),
+            content: const Text('이 경력 정보를 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -180,9 +184,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _organizationController,
-              decoration: _inputDecoration(
-                hintText: '예: 서울시립교향악단',
-              ),
+              decoration: _inputDecoration(hintText: '예: 서울시립교향악단'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return '기관/단체명을 입력해주세요';
@@ -198,9 +200,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _positionController,
-              decoration: _inputDecoration(
-                hintText: '예: 제1바이올린 단원',
-              ),
+              decoration: _inputDecoration(hintText: '예: 제1바이올린 단원'),
             ),
 
             const SizedBox(height: AppSpacing.space4),
@@ -218,9 +218,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                       FilteringTextInputFormatter.digitsOnly,
                       LengthLimitingTextInputFormatter(4),
                     ],
-                    decoration: _inputDecoration(
-                      hintText: '시작년도',
-                    ),
+                    decoration: _inputDecoration(hintText: '시작년도'),
                     validator: (value) {
                       if (value != null && value.isNotEmpty) {
                         final year = int.tryParse(value);
@@ -256,8 +254,9 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                         if (year == null || year < 1950 || year > 2030) {
                           return '올바른 연도';
                         }
-                        final startYear =
-                            int.tryParse(_startYearController.text);
+                        final startYear = int.tryParse(
+                          _startYearController.text,
+                        );
                         if (startYear != null && year < startYear) {
                           return '시작년도 이후';
                         }
@@ -295,10 +294,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                       }
                     });
                   },
-                  child: Text(
-                    '현재 재직 중',
-                    style: AppTypography.bodyMedium,
-                  ),
+                  child: Text('현재 재직 중', style: AppTypography.bodyMedium),
                 ),
               ],
             ),
@@ -312,9 +308,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
               controller: _descriptionController,
               maxLines: 3,
               maxLength: 200,
-              decoration: _inputDecoration(
-                hintText: '담당 업무나 주요 활동 내용을 입력해주세요',
-              ),
+              decoration: _inputDecoration(hintText: '담당 업무나 주요 활동 내용을 입력해주세요'),
             ),
 
             const SizedBox(height: AppSpacing.space6),
@@ -332,19 +326,20 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                child:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : Text(
+                          _isEdit ? '수정하기' : '추가하기',
+                          style: AppTypography.button,
                         ),
-                      )
-                    : Text(
-                        _isEdit ? '수정하기' : '추가하기',
-                        style: AppTypography.button,
-                      ),
               ),
             ),
           ],
@@ -358,9 +353,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       children: [
         Text(
           text,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         if (required)
           Text(
@@ -398,7 +391,9 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
       ),
       disabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: BorderSide(color: AppColors.borderLight.withValues(alpha: 0.5)),
+        borderSide: BorderSide(
+          color: AppColors.borderLight.withValues(alpha: 0.5),
+        ),
       ),
     );
   }

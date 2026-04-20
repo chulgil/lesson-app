@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -42,22 +43,30 @@ class _InstrumentManagementScreenState
       body: settingsAsync.when(
         data: (settings) => _buildContent(settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              const Text('오류가 발생했습니다.'),
-              const SizedBox(height: AppSpacing.space4),
-              FilledButton(
-                onPressed: () =>
-                    ref.read(teacherSettingsNotifierProvider.notifier).refresh(),
-                child: const Text('다시 시도'),
+        error:
+            (_, __) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  const Text('오류가 발생했습니다.'),
+                  const SizedBox(height: AppSpacing.space4),
+                  FilledButton(
+                    onPressed:
+                        () =>
+                            ref
+                                .read(teacherSettingsNotifierProvider.notifier)
+                                .refresh(),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -84,10 +93,7 @@ class _InstrumentManagementScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '현재 가르치는 악기',
-          style: AppTypography.headingSmall,
-        ),
+        Text('현재 가르치는 악기', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '악기를 탭하면 삭제할 수 있습니다',
@@ -127,11 +133,9 @@ class _InstrumentManagementScreenState
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: instruments.length,
-            onReorder: (oldIndex, newIndex) => _reorderInstrument(
-              instruments,
-              oldIndex,
-              newIndex,
-            ),
+            onReorder:
+                (oldIndex, newIndex) =>
+                    _reorderInstrument(instruments, oldIndex, newIndex),
             itemBuilder: (context, index) {
               final instrument = instruments[index];
               return _buildInstrumentTile(
@@ -156,10 +160,7 @@ class _InstrumentManagementScreenState
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-          child: Icon(
-            _getInstrumentIcon(instrument),
-            color: AppColors.primary,
-          ),
+          child: Icon(_getInstrumentIcon(instrument), color: AppColors.primary),
         ),
         title: Text(instrument, style: AppTypography.bodyLarge),
         trailing: Row(
@@ -181,17 +182,15 @@ class _InstrumentManagementScreenState
 
   Widget _buildAddInstrumentSection(List<String> currentInstruments) {
     // Filter out already added instruments
-    final availableInstruments = InstrumentList.all
-        .where((i) => !currentInstruments.contains(i))
-        .toList();
+    final availableInstruments =
+        InstrumentList.all
+            .where((i) => !currentInstruments.contains(i))
+            .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '악기 추가',
-          style: AppTypography.headingSmall,
-        ),
+        Text('악기 추가', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space4),
 
         // Preset instruments grid
@@ -206,17 +205,18 @@ class _InstrumentManagementScreenState
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: availableInstruments.map((instrument) {
-              return ActionChip(
-                avatar: Icon(
-                  _getInstrumentIcon(instrument),
-                  size: 18,
-                  color: AppColors.primary,
-                ),
-                label: Text(instrument),
-                onPressed: () => _addInstrument(instrument),
-              );
-            }).toList(),
+            children:
+                availableInstruments.map((instrument) {
+                  return ActionChip(
+                    avatar: Icon(
+                      _getInstrumentIcon(instrument),
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                    label: Text(instrument),
+                    onPressed: () => _addInstrument(instrument),
+                  );
+                }).toList(),
           ),
           const SizedBox(height: AppSpacing.space4),
         ],
@@ -237,8 +237,9 @@ class _InstrumentManagementScreenState
                 decoration: InputDecoration(
                   hintText: '악기 이름 입력',
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space4,
@@ -294,9 +295,9 @@ class _InstrumentManagementScreenState
         .read(teacherSettingsNotifierProvider.notifier)
         .addInstrument(instrument);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$instrument이(가) 추가되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
     }
   }
 
@@ -309,35 +310,34 @@ class _InstrumentManagementScreenState
         .addInstrument(instrument);
     _customInstrumentController.clear();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$instrument이(가) 추가되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 추가되었습니다')));
     }
   }
 
   void _showDeleteConfirmation(String instrument) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('악기 삭제'),
-        content: Text('$instrument을(를) 목록에서 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('악기 삭제'),
+            content: Text('$instrument을(를) 목록에서 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _removeInstrument(instrument);
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _removeInstrument(instrument);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -346,9 +346,9 @@ class _InstrumentManagementScreenState
         .read(teacherSettingsNotifierProvider.notifier)
         .removeInstrument(instrument);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$instrument이(가) 삭제되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$instrument이(가) 삭제되었습니다')));
     }
   }
 

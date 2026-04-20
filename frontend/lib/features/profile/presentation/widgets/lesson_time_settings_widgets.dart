@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -442,7 +443,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
+          child: const Text(AppStrings.cancel),
         ),
         FilledButton(onPressed: _save, child: const Text('저장')),
       ],
@@ -719,7 +720,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
+          child: const Text(AppStrings.cancel),
         ),
         FilledButton(
           onPressed:
@@ -777,7 +778,7 @@ void showDeleteDurationDialog({
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('취소'),
+              child: const Text(AppStrings.cancel),
             ),
             FilledButton(
               onPressed: () {

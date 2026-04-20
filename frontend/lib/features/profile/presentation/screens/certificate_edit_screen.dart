@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/services/image_upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -212,7 +213,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -502,7 +503,10 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             bottom: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space1,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -534,7 +538,10 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             bottom: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: AppSpacing.space1,
+              ),
               decoration: BoxDecoration(
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),

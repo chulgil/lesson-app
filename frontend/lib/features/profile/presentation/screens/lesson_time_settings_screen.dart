@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -29,22 +30,30 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
       body: settingsAsync.when(
         data: (settings) => _LessonTimeSettingsContent(settings: settings),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              const Text('오류가 발생했습니다.'),
-              const SizedBox(height: AppSpacing.space4),
-              FilledButton(
-                onPressed: () =>
-                    ref.read(teacherSettingsNotifierProvider.notifier).refresh(),
-                child: const Text('다시 시도'),
+        error:
+            (_, __) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  const Text('오류가 발생했습니다.'),
+                  const SizedBox(height: AppSpacing.space4),
+                  FilledButton(
+                    onPressed:
+                        () =>
+                            ref
+                                .read(teacherSettingsNotifierProvider.notifier)
+                                .refresh(),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -104,16 +113,17 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       children: [
         LessonTimeSettingsSectionTitle(
           title: '레슨 시간 옵션',
-          onAddPressed: () => showAddCustomDurationDialog(
-            context: context,
-            ref: ref,
-            existingDurations: settings.allLessonDurations,
-            onSave: (duration) async {
-              ref
-                  .read(teacherSettingsNotifierProvider.notifier)
-                  .addCustomDuration(duration);
-            },
-          ),
+          onAddPressed:
+              () => showAddCustomDurationDialog(
+                context: context,
+                ref: ref,
+                existingDurations: settings.allLessonDurations,
+                onSave: (duration) async {
+                  ref
+                      .read(teacherSettingsNotifierProvider.notifier)
+                      .addCustomDuration(duration);
+                },
+              ),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
@@ -131,48 +141,57 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Column(
-            children: allDurations.asMap().entries.map((entry) {
-              final index = entry.key;
-              final duration = entry.value;
-              final isDefault = settings.defaultLessonDuration == duration;
-              final isDisabled = settings.isDurationDisabled(duration);
-              final isCustom = settings.customLessonDurations.contains(duration);
-              final isOnlyActive =
-                  settings.allLessonDurations.length == 1 && !isDisabled;
+            children:
+                allDurations.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final duration = entry.value;
+                  final isDefault = settings.defaultLessonDuration == duration;
+                  final isDisabled = settings.isDurationDisabled(duration);
+                  final isCustom = settings.customLessonDurations.contains(
+                    duration,
+                  );
+                  final isOnlyActive =
+                      settings.allLessonDurations.length == 1 && !isDisabled;
 
-              return Column(
-                children: [
-                  DurationOptionItem(
-                    duration: duration,
-                    isDefault: isDefault,
-                    isDisabled: isDisabled,
-                    isCustom: isCustom,
-                    isOnlyActive: isOnlyActive,
-                    onTap: () => _updateDefaultDuration(ref, duration),
-                    onDelete: isCustom
-                        ? () => showDeleteDurationDialog(
-                              context: context,
-                              duration: duration,
-                              onConfirm: () {
-                                ref
-                                    .read(teacherSettingsNotifierProvider.notifier)
-                                    .removeCustomDuration(duration);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${LessonDurations.format(duration)} 삭제됨'),
-                                  ),
-                                );
-                              },
-                            )
-                        : null,
-                    onToggle: (value) => _toggleDuration(ref, duration, value),
-                  ),
-                  if (index < allDurations.length - 1)
-                    const Divider(height: 1, indent: 16, endIndent: 16),
-                ],
-              );
-            }).toList(),
+                  return Column(
+                    children: [
+                      DurationOptionItem(
+                        duration: duration,
+                        isDefault: isDefault,
+                        isDisabled: isDisabled,
+                        isCustom: isCustom,
+                        isOnlyActive: isOnlyActive,
+                        onTap: () => _updateDefaultDuration(ref, duration),
+                        onDelete:
+                            isCustom
+                                ? () => showDeleteDurationDialog(
+                                  context: context,
+                                  duration: duration,
+                                  onConfirm: () {
+                                    ref
+                                        .read(
+                                          teacherSettingsNotifierProvider
+                                              .notifier,
+                                        )
+                                        .removeCustomDuration(duration);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '${LessonDurations.format(duration)} 삭제됨',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                                : null,
+                        onToggle:
+                            (value) => _toggleDuration(ref, duration, value),
+                      ),
+                      if (index < allDurations.length - 1)
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                    ],
+                  );
+                }).toList(),
           ),
         ),
 
@@ -197,10 +216,7 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '예약 설정',
-          style: AppTypography.headingSmall,
-        ),
+        Text('예약 설정', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '레슨 예약 관련 설정을 지정하세요',
@@ -245,39 +261,45 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppSpacing.space4),
-            Text('레슨 간 휴식 시간', style: AppTypography.headingSmall),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '레슨과 레슨 사이의 휴식 시간을 설정합니다',
-              style: AppTypography.bodySmall
-                  .copyWith(color: AppColors.textSecondaryLight),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            ...options.map((minutes) => ListTile(
-                  leading: Icon(
-                    current == minutes
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
-                    color:
-                        current == minutes ? AppColors.primary : AppColors.textTertiaryLight,
+      builder:
+          (context) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: AppSpacing.space4),
+                Text('레슨 간 휴식 시간', style: AppTypography.headingSmall),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '레슨과 레슨 사이의 휴식 시간을 설정합니다',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
                   ),
-                  title: Text(minutes == 0 ? '없음' : '$minutes분'),
-                  onTap: () {
-                    ref
-                        .read(teacherSettingsNotifierProvider.notifier)
-                        .updateBreakTime(minutes);
-                    Navigator.pop(context);
-                  },
-                )),
-            const SizedBox(height: AppSpacing.space4),
-          ],
-        ),
-      ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                ...options.map(
+                  (minutes) => ListTile(
+                    leading: Icon(
+                      current == minutes
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color:
+                          current == minutes
+                              ? AppColors.primary
+                              : AppColors.textTertiaryLight,
+                    ),
+                    title: Text(minutes == 0 ? '없음' : '$minutes분'),
+                    onTap: () {
+                      ref
+                          .read(teacherSettingsNotifierProvider.notifier)
+                          .updateBreakTime(minutes);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+              ],
+            ),
+          ),
     );
   }
 
@@ -287,40 +309,45 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: AppSpacing.space4),
-            Text('최소 예약 가능 시간', style: AppTypography.headingSmall),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
-              style: AppTypography.bodySmall
-                  .copyWith(color: AppColors.textSecondaryLight),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            ...options.map((hours) => ListTile(
-                  leading: Icon(
-                    current == hours
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_off,
-                    color: current == hours
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+      builder:
+          (context) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: AppSpacing.space4),
+                Text('최소 예약 가능 시간', style: AppTypography.headingSmall),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '레슨 시작 몇 시간 전까지 예약 가능한지 설정합니다',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
                   ),
-                  title: Text(_formatHours(hours)),
-                  onTap: () {
-                    ref
-                        .read(teacherSettingsNotifierProvider.notifier)
-                        .updateMinBookingHours(hours);
-                    Navigator.pop(context);
-                  },
-                )),
-            const SizedBox(height: AppSpacing.space4),
-          ],
-        ),
-      ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                ...options.map(
+                  (hours) => ListTile(
+                    leading: Icon(
+                      current == hours
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_off,
+                      color:
+                          current == hours
+                              ? AppColors.primary
+                              : AppColors.textTertiaryLight,
+                    ),
+                    title: Text(_formatHours(hours)),
+                    onTap: () {
+                      ref
+                          .read(teacherSettingsNotifierProvider.notifier)
+                          .updateMinBookingHours(hours);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+              ],
+            ),
+          ),
     );
   }
 
@@ -341,10 +368,12 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
     // Sort slots within each day
     for (final slots in slotsByDay.values) {
-      slots.sort((a, b) =>
-          a.startTime.hour * 60 +
-          a.startTime.minute -
-          (b.startTime.hour * 60 + b.startTime.minute));
+      slots.sort(
+        (a, b) =>
+            a.startTime.hour * 60 +
+            a.startTime.minute -
+            (b.startTime.hour * 60 + b.startTime.minute),
+      );
     }
 
     return Column(
@@ -352,14 +381,15 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
       children: [
         LessonTimeSettingsSectionTitle(
           title: '운영 시간대',
-          onAddPressed: () => showAddTimeSlotDialog(
-            context: context,
-            onSave: (slot) {
-              ref
-                  .read(teacherSettingsNotifierProvider.notifier)
-                  .updateTimeSlot(slot);
-            },
-          ),
+          onAddPressed:
+              () => showAddTimeSlotDialog(
+                context: context,
+                onSave: (slot) {
+                  ref
+                      .read(teacherSettingsNotifierProvider.notifier)
+                      .updateTimeSlot(slot);
+                },
+              ),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
@@ -380,25 +410,28 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
             return DaySectionCard(
               dayOfWeek: dayOfWeek,
               slots: slots,
-              onToggleSlot: (slot) => _toggleTimeSlot(ref, slot.id, !slot.isActive),
-              onEditSlot: (slot) => showEditTimeSlotDialog(
-                context: context,
-                slot: slot,
-                onSave: (updatedSlot) {
-                  ref
-                      .read(teacherSettingsNotifierProvider.notifier)
-                      .updateTimeSlot(updatedSlot);
-                },
-              ),
-              onAddSlot: () => showAddTimeSlotDialog(
-                context: context,
-                preselectedDay: dayOfWeek,
-                onSave: (slot) {
-                  ref
-                      .read(teacherSettingsNotifierProvider.notifier)
-                      .updateTimeSlot(slot);
-                },
-              ),
+              onToggleSlot:
+                  (slot) => _toggleTimeSlot(ref, slot.id, !slot.isActive),
+              onEditSlot:
+                  (slot) => showEditTimeSlotDialog(
+                    context: context,
+                    slot: slot,
+                    onSave: (updatedSlot) {
+                      ref
+                          .read(teacherSettingsNotifierProvider.notifier)
+                          .updateTimeSlot(updatedSlot);
+                    },
+                  ),
+              onAddSlot:
+                  () => showAddTimeSlotDialog(
+                    context: context,
+                    preselectedDay: dayOfWeek,
+                    onSave: (slot) {
+                      ref
+                          .read(teacherSettingsNotifierProvider.notifier)
+                          .updateTimeSlot(slot);
+                    },
+                  ),
             );
           }),
       ],
@@ -453,16 +486,16 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
                   filled: true,
                   fillColor: AppColors.backgroundLight,
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                    borderSide:
-                        const BorderSide(color: AppColors.borderLight),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                    borderSide: const BorderSide(color: AppColors.borderLight),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
-                    borderSide:
-                        const BorderSide(color: AppColors.borderLight),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                    borderSide: const BorderSide(color: AppColors.borderLight),
                   ),
                   counterText: '',
                 ),
@@ -567,84 +600,96 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
               Row(
                 children: [
                   const SizedBox(width: 80),
-                  ...levels.map((level) => Expanded(
-                        child: Center(
-                          child: Text(
-                            levelLabels[level]!,
-                            style: AppTypography.caption.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondaryLight,
-                            ),
+                  ...levels.map(
+                    (level) => Expanded(
+                      child: Center(
+                        child: Text(
+                          levelLabels[level]!,
+                          style: AppTypography.caption.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
-                      )),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.space2),
               const Divider(height: 1),
-              ...instruments.map((instrument) => Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.space2),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 80,
-                          child: Text(
-                            instrument,
-                            style: AppTypography.bodySmall.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            overflow: TextOverflow.ellipsis,
+              ...instruments.map(
+                (instrument) => Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.space2),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: 80,
+                        child: Text(
+                          instrument,
+                          style: AppTypography.bodySmall.copyWith(
+                            fontWeight: FontWeight.w500,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        ...levels.map((level) {
-                          final price =
-                              settings.getPrice(instrument, level);
-                          return Expanded(
-                            child: GestureDetector(
-                              onTap: () => _showPriceEditDialog(
-                                context, ref, instrument, level,
-                                levelLabels[level]!, price,
-                              ),
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 2),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: price != null
-                                      ? AppColors.primaryLight
-                                          .withValues(alpha: 0.1)
-                                      : null,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: price != null
-                                        ? AppColors.primary
-                                            .withValues(alpha: 0.3)
-                                        : AppColors.borderLight,
-                                  ),
+                      ),
+                      ...levels.map((level) {
+                        final price = settings.getPrice(instrument, level);
+                        return Expanded(
+                          child: GestureDetector(
+                            onTap:
+                                () => _showPriceEditDialog(
+                                  context,
+                                  ref,
+                                  instrument,
+                                  level,
+                                  levelLabels[level]!,
+                                  price,
                                 ),
-                                child: Center(
-                                  child: Text(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color:
                                     price != null
-                                        ? '${(price / 10000).toStringAsFixed(price % 10000 == 0 ? 0 : 1)}만'
-                                        : '—',
-                                    style: AppTypography.caption.copyWith(
-                                      color: price != null
-                                          ? AppColors.primary
-                                          : AppColors.textTertiaryLight,
-                                      fontWeight: price != null
-                                          ? FontWeight.w600
-                                          : FontWeight.normal,
-                                    ),
+                                        ? AppColors.primaryLight.withValues(
+                                          alpha: 0.1,
+                                        )
+                                        : null,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color:
+                                      price != null
+                                          ? AppColors.primary.withValues(
+                                            alpha: 0.3,
+                                          )
+                                          : AppColors.borderLight,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  price != null
+                                      ? '${(price / 10000).toStringAsFixed(price % 10000 == 0 ? 0 : 1)}만'
+                                      : '—',
+                                  style: AppTypography.caption.copyWith(
+                                    color:
+                                        price != null
+                                            ? AppColors.primary
+                                            : AppColors.textTertiaryLight,
+                                    fontWeight:
+                                        price != null
+                                            ? FontWeight.w600
+                                            : FontWeight.normal,
                                   ),
                                 ),
                               ),
                             ),
-                          );
-                        }),
-                      ],
-                    ),
-                  )),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -653,8 +698,12 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
   }
 
   Future<void> _showPriceEditDialog(
-    BuildContext context, WidgetRef ref,
-    String instrument, String level, String levelLabel, int? currentPrice,
+    BuildContext context,
+    WidgetRef ref,
+    String instrument,
+    String level,
+    String levelLabel,
+    int? currentPrice,
   ) async {
     final controller = TextEditingController(
       text: currentPrice != null ? currentPrice.toString() : '',
@@ -662,46 +711,48 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
 
     final result = await showDialog<int?>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('$instrument $levelLabel 가격'),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: '1회 레슨 가격 (원)',
-            hintText: '예: 50000',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          if (currentPrice != null)
-            TextButton(
-              onPressed: () => Navigator.pop(context, -1),
-              child: Text('삭제', style: TextStyle(color: AppColors.error)),
+      builder:
+          (context) => AlertDialog(
+            title: Text('$instrument $levelLabel 가격'),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '1회 레슨 가격 (원)',
+                hintText: '예: 50000',
+              ),
+              autofocus: true,
             ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+            actions: [
+              if (currentPrice != null)
+                TextButton(
+                  onPressed: () => Navigator.pop(context, -1),
+                  child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  final value = int.tryParse(controller.text);
+                  if (value != null && value > 0) {
+                    Navigator.pop(context, value);
+                  }
+                },
+                child: const Text('저장'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null && value > 0) {
-                Navigator.pop(context, value);
-              }
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
     );
     controller.dispose();
 
     if (!context.mounted || result == null) return;
 
     final priceTable = Map<String, Map<String, int>>.from(
-        settings.lessonPriceTable ?? {});
+      settings.lessonPriceTable ?? {},
+    );
     if (result == -1) {
       priceTable[instrument]?.remove(level);
       if (priceTable[instrument]?.isEmpty ?? false) {
@@ -767,10 +818,7 @@ class _BookingSettingItem extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
-            ),
+            const Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
           ],
         ),
       ),
