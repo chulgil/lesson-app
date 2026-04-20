@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -92,9 +93,7 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  hintText: '선생님 이름을 입력하세요',
-                ),
+                decoration: const InputDecoration(hintText: '선생님 이름을 입력하세요'),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return '이름을 입력해주세요';
@@ -149,9 +148,7 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _phoneController,
-                decoration: const InputDecoration(
-                  hintText: '010-0000-0000',
-                ),
+                decoration: const InputDecoration(hintText: '010-0000-0000'),
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.next,
               ),
@@ -176,9 +173,7 @@ class _AddManualTeacherScreenState
               const SizedBox(height: AppSpacing.space2),
               TextFormField(
                 controller: _notesController,
-                decoration: const InputDecoration(
-                  hintText: '레슨 관련 메모를 입력하세요',
-                ),
+                decoration: const InputDecoration(hintText: '레슨 관련 메모를 입력하세요'),
                 maxLines: 3,
                 textInputAction: TextInputAction.done,
               ),
@@ -227,23 +222,24 @@ class _AddManualTeacherScreenState
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('작성 취소'),
-        content: const Text('작성 중인 내용이 있습니다. 나가시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('계속 작성'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('작성 취소'),
+            content: const Text('작성 중인 내용이 있습니다. 나가시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('계속 작성'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  context.pop();
+                },
+                child: const Text('나가기'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              context.pop();
-            },
-            child: const Text('나가기'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -268,12 +264,14 @@ class _AddManualTeacherScreenState
         final updated = widget.existingTeacher!.copyWith(
           name: _nameController.text.trim(),
           instrument: _selectedInstrument,
-          phone: _phoneController.text.trim().isNotEmpty
-              ? _phoneController.text.trim()
-              : null,
-          notes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
+          phone:
+              _phoneController.text.trim().isNotEmpty
+                  ? _phoneController.text.trim()
+                  : null,
+          notes:
+              _notesController.text.trim().isNotEmpty
+                  ? _notesController.text.trim()
+                  : null,
           profileColorValue: widget.existingTeacher!.profileColorValue,
         );
         await notifier.updateTeacher(updated);
@@ -282,12 +280,14 @@ class _AddManualTeacherScreenState
           id: const Uuid().v4(),
           name: _nameController.text.trim(),
           instrument: _selectedInstrument,
-          phone: _phoneController.text.trim().isNotEmpty
-              ? _phoneController.text.trim()
-              : null,
-          notes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
+          phone:
+              _phoneController.text.trim().isNotEmpty
+                  ? _phoneController.text.trim()
+                  : null,
+          notes:
+              _notesController.text.trim().isNotEmpty
+                  ? _notesController.text.trim()
+                  : null,
           createdAt: DateTime.now(),
         );
         await notifier.add(teacher);
@@ -321,21 +321,22 @@ class _AddManualTeacherScreenState
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('선생님 삭제'),
-        content: const Text('이 선생님을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('취소'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('선생님 삭제'),
+            content: const Text('이 선생님을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true || !mounted) return;

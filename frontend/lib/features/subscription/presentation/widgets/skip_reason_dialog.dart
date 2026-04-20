@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 /// Skip reason input dialog for proposal rejection.
@@ -51,7 +52,7 @@ class _SkipReasonDialogState extends State<SkipReasonDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, null),
-          child: const Text('취소'),
+          child: const Text(AppStrings.cancel),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, _controller.text),

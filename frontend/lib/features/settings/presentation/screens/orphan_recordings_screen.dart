@@ -326,7 +326,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
