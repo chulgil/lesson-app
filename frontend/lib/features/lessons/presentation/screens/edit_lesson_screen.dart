@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -16,10 +17,7 @@ import '../widgets/lesson_form_widgets.dart';
 class EditLessonScreen extends ConsumerStatefulWidget {
   final String lessonId;
 
-  const EditLessonScreen({
-    super.key,
-    required this.lessonId,
-  });
+  const EditLessonScreen({super.key, required this.lessonId});
 
   @override
   ConsumerState<EditLessonScreen> createState() => _EditLessonScreenState();
@@ -108,11 +106,12 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       appBar: AppBar(
         title: const Text('레슨 수정'),
         leading: IconButton(
-          onPressed: () => showEditLessonExitConfirmation(
-            context: context,
-            hasChanges: _hasChanges,
-            onExit: () => context.pop(),
-          ),
+          onPressed:
+              () => showEditLessonExitConfirmation(
+                context: context,
+                hasChanges: _hasChanges,
+                onExit: () => context.pop(),
+              ),
           icon: const Icon(Icons.close),
         ),
         actions: [
@@ -127,37 +126,39 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                   break;
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'cancel',
-                child: Row(
-                  children: [
-                    Icon(Icons.event_busy, color: AppColors.warning),
-                    const SizedBox(width: AppSpacing.space2),
-                    const Text('레슨 취소'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete_outline, color: AppColors.error),
-                    const SizedBox(width: AppSpacing.space2),
-                    Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
-                  ],
-                ),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  PopupMenuItem(
+                    value: 'cancel',
+                    child: Row(
+                      children: [
+                        Icon(Icons.event_busy, color: AppColors.warning),
+                        const SizedBox(width: AppSpacing.space2),
+                        const Text('레슨 취소'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_outline, color: AppColors.error),
+                        const SizedBox(width: AppSpacing.space2),
+                        Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
+                      ],
+                    ),
+                  ),
+                ],
           ),
           TextButton(
             onPressed: (_hasChanges && !_isSaving) ? _saveLesson : null,
             child: Text(
               '저장',
               style: TextStyle(
-                color: (_hasChanges && !_isSaving)
-                    ? null
-                    : AppColors.textTertiaryLight,
+                color:
+                    (_hasChanges && !_isSaving)
+                        ? null
+                        : AppColors.textTertiaryLight,
               ),
             ),
           ),
@@ -178,7 +179,12 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 EditLessonStudentCard(
                   student: _selectedStudent!,
                   onViewProfile: () {
-                    context.push(AppRoutes.studentDetail.replaceFirst(':id', _selectedStudent!.id));
+                    context.push(
+                      AppRoutes.studentDetail.replaceFirst(
+                        ':id',
+                        _selectedStudent!.id,
+                      ),
+                    );
                   },
                 ),
 
@@ -247,16 +253,17 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 height: AppSpacing.buttonHeight,
                 child: FilledButton(
                   onPressed: (_hasChanges && !_isSaving) ? _saveLesson : null,
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('변경사항 저장'),
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('변경사항 저장'),
                 ),
               ),
 
@@ -308,10 +315,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   }
 
   void _showDeleteDialog() {
-    showDeleteLessonDialog(
-      context: context,
-      onConfirm: _deleteLesson,
-    );
+    showDeleteLessonDialog(context: context, onConfirm: _deleteLesson);
   }
 
   Future<void> _cancelLesson() async {
@@ -323,8 +327,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                '${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
+            content: Text('${_selectedStudent?.name ?? ''} 학생의 레슨이 취소되었습니다'),
             behavior: SnackBarBehavior.floating,
             backgroundColor: AppColors.warning,
           ),
@@ -421,22 +424,23 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
   Future<bool> _showConflictDialog(String conflictStudentName) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('시간 충돌'),
-        content: Text(
-          "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('시간 충돌'),
+            content: Text(
+              "해당 시간에 이미 '$conflictStudentName' 레슨이 있습니다. 계속하시겠습니까?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('계속'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('계속'),
-          ),
-        ],
-      ),
     );
     return result ?? false;
   }
@@ -468,9 +472,8 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
         date: _selectedDate,
         startTime: timeStr,
         duration: _lessonDuration,
-        feedback: _notesController.text.isNotEmpty
-            ? _notesController.text
-            : null,
+        feedback:
+            _notesController.text.isNotEmpty ? _notesController.text : null,
         updatedAt: DateTime.now(),
       );
 

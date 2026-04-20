@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -84,7 +85,11 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.event_busy, size: 64, color: AppColors.textTertiaryLight),
+            Icon(
+              Icons.event_busy,
+              size: 64,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '레슨을 찾을 수 없습니다',
@@ -153,7 +158,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           feedback: trimmed.isEmpty ? null : trimmed,
         );
         try {
-          await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+          await ref
+              .read(lessonsNotifierProvider.notifier)
+              .updateLesson(updatedLesson);
         } catch (_) {
           // Silent fail on exit — data already in debounce
         }
@@ -171,29 +178,29 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         }
       },
       child: Scaffold(
-      appBar: _buildAppBar(lesson),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          ref.invalidate(lessonProvider(widget.lessonId));
-        },
-        child: Column(
-          children: [
-            LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
-            _buildTabBar(),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildNotesTab(lesson),
-                  _buildAssignmentsTab(lesson),
-                ],
+        appBar: _buildAppBar(lesson),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(lessonProvider(widget.lessonId));
+          },
+          child: Column(
+            children: [
+              LessonHeaderCard(lesson: lesson, isTeacher: widget.isTeacher),
+              _buildTabBar(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildNotesTab(lesson),
+                    _buildAssignmentsTab(lesson),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        // Recording FAB removed — will be re-enabled with teaching resources feature (#172)
       ),
-      // Recording FAB removed — will be re-enabled with teaching resources feature (#172)
-    ),
     );
   }
 
@@ -208,7 +215,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         IconButton(
           onPressed: () {
             final date = formatDateYMD(lesson.date);
-            final text = '${lesson.studentName} ${lesson.instrument} 레슨\n$date ${lesson.startTime} (${lesson.duration}분)';
+            final text =
+                '${lesson.studentName} ${lesson.instrument} 레슨\n$date ${lesson.startTime} (${lesson.duration}분)';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('공유 텍스트가 복사되었습니다: $text'),
@@ -220,17 +228,21 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         ),
         PopupMenuButton<String>(
           onSelected: (value) => _handleAppBarAction(value, lesson),
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'edit', child: Text('수정')),
-            if (lesson.displayStatus == LessonStatus.scheduled)
-              const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
-            if (lesson.displayStatus == LessonStatus.scheduled)
-              const PopupMenuItem(value: 'cancel', child: Text('취소')),
-            PopupMenuItem(
-              value: 'delete',
-              child: Text('삭제', style: TextStyle(color: AppColors.error)),
-            ),
-          ],
+          itemBuilder:
+              (context) => [
+                const PopupMenuItem(value: 'edit', child: Text('수정')),
+                if (lesson.displayStatus == LessonStatus.scheduled)
+                  const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
+                if (lesson.displayStatus == LessonStatus.scheduled)
+                  const PopupMenuItem(
+                    value: 'cancel',
+                    child: Text(AppStrings.cancel),
+                  ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                ),
+              ],
         ),
       ],
     );
@@ -243,11 +255,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       final confirmed = await showCancelLessonConfirmation(context);
       if (confirmed == true) {
         try {
-          await ref.read(lessonsNotifierProvider.notifier).cancelLesson(lesson.id);
+          await ref
+              .read(lessonsNotifierProvider.notifier)
+              .cancelLesson(lesson.id);
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('레슨이 취소되었습니다')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('레슨이 취소되었습니다')));
           }
         } catch (e) {
           if (mounted) {
@@ -263,29 +277,32 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     } else if (value == 'complete') {
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('레슨 완료'),
-          content: const Text('이 레슨을 완료 처리하시겠습니까?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('취소'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('레슨 완료'),
+              content: const Text('이 레슨을 완료 처리하시겠습니까?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text(AppStrings.cancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('완료'),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('완료'),
-            ),
-          ],
-        ),
       );
       if (confirmed == true) {
         try {
           final updatedLesson = lesson.copyWith(status: LessonStatus.completed);
-          await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+          await ref
+              .read(lessonsNotifierProvider.notifier)
+              .updateLesson(updatedLesson);
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('레슨이 완료 처리되었습니다')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('레슨이 완료 처리되었습니다')));
           }
 
           // Auto-propose regular lessons if student has no active subscription
@@ -307,12 +324,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       final confirmed = await showDeleteLessonConfirmation(context);
       if (confirmed == true) {
         try {
-          await ref.read(lessonsNotifierProvider.notifier).deleteLesson(lesson.id);
+          await ref
+              .read(lessonsNotifierProvider.notifier)
+              .deleteLesson(lesson.id);
           if (mounted) {
             context.pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('레슨이 삭제되었습니다')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('레슨이 삭제되었습니다')));
           }
         } catch (e) {
           if (mounted) {
@@ -336,10 +355,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        tabs: const [
-          Tab(text: '레슨 노트'),
-          Tab(text: '과제'),
-        ],
+        tabs: const [Tab(text: '레슨 노트'), Tab(text: '과제')],
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondaryLight,
         indicatorColor: AppColors.primary,
@@ -348,7 +364,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
   }
 
   Widget _buildNotesTab(Lesson lesson) {
-    final needsFeedback = widget.isTeacher &&
+    final needsFeedback =
+        widget.isTeacher &&
         lesson.displayStatus == LessonStatus.completed &&
         (lesson.feedback == null || lesson.feedback!.isEmpty);
 
@@ -397,20 +414,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
           // Teacher notes section
           if (widget.isTeacher) ...[
-            LessonDetailSectionHeader(
-              title: '레슨 피드백',
-              icon: Icons.edit_note,
-            ),
+            LessonDetailSectionHeader(title: '레슨 피드백', icon: Icons.edit_note),
             const SizedBox(height: AppSpacing.space3),
             LessonNoteEditor(
               initialText: lesson.feedback,
               onChanged: (text) => _saveFeedbackDebounced(lesson, text),
             ),
           ] else ...[
-            LessonDetailSectionHeader(
-              title: '선생님 피드백',
-              icon: Icons.school,
-            ),
+            LessonDetailSectionHeader(title: '선생님 피드백', icon: Icons.school),
             const SizedBox(height: AppSpacing.space3),
             TeacherFeedbackCard(lesson: lesson),
           ],
@@ -475,14 +486,18 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
       if (subscription == null || (subscription.remainingLessons ?? 0) <= 0) {
         // No subscription → trial auto proposal
-        await ref.read(autoProposalServiceProvider).triggerAfterTrialCompletion(
+        await ref
+            .read(autoProposalServiceProvider)
+            .triggerAfterTrialCompletion(
               teacherId: lesson.teacherId!,
               studentId: lesson.studentId,
               trialCompletedAt: DateTime.now(),
             );
       } else if ((subscription.remainingLessons ?? 999) <= 2) {
         // Low subscription → renewal trigger
-        await ref.read(subscriptionRenewalServiceProvider).triggerOnSubscriptionLow(
+        await ref
+            .read(subscriptionRenewalServiceProvider)
+            .triggerOnSubscriptionLow(
               subscription: subscription,
               teacherId: lesson.teacherId!,
             );
@@ -507,8 +522,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     return subscriptionAsync.when(
       data: (subscription) {
         // Has active subscription — no need to propose
-        if (subscription != null &&
-            (subscription.remainingLessons ?? 0) > 0) {
+        if (subscription != null && (subscription.remainingLessons ?? 0) > 0) {
           return const SizedBox.shrink();
         }
 
@@ -549,8 +563,8 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
                       ),
                     ),
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _proposalBannerDismissed = true),
+                      onTap:
+                          () => setState(() => _proposalBannerDismissed = true),
                       child: Icon(
                         Icons.close,
                         size: 18,
@@ -616,12 +630,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddTipBottomSheet(
-        title: '주요 포인트 추가',
-        instrument: lesson.instrument,
-        initialCategory: TipCategory.technique,
-        onSubmit: (content) => _addKeyPoint(lesson, content),
-      ),
+      builder:
+          (context) => AddTipBottomSheet(
+            title: '주요 포인트 추가',
+            instrument: lesson.instrument,
+            initialCategory: TipCategory.technique,
+            onSubmit: (content) => _addKeyPoint(lesson, content),
+          ),
     );
   }
 
@@ -630,12 +645,13 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddTipBottomSheet(
-        title: '연습 팁 추가',
-        instrument: lesson.instrument,
-        initialCategory: TipCategory.practice,
-        onSubmit: (content) => _setPracticeTip(lesson, content),
-      ),
+      builder:
+          (context) => AddTipBottomSheet(
+            title: '연습 팁 추가',
+            instrument: lesson.instrument,
+            initialCategory: TipCategory.practice,
+            onSubmit: (content) => _setPracticeTip(lesson, content),
+          ),
     );
   }
 
@@ -659,12 +675,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
 
     final updatedLesson = lesson.copyWith(keyPoints: currentPoints);
     try {
-      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .updateLesson(updatedLesson);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('주요 포인트가 추가되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('주요 포인트가 추가되었습니다')));
       }
     } catch (e) {
       if (mounted) {
@@ -688,7 +706,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       keyPoints: currentPoints.isEmpty ? null : currentPoints,
     );
     try {
-      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .updateLesson(updatedLesson);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -710,7 +730,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
         feedback: trimmed.isEmpty ? null : trimmed,
       );
       try {
-        await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+        await ref
+            .read(lessonsNotifierProvider.notifier)
+            .updateLesson(updatedLesson);
         _pendingFeedbackText = null;
       } catch (e) {
         if (mounted) {
@@ -730,7 +752,9 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
       studentNote: memo.trim().isEmpty ? null : memo.trim(),
     );
     try {
-      await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+      await ref
+          .read(lessonsNotifierProvider.notifier)
+          .updateLesson(updatedLesson);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -747,12 +771,14 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
     final updatedLesson = lesson.copyWith(
       practiceTips: content?.isEmpty == true ? null : content,
     );
-    await ref.read(lessonsNotifierProvider.notifier).updateLesson(updatedLesson);
+    await ref
+        .read(lessonsNotifierProvider.notifier)
+        .updateLesson(updatedLesson);
 
     if (mounted && content != null && content.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('연습 팁이 저장되었습니다')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('연습 팁이 저장되었습니다')));
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -355,7 +356,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               FilledButton(
                 onPressed: () {
