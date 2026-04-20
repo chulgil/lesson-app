@@ -92,7 +92,7 @@ class SectionInfoCard extends StatelessWidget {
                   ),
                   // Section name (if exists)
                   if (section.sectionName != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Text(
                       section.sectionName!,
                       style: AppTypography.bodyMedium.copyWith(

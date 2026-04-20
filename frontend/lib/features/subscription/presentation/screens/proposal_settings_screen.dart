@@ -440,7 +440,7 @@ class _ProposalSettingsScreenState
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다',
           style: AppTypography.caption.copyWith(
@@ -563,7 +563,7 @@ class _ProposalSettingsScreenState
           '자동 리마인더',
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '제안 후 응답이 없으면 자동으로 알림을 보냅니다',
           style: AppTypography.caption.copyWith(

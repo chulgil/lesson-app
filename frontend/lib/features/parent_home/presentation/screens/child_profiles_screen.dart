@@ -260,7 +260,7 @@ class _ChildProfileCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Row(
                       children: [
                         Icon(
@@ -278,7 +278,7 @@ class _ChildProfileCard extends StatelessWidget {
                       ],
                     ),
                     if (profile.teacherName != null) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.space1),
                       Row(
                         children: [
                           Icon(

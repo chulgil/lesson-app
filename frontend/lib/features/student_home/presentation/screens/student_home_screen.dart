@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
 import '../../../../main.dart'
@@ -145,7 +146,7 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
               color:
                   isSelected ? AppColors.primary : AppColors.textTertiaryLight,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(

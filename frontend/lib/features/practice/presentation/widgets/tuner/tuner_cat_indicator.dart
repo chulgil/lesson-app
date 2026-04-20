@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/tuner_types.dart';
 import '../../providers/tuner_combo_provider.dart';
 import '../../providers/tuner_provider.dart';
@@ -53,7 +54,8 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   final math.Random _random = math.Random();
 
   // Animation timing thresholds (in seconds of perfect tuning)
-  static const _scaleStartSeconds = 1.0; // Start scale after 1 second of perfect
+  static const _scaleStartSeconds =
+      1.0; // Start scale after 1 second of perfect
   static const _particleStartSeconds = 2.0; // Start particles after 2 seconds
   static const _starburstStartSeconds = 6.0; // Start starburst after 6 seconds
   static const _maxScale = 1.25; // 1.04 * 1.2 = 1.248 ≈ 1.25
@@ -68,7 +70,8 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
   static const _revertDurationSeconds = 3.0;
   bool _isReverting = false;
   DateTime? _revertStartTime;
-  double _revertProgress = 0.0; // 0 = just started reverting, 1 = fully reverted
+  double _revertProgress =
+      0.0; // 0 = just started reverting, 1 = fully reverted
 
   // Counter for reactivation attempts (compared against difficulty.reactivationChances)
   int _reactivationCount = 0;
@@ -101,9 +104,10 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
       CurvedAnimation(parent: _scaleController, curve: Curves.easeOutCubic),
     );
 
-    _jumpAnimation = Tween<double>(begin: 0, end: -15).animate(
-      CurvedAnimation(parent: _jumpController, curve: Curves.easeOut),
-    );
+    _jumpAnimation = Tween<double>(
+      begin: 0,
+      end: -15,
+    ).animate(CurvedAnimation(parent: _jumpController, curve: Curves.easeOut));
 
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
@@ -124,14 +128,18 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     _ecstasyAnimation = TweenSequence<double>([
       // Slowly grow bigger
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.15)
-            .chain(CurveTween(curve: Curves.easeOutQuad)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 1.15,
+        ).chain(CurveTween(curve: Curves.easeOutQuad)),
         weight: 50,
       ),
       // Slowly shrink back
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.15, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOutQuad)),
+        tween: Tween<double>(
+          begin: 1.15,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOutQuad)),
         weight: 50,
       ),
     ]).animate(_ecstasyController);
@@ -140,14 +148,18 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     _ecstasyYAnimation = TweenSequence<double>([
       // Float up from below
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: -15.0)
-            .chain(CurveTween(curve: Curves.easeOutQuad)),
+        tween: Tween<double>(
+          begin: 0.0,
+          end: -15.0,
+        ).chain(CurveTween(curve: Curves.easeOutQuad)),
         weight: 50,
       ),
       // Gentle float back down
       TweenSequenceItem(
-        tween: Tween<double>(begin: -15.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeInOutQuad)),
+        tween: Tween<double>(
+          begin: -15.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOutQuad)),
         weight: 50,
       ),
     ]).animate(_ecstasyController);
@@ -197,16 +209,18 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
       setState(() {
         // Update revert progress
         if (_revertStartTime != null) {
-          _revertProgress = DateTime.now()
-              .difference(_revertStartTime!)
-              .inMilliseconds / (_revertDurationSeconds * 1000);
+          _revertProgress =
+              DateTime.now().difference(_revertStartTime!).inMilliseconds /
+              (_revertDurationSeconds * 1000);
           _revertProgress = _revertProgress.clamp(0.0, 1.0);
         }
 
         // Move particles back toward center (reverse direction)
-        final revertSpeed = 1.0 / _revertDurationSeconds; // Complete in 3 seconds
+        final revertSpeed =
+            1.0 / _revertDurationSeconds; // Complete in 3 seconds
         for (final particle in _particles) {
-          particle.progress -= deltaProgress * revertSpeed * 1.5; // 1.5x speed to reach center
+          particle.progress -=
+              deltaProgress * revertSpeed * 1.5; // 1.5x speed to reach center
           particle.rotation -= deltaProgress * 0.1; // Slow reverse rotation
         }
 
@@ -245,7 +259,8 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
         // Spawn count: 0 at start, up to 12 at 30 seconds (80% fewer at start)
         final spawnCount = math.min(12, (timeSinceStart * 0.4).toInt());
         for (var i = 0; i < spawnCount; i++) {
-          if (_particles.length < _maxParticles && _random.nextDouble() < 0.85) {
+          if (_particles.length < _maxParticles &&
+              _random.nextDouble() < 0.85) {
             _spawnParticle();
           }
         }
@@ -275,16 +290,18 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     // Random angle for radial direction
     final angle = _random.nextDouble() * math.pi * 2;
 
-    _particles.add(HeartParticle(
-      center: center,
-      angle: angle,
-      baseSize: 28 + _random.nextDouble() * 14, // 28-42px (slightly smaller)
-      startRadius: startRadius,
-      maxRadius: maxRadius,
-      rotation: _random.nextDouble() * math.pi * 2,
-      progress: 0.0,
-      speed: 0.9 + _random.nextDouble() * 0.3, // 0.9-1.2x speed
-    ));
+    _particles.add(
+      HeartParticle(
+        center: center,
+        angle: angle,
+        baseSize: 28 + _random.nextDouble() * 14, // 28-42px (slightly smaller)
+        startRadius: startRadius,
+        maxRadius: maxRadius,
+        rotation: _random.nextDouble() * math.pi * 2,
+        progress: 0.0,
+        speed: 0.9 + _random.nextDouble() * 0.3, // 0.9-1.2x speed
+      ),
+    );
   }
 
   double _getPerfectDuration() {
@@ -292,7 +309,11 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
     return DateTime.now().difference(_perfectStartTime!).inMilliseconds / 1000;
   }
 
-  void _onPerfectStateChanged(bool isPerfect, NoteName? currentNoteName, TunerDifficulty difficulty) {
+  void _onPerfectStateChanged(
+    bool isPerfect,
+    NoteName? currentNoteName,
+    TunerDifficulty difficulty,
+  ) {
     if (isPerfect && currentNoteName != null) {
       // If we were reverting, check reactivation rules
       if (_isReverting) {
@@ -502,11 +523,12 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                 child: AnimatedBuilder(
                   animation: _starburstController,
                   builder: (context, child) {
-                    final starburstMs = _starburstStartTime != null
-                        ? DateTime.now()
-                            .difference(_starburstStartTime!)
-                            .inMilliseconds
-                        : 0;
+                    final starburstMs =
+                        _starburstStartTime != null
+                            ? DateTime.now()
+                                .difference(_starburstStartTime!)
+                                .inMilliseconds
+                            : 0;
 
                     // Size progress: 0 to 1 over 5 seconds (forward)
                     var sizeProgress = (starburstMs / 5000.0).clamp(0.0, 1.0);
@@ -517,10 +539,12 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
                     // Calculate revert progress (shrink back over 3 seconds)
                     double fadeOut = 0.0;
                     if (_isReverting && _revertStartTime != null) {
-                      final revertMs = DateTime.now()
-                          .difference(_revertStartTime!)
-                          .inMilliseconds;
-                      fadeOut = (revertMs / (_revertDurationSeconds * 1000)).clamp(0.0, 1.0);
+                      final revertMs =
+                          DateTime.now()
+                              .difference(_revertStartTime!)
+                              .inMilliseconds;
+                      fadeOut = (revertMs / (_revertDurationSeconds * 1000))
+                          .clamp(0.0, 1.0);
 
                       // Reverse size and color during revert
                       sizeProgress = sizeProgress * (1.0 - fadeOut);
@@ -558,72 +582,71 @@ class _TunerCatIndicatorState extends ConsumerState<TunerCatIndicator>
           Positioned.fill(
             child: Center(
               child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Cat face with animations
-              AnimatedBuilder(
-                animation: Listenable.merge([
-                  _jumpAnimation,
-                  _pulseAnimation,
-                  _scaleAnimation,
-                  _ecstasyAnimation,
-                  _ecstasyYAnimation,
-                ]),
-                builder: (context, child) {
-                  // Combine pulse, scale, and ecstasy animations
-                  final baseScale = _scaleAnimation.value;
-                  final pulseScale = isPerfect ? _pulseAnimation.value : 1.0;
-                  // Apply ecstasy pulsing when particles are showing
-                  final ecstasyScale = _showParticles ? _ecstasyAnimation.value : 1.0;
-                  final totalScale = baseScale * pulseScale * ecstasyScale;
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Cat face with animations
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      _jumpAnimation,
+                      _pulseAnimation,
+                      _scaleAnimation,
+                      _ecstasyAnimation,
+                      _ecstasyYAnimation,
+                    ]),
+                    builder: (context, child) {
+                      // Combine pulse, scale, and ecstasy animations
+                      final baseScale = _scaleAnimation.value;
+                      final pulseScale =
+                          isPerfect ? _pulseAnimation.value : 1.0;
+                      // Apply ecstasy pulsing when particles are showing
+                      final ecstasyScale =
+                          _showParticles ? _ecstasyAnimation.value : 1.0;
+                      final totalScale = baseScale * pulseScale * ecstasyScale;
 
-                  // Y offset: jump animation + ecstasy float from below
-                  final ecstasyY = _showParticles ? _ecstasyYAnimation.value : 0.0;
-                  final totalY = _jumpAnimation.value + ecstasyY;
+                      // Y offset: jump animation + ecstasy float from below
+                      final ecstasyY =
+                          _showParticles ? _ecstasyYAnimation.value : 0.0;
+                      final totalY = _jumpAnimation.value + ecstasyY;
 
-                  return Transform.translate(
-                    offset: Offset(0, totalY),
-                    child: Transform.scale(
-                      scale: totalScale,
-                      child: child,
-                    ),
-                  );
-                },
-                child: CatFace(
-                  size: catSize,
-                  status: status,
-                  isPerfect: isPerfect,
-                  comboTier: tier,
-                  isEcstatic: _showParticles,
-                ),
-              ),
-
-              // Status message or current note display with cent
-              if (showExtras && widget.showNote) ...[
-                const SizedBox(height: 4),
-                if (tunerState.currentNote != null)
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: NoteWithCent(
-                      note: tunerState.currentNote!,
+                      return Transform.translate(
+                        offset: Offset(0, totalY),
+                        child: Transform.scale(scale: totalScale, child: child),
+                      );
+                    },
+                    child: CatFace(
+                      size: catSize,
+                      status: status,
                       isPerfect: isPerfect,
+                      comboTier: tier,
+                      isEcstatic: _showParticles,
                     ),
-                  )
-                else
-                  StatusBubble(
-                    isListening: tunerState.isListening,
-                    hasNote: false,
-                    isPerfect: isPerfect,
-                    errorMessage: tunerState.error,
                   ),
-              ],
-            ],
+
+                  // Status message or current note display with cent
+                  if (showExtras && widget.showNote) ...[
+                    const SizedBox(height: AppSpacing.space1),
+                    if (tunerState.currentNote != null)
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: NoteWithCent(
+                          note: tunerState.currentNote!,
+                          isPerfect: isPerfect,
+                        ),
+                      )
+                    else
+                      StatusBubble(
+                        isListening: tunerState.isListening,
+                        hasNote: false,
+                        isPerfect: isPerfect,
+                        errorMessage: tunerState.error,
+                      ),
+                  ],
+                ],
               ),
             ),
           ),
-
         ],
       ),
     );

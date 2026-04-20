@@ -146,7 +146,7 @@ class _TeacherAvailabilityScreenState
       children: [
         Text(title, style: AppTypography.headingSmall),
         if (subtitle != null) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
           Text(
             subtitle,
             style: AppTypography.bodySmall.copyWith(
@@ -442,7 +442,7 @@ class _TeacherAvailabilityScreenState
               );
             }),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
           // Time bars
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

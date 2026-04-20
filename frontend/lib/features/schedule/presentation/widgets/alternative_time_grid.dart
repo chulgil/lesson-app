@@ -188,7 +188,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                   }),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.space1),
 
               // Grid body (scrollable, auto-scrolls to highlighted slot)
               Expanded(

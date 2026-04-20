@@ -473,7 +473,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                           color: AppColors.info,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.space1),
                       Text(
                         '• "완료" 상태로 저장됩니다\n• 수강권이 있으면 1회 자동 차감됩니다\n• 학생에게 레슨 기록으로 표시됩니다',
                         style: AppTypography.caption.copyWith(

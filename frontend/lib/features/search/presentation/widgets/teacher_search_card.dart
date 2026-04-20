@@ -74,20 +74,20 @@ class TeacherSearchCard extends StatelessWidget {
                     // Previous teacher badge
                     if (isPreviousTeacher) ...[
                       _buildPreviousTeacherBadge(),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.space1),
                     ],
 
                     // Academy badge (if applicable)
                     if (publicProfile.isAcademy &&
                         publicProfile.organizationName != null) ...[
                       _buildAcademyBadge(publicProfile.organizationName!),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.space1),
                     ],
 
                     // Name and badges
                     _buildNameRow(publicProfile),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
 
                     // Instruments
                     Text(
@@ -97,7 +97,7 @@ class TeacherSearchCard extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
 
                     // Experience and fee
                     _buildExperienceAndFee(publicProfile),

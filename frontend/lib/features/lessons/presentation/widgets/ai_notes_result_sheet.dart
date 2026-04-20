@@ -177,7 +177,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: AppSpacing.space1),
                                 Text(
                                   a.description,
                                   style: AppTypography.bodySmall.copyWith(

@@ -126,7 +126,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                 AppStrings.sessionCancelTitle(widget.sessionNumber),
                 style: AppTypography.headingSmall,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.space1),
               Text(
                 formatDateTimeMDHM(widget.lessonDateTime),
                 style: AppTypography.bodySmall.copyWith(

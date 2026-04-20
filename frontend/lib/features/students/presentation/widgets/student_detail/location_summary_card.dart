@@ -102,7 +102,7 @@ class LocationSummaryCard extends ConsumerWidget {
           ],
         ),
         if (location.displayAddress.isNotEmpty) ...[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
           Text(
             location.displayAddress,
             style: Theme.of(

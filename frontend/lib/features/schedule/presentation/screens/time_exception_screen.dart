@@ -138,7 +138,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
                     color: AppColors.info,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.space1),
                 Text(
                   '휴무일로 설정된 날짜는 학생들에게 예약 가능 시간으로 표시되지 않습니다.',
                   style: AppTypography.bodySmall.copyWith(

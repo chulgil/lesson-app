@@ -561,7 +561,7 @@ class _LessonCard extends StatelessWidget {
                       _buildStatusBadge(),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.space1),
                   Text(
                     '$startTime - $endTime • $teacherName',
                     style: AppTypography.bodySmall.copyWith(

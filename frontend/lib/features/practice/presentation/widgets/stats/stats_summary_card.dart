@@ -164,7 +164,7 @@ class StatsSummaryCard extends StatelessWidget {
       children: [
         if (icon != null) ...[
           Icon(icon, color: iconColor, size: 18),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
         ],
         Text(
           value,

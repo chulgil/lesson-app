@@ -338,7 +338,7 @@ class CareerCard extends ConsumerWidget {
                 ),
                 if (career.description != null &&
                     career.description!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.space1),
                   Text(
                     career.description!,
                     style: AppTypography.bodySmall.copyWith(
@@ -461,7 +461,7 @@ class CertificateCard extends ConsumerWidget {
                 ),
                 if (certificate.isRejected &&
                     certificate.rejectionReason != null) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.space1),
                   Text(
                     '반려 사유: ${certificate.rejectionReason}',
                     style: AppTypography.caption.copyWith(

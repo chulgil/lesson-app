@@ -497,7 +497,7 @@ class _IssueSubscriptionScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('변경/취소 가능 횟수', style: AppTypography.headingSmall),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.',
           style: AppTypography.bodySmall.copyWith(
@@ -542,7 +542,7 @@ class _IssueSubscriptionScreenState
         if (_rescheduleAllowance > 0) ...[
           const SizedBox(height: AppSpacing.space4),
           Text(AppStrings.rescheduleDeadlineLabel, style: AppTypography.headingSmall),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
           Text(
             AppStrings.rescheduleDeadlineDescription,
             style: AppTypography.bodySmall.copyWith(

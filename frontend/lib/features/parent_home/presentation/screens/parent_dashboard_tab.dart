@@ -370,7 +370,7 @@ class ParentDashboardTab extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.space1),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -401,7 +401,7 @@ class ParentDashboardTab extends ConsumerWidget {
                     ),
                   ),
                   if (profile.teacherName != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Row(
                       children: [
                         const Icon(
@@ -551,7 +551,7 @@ class ParentDashboardTab extends ConsumerWidget {
                   color: AppColors.textSecondaryLight,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.space1),
               Container(
                 width: 36,
                 height: 36,

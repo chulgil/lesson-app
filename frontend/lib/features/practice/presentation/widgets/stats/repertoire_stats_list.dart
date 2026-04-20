@@ -161,7 +161,7 @@ class RepertoireStatsList extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.space1),
 
           // Section count
           Text(

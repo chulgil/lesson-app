@@ -306,7 +306,7 @@ class _PracticeGoalSettingScreenState
                 color: AppColors.textSecondaryLight,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Row(
               children: [
                 if (_dailyTimeMinutes != null)
@@ -327,7 +327,7 @@ class _PracticeGoalSettingScreenState
                 color: AppColors.textSecondaryLight,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Row(
               children: [
                 if (_weeklyTimeMinutes != null)

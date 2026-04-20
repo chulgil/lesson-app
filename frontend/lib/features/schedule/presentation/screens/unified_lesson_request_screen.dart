@@ -174,7 +174,7 @@ class _UnifiedLessonRequestScreenState
                   widget.params.teacherName,
                   style: AppTypography.headingSmall,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.space1),
                 Text(
                   widget.params.teacherInstruments.join(', '),
                   style: AppTypography.bodySmall.copyWith(

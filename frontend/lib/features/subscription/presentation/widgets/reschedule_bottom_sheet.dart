@@ -376,7 +376,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Text(
               AppStrings.rescheduleCreditsChange(remaining, remaining - 1),
               style: AppTypography.caption.copyWith(color: AppColors.warning),

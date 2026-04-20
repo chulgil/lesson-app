@@ -172,7 +172,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.space1),
                   Text(
                     '녹음 파일이 삭제되었거나 찾을 수 없습니다',
                     style: AppTypography.caption.copyWith(

@@ -340,7 +340,7 @@ class GoalProgressWidget extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Align(
           alignment: Alignment.centerRight,
           child: Text(
@@ -378,7 +378,7 @@ class GoalProgressWidget extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '$value / $target',
           style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),

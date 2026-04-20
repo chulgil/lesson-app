@@ -301,7 +301,7 @@ class _ScheduleChangeListItem extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         // Elapsed time
         Text(
           formatRelativeTime(event.createdAt),

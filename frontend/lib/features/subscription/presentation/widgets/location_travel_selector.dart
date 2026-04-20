@@ -144,7 +144,7 @@ class _LocationTravelSelectorState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('레슨 장소', style: AppTypography.headingSmall),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           '이 학생의 기본 레슨 장소를 선택하세요',
           style: AppTypography.bodySmall.copyWith(

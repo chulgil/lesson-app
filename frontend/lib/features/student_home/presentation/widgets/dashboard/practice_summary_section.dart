@@ -212,7 +212,7 @@ class PracticeSummarySection extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.space1),
               Text(
                 days[index],
                 style: AppTypography.caption.copyWith(

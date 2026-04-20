@@ -390,7 +390,7 @@ class _AcademyTeacherCard extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Row(
                       children: [
                         Text(

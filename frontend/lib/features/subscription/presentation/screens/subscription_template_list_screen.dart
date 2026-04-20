@@ -347,7 +347,7 @@ class _TemplateCard extends StatelessWidget {
                             ],
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.space1),
                         Text(
                           template.summaryText,
                           style: AppTypography.bodyMedium.copyWith(

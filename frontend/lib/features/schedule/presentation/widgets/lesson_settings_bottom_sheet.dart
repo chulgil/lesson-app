@@ -170,7 +170,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
           title,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           description,
           style: AppTypography.caption.copyWith(

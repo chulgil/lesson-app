@@ -205,7 +205,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     return Column(
       children: [
         Icon(icon, size: 20, color: AppColors.primary.withValues(alpha: 0.7)),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           value,
           style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),

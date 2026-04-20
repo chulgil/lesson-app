@@ -79,7 +79,7 @@ class TrialBookingCard extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Text(
                       booking.teacherName,
                       style: AppTypography.bodyLarge.copyWith(

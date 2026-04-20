@@ -290,7 +290,7 @@ class _BankAccountCard extends StatelessWidget {
                 letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.space1),
             Text(
               account.accountHolder,
               style: AppTypography.bodySmall.copyWith(

@@ -62,7 +62,7 @@ class StatusCard extends StatelessWidget {
                         color: AppColors.textPrimaryLight,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.space1),
                     Text(
                       state.lastBackupDate != null
                           ? '마지막 백업: ${dateFormat.format(state.lastBackupDate!)}'
@@ -123,7 +123,7 @@ class StatItem extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: AppColors.textSecondaryLight, size: 20),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           value,
           style: const TextStyle(

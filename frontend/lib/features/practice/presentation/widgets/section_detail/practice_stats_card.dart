@@ -74,7 +74,7 @@ class _StatItem extends StatelessWidget {
     return Column(
       children: [
         Icon(icon, color: AppColors.primary, size: 20),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         Text(
           value,
           style: AppTypography.headingSmall.copyWith(
