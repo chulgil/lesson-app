@@ -619,7 +619,7 @@ class _ProposalSettingsScreenState
       child: ElevatedButton(
         onPressed: _isSaving ? null : _saveSettings,
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),

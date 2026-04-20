@@ -351,7 +351,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
             ),
             backgroundColor: AppColors.primary.withValues(alpha: 0.08),
             side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
-            padding: const EdgeInsets.symmetric(horizontal: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () {
               final current = _feedbackController.text;
@@ -453,7 +453,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         child: FilledButton(
           onPressed: enabled ? onPressed : null,
           style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),

@@ -653,7 +653,9 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                               },
                       selectedColor: AppColors.primary.withValues(alpha: 0.2),
                       showCheckmark: false,
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space1,
+                      ),
                       visualDensity: VisualDensity.compact,
                     );
                   }).toList(),

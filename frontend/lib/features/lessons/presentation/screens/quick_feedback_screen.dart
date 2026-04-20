@@ -301,7 +301,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               ),
               backgroundColor: AppColors.surfaceSecondaryLight,
               side: BorderSide(color: AppColors.borderLight),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space1,
+              ),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onPressed: _showAddPresetDialog,
             );
@@ -317,7 +319,9 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               ),
               backgroundColor: AppColors.primary.withValues(alpha: 0.08),
               side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space1,
+              ),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onPressed: () => _insertPreset(preset.text),
             ),

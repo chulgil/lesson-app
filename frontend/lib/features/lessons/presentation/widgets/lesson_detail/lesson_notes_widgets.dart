@@ -53,11 +53,7 @@ class LessonNoteEditor extends StatefulWidget {
   final String? initialText;
   final ValueChanged<String>? onChanged;
 
-  const LessonNoteEditor({
-    super.key,
-    this.initialText,
-    this.onChanged,
-  });
+  const LessonNoteEditor({super.key, this.initialText, this.onChanged});
 
   @override
   State<LessonNoteEditor> createState() => _LessonNoteEditorState();
@@ -108,7 +104,8 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
     if (currentText.isEmpty) {
       newText = preset;
       newCursorPos = preset.length;
-    } else if (selection.isValid && selection.baseOffset == selection.extentOffset) {
+    } else if (selection.isValid &&
+        selection.baseOffset == selection.extentOffset) {
       // Insert at cursor position
       final before = currentText.substring(0, selection.baseOffset);
       final after = currentText.substring(selection.baseOffset);
@@ -152,7 +149,9 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                 side: BorderSide(
                   color: AppColors.primary.withValues(alpha: 0.2),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space1,
+                ),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onPressed: () => _insertPreset(feedbackPresets[index]),
               );
@@ -191,46 +190,47 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
               alignment: Alignment.centerRight,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
-                child: _saveStatus == _SaveStatus.saving
-                    ? Row(
-                        key: const ValueKey('saving'),
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 1.5,
-                              color: AppColors.textTertiaryLight,
+                child:
+                    _saveStatus == _SaveStatus.saving
+                        ? Row(
+                          key: const ValueKey('saving'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 1.5,
+                                color: AppColors.textTertiaryLight,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.space1),
-                          Text(
-                            '저장 중...',
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.textTertiaryLight,
+                            const SizedBox(width: AppSpacing.space1),
+                            Text(
+                              '저장 중...',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textTertiaryLight,
+                              ),
                             ),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        key: const ValueKey('saved'),
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.check_circle_outline,
-                            size: 14,
-                            color: AppColors.success,
-                          ),
-                          const SizedBox(width: AppSpacing.space1),
-                          Text(
-                            '저장됨',
-                            style: AppTypography.caption.copyWith(
+                          ],
+                        )
+                        : Row(
+                          key: const ValueKey('saved'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.check_circle_outline,
+                              size: 14,
                               color: AppColors.success,
                             ),
-                          ),
-                        ],
-                      ),
+                            const SizedBox(width: AppSpacing.space1),
+                            Text(
+                              '저장됨',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.success,
+                              ),
+                            ),
+                          ],
+                        ),
               ),
             ),
           ),
@@ -245,10 +245,7 @@ enum _SaveStatus { idle, saving, saved }
 class TeacherFeedbackCard extends StatelessWidget {
   final Lesson lesson;
 
-  const TeacherFeedbackCard({
-    super.key,
-    required this.lesson,
-  });
+  const TeacherFeedbackCard({super.key, required this.lesson});
 
   @override
   Widget build(BuildContext context) {
@@ -286,9 +283,7 @@ class TeacherFeedbackCard extends StatelessWidget {
         children: [
           Text(
             lesson.feedback!,
-            style: AppTypography.bodyMedium.copyWith(
-              height: 1.6,
-            ),
+            style: AppTypography.bodyMedium.copyWith(height: 1.6),
           ),
           if (lesson.updatedAt != null) ...[
             const SizedBox(height: AppSpacing.space3),
@@ -333,9 +328,7 @@ class KeyPointsList extends StatelessWidget {
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
-                isTeacher
-                    ? '+ 버튼을 눌러 주요 포인트를 추가하세요'
-                    : '주요 포인트가 없습니다',
+                isTeacher ? '+ 버튼을 눌러 주요 포인트를 추가하세요' : '주요 포인트가 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
@@ -347,41 +340,40 @@ class KeyPointsList extends StatelessWidget {
     }
 
     return Column(
-      children: lesson.keyPoints!.asMap().entries.map((entry) {
-        final index = entry.key;
-        final point = entry.value;
-        return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 6),
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
+      children:
+          lesson.keyPoints!.asMap().entries.map((entry) {
+            final index = entry.key;
+            final point = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 6),
+                    width: 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.space3),
+                  Expanded(child: Text(point, style: AppTypography.bodyMedium)),
+                  if (isTeacher && onRemove != null)
+                    IconButton(
+                      onPressed: () => onRemove!(index),
+                      icon: const Icon(Icons.close),
+                      iconSize: 18,
+                      color: AppColors.textTertiaryLight,
+                      constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
+                      tooltip: '삭제',
+                    ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.space3),
-              Expanded(
-                child: Text(point, style: AppTypography.bodyMedium),
-              ),
-              if (isTeacher && onRemove != null)
-                IconButton(
-                  onPressed: () => onRemove!(index),
-                  icon: const Icon(Icons.close),
-                  iconSize: 18,
-                  color: AppColors.textTertiaryLight,
-                  constraints: const BoxConstraints(),
-                  padding: EdgeInsets.zero,
-                  tooltip: '삭제',
-                ),
-            ],
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
     );
   }
 }
@@ -413,14 +405,14 @@ class PracticeTipsCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.tips_and_updates_outlined,
-                color: AppColors.textTertiaryLight),
+            Icon(
+              Icons.tips_and_updates_outlined,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
               child: Text(
-                isTeacher
-                    ? '+ 버튼을 눌러 연습 팁을 추가하세요'
-                    : '연습 팁이 없습니다',
+                isTeacher ? '+ 버튼을 눌러 연습 팁을 추가하세요' : '연습 팁이 없습니다',
                 style: AppTypography.bodyMedium.copyWith(
                   color: AppColors.textSecondaryLight,
                 ),
@@ -445,9 +437,7 @@ class PracticeTipsCard extends StatelessWidget {
           Expanded(
             child: Text(
               lesson.practiceTips ?? '',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.info,
-              ),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.info),
             ),
           ),
           if (isTeacher && onEdit != null)
@@ -470,10 +460,7 @@ class PracticeTipsCard extends StatelessWidget {
 class RecordingStatusIndicator extends StatelessWidget {
   final int recordingSeconds;
 
-  const RecordingStatusIndicator({
-    super.key,
-    required this.recordingSeconds,
-  });
+  const RecordingStatusIndicator({super.key, required this.recordingSeconds});
 
   String _formatDuration(int seconds) {
     final minutes = seconds ~/ 60;
@@ -555,20 +542,21 @@ class RecordingsEmptyState extends StatelessWidget {
 Future<bool?> showCancelLessonConfirmation(BuildContext context) {
   return showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('레슨 취소'),
-      content: const Text('이 레슨을 취소하시겠습니까?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('아니오'),
+    builder:
+        (context) => AlertDialog(
+          title: const Text('레슨 취소'),
+          content: const Text('이 레슨을 취소하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('아니오'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('취소하기'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text('취소하기'),
-        ),
-      ],
-    ),
   );
 }
 
@@ -576,25 +564,22 @@ Future<bool?> showCancelLessonConfirmation(BuildContext context) {
 Future<bool?> showDeleteLessonConfirmation(BuildContext context) {
   return showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('레슨 삭제'),
-      content: const Text(
-        '이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('취소'),
+    builder:
+        (context) => AlertDialog(
+          title: const Text('레슨 삭제'),
+          content: const Text('이 레슨을 삭제하시겠습니까?\n녹음 파일과 노트도 함께 삭제됩니다.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: const Text('삭제'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.error,
-          ),
-          child: const Text('삭제'),
-        ),
-      ],
-    ),
   );
 }
 
@@ -608,35 +593,33 @@ Future<String?> showEditPracticeTipDialog({
 
   return showDialog<String?>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('연습 팁 수정'),
-      content: TextField(
-        controller: controller,
-        maxLines: 4,
-        decoration: const InputDecoration(
-          hintText: '연습 팁을 입력하세요',
-          border: OutlineInputBorder(),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, null),
-          child: const Text('취소'),
-        ),
-        if (hasTip)
-          TextButton(
-            onPressed: () => Navigator.pop(context, ''),
-            child: Text(
-              '삭제',
-              style: TextStyle(color: AppColors.error),
+    builder:
+        (context) => AlertDialog(
+          title: const Text('연습 팁 수정'),
+          content: TextField(
+            controller: controller,
+            maxLines: 4,
+            decoration: const InputDecoration(
+              hintText: '연습 팁을 입력하세요',
+              border: OutlineInputBorder(),
             ),
           ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, controller.text.trim()),
-          child: const Text('저장'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('취소'),
+            ),
+            if (hasTip)
+              TextButton(
+                onPressed: () => Navigator.pop(context, ''),
+                child: Text('삭제', style: TextStyle(color: AppColors.error)),
+              ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: const Text('저장'),
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }
 
@@ -645,11 +628,7 @@ class StudentMemoCard extends StatefulWidget {
   final String? initialMemo;
   final ValueChanged<String> onSave;
 
-  const StudentMemoCard({
-    super.key,
-    this.initialMemo,
-    required this.onSave,
-  });
+  const StudentMemoCard({super.key, this.initialMemo, required this.onSave});
 
   @override
   State<StudentMemoCard> createState() => _StudentMemoCardState();

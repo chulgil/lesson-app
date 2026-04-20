@@ -624,7 +624,9 @@ class StudentProfileTab extends ConsumerWidget {
                     children:
                         inviteCode.split('').map((digit) {
                           return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.space1,
+                            ),
                             child: Text(
                               digit,
                               style: AppTypography.headingLarge.copyWith(

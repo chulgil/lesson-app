@@ -504,7 +504,9 @@ void showProfilePreviewSheet({
                       margin: EdgeInsets.symmetric(vertical: AppSpacing.space3),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space4,
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.visibility, size: 20),

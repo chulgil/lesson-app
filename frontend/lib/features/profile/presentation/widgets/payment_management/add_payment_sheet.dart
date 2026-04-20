@@ -24,7 +24,11 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
   PaymentType _paymentType = PaymentType.regular;
   int _amount = 200000;
   PaymentMethod _method = PaymentMethod.bankTransfer;
-  DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime _selectedMonth = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    1,
+  );
   int _weekStart = 1;
   int _weekEnd = 4;
   int _lessonCount = 4;
@@ -129,7 +133,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('결제 유형', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '결제 유형',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         Row(
           children: [
@@ -172,37 +179,42 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('학생 선택', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '학생 선택',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         studentsAsync.when(
-          data: (students) => DropdownButtonFormField<String>(
-            value: _selectedStudentId,
-            decoration: const InputDecoration(
-              hintText: '학생을 선택하세요',
-              border: OutlineInputBorder(),
-            ),
-            items: students.map((s) {
-              return DropdownMenuItem<String>(
-                value: s.id,
-                child: Text('${s.name} (${s.level.label})'),
-              );
-            }).toList(),
-            onChanged: (value) {
-              final student = students.firstWhere((s) => s.id == value);
-              setState(() {
-                _selectedStudentId = value;
-                _selectedStudentName = student.name;
-                if (_paymentType == PaymentType.regular) {
-                  _amount = student.monthlyFee;
-                  _amountController.text = _amount.toString();
-                }
-              });
-            },
-            validator: (value) {
-              if (value == null) return '학생을 선택하세요';
-              return null;
-            },
-          ),
+          data:
+              (students) => DropdownButtonFormField<String>(
+                value: _selectedStudentId,
+                decoration: const InputDecoration(
+                  hintText: '학생을 선택하세요',
+                  border: OutlineInputBorder(),
+                ),
+                items:
+                    students.map((s) {
+                      return DropdownMenuItem<String>(
+                        value: s.id,
+                        child: Text('${s.name} (${s.level.label})'),
+                      );
+                    }).toList(),
+                onChanged: (value) {
+                  final student = students.firstWhere((s) => s.id == value);
+                  setState(() {
+                    _selectedStudentId = value;
+                    _selectedStudentName = student.name;
+                    if (_paymentType == PaymentType.regular) {
+                      _amount = student.monthlyFee;
+                      _amountController.text = _amount.toString();
+                    }
+                  });
+                },
+                validator: (value) {
+                  if (value == null) return '학생을 선택하세요';
+                  return null;
+                },
+              ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, __) => const Text('학생 목록을 불러올 수 없습니다'),
         ),
@@ -214,7 +226,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('기간 선택', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '기간 선택',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         Row(
           children: [
@@ -228,7 +243,12 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
           ],
         ),
         const SizedBox(height: AppSpacing.space3),
-        Text('주차 범위', style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondaryLight)),
+        Text(
+          '주차 범위',
+          style: AppTypography.bodySmall.copyWith(
+            color: AppColors.textSecondaryLight,
+          ),
+        ),
         const SizedBox(height: AppSpacing.space2),
         _buildWeekRangeSelector(),
         const SizedBox(height: AppSpacing.space2),
@@ -247,11 +267,15 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
             decoration: const InputDecoration(
               labelText: '시작',
               border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
             ),
-            items: List.generate(5, (i) => i + 1).map((week) {
-              return DropdownMenuItem(value: week, child: Text('$week주'));
-            }).toList(),
+            items:
+                List.generate(5, (i) => i + 1).map((week) {
+                  return DropdownMenuItem(value: week, child: Text('$week주'));
+                }).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -264,7 +288,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
           ),
         ),
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.space2),
           child: Text('~'),
         ),
         Expanded(
@@ -273,13 +297,18 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
             decoration: const InputDecoration(
               labelText: '종료',
               border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space2,
+              ),
             ),
-            items: List.generate(5, (i) => i + 1)
-                .where((w) => w >= _weekStart)
-                .map((week) {
-              return DropdownMenuItem(value: week, child: Text('$week주'));
-            }).toList(),
+            items:
+                List.generate(
+                  5,
+                  (i) => i + 1,
+                ).where((w) => w >= _weekStart).map((week) {
+                  return DropdownMenuItem(value: week, child: Text('$week주'));
+                }).toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() => _weekEnd = value);
@@ -316,7 +345,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('체험 일자', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '체험 일자',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         OutlinedButton.icon(
           onPressed: _showDatePicker,
@@ -332,7 +364,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('금액', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '금액',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         TextFormField(
           controller: _amountController,
@@ -363,22 +398,26 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('결제 수단', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '결제 수단',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         Wrap(
           spacing: AppSpacing.space2,
-          children: PaymentMethod.values.map((method) {
-            final isSelected = _method == method;
-            return ChoiceChip(
-              label: Text(method.label),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  setState(() => _method = method);
-                }
-              },
-            );
-          }).toList(),
+          children:
+              PaymentMethod.values.map((method) {
+                final isSelected = _method == method;
+                return ChoiceChip(
+                  label: Text(method.label),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      setState(() => _method = method);
+                    }
+                  },
+                );
+              }).toList(),
         ),
       ],
     );
@@ -388,7 +427,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('메모 (선택)', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '메모 (선택)',
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         TextFormField(
           controller: _descriptionController,
@@ -410,9 +452,9 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
         style: FilledButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
         ),
-        child: Text(_paymentType == PaymentType.trial
-            ? '체험 레슨 결제 추가'
-            : '정규 레슨 결제 추가'),
+        child: Text(
+          _paymentType == PaymentType.trial ? '체험 레슨 결제 추가' : '정규 레슨 결제 추가',
+        ),
       ),
     );
   }
@@ -466,8 +508,16 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       // Calculate period based on weeks
       final weekStartDay = ((_weekStart - 1) * 7) + 1;
       final weekEndDay = (_weekEnd * 7).clamp(1, 31);
-      periodStart = DateTime(_selectedMonth.year, _selectedMonth.month, weekStartDay);
-      periodEnd = DateTime(_selectedMonth.year, _selectedMonth.month, weekEndDay);
+      periodStart = DateTime(
+        _selectedMonth.year,
+        _selectedMonth.month,
+        weekStartDay,
+      );
+      periodEnd = DateTime(
+        _selectedMonth.year,
+        _selectedMonth.month,
+        weekEndDay,
+      );
     }
 
     final payment = Payment(
@@ -485,9 +535,10 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       periodEnd: periodEnd,
       weekStart: _weekStart,
       weekEnd: _weekEnd,
-      description: _descriptionController.text.isNotEmpty
-          ? _descriptionController.text
-          : null,
+      description:
+          _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : null,
       createdAt: DateTime.now(),
     );
 
@@ -497,9 +548,11 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_paymentType == PaymentType.trial
-              ? '체험 레슨 결제가 추가되었습니다'
-              : '정규 레슨 결제가 추가되었습니다'),
+          content: Text(
+            _paymentType == PaymentType.trial
+                ? '체험 레슨 결제가 추가되었습니다'
+                : '정규 레슨 결제가 추가되었습니다',
+          ),
         ),
       );
     }
@@ -524,14 +577,18 @@ class _PaymentTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = type == PaymentType.trial ? AppColors.info : AppColors.primary;
+    final color =
+        type == PaymentType.trial ? AppColors.info : AppColors.primary;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? color.withValues(alpha: 0.1)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? color : AppColors.borderLight,
@@ -540,7 +597,11 @@ class _PaymentTypeCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? color : AppColors.textSecondaryLight, size: 28),
+            Icon(
+              icon,
+              color: isSelected ? color : AppColors.textSecondaryLight,
+              size: 28,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               type.label,
@@ -552,7 +613,10 @@ class _PaymentTypeCard extends StatelessWidget {
             Text(
               description,
               style: AppTypography.caption.copyWith(
-                color: isSelected ? color.withValues(alpha: 0.8) : AppColors.textSecondaryLight,
+                color:
+                    isSelected
+                        ? color.withValues(alpha: 0.8)
+                        : AppColors.textSecondaryLight,
               ),
               textAlign: TextAlign.center,
             ),
