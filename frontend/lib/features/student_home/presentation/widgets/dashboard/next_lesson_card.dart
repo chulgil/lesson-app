@@ -190,9 +190,8 @@ class NextLessonCard extends ConsumerWidget {
                         ),
                         child: Text(
                           typeText,
-                          style: AppTypography.caption.copyWith(
+                          style: AppTypography.captionSmall.copyWith(
                             color: Colors.white,
-                            fontSize: 10,
                           ),
                         ),
                       ),

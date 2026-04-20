@@ -23,9 +23,7 @@ class LanguageSelectSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         child: Padding(
@@ -77,7 +75,9 @@ class LanguageSelectSheet extends StatelessWidget {
                 isComingSoon: true,
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('English will be supported soon')),
+                    const SnackBar(
+                      content: Text('English will be supported soon'),
+                    ),
                   );
                 },
               ),
@@ -92,9 +92,9 @@ class LanguageSelectSheet extends StatelessWidget {
                 isSelected: false,
                 isComingSoon: true,
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('日本語は準備中です')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('日本語は準備中です')));
                 },
               ),
 
@@ -119,9 +119,10 @@ class LanguageSelectSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : AppColors.backgroundLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : AppColors.backgroundLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -136,9 +137,10 @@ class LanguageSelectSheet extends StatelessWidget {
                 name,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color: isComingSoon
-                      ? AppColors.textTertiaryLight
-                      : AppColors.textPrimaryLight,
+                  color:
+                      isComingSoon
+                          ? AppColors.textTertiaryLight
+                          : AppColors.textPrimaryLight,
                 ),
               ),
             ),
@@ -146,10 +148,7 @@ class LanguageSelectSheet extends StatelessWidget {
               Icon(Icons.check_circle, color: AppColors.primary, size: 22),
             if (isComingSoon)
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.textTertiaryLight.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
@@ -158,7 +157,6 @@ class LanguageSelectSheet extends StatelessWidget {
                   '준비 중',
                   style: AppTypography.caption.copyWith(
                     color: AppColors.textTertiaryLight,
-                    fontSize: 11,
                   ),
                 ),
               ),

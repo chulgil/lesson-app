@@ -24,9 +24,7 @@ class MyTeachersScreen extends ConsumerWidget {
     final manualTeachersAsync = ref.watch(manualTeacherNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('내 선생님'),
-      ),
+      appBar: AppBar(title: const Text('내 선생님')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -79,37 +77,44 @@ class MyTeachersScreen extends ConsumerWidget {
               return _buildAppTeachersEmpty(context);
             }
             final sorted = [...relations]..sort((a, b) {
-                final aActive = a.status == RelationshipStatus.active ? 0 : 1;
-                final bActive = b.status == RelationshipStatus.active ? 0 : 1;
-                if (aActive != bActive) return aActive.compareTo(bActive);
-                return (b.lastLessonAt ?? b.createdAt)
-                    .compareTo(a.lastLessonAt ?? a.createdAt);
-              });
+              final aActive = a.status == RelationshipStatus.active ? 0 : 1;
+              final bActive = b.status == RelationshipStatus.active ? 0 : 1;
+              if (aActive != bActive) return aActive.compareTo(bActive);
+              return (b.lastLessonAt ?? b.createdAt).compareTo(
+                a.lastLessonAt ?? a.createdAt,
+              );
+            });
             return Column(
-              children: sorted
-                  .map((r) => Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: AppSpacing.space3),
-                        child: _AppTeacherCard(relation: r),
-                      ))
-                  .toList(),
+              children:
+                  sorted
+                      .map(
+                        (r) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppSpacing.space3,
+                          ),
+                          child: _AppTeacherCard(relation: r),
+                        ),
+                      )
+                      .toList(),
             );
           },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space8),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (e, _) => Padding(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: Text(
-              '데이터를 불러올 수 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+          loading:
+              () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.space8),
+                  child: CircularProgressIndicator(),
+                ),
               ),
-            ),
-          ),
+          error:
+              (e, _) => Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Text(
+                  '데이터를 불러올 수 없습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
         ),
       ],
     );
@@ -165,7 +170,11 @@ class MyTeachersScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.person_add_outlined, size: 18, color: AppColors.secondary),
+            Icon(
+              Icons.person_add_outlined,
+              size: 18,
+              color: AppColors.secondary,
+            ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -192,30 +201,34 @@ class MyTeachersScreen extends ConsumerWidget {
             }
             return Column(
               children: [
-                ...teachers.map((t) => Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                      child: _ManualTeacherCard(teacher: t),
-                    )),
+                ...teachers.map(
+                  (t) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                    child: _ManualTeacherCard(teacher: t),
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.space2),
                 _buildAddManualTeacherButton(context),
               ],
             );
           },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space8),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (e, _) => Padding(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: Text(
-              '데이터를 불러올 수 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+          loading:
+              () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.space8),
+                  child: CircularProgressIndicator(),
+                ),
               ),
-            ),
-          ),
+          error:
+              (e, _) => Padding(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Text(
+                  '데이터를 불러올 수 없습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ),
         ),
       ],
     );
@@ -260,9 +273,7 @@ class MyTeachersScreen extends ConsumerWidget {
         label: const Text('선생님 직접 등록'),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: BorderSide(
-            color: AppColors.primary.withValues(alpha: 0.5),
-          ),
+          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
         ),
       ),
     );
@@ -306,9 +317,10 @@ class _AppTeacherCard extends StatelessWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isActive
-              ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+          color:
+              isActive
+                  ? AppColors.primary.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
         boxShadow: [
           BoxShadow(
@@ -322,9 +334,10 @@ class _AppTeacherCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          onTap: () => context.push(
-            AppRoutes.teacherDetail.replaceFirst(':id', relation.teacherId),
-          ),
+          onTap:
+              () => context.push(
+                AppRoutes.teacherDetail.replaceFirst(':id', relation.teacherId),
+              ),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(
@@ -334,15 +347,17 @@ class _AppTeacherCard extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 28,
-                      backgroundColor: isActive
-                          ? AppColors.primary.withValues(alpha: 0.1)
-                          : AppColors.surfaceSecondaryLight,
+                      backgroundColor:
+                          isActive
+                              ? AppColors.primary.withValues(alpha: 0.1)
+                              : AppColors.surfaceSecondaryLight,
                       child: Icon(
                         Icons.person,
                         size: 28,
-                        color: isActive
-                            ? AppColors.primary
-                            : AppColors.textTertiaryLight,
+                        color:
+                            isActive
+                                ? AppColors.primary
+                                : AppColors.textTertiaryLight,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
@@ -427,10 +442,9 @@ class _AppTeacherCard extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: color,
           fontWeight: FontWeight.w600,
-          fontSize: 10,
         ),
       ),
     );
@@ -456,9 +470,7 @@ class _AppTeacherCard extends StatelessWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           value,
-          style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -513,10 +525,7 @@ class _ManualTeacherCard extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          onTap: () => context.push(
-            AppRoutes.addManualTeacher,
-            extra: teacher,
-          ),
+          onTap: () => context.push(AppRoutes.addManualTeacher, extra: teacher),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space4),
             child: Row(
@@ -613,30 +622,36 @@ class _ManualTeacherCard extends ConsumerWidget {
                       _confirmDelete(context, ref);
                     }
                   },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_outlined, size: 18),
-                          SizedBox(width: 8),
-                          Text('편집'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline,
-                              size: 18, color: AppColors.error),
-                          const SizedBox(width: 8),
-                          Text('삭제',
-                              style: TextStyle(color: AppColors.error)),
-                        ],
-                      ),
-                    ),
-                  ],
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit_outlined, size: 18),
+                              SizedBox(width: 8),
+                              Text('편집'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
+                                size: 18,
+                                color: AppColors.error,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '삭제',
+                                style: TextStyle(color: AppColors.error),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                   icon: Icon(
                     Icons.more_vert,
                     color: AppColors.textTertiaryLight,
@@ -656,44 +671,45 @@ class _ManualTeacherCard extends ConsumerWidget {
   void _confirmDelete(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('선생님 삭제'),
-        content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('취소'),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('선생님 삭제'),
+            content: Text('${teacher.name} 선생님을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  try {
+                    await ref
+                        .read(manualTeacherNotifierProvider.notifier)
+                        .delete(teacher.id);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${teacher.name} 선생님이 삭제되었습니다'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('삭제 실패. 다시 시도해주세요.'),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: Text('삭제', style: TextStyle(color: AppColors.error)),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                await ref
-                    .read(manualTeacherNotifierProvider.notifier)
-                    .delete(teacher.id);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('${teacher.name} 선생님이 삭제되었습니다'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('삭제 실패. 다시 시도해주세요.'),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text('삭제', style: TextStyle(color: AppColors.error)),
-          ),
-        ],
-      ),
     );
   }
 }

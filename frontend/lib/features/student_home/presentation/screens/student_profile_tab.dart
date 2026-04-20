@@ -42,17 +42,22 @@ class StudentProfileTab extends ConsumerWidget {
     final studentInstrument = student?.instrument ?? '-';
 
     // Stats calculations
-    final completedLessonCount = lessonsAsync.valueOrNull
+    final completedLessonCount =
+        lessonsAsync.valueOrNull
             ?.where((l) => l.status == LessonStatus.completed)
             .length ??
         0;
-    final totalPracticeMinutes = practiceLogsAsync.valueOrNull
-            ?.fold<int>(0, (sum, log) => sum + log.totalMinutes) ??
+    final totalPracticeMinutes =
+        practiceLogsAsync.valueOrNull?.fold<int>(
+          0,
+          (sum, log) => sum + log.totalMinutes,
+        ) ??
         0;
     final totalPracticeHours = totalPracticeMinutes ~/ 60;
-    final lessonPeriodMonths = student != null
-        ? DateTime.now().difference(student.createdAt).inDays ~/ 30
-        : 0;
+    final lessonPeriodMonths =
+        student != null
+            ? DateTime.now().difference(student.createdAt).inDays ~/ 30
+            : 0;
 
     return SingleChildScrollView(
       child: Column(
@@ -71,17 +76,17 @@ class StudentProfileTab extends ConsumerWidget {
           // Stats summary
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding),
+              horizontal: AppSpacing.screenPadding,
+            ),
             child: _buildStatsSummary(
-              lessonCount: lessonsAsync.isLoading
-                  ? null
-                  : '$completedLessonCount회',
-              practiceTime: practiceLogsAsync.isLoading
-                  ? null
-                  : '$totalPracticeHours시간',
-              period: studentAsync.isLoading
-                  ? null
-                  : lessonPeriodMonths < 1
+              lessonCount:
+                  lessonsAsync.isLoading ? null : '$completedLessonCount회',
+              practiceTime:
+                  practiceLogsAsync.isLoading ? null : '$totalPracticeHours시간',
+              period:
+                  studentAsync.isLoading
+                      ? null
+                      : lessonPeriodMonths < 1
                       ? '1개월 미만'
                       : '$lessonPeriodMonths개월',
             ),
@@ -92,7 +97,8 @@ class StudentProfileTab extends ConsumerWidget {
           // Menu items
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding),
+              horizontal: AppSpacing.screenPadding,
+            ),
             child: _buildMenuSection(context, ref),
           ),
 
@@ -101,7 +107,8 @@ class StudentProfileTab extends ConsumerWidget {
           // Settings
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding),
+              horizontal: AppSpacing.screenPadding,
+            ),
             child: _buildSettingsSection(context, ref),
           ),
 
@@ -110,7 +117,8 @@ class StudentProfileTab extends ConsumerWidget {
           // Logout button
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding),
+              horizontal: AppSpacing.screenPadding,
+            ),
             child: _buildLogoutButton(context),
           ),
 
@@ -142,10 +150,7 @@ class StudentProfileTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-          ],
+          colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -197,9 +202,7 @@ class StudentProfileTab extends ConsumerWidget {
             // Name
             Text(
               name,
-              style: AppTypography.headingLarge.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTypography.headingLarge.copyWith(color: Colors.white),
             ),
 
             const SizedBox(height: AppSpacing.space1),
@@ -207,19 +210,14 @@ class StudentProfileTab extends ConsumerWidget {
             // Email
             Text(
               email,
-              style: AppTypography.bodyMedium.copyWith(
-                color: Colors.white70,
-              ),
+              style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
             ),
 
             const SizedBox(height: AppSpacing.space2),
 
             // Instrument tag
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
@@ -227,11 +225,7 @@ class StudentProfileTab extends ConsumerWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.music_note,
-                    size: 16,
-                    color: Colors.white,
-                  ),
+                  const Icon(Icons.music_note, size: 16, color: Colors.white),
                   const SizedBox(width: 4),
                   Text(
                     instrument,
@@ -303,11 +297,7 @@ class StudentProfileTab extends ConsumerWidget {
   }
 
   Widget _buildDivider() {
-    return Container(
-      width: 1,
-      height: 40,
-      color: AppColors.borderLight,
-    );
+    return Container(width: 1, height: 40, color: AppColors.borderLight);
   }
 
   Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
@@ -362,20 +352,20 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.library_music_outlined,
             title: '레퍼토리',
-            subtitle: repertoireCount != null
-                ? '$repertoireCount곡 진행 중'
-                : null,
-            onTap: () => context.push(
-              '${AppRoutes.practiceRepertoire}?studentId=$studentId',
-            ),
+            subtitle: repertoireCount != null ? '$repertoireCount곡 진행 중' : null,
+            onTap:
+                () => context.push(
+                  '${AppRoutes.practiceRepertoire}?studentId=$studentId',
+                ),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.history,
             title: '연습 기록 내역',
-            onTap: () => context.push(
-              '${AppRoutes.repertoireHistory}?studentId=$studentId',
-            ),
+            onTap:
+                () => context.push(
+                  '${AppRoutes.repertoireHistory}?studentId=$studentId',
+                ),
           ),
           _buildMenuDivider(),
           _buildMenuItem(
@@ -423,9 +413,10 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuItem(
             icon: Icons.alarm_outlined,
             title: '연습 리마인더',
-            subtitle: reminderSettings.isEnabled
-                ? reminderSettings.formattedTime
-                : '꺼짐',
+            subtitle:
+                reminderSettings.isEnabled
+                    ? reminderSettings.formattedTime
+                    : '꺼짐',
             onTap: () => PracticeReminderSheet.show(context),
           ),
           _buildMenuDivider(),
@@ -435,16 +426,16 @@ class StudentProfileTab extends ConsumerWidget {
             trailing: Switch(
               value: false,
               onChanged: (value) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('다크 모드는 준비 중입니다')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('다크 모드는 준비 중입니다')));
               },
               activeColor: AppColors.primary,
             ),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('다크 모드는 준비 중입니다')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('다크 모드는 준비 중입니다')));
             },
           ),
           _buildMenuDivider(),
@@ -492,10 +483,12 @@ class StudentProfileTab extends ConsumerWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
-                color: iconColor?.withValues(alpha: 0.1) ?? AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(8),
+                color:
+                    iconColor?.withValues(alpha: 0.1) ??
+                    AppColors.surfaceSecondaryLight,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(
                 icon,
@@ -527,10 +520,7 @@ class StudentProfileTab extends ConsumerWidget {
             if (trailing != null)
               trailing
             else
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
           ],
         ),
       ),
@@ -551,10 +541,7 @@ class StudentProfileTab extends ConsumerWidget {
       child: OutlinedButton.icon(
         onPressed: () => _showLogoutDialog(context),
         icon: Icon(Icons.logout, color: AppColors.error),
-        label: Text(
-          '로그아웃',
-          style: TextStyle(color: AppColors.error),
-        ),
+        label: Text('로그아웃', style: TextStyle(color: AppColors.error)),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
@@ -566,26 +553,24 @@ class StudentProfileTab extends ConsumerWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('로그아웃'),
-        content: const Text('정말 로그아웃 하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('로그아웃'),
+            content: const Text('정말 로그아웃 하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.login);
+                },
+                child: Text('로그아웃', style: TextStyle(color: AppColors.error)),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.go(AppRoutes.login);
-            },
-            child: Text(
-              '로그아웃',
-              style: TextStyle(color: AppColors.error),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -593,7 +578,8 @@ class StudentProfileTab extends ConsumerWidget {
     // Generate a random 6-character alphanumeric invite code
     final random = Random();
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    final inviteCode = List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
+    final inviteCode =
+        List.generate(6, (_) => chars[random.nextInt(chars.length)]).join();
     final studentId = ref.read(currentUserIdProvider);
 
     // Create and save the invitation to the repository
@@ -607,94 +593,98 @@ class StudentProfileTab extends ConsumerWidget {
       createdAt: DateTime.now(),
     );
 
-    ref.read(invitationsNotifierProvider(studentId).notifier).createInvitation(invitation);
+    ref
+        .read(invitationsNotifierProvider(studentId).notifier)
+        .createInvitation(invitation);
 
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('학부모 초대 코드'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '학부모님을 초대합니다',
-              style: AppTypography.bodyMedium,
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text('학부모 초대 코드'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('학부모님을 초대합니다', style: AppTypography.bodyMedium),
+                const SizedBox(height: AppSpacing.space4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space5,
+                    vertical: AppSpacing.space4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLight.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                    border: Border.all(color: AppColors.primary),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        inviteCode.split('').map((digit) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Text(
+                              digit,
+                              style: AppTypography.headingLarge.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 2,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                Text(
+                  '이 코드를 학부모님께 전달해주세요.\n학부모님이 앱에서 코드를 입력하면\n연결됩니다.',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.space2),
+                Text(
+                  '* 코드는 24시간 동안 유효합니다',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space4),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.space5,
-                vertical: AppSpacing.space4,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(color: AppColors.primary),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: inviteCode.split('').map((digit) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(
-                      digit,
-                      style: AppTypography.headingLarge.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                      ),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: inviteCode));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('초대 코드가 복사되었습니다'),
+                      duration: Duration(seconds: 2),
                     ),
                   );
-                }).toList(),
+                },
+                icon: const Icon(Icons.copy, size: 18),
+                label: const Text('복사'),
               ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              '이 코드를 학부모님께 전달해주세요.\n학부모님이 앱에서 코드를 입력하면\n연결됩니다.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+              FilledButton.icon(
+                onPressed: () {
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text:
+                          '[레슨앱] 학부모 초대\n\n'
+                          '학생의 학부모님을 초대합니다.\n\n'
+                          '초대 코드: $inviteCode\n\n'
+                          '앱을 설치하고 위 코드를 입력해주세요.',
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.share, size: 18),
+                label: const Text('공유'),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.space2),
-            Text(
-              '* 코드는 24시간 동안 유효합니다',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: inviteCode));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('초대 코드가 복사되었습니다'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            icon: const Icon(Icons.copy, size: 18),
-            label: const Text('복사'),
+            ],
           ),
-          FilledButton.icon(
-            onPressed: () {
-              SharePlus.instance.share(
-                ShareParams(
-                  text: '[레슨앱] 학부모 초대\n\n'
-                      '학생의 학부모님을 초대합니다.\n\n'
-                      '초대 코드: $inviteCode\n\n'
-                      '앱을 설치하고 위 코드를 입력해주세요.',
-                ),
-              );
-            },
-            icon: const Icon(Icons.share, size: 18),
-            label: const Text('공유'),
-          ),
-        ],
-      ),
     );
   }
 }

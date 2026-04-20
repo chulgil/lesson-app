@@ -28,12 +28,12 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
       loading: () => const SizedBox.shrink(),
       error: (_, __) => const SizedBox.shrink(),
       data: (subscriptions) {
-        final expiredSubs = subscriptions
-            .where((s) => s.status == SubscriptionStatus.expired)
-            .toList();
-        final expiringSoonSubs = subscriptions
-            .where((s) => s.isExpiringSoon)
-            .toList();
+        final expiredSubs =
+            subscriptions
+                .where((s) => s.status == SubscriptionStatus.expired)
+                .toList();
+        final expiringSoonSubs =
+            subscriptions.where((s) => s.isExpiringSoon).toList();
 
         if (expiredSubs.isEmpty && expiringSoonSubs.isEmpty) {
           return const SizedBox.shrink();
@@ -43,20 +43,24 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
         final renewalProposal = renewalProposalAsync.valueOrNull;
         final hasRenewalProposal = renewalProposal != null;
 
-        final bannerColor = hasRenewalProposal
-            ? AppColors.primary
-            : (hasExpired ? AppColors.error : AppColors.warning);
+        final bannerColor =
+            hasRenewalProposal
+                ? AppColors.primary
+                : (hasExpired ? AppColors.error : AppColors.warning);
 
-        final title = hasRenewalProposal
-            ? '갱신 제안이 도착했어요!'
-            : (hasExpired ? '수강권이 만료되었습니다' : '수강권이 곧 만료됩니다');
+        final title =
+            hasRenewalProposal
+                ? '갱신 제안이 도착했어요!'
+                : (hasExpired ? '수강권이 만료되었습니다' : '수강권이 곧 만료됩니다');
 
-        final targetSub = hasExpired ? expiredSubs.first : expiringSoonSubs.first;
-        final subtitle = hasRenewalProposal
-            ? '선생님이 수강권 갱신을 제안했습니다'
-            : (hasExpired
-                ? '갱신 요청을 보내 레슨을 이어가세요'
-                : '남은 횟수 ${targetSub.remainingLessons ?? 0}회 · ${targetSub.daysUntilExpiration ?? 0}일 남음');
+        final targetSub =
+            hasExpired ? expiredSubs.first : expiringSoonSubs.first;
+        final subtitle =
+            hasRenewalProposal
+                ? '선생님이 수강권 갱신을 제안했습니다'
+                : (hasExpired
+                    ? '갱신 요청을 보내 레슨을 이어가세요'
+                    : '남은 횟수 ${targetSub.remainingLessons ?? 0}회 · ${targetSub.daysUntilExpiration ?? 0}일 남음');
 
         final ctaText = hasRenewalProposal ? '확인하기' : '갱신 요청';
 
@@ -66,13 +70,13 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
             onTap: () {
               if (hasRenewalProposal) {
                 context.push(
-                  AppRoutes.renewalDetail
-                      .replaceFirst(':id', renewalProposal.id),
+                  AppRoutes.renewalDetail.replaceFirst(
+                    ':id',
+                    renewalProposal.id,
+                  ),
                 );
               } else {
-                context.push(
-                  '${AppRoutes.lessonRequest}?studentId=$studentId',
-                );
+                context.push('${AppRoutes.lessonRequest}?studentId=$studentId');
               }
             },
             child: Container(
@@ -80,14 +84,12 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: bannerColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                border: Border.all(
-                  color: bannerColor.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: bannerColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(AppSpacing.space2),
                     decoration: BoxDecoration(
                       color: bannerColor.withValues(alpha: 0.2),
                       shape: BoxShape.circle,

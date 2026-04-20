@@ -15,9 +15,7 @@ class AppInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('앱 정보'),
-      ),
+      appBar: AppBar(title: const Text('앱 정보')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
@@ -112,28 +110,32 @@ class AppInfoScreen extends StatelessWidget {
                   context,
                   icon: Icons.source_outlined,
                   title: '오픈소스 라이선스',
-                  onTap: () => showLicensePage(
-                    context: context,
-                    applicationName: 'Lessonaza',
-                    applicationVersion: '1.0.0',
-                    applicationIcon: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.space4),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [AppColors.primary, AppColors.primaryDark],
+                  onTap:
+                      () => showLicensePage(
+                        context: context,
+                        applicationName: 'Lessonaza',
+                        applicationVersion: '1.0.0',
+                        applicationIcon: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.space4),
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary,
+                                  AppColors.primaryDark,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.music_note,
+                              color: Colors.white,
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.music_note,
-                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ),
                 ),
               ],
             ),
@@ -179,10 +181,10 @@ class AppInfoScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
                 color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(icon, size: 20, color: AppColors.textSecondaryLight),
             ),
@@ -201,5 +203,4 @@ class AppInfoScreen extends StatelessWidget {
       ),
     );
   }
-
 }

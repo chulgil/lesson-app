@@ -62,7 +62,8 @@ class WeeklyPracticeWidget extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           TextButton.icon(
-            onPressed: () => ref.invalidate(weeklyPracticeItemsProvider(studentId)),
+            onPressed:
+                () => ref.invalidate(weeklyPracticeItemsProvider(studentId)),
             icon: const Icon(Icons.refresh),
             label: const Text('다시 시도'),
           ),
@@ -71,7 +72,11 @@ class WeeklyPracticeWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, List<PracticeItem> items) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    List<PracticeItem> items,
+  ) {
     if (items.isEmpty) {
       return _buildEmptyState();
     }
@@ -89,10 +94,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
             children: [
               Text('이번 주 연습', style: AppTypography.headingMedium),
               if (onViewAll != null)
-                TextButton(
-                  onPressed: onViewAll,
-                  child: const Text('전체보기'),
-                ),
+                TextButton(onPressed: onViewAll, child: const Text('전체보기')),
             ],
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -131,7 +133,10 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                           if (grouped[priority]?.isNotEmpty == true)
                             Padding(
                               padding: const EdgeInsets.only(right: 8),
-                              child: _buildPriorityBadge(priority, grouped[priority]!.length),
+                              child: _buildPriorityBadge(
+                                priority,
+                                grouped[priority]!.length,
+                              ),
                             ),
                       ],
                     ),
@@ -167,10 +172,8 @@ class WeeklyPracticeWidget extends ConsumerWidget {
               for (final priority in PracticePriority.values)
                 if (grouped[priority]?.isNotEmpty == true)
                   ...grouped[priority]!.map(
-                    (item) => _PracticeItemTile(
-                      item: item,
-                      studentId: studentId,
-                    ),
+                    (item) =>
+                        _PracticeItemTile(item: item, studentId: studentId),
                   ),
             ],
           ),
@@ -233,10 +236,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            priority.emoji,
-            style: const TextStyle(fontSize: 12),
-          ),
+          Text(priority.emoji, style: const TextStyle(fontSize: 12)),
           const SizedBox(width: 4),
           Text(
             '$count',
@@ -256,10 +256,7 @@ class _PracticeItemTile extends ConsumerWidget {
   final PracticeItem item;
   final String studentId;
 
-  const _PracticeItemTile({
-    required this.item,
-    required this.studentId,
-  });
+  const _PracticeItemTile({required this.item, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -292,20 +289,23 @@ class _PracticeItemTile extends ConsumerWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: item.isCompleted
-                      ? AppColors.practiceGood
-                      : Colors.transparent,
+                  color:
+                      item.isCompleted
+                          ? AppColors.practiceGood
+                          : Colors.transparent,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: item.isCompleted
-                        ? AppColors.practiceGood
-                        : AppColors.borderLight,
+                    color:
+                        item.isCompleted
+                            ? AppColors.practiceGood
+                            : AppColors.borderLight,
                     width: 2,
                   ),
                 ),
-                child: item.isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
-                    : null,
+                child:
+                    item.isCompleted
+                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
               ),
             ),
 
@@ -325,15 +325,16 @@ class _PracticeItemTile extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: _getTypeColor(item.type).withValues(alpha: 0.1),
+                          color: _getTypeColor(
+                            item.type,
+                          ).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           item.type.label,
-                          style: AppTypography.caption.copyWith(
+                          style: AppTypography.captionSmall.copyWith(
                             color: _getTypeColor(item.type),
                             fontWeight: FontWeight.w500,
-                            fontSize: 10,
                           ),
                         ),
                       ),
@@ -350,9 +351,10 @@ class _PracticeItemTile extends ConsumerWidget {
                       fontWeight: FontWeight.w600,
                       decoration:
                           item.isCompleted ? TextDecoration.lineThrough : null,
-                      color: item.isCompleted
-                          ? AppColors.textTertiaryLight
-                          : AppColors.textPrimaryLight,
+                      color:
+                          item.isCompleted
+                              ? AppColors.textTertiaryLight
+                              : AppColors.textPrimaryLight,
                     ),
                   ),
                   if (item.description != null && item.description!.isNotEmpty)
@@ -380,14 +382,16 @@ class _PracticeItemTile extends ConsumerWidget {
                   children: [
                     if (item.practiceCount > 0 || item.isCompleted)
                       IconButton(
-                        onPressed: item.practiceCount > 0
-                            ? () => _decrementCount(ref)
-                            : null,
+                        onPressed:
+                            item.practiceCount > 0
+                                ? () => _decrementCount(ref)
+                                : null,
                         icon: const Icon(Icons.remove_circle_outline),
                         iconSize: 20,
-                        color: item.practiceCount > 0
-                            ? AppColors.textSecondaryLight
-                            : AppColors.borderLight,
+                        color:
+                            item.practiceCount > 0
+                                ? AppColors.textSecondaryLight
+                                : AppColors.borderLight,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(
                           minWidth: 32,
@@ -400,17 +404,19 @@ class _PracticeItemTile extends ConsumerWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: item.practiceCount > 0
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.surfaceSecondaryLight,
+                        color:
+                            item.practiceCount > 0
+                                ? AppColors.primary.withValues(alpha: 0.1)
+                                : AppColors.surfaceSecondaryLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         '${item.practiceCount}회',
                         style: AppTypography.caption.copyWith(
-                          color: item.practiceCount > 0
-                              ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                          color:
+                              item.practiceCount > 0
+                                  ? AppColors.primary
+                                  : AppColors.textTertiaryLight,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

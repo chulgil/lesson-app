@@ -53,7 +53,7 @@ class PendingProposalsBanner extends ConsumerWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withValues(alpha: 0.2),
                     shape: BoxShape.circle,

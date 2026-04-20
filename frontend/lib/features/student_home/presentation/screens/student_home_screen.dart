@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/debug_role_switcher.dart';
-import '../../../../main.dart' show getStartupRecoveryResult, clearStartupRecoveryResult;
+import '../../../../main.dart'
+    show getStartupRecoveryResult, clearStartupRecoveryResult;
 import '../../../../core/widgets/practice_center_button.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import 'student_dashboard_tab.dart';
@@ -90,12 +92,7 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.borderLight,
-            width: 1,
-          ),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight, width: 1)),
       ),
       child: SafeArea(
         top: false,
@@ -105,11 +102,20 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(0, Icons.home_outlined, Icons.home, '홈'),
-              _buildNavItem(1, Icons.calendar_today_outlined, Icons.calendar_today, '스케줄'),
+              _buildNavItem(
+                1,
+                Icons.calendar_today_outlined,
+                Icons.calendar_today,
+                '스케줄',
+              ),
               // Center practice button (same level as other items)
               const PracticeCenterButton(size: 48),
               _buildNavItem(
-                  2, Icons.fitness_center_outlined, Icons.fitness_center, '연습'),
+                2,
+                Icons.fitness_center_outlined,
+                Icons.fitness_center,
+                '연습',
+              ),
               _buildNavItem(3, Icons.person_outline, Icons.person, '프로필'),
             ],
           ),
@@ -119,7 +125,11 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
   }
 
   Widget _buildNavItem(
-      int index, IconData icon, IconData activeIcon, String label) {
+    int index,
+    IconData icon,
+    IconData activeIcon,
+    String label,
+  ) {
     final isSelected = _currentIndex == index;
 
     return InkWell(
@@ -132,15 +142,17 @@ class _StudentHomeScreenState extends ConsumerState<StudentHomeScreen> {
           children: [
             Icon(
               isSelected ? activeIcon : icon,
-              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
+              style: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                    isSelected
+                        ? AppColors.primary
+                        : AppColors.textTertiaryLight,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
