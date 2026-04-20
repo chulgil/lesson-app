@@ -29,9 +29,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     final activeChild = ref.watch(activeChildProfileProvider);
 
     if (activeChild == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return DebugWrapper(
@@ -84,8 +82,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           child: Center(
             child: Text(
               child.initial,
-              style: TextStyle(
-                fontSize: 24,
+              style: AppTypography.headingLarge.copyWith(
                 fontWeight: FontWeight.bold,
                 color: child.profileColor,
               ),
@@ -112,7 +109,9 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: child.connectionStatus.color.withValues(alpha: 0.1),
+                      color: child.connectionStatus.color.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -126,8 +125,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           child.connectionStatus.label,
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: AppTypography.caption.copyWith(
                             fontWeight: FontWeight.w500,
                             color: child.connectionStatus.color,
                           ),
@@ -193,9 +191,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +305,8 @@ class UnconnectedChildDashboard extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(7, (index) {
         final date = weekStart.add(Duration(days: index));
-        final isToday = date.day == now.day &&
+        final isToday =
+            date.day == now.day &&
             date.month == now.month &&
             date.year == now.year;
         final isPast = date.isBefore(DateTime(now.year, now.month, now.day));
@@ -332,32 +329,35 @@ class UnconnectedChildDashboard extends ConsumerWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isToday
-                    ? AppColors.primary
-                    : hasPractice
+                color:
+                    isToday
+                        ? AppColors.primary
+                        : hasPractice
                         ? AppColors.success.withValues(alpha: 0.1)
                         : isPast
-                            ? AppColors.surfaceSecondaryLight
-                            : Colors.transparent,
+                        ? AppColors.surfaceSecondaryLight
+                        : Colors.transparent,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: isToday
-                    ? null
-                    : Border.all(
-                        color: hasPractice
-                            ? AppColors.success
-                            : AppColors.borderLight,
-                        width: hasPractice ? 2 : 1,
-                      ),
+                border:
+                    isToday
+                        ? null
+                        : Border.all(
+                          color:
+                              hasPractice
+                                  ? AppColors.success
+                                  : AppColors.borderLight,
+                          width: hasPractice ? 2 : 1,
+                        ),
               ),
               child: Center(
                 child: Text(
                   '${date.day}',
-                  style: TextStyle(
-                    fontSize: 14,
+                  style: AppTypography.bodyMedium.copyWith(
                     fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                    color: isToday
-                        ? Colors.white
-                        : hasPractice
+                    color:
+                        isToday
+                            ? Colors.white
+                            : hasPractice
                             ? AppColors.success
                             : AppColors.textSecondaryLight,
                   ),
@@ -389,28 +389,29 @@ class UnconnectedChildDashboard extends ConsumerWidget {
     // TODO: Show invite code input dialog
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('초대코드 입력'),
-        content: const TextField(
-          decoration: InputDecoration(
-            hintText: '선생님에게 받은 코드를 입력하세요',
-            border: OutlineInputBorder(),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('초대코드 입력'),
+            content: const TextField(
+              decoration: InputDecoration(
+                hintText: '선생님에게 받은 코드를 입력하세요',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Process invite code
+                  Navigator.pop(context);
+                },
+                child: const Text('연결'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // TODO: Process invite code
-              Navigator.pop(context);
-            },
-            child: const Text('연결'),
-          ),
-        ],
-      ),
     );
   }
 }
