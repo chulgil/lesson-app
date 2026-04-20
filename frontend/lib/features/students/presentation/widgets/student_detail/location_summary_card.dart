@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../domain/entities/class_membership.dart';
 import '../../../domain/entities/lesson_location.dart';
 import '../../providers/location_providers.dart';
@@ -22,9 +23,8 @@ class LocationSummaryCard extends ConsumerWidget {
     }
 
     // Load location if ID is available
-    final locationAsync = locationId != null
-        ? ref.watch(locationProvider(locationId))
-        : null;
+    final locationAsync =
+        locationId != null ? ref.watch(locationProvider(locationId)) : null;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -32,30 +32,39 @@ class LocationSummaryCard extends ConsumerWidget {
       color: AppColors.surfaceSecondaryLight,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.location_on_outlined, size: 18, color: AppColors.primary),
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   '레슨 장소',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             if (locationAsync != null)
               locationAsync.when(
-                data: (location) => _buildLocationInfo(context, location, travelTime),
-                loading: () => const SizedBox(
-                  height: 20,
-                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                ),
+                data:
+                    (location) =>
+                        _buildLocationInfo(context, location, travelTime),
+                loading:
+                    () => const SizedBox(
+                      height: 20,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
                 error: (_, __) => _buildTravelOnly(context, travelTime),
               )
             else
@@ -83,9 +92,9 @@ class LocationSummaryCard extends ConsumerWidget {
             Expanded(
               child: Text(
                 location.name,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -94,9 +103,9 @@ class LocationSummaryCard extends ConsumerWidget {
           const SizedBox(height: 4),
           Text(
             location.displayAddress,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
           ),
         ],
         if (travelTime > 0) ...[
@@ -122,7 +131,11 @@ class LocationSummaryCard extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.directions_car_outlined, size: 14, color: AppColors.primary),
+          Icon(
+            Icons.directions_car_outlined,
+            size: 14,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 4),
           Text(
             '이동 $travelTime분',

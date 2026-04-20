@@ -27,10 +27,7 @@ class AddStudentMethodScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.space4),
-              Text(
-                '어떤 방법으로 학생을 등록할까요?',
-                style: AppTypography.headingMedium,
-              ),
+              Text('어떤 방법으로 학생을 등록할까요?', style: AppTypography.headingMedium),
               const SizedBox(height: AppSpacing.space6),
 
               // Invite card (recommended)
@@ -91,9 +88,10 @@ class _MethodCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isPrimary
-            ? AppColors.primary.withValues(alpha: 0.05)
-            : Theme.of(context).colorScheme.surface,
+        color:
+            isPrimary
+                ? AppColors.primary.withValues(alpha: 0.05)
+                : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isPrimary ? AppColors.primary : AppColors.borderLight,
@@ -111,15 +109,21 @@ class _MethodCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
-                    color: isPrimary
-                        ? AppColors.primary.withValues(alpha: 0.15)
-                        : AppColors.surfaceSecondaryLight,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    color:
+                        isPrimary
+                            ? AppColors.primary.withValues(alpha: 0.15)
+                            : AppColors.surfaceSecondaryLight,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: Icon(
                     icon,
                     size: 24,
-                    color: isPrimary ? AppColors.primary : AppColors.textSecondaryLight,
+                    color:
+                        isPrimary
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
@@ -127,7 +131,10 @@ class _MethodCard extends StatelessWidget {
                   title,
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: isPrimary ? AppColors.primary : AppColors.textPrimaryLight,
+                    color:
+                        isPrimary
+                            ? AppColors.primary
+                            : AppColors.textPrimaryLight,
                   ),
                 ),
                 if (badge != null) ...[
@@ -143,10 +150,9 @@ class _MethodCard extends StatelessWidget {
                     ),
                     child: Text(
                       badge!,
-                      style: AppTypography.caption.copyWith(
+                      style: AppTypography.captionSmall.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
-                        fontSize: 10,
                       ),
                     ),
                   ),
@@ -170,19 +176,17 @@ class _MethodCard extends StatelessWidget {
             // Button
             SizedBox(
               width: double.infinity,
-              child: isPrimary
-                  ? FilledButton(
-                      onPressed: onTap,
-                      child: Text(buttonText),
-                    )
-                  : OutlinedButton(
-                      onPressed: onTap,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
+              child:
+                  isPrimary
+                      ? FilledButton(onPressed: onTap, child: Text(buttonText))
+                      : OutlinedButton(
+                        onPressed: onTap,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                        ),
+                        child: Text(buttonText),
                       ),
-                      child: Text(buttonText),
-                    ),
             ),
           ],
         ),

@@ -813,10 +813,9 @@ class _StudentCard extends ConsumerWidget {
                             ),
                             child: Text(
                               '$subjectCount과목',
-                              style: AppTypography.caption.copyWith(
+                              style: AppTypography.captionSmall.copyWith(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 10,
                               ),
                             ),
                           ),
@@ -900,7 +899,6 @@ class _StudentCard extends ConsumerWidget {
                   style: AppTypography.caption.copyWith(
                     color: AppColors.error,
                     fontWeight: FontWeight.w700,
-                    fontSize: 11,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -932,7 +930,6 @@ class _StudentCard extends ConsumerWidget {
                   style: AppTypography.caption.copyWith(
                     color: AppColors.warning,
                     fontWeight: FontWeight.w700,
-                    fontSize: 11,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -988,9 +985,8 @@ class _PracticeDots extends ConsumerWidget {
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '$practiced/7일',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: AppColors.textTertiaryLight,
-                  fontSize: 10,
                 ),
               ),
             ],

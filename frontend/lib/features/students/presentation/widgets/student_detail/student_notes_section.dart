@@ -27,13 +27,20 @@ class StudentNotesSection extends ConsumerWidget {
           children: [
             Text('레슨 노트', style: AppTypography.headingSmall),
             notesAsync.whenOrNull(
-                  data: (notes) => notes.length > 3
-                      ? TextButton(
-                          onPressed: () =>
-                              context.push(AppRoutes.studentNotes.replaceFirst(':id', studentId)),
-                          child: const Text('전체 보기'),
-                        )
-                      : null,
+                  data:
+                      (notes) =>
+                          notes.length > 3
+                              ? TextButton(
+                                onPressed:
+                                    () => context.push(
+                                      AppRoutes.studentNotes.replaceFirst(
+                                        ':id',
+                                        studentId,
+                                      ),
+                                    ),
+                                child: const Text('전체 보기'),
+                              )
+                              : null,
                 ) ??
                 const SizedBox.shrink(),
           ],
@@ -46,22 +53,27 @@ class StudentNotesSection extends ConsumerWidget {
               return _buildEmptyState();
             }
             return Column(
-              children: notes
-                  .take(3)
-                  .map((lesson) => Padding(
-                        padding:
-                            const EdgeInsets.only(bottom: AppSpacing.space3),
-                        child: _NotePreviewCard(lesson: lesson),
-                      ))
-                  .toList(),
+              children:
+                  notes
+                      .take(3)
+                      .map(
+                        (lesson) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppSpacing.space3,
+                          ),
+                          child: _NotePreviewCard(lesson: lesson),
+                        ),
+                      )
+                      .toList(),
             );
           },
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space4),
-              child: CircularProgressIndicator(),
-            ),
-          ),
+          loading:
+              () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.space4),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
           error: (_, __) => _buildEmptyState(),
         ),
       ],
@@ -105,7 +117,10 @@ class _NotePreviewCard extends StatelessWidget {
         '${lesson.date.month}.${lesson.date.day.toString().padLeft(2, '0')} ($dayName)';
 
     return InkWell(
-      onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
+      onTap:
+          () => context.push(
+            AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+          ),
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
@@ -142,26 +157,28 @@ class _NotePreviewCard extends StatelessWidget {
               Wrap(
                 spacing: 4,
                 runSpacing: 4,
-                children: lesson.keyPoints!
-                    .take(3)
-                    .map((kp) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            kp,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
-                              fontSize: 11,
+                children:
+                    lesson.keyPoints!
+                        .take(3)
+                        .map(
+                          (kp) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              kp,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
-                        ))
-                    .toList(),
+                        )
+                        .toList(),
               ),
             ],
           ],

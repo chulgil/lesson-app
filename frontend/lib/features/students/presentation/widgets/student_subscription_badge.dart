@@ -11,14 +11,13 @@ import '../providers/membership_providers.dart';
 class StudentClassBadge extends ConsumerWidget {
   final String studentId;
 
-  const StudentClassBadge({
-    super.key,
-    required this.studentId,
-  });
+  const StudentClassBadge({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final membershipsAsync = ref.watch(activeStudentMembershipsProvider(studentId));
+    final membershipsAsync = ref.watch(
+      activeStudentMembershipsProvider(studentId),
+    );
 
     return membershipsAsync.when(
       data: (memberships) {
@@ -28,27 +27,26 @@ class StudentClassBadge extends ConsumerWidget {
 
         // Get the primary (first) membership
         final membership = memberships.first;
-        final lessonClassAsync = ref.watch(lessonClassProvider(membership.lessonClassId));
+        final lessonClassAsync = ref.watch(
+          lessonClassProvider(membership.lessonClassId),
+        );
 
         return lessonClassAsync.when(
           data: (lessonClass) {
-            final isAcademy = lessonClass?.type.toString().contains('academy') ?? false;
+            final isAcademy =
+                lessonClass?.type.toString().contains('academy') ?? false;
             // Subtle text-only badge with neutral background
             return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 6,
-                vertical: 2,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.surfaceSecondaryLight,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 isAcademy ? '학원' : '개인',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: AppColors.textSecondaryLight,
                   fontWeight: FontWeight.w500,
-                  fontSize: 10,
                 ),
               ),
             );
@@ -67,14 +65,13 @@ class StudentClassBadge extends ConsumerWidget {
 class StudentSubscriptionMiniBadge extends ConsumerWidget {
   final String studentId;
 
-  const StudentSubscriptionMiniBadge({
-    super.key,
-    required this.studentId,
-  });
+  const StudentSubscriptionMiniBadge({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final subscriptionsAsync = ref.watch(activeStudentSubscriptionsProvider(studentId));
+    final subscriptionsAsync = ref.watch(
+      activeStudentSubscriptionsProvider(studentId),
+    );
 
     return subscriptionsAsync.when(
       data: (subscriptions) {
@@ -99,17 +96,16 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
     if (subscriptions.isEmpty) return null;
 
     // Sort by urgency (expiring soon first, then by remaining)
-    final sorted = List<Subscription>.from(subscriptions)
-      ..sort((a, b) {
-        // Expiring soon first
-        if (a.isExpiringSoon && !b.isExpiringSoon) return -1;
-        if (!a.isExpiringSoon && b.isExpiringSoon) return 1;
+    final sorted = List<Subscription>.from(subscriptions)..sort((a, b) {
+      // Expiring soon first
+      if (a.isExpiringSoon && !b.isExpiringSoon) return -1;
+      if (!a.isExpiringSoon && b.isExpiringSoon) return 1;
 
-        // Then by remaining count/days
-        final aRemaining = a.remainingLessons ?? a.daysUntilExpiration ?? 999;
-        final bRemaining = b.remainingLessons ?? b.daysUntilExpiration ?? 999;
-        return aRemaining.compareTo(bRemaining);
-      });
+      // Then by remaining count/days
+      final aRemaining = a.remainingLessons ?? a.daysUntilExpiration ?? 999;
+      final bRemaining = b.remainingLessons ?? b.daysUntilExpiration ?? 999;
+      return aRemaining.compareTo(bRemaining);
+    });
 
     return sorted.first;
   }
@@ -117,10 +113,7 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
   Widget _buildNoSubscriptionBadge() {
     return Text(
       '수강권 없음',
-      style: AppTypography.caption.copyWith(
-        color: AppColors.textTertiaryLight,
-        fontSize: 11,
-      ),
+      style: AppTypography.caption.copyWith(color: AppColors.textTertiaryLight),
     );
   }
 
@@ -160,7 +153,6 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
           style: AppTypography.caption.copyWith(
             color: textColor,
             fontWeight: FontWeight.w500,
-            fontSize: 11,
           ),
         ),
       ],

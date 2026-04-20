@@ -470,9 +470,8 @@ class _TileLeading extends StatelessWidget {
               ),
               child: Text(
                 '$feedbackCount',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: Colors.white,
-                  fontSize: 10,
                   fontWeight: FontWeight.bold,
                   height: 1.0,
                 ),

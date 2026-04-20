@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../providers/travel_analytics_provider.dart';
 
 /// Monthly travel analytics summary card for the teacher's profile/dashboard.
@@ -22,15 +23,21 @@ class TravelAnalyticsCard extends ConsumerWidget {
           margin: EdgeInsets.zero,
           elevation: 0,
           color: AppColors.surfaceSecondaryLight,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.space4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.directions_car_outlined, size: 18, color: AppColors.primary),
+                    Icon(
+                      Icons.directions_car_outlined,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '월간 이동 리포트',
@@ -66,9 +73,9 @@ class TravelAnalyticsCard extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Colors.grey[600],
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
         ),
         const SizedBox(height: 2),
         Text(
