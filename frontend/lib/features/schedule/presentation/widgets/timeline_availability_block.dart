@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import 'timeline_lesson_block.dart' show kTimelineUnitHeight;
 
@@ -27,11 +28,8 @@ class TimelineAvailabilityBlock extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
           color: AppColors.availabilityEmpty,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: AppColors.availabilityBorder,
-            width: 1,
-          ),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+          border: Border.all(color: AppColors.availabilityBorder, width: 1),
         ),
         child: Center(
           child: Text(

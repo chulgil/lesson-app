@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/teacher_availability.dart';
 import '../../domain/entities/unified_lesson_request.dart';
-import '../providers/teacher_availability_providers.dart'
-    hide SelectedSlot;
+import '../providers/teacher_availability_providers.dart' hide SelectedSlot;
 import 'slot_selection_logic.dart';
 
 /// Weekly calendar picker with prev/next navigation and 3-slot selection.
@@ -142,26 +142,27 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
   }
 
   void _notifyParent() {
-    final slots = _selectionLogic.slots.map((s) {
-      if (widget.lessonType == LessonRequestType.regular) {
-        // Regular: weekday only, no specific date
-        return PreferredTimeSlot(
-          priority: s.priority,
-          dayOfWeek: s.dayOfWeek,
-          startTime: s.startTime,
-          endTime: s.endTime,
-        );
-      } else {
-        // Trial / perSession: specific date
-        return PreferredTimeSlot(
-          priority: s.priority,
-          date: s.date,
-          dayOfWeek: s.dayOfWeek,
-          startTime: s.startTime,
-          endTime: s.endTime,
-        );
-      }
-    }).toList();
+    final slots =
+        _selectionLogic.slots.map((s) {
+          if (widget.lessonType == LessonRequestType.regular) {
+            // Regular: weekday only, no specific date
+            return PreferredTimeSlot(
+              priority: s.priority,
+              dayOfWeek: s.dayOfWeek,
+              startTime: s.startTime,
+              endTime: s.endTime,
+            );
+          } else {
+            // Trial / perSession: specific date
+            return PreferredTimeSlot(
+              priority: s.priority,
+              date: s.date,
+              dayOfWeek: s.dayOfWeek,
+              startTime: s.startTime,
+              endTime: s.endTime,
+            );
+          }
+        }).toList();
     widget.onSlotsChanged(slots);
   }
 
@@ -179,19 +180,21 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
 
     return availabilityAsync.when(
       data: (availability) => _buildContent(availability),
-      loading: () => const SizedBox(
-        height: 200,
-        child: Center(child: CircularProgressIndicator()),
-      ),
-      error: (e, _) => SizedBox(
-        height: 200,
-        child: Center(
-          child: Text(
-            '스케줄을 불러올 수 없습니다',
-            style: TextStyle(color: AppColors.textSecondaryLight),
+      loading:
+          () => const SizedBox(
+            height: 200,
+            child: Center(child: CircularProgressIndicator()),
           ),
-        ),
-      ),
+      error:
+          (e, _) => SizedBox(
+            height: 200,
+            child: Center(
+              child: Text(
+                '스케줄을 불러올 수 없습니다',
+                style: TextStyle(color: AppColors.textSecondaryLight),
+              ),
+            ),
+          ),
     );
   }
 
@@ -207,9 +210,10 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     _now = DateTime.now();
     _schedulesByDay = {};
     for (var i = 0; i < 7; i++) {
-      _schedulesByDay[i] = availability.weeklySchedules
-          .where((s) => s.dayOfWeek == i && s.isActive)
-          .toList();
+      _schedulesByDay[i] =
+          availability.weeklySchedules
+              .where((s) => s.dayOfWeek == i && s.isActive)
+              .toList();
     }
 
     return Column(
@@ -267,7 +271,8 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
           SizedBox(width: _timeColumnWidth),
           ...List.generate(7, (i) {
             final date = _weekStart.add(Duration(days: i));
-            final isToday = date.year == todayOnly.year &&
+            final isToday =
+                date.year == todayOnly.year &&
                 date.month == todayOnly.month &&
                 date.day == todayOnly.day;
 
@@ -279,30 +284,33 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                     _dayLabels[i],
                     style: AppTypography.caption.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isToday
-                          ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                      color:
+                          isToday
+                              ? AppColors.primary
+                              : AppColors.textSecondaryLight,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Container(
                     width: 22,
                     height: 22,
-                    decoration: isToday
-                        ? const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          )
-                        : null,
+                    decoration:
+                        isToday
+                            ? const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            )
+                            : null,
                     child: Center(
                       child: Text(
                         '${date.day}',
                         style: AppTypography.caption.copyWith(
                           fontWeight:
                               isToday ? FontWeight.bold : FontWeight.normal,
-                          color: isToday
-                              ? Colors.white
-                              : AppColors.textSecondaryLight,
+                          color:
+                              isToday
+                                  ? Colors.white
+                                  : AppColors.textSecondaryLight,
                         ),
                       ),
                     ),
@@ -346,9 +354,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
               ),
             ),
             ...List.generate(7, (dayIndex) {
-              return Expanded(
-                child: _buildCell(dayIndex, hour, availability),
-              );
+              return Expanded(child: _buildCell(dayIndex, hour, availability));
             }),
           ],
         ),
@@ -356,11 +362,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     }).toList();
   }
 
-  Widget _buildCell(
-    int dayIndex,
-    int hour,
-    TeacherAvailability availability,
-  ) {
+  Widget _buildCell(int dayIndex, int hour, TeacherAvailability availability) {
     final startTime = '${hour.toString().padLeft(2, '0')}:00';
     final isPast = _isPastSlot(dayIndex, hour);
     final isAvailable =
@@ -373,7 +375,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: AppColors.scheduleMutedBackground,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
       );
     }
@@ -386,7 +388,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
           margin: const EdgeInsets.all(1),
           decoration: BoxDecoration(
             color: _priorityColor(priority),
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
             child: Text(
@@ -408,7 +410,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.2),
             width: 0.5,
@@ -426,8 +428,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
     final daySchedules = _schedulesByDay[dayIndex] ?? [];
 
     for (final schedule in daySchedules) {
-      final schedStart =
-          int.tryParse(schedule.startTime.split(':').first) ?? 0;
+      final schedStart = int.tryParse(schedule.startTime.split(':').first) ?? 0;
       final schedEnd = int.tryParse(schedule.endTime.split(':').first) ?? 0;
       if (hour >= schedStart && hour < schedEnd) {
         return true;
@@ -475,9 +476,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                     color: AppColors.primary,
                   ),
                 ),
-                Expanded(
-                  child: Text(label, style: AppTypography.bodySmall),
-                ),
+                Expanded(child: Text(label, style: AppTypography.bodySmall)),
                 GestureDetector(
                   onTap: () => _onSlotRemoved(i),
                   child: const Icon(

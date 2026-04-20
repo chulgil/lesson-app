@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/utils/name_utils.dart';
@@ -82,7 +83,7 @@ class TimelineLessonBlock extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 1),
         decoration: BoxDecoration(
           color: colors.background,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border:
               isNow ? Border.all(color: baseColors.accent, width: 1.5) : null,
         ),
