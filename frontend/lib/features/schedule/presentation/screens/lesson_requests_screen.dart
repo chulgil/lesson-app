@@ -7,13 +7,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/entities/unified_lesson_request.dart';
-import '../../../../features/settings/presentation/providers/teacher_settings_provider.dart';
 import '../providers/unified_lesson_request_providers.dart';
-import '../widgets/decline_bottom_sheet.dart';
 import '../widgets/request_list_item.dart';
-import '../widgets/unified_approval_bottom_sheet.dart';
 
 /// Screen for teachers to view and respond to lesson requests.
 ///
@@ -36,9 +32,10 @@ class LessonRequestsScreen extends ConsumerWidget {
           loading: () => const Text(AppStrings.lessonRequestTitle),
           error: (_, __) => const Text(AppStrings.lessonRequestTitle),
           data: (requests) {
-            final pendingCount = requests
-                .where((r) => r.status == UnifiedRequestStatus.pending)
-                .length;
+            final pendingCount =
+                requests
+                    .where((r) => r.status == UnifiedRequestStatus.pending)
+                    .length;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,31 +56,39 @@ class LessonRequestsScreen extends ConsumerWidget {
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline,
-                  size: AppSpacing.iconXL, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space4),
-              Text(AppStrings.requestLoadError,
-                  style: AppTypography.bodyMedium
-                      .copyWith(color: AppColors.textSecondaryLight)),
-              const SizedBox(height: AppSpacing.space4),
-              ElevatedButton(
-                onPressed: () => context.pop(),
-                child: const Text('돌아가기'),
+        error:
+            (e, __) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    size: AppSpacing.iconXL,
+                    color: AppColors.error,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  Text(
+                    AppStrings.requestLoadError,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  ElevatedButton(
+                    onPressed: () => context.pop(),
+                    child: const Text('돌아가기'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
         data: (requests) {
           if (requests.isEmpty) {
             return Center(
               child: Text(
                 AppStrings.noHistory,
-                style: AppTypography.bodyMedium
-                    .copyWith(color: AppColors.textSecondaryLight),
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
             );
           }
@@ -94,25 +99,24 @@ class LessonRequestsScreen extends ConsumerWidget {
               vertical: AppSpacing.space3,
             ),
             itemCount: requests.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: AppSpacing.space2),
+            separatorBuilder:
+                (_, __) => const SizedBox(height: AppSpacing.space2),
             itemBuilder: (context, index) {
               final request = requests[index];
               return Container(
                 decoration: BoxDecoration(
                   color: AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(color: AppColors.borderLight),
                 ),
                 child: RequestListItem(
                   request: request,
                   studentName: AppStrings.student,
-                  onTap: () => context.push(
-                    AppRoutes.requestDetail
-                        .replaceFirst(':id', request.id),
-                    extra: {'viewerRole': 'teacher'},
-                  ),
+                  onTap:
+                      () => context.push(
+                        AppRoutes.requestDetail.replaceFirst(':id', request.id),
+                        extra: {'viewerRole': 'teacher'},
+                      ),
                 ),
               );
             },

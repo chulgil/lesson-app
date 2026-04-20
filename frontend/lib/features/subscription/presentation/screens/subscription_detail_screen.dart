@@ -52,13 +52,14 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           viewerRole: viewerRole,
         );
       },
-      loading: () => Scaffold(
-        appBar: AppBar(
-          title: Text(AppStrings.subscriptionDetailTitle),
-          centerTitle: true,
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
+      loading:
+          () => Scaffold(
+            appBar: AppBar(
+              title: Text(AppStrings.subscriptionDetailTitle),
+              centerTitle: true,
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
       error: (error, _) => _buildErrorScaffold(error.toString()),
     );
   }
@@ -167,7 +168,8 @@ class _SubscriptionDetailBodyState
     super.dispose();
   }
 
-  void _showEventMessage(String message, {
+  void _showEventMessage(
+    String message, {
     Color color = AppColors.success,
     IconData icon = Icons.check_circle,
   }) {
@@ -182,92 +184,92 @@ class _SubscriptionDetailBodyState
     });
   }
 
-  void _showSuccess(String message) =>
-      _showEventMessage(message, color: AppColors.success, icon: Icons.check_circle);
+  void _showSuccess(String message) => _showEventMessage(
+    message,
+    color: AppColors.success,
+    icon: Icons.check_circle,
+  );
 
   /// Event strip widget — pixel-exact match with RequestDetailScreen._buildEventStrip()
   Widget _buildEventStrip() {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
-      child: _eventMessage != null
-          ? Container(
-              key: ValueKey(_eventMessage),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space2,
-              ),
-              color: _eventColor.withValues(alpha: 0.12),
-              child: Row(
-                children: [
-                  Icon(_eventIcon, size: 16, color: _eventColor),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      _eventMessage!,
-                      style: AppTypography.caption.copyWith(
-                        color: _eventColor,
-                        fontWeight: FontWeight.w600,
+      child:
+          _eventMessage != null
+              ? Container(
+                key: ValueKey(_eventMessage),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenPadding,
+                  vertical: AppSpacing.space2,
+                ),
+                color: _eventColor.withValues(alpha: 0.12),
+                child: Row(
+                  children: [
+                    Icon(_eventIcon, size: 16, color: _eventColor),
+                    const SizedBox(width: AppSpacing.space2),
+                    Expanded(
+                      child: Text(
+                        _eventMessage!,
+                        style: AppTypography.caption.copyWith(
+                          color: _eventColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () => setState(() => _eventMessage = null),
-                    child: Icon(Icons.close, size: 14, color: _eventColor),
-                  ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
+                    GestureDetector(
+                      onTap: () => setState(() => _eventMessage = null),
+                      child: Icon(Icons.close, size: 14, color: _eventColor),
+                    ),
+                  ],
+                ),
+              )
+              : const SizedBox.shrink(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final membershipAsync =
-        ref.watch(membershipProvider(subscription.membershipId));
+    final membershipAsync = ref.watch(
+      membershipProvider(subscription.membershipId),
+    );
     final studentNames = ref.watch(studentNameMapProvider);
-    final academyNames = ref.watch(academyNameMapProvider);
 
     return membershipAsync.when(
       data: (membership) {
         final instrument =
             membership?.instrument ?? AppStrings.instrumentFallback;
-        final lessonClassAsync = membership != null
-            ? ref.watch(lessonClassProvider(membership.lessonClassId))
-            : null;
+        final lessonClassAsync =
+            membership != null
+                ? ref.watch(lessonClassProvider(membership.lessonClassId))
+                : null;
 
         // Build AppBar title — matches RequestDetailScreen format:
         // "학원이름 학생이름 (타입)" or "학생이름 (타입)"
         final studentName =
             studentNames[subscription.studentId] ?? AppStrings.student;
         final lessonClass = lessonClassAsync?.valueOrNull;
-        final isAcademy =
-            lessonClass?.type.name == 'academy';
+        final isAcademy = lessonClass?.type.name == 'academy';
         final typeLabel = subscription.typeLabel;
 
-        final appBarTitle = isAcademy && lessonClass != null
-            ? '${lessonClass.name} $studentName ($typeLabel)'
-            : '$studentName ($typeLabel)';
+        final appBarTitle =
+            isAcademy && lessonClass != null
+                ? '${lessonClass.name} $studentName ($typeLabel)'
+                : '$studentName ($typeLabel)';
 
         return Scaffold(
           appBar: AppBar(
             titleSpacing: 0,
-            title: Text(
-              appBarTitle,
-              style: AppTypography.headingSmall,
-            ),
+            title: Text(appBarTitle, style: AppTypography.headingSmall),
           ),
           body: Column(
             children: [
               // SessionProgressBar (fixed, no wrapper — matches request_detail)
               SessionProgressBar(
-                totalSessions:
-                    subscription.totalLessonsForDisplay ?? 0,
+                totalSessions: subscription.totalLessonsForDisplay ?? 0,
                 completedSessions: subscription.usedLessons,
                 selectedSession: _selectedSession,
-                isMonthly:
-                    subscription.type == SubscriptionType.monthly,
+                isMonthly: subscription.type == SubscriptionType.monthly,
                 onSessionTap: (session) {
                   setState(() => _selectedSession = session);
                 },
@@ -302,27 +304,29 @@ class _SubscriptionDetailBodyState
           ),
         );
       },
-      loading: () => Scaffold(
-        appBar: AppBar(
-          title: Text(AppStrings.subscriptionDetailTitle),
-          centerTitle: true,
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => Scaffold(
-        appBar: AppBar(
-          title: Text(AppStrings.subscriptionDetailTitle),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Text(
-            AppStrings.lessonInfoNotFound,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+      loading:
+          () => Scaffold(
+            appBar: AppBar(
+              title: Text(AppStrings.subscriptionDetailTitle),
+              centerTitle: true,
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (_, __) => Scaffold(
+            appBar: AppBar(
+              title: Text(AppStrings.subscriptionDetailTitle),
+              centerTitle: true,
+            ),
+            body: Center(
+              child: Text(
+                AppStrings.lessonInfoNotFound,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -345,12 +349,7 @@ class _SubscriptionDetailBodyState
       sessionNumber: _selectedSession,
       createdAt: DateTime.now(),
     );
-    addSubscriptionSessionEvent(
-      ref,
-      subscription.id,
-      _selectedSession,
-      event,
-    );
+    addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
     _messageController.clear();
     _showSuccess(AppStrings.messageSentSuccess);
   }
@@ -364,34 +363,38 @@ class _SubscriptionDetailBodyState
     if (changeType == null || !context.mounted) return;
 
     // Both single and bulk use the same ScheduleChangeSlotScreen
-    final result =
-        await Navigator.of(context).push<ScheduleChangeSlotResult>(
+    final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
       MaterialPageRoute(
-        builder: (_) => ScheduleChangeSlotScreen(
-          params: ScheduleChangeSlotParams(
-            teacherId: subscription.membershipId, // TODO: resolve teacherId
-            studentId: subscription.studentId,
-            durationMinutes: 60,
-            currentScheduleLabel:
-                AppStrings.sessionNumberLabel(_selectedSession),
-            isBulkChange: changeType == ScheduleChangeType.bulkChange,
-          ),
-        ),
+        builder:
+            (_) => ScheduleChangeSlotScreen(
+              params: ScheduleChangeSlotParams(
+                teacherId: subscription.membershipId, // TODO: resolve teacherId
+                studentId: subscription.studentId,
+                durationMinutes: 60,
+                currentScheduleLabel: AppStrings.sessionNumberLabel(
+                  _selectedSession,
+                ),
+                isBulkChange: changeType == ScheduleChangeType.bulkChange,
+              ),
+            ),
       ),
     );
     if (result == null || !context.mounted) return;
 
     // Record schedule change event in chat (with slot data, same as RequestDetailScreen)
-    final suggestedSlots = result.slots
-        .map((s) => TimeSlotOption(
-              id: s.id,
-              dayOfWeek: s.dayOfWeek,
-              startTime:
-                  '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-              endTime:
-                  '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-            ))
-        .toList();
+    final suggestedSlots =
+        result.slots
+            .map(
+              (s) => TimeSlotOption(
+                id: s.id,
+                dayOfWeek: s.dayOfWeek,
+                startTime:
+                    '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                endTime:
+                    '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+              ),
+            )
+            .toList();
 
     _recordScheduleChangeEvent(
       changeType: changeType,
@@ -419,12 +422,7 @@ class _SubscriptionDetailBodyState
       createdAt: DateTime.now(),
     );
 
-    addSubscriptionSessionEvent(
-      ref,
-      subscription.id,
-      _selectedSession,
-      event,
-    );
+    addSubscriptionSessionEvent(ref, subscription.id, _selectedSession, event);
 
     if (mounted) {
       _showSuccess(AppStrings.scheduleChangePropose);

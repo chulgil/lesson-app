@@ -8,11 +8,9 @@ import '../../../features/schedule/domain/entities/group_class_schedule.dart';
 import '../../../features/schedule/presentation/screens/group_class_attendance_screen.dart';
 import '../../../features/schedule/presentation/screens/group_class_detail_screen.dart';
 import '../../../features/search/presentation/screens/teacher_search_screen.dart';
-import '../../../features/schedule/presentation/screens/lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/unified_lesson_request_screen.dart';
 import '../../../features/schedule/presentation/screens/request_completion_screen.dart';
 import '../../../features/schedule/presentation/screens/all_lesson_requests_screen.dart';
-import '../../../features/schedule/presentation/screens/my_lesson_requests_screen.dart';
 import '../../../features/schedule/presentation/screens/request_detail_screen.dart';
 import '../../../features/schedule/presentation/screens/my_bookings_screen.dart';
 import '../../../features/schedule/presentation/screens/pending_bookings_screen.dart';
@@ -47,10 +45,12 @@ List<GoRoute> scheduleRoutes = [
       final map = extra as Map<String, dynamic>?;
       return UnifiedLessonRequestScreen(
         params: UnifiedLessonRequestParams(
-          teacherId: map?['teacherId'] ??
+          teacherId:
+              map?['teacherId'] ??
               state.uri.queryParameters['teacherId'] ??
               'teacher_1',
-          teacherName: map?['teacherName'] ??
+          teacherName:
+              map?['teacherName'] ??
               state.uri.queryParameters['teacherName'] ??
               '선생님',
           teacherInstruments:
@@ -107,7 +107,8 @@ List<GoRoute> scheduleRoutes = [
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
       return AllLessonRequestsScreen(
-        teacherId: extra?['teacherId'] ??
+        teacherId:
+            extra?['teacherId'] ??
             state.uri.queryParameters['teacherId'] ??
             'teacher_1',
       );
@@ -120,8 +121,8 @@ List<GoRoute> scheduleRoutes = [
     name: 'myLessonRequests',
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>?;
-      final studentId = extra?['studentId'] ??
-          state.uri.queryParameters['studentId'] ?? '';
+      final studentId =
+          extra?['studentId'] ?? state.uri.queryParameters['studentId'] ?? '';
       return AllLessonRequestsScreen(
         teacherId: studentId,
         viewerRole: 'student',
@@ -138,19 +139,22 @@ List<GoRoute> scheduleRoutes = [
       return MyBookingsScreen(
         studentId:
             extra?['studentId'] ?? state.uri.queryParameters['studentId'] ?? '',
-        studentName: extra?['studentName'] ??
+        studentName:
+            extra?['studentName'] ??
             state.uri.queryParameters['studentName'] ??
             '',
         teacherId:
             extra?['teacherId'] ?? state.uri.queryParameters['teacherId'] ?? '',
-        teacherName: extra?['teacherName'] ??
+        teacherName:
+            extra?['teacherName'] ??
             state.uri.queryParameters['teacherName'] ??
             '',
         remainingReschedules: extra?['remainingReschedules'] ?? 2,
         totalReschedules: extra?['totalReschedules'] ?? 2,
         instrument:
             extra?['instrument'] ?? state.uri.queryParameters['instrument'],
-        subscriptionId: extra?['subscriptionId'] ??
+        subscriptionId:
+            extra?['subscriptionId'] ??
             state.uri.queryParameters['subscriptionId'], // 🆕
       );
     },
@@ -165,8 +169,7 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.teacherAvailability,
     name: 'teacherAvailability',
     builder: (context, state) {
-      final teacherId =
-          state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
       return TeacherAvailabilityScreen(teacherId: teacherId);
     },
   ),
@@ -176,8 +179,7 @@ List<GoRoute> scheduleRoutes = [
     path: AppRoutes.pendingBookings,
     name: 'pendingBookings',
     builder: (context, state) {
-      final teacherId =
-          state.uri.queryParameters['teacherId'] ?? 'teacher_1';
+      final teacherId = state.uri.queryParameters['teacherId'] ?? 'teacher_1';
       return PendingBookingsScreen(teacherId: teacherId);
     },
   ),

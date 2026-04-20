@@ -145,9 +145,6 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             studentNames[request.studentId] ?? AppStrings.student;
         final academyName = academyNames[request.academyId];
 
-        // Watch student data for regular lesson profile card
-        final studentAsync = ref.watch(studentProvider(request.studentId));
-
         // Watch teacher templates for Phase 2 proposal display
         final proposalTemplates =
             ref

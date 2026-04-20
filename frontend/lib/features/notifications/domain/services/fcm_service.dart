@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../../../core/config/environment.dart';
 import '../../../../core/network/api_client.dart';
@@ -23,10 +22,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// Manages device token registration, foreground/background message handling,
 /// and bridges FCM messages to the local notification system.
 class FcmService {
-  FcmService({
-    required this.localNotificationService,
-    required this.apiClient,
-  });
+  FcmService({required this.localNotificationService, required this.apiClient});
 
   final LocalNotificationService localNotificationService;
   final ApiClient apiClient;
@@ -68,12 +64,14 @@ class FcmService {
     }
 
     // Listen for token refresh
-    _tokenRefreshSubscription =
-        _messaging.onTokenRefresh.listen(_registerToken);
+    _tokenRefreshSubscription = _messaging.onTokenRefresh.listen(
+      _registerToken,
+    );
 
     // Handle foreground messages
-    _foregroundSubscription =
-        FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    _foregroundSubscription = FirebaseMessaging.onMessage.listen(
+      _handleForegroundMessage,
+    );
 
     // Handle notification tap when app is in background/terminated
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
@@ -99,10 +97,10 @@ class FcmService {
     if (EnvironmentConfig.useMockData) return;
 
     try {
-      await apiClient.post('/device-tokens', data: {
-        'token': token,
-        'platform': Platform.isIOS ? 'ios' : 'android',
-      });
+      await apiClient.post(
+        '/device-tokens',
+        data: {'token': token, 'platform': Platform.isIOS ? 'ios' : 'android'},
+      );
     } catch (_) {
       // Token registration failure is non-blocking
     }
@@ -149,9 +147,10 @@ class FcmService {
         ),
         title: remoteNotification?.title ?? data['title'] ?? '',
         body: remoteNotification?.body ?? data['body'] ?? '',
-        data: data.containsKey('extra')
-            ? jsonDecode(data['extra'] as String) as Map<String, dynamic>?
-            : null,
+        data:
+            data.containsKey('extra')
+                ? jsonDecode(data['extra'] as String) as Map<String, dynamic>?
+                : null,
         createdAt: DateTime.now(),
         sentAt: DateTime.now(),
         actionUrl: data['action_url'],

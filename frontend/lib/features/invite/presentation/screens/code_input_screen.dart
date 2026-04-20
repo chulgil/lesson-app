@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -23,10 +24,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
     6,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(
-    6,
-    (_) => FocusNode(),
-  );
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -85,11 +83,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.dialpad,
-                  size: 40,
-                  color: AppColors.primary,
-                ),
+                child: Icon(Icons.dialpad, size: 40, color: AppColors.primary),
               ),
 
               const SizedBox(height: AppSpacing.space6),
@@ -153,9 +147,8 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isCodeComplete && !_isLoading
-                      ? _submitCode
-                      : null,
+                  onPressed:
+                      _isCodeComplete && !_isLoading ? _submitCode : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -163,19 +156,22 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
                       vertical: AppSpacing.space4,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('확인'),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text(AppStrings.confirm),
                 ),
               ),
 
@@ -236,9 +232,7 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
             borderSide: BorderSide(color: AppColors.error),
           ),
         ),
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-        ],
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         onChanged: (value) {
           setState(() {
             _errorMessage = null;
@@ -314,9 +308,10 @@ class _CodeInputScreenState extends ConsumerState<CodeInputScreen> {
 
       if (!invite.isValid) {
         setState(() {
-          _errorMessage = invite.status == InviteStatus.expired
-              ? '만료된 초대 코드입니다'
-              : '유효하지 않은 초대 코드입니다';
+          _errorMessage =
+              invite.status == InviteStatus.expired
+                  ? '만료된 초대 코드입니다'
+                  : '유효하지 않은 초대 코드입니다';
         });
         return;
       }

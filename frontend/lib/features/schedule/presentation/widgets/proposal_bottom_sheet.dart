@@ -389,10 +389,6 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           profile.defaultBankAccount?.id ?? allAccounts.first.id;
     }
 
-    // Find selected account for display
-    final selectedAccount =
-        allAccounts.where((a) => a.id == _selectedBankAccountId).firstOrNull;
-
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space3,
