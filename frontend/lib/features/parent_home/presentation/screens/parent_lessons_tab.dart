@@ -15,10 +15,7 @@ class ParentLessonsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('레슨 일정'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('레슨 일정'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
@@ -27,10 +24,7 @@ class ParentLessonsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
 
           // Upcoming lessons
-          Text(
-            '예정된 레슨',
-            style: AppTypography.headingSmall,
-          ),
+          Text('예정된 레슨', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
 
           _LessonCard(
@@ -40,7 +34,13 @@ class ParentLessonsTab extends ConsumerWidget {
             endTime: '15:00',
             teacherName: '김선생님',
             status: LessonStatus.confirmed,
-            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_upcoming_1')),
+            onTap:
+                () => context.push(
+                  AppRoutes.lessonDetail.replaceFirst(
+                    ':id',
+                    'lesson_upcoming_1',
+                  ),
+                ),
           ),
 
           const SizedBox(height: AppSpacing.space3),
@@ -52,16 +52,19 @@ class ParentLessonsTab extends ConsumerWidget {
             endTime: '15:00',
             teacherName: '김선생님',
             status: LessonStatus.confirmed,
-            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_upcoming_2')),
+            onTap:
+                () => context.push(
+                  AppRoutes.lessonDetail.replaceFirst(
+                    ':id',
+                    'lesson_upcoming_2',
+                  ),
+                ),
           ),
 
           const SizedBox(height: AppSpacing.space6),
 
           // Past lessons
-          Text(
-            '지난 레슨',
-            style: AppTypography.headingSmall,
-          ),
+          Text('지난 레슨', style: AppTypography.headingSmall),
           const SizedBox(height: AppSpacing.space3),
 
           _LessonCard(
@@ -72,7 +75,10 @@ class ParentLessonsTab extends ConsumerWidget {
             teacherName: '김선생님',
             status: LessonStatus.completed,
             hasNote: true,
-            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1')),
+            onTap:
+                () => context.push(
+                  AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_1'),
+                ),
             onViewNote: () => _showLessonNoteSheet(context, 'lesson_1'),
           ),
 
@@ -86,7 +92,10 @@ class ParentLessonsTab extends ConsumerWidget {
             teacherName: '김선생님',
             status: LessonStatus.completed,
             hasNote: true,
-            onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2')),
+            onTap:
+                () => context.push(
+                  AppRoutes.lessonDetail.replaceFirst(':id', 'lesson_2'),
+                ),
             onViewNote: () => _showLessonNoteSheet(context, 'lesson_2'),
           ),
         ],
@@ -101,166 +110,216 @@ class ParentLessonsTab extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('레슨 노트', style: AppTypography.headingMedium),
-                  TextButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      context.push(AppRoutes.lessonDetail.replaceFirst(':id', lessonId));
-                    },
-                    icon: const Icon(Icons.open_in_new, size: 16),
-                    label: const Text('상세보기'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.space4),
-              // Content
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  children: [
-                    // Lesson info
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.space3),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceSecondaryLight,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            expand: false,
+            builder:
+                (context, scrollController) => Container(
+                  padding: const EdgeInsets.all(AppSpacing.space4),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Handle
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(
+                            bottom: AppSpacing.space4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.borderLight,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
                       ),
-                      child: Row(
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(Icons.calendar_today, size: 16, color: AppColors.textSecondaryLight),
-                          const SizedBox(width: 8),
-                          Text(
-                            '12월 21일 (토) 14:00 - 15:00',
-                            style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
-                            ),
+                          Text('레슨 노트', style: AppTypography.headingMedium),
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              context.push(
+                                AppRoutes.lessonDetail.replaceFirst(
+                                  ':id',
+                                  lessonId,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.open_in_new, size: 16),
+                            label: const Text('상세보기'),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-
-                    // Note content
-                    Text('수업 내용', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: AppSpacing.space2),
-                    Text(
-                      '• 스케일 연습: A장조 3옥타브 연습. 음정 안정성이 많이 향상되었습니다.\n'
-                      '• 에튀드: 크로이처 No.2 마무리. 다음 주부터 No.3 시작 예정.\n'
-                      '• 곡 연습: 모차르트 소나타 1악장 익스포지션 부분. 비브라토 적용 연습.',
-                      style: AppTypography.bodyMedium,
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-
-                    // Teacher comment
-                    Text('선생님 코멘트', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.space3),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                        border: Border.all(color: AppColors.primaryLight),
-                      ),
-                      child: Text(
-                        '이번 주 연습을 정말 열심히 해왔네요! 특히 스케일의 음정이 많이 안정되었어요. '
-                        '다음 주까지 비브라토 연습에 집중해서 모차르트 곡에 적용해보세요. '
-                        '화이팅입니다! 💪',
-                        style: AppTypography.bodyMedium,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-
-                    // Practice assignments
-                    Text('과제', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: AppSpacing.space2),
-                    _buildAssignmentItem(
-                      title: '스케일 연습',
-                      description: 'A장조 3옥타브 (메트로놈 ♩=80)',
-                      priority: 'must',
-                    ),
-                    _buildAssignmentItem(
-                      title: '비브라토 연습',
-                      description: '느린 템포로 꾸준히 연습',
-                      priority: 'should',
-                    ),
-                    _buildAssignmentItem(
-                      title: '모차르트 소나타',
-                      description: '1악장 전체 암보',
-                      priority: 'must',
-                    ),
-                    const SizedBox(height: AppSpacing.space4),
-
-                    // Recording (if any)
-                    Text('녹음', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: AppSpacing.space2),
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.space3),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceSecondaryLight,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.play_arrow, color: Colors.white),
-                          ),
-                          const SizedBox(width: AppSpacing.space3),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('모차르트 소나타 녹음', style: AppTypography.bodyMedium),
-                                Text(
-                                  '3:24',
-                                  style: AppTypography.caption.copyWith(
+                      const SizedBox(height: AppSpacing.space4),
+                      // Content
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          children: [
+                            // Lesson info
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.space3),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSecondaryLight,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 16,
                                     color: AppColors.textSecondaryLight,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '12월 21일 (토) 14:00 - 15:00',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: AppSpacing.space4),
+
+                            // Note content
+                            Text(
+                              '수업 내용',
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.space2),
+                            Text(
+                              '• 스케일 연습: A장조 3옥타브 연습. 음정 안정성이 많이 향상되었습니다.\n'
+                              '• 에튀드: 크로이처 No.2 마무리. 다음 주부터 No.3 시작 예정.\n'
+                              '• 곡 연습: 모차르트 소나타 1악장 익스포지션 부분. 비브라토 적용 연습.',
+                              style: AppTypography.bodyMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.space4),
+
+                            // Teacher comment
+                            Text(
+                              '선생님 코멘트',
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.space2),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.space3),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight.withValues(
+                                  alpha: 0.2,
+                                ),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium,
+                                ),
+                                border: Border.all(
+                                  color: AppColors.primaryLight,
+                                ),
+                              ),
+                              child: Text(
+                                '이번 주 연습을 정말 열심히 해왔네요! 특히 스케일의 음정이 많이 안정되었어요. '
+                                '다음 주까지 비브라토 연습에 집중해서 모차르트 곡에 적용해보세요. '
+                                '화이팅입니다! 💪',
+                                style: AppTypography.bodyMedium,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.space4),
+
+                            // Practice assignments
+                            Text(
+                              '과제',
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.space2),
+                            _buildAssignmentItem(
+                              title: '스케일 연습',
+                              description: 'A장조 3옥타브 (메트로놈 ♩=80)',
+                              priority: 'must',
+                            ),
+                            _buildAssignmentItem(
+                              title: '비브라토 연습',
+                              description: '느린 템포로 꾸준히 연습',
+                              priority: 'should',
+                            ),
+                            _buildAssignmentItem(
+                              title: '모차르트 소나타',
+                              description: '1악장 전체 암보',
+                              priority: 'must',
+                            ),
+                            const SizedBox(height: AppSpacing.space4),
+
+                            // Recording (if any)
+                            Text(
+                              '녹음',
+                              style: AppTypography.bodyMedium.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.space2),
+                            Container(
+                              padding: const EdgeInsets.all(AppSpacing.space3),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSecondaryLight,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.space3),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '모차르트 소나타 녹음',
+                                          style: AppTypography.bodyMedium,
+                                        ),
+                                        Text(
+                                          '3:24',
+                                          style: AppTypography.caption.copyWith(
+                                            color: AppColors.textSecondaryLight,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 
@@ -300,7 +359,7 @@ class ParentLessonsTab extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
               color: priorityColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               priorityLabel,
@@ -316,10 +375,17 @@ class ParentLessonsTab extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w500)),
+                Text(
+                  title,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 Text(
                   description,
-                  style: AppTypography.caption.copyWith(color: AppColors.textSecondaryLight),
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
               ],
             ),
@@ -366,22 +432,26 @@ class ParentLessonsTab extends ConsumerWidget {
           // Mini calendar week days
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['일', '월', '화', '수', '목', '금', '토']
-                .map((day) => SizedBox(
-                      width: 36,
-                      child: Text(
-                        day,
-                        style: AppTypography.caption.copyWith(
-                          color: day == '일'
-                              ? AppColors.error
-                              : day == '토'
-                                  ? AppColors.primary
-                                  : AppColors.textSecondaryLight,
+            children:
+                ['일', '월', '화', '수', '목', '금', '토']
+                    .map(
+                      (day) => SizedBox(
+                        width: 36,
+                        child: Text(
+                          day,
+                          style: AppTypography.caption.copyWith(
+                            color:
+                                day == '일'
+                                    ? AppColors.error
+                                    : day == '토'
+                                    ? AppColors.primary
+                                    : AppColors.textSecondaryLight,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ))
-                .toList(),
+                    )
+                    .toList(),
           ),
           const SizedBox(height: AppSpacing.space2),
           // Placeholder for calendar grid
@@ -447,23 +517,30 @@ class _LessonCard extends StatelessWidget {
               width: 56,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
               decoration: BoxDecoration(
-                color: isPast
-                    ? AppColors.surfaceSecondaryLight
-                    : AppColors.primaryLight.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
+                color:
+                    isPast
+                        ? AppColors.surfaceSecondaryLight
+                        : AppColors.primaryLight.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Column(
                 children: [
                   Text(
                     '${date.day}',
                     style: AppTypography.headingMedium.copyWith(
-                      color: isPast ? AppColors.textSecondaryLight : AppColors.primary,
+                      color:
+                          isPast
+                              ? AppColors.textSecondaryLight
+                              : AppColors.primary,
                     ),
                   ),
                   Text(
                     DateFormat('E', 'ko').format(date),
                     style: AppTypography.caption.copyWith(
-                      color: isPast ? AppColors.textTertiaryLight : AppColors.primary,
+                      color:
+                          isPast
+                              ? AppColors.textTertiaryLight
+                              : AppColors.primary,
                     ),
                   ),
                 ],
@@ -481,9 +558,10 @@ class _LessonCard extends StatelessWidget {
                         '정규 레슨',
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: isPast
-                              ? AppColors.textSecondaryLight
-                              : AppColors.textPrimaryLight,
+                          color:
+                              isPast
+                                  ? AppColors.textSecondaryLight
+                                  : AppColors.textPrimaryLight,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -504,10 +582,7 @@ class _LessonCard extends StatelessWidget {
             if (hasNote)
               IconButton(
                 onPressed: onViewNote,
-                icon: Icon(
-                  Icons.note_outlined,
-                  color: AppColors.primary,
-                ),
+                icon: Icon(Icons.note_outlined, color: AppColors.primary),
                 tooltip: '레슨 노트',
               ),
           ],
@@ -543,7 +618,7 @@ class _LessonCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         label,
