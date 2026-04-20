@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../schedule/domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -33,11 +34,12 @@ Future<RescheduleResult?> showRescheduleBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => _RescheduleBottomSheet(
-      subscription: subscription,
-      currentLessonDateTime: currentLessonDateTime,
-      sessionNumber: sessionNumber,
-    ),
+    builder:
+        (context) => _RescheduleBottomSheet(
+          subscription: subscription,
+          currentLessonDateTime: currentLessonDateTime,
+          sessionNumber: sessionNumber,
+        ),
   );
 }
 
@@ -67,8 +69,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
     return hoursUntilLesson < widget.subscription.rescheduleDeadlineHours;
   }
 
-  bool get _isMonthly =>
-      widget.subscription.type == SubscriptionType.monthly;
+  bool get _isMonthly => widget.subscription.type == SubscriptionType.monthly;
 
   bool get _canSubmit => _selectedDate != null && _selectedTime != null;
 
@@ -99,15 +100,9 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -178,9 +173,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         ),
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -214,9 +207,10 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                   ? formatDateYMDLong(_selectedDate!)
                   : AppStrings.selectDatePlaceholder,
               style: AppTypography.bodyMedium.copyWith(
-                color: _selectedDate != null
-                    ? AppColors.textPrimaryLight
-                    : AppColors.textTertiaryLight,
+                color:
+                    _selectedDate != null
+                        ? AppColors.textPrimaryLight
+                        : AppColors.textTertiaryLight,
               ),
             ),
           ],
@@ -251,9 +245,10 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                   ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
                   : AppStrings.selectTimePlaceholder,
               style: AppTypography.bodyMedium.copyWith(
-                color: _selectedTime != null
-                    ? AppColors.textPrimaryLight
-                    : AppColors.textTertiaryLight,
+                color:
+                    _selectedTime != null
+                        ? AppColors.textPrimaryLight
+                        : AppColors.textTertiaryLight,
               ),
             ),
           ],
@@ -305,16 +300,18 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.05)
-              : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : AppColors.surfaceLight,
         ),
         child: Row(
           children: [
             Icon(
               icon,
               size: 20,
-              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -325,9 +322,10 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                     label,
                     style: AppTypography.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textPrimaryLight,
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.textPrimaryLight,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -381,9 +379,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             const SizedBox(height: 4),
             Text(
               AppStrings.rescheduleCreditsChange(remaining, remaining - 1),
-              style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
-              ),
+              style: AppTypography.caption.copyWith(color: AppColors.warning),
             ),
           ],
         ),

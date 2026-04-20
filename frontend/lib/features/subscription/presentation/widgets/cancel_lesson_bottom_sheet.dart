@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Cancellation reason enum.
@@ -64,11 +65,12 @@ Future<CancelLessonResult?> showCancelLessonBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => _CancelLessonBottomSheet(
-      subscription: subscription,
-      lessonDateTime: lessonDateTime,
-      sessionNumber: sessionNumber,
-    ),
+    builder:
+        (context) => _CancelLessonBottomSheet(
+          subscription: subscription,
+          lessonDateTime: lessonDateTime,
+          sessionNumber: sessionNumber,
+        ),
   );
 }
 
@@ -113,15 +115,9 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -195,9 +191,8 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.05)
-                : null,
+            color:
+                isSelected ? AppColors.primary.withValues(alpha: 0.05) : null,
           ),
           child: Row(
             children: [
@@ -206,7 +201,10 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                     ? Icons.radio_button_checked
                     : Icons.radio_button_unchecked,
                 size: 20,
-                color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                color:
+                    isSelected
+                        ? AppColors.primary
+                        : AppColors.textTertiaryLight,
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
@@ -216,7 +214,8 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                     Text(
                       reason.label,
                       style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
                     ),
                     if (reason.deductsLesson)
@@ -285,9 +284,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
           Expanded(
             child: Text(
               AppStrings.rescheduleDeadlineWarning(deadlineHours),
-              style: AppTypography.bodySmall.copyWith(
-                color: AppColors.error,
-              ),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
             ),
           ),
         ],
