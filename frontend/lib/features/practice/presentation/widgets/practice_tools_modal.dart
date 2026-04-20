@@ -180,7 +180,7 @@ class _PracticeToolsModalState extends ConsumerState<PracticeToolsModal>
                           ),
                           padding: EdgeInsets.zero,
                         )
-                        : const SizedBox(width: 40);
+                        : const SizedBox(width: AppSpacing.space10);
                   },
                 ),
               ],

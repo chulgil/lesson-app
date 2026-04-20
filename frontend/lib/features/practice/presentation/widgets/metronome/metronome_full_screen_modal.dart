@@ -188,7 +188,7 @@ class _Header extends StatelessWidget {
       padding: EdgeInsets.all(AppSpacing.space4),
       child: Row(
         children: [
-          const SizedBox(width: 48), // Balance for close button
+          const SizedBox(width: AppSpacing.space12), // Balance for close button
           Expanded(
             child: Text(
               '메트로놈',

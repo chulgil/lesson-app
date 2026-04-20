@@ -450,7 +450,7 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                   )
                   .toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(6),
