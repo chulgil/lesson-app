@@ -177,7 +177,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                             });
                           },
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusLarge,
+                            ),
                             side: BorderSide(color: AppColors.borderLight),
                           ),
                           tileColor: AppColors.surfaceLight,
@@ -453,7 +455,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           style: FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
           ),
           child: Text(label),

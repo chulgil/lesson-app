@@ -286,7 +286,9 @@ class _NoteCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusLarge,
+                              ),
                             ),
                             child: Text(
                               kp,

@@ -60,22 +60,29 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Per-student rates
-          Text(AppStrings.studentAttendanceRates,
-              style: AppTypography.headingMedium),
+          Text(
+            AppStrings.studentAttendanceRates,
+            style: AppTypography.headingMedium,
+          ),
           const SizedBox(height: AppSpacing.space3),
           ...overview.studentRates.map(
-            (sr) => _buildStudentRow(sr, studentNames[sr.studentId] ?? sr.studentId),
+            (sr) => _buildStudentRow(
+              sr,
+              studentNames[sr.studentId] ?? sr.studentId,
+            ),
           ),
 
           if (overview.recentAbsences.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.space6),
 
             // Recent absences
-            Text(AppStrings.recentAbsences,
-                style: AppTypography.headingMedium),
+            Text(AppStrings.recentAbsences, style: AppTypography.headingMedium),
             const SizedBox(height: AppSpacing.space3),
             ...overview.recentAbsences.map(
-              (ar) => _buildAbsenceRow(ar, studentNames[ar.studentId] ?? ar.studentId),
+              (ar) => _buildAbsenceRow(
+                ar,
+                studentNames[ar.studentId] ?? ar.studentId,
+              ),
             ),
           ],
         ],
@@ -85,9 +92,10 @@ class TeacherAttendanceScreen extends ConsumerWidget {
 
   Widget _buildOverallRate(TeacherAttendanceOverview overview) {
     final rate = overview.overallRate;
-    final color = rate >= 90
-        ? AppColors.success
-        : rate >= 70
+    final color =
+        rate >= 90
+            ? AppColors.success
+            : rate >= 70
             ? AppColors.warning
             : AppColors.error;
 
@@ -107,7 +115,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.space2),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: rate / 100,
               minHeight: 8,
@@ -129,9 +137,10 @@ class TeacherAttendanceScreen extends ConsumerWidget {
 
   Widget _buildStudentRow(StudentAttendanceRate sr, String name) {
     final rate = sr.rate;
-    final color = rate >= 90
-        ? AppColors.success
-        : rate >= 70
+    final color =
+        rate >= 90
+            ? AppColors.success
+            : rate >= 70
             ? AppColors.warning
             : AppColors.error;
 
@@ -139,10 +148,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.space3),
       child: Row(
         children: [
-          Expanded(
-            flex: 3,
-            child: Text(name, style: AppTypography.bodyMedium),
-          ),
+          Expanded(flex: 3, child: Text(name, style: AppTypography.bodyMedium)),
           Expanded(
             flex: 5,
             child: ClipRRect(
@@ -201,9 +207,7 @@ class TeacherAttendanceScreen extends ConsumerWidget {
           if (isDeducted)
             Text(
               AppStrings.subscriptionDeducted,
-              style: AppTypography.caption.copyWith(
-                color: AppColors.error,
-              ),
+              style: AppTypography.caption.copyWith(color: AppColors.error),
             ),
         ],
       ),

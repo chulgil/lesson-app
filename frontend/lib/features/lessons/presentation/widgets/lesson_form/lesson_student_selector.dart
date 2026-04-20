@@ -34,8 +34,9 @@ class LessonStudentSelector extends StatelessWidget {
               if (selectedStudent != null) ...[
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor:
-                      selectedStudent!.color.withValues(alpha: 0.2),
+                  backgroundColor: selectedStudent!.color.withValues(
+                    alpha: 0.2,
+                  ),
                   child: Text(
                     selectedStudent!.name[0],
                     style: AppTypography.headingSmall.copyWith(
@@ -62,9 +63,12 @@ class LessonStudentSelector extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.secondaryLight
-                                  .withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(4),
+                              color: AppColors.secondaryLight.withValues(
+                                alpha: 0.3,
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusSmall,
+                              ),
                             ),
                             child: Text(
                               selectedStudent!.instrument,
@@ -109,10 +113,7 @@ class LessonStudentSelector extends StatelessWidget {
                   ),
                 ),
               ],
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
             ],
           ),
         ),

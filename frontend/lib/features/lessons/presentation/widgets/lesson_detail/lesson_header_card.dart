@@ -24,9 +24,7 @@ class LessonHeaderCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,8 +37,12 @@ class LessonHeaderCard extends StatelessWidget {
                 backgroundColor: AppColors.primaryLight,
                 child: Text(
                   isTeacher
-                      ? (lesson.studentName.isNotEmpty ? lesson.studentName[0] : '?')
-                      : (lesson.teacherName?.isNotEmpty == true ? lesson.teacherName![0] : '?'),
+                      ? (lesson.studentName.isNotEmpty
+                          ? lesson.studentName[0]
+                          : '?')
+                      : (lesson.teacherName?.isNotEmpty == true
+                          ? lesson.teacherName![0]
+                          : '?'),
                   style: AppTypography.headingSmall.copyWith(
                     color: Colors.white,
                   ),
@@ -66,8 +68,12 @@ class LessonHeaderCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryLight.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.secondaryLight.withValues(
+                              alpha: 0.3,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             lesson.instrument,
@@ -102,22 +108,25 @@ class LessonHeaderCard extends StatelessWidget {
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space2,
-              children: lesson.pieces.map((piece) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSecondaryLight,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  ),
-                  child: Text(
-                    piece.displayName,
-                    style: AppTypography.bodySmall,
-                  ),
-                );
-              }).toList(),
+              children:
+                  lesson.pieces.map((piece) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceSecondaryLight,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
+                      ),
+                      child: Text(
+                        piece.displayName,
+                        style: AppTypography.bodySmall,
+                      ),
+                    );
+                  }).toList(),
             ),
         ],
       ),
@@ -155,7 +164,7 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         status.label,

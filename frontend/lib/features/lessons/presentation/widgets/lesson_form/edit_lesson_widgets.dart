@@ -69,7 +69,7 @@ class EditLessonStudentCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.secondaryLight.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     student.instrument,

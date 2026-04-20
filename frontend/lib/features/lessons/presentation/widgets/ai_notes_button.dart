@@ -62,9 +62,13 @@ class AiNotesButton extends ConsumerWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
-              child: const Icon(Icons.auto_awesome, color: AppColors.primary, size: 22),
+              child: const Icon(
+                Icons.auto_awesome,
+                color: AppColors.primary,
+                size: 22,
+              ),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -95,9 +99,10 @@ class AiNotesButton extends ConsumerWidget {
   }
 
   Widget _buildProcessingCard(BuildContext context, AiNoteStatus status) {
-    final message = status == AiNoteStatus.uploading
-        ? '오디오 업로드 중...'
-        : 'AI 노트를 생성하고 있습니다...';
+    final message =
+        status == AiNoteStatus.uploading
+            ? '오디오 업로드 중...'
+            : 'AI 노트를 생성하고 있습니다...';
 
     return Container(
       width: double.infinity,
@@ -205,12 +210,14 @@ class AiNotesButton extends ConsumerWidget {
     if (result == null) return;
 
     // Generate
-    ref.read(aiNoteGeneratorProvider(lesson.id).notifier).generate(
-      audioFilePath: result.path,
-      studentName: lesson.studentName,
-      instrument: lesson.instrument,
-      pieces: lesson.pieces.map((p) => p.displayName).toList(),
-    );
+    ref
+        .read(aiNoteGeneratorProvider(lesson.id).notifier)
+        .generate(
+          audioFilePath: result.path,
+          studentName: lesson.studentName,
+          instrument: lesson.instrument,
+          pieces: lesson.pieces.map((p) => p.displayName).toList(),
+        );
   }
 
   void _showResults(BuildContext context, AiNoteResult result) {
