@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson.dart';
 import 'lesson_confirmation_dialog.dart';
 
@@ -15,10 +16,7 @@ import 'lesson_confirmation_dialog.dart';
 class AttendanceConfirmationSheet extends StatefulWidget {
   final Lesson lesson;
 
-  const AttendanceConfirmationSheet({
-    super.key,
-    required this.lesson,
-  });
+  const AttendanceConfirmationSheet({super.key, required this.lesson});
 
   /// Show as a modal bottom sheet and return the result.
   static Future<LessonConfirmationResult?> show(
@@ -76,9 +74,10 @@ class _AttendanceConfirmationSheetState
               ),
               child: AnimatedSize(
                 duration: const Duration(milliseconds: 200),
-                child: _showReasonSelection
-                    ? _buildReasonSelection()
-                    : _buildInitialConfirmation(),
+                child:
+                    _showReasonSelection
+                        ? _buildReasonSelection()
+                        : _buildInitialConfirmation(),
               ),
             ),
           ),
@@ -89,8 +88,16 @@ class _AttendanceConfirmationSheetState
 
   Widget _buildInitialConfirmation() {
     final lesson = widget.lesson;
-    final weekdays = ['', AppStrings.mon, AppStrings.tue, AppStrings.wed,
-        AppStrings.thu, AppStrings.fri, AppStrings.sat, AppStrings.sun];
+    final weekdays = [
+      '',
+      AppStrings.mon,
+      AppStrings.tue,
+      AppStrings.wed,
+      AppStrings.thu,
+      AppStrings.fri,
+      AppStrings.sat,
+      AppStrings.sun,
+    ];
     final weekday = weekdays[lesson.date.weekday];
     final dateStr =
         '${lesson.date.month}/${lesson.date.day}($weekday) ${lesson.startTime}';
@@ -100,15 +107,8 @@ class _AttendanceConfirmationSheetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Drag handle
-        Center(
-          child: Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+        const Center(
+          child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
         ),
         const SizedBox(height: AppSpacing.space4),
 
@@ -163,9 +163,9 @@ class _AttendanceConfirmationSheetState
                 sublabel: AppStrings.deductOne,
                 color: AppColors.success,
                 onTap: () {
-                  Navigator.of(context).pop(
-                    const LessonConfirmationResult(completed: true),
-                  );
+                  Navigator.of(
+                    context,
+                  ).pop(const LessonConfirmationResult(completed: true));
                 },
               ),
             ),
@@ -192,15 +192,8 @@ class _AttendanceConfirmationSheetState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Drag handle
-        Center(
-          child: Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+        const Center(
+          child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
         ),
         const SizedBox(height: AppSpacing.space4),
 
@@ -208,10 +201,11 @@ class _AttendanceConfirmationSheetState
         Row(
           children: [
             IconButton(
-              onPressed: () => setState(() {
-                _showReasonSelection = false;
-                _selectedReason = null;
-              }),
+              onPressed:
+                  () => setState(() {
+                    _showReasonSelection = false;
+                    _selectedReason = null;
+                  }),
               icon: const Icon(Icons.arrow_back),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
@@ -262,32 +256,31 @@ class _AttendanceConfirmationSheetState
         SizedBox(
           height: AppSpacing.buttonHeight,
           child: ElevatedButton(
-            onPressed: _selectedReason == null
-                ? null
-                : () {
-                    Navigator.of(context).pop(
-                      LessonConfirmationResult(
-                        completed: false,
-                        nonCompletionReason: _selectedReason,
-                        note: _noteController.text.isEmpty
-                            ? null
-                            : _noteController.text,
-                      ),
-                    );
-                  },
+            onPressed:
+                _selectedReason == null
+                    ? null
+                    : () {
+                      Navigator.of(context).pop(
+                        LessonConfirmationResult(
+                          completed: false,
+                          nonCompletionReason: _selectedReason,
+                          note:
+                              _noteController.text.isEmpty
+                                  ? null
+                                  : _noteController.text,
+                        ),
+                      );
+                    },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               disabledBackgroundColor: AppColors.scheduleMutedAccent,
               shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
             child: Text(
               AppStrings.confirm,
-              style: AppTypography.buttonSmall.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTypography.buttonSmall.copyWith(color: Colors.white),
             ),
           ),
         ),
@@ -325,10 +318,7 @@ class _AttendanceConfirmationSheetState
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              sublabel,
-              style: AppTypography.caption.copyWith(color: color),
-            ),
+            Text(sublabel, style: AppTypography.caption.copyWith(color: color)),
           ],
         ),
       ),
@@ -374,9 +364,10 @@ class _AttendanceConfirmationSheetState
                   Text(
                     reason.description,
                     style: AppTypography.caption.copyWith(
-                      color: reason.isDeducted
-                          ? AppColors.error
-                          : AppColors.textTertiaryLight,
+                      color:
+                          reason.isDeducted
+                              ? AppColors.error
+                              : AppColors.textTertiaryLight,
                     ),
                   ),
                 ],

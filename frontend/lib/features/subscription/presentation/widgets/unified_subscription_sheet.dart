@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_proposal_providers.dart';
 import '../providers/subscription_template_providers.dart';
@@ -44,11 +45,12 @@ class UnifiedSubscriptionSheet extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UnifiedSubscriptionSheet(
-        teacherId: teacherId,
-        studentIds: studentIds,
-        studentName: studentName,
-      ),
+      builder:
+          (_) => UnifiedSubscriptionSheet(
+            teacherId: teacherId,
+            studentIds: studentIds,
+            studentName: studentName,
+          ),
     );
   }
 
@@ -81,8 +83,9 @@ class _UnifiedSubscriptionSheetState
 
   @override
   Widget build(BuildContext context) {
-    final templatesAsync =
-        ref.watch(activeTeacherTemplatesProvider(widget.teacherId));
+    final templatesAsync = ref.watch(
+      activeTeacherTemplatesProvider(widget.teacherId),
+    );
 
     return DraggableScrollableSheet(
       expand: false,
@@ -102,17 +105,19 @@ class _UnifiedSubscriptionSheetState
               _buildHeader(),
               Expanded(
                 child: templatesAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
-                  error: (_, __) => Center(
-                    child: Text(
-                      '오류가 발생했습니다.',
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textSecondaryLight),
-                    ),
-                  ),
-                  data: (templates) =>
-                      _buildContent(templates, scrollController),
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
+                  error:
+                      (_, __) => Center(
+                        child: Text(
+                          '오류가 발생했습니다.',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                  data:
+                      (templates) => _buildContent(templates, scrollController),
                 ),
               ),
               _buildBottomButtons(),
@@ -126,14 +131,9 @@ class _UnifiedSubscriptionSheetState
   Widget _buildHeader() {
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.only(top: AppSpacing.space2),
+        const BottomSheetHandle(
           width: 36,
-          height: 4,
-          decoration: BoxDecoration(
-            color: AppColors.borderLight,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-          ),
+          margin: EdgeInsets.only(top: AppSpacing.space2),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
@@ -147,10 +147,7 @@ class _UnifiedSubscriptionSheetState
                 child: const Icon(Icons.close, size: AppSpacing.iconMD),
               ),
               const Spacer(),
-              Text(
-                '수강권 발급',
-                style: AppTypography.headingSmall,
-              ),
+              Text('수강권 발급', style: AppTypography.headingSmall),
               const Spacer(),
               const SizedBox(width: AppSpacing.iconMD),
             ],
@@ -242,8 +239,7 @@ class _UnifiedSubscriptionSheetState
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: templates.length,
-        separatorBuilder: (_, __) =>
-            const SizedBox(width: AppSpacing.space2),
+        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.space2),
         itemBuilder: (context, index) {
           final template = templates[index];
           final isSelected = _selectedTemplateIds.contains(template.id);
@@ -251,9 +247,10 @@ class _UnifiedSubscriptionSheetState
 
           return GestureDetector(
             onTap: () => _onTemplateTap(template.id),
-            onLongPress: isSelected && _selectedTemplateIds.length > 1
-                ? () => _setRecommended(template)
-                : null,
+            onLongPress:
+                isSelected && _selectedTemplateIds.length > 1
+                    ? () => _setRecommended(template)
+                    : null,
             child: _TemplateChip(
               template: template,
               isSelected: isSelected,
@@ -271,9 +268,10 @@ class _UnifiedSubscriptionSheetState
       if (_selectedTemplateIds.contains(templateId)) {
         _selectedTemplateIds.remove(templateId);
         if (_recommendedTemplateId == templateId) {
-          _recommendedTemplateId = _selectedTemplateIds.isNotEmpty
-              ? _selectedTemplateIds.first
-              : null;
+          _recommendedTemplateId =
+              _selectedTemplateIds.isNotEmpty
+                  ? _selectedTemplateIds.first
+                  : null;
         }
       } else {
         if (_selectedTemplateIds.length < _maxTemplateSelections) {
@@ -325,11 +323,7 @@ class _UnifiedSubscriptionSheetState
               ),
             ),
             const Spacer(),
-            Container(
-              height: 1,
-              width: 200,
-              color: AppColors.borderLight,
-            ),
+            Container(height: 1, width: 200, color: AppColors.borderLight),
           ],
         ),
       ),
@@ -402,7 +396,8 @@ class _UnifiedSubscriptionSheetState
             },
             selectedColor: AppColors.primary.withValues(alpha: 0.15),
             labelStyle: AppTypography.bodySmall.copyWith(
-              color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textPrimaryLight,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
             side: BorderSide(
@@ -412,7 +407,8 @@ class _UnifiedSubscriptionSheetState
         }),
         ChoiceChip(
           label: const Text('직접입력'),
-          selected: _customLessonCount != null &&
+          selected:
+              _customLessonCount != null &&
               !_lessonCountOptions.contains(_customLessonCount),
           onSelected: (_) => _showCustomLessonCountDialog(),
           selectedColor: AppColors.primary.withValues(alpha: 0.15),
@@ -459,26 +455,29 @@ class _UnifiedSubscriptionSheetState
   Widget _buildValidityChips() {
     return Wrap(
       spacing: AppSpacing.space2,
-      children: _validityDaysOptions.map((days) {
-        final isSelected = (_customValidityDays ?? _autoValidityDays) == days;
-        return ChoiceChip(
-          label: Text('$days일'),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              _customValidityDays = selected ? days : null;
-            });
-          },
-          selectedColor: AppColors.primary.withValues(alpha: 0.15),
-          labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-          ),
-          side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
-          ),
-        );
-      }).toList(),
+      children:
+          _validityDaysOptions.map((days) {
+            final isSelected =
+                (_customValidityDays ?? _autoValidityDays) == days;
+            return ChoiceChip(
+              label: Text('$days일'),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() {
+                  _customValidityDays = selected ? days : null;
+                });
+              },
+              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              labelStyle: AppTypography.bodySmall.copyWith(
+                color:
+                    isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.borderLight,
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -491,8 +490,8 @@ class _UnifiedSubscriptionSheetState
   }
 
   Widget _buildBottomButtons() {
-    final canSubmit = (_selectedTemplateIds.isNotEmpty ||
-            _hasValidDirectInput) &&
+    final canSubmit =
+        (_selectedTemplateIds.isNotEmpty || _hasValidDirectInput) &&
         !_isSubmitting;
     final isSingleSelect = _selectedTemplateIds.length <= 1;
 
@@ -505,9 +504,7 @@ class _UnifiedSubscriptionSheetState
       ),
       decoration: const BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         children: [
@@ -524,15 +521,16 @@ class _UnifiedSubscriptionSheetState
                         canSubmit ? AppColors.primary : AppColors.borderLight,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
                 child: Text(
                   '바로 발급',
                   style: AppTypography.buttonSmall.copyWith(
                     color:
-                        canSubmit ? AppColors.primary : AppColors.textDisabledLight,
+                        canSubmit
+                            ? AppColors.primary
+                            : AppColors.textDisabledLight,
                   ),
                 ),
               ),
@@ -549,29 +547,30 @@ class _UnifiedSubscriptionSheetState
                   vertical: AppSpacing.space3,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusLarge),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
-                disabledBackgroundColor:
-                    AppColors.primary.withValues(alpha: 0.3),
+                disabledBackgroundColor: AppColors.primary.withValues(
+                  alpha: 0.3,
+                ),
               ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+              child:
+                  _isSubmitting
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : Text(
+                        _selectedTemplateIds.length > 1
+                            ? '${_selectedTemplateIds.length}개 제안 보내기'
+                            : '제안 보내기',
+                        style: AppTypography.buttonSmall.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
-                    )
-                  : Text(
-                      _selectedTemplateIds.length > 1
-                          ? '${_selectedTemplateIds.length}개 제안 보내기'
-                          : '제안 보내기',
-                      style: AppTypography.buttonSmall.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
             ),
           ),
         ],
@@ -600,9 +599,7 @@ class _UnifiedSubscriptionSheetState
 
     final studentId = widget.studentIds.first;
     Navigator.of(context).pop();
-    context.push(
-      '${AppRoutes.issueSubscription}?studentId=$studentId',
-    );
+    context.push('${AppRoutes.issueSubscription}?studentId=$studentId');
   }
 
   Future<void> _onSendProposal() async {
@@ -665,34 +662,35 @@ class _UnifiedSubscriptionSheetState
     final controller = TextEditingController();
     final result = await showDialog<int>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('회차 입력', style: AppTypography.headingSmall),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(
-            hintText: '횟수를 입력하세요',
-            suffixText: '회',
+      builder:
+          (context) => AlertDialog(
+            title: Text('회차 입력', style: AppTypography.headingSmall),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                hintText: '횟수를 입력하세요',
+                suffixText: '회',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final value = int.tryParse(controller.text);
+                  if (value != null && value > 0) {
+                    Navigator.of(context).pop(value);
+                  }
+                },
+                child: const Text('확인'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () {
-              final value = int.tryParse(controller.text);
-              if (value != null && value > 0) {
-                Navigator.of(context).pop(value);
-              }
-            },
-            child: const Text('확인'),
-          ),
-        ],
-      ),
     );
 
     controller.dispose();
@@ -727,9 +725,10 @@ class _TemplateChip extends StatelessWidget {
       width: 120,
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: isSelected
-            ? AppColors.primary.withValues(alpha: 0.05)
-            : AppColors.surfaceLight,
+        color:
+            isSelected
+                ? AppColors.primary.withValues(alpha: 0.05)
+                : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -763,9 +762,8 @@ class _TemplateChip extends StatelessWidget {
             template.name,
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textPrimaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textPrimaryLight,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -775,9 +773,8 @@ class _TemplateChip extends StatelessWidget {
             template.formattedPrice,
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textSecondaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textSecondaryLight,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),

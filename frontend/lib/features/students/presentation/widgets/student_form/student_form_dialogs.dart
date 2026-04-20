@@ -5,6 +5,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 import '../../../../../core/utils/image_utils.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Show image picker options and return the cropped image path.
 ///
@@ -71,14 +72,7 @@ Future<ImagePickerAction?> showImagePickerBottomSheet(
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: AppSpacing.space2),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const BottomSheetHandle(margin: EdgeInsets.zero),
               const SizedBox(height: AppSpacing.space3),
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -140,14 +134,7 @@ void showImagePickerOptions(
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: AppSpacing.space2),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const BottomSheetHandle(margin: EdgeInsets.zero),
               const SizedBox(height: AppSpacing.space4),
               ListTile(
                 leading: const Icon(Icons.camera_alt),

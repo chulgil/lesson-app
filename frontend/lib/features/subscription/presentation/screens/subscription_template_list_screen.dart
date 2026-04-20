@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/selectors/selectors.dart';
 import '../../domain/entities/subscription_template.dart';
 import '../providers/subscription_template_providers.dart';
@@ -617,16 +618,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Handle bar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
               const SizedBox(height: AppSpacing.space4),
 
               // Title
