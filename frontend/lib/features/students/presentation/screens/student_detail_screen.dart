@@ -279,7 +279,9 @@ class _StudentDetailContent extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: student.status.color.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.5),
                         width: 1,
@@ -301,7 +303,9 @@ class _StudentDetailContent extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                     ),
                     child: Text(
                       student.instrument,
@@ -320,7 +324,9 @@ class _StudentDetailContent extends ConsumerWidget {
                       color: student.practiceStatus.color.withValues(
                         alpha: 0.3,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

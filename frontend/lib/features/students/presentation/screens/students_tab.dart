@@ -757,7 +757,9 @@ class _StudentCard extends ConsumerWidget {
                     onChanged: (value) => onSelectionChanged(value ?? false),
                     activeColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                   ),
                 ),
@@ -889,7 +891,7 @@ class _StudentCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color: AppColors.error.withValues(alpha: 0.4),
                   ),
@@ -920,7 +922,7 @@ class _StudentCard extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
                     color: AppColors.warning.withValues(alpha: 0.4),
                   ),
