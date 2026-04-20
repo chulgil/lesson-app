@@ -80,23 +80,24 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('카메라로 촬영'),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
+      builder:
+          (context) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('카메라로 촬영'),
+                  onTap: () => Navigator.pop(context, ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('갤러리에서 선택'),
+                  onTap: () => Navigator.pop(context, ImageSource.gallery),
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('갤러리에서 선택'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
 
     if (source == null) return;
@@ -163,9 +164,10 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       name: _nameController.text.trim(),
       issuingBody: _issuingBodyController.text.trim(),
       issueDate: _issueDate,
-      certificateNumber: _certificateNumberController.text.trim().isEmpty
-          ? null
-          : _certificateNumberController.text.trim(),
+      certificateNumber:
+          _certificateNumberController.text.trim().isEmpty
+              ? null
+              : _certificateNumberController.text.trim(),
       imageUrl: imageUrl ?? '',
       status: CertificateStatus.pending,
       submittedAt: _isEdit ? _existingCertificate!.submittedAt : now,
@@ -203,21 +205,22 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('자격증 삭제'),
-        content: const Text('이 자격증 정보를 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('자격증 삭제'),
+            content: const Text('이 자격증 정보를 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -261,7 +264,9 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             AppSpacing.screenPadding,
             AppSpacing.screenPadding,
             AppSpacing.screenPadding,
-            AppSpacing.screenPadding + MediaQuery.of(context).padding.bottom + 32,
+            AppSpacing.screenPadding +
+                MediaQuery.of(context).padding.bottom +
+                32,
           ),
           children: [
             // Certificate type
@@ -270,12 +275,13 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             DropdownButtonFormField<CertificateType>(
               value: _selectedType,
               decoration: _inputDecoration(),
-              items: CertificateType.values.map((type) {
-                return DropdownMenuItem(
-                  value: type,
-                  child: Text(_typeLabels[type] ?? type.name),
-                );
-              }).toList(),
+              items:
+                  CertificateType.values.map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(_typeLabels[type] ?? type.name),
+                    );
+                  }).toList(),
               onChanged: (value) {
                 if (value != null) {
                   setState(() => _selectedType = value);
@@ -290,9 +296,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _nameController,
-              decoration: _inputDecoration(
-                hintText: '예: 중등학교 정교사 2급 (음악)',
-              ),
+              decoration: _inputDecoration(hintText: '예: 중등학교 정교사 2급 (음악)'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return '자격증명을 입력해주세요';
@@ -308,9 +312,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _issuingBodyController,
-              decoration: _inputDecoration(
-                hintText: '예: 교육부',
-              ),
+              decoration: _inputDecoration(hintText: '예: 교육부'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return '발급 기관을 입력해주세요';
@@ -359,9 +361,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _certificateNumberController,
-              decoration: _inputDecoration(
-                hintText: '선택사항',
-              ),
+              decoration: _inputDecoration(hintText: '선택사항'),
             ),
 
             const SizedBox(height: AppSpacing.space4),
@@ -395,8 +395,11 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                       _existingImageUrl = null;
                     });
                   },
-                  icon: Icon(Icons.delete_outline,
-                      size: 18, color: AppColors.error),
+                  icon: Icon(
+                    Icons.delete_outline,
+                    size: 18,
+                    color: AppColors.error,
+                  ),
                   label: Text(
                     '이미지 삭제',
                     style: AppTypography.bodySmall.copyWith(
@@ -418,11 +421,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    size: 20,
-                    color: AppColors.info,
-                  ),
+                  Icon(Icons.info_outline, size: 20, color: AppColors.info),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
@@ -451,19 +450,20 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                child:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : Text(
+                          _isEdit ? '수정하기' : '제출하기',
+                          style: AppTypography.button,
                         ),
-                      )
-                    : Text(
-                        _isEdit ? '수정하기' : '제출하기',
-                        style: AppTypography.button,
-                      ),
               ),
             ),
           ],
@@ -477,9 +477,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       children: [
         Text(
           text,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         if (required)
           Text(
@@ -499,21 +497,15 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
       return Stack(
         fit: StackFit.expand,
         children: [
-          Image.file(
-            File(_localImagePath!),
-            fit: BoxFit.cover,
-          ),
+          Image.file(File(_localImagePath!), fit: BoxFit.cover),
           Positioned(
             bottom: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '탭하여 변경',
@@ -534,21 +526,18 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
           _existingImageUrl!.startsWith('/')
               ? Image.file(File(_existingImageUrl!), fit: BoxFit.cover)
               : Image.network(
-                  _existingImageUrl!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildEmptyImagePlaceholder(),
-                ),
+                _existingImageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _buildEmptyImagePlaceholder(),
+              ),
           Positioned(
             bottom: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 4,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '탭하여 변경',

@@ -114,7 +114,8 @@ class _TipTemplateManagementScreenState
         return ListView.separated(
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           itemCount: templates.length,
-          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.space3),
+          separatorBuilder:
+              (_, __) => const SizedBox(height: AppSpacing.space3),
           itemBuilder: (context, index) {
             final template = templates[index];
             return _buildTemplateCard(template);
@@ -122,33 +123,34 @@ class _TipTemplateManagementScreenState
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 64, color: AppColors.error),
-            const SizedBox(height: AppSpacing.space4),
-            Text(
-              '템플릿을 불러오는데 실패했습니다',
-              style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
+      error:
+          (error, _) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                const SizedBox(height: AppSpacing.space4),
+                Text(
+                  '템플릿을 불러오는데 실패했습니다',
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.space4),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    if (category != null) {
+                      ref.invalidate(tipTemplatesByCategoryProvider(category));
+                    } else {
+                      ref.invalidate(tipTemplatesProvider);
+                    }
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('다시 시도'),
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.space4),
-            OutlinedButton.icon(
-              onPressed: () {
-                if (category != null) {
-                  ref.invalidate(tipTemplatesByCategoryProvider(category));
-                } else {
-                  ref.invalidate(tipTemplatesProvider);
-                }
-              },
-              icon: const Icon(Icons.refresh),
-              label: const Text('다시 시도'),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -169,14 +171,18 @@ class _TipTemplateManagementScreenState
         return await _showDeleteConfirmation(template);
       },
       onDismissed: (direction) {
-        ref.read(tipTemplatesNotifierProvider.notifier).deleteTemplate(template.id);
+        ref
+            .read(tipTemplatesNotifierProvider.notifier)
+            .deleteTemplate(template.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('템플릿이 삭제되었습니다'),
             action: SnackBarAction(
               label: '실행취소',
               onPressed: () {
-                ref.read(tipTemplatesNotifierProvider.notifier).addTemplate(
+                ref
+                    .read(tipTemplatesNotifierProvider.notifier)
+                    .addTemplate(
                       content: template.content,
                       category: template.category,
                       instrument: template.instrument,
@@ -206,7 +212,9 @@ class _TipTemplateManagementScreenState
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         template.category.label,
@@ -225,7 +233,9 @@ class _TipTemplateManagementScreenState
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.secondary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           template.instrument!,
@@ -257,10 +267,7 @@ class _TipTemplateManagementScreenState
                 const SizedBox(height: AppSpacing.space3),
 
                 // Content
-                Text(
-                  template.content,
-                  style: AppTypography.bodyMedium,
-                ),
+                Text(template.content, style: AppTypography.bodyMedium),
 
                 const SizedBox(height: AppSpacing.space2),
 
@@ -300,23 +307,22 @@ class _TipTemplateManagementScreenState
   Future<bool?> _showDeleteConfirmation(TipTemplate template) {
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('템플릿 삭제'),
-        content: const Text('이 템플릿을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('템플릿 삭제'),
+            content: const Text('이 템플릿을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -327,199 +333,210 @@ class _TipTemplateManagementScreenState
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('새 템플릿 추가'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: contentController,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      hintText: '템플릿 내용을 입력하세요',
-                      border: OutlineInputBorder(),
-                    ),
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: const Text('새 템플릿 추가'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: contentController,
+                        maxLines: 4,
+                        decoration: const InputDecoration(
+                          hintText: '템플릿 내용을 입력하세요',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      Text(
+                        '카테고리',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      Wrap(
+                        spacing: AppSpacing.space2,
+                        runSpacing: AppSpacing.space2,
+                        children:
+                            TipCategory.values.map((cat) {
+                              final isSelected = selectedCategory == cat;
+                              return ChoiceChip(
+                                label: Text(cat.label),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected) {
+                                    setDialogState(
+                                      () => selectedCategory = cat,
+                                    );
+                                  }
+                                },
+                              );
+                            }).toList(),
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      TextField(
+                        controller: instrumentController,
+                        decoration: const InputDecoration(
+                          labelText: '악기 (선택)',
+                          hintText: '예: 바이올린, 피아노',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '카테고리',
-                    style: AppTypography.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
                   ),
-                  const SizedBox(height: AppSpacing.space2),
-                  Wrap(
-                    spacing: AppSpacing.space2,
-                    runSpacing: AppSpacing.space2,
-                    children: TipCategory.values.map((cat) {
-                      final isSelected = selectedCategory == cat;
-                      return ChoiceChip(
-                        label: Text(cat.label),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            setDialogState(() => selectedCategory = cat);
-                          }
-                        },
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  TextField(
-                    controller: instrumentController,
-                    decoration: const InputDecoration(
-                      labelText: '악기 (선택)',
-                      hintText: '예: 바이올린, 피아노',
-                      border: OutlineInputBorder(),
-                    ),
+                  FilledButton(
+                    onPressed: () async {
+                      if (contentController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('내용을 입력해주세요')),
+                        );
+                        return;
+                      }
+
+                      await ref
+                          .read(tipTemplatesNotifierProvider.notifier)
+                          .addTemplate(
+                            content: contentController.text.trim(),
+                            category: selectedCategory,
+                            instrument:
+                                instrumentController.text.trim().isEmpty
+                                    ? null
+                                    : instrumentController.text.trim(),
+                          );
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('템플릿이 추가되었습니다')),
+                        );
+                      }
+                    },
+                    child: const Text('추가'),
                   ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (contentController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('내용을 입력해주세요')),
-                    );
-                    return;
-                  }
-
-                  await ref
-                      .read(tipTemplatesNotifierProvider.notifier)
-                      .addTemplate(
-                        content: contentController.text.trim(),
-                        category: selectedCategory,
-                        instrument: instrumentController.text.trim().isEmpty
-                            ? null
-                            : instrumentController.text.trim(),
-                      );
-
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('템플릿이 추가되었습니다')),
-                    );
-                  }
-                },
-                child: const Text('추가'),
-              ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
   void _showEditTemplateDialog(TipTemplate template) {
     final contentController = TextEditingController(text: template.content);
-    final instrumentController =
-        TextEditingController(text: template.instrument ?? '');
+    final instrumentController = TextEditingController(
+      text: template.instrument ?? '',
+    );
     TipCategory selectedCategory = template.category;
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('템플릿 수정'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: contentController,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      hintText: '템플릿 내용을 입력하세요',
-                      border: OutlineInputBorder(),
-                    ),
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: const Text('템플릿 수정'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: contentController,
+                        maxLines: 4,
+                        decoration: const InputDecoration(
+                          hintText: '템플릿 내용을 입력하세요',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      Text(
+                        '카테고리',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      Wrap(
+                        spacing: AppSpacing.space2,
+                        runSpacing: AppSpacing.space2,
+                        children:
+                            TipCategory.values.map((cat) {
+                              final isSelected = selectedCategory == cat;
+                              return ChoiceChip(
+                                label: Text(cat.label),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected) {
+                                    setDialogState(
+                                      () => selectedCategory = cat,
+                                    );
+                                  }
+                                },
+                              );
+                            }).toList(),
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      TextField(
+                        controller: instrumentController,
+                        decoration: const InputDecoration(
+                          labelText: '악기 (선택)',
+                          hintText: '예: 바이올린, 피아노',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '카테고리',
-                    style: AppTypography.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
                   ),
-                  const SizedBox(height: AppSpacing.space2),
-                  Wrap(
-                    spacing: AppSpacing.space2,
-                    runSpacing: AppSpacing.space2,
-                    children: TipCategory.values.map((cat) {
-                      final isSelected = selectedCategory == cat;
-                      return ChoiceChip(
-                        label: Text(cat.label),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            setDialogState(() => selectedCategory = cat);
-                          }
-                        },
+                  FilledButton(
+                    onPressed: () async {
+                      if (contentController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('내용을 입력해주세요')),
+                        );
+                        return;
+                      }
+
+                      final updatedTemplate = template.copyWith(
+                        content: contentController.text.trim(),
+                        category: selectedCategory,
+                        instrument:
+                            instrumentController.text.trim().isEmpty
+                                ? null
+                                : instrumentController.text.trim(),
                       );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: AppSpacing.space4),
-                  TextField(
-                    controller: instrumentController,
-                    decoration: const InputDecoration(
-                      labelText: '악기 (선택)',
-                      hintText: '예: 바이올린, 피아노',
-                      border: OutlineInputBorder(),
-                    ),
+
+                      await ref
+                          .read(tipTemplatesNotifierProvider.notifier)
+                          .updateTemplate(updatedTemplate);
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('템플릿이 수정되었습니다')),
+                        );
+                      }
+                    },
+                    child: const Text('저장'),
                   ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (contentController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('내용을 입력해주세요')),
-                    );
-                    return;
-                  }
-
-                  final updatedTemplate = template.copyWith(
-                    content: contentController.text.trim(),
-                    category: selectedCategory,
-                    instrument: instrumentController.text.trim().isEmpty
-                        ? null
-                        : instrumentController.text.trim(),
-                  );
-
-                  await ref
-                      .read(tipTemplatesNotifierProvider.notifier)
-                      .updateTemplate(updatedTemplate);
-
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('템플릿이 수정되었습니다')),
-                    );
-                  }
-                },
-                child: const Text('저장'),
-              ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 }

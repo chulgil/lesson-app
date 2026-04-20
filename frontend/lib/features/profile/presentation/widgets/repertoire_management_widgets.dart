@@ -87,9 +87,10 @@ class RepertoireSearchAndFilter extends StatelessWidget {
                   label: Text(selectedDifficulty ?? '난이도'),
                   selected: selectedDifficulty != null,
                   onSelected: (_) => onDifficultyTap(),
-                  avatar: selectedDifficulty != null
-                      ? const Icon(Icons.check, size: 16)
-                      : const Icon(Icons.tune, size: 16),
+                  avatar:
+                      selectedDifficulty != null
+                          ? const Icon(Icons.check, size: 16)
+                          : const Icon(Icons.tune, size: 16),
                 ),
                 const SizedBox(width: AppSpacing.space2),
 
@@ -98,9 +99,10 @@ class RepertoireSearchAndFilter extends StatelessWidget {
                   label: Text(selectedComposer ?? '작곡가'),
                   selected: selectedComposer != null,
                   onSelected: (_) => onComposerTap(),
-                  avatar: selectedComposer != null
-                      ? const Icon(Icons.check, size: 16)
-                      : const Icon(Icons.person, size: 16),
+                  avatar:
+                      selectedComposer != null
+                          ? const Icon(Icons.check, size: 16)
+                          : const Icon(Icons.person, size: 16),
                 ),
 
                 if (selectedDifficulty != null || selectedComposer != null) ...[
@@ -124,10 +126,7 @@ class RepertoireSearchAndFilter extends StatelessWidget {
 class RepertoireEmptyState extends StatelessWidget {
   final bool hasFilters;
 
-  const RepertoireEmptyState({
-    super.key,
-    required this.hasFilters,
-  });
+  const RepertoireEmptyState({super.key, required this.hasFilters});
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +226,9 @@ class PieceCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           piece.opus!,
@@ -249,8 +250,9 @@ class PieceCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: getDifficultyColor(piece.difficulty)
-                        .withValues(alpha: 0.1),
+                    color: getDifficultyColor(
+                      piece.difficulty,
+                    ).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
@@ -279,38 +281,42 @@ class PieceCard extends StatelessWidget {
                       break;
                   }
                 },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'assign',
-                    child: Row(
-                      children: [
-                        Icon(Icons.person_add),
-                        SizedBox(width: 8),
-                        Text('학생에게 할당'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                        Text('수정'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: AppColors.error),
-                        SizedBox(width: 8),
-                        Text('삭제', style: TextStyle(color: AppColors.error)),
-                      ],
-                    ),
-                  ),
-                ],
+                itemBuilder:
+                    (context) => [
+                      const PopupMenuItem(
+                        value: 'assign',
+                        child: Row(
+                          children: [
+                            Icon(Icons.person_add),
+                            SizedBox(width: 8),
+                            Text('학생에게 할당'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit),
+                            SizedBox(width: 8),
+                            Text('수정'),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: AppColors.error),
+                            SizedBox(width: 8),
+                            Text(
+                              '삭제',
+                              style: TextStyle(color: AppColors.error),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
               ),
             ],
           ),
@@ -325,11 +331,7 @@ class PieceDialog extends StatefulWidget {
   final Piece? existingPiece;
   final void Function(Piece) onSave;
 
-  const PieceDialog({
-    super.key,
-    this.existingPiece,
-    required this.onSave,
-  });
+  const PieceDialog({super.key, this.existingPiece, required this.onSave});
 
   @override
   State<PieceDialog> createState() => _PieceDialogState();
@@ -438,23 +440,27 @@ class _PieceDialogState extends State<PieceDialog> {
               Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space2,
-                children: _difficulties.map((difficulty) {
-                  final isSelected = _difficulty == difficulty;
-                  return ChoiceChip(
-                    label: Text(difficulty),
-                    selected: isSelected,
-                    onSelected: (_) => setState(() => _difficulty = difficulty),
-                    selectedColor:
-                        getDifficultyColor(difficulty).withValues(alpha: 0.2),
-                    labelStyle: TextStyle(
-                      color: isSelected
-                          ? getDifficultyColor(difficulty)
-                          : AppColors.textPrimaryLight,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  );
-                }).toList(),
+                children:
+                    _difficulties.map((difficulty) {
+                      final isSelected = _difficulty == difficulty;
+                      return ChoiceChip(
+                        label: Text(difficulty),
+                        selected: isSelected,
+                        onSelected:
+                            (_) => setState(() => _difficulty = difficulty),
+                        selectedColor: getDifficultyColor(
+                          difficulty,
+                        ).withValues(alpha: 0.2),
+                        labelStyle: TextStyle(
+                          color:
+                              isSelected
+                                  ? getDifficultyColor(difficulty)
+                                  : AppColors.textPrimaryLight,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      );
+                    }).toList(),
               ),
               const SizedBox(height: AppSpacing.space3),
 
@@ -476,10 +482,7 @@ class _PieceDialogState extends State<PieceDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('취소'),
         ),
-        FilledButton(
-          onPressed: _save,
-          child: const Text('저장'),
-        ),
+        FilledButton(onPressed: _save, child: const Text('저장')),
       ],
     );
   }
@@ -489,22 +492,27 @@ class _PieceDialogState extends State<PieceDialog> {
 
     final now = DateTime.now();
     final piece = Piece(
-      id: widget.existingPiece?.id ??
+      id:
+          widget.existingPiece?.id ??
           DateTime.now().millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
-      composer: _composerController.text.trim().isNotEmpty
-          ? _composerController.text.trim()
-          : null,
-      opus: _opusController.text.trim().isNotEmpty
-          ? _opusController.text.trim()
-          : null,
-      movement: _movementController.text.trim().isNotEmpty
-          ? _movementController.text.trim()
-          : null,
+      composer:
+          _composerController.text.trim().isNotEmpty
+              ? _composerController.text.trim()
+              : null,
+      opus:
+          _opusController.text.trim().isNotEmpty
+              ? _opusController.text.trim()
+              : null,
+      movement:
+          _movementController.text.trim().isNotEmpty
+              ? _movementController.text.trim()
+              : null,
       difficulty: _difficulty,
-      notes: _notesController.text.trim().isNotEmpty
-          ? _notesController.text.trim()
-          : null,
+      notes:
+          _notesController.text.trim().isNotEmpty
+              ? _notesController.text.trim()
+              : null,
       createdAt: widget.existingPiece?.createdAt ?? now,
       updatedAt: widget.existingPiece != null ? now : null,
     );
@@ -524,40 +532,40 @@ void showDifficultyFilter({
 
   showModalBottomSheet(
     context: context,
-    builder: (context) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text(
-              '난이도 선택',
-              style: AppTypography.headingSmall,
-            ),
-          ),
-          const Divider(),
-          ...difficulties.map((difficulty) => ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: getDifficultyColor(difficulty),
-                  radius: 12,
+    builder:
+        (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text('난이도 선택', style: AppTypography.headingSmall),
+              ),
+              const Divider(),
+              ...difficulties.map(
+                (difficulty) => ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: getDifficultyColor(difficulty),
+                    radius: 12,
+                  ),
+                  title: Text(difficulty),
+                  selected: selectedDifficulty == difficulty,
+                  onTap: () {
+                    onSelected(difficulty);
+                    Navigator.pop(context);
+                  },
                 ),
-                title: Text(difficulty),
-                selected: selectedDifficulty == difficulty,
+              ),
+              ListTile(
+                leading: const Icon(Icons.clear),
+                title: const Text('선택 해제'),
                 onTap: () {
-                  onSelected(difficulty);
+                  onSelected(null);
                   Navigator.pop(context);
                 },
-              )),
-          ListTile(
-            leading: const Icon(Icons.clear),
-            title: const Text('선택 해제'),
-            onTap: () {
-              onSelected(null);
-              Navigator.pop(context);
-            },
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
+        ),
   );
 }
 
@@ -570,41 +578,39 @@ void showComposerFilter({
 }) {
   showModalBottomSheet(
     context: context,
-    builder: (context) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text(
-              '작곡가 선택',
-              style: AppTypography.headingSmall,
-            ),
+    builder:
+        (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text('작곡가 선택', style: AppTypography.headingSmall),
+              ),
+              const Divider(),
+              if (composers.isEmpty)
+                const ListTile(title: Text('등록된 작곡가가 없습니다'))
+              else
+                ...composers.map(
+                  (composer) => ListTile(
+                    title: Text(composer),
+                    selected: selectedComposer == composer,
+                    onTap: () {
+                      onSelected(composer);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ListTile(
+                leading: const Icon(Icons.clear),
+                title: const Text('선택 해제'),
+                onTap: () {
+                  onSelected(null);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-          const Divider(),
-          if (composers.isEmpty)
-            const ListTile(
-              title: Text('등록된 작곡가가 없습니다'),
-            )
-          else
-            ...composers.map((composer) => ListTile(
-                  title: Text(composer),
-                  selected: selectedComposer == composer,
-                  onTap: () {
-                    onSelected(composer);
-                    Navigator.pop(context);
-                  },
-                )),
-          ListTile(
-            leading: const Icon(Icons.clear),
-            title: const Text('선택 해제'),
-            onTap: () {
-              onSelected(null);
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
-    ),
+        ),
   );
 }
 
@@ -618,94 +624,96 @@ void showPieceDetails({
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    builder: (context) => DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      maxChildSize: 0.9,
-      minChildSize: 0.4,
-      expand: false,
-      builder: (context, scrollController) => SingleChildScrollView(
-        controller: scrollController,
-        padding: const EdgeInsets.all(AppSpacing.screenPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
+    builder:
+        (context) => DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder:
+              (context, scrollController) => SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Handle
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: AppColors.borderLight,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+
+                    // Title and composer
+                    Text(piece.title, style: AppTypography.headingLarge),
+                    const SizedBox(height: AppSpacing.space1),
+                    if (piece.composer != null)
+                      Text(
+                        piece.composer!,
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+
+                    const SizedBox(height: AppSpacing.space4),
+
+                    // Details
+                    if (piece.difficulty != null)
+                      _PieceDetailRow(label: '난이도', value: piece.difficulty!),
+                    if (piece.opus != null)
+                      _PieceDetailRow(label: '작품번호', value: piece.opus!),
+                    if (piece.movement != null)
+                      _PieceDetailRow(label: '악장', value: piece.movement!),
+                    if (piece.notes != null && piece.notes!.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.space4),
+                      Text(
+                        '메모',
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      Text(piece.notes!, style: AppTypography.bodyMedium),
+                    ],
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Actions
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              onEdit();
+                            },
+                            icon: const Icon(Icons.edit),
+                            label: const Text('수정'),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.space3),
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              onAssign();
+                            },
+                            icon: const Icon(Icons.person_add),
+                            label: const Text('학생에게 할당'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.space4),
-
-            // Title and composer
-            Text(piece.title, style: AppTypography.headingLarge),
-            const SizedBox(height: AppSpacing.space1),
-            if (piece.composer != null)
-              Text(
-                piece.composer!,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-
-            const SizedBox(height: AppSpacing.space4),
-
-            // Details
-            if (piece.difficulty != null)
-              _PieceDetailRow(label: '난이도', value: piece.difficulty!),
-            if (piece.opus != null)
-              _PieceDetailRow(label: '작품번호', value: piece.opus!),
-            if (piece.movement != null)
-              _PieceDetailRow(label: '악장', value: piece.movement!),
-            if (piece.notes != null && piece.notes!.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.space4),
-              Text(
-                '메모',
-                style: AppTypography.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              Text(piece.notes!, style: AppTypography.bodyMedium),
-            ],
-
-            const SizedBox(height: AppSpacing.space6),
-
-            // Actions
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      onEdit();
-                    },
-                    icon: const Icon(Icons.edit),
-                    label: const Text('수정'),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.space3),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      onAssign();
-                    },
-                    icon: const Icon(Icons.person_add),
-                    label: const Text('학생에게 할당'),
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
-      ),
-    ),
   );
 }
 
@@ -713,10 +721,7 @@ class _PieceDetailRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _PieceDetailRow({
-    required this.label,
-    required this.value,
-  });
+  const _PieceDetailRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -745,26 +750,25 @@ void showDeletePieceConfirmation({
 }) {
   showDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('곡 삭제'),
-      content: Text('${piece.title}을(를) 삭제하시겠습니까?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('취소'),
+    builder:
+        (dialogContext) => AlertDialog(
+          title: const Text('곡 삭제'),
+          content: Text('${piece.title}을(를) 삭제하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('취소'),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                onConfirm();
+              },
+              style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+              child: const Text('삭제'),
+            ),
+          ],
         ),
-        FilledButton(
-          onPressed: () {
-            Navigator.pop(dialogContext);
-            onConfirm();
-          },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.error,
-          ),
-          child: const Text('삭제'),
-        ),
-      ],
-    ),
   );
 }
 
@@ -778,48 +782,51 @@ void showAssignToStudentDialog({
 }) {
   showDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('학생에게 곡 할당'),
-      content: studentsAsync.when(
-        data: (students) {
-          if (students.isEmpty) {
-            return const Text('등록된 학생이 없습니다');
-          }
-          return SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: students.length,
-              itemBuilder: (listContext, index) {
-                final student = students[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                    child: Text(
-                      student.name[0],
-                      style: TextStyle(color: AppColors.primary),
-                    ),
-                  ),
-                  title: Text(student.name),
-                  subtitle: Text(student.instrument),
-                  onTap: () async {
-                    Navigator.pop(dialogContext);
-                    await onAssign(student.id);
+    builder:
+        (dialogContext) => AlertDialog(
+          title: const Text('학생에게 곡 할당'),
+          content: studentsAsync.when(
+            data: (students) {
+              if (students.isEmpty) {
+                return const Text('등록된 학생이 없습니다');
+              }
+              return SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: students.length,
+                  itemBuilder: (listContext, index) {
+                    final student = students[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.1,
+                        ),
+                        child: Text(
+                          student.name[0],
+                          style: TextStyle(color: AppColors.primary),
+                        ),
+                      ),
+                      title: Text(student.name),
+                      subtitle: Text(student.instrument),
+                      onTap: () async {
+                        Navigator.pop(dialogContext);
+                        await onAssign(student.id);
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (_, __) => const Text('오류가 발생했습니다.'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('취소'),
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Text('오류가 발생했습니다.'),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('취소'),
+          ],
         ),
-      ],
-    ),
   );
 }
