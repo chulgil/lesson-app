@@ -42,8 +42,9 @@ class _ScheduleWeeklyGridViewState
   @override
   Widget build(BuildContext context) {
     final weekLessonsAsync = ref.watch(weekLessonsProvider(_weekStart));
-    final availabilityAsync =
-        ref.watch(teacherAvailabilityProvider('teacher_1'));
+    final availabilityAsync = ref.watch(
+      teacherAvailabilityProvider('teacher_1'),
+    );
 
     return weekLessonsAsync.when(
       data: (lessons) {
@@ -77,7 +78,8 @@ class _ScheduleWeeklyGridViewState
     final restDays = _getRestDays(availability);
 
     // Check if current week contains today
-    final isCurrentWeek = _weekStart.isBefore(now.add(const Duration(days: 1))) &&
+    final isCurrentWeek =
+        _weekStart.isBefore(now.add(const Duration(days: 1))) &&
         _weekStart.add(const Duration(days: 7)).isAfter(now);
     final todayIndex = isCurrentWeek ? (now.weekday - 1) : -1;
 
@@ -148,9 +150,8 @@ class _ScheduleWeeklyGridViewState
               width: 36,
               child: Text(
                 '$hour',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: AppColors.textTertiaryLight,
-                  fontSize: 10,
                 ),
                 textAlign: TextAlign.right,
               ),
@@ -168,22 +169,25 @@ class _ScheduleWeeklyGridViewState
                   decoration: BoxDecoration(color: columnBg),
                   child: Column(
                     children: [
-                      Container(
-                        height: 0.5,
-                        color: AppColors.scheduleGridLine,
-                      ),
+                      Container(height: 0.5, color: AppColors.scheduleGridLine),
                       Expanded(
                         child: _buildGridCell(
-                          lessonMap, dayIndex, hour * 60,
-                          cellWidth, cellHeight,
+                          lessonMap,
+                          dayIndex,
+                          hour * 60,
+                          cellWidth,
+                          cellHeight,
                           dayType: dayType,
                           travelSlots: travelSlotMap,
                         ),
                       ),
                       Expanded(
                         child: _buildGridCell(
-                          lessonMap, dayIndex, hour * 60 + 30,
-                          cellWidth, cellHeight,
+                          lessonMap,
+                          dayIndex,
+                          hour * 60 + 30,
+                          cellWidth,
+                          cellHeight,
                           dayType: dayType,
                           travelSlots: travelSlotMap,
                         ),
@@ -208,7 +212,11 @@ class _ScheduleWeeklyGridViewState
           // Now indicator (red line on today's column)
           if (todayIndex >= 0 && now != null)
             _buildNowIndicator(
-              now, startHour, cellWidth, cellHeight, todayIndex,
+              now,
+              startHour,
+              cellWidth,
+              cellHeight,
+              todayIndex,
             ),
         ],
       ),
@@ -271,7 +279,8 @@ class _ScheduleWeeklyGridViewState
     final lesson = lessonMap[dayIndex]?[slotMinutes];
     if (lesson == null) {
       // Check if this is a travel time slot
-      final isTravelSlot = travelSlots[dayIndex]?.contains(slotMinutes) ?? false;
+      final isTravelSlot =
+          travelSlots[dayIndex]?.contains(slotMinutes) ?? false;
       if (isTravelSlot) {
         return Container(
           width: width - 2,
@@ -280,10 +289,7 @@ class _ScheduleWeeklyGridViewState
           decoration: BoxDecoration(
             color: AppColors.scheduleTravelBackground,
             border: Border(
-              left: BorderSide(
-                color: AppColors.scheduleTravelAccent,
-                width: 2,
-              ),
+              left: BorderSide(color: AppColors.scheduleTravelAccent, width: 2),
             ),
           ),
           alignment: Alignment.center,
@@ -303,17 +309,24 @@ class _ScheduleWeeklyGridViewState
       final date = _weekStart.add(Duration(days: dayIndex));
       final hour = slotMinutes ~/ 60;
       final minute = slotMinutes % 60;
-      final cellDateTime = DateTime(date.year, date.month, date.day, hour, minute);
+      final cellDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        hour,
+        minute,
+      );
       final isPast = cellDateTime.isBefore(DateTime.now());
 
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: isPast
-            ? null
-            : () {
-                HapticFeedback.lightImpact();
-                _navigateToAddLesson(date, hour, minute);
-              },
+        onTap:
+            isPast
+                ? null
+                : () {
+                  HapticFeedback.lightImpact();
+                  _navigateToAddLesson(date, hour, minute);
+                },
         child: SizedBox(width: width, height: height),
       );
     }
@@ -354,17 +367,19 @@ class _ScheduleWeeklyGridViewState
     final isStartSlot = slotMinutes == lessonStartMinutes;
 
     // Preview lessons navigate to student detail; normal lessons to lesson detail
-    final tapRoute = lesson.isPreview
-        ? AppRoutes.studentDetail.replaceFirst(':id', lesson.studentId)
-        : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
+    final tapRoute =
+        lesson.isPreview
+            ? AppRoutes.studentDetail.replaceFirst(':id', lesson.studentId)
+            : AppRoutes.lessonDetail.replaceFirst(':id', lesson.id);
 
     // Preview border: wider dashed-like accent border
     final leftBorder = BorderSide(
       color: colors.accent,
       width: lesson.isPreview ? 2.5 : 2,
-      strokeAlign: lesson.isPreview
-          ? BorderSide.strokeAlignInside
-          : BorderSide.strokeAlignCenter,
+      strokeAlign:
+          lesson.isPreview
+              ? BorderSide.strokeAlignInside
+              : BorderSide.strokeAlignCenter,
     );
 
     if (!isStartSlot) {
@@ -409,9 +424,8 @@ class _ScheduleWeeklyGridViewState
         alignment: Alignment.center,
         child: Text(
           shortName,
-          style: TextStyle(
+          style: AppTypography.captionSmall.copyWith(
             color: colors.accent,
-            fontSize: 10,
             fontWeight: lesson.isPreview ? FontWeight.w400 : FontWeight.w600,
           ),
           maxLines: 1,
@@ -471,7 +485,10 @@ class _ScheduleWeeklyGridViewState
     );
   }
 
-  (int, int) _getVisibleRange(List<Lesson> lessons, TeacherAvailability? availability) {
+  (int, int) _getVisibleRange(
+    List<Lesson> lessons,
+    TeacherAvailability? availability,
+  ) {
     int earliest = 23;
     int latest = 0;
 
