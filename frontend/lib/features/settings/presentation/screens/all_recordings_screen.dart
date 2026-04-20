@@ -59,25 +59,38 @@ class AllRecordingsScreen extends ConsumerWidget {
           ref.invalidate(allRecordingsWithSectionInfoProvider);
         },
         child: recordingsAsync.when(
-          data: (recordings) => recordings.isEmpty
-              ? _buildEmptyState()
-              : _RecordingsList(recordings: recordings),
+          data:
+              (recordings) =>
+                  recordings.isEmpty
+                      ? _buildEmptyState()
+                      : _RecordingsList(recordings: recordings),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                const SizedBox(height: AppSpacing.space4),
-                const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
-                const SizedBox(height: AppSpacing.space4),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(allRecordingsWithSectionInfoProvider),
-                  child: const Text('다시 시도'),
+          error:
+              (_, __) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.error,
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    const Text(
+                      '오류가 발생했습니다.',
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    ElevatedButton(
+                      onPressed:
+                          () => ref.invalidate(
+                            allRecordingsWithSectionInfoProvider,
+                          ),
+                      child: const Text('다시 시도'),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
         ),
       ),
     );
@@ -111,9 +124,7 @@ class AllRecordingsScreen extends ConsumerWidget {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -135,11 +146,9 @@ class AllRecordingsScreen extends ConsumerWidget {
       }
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('녹음 파일을 가져왔습니다: ${file.name}'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('녹음 파일을 가져왔습니다: ${file.name}')));
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -171,7 +180,14 @@ class AllRecordingsScreen extends ConsumerWidget {
 }
 
 class _RecordingsList extends StatelessWidget {
-  final List<({PracticeRecording recording, PracticeSection? section, PracticeRepertoire? repertoire})> recordings;
+  final List<
+    ({
+      PracticeRecording recording,
+      PracticeSection? section,
+      PracticeRepertoire? repertoire,
+    })
+  >
+  recordings;
 
   const _RecordingsList({required this.recordings});
 
@@ -190,22 +206,26 @@ class _RecordingsList extends StatelessWidget {
         // Orphaned recordings section (show first if any)
         if (orphaned.isNotEmpty) ...[
           _buildSectionHeader('연결되지 않은 녹음', orphaned.length, AppColors.warning),
-          ...orphaned.map((r) => _RecordingCard(
-            recording: r.recording,
-            section: null,
-            repertoire: null,
-          )),
+          ...orphaned.map(
+            (r) => _RecordingCard(
+              recording: r.recording,
+              section: null,
+              repertoire: null,
+            ),
+          ),
           const SizedBox(height: AppSpacing.space4),
         ],
 
         // Connected recordings section
         if (connected.isNotEmpty) ...[
           _buildSectionHeader('연결된 녹음', connected.length, AppColors.primary),
-          ...connected.map((r) => _RecordingCard(
-            recording: r.recording,
-            section: r.section,
-            repertoire: r.repertoire,
-          )),
+          ...connected.map(
+            (r) => _RecordingCard(
+              recording: r.recording,
+              section: r.section,
+              repertoire: r.repertoire,
+            ),
+          ),
         ],
       ],
     );
@@ -217,7 +237,7 @@ class _RecordingsList extends StatelessWidget {
       elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
@@ -277,7 +297,10 @@ class _RecordingsList extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.space2),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: 2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: 2,
+            ),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
@@ -342,10 +365,11 @@ class _RecordingCard extends ConsumerWidget {
     final result = await Navigator.push<SectionPickerResult>(
       context,
       MaterialPageRoute(
-        builder: (context) => SectionPickerScreen(
-          title: '녹음을 연결할 섹션 선택',
-          recording: recording,
-        ),
+        builder:
+            (context) => SectionPickerScreen(
+              title: '녹음을 연결할 섹션 선택',
+              recording: recording,
+            ),
       ),
     );
 
@@ -356,9 +380,7 @@ class _RecordingCard extends ConsumerWidget {
 
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('녹음이 "${result.section.pieceName}"에 연결되었습니다'),
-          ),
+          SnackBar(content: Text('녹음이 "${result.section.pieceName}"에 연결되었습니다')),
         );
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -374,21 +396,22 @@ class _RecordingCard extends ConsumerWidget {
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('녹음 삭제'),
-        content: const Text('이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('녹음 삭제'),
+            content: const Text('이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && context.mounted) {
@@ -397,9 +420,9 @@ class _RecordingCard extends ConsumerWidget {
           .deleteRecording(recording.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('녹음이 삭제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음이 삭제되었습니다')));
       }
     }
   }
@@ -413,13 +436,16 @@ class _RecordingCard extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isOrphaned ? AppColors.warning : AppColors.borderLight,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
         child: Row(
           children: [
             // Play button

@@ -34,7 +34,9 @@ class OrphanRecordingsScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () async {
-              await ref.read(orphanRecordingManagerProvider.notifier).refreshFromHive();
+              await ref
+                  .read(orphanRecordingManagerProvider.notifier)
+                  .refreshFromHive();
               ref.invalidate(orphanedRecordingsWithDiagnosticProvider);
             },
             tooltip: '새로고침 (경로 복구 포함)',
@@ -43,29 +45,44 @@ class OrphanRecordingsScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(orphanRecordingManagerProvider.notifier).refreshFromHive();
+          await ref
+              .read(orphanRecordingManagerProvider.notifier)
+              .refreshFromHive();
           ref.invalidate(orphanedRecordingsWithDiagnosticProvider);
         },
         child: diagnosticAsync.when(
-          data: (diagnostic) => diagnostic.orphans.isEmpty
-              ? _EmptyStateWithDiagnostic(diagnostic: diagnostic)
-              : _RecordingsListWithDiagnostic(diagnostic: diagnostic),
+          data:
+              (diagnostic) =>
+                  diagnostic.orphans.isEmpty
+                      ? _EmptyStateWithDiagnostic(diagnostic: diagnostic)
+                      : _RecordingsListWithDiagnostic(diagnostic: diagnostic),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                const SizedBox(height: AppSpacing.space4),
-                const Text('오류가 발생했습니다.', style: TextStyle(color: AppColors.error)),
-                const SizedBox(height: AppSpacing.space4),
-                ElevatedButton(
-                  onPressed: () => ref.invalidate(orphanedRecordingsWithDiagnosticProvider),
-                  child: const Text('다시 시도'),
+          error:
+              (_, __) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.error,
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    const Text(
+                      '오류가 발생했습니다.',
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    ElevatedButton(
+                      onPressed:
+                          () => ref.invalidate(
+                            orphanedRecordingsWithDiagnosticProvider,
+                          ),
+                      child: const Text('다시 시도'),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
         ),
       ),
     );
@@ -107,7 +124,7 @@ class _DiagnosticCard extends StatelessWidget {
       elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.05),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
@@ -129,7 +146,10 @@ class _DiagnosticCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.space3),
-            _buildStatRow('Hive에 저장된 녹음', '${diagnostic.totalRecordingsInHive}개'),
+            _buildStatRow(
+              'Hive에 저장된 녹음',
+              '${diagnostic.totalRecordingsInHive}개',
+            ),
             _buildStatRow('섹션 수', '${diagnostic.totalSections}개'),
             _buildStatRow('연결되지 않은 녹음', '${diagnostic.orphanCount}개'),
           ],
@@ -171,7 +191,8 @@ class _RecordingsListWithDiagnostic extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.space4),
-      itemCount: diagnostic.orphans.length + 2, // +2 for diagnostic card and header
+      itemCount:
+          diagnostic.orphans.length + 2, // +2 for diagnostic card and header
       itemBuilder: (context, index) {
         if (index == 0) {
           return Padding(
@@ -266,10 +287,11 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
     final result = await Navigator.push<SectionPickerResult>(
       context,
       MaterialPageRoute(
-        builder: (context) => SectionPickerScreen(
-          title: '녹음을 연결할 섹션 선택',
-          recording: widget.recording,
-        ),
+        builder:
+            (context) => SectionPickerScreen(
+              title: '녹음을 연결할 섹션 선택',
+              recording: widget.recording,
+            ),
       ),
     );
 
@@ -280,9 +302,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('녹음이 "${result.section.pieceName}"에 연결되었습니다'),
-          ),
+          SnackBar(content: Text('녹음이 "${result.section.pieceName}"에 연결되었습니다')),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -298,21 +318,22 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
   Future<void> _confirmDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('녹음 삭제'),
-        content: const Text('이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('녹음 삭제'),
+            content: const Text('이 녹음을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && mounted) {
@@ -321,9 +342,9 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
           .deleteRecording(widget.recording.id);
 
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('녹음이 삭제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('녹음이 삭제되었습니다')));
       }
     }
   }
@@ -336,7 +357,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -344,19 +365,27 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
         children: [
           // Compact row: play | date | duration | bpm | link | delete
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space1),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: AppSpacing.space1,
+            ),
             child: Row(
               children: [
                 // Play button (smaller)
                 IconButton(
                   onPressed: _togglePlayback,
                   icon: Icon(
-                    _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                    _isPlaying
+                        ? Icons.pause_circle_filled
+                        : Icons.play_circle_filled,
                     size: 32,
                     color: AppColors.primary,
                   ),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 // Date
@@ -400,7 +429,10 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                   color: AppColors.primary,
                   tooltip: '섹션에 연결',
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                 ),
                 // Delete button
                 IconButton(
@@ -409,7 +441,10 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                   color: AppColors.error,
                   tooltip: '삭제',
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                 ),
               ],
             ),
@@ -417,11 +452,17 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
           // Progress bar (when playing)
           if (_isPlaying || _position.inSeconds > 0)
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.space2, 0, AppSpacing.space2, AppSpacing.space2),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.space2,
+                0,
+                AppSpacing.space2,
+                AppSpacing.space2,
+              ),
               child: LinearProgressIndicator(
-                value: _duration.inMilliseconds > 0
-                    ? _position.inMilliseconds / _duration.inMilliseconds
-                    : 0,
+                value:
+                    _duration.inMilliseconds > 0
+                        ? _position.inMilliseconds / _duration.inMilliseconds
+                        : 0,
                 backgroundColor: AppColors.borderLight,
                 valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                 minHeight: 3,
@@ -432,4 +473,3 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
     );
   }
 }
-
