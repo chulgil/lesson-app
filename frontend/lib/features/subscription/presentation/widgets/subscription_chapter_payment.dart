@@ -28,16 +28,26 @@ class SubscriptionChapterPayment extends StatelessWidget {
             subscription.paymentConfirmed
                 ? AppStrings.paymentCompleted
                 : AppStrings.paymentPending,
-            valueColor: subscription.paymentConfirmed
-                ? AppColors.success
-                : AppColors.warning,
+            valueColor:
+                subscription.paymentConfirmed
+                    ? AppColors.success
+                    : AppColors.warning,
           ),
           if (subscription.paymentMethod != null)
-            _buildRow(AppStrings.paymentMethod, subscription.paymentMethod!.label),
+            _buildRow(
+              AppStrings.paymentMethod,
+              subscription.paymentMethod!.label,
+            ),
           if (subscription.paidAt != null)
-            _buildRow(AppStrings.paymentDate, formatDateTimeYMDHM(subscription.paidAt!)),
+            _buildRow(
+              AppStrings.paymentDate,
+              formatDateTimeYMDHM(subscription.paidAt!),
+            ),
           if (subscription.paymentConfirmedAt != null)
-            _buildRow(AppStrings.confirmationDate, formatDateTimeYMDHM(subscription.paymentConfirmedAt!)),
+            _buildRow(
+              AppStrings.confirmationDate,
+              formatDateTimeYMDHM(subscription.paymentConfirmedAt!),
+            ),
           if (subscription.originalAmount != null)
             _buildRow(
               AppStrings.originalAmount,
@@ -51,7 +61,7 @@ class SubscriptionChapterPayment extends StatelessWidget {
 
   Widget _buildRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

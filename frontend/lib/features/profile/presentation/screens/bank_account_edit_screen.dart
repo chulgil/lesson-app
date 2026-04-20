@@ -240,7 +240,7 @@ class _BankAccountCard extends StatelessWidget {
                           ? AppColors.primary
                           : AppColors.textSecondaryLight,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Text(
                   account.bankName,
                   style: AppTypography.bodyMedium.copyWith(
@@ -248,7 +248,7 @@ class _BankAccountCard extends StatelessWidget {
                   ),
                 ),
                 if (account.isDefault) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,

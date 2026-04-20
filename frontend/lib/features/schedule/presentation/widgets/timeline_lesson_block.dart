@@ -101,7 +101,7 @@ class TimelineLessonBlock extends StatelessWidget {
             // Badges
             if (isPast) _buildPastBadge(),
             if (isNext && minutesUntilNext > 0) _buildNextBadge(),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
           ],
         ),
       ),

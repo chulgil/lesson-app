@@ -92,7 +92,7 @@ class GoalProgressWidget extends ConsumerWidget {
                         color: AppColors.success,
                         size: 14,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '달성!',
                         style: AppTypography.bodySmall.copyWith(
@@ -180,7 +180,7 @@ class GoalProgressWidget extends ConsumerWidget {
                         color: AppColors.amber,
                         size: 14,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '주간 목표 달성!',
                         style: AppTypography.bodySmall.copyWith(
@@ -369,7 +369,7 @@ class GoalProgressWidget extends ConsumerWidget {
         Row(
           children: [
             Icon(icon, color: AppColors.textSecondaryLight, size: 14),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
             Text(
               label,
               style: AppTypography.caption.copyWith(

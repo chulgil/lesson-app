@@ -297,7 +297,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                         ),
                       ),
                       if (isRecommended) ...[
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -444,7 +444,9 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                         ? null
                         : () => _notifyPayment(proposal),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.space4,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),

@@ -397,7 +397,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
               textAlign: TextAlign.right,
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           // Red circle node
           Container(
             width: 8,

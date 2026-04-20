@@ -64,7 +64,7 @@ class _LegendItem extends StatelessWidget {
           icon,
           style: const TextStyle(fontSize: 14),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.space1),
         Text(
           label,
           style: AppTypography.caption.copyWith(

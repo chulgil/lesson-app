@@ -421,7 +421,7 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                     size: 16,
                     color: Colors.white,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                   Text(
                     !_hasMicInput ? '입력 없음' : '소리가 약함',
                     style: AppTypography.caption.copyWith(
@@ -712,7 +712,7 @@ class _RecordingItem extends StatelessWidget {
             if (recording.isShared) ...[
               SizedBox(width: AppSpacing.space2),
               Icon(Icons.check_circle, size: 14, color: AppColors.success),
-              SizedBox(width: 4),
+              SizedBox(width: AppSpacing.space1),
               Text(
                 '공유됨',
                 style: AppTypography.caption.copyWith(color: AppColors.success),
@@ -742,7 +742,7 @@ class _RecordingItem extends StatelessWidget {
                     child: Row(
                       children: [
                         Icon(Icons.star_outline),
-                        SizedBox(width: 8),
+                        SizedBox(width: AppSpacing.space2),
                         Text('대표로 선택'),
                       ],
                     ),
@@ -752,7 +752,7 @@ class _RecordingItem extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.share),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.space2),
                       Text('외부 앱 공유'),
                     ],
                   ),
@@ -762,7 +762,7 @@ class _RecordingItem extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(Icons.delete_outline, color: AppColors.error),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.space2),
                       Text('삭제', style: TextStyle(color: AppColors.error)),
                     ],
                   ),

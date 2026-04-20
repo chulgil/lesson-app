@@ -304,7 +304,7 @@ class _InviteCard extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.people, size: 14, color: AppColors.textSecondaryLight),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.space1),
               Text(
                 '${invite.useCount}회 사용',
                 style: AppTypography.bodySmall.copyWith(
@@ -318,7 +318,7 @@ class _InviteCard extends StatelessWidget {
                   size: 14,
                   color: AppColors.textSecondaryLight,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Text(
                   invite.formattedExpiry,
                   style: AppTypography.bodySmall.copyWith(

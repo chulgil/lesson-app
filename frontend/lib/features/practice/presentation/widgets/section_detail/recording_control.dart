@@ -211,7 +211,7 @@ class _RecordingControlState extends ConsumerState<RecordingControl> {
                                 shape: BoxShape.circle,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.space2),
                             Text(
                               widget.isPaused ? '일시정지' : '녹음 중',
                               style: AppTypography.bodyMedium.copyWith(

@@ -340,7 +340,7 @@ class _StudentDetailContent extends ConsumerWidget {
                             shape: BoxShape.circle,
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           student.practiceStatus.label,
                           style: AppTypography.bodySmall.copyWith(

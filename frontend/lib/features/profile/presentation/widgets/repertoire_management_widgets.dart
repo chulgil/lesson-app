@@ -289,7 +289,7 @@ class PieceCard extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.person_add),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.space2),
                             Text('학생에게 할당'),
                           ],
                         ),
@@ -299,7 +299,7 @@ class PieceCard extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.edit),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.space2),
                             Text('수정'),
                           ],
                         ),
@@ -309,7 +309,7 @@ class PieceCard extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.delete, color: AppColors.error),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.space2),
                             Text(
                               '삭제',
                               style: TextStyle(color: AppColors.error),

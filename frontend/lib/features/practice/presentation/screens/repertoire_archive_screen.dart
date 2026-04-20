@@ -38,7 +38,7 @@ class RepertoireArchiveScreen extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(Icons.info_outline, color: AppColors.info, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '아카이브된 레퍼토리를 복원하거나 영구 삭제할 수 있습니다.',

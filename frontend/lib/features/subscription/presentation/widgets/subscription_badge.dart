@@ -32,7 +32,7 @@ class SubscriptionBadge extends StatelessWidget {
         children: [
           if (showIcon) ...[
             Icon(_getIcon(), size: 12, color: _getTextColor()),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
           ],
           Text(
             _getLabel(),

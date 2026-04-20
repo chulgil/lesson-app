@@ -139,7 +139,7 @@ class TeacherSearchCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.history, size: 12, color: AppColors.info),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             '이전에 레슨했어요',
             style: AppTypography.caption.copyWith(
@@ -163,7 +163,7 @@ class TeacherSearchCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.school, size: 12, color: AppColors.primary),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             organizationName,
             style: AppTypography.caption.copyWith(
@@ -210,14 +210,14 @@ class TeacherSearchCard extends StatelessWidget {
             size: 14,
             color: AppColors.textSecondaryLight,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             '${publicProfile.experienceYears}년',
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondaryLight,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.space3),
         ],
         if (publicProfile.feeRange != null) ...[
           Icon(
@@ -225,7 +225,7 @@ class TeacherSearchCard extends StatelessWidget {
             size: 14,
             color: AppColors.textSecondaryLight,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             publicProfile.feeRange!.formatted,
             style: AppTypography.caption.copyWith(

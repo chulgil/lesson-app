@@ -470,7 +470,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                   Row(
                     children: [
                       Icon(reason.icon, size: 14, color: reason.color),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         reason.description,
                         style: AppTypography.caption.copyWith(

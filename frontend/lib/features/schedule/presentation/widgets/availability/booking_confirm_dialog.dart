@@ -85,7 +85,7 @@ class BookingConfirmDialog extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.person, size: 16, color: AppColors.primary),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text(
                       teacherName,
                       style: AppTypography.bodyMedium.copyWith(
@@ -102,7 +102,7 @@ class BookingConfirmDialog extends StatelessWidget {
                       size: 16,
                       color: AppColors.primary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text(
                       _formatDate(lessonDate),
                       style: AppTypography.bodyMedium,
@@ -113,7 +113,7 @@ class BookingConfirmDialog extends StatelessWidget {
                 Row(
                   children: [
                     Icon(Icons.access_time, size: 16, color: AppColors.primary),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text(
                       '$startTime - $endTime',
                       style: AppTypography.bodyMedium,
@@ -163,7 +163,7 @@ class BookingConfirmDialog extends StatelessWidget {
                       size: 18,
                       color: _getRescheduleCountColor(),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text(
                       '잔여 변경권: $remainingReschedules / $totalReschedules회',
                       style: AppTypography.bodyMedium.copyWith(
@@ -225,7 +225,7 @@ class BookingConfirmDialog extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, size: 18, color: color),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
             text,

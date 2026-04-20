@@ -281,7 +281,7 @@ class _TeacherDashboardScreenState
                       size: 16,
                       color: isPositive ? AppColors.success : AppColors.error,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.space1),
                     Text(
                       '${isPositive ? '+' : ''}${stats.revenueChangePercent.toStringAsFixed(1)}%',
                       style: AppTypography.bodyMedium.copyWith(

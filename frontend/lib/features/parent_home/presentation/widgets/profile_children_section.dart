@@ -146,7 +146,7 @@ class ProfileChildrenSection extends ConsumerWidget {
                   Row(
                     children: [
                       Text(profile.name, style: AppTypography.bodyLarge),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '(만 ${profile.age}세)',
                         style: AppTypography.caption.copyWith(

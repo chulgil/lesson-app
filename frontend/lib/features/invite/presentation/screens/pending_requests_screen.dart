@@ -243,7 +243,7 @@ class _RequestCard extends StatelessWidget {
                     Row(
                       children: [
                         Icon(method.icon, size: 14, color: AppColors.textSecondaryLight),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${method.label}로 연결 요청',
                           style: AppTypography.bodySmall.copyWith(

@@ -86,7 +86,7 @@ class NoteListItem extends StatelessWidget {
                           child: Row(
                             children: [
                               Icon(Icons.edit, size: 18),
-                              SizedBox(width: 8),
+                              SizedBox(width: AppSpacing.space2),
                               Text('수정'),
                             ],
                           ),
@@ -100,7 +100,7 @@ class NoteListItem extends StatelessWidget {
                                 size: 18,
                                 color: AppColors.error,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppSpacing.space2),
                               Text(
                                 '삭제',
                                 style: TextStyle(color: AppColors.error),

@@ -73,7 +73,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                           color: AppColors.primary,
                           size: 24,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.space2),
                         Text('AI 레슨 노트', style: AppTypography.headingSmall),
                       ],
                     ),

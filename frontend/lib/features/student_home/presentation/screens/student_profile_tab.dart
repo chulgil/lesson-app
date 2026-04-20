@@ -226,7 +226,7 @@ class StudentProfileTab extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.music_note, size: 16, color: Colors.white),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                   Text(
                     instrument,
                     style: AppTypography.bodySmall.copyWith(

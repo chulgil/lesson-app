@@ -49,7 +49,7 @@ class StatusCard extends StatelessWidget {
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,7 +172,7 @@ class ProgressCard extends StatelessWidget {
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Text(
                   label,
@@ -227,7 +227,7 @@ class ErrorCard extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.error_outline, color: AppColors.error),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               error,
@@ -458,7 +458,7 @@ class ActionButton extends StatelessWidget {
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -643,7 +643,7 @@ class BackupItem extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(Icons.restore, size: 20),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.space2),
                       Text('복원'),
                     ],
                   ),
@@ -653,7 +653,7 @@ class BackupItem extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(Icons.share, size: 20),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.space2),
                       Text('공유'),
                     ],
                   ),
@@ -663,7 +663,7 @@ class BackupItem extends ConsumerWidget {
                   child: Row(
                     children: [
                       Icon(Icons.delete, size: 20, color: AppColors.error),
-                      SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.space2),
                       Text('삭제', style: TextStyle(color: AppColors.error)),
                     ],
                   ),
@@ -823,7 +823,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.space3),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -873,7 +873,7 @@ class OrphanRecordingsButton extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Icon(
                     Icons.chevron_right,
                     color: AppColors.textSecondaryLight,

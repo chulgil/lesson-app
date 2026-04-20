@@ -224,7 +224,7 @@ class _StudentConfirmedBanner extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.notifications_active, size: 20, color: AppColors.info),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

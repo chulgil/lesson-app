@@ -29,16 +29,23 @@ class SubscriptionChapterInfo extends StatelessWidget {
             AppStrings.amount,
             '${NumberFormat('#,###').format(subscription.amount)}${AppStrings.wonUnit}',
           ),
-          if (subscription.discountAmount != null && subscription.discountAmount! > 0)
+          if (subscription.discountAmount != null &&
+              subscription.discountAmount! > 0)
             _buildRow(
               AppStrings.discount,
               '-${NumberFormat('#,###').format(subscription.discountAmount)}${AppStrings.wonUnit} (${subscription.discountReason ?? ""})',
               valueColor: AppColors.primary,
             ),
           if (subscription.startDate != null)
-            _buildRow(AppStrings.startDate, dateFormat.format(subscription.startDate!)),
+            _buildRow(
+              AppStrings.startDate,
+              dateFormat.format(subscription.startDate!),
+            ),
           if (subscription.endDate != null)
-            _buildRow(AppStrings.endDate, dateFormat.format(subscription.endDate!)),
+            _buildRow(
+              AppStrings.endDate,
+              dateFormat.format(subscription.endDate!),
+            ),
           _buildRow(
             AppStrings.rescheduleDeadlineLabel,
             '${subscription.rescheduleDeadlineHours}${AppStrings.hoursUnit}',
@@ -49,9 +56,10 @@ class SubscriptionChapterInfo extends StatelessWidget {
               subscription.remainingReschedule,
               subscription.totalRescheduleAllowance,
             ),
-            valueColor: subscription.remainingReschedule <= 0
-                ? AppColors.error
-                : subscription.remainingReschedule == 1
+            valueColor:
+                subscription.remainingReschedule <= 0
+                    ? AppColors.error
+                    : subscription.remainingReschedule == 1
                     ? AppColors.warning
                     : null,
           ),
@@ -62,7 +70,7 @@ class SubscriptionChapterInfo extends StatelessWidget {
 
   Widget _buildRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space1),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

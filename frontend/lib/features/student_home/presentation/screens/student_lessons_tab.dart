@@ -235,7 +235,7 @@ class StudentLessonsTab extends ConsumerWidget {
             ),
           ),
           if (isToday) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -258,7 +258,7 @@ class StudentLessonsTab extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.space3),
           _buildSortDropdown(ref, sortType),
         ],
       ),
@@ -285,8 +285,8 @@ class StudentLessonsTab extends ConsumerWidget {
                               color: AppColors.primary,
                             )
                           else
-                            const SizedBox(width: 16),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.space4),
+                          const SizedBox(width: AppSpacing.space2),
                           Text(type.displayName),
                         ],
                       ),

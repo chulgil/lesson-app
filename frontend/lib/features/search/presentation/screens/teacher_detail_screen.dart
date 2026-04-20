@@ -605,7 +605,7 @@ class _TeacherDetailContent extends ConsumerWidget {
                     size: 16,
                     color: _getBadgeColor(badge),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                   Text(
                     _getBadgeLabel(badge),
                     style: AppTypography.bodySmall.copyWith(

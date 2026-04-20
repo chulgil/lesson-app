@@ -56,7 +56,7 @@ class _RepertoireDetailScreenState
                     child: Row(
                       children: [
                         Icon(Icons.edit_outlined),
-                        SizedBox(width: 8),
+                        SizedBox(width: AppSpacing.space2),
                         Text('편집'),
                       ],
                     ),
@@ -66,7 +66,7 @@ class _RepertoireDetailScreenState
                     child: Row(
                       children: [
                         Icon(Icons.inventory_2_outlined),
-                        SizedBox(width: 8),
+                        SizedBox(width: AppSpacing.space2),
                         Text('아카이브로 이동'),
                       ],
                     ),

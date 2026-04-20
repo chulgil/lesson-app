@@ -177,7 +177,7 @@ class CompletionToggle extends StatelessWidget {
           size: 12,
           color: AppColors.info,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.space1),
         Text(
           '완료 시 대표녹음이 선생님께 공유됩니다',
           style: AppTypography.caption.copyWith(

@@ -312,7 +312,7 @@ class _NoteCard extends StatelessWidget {
                     size: 14,
                     color: AppColors.warning,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                   Expanded(
                     child: Text(
                       lesson.practiceTips!,
@@ -338,7 +338,7 @@ class _NoteCard extends StatelessWidget {
                     size: 14,
                     color: AppColors.secondary,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                   Expanded(
                     child: Text(
                       lesson.studentNote!,

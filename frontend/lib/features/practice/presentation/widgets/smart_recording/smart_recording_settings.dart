@@ -37,7 +37,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +82,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     size: 18,
                     color: AppColors.textSecondaryLight,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Text(
                     '트림 민감도',
                     style: AppTypography.bodyMedium.copyWith(
@@ -169,7 +169,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       size: 16,
                       color: AppColors.textSecondaryLight,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
                         '높은 민감도: 작은 소리도 녹음에 포함\n낮은 민감도: 큰 소리만 녹음에 포함',
@@ -195,7 +195,7 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     size: 18,
                     color: AppColors.textSecondaryLight,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +358,7 @@ class SmartRecordingToggle extends ConsumerWidget {
                       ? AppColors.primary
                       : AppColors.textSecondaryLight,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
             Text(
               '스마트',
               style: AppTypography.caption.copyWith(

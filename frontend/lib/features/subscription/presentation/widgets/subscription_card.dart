@@ -400,7 +400,7 @@ class SubscriptionCard extends StatelessWidget {
                   size: 14,
                   color: AppColors.primary,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Text(
                   '유효기간 내 자유롭게 사용',
                   style: AppTypography.caption.copyWith(

@@ -122,7 +122,7 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                           size: 12,
                           color: child.connectionStatus.color,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           child.connectionStatus.label,
                           style: AppTypography.caption.copyWith(

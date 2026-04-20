@@ -133,7 +133,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                         ),
                       ),
                       if (_isToday()) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.space2),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -162,7 +162,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           color: AppColors.textTertiaryLight,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.space3),
                       // Sort dropdown
                       _buildSortDropdown(),
                     ],
@@ -256,7 +256,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                                     ? AppColors.primary
                                     : AppColors.textSecondaryLight,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           Text(
                             type.displayName,
                             style: TextStyle(
@@ -292,7 +292,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
               size: 16,
               color: AppColors.textSecondaryLight,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
             Text(
               sortType.displayName,
               style: AppTypography.caption.copyWith(
@@ -495,7 +495,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     child: const Icon(Icons.add, color: Colors.white, size: 18),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 // Expand/collapse button
                 IconButton(
                   onPressed: () {

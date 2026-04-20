@@ -127,7 +127,7 @@ class ChildCard extends ConsumerWidget {
                             size: 14,
                             color: AppColors.secondary,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.space1),
                           Text(
                             '청구 대상',
                             style: AppTypography.caption.copyWith(

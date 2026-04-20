@@ -38,7 +38,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
                       size: 18,
                       color: AppColors.primary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text(
                       '월간 이동 리포트',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -51,9 +51,9 @@ class TravelAnalyticsCard extends ConsumerWidget {
                 Row(
                   children: [
                     _buildStat(context, '총 이동시간', analytics.formattedTotal),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: AppSpacing.space6),
                     _buildStat(context, '방문 횟수', '${analytics.visitCount}회'),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: AppSpacing.space6),
                     _buildStat(context, '평균', '${analytics.averageMinutes}분'),
                   ],
                 ),

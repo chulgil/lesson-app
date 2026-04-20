@@ -274,7 +274,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           child: OutlinedButton(
             onPressed: isProcessing ? null : () => _showInquiryDialog(proposal),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
             child: const Text('입금 미확인'),
           ),
@@ -287,7 +287,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
             onPressed:
                 isProcessing ? null : () => _confirmPayment(proposal, template),
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
             child:
                 isProcessing

@@ -86,7 +86,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                 child: Row(
                   children: [
                     Icon(Icons.edit, size: 20),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppSpacing.space2),
                     Text('수정'),
                   ],
                 ),
@@ -96,7 +96,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                 child: Row(
                   children: [
                     Icon(Icons.delete, size: 20, color: AppColors.error),
-                    SizedBox(width: 8),
+                    SizedBox(width: AppSpacing.space2),
                     Text('삭제', style: TextStyle(color: AppColors.error)),
                   ],
                 ),

@@ -105,7 +105,7 @@ class StudentLessonCard extends StatelessWidget {
                             size: 14,
                             color: AppColors.textTertiaryLight,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.space1),
                           Expanded(
                             child: Text(
                               lesson.feedback!,

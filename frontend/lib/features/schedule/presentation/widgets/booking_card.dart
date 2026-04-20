@@ -249,7 +249,7 @@ class BookingCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(booking.status.icon, size: 12, color: booking.status.color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             booking.status.label,
             style: AppTypography.caption.copyWith(

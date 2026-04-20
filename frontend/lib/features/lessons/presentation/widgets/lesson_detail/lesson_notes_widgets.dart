@@ -204,7 +204,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                               color: AppColors.textTertiaryLight,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.space1),
                           Text(
                             '저장 중...',
                             style: AppTypography.caption.copyWith(
@@ -222,7 +222,7 @@ class _LessonNoteEditorState extends State<LessonNoteEditor> {
                             size: 14,
                             color: AppColors.success,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.space1),
                           Text(
                             '저장됨',
                             style: AppTypography.caption.copyWith(
@@ -740,7 +740,7 @@ class _StudentMemoCardState extends State<StudentMemoCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.check, size: 12, color: AppColors.success),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.space1),
                     Text(
                       '저장됨',
                       style: AppTypography.caption.copyWith(

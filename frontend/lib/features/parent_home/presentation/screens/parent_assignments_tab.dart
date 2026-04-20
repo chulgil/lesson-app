@@ -177,7 +177,7 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       children: [
         Text(title, style: AppTypography.headingSmall),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.space2),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
@@ -322,7 +322,7 @@ class _AssignmentCard extends StatelessWidget {
                               ? AppColors.success
                               : AppColors.textTertiaryLight,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.space1),
                     Text(
                       dueDate,
                       style: AppTypography.caption.copyWith(

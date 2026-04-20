@@ -267,7 +267,7 @@ class PaymentStatusBadge extends StatelessWidget {
         children: [
           if (payment.isAwaitingTeacherConfirmation) ...[
             Icon(Icons.notifications_active, size: 12, color: color),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
           ],
           Text(
             label,
@@ -317,7 +317,7 @@ class PaymentActionButton extends StatelessWidget {
                   size: 14,
                   color: AppColors.info,
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Text(
                   '입금알림',
                   style: AppTypography.caption.copyWith(
@@ -328,7 +328,7 @@ class PaymentActionButton extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
         ],
         // Confirm button
         FilledButton.icon(

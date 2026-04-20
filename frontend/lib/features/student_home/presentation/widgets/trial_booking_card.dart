@@ -108,7 +108,7 @@ class TrialBookingCard extends ConsumerWidget {
                       size: 14,
                       color: booking.status.color,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.space1),
                     Text(
                       booking.status.label,
                       style: AppTypography.caption.copyWith(

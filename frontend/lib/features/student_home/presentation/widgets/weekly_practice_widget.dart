@@ -242,7 +242,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(priority.emoji, style: const TextStyle(fontSize: 12)),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             '$count',
             style: AppTypography.caption.copyWith(

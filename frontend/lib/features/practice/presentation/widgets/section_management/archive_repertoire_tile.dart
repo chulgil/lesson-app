@@ -170,7 +170,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
             title: Row(
               children: [
                 Icon(Icons.warning, color: AppColors.error),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 const Text('레퍼토리 영구 삭제'),
               ],
             ),

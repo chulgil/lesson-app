@@ -175,7 +175,7 @@ class _RepertoireCard extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(Icons.edit, size: 20),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.space2),
                           Text('수정'),
                         ],
                       ),
@@ -185,7 +185,7 @@ class _RepertoireCard extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(Icons.inventory_2_outlined, size: 20),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.space2),
                           Text('아카이브'),
                         ],
                       ),
@@ -195,7 +195,7 @@ class _RepertoireCard extends ConsumerWidget {
                       child: Row(
                         children: [
                           Icon(Icons.delete, size: 20, color: AppColors.error),
-                          SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.space2),
                           Text('삭제', style: TextStyle(color: AppColors.error)),
                         ],
                       ),
@@ -398,7 +398,7 @@ class _SectionListItem extends ConsumerWidget {
                       ),
                       // Repeat indicator
                       if (section.isRepeat) ...[
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Icon(
                           Icons.repeat,
                           size: 14,

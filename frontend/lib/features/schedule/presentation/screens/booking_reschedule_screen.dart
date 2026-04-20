@@ -303,7 +303,7 @@ class _BookingRescheduleScreenState
                     '⭐',
                     style: TextStyle(fontSize: 12),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.space1),
                 ],
                 Text(
                   slot.formattedStartTime,

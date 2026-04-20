@@ -119,7 +119,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
         Row(
           children: [
             CircleButton(label: '-5', onPressed: () => onIncrement(-5)),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
@@ -139,7 +139,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             CircleButton(label: '+5', onPressed: () => onIncrement(5)),
           ],
         ),
@@ -149,7 +149,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SmallButton(label: '-1', onPressed: () => onIncrement(-1)),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.space4),
             SmallButton(label: '+1', onPressed: () => onIncrement(1)),
           ],
         ),

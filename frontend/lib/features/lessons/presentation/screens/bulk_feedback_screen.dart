@@ -124,7 +124,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           child: Row(
             children: [
               const Icon(Icons.info_outline, size: 16, color: AppColors.info),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Text(
                   '완료된 레슨 학생이 자동 선택됩니다. 변경하려면 탭하세요.',

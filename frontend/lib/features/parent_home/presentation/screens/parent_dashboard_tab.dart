@@ -348,7 +348,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -390,7 +390,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           size: 14,
                           color: Colors.white,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${profile.instrumentLabel} • ${profile.levelLabel}',
                           style: AppTypography.caption.copyWith(
@@ -409,7 +409,7 @@ class ParentDashboardTab extends ConsumerWidget {
                           size: 14,
                           color: Colors.white70,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           profile.teacherName!,
                           style: AppTypography.caption.copyWith(

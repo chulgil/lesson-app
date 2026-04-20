@@ -243,7 +243,10 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       child: DropdownButtonFormField<String>(
         value: effectiveSelection,
         decoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.space4,
+            vertical: AppSpacing.space3,
+          ),
           border: InputBorder.none,
           hintText: '학생을 선택하세요',
         ),
@@ -363,7 +366,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       child: Row(
         children: [
           const Icon(Icons.info_outline, size: 16, color: AppColors.info),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               text,
@@ -432,7 +435,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           child: ElevatedButton(
             onPressed: canSubmit ? () => _submit(ProposalType.proposal) : null,
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
@@ -461,7 +464,9 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
               onPressed:
                   canSubmit ? () => _submit(ProposalType.directIssue) : null,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space4,
+                ),
                 side: BorderSide(
                   color: canSubmit ? AppColors.primary : AppColors.borderLight,
                 ),

@@ -276,7 +276,7 @@ class VisibilityTile extends StatelessWidget {
                   size: 16,
                   color: getVisibilityColor(value),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Text(
                   visibilityLabels[value]!,
                   style: AppTypography.caption.copyWith(
@@ -284,7 +284,7 @@ class VisibilityTile extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Icon(
                   Icons.arrow_drop_down,
                   size: 20,
@@ -406,7 +406,7 @@ class PreviewSection extends StatelessWidget {
                 ),
               ),
               if (!isVisible) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
@@ -461,7 +461,7 @@ class BadgeChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(getBadgeIcon(badge), size: 16, color: AppColors.primary),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             getBadgeLabel(badge),
             style: AppTypography.caption.copyWith(
@@ -508,7 +508,7 @@ void showProfilePreviewSheet({
                       child: Row(
                         children: [
                           const Icon(Icons.visibility, size: 20),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           Text(
                             '공개 프로필 미리보기',
                             style: AppTypography.headingSmall,
@@ -698,7 +698,7 @@ class ProfilePreviewContent extends StatelessWidget {
                                 size: 16,
                                 color: AppColors.success,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppSpacing.space1),
                               Expanded(
                                 child: Text(
                                   cert.name,

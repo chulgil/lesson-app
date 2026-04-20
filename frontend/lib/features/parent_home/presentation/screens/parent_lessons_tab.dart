@@ -171,7 +171,7 @@ class ParentLessonsTab extends ConsumerWidget {
                                     size: 16,
                                     color: AppColors.textSecondaryLight,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppSpacing.space2),
                                   Text(
                                     '12월 21일 (토) 14:00 - 15:00',
                                     style: AppTypography.bodySmall.copyWith(
@@ -557,7 +557,7 @@ class _LessonCard extends StatelessWidget {
                                   : AppColors.textPrimaryLight,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       _buildStatusBadge(),
                     ],
                   ),

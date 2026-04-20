@@ -382,7 +382,7 @@ class _TemplateCard extends StatelessWidget {
                             child: Row(
                               children: [
                                 Icon(Icons.edit_outlined, size: 20),
-                                SizedBox(width: 8),
+                                SizedBox(width: AppSpacing.space2),
                                 Text('수정'),
                               ],
                             ),
@@ -397,7 +397,7 @@ class _TemplateCard extends StatelessWidget {
                                       : Icons.visibility_outlined,
                                   size: 20,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: AppSpacing.space2),
                                 Text(template.isActive ? '비활성화' : '활성화'),
                               ],
                             ),
@@ -411,7 +411,7 @@ class _TemplateCard extends StatelessWidget {
                                   size: 20,
                                   color: AppColors.error,
                                 ),
-                                SizedBox(width: 8),
+                                SizedBox(width: AppSpacing.space2),
                                 Text(
                                   '삭제',
                                   style: TextStyle(color: AppColors.error),
@@ -502,7 +502,7 @@ class _DetailChip extends StatelessWidget {
             size: 14,
             color: isActive ? AppColors.primary : AppColors.textTertiaryLight,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
@@ -819,7 +819,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                                 ? AppColors.success
                                 : AppColors.textTertiaryLight,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '자동 제안 대상',
                         style: AppTypography.bodyMedium.copyWith(

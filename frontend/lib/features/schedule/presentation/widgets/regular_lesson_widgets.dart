@@ -104,7 +104,7 @@ class RegularLessonDurationSelector extends StatelessWidget {
             children: [
               Text(LessonDurations.format(duration)),
               if (isDefault) ...[
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Icon(
                   Icons.star,
                   size: 12,

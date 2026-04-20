@@ -169,7 +169,7 @@ class ProfileNotificationSection extends ConsumerWidget {
                   children: [
                     Text(label, style: AppTypography.bodyLarge),
                     if (isRequired) ...[
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,

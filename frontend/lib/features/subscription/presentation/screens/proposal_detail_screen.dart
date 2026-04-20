@@ -247,7 +247,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       ),
                     ),
                     if (proposal.isAutoProposal) ...[
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,
@@ -391,7 +391,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                       ),
                                     ),
                                     if (isRecommended) ...[
-                                      const SizedBox(width: 4),
+                                      const SizedBox(width: AppSpacing.space1),
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 6,

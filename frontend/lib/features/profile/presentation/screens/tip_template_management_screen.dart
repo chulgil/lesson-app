@@ -253,7 +253,7 @@ class _TipTemplateManagementScreenState
                         size: 14,
                         color: AppColors.textTertiaryLight,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.space1),
                       Text(
                         '${template.usageCount}회',
                         style: AppTypography.caption.copyWith(

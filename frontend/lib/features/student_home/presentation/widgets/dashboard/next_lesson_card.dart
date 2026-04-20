@@ -178,7 +178,7 @@ class NextLessonCard extends ConsumerWidget {
                           color: Colors.white.withValues(alpha: 0.8),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,

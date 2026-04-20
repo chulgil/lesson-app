@@ -165,7 +165,7 @@ class _TeacherAvailabilityScreenState
             child: Row(
               children: [
                 const Icon(Icons.info_outline, size: 16, color: AppColors.info),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     helpText,
@@ -355,7 +355,7 @@ class _TeacherAvailabilityScreenState
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: AppSpacing.space1),
                 Icon(Icons.chevron_right, size: 16, color: AppColors.primary),
               ],
             ),

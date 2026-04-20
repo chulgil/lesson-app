@@ -45,7 +45,7 @@ class LocationSummaryCard extends ConsumerWidget {
                   size: 18,
                   color: AppColors.primary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 Text(
                   '레슨 장소',
                   style: Theme.of(
@@ -138,7 +138,7 @@ class LocationSummaryCard extends ConsumerWidget {
             size: 14,
             color: AppColors.primary,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.space1),
           Text(
             '이동 $travelTime분',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

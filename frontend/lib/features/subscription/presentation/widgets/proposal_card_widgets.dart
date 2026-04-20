@@ -441,8 +441,8 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
                               color: AppColors.primary,
                             )
                           else
-                            const SizedBox(width: 16),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.space4),
+                          const SizedBox(width: AppSpacing.space2),
                           Text('${account.bankName} ${account.accountNumber}'),
                         ],
                       ),

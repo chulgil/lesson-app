@@ -300,7 +300,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemCount: topStudents.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.space2),
           itemBuilder: (context, index) {
             final student = topStudents[index];
             final isSelected = _selectedStudent?.id == student.id;
@@ -445,7 +445,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
             title: Row(
               children: [
                 Icon(Icons.history, color: AppColors.warning, size: 24),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.space2),
                 const Text('과거 레슨 기록'),
               ],
             ),

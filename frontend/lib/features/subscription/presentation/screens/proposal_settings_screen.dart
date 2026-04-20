@@ -423,7 +423,7 @@ class _ProposalSettingsScreenState
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
@@ -467,7 +467,9 @@ class _ProposalSettingsScreenState
                     child: DropdownButtonFormField<int>(
                       value: _discountPercent,
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.space3,
+                        ),
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
@@ -498,7 +500,9 @@ class _ProposalSettingsScreenState
                     child: DropdownButtonFormField<int>(
                       value: _discountHours,
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.space3,
+                        ),
                         border: OutlineInputBorder(),
                         isDense: true,
                       ),
@@ -535,7 +539,7 @@ class _ProposalSettingsScreenState
                         size: 16,
                         color: AppColors.warning,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           '체험 후 $_discountHours시간 이내 결제 시 $_discountPercent% 할인',

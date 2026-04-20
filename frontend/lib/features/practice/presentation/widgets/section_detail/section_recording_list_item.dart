@@ -141,7 +141,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                         ),
                       ),
                       if (widget.recording.bpm != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.space2),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -255,7 +255,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                           ),
                         ),
                         if (widget.recording.bpm != null) ...[
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -277,7 +277,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                           ),
                         ],
                         if (widget.recording.isRepresentative) ...[
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.space2),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -328,7 +328,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                           child: Row(
                             children: [
                               Icon(Icons.star_outline, size: 20),
-                              SizedBox(width: 8),
+                              SizedBox(width: AppSpacing.space2),
                               Text('대표 녹음으로 설정'),
                             ],
                           ),
@@ -338,7 +338,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                         child: Row(
                           children: [
                             Icon(Icons.share, size: 20),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.space2),
                             Text('외부 앱 공유'),
                           ],
                         ),
@@ -352,7 +352,7 @@ class _SectionRecordingListItemState extends State<SectionRecordingListItem> {
                               size: 20,
                               color: AppColors.error,
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.space2),
                             Text(
                               '삭제',
                               style: TextStyle(color: AppColors.error),

@@ -501,7 +501,7 @@ class _AllLessonRequestsScreenState
                 size: 14,
                 color: selected ? Colors.white : AppColors.textSecondaryLight,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.space1),
             ],
             Text(
               label,

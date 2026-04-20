@@ -80,7 +80,7 @@ class SectionInfoCard extends StatelessWidget {
                         ),
                       ),
                       if (rangeText != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.space2),
                         Text(
                           rangeText,
                           style: AppTypography.bodySmall.copyWith(

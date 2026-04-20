@@ -108,7 +108,7 @@ class GamificationHeader extends ConsumerWidget {
                           size: 14,
                           color: Colors.white,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${data.earnedBadges.where((b) => b.isEarned).length}',
                           style: AppTypography.caption.copyWith(

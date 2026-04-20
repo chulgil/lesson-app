@@ -379,7 +379,7 @@ class _PaymentManagementScreenState
                           size: 18,
                           color: AppColors.practiceGood,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.space2),
                         Text(
                           '학생이 입금완료를 알렸습니다',
                           style: AppTypography.caption.copyWith(

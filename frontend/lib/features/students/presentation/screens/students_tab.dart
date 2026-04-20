@@ -801,7 +801,7 @@ class _StudentCard extends ConsumerWidget {
                         ),
                         // Subject count badge (복수 과목 힌트)
                         if (subjectCount > 1) ...[
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.space1),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 5,
@@ -822,7 +822,7 @@ class _StudentCard extends ConsumerWidget {
                             ),
                           ),
                         ],
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacing.space1),
                         Icon(
                           swm.isAppConnected ? Icons.link : Icons.edit_note,
                           size: 14,

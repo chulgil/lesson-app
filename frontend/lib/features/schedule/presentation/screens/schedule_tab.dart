@@ -236,7 +236,7 @@ class ScheduleTab extends ConsumerWidget {
               ref.read(scheduleViewModeProvider.notifier).setMode(mode);
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.space2),
           IconButton(
             onPressed: () => _navigateToAddLesson(context, ref),
             icon: const Icon(Icons.add),
@@ -275,7 +275,7 @@ class ScheduleTab extends ConsumerWidget {
             ),
           ),
           if (isToday) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.space2),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -298,7 +298,7 @@ class ScheduleTab extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.space3),
           _buildSortDropdown(ref, sortType),
         ],
       ),
@@ -325,8 +325,8 @@ class ScheduleTab extends ConsumerWidget {
                               color: AppColors.primary,
                             )
                           else
-                            const SizedBox(width: 16),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.space4),
+                          const SizedBox(width: AppSpacing.space2),
                           Text(type.displayName),
                         ],
                       ),
@@ -472,7 +472,7 @@ class _LessonTimeCard extends ConsumerWidget {
         child: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
+            SizedBox(width: AppSpacing.space2),
             Text(
               '완료',
               style: TextStyle(
@@ -500,7 +500,7 @@ class _LessonTimeCard extends ConsumerWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(width: 8),
+            SizedBox(width: AppSpacing.space2),
             Icon(Icons.cancel, color: Colors.white),
           ],
         ),

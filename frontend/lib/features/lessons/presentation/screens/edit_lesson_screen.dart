@@ -133,7 +133,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.event_busy, color: AppColors.warning),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     const Text('레슨 취소'),
                   ],
                 ),
@@ -143,7 +143,7 @@ class _EditLessonScreenState extends ConsumerState<EditLessonScreen> {
                 child: Row(
                   children: [
                     Icon(Icons.delete_outline, color: AppColors.error),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.space2),
                     Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
                   ],
                 ),

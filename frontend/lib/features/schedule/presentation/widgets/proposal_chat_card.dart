@@ -83,7 +83,7 @@ class ProposalChatCard extends StatelessWidget {
           children: [
             if (isRecommended) ...[
               const Text('\u2B50', style: TextStyle(fontSize: 12)),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.space1),
             ],
             Expanded(
               child: Text(

@@ -629,7 +629,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                           child: Row(
                             children: [
                               Icon(Icons.edit_outlined, size: 18),
-                              SizedBox(width: 8),
+                              SizedBox(width: AppSpacing.space2),
                               Text('편집'),
                             ],
                           ),
@@ -643,7 +643,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                                 size: 18,
                                 color: AppColors.error,
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppSpacing.space2),
                               Text(
                                 '삭제',
                                 style: TextStyle(color: AppColors.error),
