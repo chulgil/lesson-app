@@ -7,10 +7,7 @@ import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting time signature.
 class TimeSignaturePicker extends StatelessWidget {
-  const TimeSignaturePicker({
-    super.key,
-    required this.current,
-  });
+  const TimeSignaturePicker({super.key, required this.current});
 
   final TimeSignature current;
 
@@ -110,19 +107,20 @@ class TimeSignaturePicker extends StatelessWidget {
           ),
           SizedBox(height: AppSpacing.space3),
           Row(
-            children: signatures.map((ts) {
-              final isSelected = ts == current;
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: _TimeSignatureCard(
-                    timeSignature: ts,
-                    isSelected: isSelected,
-                    onTap: () => Navigator.of(context).pop(ts),
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                signatures.map((ts) {
+                  final isSelected = ts == current;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: _TimeSignatureCard(
+                        timeSignature: ts,
+                        isSelected: isSelected,
+                        onTap: () => Navigator.of(context).pop(ts),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -158,15 +156,16 @@ class _TimeSignatureCard extends StatelessWidget {
             color: isSelected ? AppColors.primary : AppColors.borderLight,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -178,9 +177,11 @@ class _TimeSignatureCard extends StatelessWidget {
             if (timeSignature.isCompound) ...[
               Text(
                 '큰박 ${timeSignature.mainBeats}개',
-                style: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? Colors.white70 : AppColors.textSecondaryLight,
-                  fontSize: 10,
+                style: AppTypography.captionSmall.copyWith(
+                  color:
+                      isSelected
+                          ? Colors.white70
+                          : AppColors.textSecondaryLight,
                 ),
               ),
             ],
@@ -200,8 +201,7 @@ class _TimeSignatureCard extends StatelessWidget {
       children: [
         Text(
           numerator,
-          style: TextStyle(
-            fontSize: 28,
+          style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: isSelected ? Colors.white : AppColors.textPrimaryLight,
             height: 1.0,
@@ -214,8 +214,7 @@ class _TimeSignatureCard extends StatelessWidget {
         ),
         Text(
           denominator,
-          style: TextStyle(
-            fontSize: 28,
+          style: AppTypography.displayMedium.copyWith(
             fontWeight: FontWeight.bold,
             color: isSelected ? Colors.white : AppColors.textPrimaryLight,
             height: 1.0,
