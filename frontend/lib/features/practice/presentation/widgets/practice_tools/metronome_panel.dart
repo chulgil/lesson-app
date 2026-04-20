@@ -365,7 +365,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Row(
@@ -440,7 +440,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Row(
@@ -454,7 +454,9 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
                             height: 48,
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMedium,
+                              ),
                             ),
                             child: Center(
                               child: Text(
@@ -548,7 +550,7 @@ class _MetronomePanelState extends ConsumerState<MetronomePanel>
       height: 48,
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

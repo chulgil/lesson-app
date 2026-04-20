@@ -84,12 +84,17 @@ class _MetronomeFullScreenModalState
                   // BPM controls
                   _BpmSlider(
                     bpm: state.settings.bpm,
-                    onChanged: (value) =>
-                        ref.read(metronomeProvider.notifier).setBpm(value),
-                    onDecrement: () =>
-                        ref.read(metronomeProvider.notifier).incrementBpm(-5),
-                    onIncrement: () =>
-                        ref.read(metronomeProvider.notifier).incrementBpm(5),
+                    onChanged:
+                        (value) =>
+                            ref.read(metronomeProvider.notifier).setBpm(value),
+                    onDecrement:
+                        () => ref
+                            .read(metronomeProvider.notifier)
+                            .incrementBpm(-5),
+                    onIncrement:
+                        () => ref
+                            .read(metronomeProvider.notifier)
+                            .incrementBpm(5),
                   ),
                   SizedBox(height: AppSpacing.space8),
 
@@ -97,40 +102,48 @@ class _MetronomeFullScreenModalState
                   _LargePlayButton(
                     isPlaying: state.isPlaying,
                     currentBeat: state.currentBeat,
-                    onPressed: () =>
-                        ref.read(metronomeProvider.notifier).toggle(),
+                    onPressed:
+                        () => ref.read(metronomeProvider.notifier).toggle(),
                   ),
                   SizedBox(height: AppSpacing.space8),
 
                   // Time signature selector
                   _TimeSignatureSelector(
                     selected: state.settings.timeSignature,
-                    onChanged: (ts) =>
-                        ref.read(metronomeProvider.notifier).setTimeSignature(ts),
+                    onChanged:
+                        (ts) => ref
+                            .read(metronomeProvider.notifier)
+                            .setTimeSignature(ts),
                   ),
                   SizedBox(height: AppSpacing.space6),
 
                   // Subdivision selector
                   _SubdivisionSelector(
                     selected: state.settings.subdivision,
-                    onChanged: (sub) =>
-                        ref.read(metronomeProvider.notifier).setSubdivision(sub),
+                    onChanged:
+                        (sub) => ref
+                            .read(metronomeProvider.notifier)
+                            .setSubdivision(sub),
                   ),
                   SizedBox(height: AppSpacing.space6),
 
                   // Sound selector
                   _SoundSelector(
                     selected: state.settings.sound,
-                    onChanged: (sound) =>
-                        ref.read(metronomeProvider.notifier).setSound(sound),
+                    onChanged:
+                        (sound) => ref
+                            .read(metronomeProvider.notifier)
+                            .setSound(sound),
                   ),
                   SizedBox(height: AppSpacing.space6),
 
                   // Accent pattern selector
                   _AccentPatternSelector(
                     selected: state.settings.accentPattern,
-                    onChanged: (pattern) =>
-                        ref.read(metronomeProvider.notifier).setAccentPattern(pattern),
+                    onChanged:
+                        (pattern) => ref
+                            .read(metronomeProvider.notifier)
+                            .setAccentPattern(pattern),
                   ),
                   SizedBox(height: AppSpacing.space6),
 
@@ -138,10 +151,16 @@ class _MetronomeFullScreenModalState
                   _ToggleOptions(
                     visualFlash: state.settings.visualFlash,
                     vibration: state.settings.vibration,
-                    onVisualFlashChanged: () =>
-                        ref.read(metronomeProvider.notifier).toggleVisualFlash(),
-                    onVibrationChanged: () =>
-                        ref.read(metronomeProvider.notifier).toggleVibration(),
+                    onVisualFlashChanged:
+                        () =>
+                            ref
+                                .read(metronomeProvider.notifier)
+                                .toggleVisualFlash(),
+                    onVibrationChanged:
+                        () =>
+                            ref
+                                .read(metronomeProvider.notifier)
+                                .toggleVibration(),
                   ),
                   // Extra bottom padding for safe scrolling
                   SizedBox(height: AppSpacing.space8),
@@ -191,10 +210,7 @@ class _Header extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: onClose,
-          ),
+          IconButton(icon: const Icon(Icons.close), onPressed: onClose),
         ],
       ),
     );
@@ -246,10 +262,7 @@ class _BpmSlider extends StatelessWidget {
     return Row(
       children: [
         // -5 button
-        _CircleButton(
-          label: '-5',
-          onPressed: onDecrement,
-        ),
+        _CircleButton(label: '-5', onPressed: onDecrement),
         SizedBox(width: AppSpacing.space2),
 
         // Slider
@@ -272,20 +285,14 @@ class _BpmSlider extends StatelessWidget {
         SizedBox(width: AppSpacing.space2),
 
         // +5 button
-        _CircleButton(
-          label: '+5',
-          onPressed: onIncrement,
-        ),
+        _CircleButton(label: '+5', onPressed: onIncrement),
       ],
     );
   }
 }
 
 class _CircleButton extends StatelessWidget {
-  const _CircleButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _CircleButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;
@@ -305,9 +312,7 @@ class _CircleButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: AppTypography.button.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.button.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -338,20 +343,21 @@ class _LargePlayButton extends StatelessWidget {
           shape: const CircleBorder(),
           padding: EdgeInsets.zero,
         ),
-        child: isPlaying && currentBeat > 0
-            ? Text(
-                '$currentBeat',
-                style: AppTypography.displayLarge.copyWith(
-                  fontWeight: FontWeight.bold,
+        child:
+            isPlaying && currentBeat > 0
+                ? Text(
+                  '$currentBeat',
+                  style: AppTypography.displayLarge.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                    fontSize: 36,
+                  ),
+                )
+                : Icon(
+                  isPlaying ? Icons.pause : Icons.play_arrow,
+                  size: 48,
                   color: AppColors.primary,
-                  fontSize: 36,
                 ),
-              )
-            : Icon(
-                isPlaying ? Icons.pause : Icons.play_arrow,
-                size: 48,
-                color: AppColors.primary,
-              ),
       ),
     );
   }
@@ -373,27 +379,28 @@ class _TimeSignatureSelector extends StatelessWidget {
       children: [
         Text(
           '박자표',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         Wrap(
           spacing: AppSpacing.space1,
           runSpacing: AppSpacing.space1,
-          children: TimeSignature.values.map((ts) {
-            final isSelected = ts == selected;
-            return ChoiceChip(
-              label: Text(ts.label),
-              selected: isSelected,
-              onSelected: (_) => onChanged(ts),
-              selectedColor: AppColors.primary,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              TimeSignature.values.map((ts) {
+                final isSelected = ts == selected;
+                return ChoiceChip(
+                  label: Text(ts.label),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(ts),
+                  selectedColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -401,10 +408,7 @@ class _TimeSignatureSelector extends StatelessWidget {
 }
 
 class _SubdivisionSelector extends StatelessWidget {
-  const _SubdivisionSelector({
-    required this.selected,
-    required this.onChanged,
-  });
+  const _SubdivisionSelector({required this.selected, required this.onChanged});
 
   final Subdivision selected;
   final ValueChanged<Subdivision> onChanged;
@@ -423,26 +427,25 @@ class _SubdivisionSelector extends StatelessWidget {
       children: [
         Text(
           '서브디비전',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         // Basic subdivisions row
         Row(
-          children: basicSubdivisions.map((sub) {
-            final isSelected = sub == selected;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: _SubdivisionChip(
-                  subdivision: sub,
-                  isSelected: isSelected,
-                  onSelected: () => onChanged(sub),
-                ),
-              ),
-            );
-          }).toList(),
+          children:
+              basicSubdivisions.map((sub) {
+                final isSelected = sub == selected;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: _SubdivisionChip(
+                      subdivision: sub,
+                      isSelected: isSelected,
+                      onSelected: () => onChanged(sub),
+                    ),
+                  ),
+                );
+              }).toList(),
         ),
         SizedBox(height: AppSpacing.space2),
         // Advanced subdivisions (5, 6 연음)
@@ -450,19 +453,24 @@ class _SubdivisionSelector extends StatelessWidget {
           Wrap(
             spacing: AppSpacing.space2,
             runSpacing: AppSpacing.space2,
-            children: advancedSubdivisions.map((sub) {
-              final isSelected = sub == selected;
-              return ChoiceChip(
-                label: Text(sub.label),
-                selected: isSelected,
-                onSelected: (_) => onChanged(sub),
-                selectedColor: AppColors.primary,
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              );
-            }).toList(),
+            children:
+                advancedSubdivisions.map((sub) {
+                  final isSelected = sub == selected;
+                  return ChoiceChip(
+                    label: Text(sub.label),
+                    selected: isSelected,
+                    onSelected: (_) => onChanged(sub),
+                    selectedColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color:
+                          isSelected
+                              ? Colors.white
+                              : AppColors.textPrimaryLight,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  );
+                }).toList(),
           ),
           SizedBox(height: AppSpacing.space2),
         ],
@@ -474,7 +482,7 @@ class _SubdivisionSelector extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: FittedBox(
             fit: BoxFit.scaleDown,
@@ -526,7 +534,7 @@ class _SubdivisionChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
           ),
@@ -545,9 +553,10 @@ class _SubdivisionChip extends StatelessWidget {
             Text(
               subdivision.label,
               style: AppTypography.caption.copyWith(
-                color: isSelected
-                    ? Colors.white.withValues(alpha: 0.9)
-                    : AppColors.textSecondaryLight,
+                color:
+                    isSelected
+                        ? Colors.white.withValues(alpha: 0.9)
+                        : AppColors.textSecondaryLight,
               ),
             ),
           ],
@@ -558,10 +567,7 @@ class _SubdivisionChip extends StatelessWidget {
 }
 
 class _SoundSelector extends StatelessWidget {
-  const _SoundSelector({
-    required this.selected,
-    required this.onChanged,
-  });
+  const _SoundSelector({required this.selected, required this.onChanged});
 
   final MetronomeSound selected;
   final ValueChanged<MetronomeSound> onChanged;
@@ -573,27 +579,28 @@ class _SoundSelector extends StatelessWidget {
       children: [
         Text(
           '소리',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: MetronomeSound.values.map((sound) {
-            final isSelected = sound == selected;
-            return ChoiceChip(
-              label: Text(sound.label),
-              selected: isSelected,
-              onSelected: (_) => onChanged(sound),
-              selectedColor: AppColors.primary,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              MetronomeSound.values.map((sound) {
+                final isSelected = sound == selected;
+                return ChoiceChip(
+                  label: Text(sound.label),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(sound),
+                  selectedColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -616,27 +623,28 @@ class _AccentPatternSelector extends StatelessWidget {
       children: [
         Text(
           '박자 패턴',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: AccentPattern.values.map((pattern) {
-            final isSelected = pattern == selected;
-            return ChoiceChip(
-              label: Text(pattern.label),
-              selected: isSelected,
-              onSelected: (_) => onChanged(pattern),
-              selectedColor: AppColors.primary,
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            );
-          }).toList(),
+          children:
+              AccentPattern.values.map((pattern) {
+                final isSelected = pattern == selected;
+                return ChoiceChip(
+                  label: Text(pattern.label),
+                  selected: isSelected,
+                  onSelected: (_) => onChanged(pattern),
+                  selectedColor: AppColors.primary,
+                  labelStyle: TextStyle(
+                    color:
+                        isSelected ? Colors.white : AppColors.textPrimaryLight,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                );
+              }).toList(),
         ),
         SizedBox(height: AppSpacing.space1),
         Text(
@@ -670,9 +678,7 @@ class _ToggleOptions extends StatelessWidget {
       children: [
         Text(
           '옵션',
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         SizedBox(height: AppSpacing.space2),
         _ToggleRow(

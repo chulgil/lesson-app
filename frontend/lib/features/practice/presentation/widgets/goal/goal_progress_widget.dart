@@ -36,21 +36,23 @@ class GoalProgressWidget extends ConsumerWidget {
       ),
       child: goalStatusAsync.when(
         data: (status) => _buildContent(context, status),
-        loading: () => const Padding(
-          padding: EdgeInsets.all(AppSpacing.space4),
-          child: Center(child: CircularProgressIndicator()),
-        ),
-        error: (e, _) => Padding(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          child: Center(
-            child: Text(
-              '목표를 불러올 수 없습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.error,
+        loading:
+            () => const Padding(
+              padding: EdgeInsets.all(AppSpacing.space4),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+        error:
+            (e, _) => Padding(
+              padding: const EdgeInsets.all(AppSpacing.space4),
+              child: Center(
+                child: Text(
+                  '목표를 불러올 수 없습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -68,16 +70,9 @@ class GoalProgressWidget extends ConsumerWidget {
           // Header
           Row(
             children: [
-              Icon(
-                Icons.flag,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Icon(Icons.flag, color: AppColors.primary, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '오늘의 목표',
-                style: AppTypography.headingSmall,
-              ),
+              Text('오늘의 목표', style: AppTypography.headingSmall),
               const Spacer(),
               if (status.isDailyGoalAchieved)
                 Container(
@@ -273,10 +268,7 @@ class GoalProgressWidget extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.textSecondaryLight,
-            ),
+            Icon(Icons.chevron_right, color: AppColors.textSecondaryLight),
           ],
         ),
       ),
@@ -317,11 +309,7 @@ class GoalProgressWidget extends ConsumerWidget {
             ),
             if (isAchieved) ...[
               const SizedBox(width: AppSpacing.space1),
-              Icon(
-                Icons.check_circle,
-                color: AppColors.success,
-                size: 14,
-              ),
+              Icon(Icons.check_circle, color: AppColors.success, size: 14),
             ],
           ],
         ),
@@ -332,7 +320,7 @@ class GoalProgressWidget extends ConsumerWidget {
               height: 8,
               decoration: BoxDecoration(
                 color: AppColors.surfaceSecondaryLight,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
             ),
             FractionallySizedBox(
@@ -341,11 +329,12 @@ class GoalProgressWidget extends ConsumerWidget {
                 height: 8,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: isAchieved
-                        ? [AppColors.success, AppColors.success]
-                        : [AppColors.primary, AppColors.secondary],
+                    colors:
+                        isAchieved
+                            ? [AppColors.success, AppColors.success]
+                            : [AppColors.primary, AppColors.secondary],
                   ),
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
               ),
             ),
@@ -357,7 +346,8 @@ class GoalProgressWidget extends ConsumerWidget {
           child: Text(
             '$percent%',
             style: AppTypography.caption.copyWith(
-              color: isAchieved ? AppColors.success : AppColors.textSecondaryLight,
+              color:
+                  isAchieved ? AppColors.success : AppColors.textSecondaryLight,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -391,15 +381,16 @@ class GoalProgressWidget extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           '$value / $target',
-          style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 2),
         Text(
           '($percent%)',
           style: AppTypography.caption.copyWith(
-            color: percent >= 100 ? AppColors.success : AppColors.textTertiaryLight,
+            color:
+                percent >= 100
+                    ? AppColors.success
+                    : AppColors.textTertiaryLight,
           ),
         ),
       ],

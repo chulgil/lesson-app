@@ -49,28 +49,29 @@ class _RepertoireDetailScreenState
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) => _handleMenuAction(value),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_outlined),
-                    SizedBox(width: 8),
-                    Text('편집'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'archive',
-                child: Row(
-                  children: [
-                    Icon(Icons.inventory_2_outlined),
-                    SizedBox(width: 8),
-                    Text('아카이브로 이동'),
-                  ],
-                ),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        Icon(Icons.edit_outlined),
+                        SizedBox(width: 8),
+                        Text('편집'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'archive',
+                    child: Row(
+                      children: [
+                        Icon(Icons.inventory_2_outlined),
+                        SizedBox(width: 8),
+                        Text('아카이브로 이동'),
+                      ],
+                    ),
+                  ),
+                ],
           ),
         ],
       ),
@@ -99,20 +100,13 @@ class _RepertoireDetailScreenState
           // Repertoire header (same as list item)
           Row(
             children: [
-              Icon(
-                Icons.menu_book,
-                color: AppColors.primary,
-                size: 28,
-              ),
+              Icon(Icons.menu_book, color: AppColors.primary, size: 28),
               const SizedBox(width: AppSpacing.space3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      repertoire.name,
-                      style: AppTypography.headingLarge,
-                    ),
+                    Text(repertoire.name, style: AppTypography.headingLarge),
                     const SizedBox(height: AppSpacing.space1),
                     Text(
                       repertoire.dateRangeText,
@@ -237,8 +231,9 @@ class _RepertoireDetailScreenState
 
   Widget _buildSectionsSection(PracticeRepertoire repertoire) {
     // Watch sorted sections
-    final sortedSections =
-        ref.watch(sortedSectionsProvider(widget.repertoireId));
+    final sortedSections = ref.watch(
+      sortedSectionsProvider(widget.repertoireId),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,11 +310,9 @@ class _RepertoireDetailScreenState
         onReorder: (oldIndex, newIndex) {
           // Adjust newIndex for the remove-before-insert behavior
           if (newIndex > oldIndex) newIndex--;
-          ref.read(sectionOrderNotifierProvider.notifier).reorderSections(
-                widget.repertoireId,
-                oldIndex,
-                newIndex,
-              );
+          ref
+              .read(sectionOrderNotifierProvider.notifier)
+              .reorderSections(widget.repertoireId, oldIndex, newIndex);
         },
         itemBuilder: (context, index) {
           final section = sections[index];
@@ -335,11 +328,16 @@ class _RepertoireDetailScreenState
     } else {
       // Normal list for other sort types
       return Column(
-        children: sections.map((section) => _SectionListTile(
-              section: section,
-              repertoireId: widget.repertoireId,
-              studentId: widget.studentId,
-            )).toList(),
+        children:
+            sections
+                .map(
+                  (section) => _SectionListTile(
+                    section: section,
+                    repertoireId: widget.repertoireId,
+                    studentId: widget.studentId,
+                  ),
+                )
+                .toList(),
       );
     }
   }
@@ -374,7 +372,10 @@ class _RepertoireDetailScreenState
   }
 
   void _openEditScreen() {
-    final editPath = AppRoutes.editRepertoire.replaceFirst(':id', widget.repertoireId);
+    final editPath = AppRoutes.editRepertoire.replaceFirst(
+      ':id',
+      widget.repertoireId,
+    );
     context.push('$editPath?studentId=${widget.studentId}').then((result) {
       if (result == true) {
         // Refresh the data after edit
@@ -390,32 +391,34 @@ class _RepertoireDetailScreenState
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('아카이브'),
-        content: Text(
-            '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              await ref
-                  .read(repertoireArchiveNotifierProvider.notifier)
-                  .archive(widget.repertoireId, widget.studentId);
+      builder:
+          (context) => AlertDialog(
+            title: const Text('아카이브'),
+            content: Text(
+              '"${repertoire.name}"을(를) 아카이브로 이동할까요?\n\n아카이브된 레퍼토리는 목록에서 숨겨지며, 아카이브 화면에서 복원할 수 있습니다.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await ref
+                      .read(repertoireArchiveNotifierProvider.notifier)
+                      .archive(widget.repertoireId, widget.studentId);
 
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
-              );
-              context.pop(); // Go back to repertoire list
-            },
-            child: const Text('아카이브'),
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('"${repertoire.name}" 아카이브됨')),
+                  );
+                  context.pop(); // Go back to repertoire list
+                },
+                child: const Text('아카이브'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -557,7 +560,7 @@ class _SectionListTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondaryLight,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -696,7 +699,7 @@ class _ReorderableSectionTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondaryLight,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

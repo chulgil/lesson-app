@@ -12,11 +12,7 @@ class PracticeStreakCard extends ConsumerWidget {
   final String studentId;
   final VoidCallback? onTap;
 
-  const PracticeStreakCard({
-    super.key,
-    required this.studentId,
-    this.onTap,
-  });
+  const PracticeStreakCard({super.key, required this.studentId, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,7 +25,11 @@ class PracticeStreakCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildCard(BuildContext context, WidgetRef ref, PracticeStreak streak) {
+  Widget _buildCard(
+    BuildContext context,
+    WidgetRef ref,
+    PracticeStreak streak,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -43,8 +43,9 @@ class PracticeStreakCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           boxShadow: [
             BoxShadow(
-              color: _getGradientColors(streak.streakLevel).first
-                  .withValues(alpha: 0.3),
+              color: _getGradientColors(
+                streak.streakLevel,
+              ).first.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -65,10 +66,7 @@ class PracticeStreakCard extends ConsumerWidget {
                   ),
                 ),
                 if (streak.fireEmoji.isNotEmpty)
-                  Text(
-                    streak.fireEmoji,
-                    style: const TextStyle(fontSize: 24),
-                  ),
+                  Text(streak.fireEmoji, style: const TextStyle(fontSize: 24)),
               ],
             ),
 
@@ -149,24 +147,25 @@ class PracticeStreakCard extends ConsumerWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: isFuture
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : isPracticed
+                color:
+                    isFuture
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : isPracticed
                         ? Colors.white
                         : Colors.white.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
-                border: isToday
-                    ? Border.all(color: Colors.white, width: 2)
-                    : null,
+                border:
+                    isToday ? Border.all(color: Colors.white, width: 2) : null,
               ),
               child: Center(
-                child: isPracticed && !isFuture
-                    ? Icon(
-                        Icons.check,
-                        size: 16,
-                        color: _getGradientColors(streak.streakLevel).first,
-                      )
-                    : null,
+                child:
+                    isPracticed && !isFuture
+                        ? Icon(
+                          Icons.check,
+                          size: 16,
+                          color: _getGradientColors(streak.streakLevel).first,
+                        )
+                        : null,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
@@ -204,9 +203,7 @@ class PracticeStreakCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       height: 180,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 
@@ -237,10 +234,7 @@ class PracticeStreakCard extends ConsumerWidget {
 class PracticeStreakBadge extends ConsumerWidget {
   final String studentId;
 
-  const PracticeStreakBadge({
-    super.key,
-    required this.studentId,
-  });
+  const PracticeStreakBadge({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -257,7 +251,7 @@ class PracticeStreakBadge extends ConsumerWidget {
           ),
           decoration: BoxDecoration(
             color: _getBadgeColor(streak.streakLevel),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -320,12 +314,18 @@ class RecordPracticeButton extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: AppColors.success.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                const Icon(
+                  Icons.check_circle,
+                  color: AppColors.success,
+                  size: 20,
+                ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(
                   '오늘 연습 완료!',
@@ -341,7 +341,9 @@ class RecordPracticeButton extends ConsumerWidget {
 
         return FilledButton.icon(
           onPressed: () async {
-            final notifier = ref.read(streakNotifierProvider(studentId).notifier);
+            final notifier = ref.read(
+              streakNotifierProvider(studentId).notifier,
+            );
             await notifier.recordPractice();
             ref.invalidate(practiceStreakProvider(studentId));
             onRecorded?.call();

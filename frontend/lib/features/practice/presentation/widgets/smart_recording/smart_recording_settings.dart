@@ -27,7 +27,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: const Icon(
                     Icons.auto_fix_high,
@@ -95,7 +97,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       '${(settings.trimThreshold * 100).toInt()}%',
@@ -121,7 +125,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                         activeTrackColor: AppColors.primary,
-                        inactiveTrackColor: AppColors.primary.withValues(alpha: 0.2),
+                        inactiveTrackColor: AppColors.primary.withValues(
+                          alpha: 0.2,
+                        ),
                         thumbColor: AppColors.primary,
                         overlayColor: AppColors.primary.withValues(alpha: 0.1),
                       ),
@@ -132,7 +138,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                         divisions: 8,
                         onChanged: (value) {
                           ref
-                              .read(smartRecordingSettingsNotifierProvider.notifier)
+                              .read(
+                                smartRecordingSettingsNotifierProvider.notifier,
+                              )
                               .setThreshold(value);
                         },
                       ),
@@ -238,7 +246,9 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         '${settings.middleSilenceThreshold}초 이상',
@@ -263,9 +273,13 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                       child: SliderTheme(
                         data: SliderTheme.of(context).copyWith(
                           activeTrackColor: AppColors.primary,
-                          inactiveTrackColor: AppColors.primary.withValues(alpha: 0.2),
+                          inactiveTrackColor: AppColors.primary.withValues(
+                            alpha: 0.2,
+                          ),
                           thumbColor: AppColors.primary,
-                          overlayColor: AppColors.primary.withValues(alpha: 0.1),
+                          overlayColor: AppColors.primary.withValues(
+                            alpha: 0.1,
+                          ),
                         ),
                         child: Slider(
                           value: settings.middleSilenceThreshold.toDouble(),
@@ -274,7 +288,10 @@ class SmartRecordingSettingsCard extends ConsumerWidget {
                           divisions: 5,
                           onChanged: (value) {
                             ref
-                                .read(smartRecordingSettingsNotifierProvider.notifier)
+                                .read(
+                                  smartRecordingSettingsNotifierProvider
+                                      .notifier,
+                                )
                                 .setMiddleSilenceThreshold(value.toInt());
                           },
                         ),
@@ -307,7 +324,9 @@ class SmartRecordingToggle extends ConsumerWidget {
 
     return InkWell(
       onTap: () {
-        ref.read(smartRecordingSettingsNotifierProvider.notifier).toggleEnabled();
+        ref
+            .read(smartRecordingSettingsNotifierProvider.notifier)
+            .toggleEnabled();
       },
       borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       child: Container(
@@ -316,14 +335,16 @@ class SmartRecordingToggle extends ConsumerWidget {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: settings.smartRecordingEnabled
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.surfaceSecondaryLight,
+          color:
+              settings.smartRecordingEnabled
+                  ? AppColors.primary.withValues(alpha: 0.1)
+                  : AppColors.surfaceSecondaryLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: settings.smartRecordingEnabled
-                ? AppColors.primary.withValues(alpha: 0.3)
-                : AppColors.borderLight,
+            color:
+                settings.smartRecordingEnabled
+                    ? AppColors.primary.withValues(alpha: 0.3)
+                    : AppColors.borderLight,
           ),
         ),
         child: Row(
@@ -332,17 +353,19 @@ class SmartRecordingToggle extends ConsumerWidget {
             Icon(
               Icons.auto_fix_high,
               size: 16,
-              color: settings.smartRecordingEnabled
-                  ? AppColors.primary
-                  : AppColors.textSecondaryLight,
+              color:
+                  settings.smartRecordingEnabled
+                      ? AppColors.primary
+                      : AppColors.textSecondaryLight,
             ),
             const SizedBox(width: 4),
             Text(
               '스마트',
               style: AppTypography.caption.copyWith(
-                color: settings.smartRecordingEnabled
-                    ? AppColors.primary
-                    : AppColors.textSecondaryLight,
+                color:
+                    settings.smartRecordingEnabled
+                        ? AppColors.primary
+                        : AppColors.textSecondaryLight,
                 fontWeight: FontWeight.w600,
               ),
             ),

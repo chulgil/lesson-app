@@ -50,11 +50,7 @@ class NotePreviewCard extends ConsumerWidget {
 
     return Row(
       children: [
-        Icon(
-          Icons.edit_note,
-          color: AppColors.primary,
-          size: 20,
-        ),
+        Icon(Icons.edit_note, color: AppColors.primary, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Column(
@@ -90,11 +86,7 @@ class NotePreviewCard extends ConsumerWidget {
             ],
           ),
         ),
-        Icon(
-          Icons.chevron_right,
-          color: AppColors.textTertiaryLight,
-          size: 20,
-        ),
+        Icon(Icons.chevron_right, color: AppColors.textTertiaryLight, size: 20),
       ],
     );
   }
@@ -102,11 +94,7 @@ class NotePreviewCard extends ConsumerWidget {
   Widget _buildEmpty() {
     return Row(
       children: [
-        Icon(
-          Icons.edit_note,
-          color: AppColors.textTertiaryLight,
-          size: 20,
-        ),
+        Icon(Icons.edit_note, color: AppColors.textTertiaryLight, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
@@ -116,11 +104,7 @@ class NotePreviewCard extends ConsumerWidget {
             ),
           ),
         ),
-        Icon(
-          Icons.chevron_right,
-          color: AppColors.textTertiaryLight,
-          size: 20,
-        ),
+        Icon(Icons.chevron_right, color: AppColors.textTertiaryLight, size: 20),
       ],
     );
   }
@@ -128,18 +112,14 @@ class NotePreviewCard extends ConsumerWidget {
   Widget _buildLoading() {
     return Row(
       children: [
-        Icon(
-          Icons.edit_note,
-          color: AppColors.textTertiaryLight,
-          size: 20,
-        ),
+        Icon(Icons.edit_note, color: AppColors.textTertiaryLight, size: 20),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Container(
             height: 16,
             decoration: BoxDecoration(
               color: AppColors.borderLight,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
           ),
         ),

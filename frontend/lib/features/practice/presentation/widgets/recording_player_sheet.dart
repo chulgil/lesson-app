@@ -435,7 +435,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       child: Text(
                         _speed.label,
@@ -458,7 +460,9 @@ class _RecordingPlayerSheetState extends ConsumerState<RecordingPlayerSheet> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceSecondaryDark,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       child: Icon(
                         Icons.ios_share,
@@ -559,12 +563,15 @@ class _ABButton extends StatelessWidget {
         height: 36,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border:
               isSet
                   ? null
                   : Border.all(
-                    color: isEnabled ? AppColors.textTertiaryDark : AppColors.surfaceSecondaryDark,
+                    color:
+                        isEnabled
+                            ? AppColors.textTertiaryDark
+                            : AppColors.surfaceSecondaryDark,
                     width: 1,
                   ),
         ),

@@ -443,10 +443,10 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   widget.isRecording
                       ? AppColors.primary
                       : AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
               child: RecordingWaveform(
                 style: waveformStyle,
                 isActive: waveformIsActive,
@@ -505,7 +505,9 @@ class _RecordingSectionState extends ConsumerState<_RecordingSection> {
                   child: IconButton.filled(
                     onPressed: widget.onStop,
                     icon: const Icon(Icons.stop, size: 36),
-                    style: IconButton.styleFrom(backgroundColor: AppColors.error),
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                    ),
                     tooltip: '녹음 완료',
                   ),
                 ),
@@ -683,7 +685,7 @@ class _RecordingItem extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
                   '대표',

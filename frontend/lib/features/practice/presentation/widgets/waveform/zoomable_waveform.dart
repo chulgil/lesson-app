@@ -69,7 +69,8 @@ class _ZoomableWaveformProgressBarState
   // For reliable tap detection on iOS
   bool _isInScaleGesture = false;
   double _maxMoveDistance = 0.0;
-  static const double _tapThreshold = 15.0; // Max movement to be considered a tap
+  static const double _tapThreshold =
+      15.0; // Max movement to be considered a tap
 
   /// Convert local x position to progress value considering zoom
   double _localXToProgress(double localX, double width) {
@@ -146,8 +147,10 @@ class _ZoomableWaveformProgressBarState
       // Detect if zooming (pinch with scale != 1.0)
       if (details.scale != 1.0) {
         _isZooming = true;
-        final newScale =
-            (_baseScale * details.scale).clamp(widget.minScale, widget.maxScale);
+        final newScale = (_baseScale * details.scale).clamp(
+          widget.minScale,
+          widget.maxScale,
+        );
 
         // Zoom centered on focal point
         if (_lastFocalPoint != null) {
@@ -188,7 +191,8 @@ class _ZoomableWaveformProgressBarState
   void _handleScaleEnd(ScaleEndDetails details, double width) {
     // Use distance-based tap detection for reliability on iOS
     // If movement was minimal, treat as a tap (not pan, not zoom, not marker drag)
-    final isTap = _maxMoveDistance < _tapThreshold &&
+    final isTap =
+        _maxMoveDistance < _tapThreshold &&
         !_isZooming &&
         !_isDraggingMarkerA &&
         !_isDraggingMarkerB;
@@ -273,20 +277,23 @@ class _ZoomableWaveformProgressBarState
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               // Use onTapDown for desktop (macOS) for immediate click response
-              onTapDown: (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-                  ? (details) => _handleTap(details, width)
-                  : null,
+              onTapDown:
+                  (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                      ? (details) => _handleTap(details, width)
+                      : null,
               onTapUp: (details) => _handleTapUp(details, width),
               onScaleStart: (details) => _handleScaleStart(details, width),
               onScaleUpdate: (details) => _handleScaleUpdate(details, width),
               onScaleEnd: (details) => _handleScaleEnd(details, width),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 child: Container(
                   height: widget.height,
                   decoration: BoxDecoration(
                     color: AppColors.surfaceSecondaryDark,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: CustomPaint(
                     painter: _ZoomableWaveformPainter(
@@ -345,22 +352,24 @@ class _ZoomableWaveformPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final playedPaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+    final playedPaint =
+        Paint()
+          ..color = AppColors.primary
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round;
 
-    final unplayedPaint = Paint()
-      ..color = AppColors.textTertiaryDark
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+    final unplayedPaint =
+        Paint()
+          ..color = AppColors.textTertiaryDark
+          ..strokeWidth = 2
+          ..strokeCap = StrokeCap.round;
 
-    final loopPaint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.3);
+    final loopPaint = Paint()..color = AppColors.primary.withValues(alpha: 0.3);
 
-    final markerPaint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 3;
+    final markerPaint =
+        Paint()
+          ..color = AppColors.primary
+          ..strokeWidth = 3;
 
     // Calculate visible range
     final visibleWidth = 1.0 / scale;
@@ -374,19 +383,14 @@ class _ZoomableWaveformPainter extends CustomPainter {
 
     // Draw A-B loop highlight
     if (abLoop.isActive && duration.inMilliseconds > 0) {
-      final aProgress =
-          abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
-      final bProgress =
-          abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
+      final aProgress = abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
+      final bProgress = abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
 
       // Only draw if visible
       if (bProgress >= visibleStart && aProgress <= visibleEnd) {
         final aX = progressToX(aProgress).clamp(0.0, size.width);
         final bX = progressToX(bProgress).clamp(0.0, size.width);
-        canvas.drawRect(
-          Rect.fromLTRB(aX, 0, bX, size.height),
-          loopPaint,
-        );
+        canvas.drawRect(Rect.fromLTRB(aX, 0, bX, size.height), loopPaint);
       }
     }
 
@@ -405,8 +409,8 @@ class _ZoomableWaveformPainter extends CustomPainter {
 
       // Simulated waveform heights (consistent pattern based on progress)
       final patternIndex = (barProgress * 1000).round();
-      final height = (20 + (patternIndex % 7) * 5 + (patternIndex % 3) * 3)
-          .toDouble();
+      final height =
+          (20 + (patternIndex % 7) * 5 + (patternIndex % 3) * 3).toDouble();
       final halfHeight = height / 2;
 
       final paint = barProgress <= progress ? playedPaint : unplayedPaint;
@@ -420,8 +424,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
 
     // Draw A marker
     if (abLoop.hasA && duration.inMilliseconds > 0) {
-      final aProgress =
-          abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
+      final aProgress = abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
       if (aProgress >= visibleStart && aProgress <= visibleEnd) {
         final aX = progressToX(aProgress);
         _drawMarker(canvas, size, aX, 'A', markerPaint);
@@ -430,8 +433,7 @@ class _ZoomableWaveformPainter extends CustomPainter {
 
     // Draw B marker
     if (abLoop.hasB && duration.inMilliseconds > 0) {
-      final bProgress =
-          abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
+      final bProgress = abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
       if (bProgress >= visibleStart && bProgress <= visibleEnd) {
         final bX = progressToX(bProgress);
         _drawMarker(canvas, size, bX, 'B', markerPaint);
@@ -441,9 +443,10 @@ class _ZoomableWaveformPainter extends CustomPainter {
     // Draw playhead
     if (progress >= visibleStart && progress <= visibleEnd) {
       final playheadX = progressToX(progress).clamp(0.0, size.width);
-      final playheadPaint = Paint()
-        ..color = Colors.white
-        ..strokeWidth = 2;
+      final playheadPaint =
+          Paint()
+            ..color = Colors.white
+            ..strokeWidth = 2;
 
       canvas.drawLine(
         Offset(playheadX, 4),
@@ -462,13 +465,14 @@ class _ZoomableWaveformPainter extends CustomPainter {
   }
 
   void _drawMarker(
-      Canvas canvas, Size size, double x, String label, Paint paint) {
+    Canvas canvas,
+    Size size,
+    double x,
+    String label,
+    Paint paint,
+  ) {
     // Marker line
-    canvas.drawLine(
-      Offset(x, 0),
-      Offset(x, size.height),
-      paint,
-    );
+    canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
 
     // Label background
     final labelRect = RRect.fromRectAndRadius(
@@ -569,12 +573,13 @@ class _MiniMapState extends State<_MiniMap> {
         return GestureDetector(
           onTapDown: (details) => _handleTap(details, width),
           onHorizontalDragStart: _handleDragStart,
-          onHorizontalDragUpdate: (details) => _handleDragUpdate(details, width),
+          onHorizontalDragUpdate:
+              (details) => _handleDragUpdate(details, width),
           child: Container(
             height: 20,
             decoration: BoxDecoration(
               color: AppColors.surfaceDark,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: CustomPaint(
               painter: _MiniMapPainter(
@@ -611,9 +616,10 @@ class _MiniMapPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Draw simplified waveform
-    final barPaint = Paint()
-      ..color = AppColors.textTertiaryDark
-      ..strokeWidth = 1;
+    final barPaint =
+        Paint()
+          ..color = AppColors.textTertiaryDark
+          ..strokeWidth = 1;
 
     const barCount = 30;
     final barWidth = size.width / barCount;
@@ -631,10 +637,8 @@ class _MiniMapPainter extends CustomPainter {
 
     // Draw A-B loop region
     if (abLoop.isActive && duration.inMilliseconds > 0) {
-      final aProgress =
-          abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
-      final bProgress =
-          abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
+      final aProgress = abLoop.pointA!.inMilliseconds / duration.inMilliseconds;
+      final bProgress = abLoop.pointB!.inMilliseconds / duration.inMilliseconds;
       canvas.drawRect(
         Rect.fromLTRB(
           size.width * aProgress,

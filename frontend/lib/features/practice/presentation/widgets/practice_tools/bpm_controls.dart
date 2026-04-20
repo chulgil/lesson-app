@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 /// Circle button for BPM increment/decrement.
 class CircleButton extends StatelessWidget {
-  const CircleButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-  });
+  const CircleButton({super.key, required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;
@@ -98,7 +95,8 @@ class LogarithmicBpmSlider extends StatelessWidget {
       return bpm.round().clamp(_minBpm.toInt(), _midBpm.toInt());
     } else {
       // Compressed: 0.75-1.0 maps to 200-400
-      final bpm = _midBpm +
+      final bpm =
+          _midBpm +
           ((position - _midPosition) / (1.0 - _midPosition)) *
               (_maxBpm - _midBpm);
       return bpm.round().clamp(_midBpm.toInt(), _maxBpm.toInt());
@@ -108,11 +106,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
   /// Get color based on BPM intensity (darker = faster).
   Color _getSliderColor(int bpm) {
     final intensity = ((bpm - _minBpm) / (_maxBpm - _minBpm)).clamp(0.0, 1.0);
-    return Color.lerp(
-      AppColors.primaryLight,
-      AppColors.primary,
-      intensity,
-    )!;
+    return Color.lerp(AppColors.primaryLight, AppColors.primary, intensity)!;
   }
 
   @override
@@ -124,17 +118,15 @@ class LogarithmicBpmSlider extends StatelessWidget {
         // Main slider with +5/-5 buttons
         Row(
           children: [
-            CircleButton(
-              label: '-5',
-              onPressed: () => onIncrement(-5),
-            ),
+            CircleButton(label: '-5', onPressed: () => onIncrement(-5)),
             const SizedBox(width: 8),
             Expanded(
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   activeTrackColor: sliderColor,
-                  inactiveTrackColor:
-                      AppColors.primaryLight.withValues(alpha: 0.3),
+                  inactiveTrackColor: AppColors.primaryLight.withValues(
+                    alpha: 0.3,
+                  ),
                   thumbColor: sliderColor,
                   overlayColor: sliderColor.withValues(alpha: 0.2),
                   trackHeight: 6,
@@ -148,10 +140,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            CircleButton(
-              label: '+5',
-              onPressed: () => onIncrement(5),
-            ),
+            CircleButton(label: '+5', onPressed: () => onIncrement(5)),
           ],
         ),
         const SizedBox(height: 8),
@@ -159,15 +148,9 @@ class LogarithmicBpmSlider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SmallButton(
-              label: '-1',
-              onPressed: () => onIncrement(-1),
-            ),
+            SmallButton(label: '-1', onPressed: () => onIncrement(-1)),
             const SizedBox(width: 16),
-            SmallButton(
-              label: '+1',
-              onPressed: () => onIncrement(1),
-            ),
+            SmallButton(label: '+1', onPressed: () => onIncrement(1)),
           ],
         ),
       ],
@@ -177,11 +160,7 @@ class LogarithmicBpmSlider extends StatelessWidget {
 
 /// Small button for fine BPM adjustment.
 class SmallButton extends StatelessWidget {
-  const SmallButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-  });
+  const SmallButton({super.key, required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;
@@ -197,17 +176,13 @@ class SmallButton extends StatelessWidget {
           foregroundColor: AppColors.primary,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: BorderSide(
-              color: AppColors.primary.withValues(alpha: 0.3),
-            ),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
           ),
         ),
         child: Text(
           label,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
     );

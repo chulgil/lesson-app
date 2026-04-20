@@ -21,11 +21,12 @@ class DailyBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Calculate max value for scaling
-    final actualMax = dailyStats.isEmpty
-        ? maxMinutes
-        : dailyStats
-            .map((s) => s.practiceMinutes)
-            .reduce((a, b) => a > b ? a : b);
+    final actualMax =
+        dailyStats.isEmpty
+            ? maxMinutes
+            : dailyStats
+                .map((s) => s.practiceMinutes)
+                .reduce((a, b) => a > b ? a : b);
     final chartMax = (actualMax * 1.2).clamp(30, 300).toInt();
 
     return Container(
@@ -40,16 +41,9 @@ class DailyBarChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.bar_chart,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Icon(Icons.bar_chart, color: AppColors.primary, size: 20),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '일별 연습 시간',
-                style: AppTypography.headingSmall,
-              ),
+              Text('일별 연습 시간', style: AppTypography.headingSmall),
             ],
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -59,9 +53,10 @@ class DailyBarChart extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
-              children: dailyStats.map((stat) {
-                return _buildBar(stat, chartMax);
-              }).toList(),
+              children:
+                  dailyStats.map((stat) {
+                    return _buildBar(stat, chartMax);
+                  }).toList(),
             ),
           ),
         ],
@@ -71,7 +66,8 @@ class DailyBarChart extends StatelessWidget {
 
   Widget _buildBar(DailyStats stat, int chartMax) {
     final now = DateTime.now();
-    final isToday = stat.date.year == now.year &&
+    final isToday =
+        stat.date.year == now.year &&
         stat.date.month == now.month &&
         stat.date.day == now.day;
     final isFuture = stat.date.isAfter(now);
@@ -114,20 +110,17 @@ class DailyBarChart extends StatelessWidget {
           height: stat.hasPracticed ? barHeight * heightPercent : 4,
           decoration: BoxDecoration(
             color: barColor,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
 
         // Day label
         Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 6,
-            vertical: 2,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
             color: isToday ? AppColors.primary : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Text(
             stat.dayLabel,

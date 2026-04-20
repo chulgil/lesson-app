@@ -51,10 +51,13 @@ class StatusBubble extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space3,
+        vertical: 6,
+      ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -195,11 +198,7 @@ class CatFace extends StatelessWidget {
 
 /// Note display with cent (note above, cent below).
 class NoteWithCent extends StatelessWidget {
-  const NoteWithCent({
-    super.key,
-    required this.note,
-    required this.isPerfect,
-  });
+  const NoteWithCent({super.key, required this.note, required this.isPerfect});
 
   final TunerNote note;
   final bool isPerfect;
@@ -207,11 +206,13 @@ class NoteWithCent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final noteColor = isPerfect ? AppColors.success : AppColors.primary;
-    final centColor = isPerfect
-        ? AppColors.success
-        : (note.centDeviation < 0 ? AppColors.error : AppColors.warning);
+    final centColor =
+        isPerfect
+            ? AppColors.success
+            : (note.centDeviation < 0 ? AppColors.error : AppColors.warning);
 
-    final centText = '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';
+    final centText =
+        '${note.centDeviation >= 0 ? '+' : ''}${note.centDeviation.toStringAsFixed(0)}¢';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -226,7 +227,7 @@ class NoteWithCent extends StatelessWidget {
             Text(
               note.name.sharpName,
               style: TextStyle(
-                fontSize: 72,  // Increased to 72
+                fontSize: 72, // Increased to 72
                 fontWeight: FontWeight.bold,
                 color: noteColor,
               ),

@@ -7,18 +7,12 @@ import '../../../domain/entities/metronome_settings.dart';
 
 /// Bottom sheet picker for selecting subdivision.
 class SubdivisionPicker extends StatefulWidget {
-  const SubdivisionPicker({
-    super.key,
-    required this.current,
-  });
+  const SubdivisionPicker({super.key, required this.current});
 
   final Subdivision current;
 
   /// Show the subdivision picker as a bottom sheet.
-  static Future<Subdivision?> show(
-    BuildContext context,
-    Subdivision current,
-  ) {
+  static Future<Subdivision?> show(BuildContext context, Subdivision current) {
     return showModalBottomSheet<Subdivision>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -84,13 +78,15 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
                     // Basic subdivisions section
                     _buildSection(
                       title: '기본 패턴',
-                      subdivisions: Subdivision.values.where((s) => s.isBasic).toList(),
+                      subdivisions:
+                          Subdivision.values.where((s) => s.isBasic).toList(),
                     ),
                     SizedBox(height: AppSpacing.space4),
                     // Variations section
                     _buildSection(
                       title: '베리에이션 (쉼표 포함)',
-                      subdivisions: Subdivision.values.where((s) => !s.isBasic).toList(),
+                      subdivisions:
+                          Subdivision.values.where((s) => !s.isBasic).toList(),
                     ),
                     SizedBox(height: AppSpacing.space4),
                   ],
@@ -106,7 +102,7 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
               ),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 border: Border.all(
                   color: AppColors.primary.withValues(alpha: 0.3),
                 ),
@@ -114,11 +110,7 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.music_note,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
+                  Icon(Icons.music_note, size: 20, color: AppColors.primary),
                   SizedBox(width: AppSpacing.space2),
                   Text(
                     '패턴: ${_selected.visualPattern}',
@@ -162,17 +154,18 @@ class _SubdivisionPickerState extends State<SubdivisionPicker> {
         Wrap(
           spacing: AppSpacing.space2,
           runSpacing: AppSpacing.space2,
-          children: subdivisions.map((sub) {
-            final isSelected = sub == _selected;
-            return _SubdivisionChip(
-              subdivision: sub,
-              isSelected: isSelected,
-              onTap: () {
-                setState(() => _selected = sub);
-                Navigator.of(context).pop(sub);
-              },
-            );
-          }).toList(),
+          children:
+              subdivisions.map((sub) {
+                final isSelected = sub == _selected;
+                return _SubdivisionChip(
+                  subdivision: sub,
+                  isSelected: isSelected,
+                  onTap: () {
+                    setState(() => _selected = sub);
+                    Navigator.of(context).pop(sub);
+                  },
+                );
+              }).toList(),
         ),
       ],
     );
@@ -202,20 +195,21 @@ class _SubdivisionChip extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surfaceLight,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
             width: isSelected ? 2 : 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

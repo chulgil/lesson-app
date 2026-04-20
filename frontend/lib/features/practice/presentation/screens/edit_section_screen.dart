@@ -65,7 +65,9 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
   Future<void> _loadSectionData() async {
     // Load repertoire data for context display
-    final repertoire = await ref.read(repertoireProvider(widget.repertoireId).future);
+    final repertoire = await ref.read(
+      repertoireProvider(widget.repertoireId).future,
+    );
 
     // Load section data
     final section = await ref.read(sectionProvider(widget.sectionId).future);
@@ -81,9 +83,10 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         _startLine = section.startLine ?? 1;
         _endLine = section.endLine ?? 2;
         _repeatCount = section.repeatCount;
-        _targetPracticeMinutes = section.targetPracticeSeconds != null
-            ? (section.targetPracticeSeconds! / 60).round()
-            : null;
+        _targetPracticeMinutes =
+            section.targetPracticeSeconds != null
+                ? (section.targetPracticeSeconds! / 60).round()
+                : null;
         _isInitialized = true;
       });
     }
@@ -136,17 +139,19 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
         endLine: _rangeType == SectionRangeType.line ? _endLine : null,
         clearStartLine: _rangeType != SectionRangeType.line,
         clearEndLine: _rangeType != SectionRangeType.line,
-        sectionName: _sectionNameController.text.trim().isEmpty
-            ? null
-            : _sectionNameController.text.trim(),
+        sectionName:
+            _sectionNameController.text.trim().isEmpty
+                ? null
+                : _sectionNameController.text.trim(),
         isRepeat: true, // 섹션은 레퍼토리 기간 동안 매일 반복
         repeatCount: _repeatCount,
         clearRepeatCount: _repeatCount == null,
         clearStartDate: true, // 섹션 날짜는 레퍼토리에서 상속
         clearEndDate: true,
-        targetPracticeSeconds: _targetPracticeMinutes != null
-            ? _targetPracticeMinutes! * 60
-            : null,
+        targetPracticeSeconds:
+            _targetPracticeMinutes != null
+                ? _targetPracticeMinutes! * 60
+                : null,
         clearTargetPracticeSeconds: _targetPracticeMinutes == null,
         updatedAt: DateTime.now(),
       );
@@ -161,9 +166,11 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       ref.invalidate(studentRepertoiresProvider(widget.studentId));
       // Also invalidate date-based provider
       final today = DateTime.now();
-      ref.invalidate(repertoiresForDateProvider(
-        RepertoiresForDateParams(studentId: widget.studentId, date: today),
-      ));
+      ref.invalidate(
+        repertoiresForDateProvider(
+          RepertoiresForDateParams(studentId: widget.studentId, date: today),
+        ),
+      );
 
       if (mounted) {
         context.pop(true);
@@ -189,24 +196,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 마디' : '끝 마디',
-        unit: '마디',
-        initialValue: initialValue,
-        maxValue: 100,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startMeasure = value;
-              if (_endMeasure < _startMeasure) {
-                _endMeasure = _startMeasure;
-              }
-            } else {
-              _endMeasure = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 마디' : '끝 마디',
+            unit: '마디',
+            initialValue: initialValue,
+            maxValue: 100,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startMeasure = value;
+                  if (_endMeasure < _startMeasure) {
+                    _endMeasure = _startMeasure;
+                  }
+                } else {
+                  _endMeasure = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -215,24 +223,25 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
 
     showModalBottomSheet(
       context: context,
-      builder: (context) => RangePickerSheet(
-        title: isStart ? '시작 줄' : '끝 줄',
-        unit: '줄',
-        initialValue: initialValue,
-        maxValue: 10,
-        onSelected: (value) {
-          setState(() {
-            if (isStart) {
-              _startLine = value;
-              if (_endLine < _startLine) {
-                _endLine = _startLine;
-              }
-            } else {
-              _endLine = value;
-            }
-          });
-        },
-      ),
+      builder:
+          (context) => RangePickerSheet(
+            title: isStart ? '시작 줄' : '끝 줄',
+            unit: '줄',
+            initialValue: initialValue,
+            maxValue: 10,
+            onSelected: (value) {
+              setState(() {
+                if (isStart) {
+                  _startLine = value;
+                  if (_endLine < _startLine) {
+                    _endLine = _startLine;
+                  }
+                } else {
+                  _endLine = value;
+                }
+              });
+            },
+          ),
     );
   }
 
@@ -254,9 +263,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('섹션 수정'),
-      ),
+      appBar: AppBar(title: const Text('섹션 수정')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Form(
@@ -272,7 +279,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(
                       color: AppColors.primary.withValues(alpha: 0.2),
                     ),
@@ -332,10 +339,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               const SizedBox(height: AppSpacing.space6),
 
               // Range type selector (전체/줄/마디)
-              Text(
-                '범위 유형',
-                style: AppTypography.headingSmall,
-              ),
+              Text('범위 유형', style: AppTypography.headingSmall),
               const SizedBox(height: AppSpacing.space2),
               SegmentedButton<SectionRangeType>(
                 segments: const [
@@ -366,10 +370,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // Range input based on type (hidden when 'full' is selected)
               if (_rangeType == SectionRangeType.measure) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Text(
-                  '마디 범위 *',
-                  style: AppTypography.headingSmall,
-                ),
+                Text('마디 범위 *', style: AppTypography.headingSmall),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '연습할 마디 구간을 선택하세요',
@@ -389,10 +390,7 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 ),
               ] else if (_rangeType == SectionRangeType.line) ...[
                 const SizedBox(height: AppSpacing.space4),
-                Text(
-                  '줄 범위 *',
-                  style: AppTypography.headingSmall,
-                ),
+                Text('줄 범위 *', style: AppTypography.headingSmall),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '연습할 줄 구간을 선택하세요 (1~10줄)',
@@ -452,8 +450,8 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
               // ========================================
               TargetTimeSection(
                 targetMinutes: _targetPracticeMinutes,
-                onChanged: (value) =>
-                    setState(() => _targetPracticeMinutes = value),
+                onChanged:
+                    (value) => setState(() => _targetPracticeMinutes = value),
               ),
 
               const SizedBox(height: AppSpacing.space8),
@@ -463,16 +461,17 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isLoading ? null : _submit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('변경사항 저장'),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('변경사항 저장'),
                 ),
               ),
 
@@ -483,5 +482,4 @@ class _EditSectionScreenState extends ConsumerState<EditSectionScreen> {
       ),
     );
   }
-
 }
