@@ -527,7 +527,7 @@ class BackupListSection extends ConsumerWidget {
           data: (backups) {
             if (backups.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.space6),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceSecondaryLight,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -561,14 +561,14 @@ class BackupListSection extends ConsumerWidget {
           loading:
               () => const Center(
                 child: Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.all(AppSpacing.space6),
                   child: CircularProgressIndicator(),
                 ),
               ),
           error:
               (e, _) => Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppSpacing.space6),
                   child: Text(
                     '백업 목록을 불러올 수 없습니다',
                     style: TextStyle(color: AppColors.error),
@@ -592,16 +592,19 @@ class BackupItem extends ConsumerWidget {
     final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space2,
+        ),
         leading: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
             color: AppColors.secondary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
