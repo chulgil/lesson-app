@@ -31,13 +31,13 @@ class CurrentRequestBox extends StatefulWidget {
   final int? initialSelectedSlot;
 
   // Phase 2 callbacks
-  final VoidCallback? onSendPaymentGuide;  // 선불: 결제 안내 BottomSheet
-  final VoidCallback? onIssuePostpaid;      // 후불: 수강권 먼저 발급
-  final VoidCallback? onIssueFree;          // 무료: 체험 수강권 발급
-  final VoidCallback? onConfirmPayment;     // 학생: 입금 완료
-  final VoidCallback? onVerifyPayment;      // 선생님: 입금 확인
+  final VoidCallback? onSendPaymentGuide; // 선불: 결제 안내 BottomSheet
+  final VoidCallback? onIssuePostpaid; // 후불: 수강권 먼저 발급
+  final VoidCallback? onIssueFree; // 무료: 체험 수강권 발급
+  final VoidCallback? onConfirmPayment; // 학생: 입금 완료
+  final VoidCallback? onVerifyPayment; // 선생님: 입금 확인
   final void Function(String? selectedTemplateId)? onAcceptProposal; // 학생: 수락
-  final void Function(String? reason)? onRejectProposal;             // 학생: 거절
+  final void Function(String? reason)? onRejectProposal; // 학생: 거절
 
   // Phase 2 data: proposal templates for student selection
   final List<SubscriptionTemplate> proposalTemplates;
@@ -50,7 +50,7 @@ class CurrentRequestBox extends StatefulWidget {
   final VoidCallback? onScheduleChangeResponse;
 
   // Phase 3/4 callbacks
-  final VoidCallback? onViewSubscription;  // 수강권 상세 보기
+  final VoidCallback? onViewSubscription; // 수강권 상세 보기
   final VoidCallback? onProposeRenewal;
   final VoidCallback? onRequestRenewal;
 
@@ -152,13 +152,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (lastEvent.eventType == RequestEventType.withdrawApproval) {
       final withdrawerIsViewer =
           (lastEvent.actorType == ProposerRole.teacher && _isTeacher) ||
-              (lastEvent.actorType == ProposerRole.student && !_isTeacher);
+          (lastEvent.actorType == ProposerRole.student && !_isTeacher);
       return withdrawerIsViewer ? _TurnState.myTurn : _TurnState.theirTurn;
     }
 
     final lastActorIsViewer =
         (lastEvent.actorType == ProposerRole.teacher && _isTeacher) ||
-            (lastEvent.actorType == ProposerRole.student && !_isTeacher);
+        (lastEvent.actorType == ProposerRole.student && !_isTeacher);
 
     return lastActorIsViewer ? _TurnState.theirTurn : _TurnState.myTurn;
   }
@@ -174,9 +174,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: _buildPhaseContent(),
     );
@@ -219,9 +217,12 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             padding: const EdgeInsets.only(bottom: AppSpacing.space1),
             child: Row(
               children: [
-                Icon(Icons.touch_app, size: 14,
-                    color: AppColors.textTertiaryLight),
-                const SizedBox(width: 4),
+                Icon(
+                  Icons.touch_app,
+                  size: 14,
+                  color: AppColors.textTertiaryLight,
+                ),
+                const SizedBox(width: AppSpacing.space1),
                 Text(
                   AppStrings.slotSelectionHint,
                   style: AppTypography.caption.copyWith(
@@ -276,11 +277,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.borderLight),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space3),
+                      horizontal: AppSpacing.space3,
+                    ),
                   ),
                   child: Text(
                     AppStrings.counterPropose,
@@ -297,24 +300,27 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: SizedBox(
                 height: AppSpacing.buttonHeightSmall,
                 child: ElevatedButton(
-                  onPressed: _selectedSlotIndex != null
-                      ? () {
-                          widget.onAccept?.call(
-                            _selectedSlotIndex!,
-                            _messageController.text.trim(),
-                          );
-                          _messageController.clear();
-                        }
-                      : null,
+                  onPressed:
+                      _selectedSlotIndex != null
+                          ? () {
+                            widget.onAccept?.call(
+                              _selectedSlotIndex!,
+                              _messageController.text.trim(),
+                            );
+                            _messageController.clear();
+                          }
+                          : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: AppColors.scheduleMutedAccent,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.space3),
+                      horizontal: AppSpacing.space3,
+                    ),
                   ),
                   child: Text(
                     AppStrings.accept,
@@ -336,40 +342,45 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space1,
-      children: slotLabels.asMap().entries.map((entry) {
-        final index = entry.key;
-        final label = entry.value;
-        final isSelected = _selectedSlotIndex == index;
+      children:
+          slotLabels.asMap().entries.map((entry) {
+            final index = entry.key;
+            final label = entry.value;
+            final isSelected = _selectedSlotIndex == index;
 
-        return GestureDetector(
-          onTap: () => setState(() => _selectedSlotIndex = index),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space1 + 2,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
-                width: isSelected ? 1.5 : 1,
+            return GestureDetector(
+              onTap: () => setState(() => _selectedSlotIndex = index),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space1 + 2,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected
+                          ? AppColors.primary.withValues(alpha: 0.08)
+                          : AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color:
+                        isSelected ? AppColors.primary : AppColors.borderLight,
+                    width: isSelected ? 1.5 : 1,
+                  ),
+                ),
+                child: Text(
+                  '${index + 1}. $label',
+                  style: AppTypography.caption.copyWith(
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textPrimaryLight,
+                  ),
+                ),
               ),
-            ),
-            child: Text(
-              '${index + 1}. $label',
-              style: AppTypography.caption.copyWith(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textPrimaryLight,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
+            );
+          }).toList(),
     );
   }
 
@@ -381,8 +392,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Waiting message row
         Row(
           children: [
-            Icon(Icons.hourglass_top,
-                color: AppColors.info, size: 18),
+            Icon(Icons.hourglass_top, color: AppColors.info, size: 18),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -411,10 +421,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: AppColors.borderLight),
               shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+              ),
             ),
           ),
         ),
@@ -564,8 +575,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         const SizedBox(height: AppSpacing.space2),
 
         // Template radio selection (multi-choice only)
-        if (isMultiChoice)
-          ...templates.map((t) => _buildTemplateRadio(t)),
+        if (isMultiChoice) ...templates.map((t) => _buildTemplateRadio(t)),
 
         const SizedBox(height: AppSpacing.space2),
 
@@ -584,10 +594,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: _buildPrimaryButton(
                 label: AppStrings.eventProposalAccepted,
                 icon: Icons.check,
-                onPressed: isMultiChoice && _selectedTemplateId == null
-                    ? null
-                    : () => widget.onAcceptProposal?.call(
-                          isMultiChoice ? _selectedTemplateId : templates.firstOrNull?.id,
+                onPressed:
+                    isMultiChoice && _selectedTemplateId == null
+                        ? null
+                        : () => widget.onAcceptProposal?.call(
+                          isMultiChoice
+                              ? _selectedTemplateId
+                              : templates.firstOrNull?.id,
                         ),
               ),
             ),
@@ -609,9 +622,10 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.06)
-              : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.06)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -623,7 +637,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 18,
-              color: isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
@@ -651,9 +666,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   /// Scan schedule change state: returns who owns the pending proposal.
   /// null = no pending, 'self' = viewer proposed, 'opponent' = opponent proposed.
   String? get _pendingScheduleChangeOwner {
-    final viewerId = _isTeacher
-        ? widget.request.teacherId
-        : widget.request.studentId;
+    final viewerId =
+        _isTeacher ? widget.request.teacherId : widget.request.studentId;
 
     for (int i = widget.events.length - 1; i >= 0; i--) {
       final event = widget.events[i];
@@ -698,8 +712,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
   Widget _buildSubscriptionSummary() {
     return Row(
       children: [
-        Icon(Icons.card_membership,
-            size: 18, color: AppColors.primary),
+        Icon(Icons.card_membership, size: 18, color: AppColors.primary),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Text(
@@ -713,9 +726,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         TextButton(
           onPressed: widget.onViewSubscription,
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space2,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2),
             minimumSize: Size.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
@@ -737,8 +748,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.check_circle_outline,
-            color: AppColors.textTertiaryLight, size: 18),
+        Icon(
+          Icons.check_circle_outline,
+          color: AppColors.textTertiaryLight,
+          size: 18,
+        ),
         const SizedBox(width: AppSpacing.space2),
         Text(
           AppStrings.requestClosed,
@@ -788,15 +802,12 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             icon: Icon(primaryIcon, size: 18),
             label: Text(
               primaryLabel,
-              style: AppTypography.buttonSmall.copyWith(
-                color: Colors.white,
-              ),
+              style: AppTypography.buttonSmall.copyWith(color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
             ),
           ),
@@ -930,9 +941,10 @@ class _PaymentMethodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: isPrimary
-          ? AppColors.primary.withValues(alpha: 0.04)
-          : AppColors.surfaceLight,
+      color:
+          isPrimary
+              ? AppColors.primary.withValues(alpha: 0.04)
+              : AppColors.surfaceLight,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: InkWell(
         onTap: onTap,
@@ -943,9 +955,10 @@ class _PaymentMethodCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: isPrimary
-                  ? AppColors.primary.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+              color:
+                  isPrimary
+                      ? AppColors.primary.withValues(alpha: 0.3)
+                      : AppColors.borderLight,
             ),
           ),
           child: Column(
@@ -954,9 +967,10 @@ class _PaymentMethodCard extends StatelessWidget {
               Text(
                 title,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: isPrimary
-                      ? AppColors.primary
-                      : AppColors.textPrimaryLight,
+                  color:
+                      isPrimary
+                          ? AppColors.primary
+                          : AppColors.textPrimaryLight,
                   fontWeight: FontWeight.w600,
                 ),
               ),
