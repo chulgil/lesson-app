@@ -192,7 +192,7 @@ class RepeatCountSection extends StatelessWidget {
 
         // Repeat count dropdown
         DropdownButtonFormField<int?>(
-          value: repeatCount,
+          initialValue: repeatCount,
           decoration: const InputDecoration(
             prefixIcon: Icon(Icons.repeat),
             contentPadding: EdgeInsets.symmetric(
@@ -295,7 +295,7 @@ class TargetTimeSection extends StatelessWidget {
 
         // Target time dropdown
         DropdownButtonFormField<int?>(
-          value: targetMinutes,
+          initialValue: targetMinutes,
           decoration: const InputDecoration(
             prefixIcon: Icon(Icons.timer_outlined),
             contentPadding: EdgeInsets.symmetric(

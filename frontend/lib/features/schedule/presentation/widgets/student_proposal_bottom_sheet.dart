@@ -24,18 +24,20 @@ Future<void> showStudentProposalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => DraggableScrollableSheet(
-      initialChildSize: 0.55,
-      minChildSize: 0.3,
-      maxChildSize: 0.75,
-      expand: false,
-      builder: (context, scrollController) => _StudentProposalBottomSheet(
-        request: request,
-        teacherProposal: teacherProposal,
-        scrollController: scrollController,
-        onComplete: onComplete,
-      ),
-    ),
+    builder:
+        (context) => DraggableScrollableSheet(
+          initialChildSize: 0.55,
+          minChildSize: 0.3,
+          maxChildSize: 0.75,
+          expand: false,
+          builder:
+              (context, scrollController) => _StudentProposalBottomSheet(
+                request: request,
+                teacherProposal: teacherProposal,
+                scrollController: scrollController,
+                onComplete: onComplete,
+              ),
+        ),
   );
 }
 
@@ -81,10 +83,7 @@ class _StudentProposalBottomSheetState
               const SizedBox(height: AppSpacing.space4),
 
               // Header
-              Text(
-                '선생님의 제안',
-                style: AppTypography.headingMedium,
-              ),
+              Text('선생님의 제안', style: AppTypography.headingMedium),
               const SizedBox(height: AppSpacing.space3),
 
               // Teacher message
@@ -94,20 +93,25 @@ class _StudentProposalBottomSheetState
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.05),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.chat_bubble_outline,
-                          size: 16, color: AppColors.primary),
+                      const Icon(
+                        Icons.chat_bubble_outline,
+                        size: 16,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           widget.teacherProposal.message!,
-                          style: AppTypography.bodySmall
-                              .copyWith(color: AppColors.primary),
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
                     ],
@@ -119,8 +123,9 @@ class _StudentProposalBottomSheetState
               // Instruction
               Text(
                 '원하는 시간을 선택해주세요',
-                style: AppTypography.bodySmall
-                    .copyWith(color: AppColors.textSecondaryLight),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
               ),
               const SizedBox(height: AppSpacing.space3),
 
@@ -130,27 +135,30 @@ class _StudentProposalBottomSheetState
                 final isSelected = _selectedIndex == index;
 
                 return Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: AppSpacing.space2),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: InkWell(
                     onTap: () => setState(() => _selectedIndex = index),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space4,
                         vertical: AppSpacing.space3,
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.backgroundLight,
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        color:
+                            isSelected
+                                ? AppColors.primary.withValues(alpha: 0.1)
+                                : AppColors.backgroundLight,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                         border: Border.all(
-                          color: isSelected
-                              ? AppColors.primary
-                              : AppColors.borderLight,
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderLight,
                           width: isSelected ? 2 : 1,
                         ),
                       ),
@@ -160,9 +168,10 @@ class _StudentProposalBottomSheetState
                             isSelected
                                 ? Icons.radio_button_checked
                                 : Icons.radio_button_unchecked,
-                            color: isSelected
-                                ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondaryLight,
                             size: 20,
                           ),
                           const SizedBox(width: AppSpacing.space3),
@@ -170,9 +179,10 @@ class _StudentProposalBottomSheetState
                             child: Text(
                               slot.displayLabel,
                               style: AppTypography.bodyMedium.copyWith(
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.normal,
+                                fontWeight:
+                                    isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
                               ),
                             ),
                           ),
@@ -196,10 +206,9 @@ class _StudentProposalBottomSheetState
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondaryLight,
                         side: BorderSide(color: AppColors.borderLight),
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: const Text('취소'),
+                      child: const Text(AppStrings.cancel),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -207,23 +216,24 @@ class _StudentProposalBottomSheetState
                   Expanded(
                     flex: 2,
                     child: FilledButton(
-                      onPressed: _selectedIndex != null && !_isProcessing
-                          ? _handleAccept
-                          : null,
+                      onPressed:
+                          _selectedIndex != null && !_isProcessing
+                              ? _handleAccept
+                              : null,
                       style: FilledButton.styleFrom(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      child: _isProcessing
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(AppStrings.accept),
+                      child:
+                          _isProcessing
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : Text(AppStrings.accept),
                     ),
                   ),
                 ],

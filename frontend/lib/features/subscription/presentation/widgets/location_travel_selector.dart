@@ -336,7 +336,7 @@ class _LocationTravelSelectorState
         Text('이동시간', style: AppTypography.headingSmall),
         const SizedBox(height: AppSpacing.space2),
         DropdownButtonFormField<int>(
-          value: _travelTimeValues.contains(effectiveValue)
+          initialValue: _travelTimeValues.contains(effectiveValue)
               ? effectiveValue
               : 0,
           items: _travelTimeValues.map((minutes) {

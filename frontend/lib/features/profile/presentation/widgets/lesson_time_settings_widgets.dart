@@ -369,7 +369,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
           ),
           const SizedBox(height: AppSpacing.space2),
           DropdownButtonFormField<int>(
-            value: _selectedDay,
+            initialValue: _selectedDay,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),

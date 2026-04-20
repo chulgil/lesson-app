@@ -197,7 +197,7 @@ class _EducationEditScreenState extends ConsumerState<EducationEditScreen> {
             _buildLabel('학위'),
             const SizedBox(height: AppSpacing.space2),
             DropdownButtonFormField<String>(
-              value: _selectedDegree,
+              initialValue: _selectedDegree,
               decoration: _inputDecoration(),
               items: _degreeOptions.map((option) {
                 return DropdownMenuItem(

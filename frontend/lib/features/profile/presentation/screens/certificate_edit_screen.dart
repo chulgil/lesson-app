@@ -273,7 +273,7 @@ class _CertificateEditScreenState extends ConsumerState<CertificateEditScreen> {
             _buildLabel('자격증 종류', required: true),
             const SizedBox(height: AppSpacing.space2),
             DropdownButtonFormField<CertificateType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: _inputDecoration(),
               items:
                   CertificateType.values.map((type) {

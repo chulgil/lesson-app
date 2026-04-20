@@ -345,7 +345,7 @@ class _UnifiedLessonRequestScreenState
       icon: Icons.flag,
       title: '레슨 목표',
       child: DropdownButtonFormField<UnifiedLessonGoal>(
-        value: _selectedGoal,
+        initialValue: _selectedGoal,
         decoration: InputDecoration(
           filled: true,
           fillColor: AppColors.surfaceLight,

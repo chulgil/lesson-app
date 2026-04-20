@@ -241,7 +241,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         border: Border.all(color: AppColors.borderLight),
       ),
       child: DropdownButtonFormField<String>(
-        value: effectiveSelection,
+        initialValue: effectiveSelection,
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.symmetric(
             horizontal: AppSpacing.space4,

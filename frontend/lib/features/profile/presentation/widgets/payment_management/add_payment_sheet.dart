@@ -187,7 +187,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
         studentsAsync.when(
           data:
               (students) => DropdownButtonFormField<String>(
-                value: _selectedStudentId,
+                initialValue: _selectedStudentId,
                 decoration: const InputDecoration(
                   hintText: '학생을 선택하세요',
                   border: OutlineInputBorder(),
@@ -263,7 +263,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
       children: [
         Expanded(
           child: DropdownButtonFormField<int>(
-            value: _weekStart,
+            initialValue: _weekStart,
             decoration: const InputDecoration(
               labelText: '시작',
               border: OutlineInputBorder(),
@@ -293,7 +293,7 @@ class _AddPaymentSheetState extends ConsumerState<AddPaymentSheet> {
         ),
         Expanded(
           child: DropdownButtonFormField<int>(
-            value: _weekEnd,
+            initialValue: _weekEnd,
             decoration: const InputDecoration(
               labelText: '종료',
               border: OutlineInputBorder(),
