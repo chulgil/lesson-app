@@ -47,7 +47,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
       children: [
         // Handle
         Container(
-          margin: const EdgeInsets.only(top: 12),
+          margin: const EdgeInsets.only(top: AppSpacing.space3),
           width: 40,
           height: 4,
           decoration: BoxDecoration(
@@ -73,8 +73,9 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
 
         // Summary
         Container(
-          margin:
-              const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+          margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadding,
+          ),
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.1),
@@ -82,8 +83,11 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.notifications_active,
-                  color: AppColors.primary, size: 20),
+              const Icon(
+                Icons.notifications_active,
+                color: AppColors.primary,
+                size: 20,
+              ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${_settings.enabledCount}/${ParentNotificationSettings.totalConfigurable}개 알림 활성화',
@@ -117,7 +121,9 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
   }
 
   Widget _buildCategorySection(
-      NotificationCategory category, List<NotificationItem> items) {
+    NotificationCategory category,
+    List<NotificationItem> items,
+  ) {
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -149,19 +155,20 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
             border: Border.all(color: AppColors.borderLight),
           ),
           child: Column(
-            children: items.asMap().entries.map((entry) {
-              final index = entry.key;
-              final item = entry.value;
-              final isLast = index == items.length - 1;
+            children:
+                items.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+                  final isLast = index == items.length - 1;
 
-              return Column(
-                children: [
-                  _buildSettingTile(category, item, index),
-                  if (!isLast)
-                    const Divider(height: 1, indent: 16, endIndent: 16),
-                ],
-              );
-            }).toList(),
+                  return Column(
+                    children: [
+                      _buildSettingTile(category, item, index),
+                      if (!isLast)
+                        const Divider(height: 1, indent: 16, endIndent: 16),
+                    ],
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -169,7 +176,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
   }
 
   Widget _buildSettingTile(
-      NotificationCategory category, NotificationItem item, int index) {
+    NotificationCategory category,
+    NotificationItem item,
+    int index,
+  ) {
     return ListTile(
       dense: true,
       title: Row(
@@ -178,30 +188,33 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
             child: Text(
               item.label,
               style: AppTypography.bodyMedium.copyWith(
-                color: item.isRequired
-                    ? AppColors.textTertiaryLight
-                    : AppColors.textPrimaryLight,
+                color:
+                    item.isRequired
+                        ? AppColors.textTertiaryLight
+                        : AppColors.textPrimaryLight,
               ),
             ),
           ),
           if (item.suffix.isNotEmpty)
             Container(
-              margin: const EdgeInsets.only(left: 8),
+              margin: const EdgeInsets.only(left: AppSpacing.space2),
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: item.isRequired
-                    ? AppColors.textTertiaryLight.withValues(alpha: 0.2)
-                    : item.isRecommended
+                color:
+                    item.isRequired
+                        ? AppColors.textTertiaryLight.withValues(alpha: 0.2)
+                        : item.isRecommended
                         ? AppColors.success.withValues(alpha: 0.15)
                         : Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 item.suffix,
                 style: AppTypography.caption.copyWith(
-                  color: item.isRequired
-                      ? AppColors.textTertiaryLight
-                      : item.isRecommended
+                  color:
+                      item.isRequired
+                          ? AppColors.textTertiaryLight
+                          : item.isRecommended
                           ? AppColors.success
                           : AppColors.textSecondaryLight,
                   fontSize: 10,
@@ -213,9 +226,10 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
       ),
       trailing: Switch(
         value: item.isEnabled,
-        onChanged: item.isRequired
-            ? null
-            : (value) => _handleToggle(category, index, value),
+        onChanged:
+            item.isRequired
+                ? null
+                : (value) => _handleToggle(category, index, value),
         activeColor: AppColors.primary,
       ),
     );

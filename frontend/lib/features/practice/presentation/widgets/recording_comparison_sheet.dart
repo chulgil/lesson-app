@@ -21,16 +21,18 @@ void showRecordingComparisonSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => DraggableScrollableSheet(
-      initialChildSize: 0.75,
-      maxChildSize: 0.95,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) => _RecordingComparisonSheet(
-        recordings: recordings,
-        scrollController: scrollController,
-      ),
-    ),
+    builder:
+        (context) => DraggableScrollableSheet(
+          initialChildSize: 0.75,
+          maxChildSize: 0.95,
+          minChildSize: 0.5,
+          expand: false,
+          builder:
+              (context, scrollController) => _RecordingComparisonSheet(
+                recordings: recordings,
+                scrollController: scrollController,
+              ),
+        ),
   );
 }
 
@@ -156,21 +158,24 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           Expanded(
             child: switch (_step) {
               0 => _buildSelectStep(
-                  label: 'Step 1/2: 이전 녹음 선택',
-                  recordings: widget.recordings,
-                  selected: _recordingA,
-                  onSelect: _selectA,
-                ),
+                label: 'Step 1/2: 이전 녹음 선택',
+                recordings: widget.recordings,
+                selected: _recordingA,
+                onSelect: _selectA,
+              ),
               1 => _buildSelectStep(
-                  label: 'Step 2/2: 현재 녹음 선택',
-                  recordings: widget.recordings
-                      .where((r) =>
-                          r.id != _recordingA!.id &&
-                          r.createdAt.isAfter(_recordingA!.createdAt))
-                      .toList(),
-                  selected: _recordingB,
-                  onSelect: _selectB,
-                ),
+                label: 'Step 2/2: 현재 녹음 선택',
+                recordings:
+                    widget.recordings
+                        .where(
+                          (r) =>
+                              r.id != _recordingA!.id &&
+                              r.createdAt.isAfter(_recordingA!.createdAt),
+                        )
+                        .toList(),
+                selected: _recordingB,
+                onSelect: _selectB,
+              ),
               _ => _buildComparisonView(),
             },
           ),
@@ -181,7 +186,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
 
   Widget _buildHandle() {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
+      margin: const EdgeInsets.only(top: AppSpacing.space3),
       width: 40,
       height: 4,
       decoration: BoxDecoration(
@@ -199,10 +204,11 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           if (_step > 0)
             IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => setState(() {
-                _step = _step - 1;
-                if (_step < 2) _stopAll();
-              }),
+              onPressed:
+                  () => setState(() {
+                    _step = _step - 1;
+                    if (_step < 2) _stopAll();
+                  }),
             ),
           Icon(Icons.compare_arrows, color: AppColors.primary),
           const SizedBox(width: AppSpacing.space2),
@@ -232,9 +238,7 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       children: [
         Text(
           label,
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space4),
         ...recordings.map((rec) {
@@ -249,9 +253,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               margin: const EdgeInsets.only(bottom: AppSpacing.space2),
               decoration: BoxDecoration(
-                color: isSelected
-                    ? AppColors.primary.withValues(alpha: 0.08)
-                    : AppColors.surfaceLight,
+                color:
+                    isSelected
+                        ? AppColors.primary.withValues(alpha: 0.08)
+                        : AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -263,9 +268,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                     isSelected
                         ? Icons.radio_button_checked
                         : Icons.radio_button_unchecked,
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textTertiaryLight,
                     size: 20,
                   ),
                   const SizedBox(width: AppSpacing.space3),
@@ -304,8 +310,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
       recordingA: _recordingA!,
       recordingB: _recordingB!,
     );
-    final dateA = '${_recordingA!.createdAt.month}/${_recordingA!.createdAt.day}';
-    final dateB = '${_recordingB!.createdAt.month}/${_recordingB!.createdAt.day}';
+    final dateA =
+        '${_recordingA!.createdAt.month}/${_recordingA!.createdAt.day}';
+    final dateB =
+        '${_recordingB!.createdAt.month}/${_recordingB!.createdAt.day}';
 
     return ListView(
       controller: widget.scrollController,
@@ -360,7 +368,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               label: Text(
                 '번갈아 듣기',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: _alternateMode ? Colors.white : AppColors.textPrimaryLight,
+                  color:
+                      _alternateMode
+                          ? Colors.white
+                          : AppColors.textPrimaryLight,
                 ),
               ),
               selected: _alternateMode,
@@ -368,7 +379,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               avatar: Icon(
                 Icons.repeat,
                 size: 18,
-                color: _alternateMode ? Colors.white : AppColors.textSecondaryLight,
+                color:
+                    _alternateMode
+                        ? Colors.white
+                        : AppColors.textSecondaryLight,
               ),
               onSelected: (v) => setState(() => _alternateMode = v),
             ),
@@ -425,9 +439,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -439,13 +454,17 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+              color:
+                  isSelected ? AppColors.primary : AppColors.textSecondaryLight,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                color:
+                    isSelected
+                        ? AppColors.primary
+                        : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -457,12 +476,14 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
 
   /// Parallel waveform comparison (Phase 2).
   Widget _buildParallelWaveformView(String dateA, String dateB) {
-    final progressA = _durationA.inMilliseconds > 0
-        ? _positionA.inMilliseconds / _durationA.inMilliseconds
-        : 0.0;
-    final progressB = _durationB.inMilliseconds > 0
-        ? _positionB.inMilliseconds / _durationB.inMilliseconds
-        : 0.0;
+    final progressA =
+        _durationA.inMilliseconds > 0
+            ? _positionA.inMilliseconds / _durationA.inMilliseconds
+            : 0.0;
+    final progressB =
+        _durationB.inMilliseconds > 0
+            ? _positionB.inMilliseconds / _durationB.inMilliseconds
+            : 0.0;
 
     return Column(
       children: [
@@ -474,9 +495,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           duration: _durationA,
           position: _positionA,
           bpmText: _recordingA!.bpmText,
-          onSeek: (p) => _playerA.seek(
-            Duration(milliseconds: (p * _durationA.inMilliseconds).round()),
-          ),
+          onSeek:
+              (p) => _playerA.seek(
+                Duration(milliseconds: (p * _durationA.inMilliseconds).round()),
+              ),
         ),
         const SizedBox(height: AppSpacing.space3),
         // Waveform B
@@ -487,9 +509,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           duration: _durationB,
           position: _positionB,
           bpmText: _recordingB!.bpmText,
-          onSeek: (p) => _playerB.seek(
-            Duration(milliseconds: (p * _durationB.inMilliseconds).round()),
-          ),
+          onSeek:
+              (p) => _playerB.seek(
+                Duration(milliseconds: (p * _durationB.inMilliseconds).round()),
+              ),
         ),
         const SizedBox(height: AppSpacing.space4),
         // Sync play/stop controls
@@ -615,22 +638,23 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
                   vertical: AppSpacing.space1,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : Colors.transparent,
+                  color:
+                      isSelected
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : Colors.transparent,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.borderLight,
+                    color:
+                        isSelected ? AppColors.primary : AppColors.borderLight,
                   ),
                 ),
                 child: Text(
                   '${speed}x',
                   style: AppTypography.caption.copyWith(
-                    color: isSelected
-                        ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                    color:
+                        isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondaryLight,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
@@ -652,9 +676,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
     required VoidCallback onPlay,
     required VoidCallback onStop,
   }) {
-    final progress = duration.inMilliseconds > 0
-        ? position.inMilliseconds / duration.inMilliseconds
-        : 0.0;
+    final progress =
+        duration.inMilliseconds > 0
+            ? position.inMilliseconds / duration.inMilliseconds
+            : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -738,7 +763,8 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
               label: 'BPM',
               value:
                   '${comparison.recordingA.bpm} → ${comparison.recordingB.bpm}',
-              delta: '${comparison.bpmDelta! > 0 ? "+" : ""}${comparison.bpmDelta}',
+              delta:
+                  '${comparison.bpmDelta! > 0 ? "+" : ""}${comparison.bpmDelta}',
               isPositive: comparison.bpmDelta! > 0,
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -748,7 +774,8 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
             label: '시간',
             value:
                 '${comparison.recordingA.formattedDuration} → ${comparison.recordingB.formattedDuration}',
-            delta: '${comparison.durationDelta > 0 ? "+" : ""}${comparison.durationDelta}초',
+            delta:
+                '${comparison.durationDelta > 0 ? "+" : ""}${comparison.durationDelta}초',
             isPositive: null,
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -791,9 +818,10 @@ class _RecordingComparisonSheetState extends State<_RecordingComparisonSheet> {
           Text(
             delta,
             style: AppTypography.bodySmall.copyWith(
-              color: isPositive == true
-                  ? AppColors.success
-                  : isPositive == false
+              color:
+                  isPositive == true
+                      ? AppColors.success
+                      : isPositive == false
                       ? AppColors.error
                       : AppColors.textSecondaryLight,
               fontWeight: FontWeight.w600,

@@ -11,10 +11,7 @@ import '../../../../features/students/presentation/providers/student_crud_provid
 class ChildCard extends ConsumerWidget {
   final ParentChildRelation relation;
 
-  const ChildCard({
-    super.key,
-    required this.relation,
-  });
+  const ChildCard({super.key, required this.relation});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,8 +76,12 @@ class ChildCard extends ConsumerWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusSmall,
+                                  ),
                                 ),
                                 child: Text(
                                   '주 보호자',
@@ -94,7 +95,9 @@ class ChildCard extends ConsumerWidget {
                           ],
                         ),
                         Text(
-                          student.instrument.isEmpty ? '악기 미설정' : student.instrument,
+                          student.instrument.isEmpty
+                              ? '악기 미설정'
+                              : student.instrument,
                           style: AppTypography.bodySmall.copyWith(
                             color: AppColors.textSecondaryLight,
                           ),
@@ -112,7 +115,9 @@ class ChildCard extends ConsumerWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLarge,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -137,10 +142,7 @@ class ChildCard extends ConsumerWidget {
                   ],
 
                   // Chevron
-                  Icon(
-                    Icons.chevron_right,
-                    color: AppColors.textTertiaryLight,
-                  ),
+                  Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
                 ],
               ),
 
@@ -177,27 +179,27 @@ class ChildCard extends ConsumerWidget {
           ),
         );
       },
-      loading: () => Container(
-        height: 120,
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (_, __) => Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Text(
-          '정보를 불러올 수 없습니다',
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.error,
+      loading:
+          () => Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSecondaryLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            ),
+            child: const Center(child: CircularProgressIndicator()),
           ),
-        ),
-      ),
+      error:
+          (_, __) => Container(
+            padding: const EdgeInsets.all(AppSpacing.space4),
+            decoration: BoxDecoration(
+              color: AppColors.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            ),
+            child: Text(
+              '정보를 불러올 수 없습니다',
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
+            ),
+          ),
     );
   }
 
