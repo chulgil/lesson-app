@@ -45,9 +45,10 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
   void _onTabChanged() {
     if (!_tabController.indexIsChanging) {
-      final type = _tabController.index == 0
-          ? TeacherSearchType.academy
-          : TeacherSearchType.individual;
+      final type =
+          _tabController.index == 0
+              ? TeacherSearchType.academy
+              : TeacherSearchType.individual;
       ref.read(teacherSearchTabStateProvider.notifier).setTab(type);
     }
   }
@@ -60,9 +61,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
   }
 
   void _onSearch(String query) {
-    ref.read(teacherSearchFilterStateProvider.notifier).updateKeyword(
-          query.isEmpty ? null : query,
-        );
+    ref
+        .read(teacherSearchFilterStateProvider.notifier)
+        .updateKeyword(query.isEmpty ? null : query);
   }
 
   @override
@@ -90,14 +91,8 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           unselectedLabelColor: AppColors.textSecondaryLight,
           indicatorWeight: 3,
           tabs: const [
-            Tab(
-              icon: Icon(Icons.school_outlined),
-              text: '학원',
-            ),
-            Tab(
-              icon: Icon(Icons.person_outline),
-              text: '개인 선생님',
-            ),
+            Tab(icon: Icon(Icons.school_outlined), text: '학원'),
+            Tab(icon: Icon(Icons.person_outline), text: '개인 선생님'),
           ],
         ),
       ),
@@ -109,19 +104,21 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: currentTab == TeacherSearchType.academy
-                    ? '학원 이름, 악기, 지역으로 검색'
-                    : '선생님 이름, 악기, 지역으로 검색',
+                hintText:
+                    currentTab == TeacherSearchType.academy
+                        ? '학원 이름, 악기, 지역으로 검색'
+                        : '선생님 이름, 악기, 지역으로 검색',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearch('');
-                        },
-                      )
-                    : null,
+                suffixIcon:
+                    _searchController.text.isNotEmpty
+                        ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            _onSearch('');
+                          },
+                        )
+                        : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
@@ -151,24 +148,35 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           Expanded(
             child: searchResult.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline,
-                        size: 48, color: AppColors.textTertiaryLight),
-                    const SizedBox(height: AppSpacing.space2),
-                    Text('검색 중 오류가 발생했습니다',
-                        style: AppTypography.bodyMedium),
-                    const SizedBox(height: AppSpacing.space2),
-                    ElevatedButton(
-                      onPressed: () =>
-                          ref.read(teacherSearchResultsProvider.notifier).refresh(),
-                      child: const Text('다시 시도'),
+              error:
+                  (e, _) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.textTertiaryLight,
+                        ),
+                        const SizedBox(height: AppSpacing.space2),
+                        Text(
+                          '검색 중 오류가 발생했습니다',
+                          style: AppTypography.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.space2),
+                        ElevatedButton(
+                          onPressed:
+                              () =>
+                                  ref
+                                      .read(
+                                        teacherSearchResultsProvider.notifier,
+                                      )
+                                      .refresh(),
+                          child: const Text('다시 시도'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
               data: (result) => _buildResults(result),
             ),
           ),
@@ -185,23 +193,24 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: ListView(
         scrollDirection: Axis.horizontal,
-        children: TeacherSortOption.values.map((option) {
-          final isSelected = sort == option;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(_getSortLabel(option)),
-              selected: isSelected,
-              onSelected: (_) {
-                ref
-                    .read(teacherSearchSortStateProvider.notifier)
-                    .updateSort(option);
-              },
-              selectedColor: AppColors.primary.withValues(alpha: 0.2),
-              checkmarkColor: AppColors.primary,
-            ),
-          );
-        }).toList(),
+        children:
+            TeacherSortOption.values.map((option) {
+              final isSelected = sort == option;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(_getSortLabel(option)),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    ref
+                        .read(teacherSearchSortStateProvider.notifier)
+                        .updateSort(option);
+                  },
+                  selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                  checkmarkColor: AppColors.primary,
+                ),
+              );
+            }).toList(),
       ),
     );
   }
@@ -211,51 +220,63 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
     if (filter.instruments != null && filter.instruments!.isNotEmpty) {
       for (final inst in filter.instruments!) {
-        chips.add(_buildFilterChip(inst, () {
-          final newList = List<String>.from(filter.instruments!)..remove(inst);
-          ref
-              .read(teacherSearchFilterStateProvider.notifier)
-              .updateInstruments(newList.isEmpty ? null : newList);
-        }));
+        chips.add(
+          _buildFilterChip(inst, () {
+            final newList = List<String>.from(filter.instruments!)
+              ..remove(inst);
+            ref
+                .read(teacherSearchFilterStateProvider.notifier)
+                .updateInstruments(newList.isEmpty ? null : newList);
+          }),
+        );
       }
     }
 
     if (filter.areas != null && filter.areas!.isNotEmpty) {
       for (final area in filter.areas!) {
-        chips.add(_buildFilterChip(area, () {
-          final newList = List<String>.from(filter.areas!)..remove(area);
-          ref
-              .read(teacherSearchFilterStateProvider.notifier)
-              .updateAreas(newList.isEmpty ? null : newList);
-        }));
+        chips.add(
+          _buildFilterChip(area, () {
+            final newList = List<String>.from(filter.areas!)..remove(area);
+            ref
+                .read(teacherSearchFilterStateProvider.notifier)
+                .updateAreas(newList.isEmpty ? null : newList);
+          }),
+        );
       }
     }
 
     if (filter.lessonTypes != null && filter.lessonTypes!.isNotEmpty) {
       for (final type in filter.lessonTypes!) {
-        chips.add(_buildFilterChip(_getLessonTypeOptionLabel(type), () {
-          final newList = List<LessonTypeOption>.from(filter.lessonTypes!)..remove(type);
-          ref
-              .read(teacherSearchFilterStateProvider.notifier)
-              .updateLessonTypes(newList.isEmpty ? null : newList);
-        }));
+        chips.add(
+          _buildFilterChip(_getLessonTypeOptionLabel(type), () {
+            final newList = List<LessonTypeOption>.from(filter.lessonTypes!)
+              ..remove(type);
+            ref
+                .read(teacherSearchFilterStateProvider.notifier)
+                .updateLessonTypes(newList.isEmpty ? null : newList);
+          }),
+        );
       }
     }
 
     if (filter.hasVerifiedCertificate == true) {
-      chips.add(_buildFilterChip('자격증 인증', () {
-        ref
-            .read(teacherSearchFilterStateProvider.notifier)
-            .updateHasVerifiedCertificate(null);
-      }));
+      chips.add(
+        _buildFilterChip('자격증 인증', () {
+          ref
+              .read(teacherSearchFilterStateProvider.notifier)
+              .updateHasVerifiedCertificate(null);
+        }),
+      );
     }
 
     if (filter.minExperience != null) {
-      chips.add(_buildFilterChip('${filter.minExperience}년 이상', () {
-        ref
-            .read(teacherSearchFilterStateProvider.notifier)
-            .updateMinExperience(null);
-      }));
+      chips.add(
+        _buildFilterChip('${filter.minExperience}년 이상', () {
+          ref
+              .read(teacherSearchFilterStateProvider.notifier)
+              .updateMinExperience(null);
+        }),
+      );
     }
 
     chips.add(
@@ -273,10 +294,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: chips,
-      ),
+      child: ListView(scrollDirection: Axis.horizontal, children: chips),
     );
   }
 
@@ -305,7 +323,9 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isAcademyTab ? Icons.school_outlined : Icons.person_search_outlined,
+              isAcademyTab
+                  ? Icons.school_outlined
+                  : Icons.person_search_outlined,
               size: 64,
               color: AppColors.textTertiaryLight,
             ),
@@ -339,7 +359,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
         if (index == result.teachers.length) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(AppSpacing.space4),
               child: CircularProgressIndicator(),
             ),
           );

@@ -73,11 +73,7 @@ class InviteHistoryScreen extends ConsumerWidget {
                 color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.history,
-                size: 40,
-                color: AppColors.primary,
-              ),
+              child: Icon(Icons.history, size: 40, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.space6),
             Text(
@@ -114,27 +110,28 @@ class InviteHistoryScreen extends ConsumerWidget {
         if (activeInvites.isNotEmpty) ...[
           _buildSectionHeader('활성 초대', activeInvites.length),
           const SizedBox(height: AppSpacing.space3),
-          ...activeInvites.map((invite) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: _InviteCard(
-                  invite: invite,
-                  onRevoke: () => _handleRevoke(context, ref, invite),
-                  onCopyCode: () => _copyCode(context, invite.inviteCode),
-                ),
-              )),
+          ...activeInvites.map(
+            (invite) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: _InviteCard(
+                invite: invite,
+                onRevoke: () => _handleRevoke(context, ref, invite),
+                onCopyCode: () => _copyCode(context, invite.inviteCode),
+              ),
+            ),
+          ),
         ],
         if (activeInvites.isNotEmpty && inactiveInvites.isNotEmpty)
           const SizedBox(height: AppSpacing.space4),
         if (inactiveInvites.isNotEmpty) ...[
           _buildSectionHeader('만료/취소된 초대', inactiveInvites.length),
           const SizedBox(height: AppSpacing.space3),
-          ...inactiveInvites.map((invite) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                child: _InviteCard(
-                  invite: invite,
-                  isInactive: true,
-                ),
-              )),
+          ...inactiveInvites.map(
+            (invite) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+              child: _InviteCard(invite: invite, isInactive: true),
+            ),
+          ),
         ],
       ],
     );
@@ -145,9 +142,7 @@ class InviteHistoryScreen extends ConsumerWidget {
       children: [
         Text(
           title,
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(width: AppSpacing.space2),
         Container(
@@ -178,21 +173,22 @@ class InviteHistoryScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('초대 취소'),
-        content: const Text('이 초대 링크를 취소하시겠습니까?\n취소 후에는 이 코드로 연결할 수 없습니다.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('아니오'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('초대 취소'),
+            content: const Text('이 초대 링크를 취소하시겠습니까?\n취소 후에는 이 코드로 연결할 수 없습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('아니오'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('취소하기'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('취소하기'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && context.mounted) {
@@ -201,9 +197,9 @@ class InviteHistoryScreen extends ConsumerWidget {
           .revokeInvite(invite.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('초대가 취소되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('초대가 취소되었습니다')));
       }
     }
   }
@@ -240,9 +236,10 @@ class _InviteCard extends StatelessWidget {
         color: isInactive ? AppColors.backgroundLight : Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isInactive
-              ? AppColors.borderLight.withValues(alpha: 0.5)
-              : AppColors.borderLight,
+          color:
+              isInactive
+                  ? AppColors.borderLight.withValues(alpha: 0.5)
+                  : AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -285,9 +282,10 @@ class _InviteCard extends StatelessWidget {
                 invite.inviteCode,
                 style: AppTypography.headingMedium.copyWith(
                   letterSpacing: 4,
-                  color: isInactive
-                      ? AppColors.textSecondaryLight
-                      : AppColors.textPrimaryLight,
+                  color:
+                      isInactive
+                          ? AppColors.textSecondaryLight
+                          : AppColors.textPrimaryLight,
                 ),
               ),
               if (!isInactive && onCopyCode != null) ...[
@@ -297,7 +295,7 @@ class _InviteCard extends StatelessWidget {
                   icon: Icon(Icons.copy, size: 18, color: AppColors.primary),
                   tooltip: '코드 복사',
                   constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(AppSpacing.space1),
                 ),
               ],
             ],
@@ -305,11 +303,7 @@ class _InviteCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(
-                Icons.people,
-                size: 14,
-                color: AppColors.textSecondaryLight,
-              ),
+              Icon(Icons.people, size: 14, color: AppColors.textSecondaryLight),
               const SizedBox(width: 4),
               Text(
                 '${invite.useCount}회 사용',
@@ -352,7 +346,9 @@ class _InviteCard extends StatelessWidget {
                 onPressed: onRevoke,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.error,
-                  side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
+                  side: BorderSide(
+                    color: AppColors.error.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: const Text('초대 취소'),
               ),

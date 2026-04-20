@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Notification bell icon with badge for parent dashboard
@@ -8,11 +9,7 @@ class ParentNotificationBadge extends StatelessWidget {
   final int count;
   final VoidCallback? onTap;
 
-  const ParentNotificationBadge({
-    super.key,
-    this.count = 0,
-    this.onTap,
-  });
+  const ParentNotificationBadge({super.key, this.count = 0, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +28,12 @@ class ParentNotificationBadge extends StatelessWidget {
             right: 4,
             top: 4,
             child: Container(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(AppSpacing.space1),
               decoration: BoxDecoration(
                 color: AppColors.error,
                 shape: BoxShape.circle,
               ),
-              constraints: const BoxConstraints(
-                minWidth: 18,
-                minHeight: 18,
-              ),
+              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
               child: Center(
                 child: Text(
                   count > 99 ? '99+' : count.toString(),
