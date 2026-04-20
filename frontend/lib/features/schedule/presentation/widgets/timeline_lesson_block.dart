@@ -83,9 +83,8 @@ class TimelineLessonBlock extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.background,
           borderRadius: BorderRadius.circular(8),
-          border: isNow
-              ? Border.all(color: baseColors.accent, width: 1.5)
-              : null,
+          border:
+              isNow ? Border.all(color: baseColors.accent, width: 1.5) : null,
         ),
         child: Row(
           children: [
@@ -112,9 +111,10 @@ class TimelineLessonBlock extends StatelessWidget {
   /// Line 1: 이름  악기  시간분
   /// Line 2: 곡명 (if available)
   Widget _buildContent(InstrumentColorPair colors) {
-    final assignment = lesson.assignments?.isNotEmpty == true
-        ? lesson.assignments!.first
-        : lesson.pieces.isNotEmpty
+    final assignment =
+        lesson.assignments?.isNotEmpty == true
+            ? lesson.assignments!.first
+            : lesson.pieces.isNotEmpty
             ? lesson.pieces.first.displayName
             : null;
 
@@ -140,9 +140,8 @@ class TimelineLessonBlock extends StatelessWidget {
           const SizedBox(height: 1),
           Text(
             assignment,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.captionSmall.copyWith(
               color: colors.accent.withValues(alpha: 0.6),
-              fontSize: 10,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -159,9 +158,10 @@ class TimelineLessonBlock extends StatelessWidget {
       child: Icon(
         isCompleted ? Icons.check_circle : Icons.error_outline,
         size: 16,
-        color: isCompleted
-            ? AppColors.success.withValues(alpha: 0.7)
-            : AppColors.warning.withValues(alpha: 0.7),
+        color:
+            isCompleted
+                ? AppColors.success.withValues(alpha: 0.7)
+                : AppColors.warning.withValues(alpha: 0.7),
       ),
     );
   }
@@ -192,9 +192,8 @@ class TimelineLessonBlock extends StatelessWidget {
       ),
       child: Text(
         '$minutesUntilNext분 후',
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: AppColors.primary,
-          fontSize: 10,
           fontWeight: FontWeight.w600,
         ),
       ),
