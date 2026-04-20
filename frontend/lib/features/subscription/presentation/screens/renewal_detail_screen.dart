@@ -217,7 +217,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               data: (template) {
                 if (template == null) return const SizedBox.shrink();
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.space2),
                   child: _buildTemplateOption(
                     template,
                     isSelected: isSelected,

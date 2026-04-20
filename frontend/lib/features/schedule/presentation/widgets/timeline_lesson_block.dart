@@ -155,7 +155,7 @@ class TimelineLessonBlock extends StatelessWidget {
   Widget _buildPastBadge() {
     final isCompleted = lesson.displayStatus == LessonStatus.completed;
     return Padding(
-      padding: const EdgeInsets.only(right: 4),
+      padding: const EdgeInsets.only(right: AppSpacing.space1),
       child: Icon(
         isCompleted ? Icons.check_circle : Icons.error_outline,
         size: 16,

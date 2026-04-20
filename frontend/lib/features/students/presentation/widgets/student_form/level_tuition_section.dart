@@ -168,7 +168,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                   // Preview in 만원 units
                   if (feeController.text.isNotEmpty && !isLinked)
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.only(top: AppSpacing.space1),
                       child: Text(
                         formatCurrencyInMan(
                           int.tryParse(feeController.text) ?? 0,

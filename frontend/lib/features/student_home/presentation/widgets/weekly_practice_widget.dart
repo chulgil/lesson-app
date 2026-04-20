@@ -132,7 +132,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                         for (final priority in PracticePriority.values)
                           if (grouped[priority]?.isNotEmpty == true)
                             Padding(
-                              padding: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.only(right: AppSpacing.space2),
                               child: _buildPriorityBadge(
                                 priority,
                                 grouped[priority]!.length,

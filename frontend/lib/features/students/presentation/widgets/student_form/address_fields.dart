@@ -42,7 +42,7 @@ class AddressFields extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.space3),
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: AppSpacing.space1),
               child: SizedBox(
                 height: AppSpacing.buttonHeight,
                 child: OutlinedButton.icon(

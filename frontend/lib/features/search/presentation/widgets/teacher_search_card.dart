@@ -189,7 +189,7 @@ class TeacherSearchCard extends StatelessWidget {
         ),
         ...publicProfile.badges.take(2).map((badge) {
           return Padding(
-            padding: const EdgeInsets.only(left: 4),
+            padding: const EdgeInsets.only(left: AppSpacing.space1),
             child: Icon(
               _getBadgeIcon(badge),
               size: 18,

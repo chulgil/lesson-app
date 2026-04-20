@@ -340,7 +340,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
             SizedBox(
               width: _timeColumnWidth,
               child: Padding(
-                padding: const EdgeInsets.only(right: 4),
+                padding: const EdgeInsets.only(right: AppSpacing.space1),
                 child: Align(
                   alignment: Alignment.topRight,
                   child: Text(

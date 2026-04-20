@@ -197,7 +197,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
             TeacherSortOption.values.map((option) {
               final isSelected = sort == option;
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: AppSpacing.space2),
                 child: FilterChip(
                   label: Text(_getSortLabel(option)),
                   selected: isSelected,
@@ -300,7 +300,7 @@ class _TeacherSearchScreenState extends ConsumerState<TeacherSearchScreen>
 
   Widget _buildFilterChip(String label, VoidCallback onRemove) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: AppSpacing.space2),
       child: Chip(
         label: Text(label, style: AppTypography.caption),
         deleteIcon: const Icon(Icons.close, size: 16),

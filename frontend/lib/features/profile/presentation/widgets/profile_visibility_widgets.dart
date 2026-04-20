@@ -658,7 +658,7 @@ class ProfilePreviewContent extends StatelessWidget {
                 if (profile.education != null)
                   ...profile.education!.map(
                     (edu) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space1),
                       child: Text(
                         '${edu.school} ${edu.major} (${edu.degree})',
                         style: AppTypography.bodySmall,
@@ -668,7 +668,7 @@ class ProfilePreviewContent extends StatelessWidget {
                 if (profile.career != null)
                   ...profile.career!.map(
                     (career) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space1),
                       child: Text(
                         '${career.organization} - ${career.position} (${career.period})',
                         style: AppTypography.bodySmall,
@@ -692,7 +692,7 @@ class ProfilePreviewContent extends StatelessWidget {
                       .where((c) => c.isApproved)
                       .map(
                         (cert) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.only(bottom: AppSpacing.space1),
                           child: Row(
                             children: [
                               Icon(
