@@ -79,10 +79,7 @@ class _TipTemplateBottomSheetState
                 padding: const EdgeInsets.all(AppSpacing.screenPadding),
                 child: Row(
                   children: [
-                    Text(
-                      '템플릿 선택',
-                      style: AppTypography.headingMedium,
-                    ),
+                    Text('템플릿 선택', style: AppTypography.headingMedium),
                     const Spacer(),
                     TextButton.icon(
                       onPressed: () => _showAddTemplateDialog(context),
@@ -103,18 +100,20 @@ class _TipTemplateBottomSheetState
                   decoration: InputDecoration(
                     hintText: '템플릿 검색...',
                     prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          )
-                        : null,
+                    suffixIcon:
+                        _searchQuery.isNotEmpty
+                            ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _searchQuery = '');
+                              },
+                            )
+                            : null,
                     border: OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -151,9 +150,7 @@ class _TipTemplateBottomSheetState
                 _buildFrequentSection(),
 
               // Template list
-              Expanded(
-                child: _buildTemplateList(scrollController),
-              ),
+              Expanded(child: _buildTemplateList(scrollController)),
             ],
           ),
         );
@@ -201,11 +198,7 @@ class _TipTemplateBottomSheetState
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.star,
-                    size: 18,
-                    color: AppColors.warning,
-                  ),
+                  Icon(Icons.star, size: 18, color: AppColors.warning),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '자주 사용',
@@ -271,7 +264,9 @@ class _TipTemplateBottomSheetState
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       template.category.label,
@@ -313,11 +308,13 @@ class _TipTemplateBottomSheetState
     if (_searchQuery.isNotEmpty) {
       templatesAsync = ref.watch(tipTemplateSearchProvider(_searchQuery));
     } else if (_selectedCategory != null) {
-      templatesAsync =
-          ref.watch(tipTemplatesByCategoryProvider(_selectedCategory!));
+      templatesAsync = ref.watch(
+        tipTemplatesByCategoryProvider(_selectedCategory!),
+      );
     } else if (widget.instrument != null) {
-      templatesAsync =
-          ref.watch(tipTemplatesByInstrumentProvider(widget.instrument));
+      templatesAsync = ref.watch(
+        tipTemplatesByInstrumentProvider(widget.instrument),
+      );
     } else {
       templatesAsync = ref.watch(tipTemplatesProvider);
     }
@@ -350,8 +347,8 @@ class _TipTemplateBottomSheetState
           controller: scrollController,
           padding: const EdgeInsets.all(AppSpacing.screenPadding),
           itemCount: templates.length,
-          separatorBuilder: (_, __) =>
-              const SizedBox(height: AppSpacing.space3),
+          separatorBuilder:
+              (_, __) => const SizedBox(height: AppSpacing.space3),
           itemBuilder: (context, index) {
             final template = templates[index];
             return _buildTemplateCard(template);
@@ -359,21 +356,22 @@ class _TipTemplateBottomSheetState
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error_outline, size: 48, color: AppColors.error),
-            const SizedBox(height: AppSpacing.space3),
-            Text(
-              '템플릿을 불러오는데 실패했습니다',
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
-              ),
+      error:
+          (error, _) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                const SizedBox(height: AppSpacing.space3),
+                Text(
+                  '템플릿을 불러오는데 실패했습니다',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -402,7 +400,9 @@ class _TipTemplateBottomSheetState
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       template.category.label,
@@ -421,7 +421,9 @@ class _TipTemplateBottomSheetState
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         template.instrument!,
@@ -441,10 +443,7 @@ class _TipTemplateBottomSheetState
                 ],
               ),
               const SizedBox(height: AppSpacing.space3),
-              Text(
-                template.content,
-                style: AppTypography.bodyMedium,
-              ),
+              Text(template.content, style: AppTypography.bodyMedium),
               if (template.usageCount > 0) ...[
                 const SizedBox(height: AppSpacing.space2),
                 Text(
@@ -464,7 +463,9 @@ class _TipTemplateBottomSheetState
   void _selectTemplate(TipTemplate template) async {
     try {
       // Increment usage count
-      await ref.read(tipTemplatesNotifierProvider.notifier).useTemplate(template.id);
+      await ref
+          .read(tipTemplatesNotifierProvider.notifier)
+          .useTemplate(template.id);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -488,80 +489,84 @@ class _TipTemplateBottomSheetState
 
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('새 템플릿 추가'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: contentController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: '템플릿 내용을 입력하세요',
-                      border: OutlineInputBorder(),
-                    ),
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setDialogState) {
+              return AlertDialog(
+                title: const Text('새 템플릿 추가'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: contentController,
+                        maxLines: 3,
+                        decoration: const InputDecoration(
+                          hintText: '템플릿 내용을 입력하세요',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space4),
+                      Text(
+                        '카테고리',
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.space2),
+                      Wrap(
+                        spacing: AppSpacing.space2,
+                        runSpacing: AppSpacing.space2,
+                        children:
+                            TipCategory.values.map((cat) {
+                              final isSelected = selectedCategory == cat;
+                              return ChoiceChip(
+                                label: Text(cat.label),
+                                selected: isSelected,
+                                onSelected: (selected) {
+                                  if (selected) {
+                                    setDialogState(
+                                      () => selectedCategory = cat,
+                                    );
+                                  }
+                                },
+                              );
+                            }).toList(),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.space4),
-                  Text(
-                    '카테고리',
-                    style: AppTypography.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('취소'),
                   ),
-                  const SizedBox(height: AppSpacing.space2),
-                  Wrap(
-                    spacing: AppSpacing.space2,
-                    runSpacing: AppSpacing.space2,
-                    children: TipCategory.values.map((cat) {
-                      final isSelected = selectedCategory == cat;
-                      return ChoiceChip(
-                        label: Text(cat.label),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            setDialogState(() => selectedCategory = cat);
-                          }
-                        },
-                      );
-                    }).toList(),
+                  FilledButton(
+                    onPressed: () async {
+                      if (contentController.text.trim().isEmpty) return;
+
+                      await ref
+                          .read(tipTemplatesNotifierProvider.notifier)
+                          .addTemplate(
+                            content: contentController.text.trim(),
+                            category: selectedCategory,
+                            instrument: widget.instrument,
+                          );
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('템플릿이 추가되었습니다')),
+                        );
+                      }
+                    },
+                    child: const Text('추가'),
                   ),
                 ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (contentController.text.trim().isEmpty) return;
-
-                  await ref
-                      .read(tipTemplatesNotifierProvider.notifier)
-                      .addTemplate(
-                        content: contentController.text.trim(),
-                        category: selectedCategory,
-                        instrument: widget.instrument,
-                      );
-
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('템플릿이 추가되었습니다')),
-                    );
-                  }
-                },
-                child: const Text('추가'),
-              ),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 }
@@ -577,10 +582,11 @@ Future<void> showTipTemplateBottomSheet({
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => TipTemplateBottomSheet(
-      instrument: instrument,
-      initialCategory: initialCategory,
-      onSelect: onSelect,
-    ),
+    builder:
+        (context) => TipTemplateBottomSheet(
+          instrument: instrument,
+          initialCategory: initialCategory,
+          onSelect: onSelect,
+        ),
   );
 }
