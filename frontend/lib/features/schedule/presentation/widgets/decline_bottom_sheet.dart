@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../screens/suggest_alternative_screen.dart';
 
 /// Result from the decline bottom sheet.
@@ -23,10 +24,11 @@ Future<DeclineResult?> showDeclineBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => _DeclineBottomSheet(
-      durationMinutes: durationMinutes,
-      teacherId: teacherId,
-    ),
+    builder:
+        (context) => _DeclineBottomSheet(
+          durationMinutes: durationMinutes,
+          teacherId: teacherId,
+        ),
   );
 }
 
@@ -34,10 +36,7 @@ class _DeclineBottomSheet extends StatefulWidget {
   final int durationMinutes;
   final String? teacherId;
 
-  const _DeclineBottomSheet({
-    required this.durationMinutes,
-    this.teacherId,
-  });
+  const _DeclineBottomSheet({required this.durationMinutes, this.teacherId});
 
   @override
   State<_DeclineBottomSheet> createState() => _DeclineBottomSheetState();
@@ -73,15 +72,9 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -113,12 +106,14 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                     child: OutlinedButton(
                       onPressed: _sendMessageOnly,
                       style: OutlinedButton.styleFrom(
-                        minimumSize:
-                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeightSmall,
+                        ),
                         side: const BorderSide(color: AppColors.borderLight),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -135,12 +130,14 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                     child: ElevatedButton(
                       onPressed: _suggestAlternative,
                       style: ElevatedButton.styleFrom(
-                        minimumSize:
-                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeightSmall,
+                        ),
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -161,39 +158,43 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
   }
 
   void _sendMessageOnly() {
-    final message = _messageController.text.trim().isEmpty
-        ? AppStrings.declineDefaultMessage
-        : _messageController.text.trim();
+    final message =
+        _messageController.text.trim().isEmpty
+            ? AppStrings.declineDefaultMessage
+            : _messageController.text.trim();
 
-    Navigator.pop<DeclineResult>(
-      context,
-      (message: message, suggestedSlots: <TimeSlot>[]),
-    );
+    Navigator.pop<DeclineResult>(context, (
+      message: message,
+      suggestedSlots: <TimeSlot>[],
+    ));
   }
 
   Future<void> _suggestAlternative() async {
     // Switch to propose default if user hasn't modified the decline default
     final currentText = _messageController.text.trim();
-    final message = currentText.isEmpty || currentText == AppStrings.declineDefaultMessage
-        ? AppStrings.proposeDefaultMessage
-        : currentText;
+    final message =
+        currentText.isEmpty || currentText == AppStrings.declineDefaultMessage
+            ? AppStrings.proposeDefaultMessage
+            : currentText;
 
-    final result = await Navigator.push<({String message, List<TimeSlot> slots})>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SuggestAlternativeScreen(
-          message: message,
-          durationMinutes: widget.durationMinutes,
-          teacherId: widget.teacherId,
-        ),
-      ),
-    );
+    final result =
+        await Navigator.push<({String message, List<TimeSlot> slots})>(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => SuggestAlternativeScreen(
+                  message: message,
+                  durationMinutes: widget.durationMinutes,
+                  teacherId: widget.teacherId,
+                ),
+          ),
+        );
 
     if (result != null && mounted) {
-      Navigator.pop<DeclineResult>(
-        context,
-        (message: result.message, suggestedSlots: result.slots),
-      );
+      Navigator.pop<DeclineResult>(context, (
+        message: result.message,
+        suggestedSlots: result.slots,
+      ));
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
 import '../../../practice/presentation/providers/practice_repertoire_crud_provider.dart';
@@ -35,8 +36,8 @@ class PracticeRangeEntry {
     this.type = RangeType.measure,
     String? start,
     String? end,
-  })  : startController = TextEditingController(text: start),
-        endController = TextEditingController(text: end);
+  }) : startController = TextEditingController(text: start),
+       endController = TextEditingController(text: end);
 
   void dispose() {
     startController.dispose();
@@ -68,7 +69,8 @@ class AddPracticeItemSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<AddPracticeItemSheet> createState() => _AddPracticeItemSheetState();
+  ConsumerState<AddPracticeItemSheet> createState() =>
+      _AddPracticeItemSheetState();
 }
 
 class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
@@ -107,7 +109,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   @override
   Widget build(BuildContext context) {
     // Fetch student's existing repertoires
-    final repertoiresAsync = ref.watch(studentRepertoiresProvider(widget.studentId));
+    final repertoiresAsync = ref.watch(
+      studentRepertoiresProvider(widget.studentId),
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -130,15 +134,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -149,7 +147,12 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               _buildRepertoireSection(repertoiresAsync),
 
               // Description
-              Text('설명 (선택)', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                '설명 (선택)',
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: AppSpacing.space2),
               TextField(
                 controller: _descriptionController,
@@ -157,7 +160,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 decoration: InputDecoration(
                   hintText: '예: 메트로놈 60으로 정확하게!',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -175,13 +180,14 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isSubmitting ? null : _submit,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('추가'),
+                  child:
+                      _isSubmitting
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text('추가'),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -192,39 +198,53 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     );
   }
 
-  Widget _buildRepertoireSection(AsyncValue<List<PracticeRepertoire>> repertoiresAsync) {
+  Widget _buildRepertoireSection(
+    AsyncValue<List<PracticeRepertoire>> repertoiresAsync,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Repertoire selection
-        Text('레퍼토리', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '레퍼토리',
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
 
         repertoiresAsync.when(
           data: (repertoires) => _buildRepertoireSelector(repertoires),
-          loading: () => const Center(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.space4),
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (_, __) => Container(
-            padding: const EdgeInsets.all(AppSpacing.space3),
-            decoration: BoxDecoration(
-              color: AppColors.error.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Text(
-              '레퍼토리를 불러올 수 없습니다',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
-            ),
-          ),
+          loading:
+              () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.space4),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+          error:
+              (_, __) => Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                ),
+                child: Text(
+                  '레퍼토리를 불러올 수 없습니다',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.error,
+                  ),
+                ),
+              ),
         ),
         const SizedBox(height: AppSpacing.space4),
 
         // New repertoire name input (if creating new)
         if (_isCreatingNewRepertoire) ...[
-          Text('새 레퍼토리 이름', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+          Text(
+            '새 레퍼토리 이름',
+            style: AppTypography.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: AppSpacing.space2),
           TextField(
             controller: _newRepertoireNameController,
@@ -239,7 +259,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         ],
 
         // Piece name
-        Text('곡명', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '곡명',
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         TextField(
           controller: _pieceNameController,
@@ -253,7 +276,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         const SizedBox(height: AppSpacing.space4),
 
         // Practice ranges (multiple)
-        Text('연습 구간', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          '연습 구간',
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: AppSpacing.space2),
         _buildPracticeRanges(),
         const SizedBox(height: AppSpacing.space4),
@@ -271,18 +297,27 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
         children: [
           // Existing repertoires
           ...repertoires.map((repertoire) {
-            final isSelected = _selectedRepertoire?.id == repertoire.id && !_isCreatingNewRepertoire;
+            final isSelected =
+                _selectedRepertoire?.id == repertoire.id &&
+                !_isCreatingNewRepertoire;
             return InkWell(
-              onTap: () => setState(() {
-                _selectedRepertoire = repertoire;
-                _isCreatingNewRepertoire = false;
-              }),
+              onTap:
+                  () => setState(() {
+                    _selectedRepertoire = repertoire;
+                    _isCreatingNewRepertoire = false;
+                  }),
               child: Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : null,
+                  color:
+                      isSelected
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : null,
                   border: Border(
-                    bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
+                    bottom: BorderSide(
+                      color: AppColors.borderLight,
+                      width: 0.5,
+                    ),
                   ),
                 ),
                 child: Row(
@@ -293,14 +328,23 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isSelected ? AppColors.primary : AppColors.borderLight,
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderLight,
                           width: 2,
                         ),
-                        color: isSelected ? AppColors.primary : Colors.transparent,
+                        color:
+                            isSelected ? AppColors.primary : Colors.transparent,
                       ),
-                      child: isSelected
-                          ? const Icon(Icons.check, size: 14, color: Colors.white)
-                          : null,
+                      child:
+                          isSelected
+                              ? const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              )
+                              : null,
                     ),
                     const SizedBox(width: AppSpacing.space3),
                     Expanded(
@@ -310,7 +354,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                           Text(
                             repertoire.name,
                             style: AppTypography.bodyMedium.copyWith(
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
                             ),
                           ),
                           if (repertoire.sections.isNotEmpty)
@@ -331,14 +378,18 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
 
           // Create new repertoire option
           InkWell(
-            onTap: () => setState(() {
-              _selectedRepertoire = null;
-              _isCreatingNewRepertoire = true;
-            }),
+            onTap:
+                () => setState(() {
+                  _selectedRepertoire = null;
+                  _isCreatingNewRepertoire = true;
+                }),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: _isCreatingNewRepertoire ? AppColors.secondary.withValues(alpha: 0.1) : null,
+                color:
+                    _isCreatingNewRepertoire
+                        ? AppColors.secondary.withValues(alpha: 0.1)
+                        : null,
               ),
               child: Row(
                 children: [
@@ -348,27 +399,47 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: _isCreatingNewRepertoire ? AppColors.secondary : AppColors.borderLight,
+                        color:
+                            _isCreatingNewRepertoire
+                                ? AppColors.secondary
+                                : AppColors.borderLight,
                         width: 2,
                       ),
-                      color: _isCreatingNewRepertoire ? AppColors.secondary : Colors.transparent,
+                      color:
+                          _isCreatingNewRepertoire
+                              ? AppColors.secondary
+                              : Colors.transparent,
                     ),
-                    child: _isCreatingNewRepertoire
-                        ? const Icon(Icons.check, size: 14, color: Colors.white)
-                        : null,
+                    child:
+                        _isCreatingNewRepertoire
+                            ? const Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Colors.white,
+                            )
+                            : null,
                   ),
                   const SizedBox(width: AppSpacing.space3),
                   Icon(
                     Icons.add_circle_outline,
                     size: 20,
-                    color: _isCreatingNewRepertoire ? AppColors.secondary : AppColors.textSecondaryLight,
+                    color:
+                        _isCreatingNewRepertoire
+                            ? AppColors.secondary
+                            : AppColors.textSecondaryLight,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '새 레퍼토리 만들기',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: _isCreatingNewRepertoire ? AppColors.secondary : AppColors.textSecondaryLight,
-                      fontWeight: _isCreatingNewRepertoire ? FontWeight.w600 : FontWeight.normal,
+                      color:
+                          _isCreatingNewRepertoire
+                              ? AppColors.secondary
+                              : AppColors.textSecondaryLight,
+                      fontWeight:
+                          _isCreatingNewRepertoire
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -428,7 +499,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
     final canDelete = _practiceRanges.length > 1;
 
     return Container(
-      margin: EdgeInsets.only(bottom: index < _practiceRanges.length - 1 ? AppSpacing.space2 : 0),
+      margin: EdgeInsets.only(
+        bottom: index < _practiceRanges.length - 1 ? AppSpacing.space2 : 0,
+      ),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.surfaceSecondaryLight,
@@ -449,15 +522,13 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
               child: DropdownButton<RangeType>(
                 value: range.type,
                 isDense: true,
-                items: RangeType.values.map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(
-                      type.label,
-                      style: AppTypography.bodySmall,
-                    ),
-                  );
-                }).toList(),
+                items:
+                    RangeType.values.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(type.label, style: AppTypography.bodySmall),
+                      );
+                    }).toList(),
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
@@ -483,7 +554,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space2),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: AppSpacing.space2,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
@@ -512,7 +586,10 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
                   hintStyle: AppTypography.bodySmall.copyWith(
                     color: AppColors.textTertiaryLight,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.space2, vertical: AppSpacing.space2),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.space2,
+                    vertical: AppSpacing.space2,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
@@ -554,21 +631,22 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
   Future<void> _submit() async {
     // Validate repertoire selection
     if (!_isCreatingNewRepertoire && _selectedRepertoire == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('레퍼토리를 선택해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('레퍼토리를 선택해주세요')));
       return;
     }
-    if (_isCreatingNewRepertoire && _newRepertoireNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('새 레퍼토리 이름을 입력해주세요')),
-      );
+    if (_isCreatingNewRepertoire &&
+        _newRepertoireNameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('새 레퍼토리 이름을 입력해주세요')));
       return;
     }
     if (_pieceNameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('곡명을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('곡명을 입력해주세요')));
       return;
     }
     // Validate all practice ranges
@@ -577,9 +655,9 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       final start = int.tryParse(range.startController.text.trim());
       final end = int.tryParse(range.endController.text.trim());
       if (start == null || end == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('구간 ${i + 1}의 시작/끝 번호를 입력해주세요')));
         return;
       }
       if (start > end) {
@@ -599,10 +677,12 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       // Create or get repertoire
       PracticeRepertoire repertoire;
       if (_isCreatingNewRepertoire) {
-        repertoire = await ref.read(repertoireCrudProvider.notifier).createRepertoire(
-          studentId: widget.studentId,
-          name: _newRepertoireNameController.text.trim(),
-        );
+        repertoire = await ref
+            .read(repertoireCrudProvider.notifier)
+            .createRepertoire(
+              studentId: widget.studentId,
+              name: _newRepertoireNameController.text.trim(),
+            );
       } else {
         repertoire = _selectedRepertoire!;
       }
@@ -613,42 +693,49 @@ class _AddPracticeItemSheetState extends ConsumerState<AddPracticeItemSheet> {
       final startMeasure = int.parse(firstRange.startController.text.trim());
       final endMeasure = int.parse(firstRange.endController.text.trim());
 
-      final section = await ref.read(sectionCrudProvider.notifier).createSection(
-        repertoireId: repertoireId,
-        pieceName: pieceName,
-        startMeasure: startMeasure,
-        endMeasure: endMeasure,
-      );
+      final section = await ref
+          .read(sectionCrudProvider.notifier)
+          .createSection(
+            repertoireId: repertoireId,
+            pieceName: pieceName,
+            startMeasure: startMeasure,
+            endMeasure: endMeasure,
+          );
       final sectionId = section.id;
 
       // Build title: "곡명 시작~끝마디, 시작~끝줄, ..."
-      final rangeStrings = _practiceRanges.map((r) => r.toDisplayString()).join(', ');
+      final rangeStrings = _practiceRanges
+          .map((r) => r.toDisplayString())
+          .join(', ');
       final title = '$pieceName $rangeStrings';
 
       // Create practice item (always repertoire type)
-      await ref.read(practiceItemsNotifierProvider(widget.lessonId).notifier).addItem(
-        studentId: widget.studentId,
-        teacherId: teacherId,
-        title: title,
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
-        repertoireId: repertoireId,
-        sectionId: sectionId,
-        resourceIds: _resourceIds,
-      );
+      await ref
+          .read(practiceItemsNotifierProvider(widget.lessonId).notifier)
+          .addItem(
+            studentId: widget.studentId,
+            teacherId: teacherId,
+            title: title,
+            description:
+                _descriptionController.text.trim().isNotEmpty
+                    ? _descriptionController.text.trim()
+                    : null,
+            repertoireId: repertoireId,
+            sectionId: sectionId,
+            resourceIds: _resourceIds,
+          );
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('연습이 추가되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('연습이 추가되었습니다')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
       }
     } finally {
       if (mounted) {

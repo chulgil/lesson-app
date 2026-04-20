@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/booking/entities/lesson_booking.dart';
-import '../../../../core/booking/entities/time_slot.dart';
 import '../../../../features/lessons/presentation/providers/booking_providers.dart';
 import 'schedule_option_card.dart';
 import 'decline_bottom_sheet.dart';
@@ -58,15 +58,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       child: Column(
         children: [
           // Handle bar
-          Center(
-            child: Container(
-              margin: const EdgeInsets.only(top: AppSpacing.space2),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.borderLight,
-                borderRadius: BorderRadius.circular(2),
-              ),
+          const Center(
+            child: BottomSheetHandle(
+              margin: EdgeInsets.only(top: AppSpacing.space2),
             ),
           ),
 
@@ -109,17 +103,19 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
-                  ...options.map((option) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                        child: ScheduleOptionCard(
-                          option: option,
-                          mode: ScheduleOptionCardMode.teacher,
-                          isSelected: option.id == _selectedOptionId,
-                          onTap: () {
-                            setState(() => _selectedOptionId = option.id);
-                          },
-                        ),
-                      )),
+                  ...options.map(
+                    (option) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                      child: ScheduleOptionCard(
+                        option: option,
+                        mode: ScheduleOptionCardMode.teacher,
+                        isSelected: option.id == _selectedOptionId,
+                        onTap: () {
+                          setState(() => _selectedOptionId = option.id);
+                        },
+                      ),
+                    ),
+                  ),
                 ] else ...[
                   // Legacy single option display
                   _buildLegacyScheduleCard(booking),
@@ -178,10 +174,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                booking.studentName,
-                style: AppTypography.headingSmall,
-              ),
+              Text(booking.studentName, style: AppTypography.headingSmall),
               if (booking.lessonGoal != null || booking.experienceLevel != null)
                 Text(
                   [
@@ -200,7 +193,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -235,10 +230,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(
-          color: AppColors.primary,
-          width: 2,
-        ),
+        border: Border.all(color: AppColors.primary, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,10 +260,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 color: AppColors.textSecondaryLight,
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                booking.timeRange,
-                style: AppTypography.bodyMedium,
-              ),
+              Text(booking.timeRange, style: AppTypography.bodyMedium),
             ],
           ),
         ],
@@ -288,18 +277,12 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline,
-            size: 18,
-            color: AppColors.warning,
-          ),
+          Icon(Icons.info_outline, size: 18, color: AppColors.warning),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               '모든 일정이 불가능하면 거절 후 메시지로 대안을 제안해주세요',
-              style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
-              ),
+              style: AppTypography.caption.copyWith(color: AppColors.warning),
             ),
           ),
         ],
@@ -320,9 +303,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ),
       decoration: BoxDecoration(
         color: AppColors.backgroundLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         children: [
@@ -330,7 +311,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
             child: OutlinedButton(
               onPressed: _isProcessing ? null : _handleReject,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space3,
+                ),
                 side: BorderSide(color: AppColors.borderLight),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -347,33 +330,34 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: FilledButton(
-              onPressed: canApprove && !_isProcessing
-                  ? _handleApprove
-                  : null,
+              onPressed: canApprove && !_isProcessing ? _handleApprove : null,
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space3,
+                ),
                 backgroundColor: AppColors.primary,
-                disabledBackgroundColor:
-                    AppColors.textSecondaryLight.withValues(alpha: 0.3),
+                disabledBackgroundColor: AppColors.textSecondaryLight
+                    .withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
-              child: _isProcessing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+              child:
+                  _isProcessing
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                      : Text(
+                        '승인하기',
+                        style: AppTypography.button.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
-                    )
-                  : Text(
-                      '승인하기',
-                      style: AppTypography.button.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
             ),
           ),
         ],
@@ -385,7 +369,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     setState(() => _isProcessing = true);
 
     try {
-      await ref.read(bookingsNotifierProvider.notifier).approveTrialLesson(
+      await ref
+          .read(bookingsNotifierProvider.notifier)
+          .approveTrialLesson(
             widget.booking.id,
             selectedOptionId: _selectedOptionId,
           );
@@ -395,9 +381,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       widget.onApproved();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            '${widget.booking.studentName}님의 레슨이 승인되었습니다',
-          ),
+          content: Text('${widget.booking.studentName}님의 레슨이 승인되었습니다'),
           backgroundColor: AppColors.practiceGood,
         ),
       );
@@ -428,7 +412,9 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     setState(() => _isProcessing = true);
 
     try {
-      await ref.read(bookingsNotifierProvider.notifier).markUnavailable(
+      await ref
+          .read(bookingsNotifierProvider.notifier)
+          .markUnavailable(
             widget.booking.id,
             result.message,
             suggestedTimeSlots:
@@ -440,9 +426,11 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       widget.onApproved();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.suggestedSlots.isNotEmpty
-              ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
-              : '학생에게 안내가 전달되었습니다'),
+          content: Text(
+            result.suggestedSlots.isNotEmpty
+                ? '대안 시간과 함께 학생에게 안내가 전달되었습니다'
+                : '학생에게 안내가 전달되었습니다',
+          ),
         ),
       );
     } catch (e) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Bottom sheet for lesson time settings
 class LessonSettingsBottomSheet extends StatefulWidget {
@@ -56,16 +57,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Handle bar
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.borderLight,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
+                const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
 
                 const SizedBox(height: AppSpacing.space5),
 

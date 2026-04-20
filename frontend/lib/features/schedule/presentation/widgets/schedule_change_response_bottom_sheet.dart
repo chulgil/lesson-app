@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson_schedule_change.dart';
 import '../../domain/entities/unified_lesson_request.dart';
 import '../screens/suggest_alternative_screen.dart';
@@ -13,12 +14,13 @@ import '../screens/suggest_alternative_screen.dart';
 enum ScheduleChangeResponseAction { accept, reject, counter }
 
 /// Result from the schedule change response bottom sheet.
-typedef ScheduleChangeResponseResult = ({
-  ScheduleChangeResponseAction action,
-  String message,
-  List<TimeSlot> counterSlots,
-  int? acceptedSlotIndex,
-});
+typedef ScheduleChangeResponseResult =
+    ({
+      ScheduleChangeResponseAction action,
+      String message,
+      List<TimeSlot> counterSlots,
+      int? acceptedSlotIndex,
+    });
 
 /// Shows the schedule change response bottom sheet.
 ///
@@ -34,12 +36,13 @@ Future<ScheduleChangeResponseResult?> showScheduleChangeResponseBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => _ScheduleChangeResponseBottomSheet(
-      proposedSlots: proposedSlots,
-      changeType: changeType,
-      durationMinutes: durationMinutes,
-      teacherId: teacherId,
-    ),
+    builder:
+        (context) => _ScheduleChangeResponseBottomSheet(
+          proposedSlots: proposedSlots,
+          changeType: changeType,
+          durationMinutes: durationMinutes,
+          teacherId: teacherId,
+        ),
   );
 }
 
@@ -93,15 +96,9 @@ class _ScheduleChangeResponseBottomSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Drag handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -123,8 +120,8 @@ class _ScheduleChangeResponseBottomSheetState
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 ...widget.proposedSlots.asMap().entries.map(
-                      (entry) => _buildSlotOption(entry.key, entry.value),
-                    ),
+                  (entry) => _buildSlotOption(entry.key, entry.value),
+                ),
                 const SizedBox(height: AppSpacing.space4),
               ],
 
@@ -136,12 +133,14 @@ class _ScheduleChangeResponseBottomSheetState
                     child: OutlinedButton(
                       onPressed: _reject,
                       style: OutlinedButton.styleFrom(
-                        minimumSize:
-                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeightSmall,
+                        ),
                         side: const BorderSide(color: AppColors.borderLight),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -158,12 +157,14 @@ class _ScheduleChangeResponseBottomSheetState
                     child: OutlinedButton(
                       onPressed: _counterPropose,
                       style: OutlinedButton.styleFrom(
-                        minimumSize:
-                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeightSmall,
+                        ),
                         side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -180,12 +181,14 @@ class _ScheduleChangeResponseBottomSheetState
                     child: ElevatedButton(
                       onPressed: _selectedSlotIndex != null ? _accept : null,
                       style: ElevatedButton.styleFrom(
-                        minimumSize:
-                            const Size.fromHeight(AppSpacing.buttonHeightSmall),
+                        minimumSize: const Size.fromHeight(
+                          AppSpacing.buttonHeightSmall,
+                        ),
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -208,9 +211,10 @@ class _ScheduleChangeResponseBottomSheetState
   Widget _buildSlotOption(int index, TimeSlotOption slot) {
     final isSelected = _selectedSlotIndex == index;
     return GestureDetector(
-      onTap: () => setState(() {
-        _selectedSlotIndex = isSelected ? null : index;
-      }),
+      onTap:
+          () => setState(() {
+            _selectedSlotIndex = isSelected ? null : index;
+          }),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.space2),
         padding: const EdgeInsets.symmetric(
@@ -218,9 +222,10 @@ class _ScheduleChangeResponseBottomSheetState
           vertical: AppSpacing.space2,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.08)
-              : AppColors.backgroundLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.08)
+                  : AppColors.backgroundLight,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
           ),
@@ -240,9 +245,8 @@ class _ScheduleChangeResponseBottomSheetState
               '${index + 1}순위 ${slot.displayLabel}',
               style: AppTypography.bodyMedium.copyWith(
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textPrimaryLight,
+                color:
+                    isSelected ? AppColors.primary : AppColors.textPrimaryLight,
               ),
             ),
           ],
@@ -252,51 +256,44 @@ class _ScheduleChangeResponseBottomSheetState
   }
 
   void _accept() {
-    Navigator.pop<ScheduleChangeResponseResult>(
-      context,
-      (
-        action: ScheduleChangeResponseAction.accept,
-        message: '',
-        counterSlots: <TimeSlot>[],
-        acceptedSlotIndex: _selectedSlotIndex,
-      ),
-    );
+    Navigator.pop<ScheduleChangeResponseResult>(context, (
+      action: ScheduleChangeResponseAction.accept,
+      message: '',
+      counterSlots: <TimeSlot>[],
+      acceptedSlotIndex: _selectedSlotIndex,
+    ));
   }
 
   void _reject() {
-    Navigator.pop<ScheduleChangeResponseResult>(
-      context,
-      (
-        action: ScheduleChangeResponseAction.reject,
-        message: AppStrings.scheduleChangeReject,
-        counterSlots: <TimeSlot>[],
-        acceptedSlotIndex: null,
-      ),
-    );
+    Navigator.pop<ScheduleChangeResponseResult>(context, (
+      action: ScheduleChangeResponseAction.reject,
+      message: AppStrings.scheduleChangeReject,
+      counterSlots: <TimeSlot>[],
+      acceptedSlotIndex: null,
+    ));
   }
 
   Future<void> _counterPropose() async {
-    final result = await Navigator.push<({String message, List<TimeSlot> slots})>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SuggestAlternativeScreen(
-          message: AppStrings.scheduleChangeCounter,
-          durationMinutes: widget.durationMinutes,
-          teacherId: widget.teacherId,
-        ),
-      ),
-    );
+    final result =
+        await Navigator.push<({String message, List<TimeSlot> slots})>(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => SuggestAlternativeScreen(
+                  message: AppStrings.scheduleChangeCounter,
+                  durationMinutes: widget.durationMinutes,
+                  teacherId: widget.teacherId,
+                ),
+          ),
+        );
 
     if (result != null && mounted) {
-      Navigator.pop<ScheduleChangeResponseResult>(
-        context,
-        (
-          action: ScheduleChangeResponseAction.counter,
-          message: result.message,
-          counterSlots: result.slots,
-          acceptedSlotIndex: null,
-        ),
-      );
+      Navigator.pop<ScheduleChangeResponseResult>(context, (
+        action: ScheduleChangeResponseAction.counter,
+        message: result.message,
+        counterSlots: result.slots,
+        acceptedSlotIndex: null,
+      ));
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Guest student information collected before booking
 class GuestStudentInfo {
@@ -10,11 +11,7 @@ class GuestStudentInfo {
   final String? phone;
   final String? email;
 
-  const GuestStudentInfo({
-    required this.name,
-    this.phone,
-    this.email,
-  });
+  const GuestStudentInfo({required this.name, this.phone, this.email});
 }
 
 /// Dialog for collecting guest student information before booking
@@ -54,12 +51,14 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
     if (_formKey.currentState!.validate()) {
       final info = GuestStudentInfo(
         name: _nameController.text.trim(),
-        phone: _phoneController.text.trim().isEmpty
-            ? null
-            : _phoneController.text.trim(),
-        email: _emailController.text.trim().isEmpty
-            ? null
-            : _emailController.text.trim(),
+        phone:
+            _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+        email:
+            _emailController.text.trim().isEmpty
+                ? null
+                : _emailController.text.trim(),
       );
       Navigator.of(context).pop(info);
     }
@@ -88,24 +87,14 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Handle bar
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
+                  const Center(
+                    child: BottomSheetHandle(margin: EdgeInsets.zero),
                   ),
 
                   const SizedBox(height: AppSpacing.space5),
 
                   // Title
-                  Text(
-                    '예약자 정보 입력',
-                    style: AppTypography.headingMedium,
-                  ),
+                  Text('예약자 정보 입력', style: AppTypography.headingMedium),
 
                   const SizedBox(height: AppSpacing.space2),
 
@@ -182,8 +171,9 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
                       color: AppColors.info.withValues(alpha: 0.08),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -248,9 +238,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
       children: [
         Text(
           text,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         if (isRequired)
           Text(

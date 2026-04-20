@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/practice/domain/entities/practice_item.dart';
 import '../../../practice/presentation/providers/practice_item_providers.dart';
 import 'resource_attachment_section.dart';
@@ -22,7 +23,8 @@ class EditPracticeItemSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<EditPracticeItemSheet> createState() => _EditPracticeItemSheetState();
+  ConsumerState<EditPracticeItemSheet> createState() =>
+      _EditPracticeItemSheetState();
 }
 
 class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
@@ -35,7 +37,9 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.item.title);
-    _descriptionController = TextEditingController(text: widget.item.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.item.description ?? '',
+    );
     _resourceIds = List<String>.from(widget.item.resourceIds);
   }
 
@@ -66,15 +70,9 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+              const Center(
+                child: BottomSheetHandle(
+                  margin: EdgeInsets.only(bottom: AppSpacing.space4),
                 ),
               ),
 
@@ -84,10 +82,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                   const Spacer(),
                   TextButton(
                     onPressed: _isSubmitting ? null : _delete,
-                    child: Text(
-                      '삭제',
-                      style: TextStyle(color: AppColors.error),
-                    ),
+                    child: Text('삭제', style: TextStyle(color: AppColors.error)),
                   ),
                 ],
               ),
@@ -99,7 +94,9 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -120,27 +117,41 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
               ],
 
               // Title
-              Text('제목', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                '제목',
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: AppSpacing.space2),
               TextField(
                 controller: _titleController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
 
               // Description
-              Text('설명 (선택)', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                '설명 (선택)',
+                style: AppTypography.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: AppSpacing.space2),
               TextField(
                 controller: _descriptionController,
                 maxLines: 2,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -158,13 +169,14 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _isSubmitting ? null : _submit,
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('저장'),
+                  child:
+                      _isSubmitting
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text('저장'),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -178,9 +190,9 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   Future<void> _submit() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('제목을 입력해주세요')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('제목을 입력해주세요')));
       return;
     }
 
@@ -189,9 +201,10 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
     try {
       final updatedItem = widget.item.copyWith(
         title: title,
-        description: _descriptionController.text.trim().isNotEmpty
-            ? _descriptionController.text.trim()
-            : null,
+        description:
+            _descriptionController.text.trim().isNotEmpty
+                ? _descriptionController.text.trim()
+                : null,
         resourceIds: _resourceIds,
       );
 
@@ -201,15 +214,15 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('연습이 수정되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('연습이 수정되었습니다')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
       }
     } finally {
       if (mounted) {
@@ -221,23 +234,22 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
   Future<void> _delete() async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('연습 삭제'),
-        content: const Text('이 연습을 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('연습 삭제'),
+            content: const Text('이 연습을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -251,15 +263,15 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
 
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('연습이 삭제되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('연습이 삭제되었습니다')));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')));
       }
     } finally {
       if (mounted) {

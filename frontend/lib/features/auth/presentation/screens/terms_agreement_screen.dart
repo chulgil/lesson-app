@@ -6,6 +6,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../providers/auth_provider.dart';
 
 /// Terms agreement screen shown after OAuth login for new users.
@@ -266,15 +267,7 @@ class _TermsAgreementScreenState extends ConsumerState<TermsAgreementScreen> {
             return Column(
               children: [
                 // Handle bar
-                Container(
-                  margin: const EdgeInsets.only(top: AppSpacing.space3),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                const BottomSheetHandle(),
                 // Title
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.space4),

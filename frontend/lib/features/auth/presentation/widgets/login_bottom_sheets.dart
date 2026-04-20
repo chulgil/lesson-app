@@ -5,6 +5,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import 'parent_login_option.dart';
 import 'role_option_card.dart';
 
@@ -26,14 +27,7 @@ void showParentLoginSheet(BuildContext context) {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space4),
 
                 // Parent icon
@@ -42,9 +36,7 @@ void showParentLoginSheet(BuildContext context) {
                   height: 56,
                   decoration: BoxDecoration(
                     color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(
-                      AppSpacing.radiusLarge,
-                    ),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                   child: const Center(
                     child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 28)),
@@ -132,14 +124,7 @@ void showRoleSelectSheet(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+                const BottomSheetHandle(margin: EdgeInsets.zero),
                 const SizedBox(height: AppSpacing.space4),
 
                 Text('역할을 선택하세요', style: AppTypography.headingMedium),

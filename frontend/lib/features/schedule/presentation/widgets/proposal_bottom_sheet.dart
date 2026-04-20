@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../profile/domain/entities/teacher_profile.dart';
 import '../../../profile/presentation/providers/teacher_extended_profile_provider.dart';
 import '../../../subscription/domain/entities/subscription_template.dart';
@@ -70,8 +71,9 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final templatesAsync =
-        ref.watch(activeTeacherTemplatesProvider(widget.teacherId));
+    final templatesAsync = ref.watch(
+      activeTeacherTemplatesProvider(widget.teacherId),
+    );
     final profileAsync = ref.watch(teacherExtendedProfileProvider);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
@@ -90,18 +92,9 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Handle bar
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.space3),
-            child: Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: AppSpacing.space3),
+            child: Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
           ),
           const SizedBox(height: AppSpacing.space3),
 
@@ -168,19 +161,22 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                         color: AppColors.textTertiaryLight,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
-                        borderSide:
-                            const BorderSide(color: AppColors.borderLight),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderLight,
+                        ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
-                        borderSide:
-                            const BorderSide(color: AppColors.borderLight),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
+                        borderSide: const BorderSide(
+                          color: AppColors.borderLight,
+                        ),
                       ),
-                      contentPadding:
-                          const EdgeInsets.all(AppSpacing.space3),
+                      contentPadding: const EdgeInsets.all(AppSpacing.space3),
                     ),
                     style: AppTypography.bodySmall,
                   ),
@@ -191,13 +187,13 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                     width: double.infinity,
                     height: AppSpacing.buttonHeightSmall,
                     child: FilledButton(
-                      onPressed:
-                          _selectedIds.isNotEmpty ? _submit : null,
+                      onPressed: _selectedIds.isNotEmpty ? _submit : null,
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMedium),
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -296,26 +292,27 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     AsyncValue<List<SubscriptionTemplate>> templatesAsync,
   ) {
     return templatesAsync.when(
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.space4),
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (_, __) => Text(
-        AppStrings.requestLoadError,
-        style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
-      ),
+      loading:
+          () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space4),
+              child: CircularProgressIndicator(),
+            ),
+          ),
+      error:
+          (_, __) => Text(
+            AppStrings.requestLoadError,
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryLight,
+            ),
+          ),
       data: (templates) {
         if (templates.isEmpty) {
           return Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
               color: AppColors.backgroundLight,
-              borderRadius:
-                  BorderRadius.circular(AppSpacing.radiusMedium),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               border: Border.all(color: AppColors.borderLight),
             ),
             child: Center(
@@ -329,8 +326,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           );
         }
 
-        final atMax =
-            _selectedIds.length >= kMaxTemplateSelections;
+        final atMax = _selectedIds.length >= kMaxTemplateSelections;
 
         return Column(
           children: [
@@ -338,8 +334,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
               SelectableTemplateCard(
                 template: template,
                 isSelected: _selectedIds.contains(template.id),
-                isDisabled: atMax &&
-                    !_selectedIds.contains(template.id),
+                isDisabled: atMax && !_selectedIds.contains(template.id),
                 onTap: () => _toggleTemplate(template.id),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -352,9 +347,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
 
   // ── Bank Account Selector ──────────────────────────────────
 
-  Widget _buildBankAccountSelector(
-    AsyncValue<TeacherProfile?> profileAsync,
-  ) {
+  Widget _buildBankAccountSelector(AsyncValue<TeacherProfile?> profileAsync) {
     final profile = profileAsync.valueOrNull;
     if (profile == null) return const SizedBox.shrink();
 
@@ -364,8 +357,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           color: AppColors.backgroundLight,
-          borderRadius:
-              BorderRadius.circular(AppSpacing.radiusMedium),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(color: AppColors.borderLight),
         ),
         child: Text(
@@ -382,8 +374,8 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       ...accounts,
       if (profile.bankAccount != null &&
           !accounts.any(
-              (a) => a.accountNumber ==
-                  profile.bankAccount!.accountNumber))
+            (a) => a.accountNumber == profile.bankAccount!.accountNumber,
+          ))
         profile.bankAccount!,
     ];
 
@@ -398,9 +390,8 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     }
 
     // Find selected account for display
-    final selectedAccount = allAccounts
-        .where((a) => a.id == _selectedBankAccountId)
-        .firstOrNull;
+    final selectedAccount =
+        allAccounts.where((a) => a.id == _selectedBankAccountId).firstOrNull;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -408,8 +399,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
         vertical: AppSpacing.space1,
       ),
       decoration: BoxDecoration(
-        borderRadius:
-            BorderRadius.circular(AppSpacing.radiusMedium),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: DropdownButton<String>(
@@ -433,21 +423,20 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
             );
           }).toList();
         },
-        items: allAccounts.map((account) {
-          final isDefault = account.isDefault;
-          return DropdownMenuItem(
-            value: account.id,
-            child: Text(
-              '${account.bankName} ${account.accountNumber}'
-              '${isDefault ? ' (기본)' : ''}',
-              style: AppTypography.bodySmall.copyWith(
-                fontWeight: isDefault
-                    ? FontWeight.w600
-                    : FontWeight.normal,
-              ),
-            ),
-          );
-        }).toList(),
+        items:
+            allAccounts.map((account) {
+              final isDefault = account.isDefault;
+              return DropdownMenuItem(
+                value: account.id,
+                child: Text(
+                  '${account.bankName} ${account.accountNumber}'
+                  '${isDefault ? ' (기본)' : ''}',
+                  style: AppTypography.bodySmall.copyWith(
+                    fontWeight: isDefault ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              );
+            }).toList(),
         onChanged: (value) {
           setState(() => _selectedBankAccountId = value);
         },
@@ -471,16 +460,16 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     String? bankDisplay;
     if (_paymentMethod == PaymentMethod.prepaid &&
         _selectedBankAccountId != null) {
-      final profile =
-          ref.read(teacherExtendedProfileProvider).valueOrNull;
+      final profile = ref.read(teacherExtendedProfileProvider).valueOrNull;
       if (profile != null) {
         final allAccounts = [
           ...profile.bankAccounts,
           if (profile.bankAccount != null) profile.bankAccount!,
         ];
-        final selected = allAccounts
-            .where((a) => a.id == _selectedBankAccountId)
-            .firstOrNull;
+        final selected =
+            allAccounts
+                .where((a) => a.id == _selectedBankAccountId)
+                .firstOrNull;
         if (selected != null) {
           bankDisplay =
               '${selected.bankName} ${selected.accountNumber} ${selected.accountHolder}';
@@ -488,18 +477,19 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       }
     }
 
-    Navigator.of(context).pop(ProposalResult(
-      paymentMethod: _paymentMethod,
-      templateIds: _selectedIds.toList(),
-      bankAccountId: _paymentMethod == PaymentMethod.prepaid
-          ? _selectedBankAccountId
-          : null,
-      bankAccountDisplay: _paymentMethod == PaymentMethod.prepaid
-          ? bankDisplay
-          : null,
-      message: _messageController.text.isEmpty
-          ? null
-          : _messageController.text,
-    ));
+    Navigator.of(context).pop(
+      ProposalResult(
+        paymentMethod: _paymentMethod,
+        templateIds: _selectedIds.toList(),
+        bankAccountId:
+            _paymentMethod == PaymentMethod.prepaid
+                ? _selectedBankAccountId
+                : null,
+        bankAccountDisplay:
+            _paymentMethod == PaymentMethod.prepaid ? bankDisplay : null,
+        message:
+            _messageController.text.isEmpty ? null : _messageController.text,
+      ),
+    );
   }
 }

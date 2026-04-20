@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Result from the payment guide bottom sheet.
 class PaymentGuideResult {
@@ -25,9 +26,7 @@ class PaymentGuideResult {
 ///
 /// Collects: subscription type, total lessons, amount, optional message.
 /// Returns [PaymentGuideResult] or null if cancelled.
-Future<PaymentGuideResult?> showPaymentGuideBottomSheet(
-  BuildContext context,
-) {
+Future<PaymentGuideResult?> showPaymentGuideBottomSheet(BuildContext context) {
   return showModalBottomSheet<PaymentGuideResult>(
     context: context,
     isScrollControlled: true,
@@ -59,8 +58,8 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
 
   bool get _isValid {
     final lessons = int.tryParse(_lessonsController.text) ?? 0;
-    final amount = int.tryParse(
-        _amountController.text.replaceAll(',', '')) ?? 0;
+    final amount =
+        int.tryParse(_amountController.text.replaceAll(',', '')) ?? 0;
     return lessons > 0 && amount > 0;
   }
 
@@ -83,16 +82,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+            const Center(child: BottomSheetHandle(margin: EdgeInsets.zero)),
             const SizedBox(height: AppSpacing.space4),
 
             // Title
@@ -168,13 +158,11 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                   color: AppColors.textTertiaryLight,
                 ),
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   borderSide: const BorderSide(color: AppColors.borderLight),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
@@ -192,8 +180,9 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
                 child: Text(
@@ -270,13 +259,11 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
                 color: AppColors.textSecondaryLight,
               ),
               border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: const BorderSide(color: AppColors.borderLight),
               ),
               contentPadding: const EdgeInsets.symmetric(
@@ -295,16 +282,17 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
 
   void _submit() {
     final lessons = int.tryParse(_lessonsController.text) ?? 0;
-    final amount = int.tryParse(
-        _amountController.text.replaceAll(',', '')) ?? 0;
+    final amount =
+        int.tryParse(_amountController.text.replaceAll(',', '')) ?? 0;
 
-    Navigator.of(context).pop(PaymentGuideResult(
-      isMonthly: _isMonthly,
-      totalLessons: lessons,
-      amount: amount,
-      message: _messageController.text.isEmpty
-          ? null
-          : _messageController.text,
-    ));
+    Navigator.of(context).pop(
+      PaymentGuideResult(
+        isMonthly: _isMonthly,
+        totalLessons: lessons,
+        amount: amount,
+        message:
+            _messageController.text.isEmpty ? null : _messageController.text,
+      ),
+    );
   }
 }

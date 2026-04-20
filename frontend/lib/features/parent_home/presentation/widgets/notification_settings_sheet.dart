@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../features/parent_home/domain/entities/parent_notification_settings.dart';
 
 /// Detailed notification settings sheet for parents.
@@ -46,15 +47,7 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
     return Column(
       children: [
         // Handle
-        Container(
-          margin: const EdgeInsets.only(top: AppSpacing.space3),
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: AppColors.borderLight,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
+        const BottomSheetHandle(),
 
         // Header
         Padding(

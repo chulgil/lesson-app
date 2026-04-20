@@ -4,6 +4,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../domain/entities/lesson_schedule_change.dart';
 
 /// Shows a bottom sheet to choose between single lesson or bulk schedule change.
@@ -37,15 +38,9 @@ class _ScheduleChangeTypeBottomSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Drag handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                decoration: BoxDecoration(
-                  color: AppColors.borderLight,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+            const Center(
+              child: BottomSheetHandle(
+                margin: EdgeInsets.only(bottom: AppSpacing.space4),
               ),
             ),
             // Title
