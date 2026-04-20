@@ -18,10 +18,7 @@ import '../providers/feedback_preset_providers.dart';
 class QuickFeedbackScreen extends ConsumerStatefulWidget {
   final String lessonId;
 
-  const QuickFeedbackScreen({
-    super.key,
-    required this.lessonId,
-  });
+  const QuickFeedbackScreen({super.key, required this.lessonId});
 
   @override
   ConsumerState<QuickFeedbackScreen> createState() =>
@@ -84,7 +81,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             actions: [
               if (_isSaving)
                 const Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppSpacing.space4),
                   child: SizedBox(
                     width: 20,
                     height: 20,
@@ -109,10 +106,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 const SizedBox(height: AppSpacing.space6),
 
                 // Feedback text field
-                _buildSectionHeader(
-                  icon: Icons.edit_note,
-                  title: '레슨 피드백',
-                ),
+                _buildSectionHeader(icon: Icons.edit_note, title: '레슨 피드백'),
                 const SizedBox(height: AppSpacing.space3),
                 _buildFeedbackField(),
 
@@ -124,8 +118,8 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                   title: '주요 포인트',
                   count: _keyPoints.length,
                   isExpanded: _showKeyPoints,
-                  onToggle: () =>
-                      setState(() => _showKeyPoints = !_showKeyPoints),
+                  onToggle:
+                      () => setState(() => _showKeyPoints = !_showKeyPoints),
                   child: _buildKeyPointsSection(),
                 ),
 
@@ -155,16 +149,17 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space3,
                       ),
-                      child: _isSaving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('저장하기'),
+                      child:
+                          _isSaving
+                              ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                              : const Text('저장하기'),
                     ),
                   ),
                 ),
@@ -173,21 +168,23 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
           ),
         );
       },
-      loading: () => Scaffold(
-        appBar: AppBar(title: const Text('피드백')),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => Scaffold(
-        appBar: AppBar(title: const Text('피드백')),
-        body: Center(
-          child: Text(
-            '데이터를 불러오는데 실패했습니다',
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+      loading:
+          () => Scaffold(
+            appBar: AppBar(title: const Text('피드백')),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (error, _) => Scaffold(
+            appBar: AppBar(title: const Text('피드백')),
+            body: Center(
+              child: Text(
+                '데이터를 불러오는데 실패했습니다',
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
     );
   }
 
@@ -226,19 +223,14 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     );
   }
 
-  Widget _buildSectionHeader({
-    required IconData icon,
-    required String title,
-  }) {
+  Widget _buildSectionHeader({required IconData icon, required String title}) {
     return Row(
       children: [
         Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(width: AppSpacing.space2),
         Text(
           title,
-          style: AppTypography.bodyLarge.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -259,8 +251,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
       // Insert at cursor position
       final before = currentText.substring(0, selection.baseOffset);
       final after = currentText.substring(selection.baseOffset);
-      final separator =
-          before.isNotEmpty && !before.endsWith('\n') ? '\n' : '';
+      final separator = before.isNotEmpty && !before.endsWith('\n') ? '\n' : '';
       newText = '$before$separator$preset$after';
       newCursorPos = before.length + separator.length + preset.length;
     } else {
@@ -277,9 +268,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
   }
 
   Widget _buildPresetChips() {
-    final presetsAsync = ref.watch(
-      feedbackPresetNotifierProvider(),
-    );
+    final presetsAsync = ref.watch(feedbackPresetNotifierProvider());
 
     return presetsAsync.when(
       data: (presets) => _buildPresetChipList(presets),
@@ -299,7 +288,11 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
           // Last item: add button
           if (index == presets.length) {
             return ActionChip(
-              avatar: Icon(Icons.add, size: 16, color: AppColors.textSecondaryLight),
+              avatar: Icon(
+                Icons.add,
+                size: 16,
+                color: AppColors.textSecondaryLight,
+              ),
               label: Text(
                 '추가',
                 style: AppTypography.caption.copyWith(
@@ -307,9 +300,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                 ),
               ),
               backgroundColor: AppColors.surfaceSecondaryLight,
-              side: BorderSide(
-                color: AppColors.borderLight,
-              ),
+              side: BorderSide(color: AppColors.borderLight),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onPressed: _showAddPresetDialog,
@@ -322,14 +313,10 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             child: ActionChip(
               label: Text(
                 preset.text,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
-                ),
+                style: AppTypography.caption.copyWith(color: AppColors.primary),
               ),
               backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-              side: BorderSide(
-                color: AppColors.primary.withValues(alpha: 0.2),
-              ),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               onPressed: () => _insertPreset(preset.text),
@@ -344,69 +331,69 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
     final controller = TextEditingController();
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('프리셋 추가'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: '피드백 문구 입력',
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text('프리셋 추가'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: '피드백 문구 입력'),
+              onSubmitted: (_) {
+                final text = controller.text.trim();
+                if (text.isNotEmpty) {
+                  ref
+                      .read(feedbackPresetNotifierProvider().notifier)
+                      .addPreset(text);
+                  Navigator.pop(ctx);
+                }
+              },
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  final text = controller.text.trim();
+                  if (text.isNotEmpty) {
+                    ref
+                        .read(feedbackPresetNotifierProvider().notifier)
+                        .addPreset(text);
+                    Navigator.pop(ctx);
+                  }
+                },
+                child: const Text('추가'),
+              ),
+            ],
           ),
-          onSubmitted: (_) {
-            final text = controller.text.trim();
-            if (text.isNotEmpty) {
-              ref
-                  .read(feedbackPresetNotifierProvider().notifier)
-                  .addPreset(text);
-              Navigator.pop(ctx);
-            }
-          },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('취소'),
-          ),
-          FilledButton(
-            onPressed: () {
-              final text = controller.text.trim();
-              if (text.isNotEmpty) {
-                ref
-                    .read(feedbackPresetNotifierProvider().notifier)
-                    .addPreset(text);
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('추가'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showPresetOptions(FeedbackPreset preset) {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: Text(preset.isDefault ? '숨기기' : '삭제'),
-              subtitle: Text(preset.isDefault
-                  ? '기본 프리셋은 숨김 처리됩니다'
-                  : '이 프리셋을 삭제합니다'),
-              onTap: () {
-                Navigator.pop(ctx);
-                ref
-                    .read(feedbackPresetNotifierProvider().notifier)
-                    .deletePreset(preset.id);
-              },
+      builder:
+          (ctx) => SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.delete_outline),
+                  title: Text(preset.isDefault ? '숨기기' : '삭제'),
+                  subtitle: Text(
+                    preset.isDefault ? '기본 프리셋은 숨김 처리됩니다' : '이 프리셋을 삭제합니다',
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    ref
+                        .read(feedbackPresetNotifierProvider().notifier)
+                        .deletePreset(preset.id);
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -494,10 +481,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
             ),
           ),
         ),
-        if (isExpanded) ...[
-          const SizedBox(height: AppSpacing.space2),
-          child,
-        ],
+        if (isExpanded) ...[const SizedBox(height: AppSpacing.space2), child],
       ],
     );
   }
@@ -520,14 +504,14 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.check_circle_outline,
-                      size: 18, color: AppColors.success),
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                    color: AppColors.success,
+                  ),
                   const SizedBox(width: AppSpacing.space3),
                   Expanded(
-                    child: Text(
-                      entry.value,
-                      style: AppTypography.bodyMedium,
-                    ),
+                    child: Text(entry.value, style: AppTypography.bodyMedium),
                   ),
                   IconButton(
                     onPressed: () {
@@ -536,8 +520,11 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
                         _hasChanges = true;
                       });
                     },
-                    icon: Icon(Icons.close,
-                        size: 18, color: AppColors.textTertiaryLight),
+                    icon: Icon(
+                      Icons.close,
+                      size: 18,
+                      color: AppColors.textTertiaryLight,
+                    ),
                     constraints: const BoxConstraints(),
                     padding: EdgeInsets.zero,
                   ),

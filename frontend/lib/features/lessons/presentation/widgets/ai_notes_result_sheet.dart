@@ -10,11 +10,7 @@ class AiNotesResultSheet extends StatefulWidget {
   final AiNoteResult result;
   final VoidCallback? onSave;
 
-  const AiNotesResultSheet({
-    super.key,
-    required this.result,
-    this.onSave,
-  });
+  const AiNotesResultSheet({super.key, required this.result, this.onSave});
 
   @override
   State<AiNotesResultSheet> createState() => _AiNotesResultSheetState();
@@ -27,8 +23,12 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
   @override
   void initState() {
     super.initState();
-    _feedbackController = TextEditingController(text: widget.result.feedback ?? '');
-    _tipsController = TextEditingController(text: widget.result.practiceTips ?? '');
+    _feedbackController = TextEditingController(
+      text: widget.result.feedback ?? '',
+    );
+    _tipsController = TextEditingController(
+      text: widget.result.practiceTips ?? '',
+    );
   }
 
   @override
@@ -72,7 +72,11 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.auto_awesome, color: AppColors.primary, size: 24),
+                        Icon(
+                          Icons.auto_awesome,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
                         const SizedBox(width: 8),
                         Text('AI 레슨 노트', style: AppTypography.headingSmall),
                       ],
@@ -165,7 +169,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(AppSpacing.space3),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -224,7 +228,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
       ),
-      contentPadding: const EdgeInsets.all(12),
+      contentPadding: const EdgeInsets.all(AppSpacing.space3),
     );
   }
 }

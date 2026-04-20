@@ -36,8 +36,7 @@ class _LessonNoteHistoryScreenState
 
   @override
   Widget build(BuildContext context) {
-    final notesAsync =
-        ref.watch(studentLessonNotesProvider(widget.studentId));
+    final notesAsync = ref.watch(studentLessonNotesProvider(widget.studentId));
 
     return Scaffold(
       appBar: AppBar(
@@ -64,20 +63,20 @@ class _LessonNoteHistoryScreenState
                   Icons.search,
                   color: AppColors.textTertiaryLight,
                 ),
-                suffixIcon: _query.isNotEmpty
-                    ? IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() => _query = '');
-                        },
-                        icon: const Icon(Icons.clear, size: 20),
-                      )
-                    : null,
+                suffixIcon:
+                    _query.isNotEmpty
+                        ? IconButton(
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _query = '');
+                          },
+                          icon: const Icon(Icons.clear, size: 20),
+                        )
+                        : null,
                 filled: true,
                 fillColor: AppColors.surfaceSecondaryLight,
                 border: OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusLarge),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   borderSide: BorderSide.none,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -95,33 +94,37 @@ class _LessonNoteHistoryScreenState
               horizontal: AppSpacing.screenPadding,
             ),
             child: Row(
-              children: NoteFilterPeriod.values.map((period) {
-                final isSelected = _period == period;
-                return Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.space2),
-                  child: FilterChip(
-                    label: Text(period.label),
-                    selected: isSelected,
-                    onSelected: (_) => setState(() => _period = period),
-                    backgroundColor: AppColors.surfaceLight,
-                    selectedColor:
-                        AppColors.primary.withValues(alpha: 0.15),
-                    checkmarkColor: AppColors.primary,
-                    side: BorderSide(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.borderLight,
-                    ),
-                    labelStyle: AppTypography.bodySmall.copyWith(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondaryLight,
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                  ),
-                );
-              }).toList(),
+              children:
+                  NoteFilterPeriod.values.map((period) {
+                    final isSelected = _period == period;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: AppSpacing.space2),
+                      child: FilterChip(
+                        label: Text(period.label),
+                        selected: isSelected,
+                        onSelected: (_) => setState(() => _period = period),
+                        backgroundColor: AppColors.surfaceLight,
+                        selectedColor: AppColors.primary.withValues(
+                          alpha: 0.15,
+                        ),
+                        checkmarkColor: AppColors.primary,
+                        side: BorderSide(
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : AppColors.borderLight,
+                        ),
+                        labelStyle: AppTypography.bodySmall.copyWith(
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : AppColors.textSecondaryLight,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                    );
+                  }).toList(),
             ),
           ),
 
@@ -137,8 +140,7 @@ class _LessonNoteHistoryScreenState
                 }
                 return _buildNotesList(filtered);
               },
-              loading: () =>
-                  const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(child: CircularProgressIndicator()),
               error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
             ),
           ),
@@ -156,8 +158,7 @@ class _LessonNoteHistoryScreenState
       if (_query.isEmpty) return true;
       final q = _query.toLowerCase();
       return (lesson.feedback?.toLowerCase().contains(q) ?? false) ||
-          (lesson.keyPoints
-                  ?.any((kp) => kp.toLowerCase().contains(q)) ??
+          (lesson.keyPoints?.any((kp) => kp.toLowerCase().contains(q)) ??
               false) ||
           (lesson.practiceTips?.toLowerCase().contains(q) ?? false) ||
           (lesson.studentNote?.toLowerCase().contains(q) ?? false);
@@ -180,9 +181,7 @@ class _LessonNoteHistoryScreenState
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       itemCount: grouped.length,
       itemBuilder: (context, index) {
         final entry = grouped.entries.elementAt(index);
@@ -204,11 +203,12 @@ class _LessonNoteHistoryScreenState
               ),
             ),
             // Note cards
-            ...entry.value.map((lesson) => Padding(
-                  padding:
-                      const EdgeInsets.only(bottom: AppSpacing.space3),
-                  child: _NoteCard(lesson: lesson),
-                )),
+            ...entry.value.map(
+              (lesson) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                child: _NoteCard(lesson: lesson),
+              ),
+            ),
           ],
         );
       },
@@ -226,7 +226,10 @@ class _NoteCard extends StatelessWidget {
     final dateStr = formatDateYMDWithDay(lesson.date);
 
     return InkWell(
-      onTap: () => context.push(AppRoutes.lessonDetail.replaceFirst(':id', lesson.id)),
+      onTap:
+          () => context.push(
+            AppRoutes.lessonDetail.replaceFirst(':id', lesson.id),
+          ),
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -273,26 +276,27 @@ class _NoteCard extends StatelessWidget {
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
-                children: lesson.keyPoints!
-                    .map((kp) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                AppColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            kp,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
-                              fontSize: 11,
+                children:
+                    lesson.keyPoints!
+                        .map(
+                          (kp) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              kp,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
-                        ))
-                    .toList(),
+                        )
+                        .toList(),
               ),
             ],
 

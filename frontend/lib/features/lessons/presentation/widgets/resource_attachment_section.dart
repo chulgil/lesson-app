@@ -13,10 +13,7 @@ import 'add_youtube_resource_sheet.dart';
 class ResourceAttachmentList extends ConsumerWidget {
   final List<String> resourceIds;
 
-  const ResourceAttachmentList({
-    super.key,
-    required this.resourceIds,
-  });
+  const ResourceAttachmentList({super.key, required this.resourceIds});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,9 +28,7 @@ class ResourceAttachmentList extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.space2),
-            ...resources.map(
-              (r) => _ResourceChip(resource: r),
-            ),
+            ...resources.map((r) => _ResourceChip(resource: r)),
           ],
         );
       },
@@ -85,9 +80,8 @@ class _ResourceChip extends StatelessWidget {
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   '(${resource.timestampText})',
-                  style: AppTypography.caption.copyWith(
+                  style: AppTypography.captionSmall.copyWith(
                     color: _chipColor.withValues(alpha: 0.7),
-                    fontSize: 10,
                   ),
                 ),
               ],
@@ -131,9 +125,9 @@ class _ResourceChip extends StatelessWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('링크를 열 수 없습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('링크를 열 수 없습니다')));
       }
     }
   }
@@ -161,7 +155,11 @@ class ResourceAttachmentEditor extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.attach_file, size: 16, color: AppColors.textSecondaryLight),
+            Icon(
+              Icons.attach_file,
+              size: 16,
+              color: AppColors.textSecondaryLight,
+            ),
             const SizedBox(width: AppSpacing.space1),
             Text(
               '학습 자료 (${resourceIds.length})',
@@ -211,15 +209,15 @@ class _AttachedResourceList extends ConsumerWidget {
     final resourcesAsync = ref.watch(resourcesByIdsProvider(resourceIds));
 
     return resourcesAsync.when(
-      data: (resources) => Column(
-        children: resources
-            .map((r) => _buildAttachedItem(r))
-            .toList(),
-      ),
-      loading: () => const SizedBox(
-        height: 24,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      ),
+      data:
+          (resources) => Column(
+            children: resources.map((r) => _buildAttachedItem(r)).toList(),
+          ),
+      loading:
+          () => const SizedBox(
+            height: 24,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
@@ -238,10 +236,7 @@ class _AttachedResourceList extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Text(
-            resource.type.icon,
-            style: const TextStyle(fontSize: 16),
-          ),
+          Text(resource.type.icon, style: const TextStyle(fontSize: 16)),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Column(
@@ -305,55 +300,56 @@ class _AddResourceButton extends ConsumerWidget {
   void _showAddOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
+      builder:
+          (ctx) => SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.screenPadding),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.borderLight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Text('학습 자료 추가', style: AppTypography.headingSmall),
-              const SizedBox(height: AppSpacing.space4),
+                  Text('학습 자료 추가', style: AppTypography.headingSmall),
+                  const SizedBox(height: AppSpacing.space4),
 
-              // From library
-              _buildOption(
-                ctx,
-                icon: Icons.folder_outlined,
-                label: '라이브러리에서 선택',
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showLibraryPicker(context, ref);
-                },
-              ),
+                  // From library
+                  _buildOption(
+                    ctx,
+                    icon: Icons.folder_outlined,
+                    label: '라이브러리에서 선택',
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _showLibraryPicker(context, ref);
+                    },
+                  ),
 
-              // New YouTube link
-              _buildOption(
-                ctx,
-                icon: Icons.play_circle_outline,
-                label: '유튜브 링크 추가',
-                color: AppColors.youtubeRed,
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _showAddYoutube(context);
-                },
-              ),
+                  // New YouTube link
+                  _buildOption(
+                    ctx,
+                    icon: Icons.play_circle_outline,
+                    label: '유튜브 링크 추가',
+                    color: AppColors.youtubeRed,
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _showAddYoutube(context);
+                    },
+                  ),
 
-              const SizedBox(height: AppSpacing.space4),
-            ],
+                  const SizedBox(height: AppSpacing.space4),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -379,111 +375,122 @@ class _AddResourceButton extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Consumer(
-        builder: (ctx, modalRef, _) {
-          final resourcesAsync = modalRef.watch(teachingResourceNotifierProvider);
+      builder:
+          (ctx) => Consumer(
+            builder: (ctx, modalRef, _) {
+              final resourcesAsync = modalRef.watch(
+                teachingResourceNotifierProvider,
+              );
 
-          return Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusXLarge),
-              ),
-            ),
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.screenPadding),
-                  child: Column(
-                    children: [
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: AppColors.borderLight,
-                            borderRadius: BorderRadius.circular(2),
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(AppSpacing.radiusXLarge),
+                  ),
+                ),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Handle
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                      child: Column(
+                        children: [
+                          Center(
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                bottom: AppSpacing.space4,
+                              ),
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: AppColors.borderLight,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
                           ),
-                        ),
+                          Text('내 학습 자료', style: AppTypography.headingSmall),
+                        ],
                       ),
-                      Text('내 학습 자료', style: AppTypography.headingSmall),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: resourcesAsync.when(
-                data: (resources) {
-                  if (resources.isEmpty) {
-                    return Center(
-                      child: Text(
-                        '등록된 자료가 없습니다',
-                        style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.screenPadding),
-                    itemCount: resources.length,
-                    itemBuilder: (_, index) {
-                      final r = resources[index];
-                      return ListTile(
-                        leading: Text(
-                          r.type.icon,
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        title: Text(
-                          r.title,
-                          style: AppTypography.bodyMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: r.timestampText != null
-                            ? Text(
-                                r.timestampText!,
-                                style: AppTypography.caption.copyWith(
-                                  color: AppColors.textTertiaryLight,
-                                ),
-                              )
-                            : null,
-                        onTap: () {
-                          Navigator.pop(ctx);
-                          onResourceSelected(r);
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
-                        ),
-                      );
-                    },
-                  );
-                },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator()),
-                error: (_, __) => Center(
-                  child: Text(
-                    '자료를 불러올 수 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.error,
                     ),
-                  ),
+
+                    Expanded(
+                      child: resourcesAsync.when(
+                        data: (resources) {
+                          if (resources.isEmpty) {
+                            return Center(
+                              child: Text(
+                                '등록된 자료가 없습니다',
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                            );
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.screenPadding,
+                            ),
+                            itemCount: resources.length,
+                            itemBuilder: (_, index) {
+                              final r = resources[index];
+                              return ListTile(
+                                leading: Text(
+                                  r.type.icon,
+                                  style: const TextStyle(fontSize: 24),
+                                ),
+                                title: Text(
+                                  r.title,
+                                  style: AppTypography.bodyMedium,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle:
+                                    r.timestampText != null
+                                        ? Text(
+                                          r.timestampText!,
+                                          style: AppTypography.caption.copyWith(
+                                            color: AppColors.textTertiaryLight,
+                                          ),
+                                        )
+                                        : null,
+                                onTap: () {
+                                  Navigator.pop(ctx);
+                                  onResourceSelected(r);
+                                },
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusMedium,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        loading:
+                            () => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                        error:
+                            (_, __) => Center(
+                              child: Text(
+                                '자료를 불러올 수 없습니다',
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.error,
+                                ),
+                              ),
+                            ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -492,9 +499,8 @@ class _AddResourceButton extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => AddYoutubeResourceSheet(
-        onResourceCreated: onResourceSelected,
-      ),
+      builder:
+          (_) => AddYoutubeResourceSheet(onResourceCreated: onResourceSelected),
     );
   }
 }

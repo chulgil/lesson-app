@@ -29,39 +29,48 @@ class PracticeItemsSection extends ConsumerWidget {
 
     return itemsAsync.when(
       data: (items) => _buildContent(context, ref, items),
-      loading: () => const Center(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.space6),
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (error, _) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.space6),
-          child: Column(
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space3),
-              Text(
-                '데이터를 불러오는데 실패했습니다',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              TextButton.icon(
-                onPressed: () => ref.invalidate(practiceItemsNotifierProvider(lessonId)),
-                icon: const Icon(Icons.refresh),
-                label: const Text('다시 시도'),
-              ),
-            ],
+      loading:
+          () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.space6),
+              child: CircularProgressIndicator(),
+            ),
           ),
-        ),
-      ),
+      error:
+          (error, _) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.space6),
+              child: Column(
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    '데이터를 불러오는데 실패했습니다',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  TextButton.icon(
+                    onPressed:
+                        () => ref.invalidate(
+                          practiceItemsNotifierProvider(lessonId),
+                        ),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('다시 시도'),
+                  ),
+                ],
+              ),
+            ),
+          ),
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, List<PracticeItem> items) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    List<PracticeItem> items,
+  ) {
     if (items.isEmpty) {
       return _buildEmptyState(context, ref);
     }
@@ -74,10 +83,12 @@ class PracticeItemsSection extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space4),
 
         // Flat list (no priority grouping)
-        ...items.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-              child: _buildPracticeItemCard(context, ref, item),
-            )),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+            child: _buildPracticeItemCard(context, ref, item),
+          ),
+        ),
 
         // Add button (teacher only)
         if (isTeacher) ...[
@@ -196,7 +207,8 @@ class PracticeItemsSection extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          onTap: isTeacher ? () => _showEditItemDialog(context, ref, item) : null,
+          onTap:
+              isTeacher ? () => _showEditItemDialog(context, ref, item) : null,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.space3),
             child: Row(
@@ -214,19 +226,22 @@ class PracticeItemsSection extends ConsumerWidget {
                         item.title,
                         style: AppTypography.bodyMedium.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: item.isCompleted
-                              ? AppColors.textTertiaryLight
-                              : AppColors.textPrimaryLight,
+                          color:
+                              item.isCompleted
+                                  ? AppColors.textTertiaryLight
+                                  : AppColors.textPrimaryLight,
                         ),
                       ),
-                      if (item.description != null && item.description!.isNotEmpty) ...[
+                      if (item.description != null &&
+                          item.description!.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.space1),
                         Text(
                           item.description!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: item.isCompleted
-                                ? AppColors.textTertiaryLight
-                                : AppColors.textSecondaryLight,
+                            color:
+                                item.isCompleted
+                                    ? AppColors.textTertiaryLight
+                                    : AppColors.textSecondaryLight,
                           ),
                           maxLines: 5,
                           overflow: TextOverflow.ellipsis,
@@ -278,13 +293,17 @@ class PracticeItemsSection extends ConsumerWidget {
           color: item.isCompleted ? AppColors.practiceGood : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(
-            color: item.isCompleted ? AppColors.practiceGood : AppColors.borderLight,
+            color:
+                item.isCompleted
+                    ? AppColors.practiceGood
+                    : AppColors.borderLight,
             width: 2,
           ),
         ),
-        child: item.isCompleted
-            ? const Icon(Icons.check, size: 16, color: Colors.white)
-            : null,
+        child:
+            item.isCompleted
+                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                : null,
       ),
     );
   }
@@ -310,19 +329,15 @@ class PracticeItemsSection extends ConsumerWidget {
     return GestureDetector(
       onTap: () => _toggleLike(ref, item),
       child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: item.hasLike
-            ? BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              )
-            : null,
-        child: Text(
-          '👍',
-          style: TextStyle(
-            fontSize: item.hasLike ? 20 : 16,
-          ),
-        ),
+        padding: const EdgeInsets.all(AppSpacing.space1),
+        decoration:
+            item.hasLike
+                ? BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                )
+                : null,
+        child: Text('👍', style: TextStyle(fontSize: item.hasLike ? 20 : 16)),
       ),
     );
   }
@@ -338,23 +353,27 @@ class PracticeItemsSection extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => AddPracticeItemSheet(
-        lessonId: lessonId,
-        studentId: studentId,
-      ),
+      builder:
+          (context) =>
+              AddPracticeItemSheet(lessonId: lessonId, studentId: studentId),
     );
   }
 
-  void _showEditItemDialog(BuildContext context, WidgetRef ref, PracticeItem item) {
+  void _showEditItemDialog(
+    BuildContext context,
+    WidgetRef ref,
+    PracticeItem item,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => EditPracticeItemSheet(
-        item: item,
-        lessonId: lessonId,
-        studentId: studentId,
-      ),
+      builder:
+          (context) => EditPracticeItemSheet(
+            item: item,
+            lessonId: lessonId,
+            studentId: studentId,
+          ),
     );
   }
 }

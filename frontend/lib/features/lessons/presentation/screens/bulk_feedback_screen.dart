@@ -49,9 +49,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         title: Text(_stepTitle),
         centerTitle: true,
         leading: IconButton(
-          onPressed: _currentStep > 0
-              ? () => setState(() => _currentStep--)
-              : () => context.pop(),
+          onPressed:
+              _currentStep > 0
+                  ? () => setState(() => _currentStep--)
+                  : () => context.pop(),
           icon: Icon(_currentStep > 0 ? Icons.arrow_back : Icons.close),
         ),
       ),
@@ -80,11 +81,12 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
     // Get today's lessons
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final todayLessons = allLessons.where((l) {
-      final lessonDate = DateTime(l.date.year, l.date.month, l.date.day);
-      return lessonDate == today;
-    }).toList()
-      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+    final todayLessons =
+        allLessons.where((l) {
+            final lessonDate = DateTime(l.date.year, l.date.month, l.date.day);
+            return lessonDate == today;
+          }).toList()
+          ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
     switch (_currentStep) {
       case 0:
@@ -114,10 +116,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
         // Info banner
         Container(
           margin: const EdgeInsets.all(AppSpacing.screenPadding),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.info.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
@@ -135,69 +137,74 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
 
         // Lesson list
         Expanded(
-          child: todayLessons.isEmpty
-              ? Center(
-                  child: Text(
-                    '오늘 레슨이 없습니다',
-                    style: AppTypography.bodyMedium
-                        .copyWith(color: AppColors.textSecondaryLight),
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenPadding),
-                  itemCount: todayLessons.length,
-                  itemBuilder: (context, index) {
-                    final lesson = todayLessons[index];
-                    final isSelected =
-                        _selectedLessonIds.contains(lesson.id);
-                    final isCompleted =
-                        lesson.displayStatus == LessonStatus.completed;
-                    final hasFeedback = lesson.feedback != null &&
-                        lesson.feedback!.isNotEmpty;
-
-                    return Padding(
-                      padding:
-                          const EdgeInsets.only(bottom: AppSpacing.space2),
-                      child: CheckboxListTile(
-                        value: isSelected,
-                        onChanged: (val) {
-                          setState(() {
-                            if (val == true) {
-                              _selectedLessonIds.add(lesson.id);
-                            } else {
-                              _selectedLessonIds.remove(lesson.id);
-                            }
-                          });
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: AppColors.borderLight),
-                        ),
-                        tileColor: AppColors.surfaceLight,
-                        title: Text(
-                          '${NameUtils.givenName(lesson.studentName)} · ${lesson.instrument}',
-                          style: AppTypography.bodyMedium
-                              .copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        subtitle: Text(
-                          '${lesson.startTime} (${isCompleted ? "완료" : "예정"})'
-                          '${hasFeedback ? " · 피드백 있음" : ""}',
-                          style: AppTypography.bodySmall
-                              .copyWith(color: AppColors.textSecondaryLight),
-                        ),
-                        secondary: Icon(
-                          isCompleted
-                              ? Icons.check_circle
-                              : Icons.schedule,
-                          color: isCompleted
-                              ? AppColors.practiceGood
-                              : AppColors.textTertiaryLight,
-                        ),
+          child:
+              todayLessons.isEmpty
+                  ? Center(
+                    child: Text(
+                      '오늘 레슨이 없습니다',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  )
+                  : ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.screenPadding,
+                    ),
+                    itemCount: todayLessons.length,
+                    itemBuilder: (context, index) {
+                      final lesson = todayLessons[index];
+                      final isSelected = _selectedLessonIds.contains(lesson.id);
+                      final isCompleted =
+                          lesson.displayStatus == LessonStatus.completed;
+                      final hasFeedback =
+                          lesson.feedback != null &&
+                          lesson.feedback!.isNotEmpty;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: AppSpacing.space2,
+                        ),
+                        child: CheckboxListTile(
+                          value: isSelected,
+                          onChanged: (val) {
+                            setState(() {
+                              if (val == true) {
+                                _selectedLessonIds.add(lesson.id);
+                              } else {
+                                _selectedLessonIds.remove(lesson.id);
+                              }
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: AppColors.borderLight),
+                          ),
+                          tileColor: AppColors.surfaceLight,
+                          title: Text(
+                            '${NameUtils.givenName(lesson.studentName)} · ${lesson.instrument}',
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${lesson.startTime} (${isCompleted ? "완료" : "예정"})'
+                            '${hasFeedback ? " · 피드백 있음" : ""}',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondaryLight,
+                            ),
+                          ),
+                          secondary: Icon(
+                            isCompleted ? Icons.check_circle : Icons.schedule,
+                            color:
+                                isCompleted
+                                    ? AppColors.practiceGood
+                                    : AppColors.textTertiaryLight,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
         ),
 
         // Next button
@@ -227,8 +234,9 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 // Common feedback
                 Text(
                   '공통 피드백',
-                  style: AppTypography.bodyMedium
-                      .copyWith(fontWeight: FontWeight.w600),
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
 
@@ -243,8 +251,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   child: TextField(
@@ -252,11 +259,11 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     maxLines: 5,
                     decoration: InputDecoration(
                       hintText: '모든 선택 학생에게 전달할 피드백을 작성하세요...',
-                      hintStyle: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textTertiaryLight),
+                      hintStyle: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textTertiaryLight,
+                      ),
                       border: InputBorder.none,
-                      contentPadding:
-                          const EdgeInsets.all(AppSpacing.space4),
+                      contentPadding: const EdgeInsets.all(AppSpacing.space4),
                     ),
                   ),
                 ),
@@ -266,14 +273,16 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                 // Per-student comments (optional)
                 Text(
                   '개별 코멘트 (선택)',
-                  style: AppTypography.bodyMedium
-                      .copyWith(fontWeight: FontWeight.w600),
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '각 학생에게 추가할 개별 메시지',
-                  style: AppTypography.bodySmall
-                      .copyWith(color: AppColors.textTertiaryLight),
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.textTertiaryLight,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.space3),
 
@@ -283,27 +292,28 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                     () => TextEditingController(),
                   );
                   return Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: AppSpacing.space3),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.space3),
                     child: Container(
                       decoration: BoxDecoration(
                         color: AppColors.surfaceLight,
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                         border: Border.all(color: AppColors.borderLight),
                       ),
                       child: TextField(
                         controller: _perStudentControllers[lesson.id],
                         maxLines: 2,
                         decoration: InputDecoration(
-                          labelText:
-                              NameUtils.givenName(lesson.studentName),
+                          labelText: NameUtils.givenName(lesson.studentName),
                           hintText: '추가 코멘트...',
-                          hintStyle: AppTypography.bodySmall
-                              .copyWith(color: AppColors.textTertiaryLight),
+                          hintStyle: AppTypography.bodySmall.copyWith(
+                            color: AppColors.textTertiaryLight,
+                          ),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.all(
-                              AppSpacing.space3),
+                            AppSpacing.space3,
+                          ),
                         ),
                       ),
                     ),
@@ -335,22 +345,17 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
           return ActionChip(
             label: Text(
               preset.text,
-              style: AppTypography.caption
-                  .copyWith(color: AppColors.primary),
+              style: AppTypography.caption.copyWith(color: AppColors.primary),
             ),
             backgroundColor: AppColors.primary.withValues(alpha: 0.08),
-            side: BorderSide(
-                color: AppColors.primary.withValues(alpha: 0.2)),
+            side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2)),
             padding: const EdgeInsets.symmetric(horizontal: 4),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () {
               final current = _feedbackController.text;
               final separator =
-                  current.isNotEmpty && !current.endsWith('\n')
-                      ? '\n'
-                      : '';
-              _feedbackController.text =
-                  '$current$separator${preset.text}';
+                  current.isNotEmpty && !current.endsWith('\n') ? '\n' : '';
+              _feedbackController.text = '$current$separator${preset.text}';
               setState(() {});
             },
           );
@@ -375,9 +380,10 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
               final lesson = selectedLessons[index];
               final perStudent =
                   _perStudentControllers[lesson.id]?.text.trim() ?? '';
-              final fullFeedback = perStudent.isNotEmpty
-                  ? '$commonFeedback\n\n$perStudent'
-                  : commonFeedback;
+              final fullFeedback =
+                  perStudent.isNotEmpty
+                      ? '$commonFeedback\n\n$perStudent'
+                      : commonFeedback;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.space3),
@@ -385,8 +391,7 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                     border: Border.all(color: AppColors.borderLight),
                   ),
                   child: Column(
@@ -396,27 +401,27 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
                         children: [
                           CircleAvatar(
                             radius: 16,
-                            backgroundColor:
-                                AppColors.primary.withValues(alpha: 0.1),
+                            backgroundColor: AppColors.primary.withValues(
+                              alpha: 0.1,
+                            ),
                             child: Text(
                               lesson.studentName[0],
-                              style: AppTypography.bodySmall
-                                  .copyWith(color: AppColors.primary),
+                              style: AppTypography.bodySmall.copyWith(
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.space2),
                           Text(
                             '${NameUtils.givenName(lesson.studentName)} · ${lesson.instrument}',
-                            style: AppTypography.bodyMedium
-                                .copyWith(fontWeight: FontWeight.w600),
+                            style: AppTypography.bodyMedium.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.space3),
-                      Text(
-                        fullFeedback,
-                        style: AppTypography.bodySmall,
-                      ),
+                      Text(fullFeedback, style: AppTypography.bodySmall),
                     ],
                   ),
                 ),
@@ -465,11 +470,11 @@ class _BulkFeedbackScreenState extends ConsumerState<BulkFeedbackScreen> {
       final notifier = ref.read(lessonsNotifierProvider.notifier);
 
       for (final lesson in selectedLessons) {
-        final perStudent =
-            _perStudentControllers[lesson.id]?.text.trim() ?? '';
-        final fullFeedback = perStudent.isNotEmpty
-            ? '$commonFeedback\n\n$perStudent'
-            : commonFeedback;
+        final perStudent = _perStudentControllers[lesson.id]?.text.trim() ?? '';
+        final fullFeedback =
+            perStudent.isNotEmpty
+                ? '$commonFeedback\n\n$perStudent'
+                : commonFeedback;
 
         final updated = lesson.copyWith(feedback: fullFeedback);
         await notifier.updateLesson(updated);

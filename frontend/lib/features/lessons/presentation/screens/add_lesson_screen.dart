@@ -310,8 +310,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
                 backgroundColor: student.profileColor.withValues(alpha: 0.3),
                 child: Text(
                   student.initial,
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: AppTypography.caption.copyWith(
                     color: student.profileColor,
                     fontWeight: FontWeight.w600,
                   ),

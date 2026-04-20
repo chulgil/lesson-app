@@ -48,9 +48,7 @@ class EditLessonStudentCard extends StatelessWidget {
             backgroundColor: student.color.withValues(alpha: 0.2),
             child: Text(
               student.name[0],
-              style: AppTypography.headingSmall.copyWith(
-                color: student.color,
-              ),
+              style: AppTypography.headingSmall.copyWith(color: student.color),
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -85,10 +83,7 @@ class EditLessonStudentCard extends StatelessWidget {
             ),
           ),
           if (onViewProfile != null)
-            TextButton(
-              onPressed: onViewProfile,
-              child: const Text('프로필 보기'),
-            ),
+            TextButton(onPressed: onViewProfile, child: const Text('프로필 보기')),
         ],
       ),
     );
@@ -114,10 +109,7 @@ class LessonActionButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onCancel,
             icon: Icon(Icons.event_busy, color: AppColors.warning),
-            label: Text(
-              '레슨 취소',
-              style: TextStyle(color: AppColors.warning),
-            ),
+            label: Text('레슨 취소', style: TextStyle(color: AppColors.warning)),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
               side: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
@@ -129,10 +121,7 @@ class LessonActionButtons extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onDelete,
             icon: Icon(Icons.delete_outline, color: AppColors.error),
-            label: Text(
-              '레슨 삭제',
-              style: TextStyle(color: AppColors.error),
-            ),
+            label: Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
               side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
@@ -156,64 +145,63 @@ void showCancelLessonDialog({
 
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('레슨 취소'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('이 레슨을 취소하시겠습니까?'),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$studentName 학생',
-                  style: AppTypography.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+    builder:
+        (context) => AlertDialog(
+          title: const Text('레슨 취소'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('이 레슨을 취소하시겠습니까?'),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.space3),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
-                Text(
-                  '${dateFormat.format(lessonDate)} ${formatLessonTime(lessonTime)}',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$studentName 학생',
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${dateFormat.format(lessonDate)} ${formatLessonTime(lessonTime)}',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '학생에게 레슨 취소 알림이 전송됩니다.',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('닫기'),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '학생에게 레슨 취소 알림이 전송됩니다.',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                onConfirm();
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.warning),
+              child: const Text('레슨 취소'),
             ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('닫기'),
+          ],
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onConfirm();
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.warning,
-          ),
-          child: const Text('레슨 취소'),
-        ),
-      ],
-    ),
   );
 }
 
@@ -224,29 +212,28 @@ void showDeleteLessonDialog({
 }) {
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('레슨 삭제'),
-      content: const Text(
-        '이 레슨을 삭제하시겠습니까?\n\n'
-        '삭제된 레슨은 복구할 수 없습니다.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('취소'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onConfirm();
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.error,
+    builder:
+        (context) => AlertDialog(
+          title: const Text('레슨 삭제'),
+          content: const Text(
+            '이 레슨을 삭제하시겠습니까?\n\n'
+            '삭제된 레슨은 복구할 수 없습니다.',
           ),
-          child: const Text('삭제'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                onConfirm();
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('삭제'),
+            ),
+          ],
         ),
-      ],
-    ),
   );
 }
 
@@ -263,25 +250,24 @@ void showEditLessonExitConfirmation({
 
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('변경사항 취소'),
-      content: const Text('변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('계속 수정'),
+    builder:
+        (context) => AlertDialog(
+          title: const Text('변경사항 취소'),
+          content: const Text('변경한 내용이 저장되지 않습니다.\n정말 나가시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('계속 수정'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                onExit();
+              },
+              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              child: const Text('나가기'),
+            ),
+          ],
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-            onExit();
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: AppColors.error,
-          ),
-          child: const Text('나가기'),
-        ),
-      ],
-    ),
   );
 }

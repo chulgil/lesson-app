@@ -13,10 +13,7 @@ import '../providers/attendance_providers.dart';
 class AttendanceStatsSection extends ConsumerWidget {
   final String studentId;
 
-  const AttendanceStatsSection({
-    super.key,
-    required this.studentId,
-  });
+  const AttendanceStatsSection({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -88,9 +85,10 @@ class AttendanceStatsSection extends ConsumerWidget {
 
   Widget _buildAttendanceRate(AttendanceStats stats) {
     final rate = stats.attendanceRate;
-    final rateColor = rate >= 90
-        ? AppColors.success
-        : rate >= 70
+    final rateColor =
+        rate >= 90
+            ? AppColors.success
+            : rate >= 70
             ? AppColors.warning
             : AppColors.error;
 
@@ -150,11 +148,7 @@ class AttendanceStatsSection extends ConsumerWidget {
   Widget _buildStatusBreakdown(AttendanceStats stats) {
     return Column(
       children: [
-        _buildStatusRow(
-          '출석 완료',
-          stats.completedLessons,
-          AppColors.success,
-        ),
+        _buildStatusRow('출석 완료', stats.completedLessons, AppColors.success),
         const SizedBox(height: AppSpacing.space2),
         _buildStatusRow(
           '학생 불참',
@@ -183,11 +177,7 @@ class AttendanceStatsSection extends ConsumerWidget {
           AppColors.info,
         ),
         const SizedBox(height: AppSpacing.space2),
-        _buildStatusRow(
-          '상호 합의 취소',
-          stats.mutualCancelledCount,
-          AppColors.info,
-        ),
+        _buildStatusRow('상호 합의 취소', stats.mutualCancelledCount, AppColors.info),
       ],
     );
   }
@@ -203,35 +193,24 @@ class AttendanceStatsSection extends ConsumerWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: AppSpacing.space2),
         Expanded(
           child: Row(
             children: [
-              Text(
-                label,
-                style: AppTypography.bodySmall,
-              ),
+              Text(label, style: AppTypography.bodySmall),
               if (deducted)
                 Text(
                   ' (수강권 차감)',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.error,
-                    fontSize: 11,
-                  ),
+                  style: AppTypography.caption.copyWith(color: AppColors.error),
                 ),
             ],
           ),
         ),
         Text(
           '$count회',
-          style: AppTypography.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -264,9 +243,10 @@ class AttendanceStatsSection extends ConsumerWidget {
         // Table rows (show last 6 months)
         ...stats.monthlyBreakdown.take(6).map((m) {
           final rate = m.attendanceRate;
-          final rateColor = rate >= 90
-              ? AppColors.success
-              : rate >= 70
+          final rateColor =
+              rate >= 90
+                  ? AppColors.success
+                  : rate >= 70
                   ? AppColors.warning
                   : AppColors.error;
 
@@ -292,7 +272,10 @@ class AttendanceStatsSection extends ConsumerWidget {
                   ],
                 ),
               ),
-              Divider(height: 1, color: AppColors.borderLight.withValues(alpha: 0.5)),
+              Divider(
+                height: 1,
+                color: AppColors.borderLight.withValues(alpha: 0.5),
+              ),
             ],
           );
         }),
@@ -307,12 +290,13 @@ class AttendanceStatsSection extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Text(
           text,
-          style: isHeader
-              ? AppTypography.caption.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondaryLight,
-                )
-              : AppTypography.caption,
+          style:
+              isHeader
+                  ? AppTypography.caption.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondaryLight,
+                  )
+                  : AppTypography.caption,
           textAlign: TextAlign.center,
         ),
       ),
