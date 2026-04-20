@@ -295,7 +295,7 @@ class RemoteParentRepository implements ParentRepository {
       'phone': parent.phone,
       'email': parent.email,
       'profile_image_url': parent.profileImageUrl,
-      'profile_color': parent.profileColor.value.toRadixString(16),
+      'profile_color': parent.profileColor.toARGB32().toRadixString(16),
     };
   }
 

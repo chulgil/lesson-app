@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -23,14 +24,12 @@ class ParentProfileTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final parentId = ref.watch(currentUserIdProvider);
     final childProfilesAsync = ref.watch(childProfilesProvider(parentId));
-    final notificationSettingsAsync =
-        ref.watch(notificationSettingsNotifierProvider(parentId));
+    final notificationSettingsAsync = ref.watch(
+      notificationSettingsNotifierProvider(parentId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('프로필'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('프로필'), centerTitle: true),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -140,26 +139,25 @@ class ParentProfileTab extends ConsumerWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('로그아웃'),
-        content: const Text('정말 로그아웃 하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('로그아웃'),
+            content: const Text('정말 로그아웃 하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(AppStrings.cancel),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  context.go(AppRoutes.login);
+                },
+                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                child: const Text('로그아웃'),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.go(AppRoutes.login);
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
-            ),
-            child: const Text('로그아웃'),
-          ),
-        ],
-      ),
     );
   }
 }

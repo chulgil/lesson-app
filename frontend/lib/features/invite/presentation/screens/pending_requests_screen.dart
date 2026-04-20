@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -136,7 +137,9 @@ class PendingRequestsScreen extends ConsumerWidget {
     if (connection != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${request.requesterName ?? request.requesterRole.label}님과 연결되었습니다!'),
+          content: Text(
+            '${request.requesterName ?? request.requesterRole.label}님과 연결되었습니다!',
+          ),
           backgroundColor: AppColors.success,
         ),
       );
@@ -150,21 +153,24 @@ class PendingRequestsScreen extends ConsumerWidget {
   ) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('연결 거절'),
-        content: Text('${request.requesterName ?? request.requesterRole.label}님의 연결 요청을 거절하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('연결 거절'),
+            content: Text(
+              '${request.requesterName ?? request.requesterRole.label}님의 연결 요청을 거절하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('거절'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('거절'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true && context.mounted) {
@@ -173,9 +179,9 @@ class PendingRequestsScreen extends ConsumerWidget {
           .rejectRequest(request.id);
 
       if (success && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('요청이 거절되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('요청이 거절되었습니다')));
       }
     }
   }
@@ -242,7 +248,11 @@ class _RequestCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Icon(method.icon, size: 14, color: AppColors.textSecondaryLight),
+                        Icon(
+                          method.icon,
+                          size: 14,
+                          color: AppColors.textSecondaryLight,
+                        ),
                         const SizedBox(width: AppSpacing.space1),
                         Text(
                           '${method.label}로 연결 요청',
@@ -307,16 +317,17 @@ class _RequestCard extends StatelessWidget {
                       vertical: AppSpacing.space3,
                     ),
                   ),
-                  child: isProcessing
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('수락'),
+                  child:
+                      isProcessing
+                          ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : const Text('수락'),
                 ),
               ),
             ],
@@ -351,10 +362,7 @@ class _RequestCard extends StatelessWidget {
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
-      child: Text(
-        text,
-        style: AppTypography.caption.copyWith(color: color),
-      ),
+      child: Text(text, style: AppTypography.caption.copyWith(color: color)),
     );
   }
 }

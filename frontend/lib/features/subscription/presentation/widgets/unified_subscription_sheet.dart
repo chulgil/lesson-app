@@ -679,7 +679,7 @@ class _UnifiedSubscriptionSheetState
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               TextButton(
                 onPressed: () {

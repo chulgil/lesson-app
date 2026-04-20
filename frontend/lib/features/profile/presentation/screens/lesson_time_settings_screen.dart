@@ -140,58 +140,67 @@ class _LessonTimeSettingsContent extends ConsumerWidget {
             color: AppColors.surfaceSecondaryLight,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
-          child: Column(
-            children:
-                allDurations.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final duration = entry.value;
-                  final isDefault = settings.defaultLessonDuration == duration;
-                  final isDisabled = settings.isDurationDisabled(duration);
-                  final isCustom = settings.customLessonDurations.contains(
-                    duration,
-                  );
-                  final isOnlyActive =
-                      settings.allLessonDurations.length == 1 && !isDisabled;
+          child: RadioGroup<int>(
+            groupValue: settings.defaultLessonDuration,
+            onChanged: (value) {
+              if (value != null) _updateDefaultDuration(ref, value);
+            },
+            child: Column(
+              children:
+                  allDurations.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final duration = entry.value;
+                    final isDefault =
+                        settings.defaultLessonDuration == duration;
+                    final isDisabled = settings.isDurationDisabled(duration);
+                    final isCustom = settings.customLessonDurations.contains(
+                      duration,
+                    );
+                    final isOnlyActive =
+                        settings.allLessonDurations.length == 1 && !isDisabled;
 
-                  return Column(
-                    children: [
-                      DurationOptionItem(
-                        duration: duration,
-                        isDefault: isDefault,
-                        isDisabled: isDisabled,
-                        isCustom: isCustom,
-                        isOnlyActive: isOnlyActive,
-                        onTap: () => _updateDefaultDuration(ref, duration),
-                        onDelete:
-                            isCustom
-                                ? () => showDeleteDurationDialog(
-                                  context: context,
-                                  duration: duration,
-                                  onConfirm: () {
-                                    ref
-                                        .read(
-                                          teacherSettingsNotifierProvider
-                                              .notifier,
-                                        )
-                                        .removeCustomDuration(duration);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          '${LessonDurations.format(duration)} 삭제됨',
+                    return Column(
+                      children: [
+                        DurationOptionItem(
+                          duration: duration,
+                          isDefault: isDefault,
+                          isDisabled: isDisabled,
+                          isCustom: isCustom,
+                          isOnlyActive: isOnlyActive,
+                          onTap: () => _updateDefaultDuration(ref, duration),
+                          onDelete:
+                              isCustom
+                                  ? () => showDeleteDurationDialog(
+                                    context: context,
+                                    duration: duration,
+                                    onConfirm: () {
+                                      ref
+                                          .read(
+                                            teacherSettingsNotifierProvider
+                                                .notifier,
+                                          )
+                                          .removeCustomDuration(duration);
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '${LessonDurations.format(duration)} 삭제됨',
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                )
-                                : null,
-                        onToggle:
-                            (value) => _toggleDuration(ref, duration, value),
-                      ),
-                      if (index < allDurations.length - 1)
-                        const Divider(height: 1, indent: 16, endIndent: 16),
-                    ],
-                  );
-                }).toList(),
+                                      );
+                                    },
+                                  )
+                                  : null,
+                          onToggle:
+                              (value) => _toggleDuration(ref, duration, value),
+                        ),
+                        if (index < allDurations.length - 1)
+                          const Divider(height: 1, indent: 16, endIndent: 16),
+                      ],
+                    );
+                  }).toList(),
+            ),
           ),
         ),
 

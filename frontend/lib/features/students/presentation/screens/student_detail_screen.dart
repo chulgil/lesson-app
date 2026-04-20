@@ -639,7 +639,7 @@ class _StudentDetailContent extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
@@ -665,7 +665,7 @@ class _StudentDetailContent extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),

@@ -22,74 +22,78 @@ class MembershipSelectorWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('레슨 선택', style: AppTypography.headingSmall),
-        const SizedBox(height: AppSpacing.space3),
-        ...memberships.map((membership) {
-          final isSelected = selectedMembershipId == membership.id;
-          final lessonClassAsync = ref.watch(
-            lessonClassProvider(membership.lessonClassId),
-          );
+    return RadioGroup<String>(
+      groupValue: selectedMembershipId,
+      onChanged: onChanged,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('레슨 선택', style: AppTypography.headingSmall),
+          const SizedBox(height: AppSpacing.space3),
+          ...memberships.map((membership) {
+            final isSelected = selectedMembershipId == membership.id;
+            final lessonClassAsync = ref.watch(
+              lessonClassProvider(membership.lessonClassId),
+            );
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.space2),
-            child: GestureDetector(
-              onTap: () => onChanged(membership.id),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.space3),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected
-                          ? AppColors.primary.withValues(alpha: 0.1)
-                          : AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  border: Border.all(
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.space2),
+              child: GestureDetector(
+                onTap: () => onChanged(membership.id),
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.space3),
+                  decoration: BoxDecoration(
                     color:
-                        isSelected ? AppColors.primary : AppColors.borderLight,
-                    width: isSelected ? 2 : 1,
+                        isSelected
+                            ? AppColors.primary.withValues(alpha: 0.1)
+                            : AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
+                    border: Border.all(
+                      color:
+                          isSelected
+                              ? AppColors.primary
+                              : AppColors.borderLight,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Radio<String>(value: membership.id),
+                      const SizedBox(width: AppSpacing.space2),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            lessonClassAsync.when(
+                              data:
+                                  (lessonClass) => Text(
+                                    lessonClass?.name ?? '개인레슨',
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                              loading: () => const Text('...'),
+                              error: (_, __) => const Text('레슨'),
+                            ),
+                            Text(
+                              membership.instrument,
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Radio<String>(
-                      value: membership.id,
-                      groupValue: selectedMembershipId,
-                      onChanged: onChanged,
-                    ),
-                    const SizedBox(width: AppSpacing.space2),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          lessonClassAsync.when(
-                            data:
-                                (lessonClass) => Text(
-                                  lessonClass?.name ?? '개인레슨',
-                                  style: AppTypography.bodyMedium.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                            loading: () => const Text('...'),
-                            error: (_, __) => const Text('레슨'),
-                          ),
-                          Text(
-                            membership.instrument,
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ),
-          );
-        }),
-      ],
+            );
+          }),
+        ],
+      ),
     );
   }
 }

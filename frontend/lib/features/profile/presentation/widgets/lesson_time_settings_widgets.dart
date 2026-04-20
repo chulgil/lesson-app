@@ -64,12 +64,7 @@ class DurationOptionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Radio<int>(
-        value: duration,
-        groupValue: isDefault ? duration : null,
-        onChanged: isDisabled ? null : (_) => onTap?.call(),
-        activeColor: AppColors.primary,
-      ),
+      leading: Radio<int>(value: duration, activeColor: AppColors.primary),
       title: Text(
         LessonDurations.format(duration),
         style: AppTypography.bodyLarge.copyWith(

@@ -42,11 +42,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.space6),
                 DevLoginSection(
                   isLoading: _isLoading,
-                  onDevLogin: ({
-                    required String email,
-                    required String role,
-                    String? name,
-                  }) => _handleDevLogin(email: email, role: role, name: name),
+                  onDevLogin:
+                      ({
+                        required String email,
+                        required String role,
+                        String? name,
+                      }) =>
+                          _handleDevLogin(email: email, role: role, name: name),
                 ),
                 const SizedBox(height: AppSpacing.space6),
                 _buildTermsText(context),
@@ -317,7 +319,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .read(authNotifierProvider.notifier)
           .loginWithOAuth(provider: 'google', idToken: serverAuthCode);
 
-      if (!mounted) return;
+      if (!context.mounted) return;
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
@@ -325,7 +327,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         context.go(AppRoutes.termsAgreement);
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Google 로그인 실패. 다시 시도해주세요.'),
@@ -373,7 +375,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  void _handleRoleLogin(BuildContext context, String role, String authProvider) {
+  void _handleRoleLogin(
+    BuildContext context,
+    String role,
+    String authProvider,
+  ) {
     if (role == 'teacher') {
       _handleTeacherLogin(context, authProvider);
     } else {

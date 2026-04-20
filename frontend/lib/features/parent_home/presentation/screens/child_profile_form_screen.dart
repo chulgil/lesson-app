@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -166,8 +167,9 @@ class _ChildProfileFormScreenState
                   Expanded(
                     child: Text(
                       '만 14세 미만 자녀는 별도 계정 없이 학부모 계정에서 관리됩니다.',
-                      style: AppTypography.bodySmall
-                          .copyWith(color: AppColors.info),
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.info,
+                      ),
                     ),
                   ),
                 ],
@@ -176,36 +178,57 @@ class _ChildProfileFormScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Profile color selector
-            Text('프로필 색상', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              '프로필 색상',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: AppSpacing.space2),
             Wrap(
               spacing: AppSpacing.space2,
               runSpacing: AppSpacing.space2,
-              children: _profileColors.map((color) {
-                final isSelected = _selectedColor.toARGB32() == color.toARGB32();
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedColor = color),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      border: isSelected
-                          ? Border.all(color: AppColors.textPrimaryLight, width: 3)
-                          : null,
-                    ),
-                    child: isSelected
-                        ? const Icon(Icons.check, color: Colors.white, size: 20)
-                        : null,
-                  ),
-                );
-              }).toList(),
+              children:
+                  _profileColors.map((color) {
+                    final isSelected =
+                        _selectedColor.toARGB32() == color.toARGB32();
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedColor = color),
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border:
+                              isSelected
+                                  ? Border.all(
+                                    color: AppColors.textPrimaryLight,
+                                    width: 3,
+                                  )
+                                  : null,
+                        ),
+                        child:
+                            isSelected
+                                ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 20,
+                                )
+                                : null,
+                      ),
+                    );
+                  }).toList(),
             ),
             const SizedBox(height: AppSpacing.space6),
 
             // Name field
-            Text('이름/별명', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              '이름/별명',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: AppSpacing.space2),
             TextFormField(
               controller: _nameController,
@@ -235,10 +258,17 @@ class _ChildProfileFormScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Birth year selector
-            Text('출생년도', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              '출생년도',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: AppSpacing.space2),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -248,17 +278,14 @@ class _ChildProfileFormScreenState
                 child: DropdownButton<int>(
                   value: _selectedBirthYear,
                   isExpanded: true,
-                  items: List.generate(
-                    maxYear - minYear + 1,
-                    (index) {
-                      final year = maxYear - index;
-                      final age = currentYear - year;
-                      return DropdownMenuItem(
-                        value: year,
-                        child: Text('$year년 (만 $age세)'),
-                      );
-                    },
-                  ),
+                  items: List.generate(maxYear - minYear + 1, (index) {
+                    final year = maxYear - index;
+                    final age = currentYear - year;
+                    return DropdownMenuItem(
+                      value: year,
+                      child: Text('$year년 (만 $age세)'),
+                    );
+                  }),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() => _selectedBirthYear = value);
@@ -278,14 +305,18 @@ class _ChildProfileFormScreenState
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded,
-                        color: AppColors.warning, size: 16),
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: AppColors.warning,
+                      size: 16,
+                    ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
                         '만 14세 이상은 별도 계정 등록이 가능합니다.',
-                        style: AppTypography.caption
-                            .copyWith(color: AppColors.warning),
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.warning,
+                        ),
                       ),
                     ),
                   ],
@@ -295,10 +326,17 @@ class _ChildProfileFormScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Instrument selector
-            Text('악기', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              '악기',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: AppSpacing.space2),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -308,12 +346,13 @@ class _ChildProfileFormScreenState
                 child: DropdownButton<String>(
                   value: _selectedInstrument,
                   isExpanded: true,
-                  items: _instruments.map((item) {
-                    return DropdownMenuItem(
-                      value: item.$1,
-                      child: Text(item.$2),
-                    );
-                  }).toList(),
+                  items:
+                      _instruments.map((item) {
+                        return DropdownMenuItem(
+                          value: item.$1,
+                          child: Text(item.$2),
+                        );
+                      }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() => _selectedInstrument = value);
@@ -325,10 +364,17 @@ class _ChildProfileFormScreenState
             const SizedBox(height: AppSpacing.space6),
 
             // Level selector
-            Text('수준', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              '수준',
+              style: AppTypography.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: AppSpacing.space2),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -338,12 +384,13 @@ class _ChildProfileFormScreenState
                 child: DropdownButton<String>(
                   value: _selectedLevel,
                   isExpanded: true,
-                  items: _levels.map((item) {
-                    return DropdownMenuItem(
-                      value: item.$1,
-                      child: Text(item.$2),
-                    );
-                  }).toList(),
+                  items:
+                      _levels.map((item) {
+                        return DropdownMenuItem(
+                          value: item.$1,
+                          child: Text(item.$2),
+                        );
+                      }).toList(),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() => _selectedLevel = value);
@@ -364,23 +411,27 @@ class _ChildProfileFormScreenState
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
+                child:
+                    _isLoading
+                        ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                        : Text(
+                          isEditing ? '저장' : '자녀 추가',
+                          style: AppTypography.button.copyWith(
+                            color: Colors.white,
+                          ),
                         ),
-                      )
-                    : Text(
-                        isEditing ? '저장' : '자녀 추가',
-                        style: AppTypography.button.copyWith(color: Colors.white),
-                      ),
               ),
             ),
 
@@ -406,26 +457,27 @@ class _ChildProfileFormScreenState
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('자녀 프로필 삭제'),
-        content: Text(
-          "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('자녀 프로필 삭제'),
+            content: Text(
+              "'${widget.existingProfile!.name}' 프로필을 삭제하시겠습니까?\n\n연결된 레슨 기록은 유지됩니다.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(AppStrings.cancel),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await _deleteProfile();
+                },
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('삭제'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _deleteProfile();
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('삭제'),
-          ),
-        ],
-      ),
     );
   }
 
