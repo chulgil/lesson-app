@@ -81,7 +81,7 @@ class BankAccountEditScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.primaryLight.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
@@ -218,7 +218,7 @@ class _BankAccountCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         side:
             account.isDefault
                 ? BorderSide(color: AppColors.primary, width: 1.5)
@@ -256,7 +256,9 @@ class _BankAccountCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       '기본',
@@ -504,7 +506,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
                   color:
                       _consentChecked
@@ -548,7 +550,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       '필수',
@@ -596,7 +600,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                         vertical: AppSpacing.space3,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                     ),
                     items: [
@@ -627,7 +633,9 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
                     decoration: InputDecoration(
                       hintText: '은행명 입력',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                     ),
                     validator: (value) {
@@ -654,7 +662,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               decoration: InputDecoration(
                 hintText: '계좌번호를 입력하세요',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               validator: (value) {
@@ -677,7 +685,7 @@ class _AddBankAccountSheetState extends State<_AddBankAccountSheet> {
               decoration: InputDecoration(
                 hintText: '예금주명을 입력하세요',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
               validator: (value) {
