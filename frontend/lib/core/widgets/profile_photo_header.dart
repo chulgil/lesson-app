@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 /// Header widget showing background image + profile avatar overlay.
@@ -51,7 +52,7 @@ class ProfilePhotoHeader extends StatelessWidget {
                   height: backgroundHeight,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Stack(
@@ -82,25 +83,23 @@ class ProfilePhotoHeader extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 3,
-                            ),
+                            border: Border.all(color: Colors.white, width: 3),
                           ),
                           child: CircleAvatar(
                             radius: avatarRadius,
                             backgroundColor: avatarColor,
                             backgroundImage: _resolveProfileImage(),
-                            child: _resolveProfileImage() == null
-                                ? Text(
-                                    initial,
-                                    style:
-                                        AppTypography.displayMedium.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : null,
+                            child:
+                                _resolveProfileImage() == null
+                                    ? Text(
+                                      initial,
+                                      style: AppTypography.displayMedium
+                                          .copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    )
+                                    : null,
                           ),
                         ),
                         if (editable)

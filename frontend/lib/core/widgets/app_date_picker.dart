@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
 
 /// Shared date picker utility with improved UX visibility.
 ///
@@ -88,12 +89,11 @@ class AppDatePicker {
               todayBorder: BorderSide(color: AppColors.primary, width: 1.5),
               // Improved action button styles for visibility
               cancelButtonStyle: ButtonStyle(
-                foregroundColor: WidgetStateProperty.all(AppColors.textSecondaryLight),
+                foregroundColor: WidgetStateProperty.all(
+                  AppColors.textSecondaryLight,
+                ),
                 textStyle: WidgetStateProperty.all(
-                  const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 padding: WidgetStateProperty.all(
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -103,17 +103,16 @@ class AppDatePicker {
                 backgroundColor: WidgetStateProperty.all(AppColors.primary),
                 foregroundColor: WidgetStateProperty.all(Colors.white),
                 textStyle: WidgetStateProperty.all(
-                  const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 padding: WidgetStateProperty.all(
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),
@@ -171,15 +170,16 @@ class AppDatePicker {
               rangePickerBackgroundColor: AppColors.surfaceLight,
               rangePickerHeaderBackgroundColor: AppColors.primary,
               rangePickerHeaderForegroundColor: Colors.white,
-              rangeSelectionBackgroundColor: AppColors.primaryLight.withValues(alpha: 0.3),
+              rangeSelectionBackgroundColor: AppColors.primaryLight.withValues(
+                alpha: 0.3,
+              ),
               // Action button styles
               cancelButtonStyle: ButtonStyle(
-                foregroundColor: WidgetStateProperty.all(AppColors.textSecondaryLight),
+                foregroundColor: WidgetStateProperty.all(
+                  AppColors.textSecondaryLight,
+                ),
                 textStyle: WidgetStateProperty.all(
-                  const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 padding: WidgetStateProperty.all(
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -189,17 +189,16 @@ class AppDatePicker {
                 backgroundColor: WidgetStateProperty.all(AppColors.primary),
                 foregroundColor: WidgetStateProperty.all(Colors.white),
                 textStyle: WidgetStateProperty.all(
-                  const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 padding: WidgetStateProperty.all(
                   const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                   ),
                 ),
               ),

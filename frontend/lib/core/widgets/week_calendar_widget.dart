@@ -60,8 +60,11 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   DateTime _getWeekStart(DateTime date) {
     // Get Monday of the week (weekday: 1=Mon, 7=Sun)
     final weekday = date.weekday;
-    return DateTime(date.year, date.month, date.day)
-        .subtract(Duration(days: weekday - 1));
+    return DateTime(
+      date.year,
+      date.month,
+      date.day,
+    ).subtract(Duration(days: weekday - 1));
   }
 
   DateTime _getMonthStart(DateTime date) {
@@ -78,8 +81,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
           1,
         );
       } else {
-        _currentWeekStart =
-            _currentWeekStart.subtract(const Duration(days: 7));
+        _currentWeekStart = _currentWeekStart.subtract(const Duration(days: 7));
       }
     });
   }
@@ -150,10 +152,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            AppColors.primary,
-            AppColors.primaryDark,
-          ],
+          colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -244,19 +243,22 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
               children: [
                 // Day headers
                 Row(
-                  children: ['월', '화', '수', '목', '금', '토', '일']
-                      .map((day) => Expanded(
-                            child: Center(
-                              child: Text(
-                                day,
-                                style: AppTypography.bodySmall.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w600,
+                  children:
+                      ['월', '화', '수', '목', '금', '토', '일']
+                          .map(
+                            (day) => Expanded(
+                              child: Center(
+                                child: Text(
+                                  day,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                          ))
-                      .toList(),
+                          )
+                          .toList(),
                 ),
 
                 const SizedBox(height: AppSpacing.space3),
@@ -280,17 +282,14 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: IconButton(
         onPressed: onPressed,
         icon: Icon(icon, color: Colors.white),
         iconSize: 24,
         padding: const EdgeInsets.all(8),
-        constraints: const BoxConstraints(
-          minWidth: 40,
-          minHeight: 40,
-        ),
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
       ),
     );
   }
@@ -319,9 +318,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Row(
       children: List.generate(7, (index) {
         final date = _currentWeekStart.add(Duration(days: index));
-        return Expanded(
-          child: _buildDayCell(date, today),
-        );
+        return Expanded(child: _buildDayCell(date, today));
       }),
     );
   }
@@ -329,8 +326,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   Widget _buildMonthView(DateTime today) {
     final monthStart = _getMonthStart(_currentWeekStart);
     final firstWeekday = monthStart.weekday; // 1=Mon, 7=Sun
-    final daysInMonth =
-        DateTime(monthStart.year, monthStart.month + 1, 0).day;
+    final daysInMonth = DateTime(monthStart.year, monthStart.month + 1, 0).day;
 
     // Calculate number of weeks needed
     final totalCells = firstWeekday - 1 + daysInMonth;
@@ -354,9 +350,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                 monthStart.month,
                 dayNumber,
               );
-              return Expanded(
-                child: _buildDayCell(date, today),
-              );
+              return Expanded(child: _buildDayCell(date, today));
             }),
           ),
         );
@@ -377,9 +371,8 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
 
     // Determine if cell should be interactive
     // In booking mode: only future dates with availability can be tapped
-    final canSelect = isBookingMode
-        ? (!isPast && (isAvailable || isToday))
-        : true;
+    final canSelect =
+        isBookingMode ? (!isPast && (isAvailable || isToday)) : true;
 
     // Determine visual appearance
     // UX: Available dates are bright, unavailable dates are faded
@@ -404,9 +397,10 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
         height: 52,
         margin: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.white
-              : isToday
+          color:
+              isSelected
+                  ? Colors.white
+                  : isToday
                   ? Colors.white.withValues(alpha: 0.25)
                   : null,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -429,9 +423,10 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                 margin: const EdgeInsets.only(top: 4),
                 decoration: BoxDecoration(
                   // UX: Green dot for available, white for others
-                  color: isSelected
-                      ? AppColors.success
-                      : isBookingMode
+                  color:
+                      isSelected
+                          ? AppColors.success
+                          : isBookingMode
                           ? AppColors.success.withValues(alpha: 0.9)
                           : Colors.white,
                   shape: BoxShape.circle,

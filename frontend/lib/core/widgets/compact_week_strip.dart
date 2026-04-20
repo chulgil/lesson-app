@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 /// Compact week date strip — shared across teacher and student views.
@@ -27,8 +28,11 @@ class CompactWeekStrip extends StatelessWidget {
 
   DateTime get _weekStart {
     final weekday = selectedDate.weekday;
-    return DateTime(selectedDate.year, selectedDate.month, selectedDate.day)
-        .subtract(Duration(days: weekday - 1));
+    return DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    ).subtract(Duration(days: weekday - 1));
   }
 
   bool _isSameDay(DateTime a, DateTime b) {
@@ -83,21 +87,25 @@ class CompactWeekStrip extends StatelessWidget {
                   onTap: () => onDateSelected(date),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: isSelected
-                        ? BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(8),
-                          )
-                        : null,
+                    decoration:
+                        isSelected
+                            ? BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMedium,
+                              ),
+                            )
+                            : null,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           dayNames[index],
                           style: AppTypography.caption.copyWith(
-                            color: isToday
-                                ? AppColors.primary
-                                : AppColors.textTertiaryLight,
+                            color:
+                                isToday
+                                    ? AppColors.primary
+                                    : AppColors.textTertiaryLight,
                             fontWeight: FontWeight.w500,
                             fontSize: 11,
                           ),
@@ -107,31 +115,36 @@ class CompactWeekStrip extends StatelessWidget {
                           width: 28,
                           height: 28,
                           alignment: Alignment.center,
-                          decoration: isToday
-                              ? BoxDecoration(
-                                  color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.primary
-                                          .withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
-                                )
-                              : isSelected
+                          decoration:
+                              isToday
                                   ? BoxDecoration(
-                                      color: AppColors.primary,
-                                      shape: BoxShape.circle,
-                                    )
+                                    color:
+                                        isSelected
+                                            ? AppColors.primary
+                                            : AppColors.primary.withValues(
+                                              alpha: 0.15,
+                                            ),
+                                    shape: BoxShape.circle,
+                                  )
+                                  : isSelected
+                                  ? BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                  )
                                   : null,
                           child: Text(
                             '${date.day}',
                             style: AppTypography.bodySmall.copyWith(
-                              color: (isSelected || isToday)
-                                  ? (isSelected
-                                      ? Colors.white
-                                      : AppColors.primary)
-                                  : AppColors.textPrimaryLight,
-                              fontWeight: (isToday || isSelected)
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
+                              color:
+                                  (isSelected || isToday)
+                                      ? (isSelected
+                                          ? Colors.white
+                                          : AppColors.primary)
+                                      : AppColors.textPrimaryLight,
+                              fontWeight:
+                                  (isToday || isSelected)
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                               fontSize: 13,
                             ),
                           ),
@@ -141,9 +154,10 @@ class CompactWeekStrip extends StatelessWidget {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: hasMarker
-                                ? AppColors.primary.withValues(alpha: 0.5)
-                                : Colors.transparent,
+                            color:
+                                hasMarker
+                                    ? AppColors.primary.withValues(alpha: 0.5)
+                                    : Colors.transparent,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -161,18 +175,20 @@ class CompactWeekStrip extends StatelessWidget {
 
   Widget _buildWeekHeader(BuildContext context, DateTime todayOnly) {
     final weekEnd = _weekStart.add(const Duration(days: 6));
-    final monthLabel = _weekStart.month == weekEnd.month
-        ? '${_weekStart.month}월'
-        : '${_weekStart.month}월~${weekEnd.month}월';
+    final monthLabel =
+        _weekStart.month == weekEnd.month
+            ? '${_weekStart.month}월'
+            : '${_weekStart.month}월~${weekEnd.month}월';
     final weekLabel = '$monthLabel ${_weekStart.day}~${weekEnd.day}일';
 
     return Row(
       children: [
         _NavChevron(
           icon: Icons.chevron_left,
-          onTap: () => onDateSelected(
-            selectedDate.subtract(const Duration(days: 7)),
-          ),
+          onTap:
+              () => onDateSelected(
+                selectedDate.subtract(const Duration(days: 7)),
+              ),
         ),
         const SizedBox(width: 4),
         GestureDetector(
@@ -209,9 +225,8 @@ class CompactWeekStrip extends StatelessWidget {
         const SizedBox(width: 4),
         _NavChevron(
           icon: Icons.chevron_right,
-          onTap: () => onDateSelected(
-            selectedDate.add(const Duration(days: 7)),
-          ),
+          onTap:
+              () => onDateSelected(selectedDate.add(const Duration(days: 7))),
         ),
         const Spacer(),
         if (!_isCurrentWeek)
@@ -221,7 +236,7 @@ class CompactWeekStrip extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
               child: Text(
                 '오늘',
@@ -250,11 +265,7 @@ class _NavChevron extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: Icon(
-          icon,
-          size: 18,
-          color: AppColors.textSecondaryLight,
-        ),
+        child: Icon(icon, size: 18, color: AppColors.textSecondaryLight),
       ),
     );
   }

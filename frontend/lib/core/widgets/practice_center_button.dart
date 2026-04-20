@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../features/practice/presentation/widgets/practice_tools_modal.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_spacing.dart';
 
 /// SVG icon for metronome (simple pyramid style)
 const _metronomeIconSvg = '''
@@ -26,10 +27,7 @@ const _metronomeIconSvg = '''
 /// - Long press: Open practice tools modal with Metronome tab
 /// - Pixel art style icon (tuning fork + metronome)
 class PracticeCenterButton extends StatefulWidget {
-  const PracticeCenterButton({
-    super.key,
-    this.size = 56,
-  });
+  const PracticeCenterButton({super.key, this.size = 56});
 
   /// Button size (width and height).
   final double size;
@@ -71,7 +69,7 @@ class _PracticeCenterButtonState extends State<PracticeCenterButton> {
           height: widget.size,
           decoration: BoxDecoration(
             color: AppColors.primaryLight,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withValues(alpha: 0.2),
