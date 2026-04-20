@@ -392,7 +392,7 @@ class _UnpaidCard extends ConsumerWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.success,
                 ),
-                child: const Text('확인'),
+                child: const Text(AppStrings.confirm),
               ),
             ],
           ),

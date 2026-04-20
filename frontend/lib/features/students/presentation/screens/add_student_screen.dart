@@ -40,8 +40,6 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
   TimeOfDay _lessonTime = const TimeOfDay(hour: 14, minute: 0);
   final Map<int, TimeOfDay> _dayTimeMap = {};
 
-  static const List<String> _dayNames = ['월', '화', '수', '목', '금', '토', '일'];
-
   @override
   void initState() {
     super.initState();
@@ -71,19 +69,15 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       appBar: AppBar(
         title: const Text('학생 작성'),
         leading: IconButton(
-          onPressed: () => showExitConfirmation(
-            context,
-            hasChanges: _hasFormData(),
-            onExit: () => context.pop(),
-          ),
+          onPressed:
+              () => showExitConfirmation(
+                context,
+                hasChanges: _hasFormData(),
+                onExit: () => context.pop(),
+              ),
           icon: const Icon(Icons.close),
         ),
-        actions: [
-          TextButton(
-            onPressed: _saveStudent,
-            child: const Text('저장'),
-          ),
-        ],
+        actions: [TextButton(onPressed: _saveStudent, child: const Text('저장'))],
       ),
       body: Form(
         key: _formKey,
@@ -93,9 +87,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Profile photo section
-              StudentProfileSection(
-                displayName: _nameController.text,
-              ),
+              StudentProfileSection(displayName: _nameController.text),
 
               const SizedBox(height: AppSpacing.space6),
 
@@ -258,19 +250,17 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       return;
     }
 
-    final monthlyFee = int.tryParse(_monthlyFeeController.text) ??
+    final monthlyFee =
+        int.tryParse(_monthlyFeeController.text) ??
         _selectedLevel.defaultMonthlyFee;
 
     final sortedDays = _selectedDays.toList()..sort();
-    final lessonSlots = sortedDays.map((d) {
-      final time = _dayTimeMap[d] ?? _lessonTime;
-      final startTime = formatTime(time);
-      return LessonSlot(
-        dayOfWeek: d,
-        startTime: startTime,
-        endTime: '',
-      );
-    }).toList();
+    final lessonSlots =
+        sortedDays.map((d) {
+          final time = _dayTimeMap[d] ?? _lessonTime;
+          final startTime = formatTime(time);
+          return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
+        }).toList();
 
     // Generate random profile color
     final profileColors = [
@@ -293,34 +283,45 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       status: StudentStatus.trial,
       monthlyFee: monthlyFee,
       lessonsPerWeek: _lessonsPerWeek,
-      phone: _phoneController.text.isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      parentName: _parentNameController.text.isNotEmpty
-          ? _parentNameController.text.trim()
-          : null,
-      parentPhone: _parentPhoneController.text.isNotEmpty
-          ? _parentPhoneController.text.trim()
-          : null,
+      phone:
+          _phoneController.text.isNotEmpty
+              ? _phoneController.text.trim()
+              : null,
+      parentName:
+          _parentNameController.text.isNotEmpty
+              ? _parentNameController.text.trim()
+              : null,
+      parentPhone:
+          _parentPhoneController.text.isNotEmpty
+              ? _parentPhoneController.text.trim()
+              : null,
       email:
-          _emailController.text.isNotEmpty ? _emailController.text.trim() : null,
+          _emailController.text.isNotEmpty
+              ? _emailController.text.trim()
+              : null,
       profileColor: profileColor,
       lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
       notes:
-          _notesController.text.isNotEmpty ? _notesController.text.trim() : null,
-      postalCode: _postalCodeController.text.isNotEmpty
-          ? _postalCodeController.text.trim()
-          : null,
-      address: _addressController.text.isNotEmpty
-          ? _addressController.text.trim()
-          : null,
-      addressDetail: _addressDetailController.text.isNotEmpty
-          ? _addressDetailController.text.trim()
-          : null,
-      district: _addressController.text.isNotEmpty
-          ? _extractDistrict(_addressController.text.trim())
-          : null,
+          _notesController.text.isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+      postalCode:
+          _postalCodeController.text.isNotEmpty
+              ? _postalCodeController.text.trim()
+              : null,
+      address:
+          _addressController.text.isNotEmpty
+              ? _addressController.text.trim()
+              : null,
+      addressDetail:
+          _addressDetailController.text.isNotEmpty
+              ? _addressDetailController.text.trim()
+              : null,
+      district:
+          _addressController.text.isNotEmpty
+              ? _extractDistrict(_addressController.text.trim())
+              : null,
       createdAt: DateTime.now(),
     );
 
@@ -333,31 +334,30 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
       // Ask about subscription
       final issueSubscription = await showDialog<bool>(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('학생 추가 완료'),
-          content: Text(
-            '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('나중에'),
+        builder:
+            (ctx) => AlertDialog(
+              title: const Text('학생 추가 완료'),
+              content: Text(
+                '${_nameController.text} 학생이 추가되었습니다.\n수강권을 발급하시겠습니까?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: const Text('나중에'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: const Text('발급하기'),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('발급하기'),
-            ),
-          ],
-        ),
       );
 
       if (!mounted) return;
 
       if (issueSubscription == true) {
         context.pop();
-        context.push(
-          '${AppRoutes.issueSubscription}?studentId=${student.id}',
-        );
+        context.push('${AppRoutes.issueSubscription}?studentId=${student.id}');
       } else {
         context.pop();
       }
@@ -387,5 +387,4 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     }
     return null;
   }
-
 }

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -266,7 +267,7 @@ class _CountEditorSheetState extends State<_CountEditorSheet> {
                 widget.onConfirm(_count);
                 Navigator.pop(context);
               },
-              child: const Text('확인'),
+              child: const Text(AppStrings.confirm),
             ),
           ),
         ],
@@ -389,7 +390,7 @@ class _TimeEditorSheetState extends State<_TimeEditorSheet> {
                 widget.onConfirm(seconds);
                 Navigator.pop(context);
               },
-              child: const Text('확인'),
+              child: const Text(AppStrings.confirm),
             ),
           ),
         ],

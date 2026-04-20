@@ -81,6 +81,7 @@ void main() {
       expect(selectedIndex, isNull);
 
       // Can't call acceptAlternative without selection
+      // ignore: unnecessary_null_comparison
       final canSubmit = selectedIndex != null;
       expect(canSubmit, isFalse);
     });
@@ -111,9 +112,8 @@ void main() {
         ),
       ];
 
-      final teacherProposals = proposals
-          .where((p) => p.role == ProposerRole.teacher)
-          .toList();
+      final teacherProposals =
+          proposals.where((p) => p.role == ProposerRole.teacher).toList();
       expect(teacherProposals.length, 1);
       expect(teacherProposals.first.slots.length, 3);
     });

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../data/services/backup_service.dart';
@@ -399,7 +400,7 @@ class ActionsSection extends ConsumerWidget {
             actions: [
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('확인'),
+                child: const Text(AppStrings.confirm),
               ),
             ],
           ),
@@ -726,7 +727,7 @@ class BackupItem extends ConsumerWidget {
             actions: [
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('확인'),
+                child: const Text(AppStrings.confirm),
               ),
             ],
           ),

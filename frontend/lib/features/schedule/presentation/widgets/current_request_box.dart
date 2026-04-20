@@ -663,37 +663,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 
   // ── Phase 3: Lesson Progress ───────────────────────────────
 
-  /// Scan schedule change state: returns who owns the pending proposal.
-  /// null = no pending, 'self' = viewer proposed, 'opponent' = opponent proposed.
-  String? get _pendingScheduleChangeOwner {
-    final viewerId =
-        _isTeacher ? widget.request.teacherId : widget.request.studentId;
-
-    for (int i = widget.events.length - 1; i >= 0; i--) {
-      final event = widget.events[i];
-      final type = event.eventType;
-
-      // Found a resolution — no pending proposal
-      if (type == RequestEventType.scheduleChangeAccepted ||
-          type == RequestEventType.scheduleChangeRejected) {
-        return null;
-      }
-
-      // Found a proposal/counter
-      if (type == RequestEventType.scheduleChangeProposed ||
-          type == RequestEventType.scheduleChangeCountered) {
-        return event.actorId == viewerId ? 'self' : 'opponent';
-      }
-    }
-    return null;
-  }
-
-  bool get _hasPendingScheduleChange =>
-      _pendingScheduleChangeOwner == 'opponent';
-
-  bool get _hasOwnPendingScheduleChange =>
-      _pendingScheduleChangeOwner == 'self';
-
   Widget _buildPhase3Lessons() {
     // Subscription summary card + message input only.
     // Lesson management (attendance, schedule change) is handled in
@@ -816,35 +785,6 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     );
   }
 
-  /// Section with icon header + custom children (for multi-button layouts).
-  Widget _buildSection({
-    required IconData icon,
-    required Color iconColor,
-    required String message,
-    required List<Widget> children,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: iconColor, size: 18),
-            const SizedBox(width: AppSpacing.space2),
-            Expanded(
-              child: Text(
-                message,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ),
-          ],
-        ),
-        ...children,
-      ],
-    );
-  }
-
   /// Message-only row (no button).
   Widget _buildMessageOnly({
     required IconData icon,
@@ -923,68 +863,3 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
 }
 
 enum _TurnState { myTurn, theirTurn, terminal }
-
-/// Selectable card for payment method (prepaid / postpaid).
-class _PaymentMethodCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final VoidCallback? onTap;
-  final bool isPrimary;
-
-  const _PaymentMethodCard({
-    required this.title,
-    required this.description,
-    required this.onTap,
-    required this.isPrimary,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color:
-          isPrimary
-              ? AppColors.primary.withValues(alpha: 0.04)
-              : AppColors.surfaceLight,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(AppSpacing.space3),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color:
-                  isPrimary
-                      ? AppColors.primary.withValues(alpha: 0.3)
-                      : AppColors.borderLight,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTypography.bodyMedium.copyWith(
-                  color:
-                      isPrimary
-                          ? AppColors.primary
-                          : AppColors.textPrimaryLight,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.space1),
-              Text(
-                description,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}

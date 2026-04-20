@@ -167,23 +167,6 @@ class TimelineLessonBlock extends StatelessWidget {
     );
   }
 
-  Widget _buildTravelIndicator() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(left: 12, right: 8, bottom: 2),
-      child: Text(
-        '\u{1F697} ${lesson.travelTimeMinutes}분',
-        style: AppTypography.caption.copyWith(
-          color: AppColors.scheduleTravelAccent,
-          fontSize: 9,
-          fontWeight: FontWeight.w500,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
   Widget _buildNextBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

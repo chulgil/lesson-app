@@ -669,7 +669,7 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('확인'),
+                child: const Text(AppStrings.confirm),
               ),
             ],
           ),

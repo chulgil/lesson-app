@@ -18,10 +18,7 @@ import '../widgets/student_form_widgets.dart';
 class EditStudentScreen extends ConsumerStatefulWidget {
   final String studentId;
 
-  const EditStudentScreen({
-    super.key,
-    required this.studentId,
-  });
+  const EditStudentScreen({super.key, required this.studentId});
 
   @override
   ConsumerState<EditStudentScreen> createState() => _EditStudentScreenState();
@@ -51,8 +48,6 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
   bool _isInitialized = false;
   bool _hasChanges = false;
   bool _isSaving = false;
-
-  static const List<String> _dayNames = ['월', '화', '수', '목', '금', '토', '일'];
 
   @override
   void dispose() {
@@ -115,36 +110,44 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
   @override
   Widget build(BuildContext context) {
     final studentAsync = ref.watch(studentProvider(widget.studentId));
-    final membershipsAsync =
-        ref.watch(studentMembershipsProvider(widget.studentId));
-    final isLinked = membershipsAsync.whenOrNull(
+    final membershipsAsync = ref.watch(
+      studentMembershipsProvider(widget.studentId),
+    );
+    final isLinked =
+        membershipsAsync.whenOrNull(
           data: (memberships) => memberships.isNotEmpty,
         ) ??
         false;
 
     return studentAsync.when(
-      loading: () => Scaffold(
-        appBar: AppBar(title: const Text('학생 수정')),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => Scaffold(
-        appBar: AppBar(title: const Text('학생 수정')),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space3),
-              Text('학생 정보를 불러올 수 없습니다', style: TextStyle(color: AppColors.error)),
-              const SizedBox(height: AppSpacing.space3),
-              FilledButton(
-                onPressed: () => ref.invalidate(studentProvider(widget.studentId)),
-                child: const Text('다시 시도'),
-              ),
-            ],
+      loading:
+          () => Scaffold(
+            appBar: AppBar(title: const Text('학생 수정')),
+            body: const Center(child: CircularProgressIndicator()),
           ),
-        ),
-      ),
+      error:
+          (error, _) => Scaffold(
+            appBar: AppBar(title: const Text('학생 수정')),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text(
+                    '학생 정보를 불러올 수 없습니다',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  FilledButton(
+                    onPressed:
+                        () => ref.invalidate(studentProvider(widget.studentId)),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
+              ),
+            ),
+          ),
       data: (student) {
         if (student == null) {
           return Scaffold(
@@ -160,248 +163,260 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         return PopScope(
           canPop: !_isSaving,
           child: Scaffold(
-          appBar: AppBar(
-            title: const Text('학생 수정'),
-            leading: IconButton(
-              onPressed: _isSaving
-                  ? null
-                  : () => showExitConfirmation(
-                        context,
-                        hasChanges: _hasChanges,
-                        onExit: () => context.pop(),
-                      ),
-              icon: const Icon(Icons.close),
-            ),
-            actions: [
-              TextButton(
-                onPressed: _hasChanges && !_isSaving
-                    ? () => _saveStudent(student)
-                    : null,
-                child: _isSaving
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        '저장',
-                        style: TextStyle(
-                          color: _hasChanges ? null : AppColors.textTertiaryLight,
+            appBar: AppBar(
+              title: const Text('학생 수정'),
+              leading: IconButton(
+                onPressed:
+                    _isSaving
+                        ? null
+                        : () => showExitConfirmation(
+                          context,
+                          hasChanges: _hasChanges,
+                          onExit: () => context.pop(),
                         ),
-                      ),
+                icon: const Icon(Icons.close),
               ),
-            ],
-          ),
-          body: Form(
-            key: _formKey,
-            onChanged: _markChanged,
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Profile + background photo header
-                  _buildPhotoHeader(student),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Basic info section
-                  const FormSectionTitle('기본 정보'),
-                  const SizedBox(height: AppSpacing.space3),
-                  BasicInfoFields(
-                    nameController: _nameController,
-                    phoneController: _phoneController,
-                    emailController: _emailController,
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Parent/Guardian info section
-                  const FormSectionTitle('보호자 정보'),
-                  const FormSectionSubtitle('미성년 학생의 경우 입력해주세요'),
-                  const SizedBox(height: AppSpacing.space3),
-                  ParentInfoFields(
-                    parentNameController: _parentNameController,
-                    parentPhoneController: _parentPhoneController,
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Address section
-                  const FormSectionTitle('주소'),
-                  const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
-                  const SizedBox(height: AppSpacing.space3),
-                  AddressFields(
-                    postalCodeController: _postalCodeController,
-                    addressController: _addressController,
-                    addressDetailController: _addressDetailController,
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Instrument section
-                  const FormSectionTitle('악기'),
-                  const SizedBox(height: AppSpacing.space3),
-                  InstrumentSelector(
-                    selectedInstrument: _selectedInstrument,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedInstrument = value;
-                        _hasChanges = true;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Level and tuition section
-                  const FormSectionTitle('레벨 및 수강료'),
-                  FormSectionSubtitle(
-                    isLinked
-                        ? '수강권이 발급된 학생입니다'
-                        : '레벨에 따라 기본 수강료가 설정됩니다',
-                  ),
-                  const SizedBox(height: AppSpacing.space3),
-                  LevelAndTuitionSection(
-                    selectedLevel: _selectedLevel,
-                    onLevelChanged: (level) {
-                      setState(() {
-                        _selectedLevel = level;
-                        if (!isLinked) {
-                          _monthlyFeeController.text =
-                              level.defaultMonthlyFee.toString();
-                        }
-                        _hasChanges = true;
-                      });
-                    },
-                    feeController: _monthlyFeeController,
-                    lessonsPerWeek: _lessonsPerWeek,
-                    onFrequencyChanged: (value) {
-                      setState(() {
-                        _lessonsPerWeek = value;
-                        _hasChanges = true;
-                      });
-                    },
-                    onFeeChanged: () {
-                      _markChanged();
-                      setState(() {});
-                    },
-                    isLinked: isLinked,
-                    onManageSubscription: isLinked
-                        ? () => context.push(
-                              '${AppRoutes.issueSubscription}?studentId=${widget.studentId}',
-                            )
-                        : null,
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Lesson schedule section
-                  const FormSectionTitle('레슨 일정'),
-                  const SizedBox(height: AppSpacing.space3),
-                  ScheduleSection(
-                    selectedDays: _selectedDays,
-                    onDayToggle: (index) {
-                      setState(() {
-                        if (_selectedDays.contains(index)) {
-                          _selectedDays.remove(index);
-                          _dayTimeMap.remove(index);
-                        } else {
-                          _selectedDays.add(index);
-                          _dayTimeMap[index] = _lessonTime;
-                        }
-                        _hasChanges = true;
-                      });
-                    },
-                    lessonTime: _lessonTime,
-                    onTimeTap: () async {
-                      final picked = await selectTime(context, _lessonTime);
-                      if (picked != null) {
-                        setState(() {
-                          _lessonTime = picked;
-                          _hasChanges = true;
-                        });
-                      }
-                    },
-                    lessonDuration: _lessonDuration,
-                    onDurationChanged: (value) {
-                      setState(() {
-                        _lessonDuration = value;
-                        _hasChanges = true;
-                      });
-                    },
-                    dayTimeMap: _dayTimeMap,
-                    onDayTimeChanged: (dayIndex, time) {
-                      setState(() {
-                        _dayTimeMap[dayIndex] = time;
-                        _hasChanges = true;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: AppSpacing.space6),
-
-                  // Notes section
-                  const FormSectionTitle('메모'),
-                  const FormSectionSubtitle('레슨 시 참고할 내용을 입력해주세요'),
-                  const SizedBox(height: AppSpacing.space3),
-                  NotesField(controller: _notesController),
-
-                  const SizedBox(height: AppSpacing.space8),
-
-                  // Save button
-                  SizedBox(
-                    width: double.infinity,
-                    height: AppSpacing.buttonHeight,
-                    child: FilledButton(
-                      onPressed: _hasChanges && !_isSaving
+              actions: [
+                TextButton(
+                  onPressed:
+                      _hasChanges && !_isSaving
                           ? () => _saveStudent(student)
                           : null,
-                      child: _isSaving
+                  child:
+                      _isSaving
                           ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : const Text('변경사항 저장'),
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : Text(
+                            '저장',
+                            style: TextStyle(
+                              color:
+                                  _hasChanges
+                                      ? null
+                                      : AppColors.textTertiaryLight,
+                            ),
+                          ),
+                ),
+              ],
+            ),
+            body: Form(
+              key: _formKey,
+              onChanged: _markChanged,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Profile + background photo header
+                    _buildPhotoHeader(student),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Basic info section
+                    const FormSectionTitle('기본 정보'),
+                    const SizedBox(height: AppSpacing.space3),
+                    BasicInfoFields(
+                      nameController: _nameController,
+                      phoneController: _phoneController,
+                      emailController: _emailController,
                     ),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space4),
+                    const SizedBox(height: AppSpacing.space6),
 
-                  // Delete button
-                  SizedBox(
-                    width: double.infinity,
-                    height: AppSpacing.buttonHeight,
-                    child: OutlinedButton.icon(
-                      onPressed: _isSaving
-                          ? null
-                          : () => showDeleteStudentConfirmation(
-                                context,
-                                studentName: _nameController.text,
-                                onDelete: () => _deleteStudent(student),
-                              ),
-                      icon: Icon(Icons.delete_outline, color: AppColors.error),
-                      label: Text(
-                        '학생 삭제',
-                        style: TextStyle(color: AppColors.error),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                            color: AppColors.error.withValues(alpha: 0.5)),
+                    // Parent/Guardian info section
+                    const FormSectionTitle('보호자 정보'),
+                    const FormSectionSubtitle('미성년 학생의 경우 입력해주세요'),
+                    const SizedBox(height: AppSpacing.space3),
+                    ParentInfoFields(
+                      parentNameController: _parentNameController,
+                      parentPhoneController: _parentPhoneController,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Address section
+                    const FormSectionTitle('주소'),
+                    const FormSectionSubtitle('레슨 장소가 학생 집인 경우 자동으로 사용됩니다'),
+                    const SizedBox(height: AppSpacing.space3),
+                    AddressFields(
+                      postalCodeController: _postalCodeController,
+                      addressController: _addressController,
+                      addressDetailController: _addressDetailController,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Instrument section
+                    const FormSectionTitle('악기'),
+                    const SizedBox(height: AppSpacing.space3),
+                    InstrumentSelector(
+                      selectedInstrument: _selectedInstrument,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedInstrument = value;
+                          _hasChanges = true;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Level and tuition section
+                    const FormSectionTitle('레벨 및 수강료'),
+                    FormSectionSubtitle(
+                      isLinked ? '수강권이 발급된 학생입니다' : '레벨에 따라 기본 수강료가 설정됩니다',
+                    ),
+                    const SizedBox(height: AppSpacing.space3),
+                    LevelAndTuitionSection(
+                      selectedLevel: _selectedLevel,
+                      onLevelChanged: (level) {
+                        setState(() {
+                          _selectedLevel = level;
+                          if (!isLinked) {
+                            _monthlyFeeController.text =
+                                level.defaultMonthlyFee.toString();
+                          }
+                          _hasChanges = true;
+                        });
+                      },
+                      feeController: _monthlyFeeController,
+                      lessonsPerWeek: _lessonsPerWeek,
+                      onFrequencyChanged: (value) {
+                        setState(() {
+                          _lessonsPerWeek = value;
+                          _hasChanges = true;
+                        });
+                      },
+                      onFeeChanged: () {
+                        _markChanged();
+                        setState(() {});
+                      },
+                      isLinked: isLinked,
+                      onManageSubscription:
+                          isLinked
+                              ? () => context.push(
+                                '${AppRoutes.issueSubscription}?studentId=${widget.studentId}',
+                              )
+                              : null,
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Lesson schedule section
+                    const FormSectionTitle('레슨 일정'),
+                    const SizedBox(height: AppSpacing.space3),
+                    ScheduleSection(
+                      selectedDays: _selectedDays,
+                      onDayToggle: (index) {
+                        setState(() {
+                          if (_selectedDays.contains(index)) {
+                            _selectedDays.remove(index);
+                            _dayTimeMap.remove(index);
+                          } else {
+                            _selectedDays.add(index);
+                            _dayTimeMap[index] = _lessonTime;
+                          }
+                          _hasChanges = true;
+                        });
+                      },
+                      lessonTime: _lessonTime,
+                      onTimeTap: () async {
+                        final picked = await selectTime(context, _lessonTime);
+                        if (picked != null) {
+                          setState(() {
+                            _lessonTime = picked;
+                            _hasChanges = true;
+                          });
+                        }
+                      },
+                      lessonDuration: _lessonDuration,
+                      onDurationChanged: (value) {
+                        setState(() {
+                          _lessonDuration = value;
+                          _hasChanges = true;
+                        });
+                      },
+                      dayTimeMap: _dayTimeMap,
+                      onDayTimeChanged: (dayIndex, time) {
+                        setState(() {
+                          _dayTimeMap[dayIndex] = time;
+                          _hasChanges = true;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+
+                    // Notes section
+                    const FormSectionTitle('메모'),
+                    const FormSectionSubtitle('레슨 시 참고할 내용을 입력해주세요'),
+                    const SizedBox(height: AppSpacing.space3),
+                    NotesField(controller: _notesController),
+
+                    const SizedBox(height: AppSpacing.space8),
+
+                    // Save button
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppSpacing.buttonHeight,
+                      child: FilledButton(
+                        onPressed:
+                            _hasChanges && !_isSaving
+                                ? () => _saveStudent(student)
+                                : null,
+                        child:
+                            _isSaving
+                                ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Text('변경사항 저장'),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: AppSpacing.space6),
-                ],
+                    const SizedBox(height: AppSpacing.space4),
+
+                    // Delete button
+                    SizedBox(
+                      width: double.infinity,
+                      height: AppSpacing.buttonHeight,
+                      child: OutlinedButton.icon(
+                        onPressed:
+                            _isSaving
+                                ? null
+                                : () => showDeleteStudentConfirmation(
+                                  context,
+                                  studentName: _nameController.text,
+                                  onDelete: () => _deleteStudent(student),
+                                ),
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: AppColors.error,
+                        ),
+                        label: Text(
+                          '학생 삭제',
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: AppColors.error.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacing.space6),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         );
       },
     );
@@ -411,7 +426,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     final profileImagePath =
         ref.watch(studentProfileImageNotifierProvider(student.id)).valueOrNull;
     final backgroundImagePath =
-        ref.watch(studentBackgroundImageNotifierProvider(student.id)).valueOrNull;
+        ref
+            .watch(studentBackgroundImageNotifierProvider(student.id))
+            .valueOrNull;
     final displayName = _nameController.text;
     final initial = displayName.isNotEmpty ? displayName[0] : '?';
 
@@ -436,8 +453,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     );
     if (action == null || !mounted) return;
 
-    final notifier =
-        ref.read(studentProfileImageNotifierProvider(studentId).notifier);
+    final notifier = ref.read(
+      studentProfileImageNotifierProvider(studentId).notifier,
+    );
 
     if (action == ImagePickerAction.delete) {
       await notifier.removeImage();
@@ -445,9 +463,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       return;
     }
 
-    final source = action == ImagePickerAction.camera
-        ? ImageSource.camera
-        : ImageSource.gallery;
+    final source =
+        action == ImagePickerAction.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
 
     if (!mounted) return;
     final success = await notifier.pickAndSaveImage(source, context);
@@ -465,8 +484,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     );
     if (action == null || !mounted) return;
 
-    final notifier =
-        ref.read(studentBackgroundImageNotifierProvider(studentId).notifier);
+    final notifier = ref.read(
+      studentBackgroundImageNotifierProvider(studentId).notifier,
+    );
 
     if (action == ImagePickerAction.delete) {
       await notifier.removeImage();
@@ -474,9 +494,10 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       return;
     }
 
-    final source = action == ImagePickerAction.camera
-        ? ImageSource.camera
-        : ImageSource.gallery;
+    final source =
+        action == ImagePickerAction.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
 
     if (!mounted) return;
     final success = await notifier.pickAndSaveImage(source, context);
@@ -485,7 +506,9 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
 
   Future<void> _deleteStudent(Student student) async {
     try {
-      await ref.read(studentsNotifierProvider.notifier).deleteStudent(student.id);
+      await ref
+          .read(studentsNotifierProvider.notifier)
+          .deleteStudent(student.id);
 
       if (!mounted) return;
 
@@ -526,15 +549,12 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     setState(() => _isSaving = true);
 
     final sortedDays = _selectedDays.toList()..sort();
-    final lessonSlots = sortedDays.map((d) {
-      final time = _dayTimeMap[d] ?? _lessonTime;
-      final startTime = formatTime(time);
-      return LessonSlot(
-        dayOfWeek: d,
-        startTime: startTime,
-        endTime: '',
-      );
-    }).toList();
+    final lessonSlots =
+        sortedDays.map((d) {
+          final time = _dayTimeMap[d] ?? _lessonTime;
+          final startTime = formatTime(time);
+          return LessonSlot(dayOfWeek: d, startTime: startTime, endTime: '');
+        }).toList();
     final monthlyFee =
         int.tryParse(_monthlyFeeController.text) ?? original.monthlyFee;
 
@@ -544,35 +564,44 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
       level: _selectedLevel,
       monthlyFee: monthlyFee,
       lessonsPerWeek: _lessonsPerWeek,
-      phone: _phoneController.text.isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      parentName: _parentNameController.text.isNotEmpty
-          ? _parentNameController.text.trim()
-          : null,
-      parentPhone: _parentPhoneController.text.isNotEmpty
-          ? _parentPhoneController.text.trim()
-          : null,
-      email: _emailController.text.isNotEmpty
-          ? _emailController.text.trim()
-          : null,
+      phone:
+          _phoneController.text.isNotEmpty
+              ? _phoneController.text.trim()
+              : null,
+      parentName:
+          _parentNameController.text.isNotEmpty
+              ? _parentNameController.text.trim()
+              : null,
+      parentPhone:
+          _parentPhoneController.text.isNotEmpty
+              ? _parentPhoneController.text.trim()
+              : null,
+      email:
+          _emailController.text.isNotEmpty
+              ? _emailController.text.trim()
+              : null,
       lessonSlots: lessonSlots,
       lessonDuration: _lessonDuration,
-      notes: _notesController.text.isNotEmpty
-          ? _notesController.text.trim()
-          : null,
-      postalCode: _postalCodeController.text.isNotEmpty
-          ? _postalCodeController.text.trim()
-          : null,
-      address: _addressController.text.isNotEmpty
-          ? _addressController.text.trim()
-          : null,
-      addressDetail: _addressDetailController.text.isNotEmpty
-          ? _addressDetailController.text.trim()
-          : null,
-      district: _addressController.text.isNotEmpty
-          ? _extractDistrict(_addressController.text.trim())
-          : null,
+      notes:
+          _notesController.text.isNotEmpty
+              ? _notesController.text.trim()
+              : null,
+      postalCode:
+          _postalCodeController.text.isNotEmpty
+              ? _postalCodeController.text.trim()
+              : null,
+      address:
+          _addressController.text.isNotEmpty
+              ? _addressController.text.trim()
+              : null,
+      addressDetail:
+          _addressDetailController.text.isNotEmpty
+              ? _addressDetailController.text.trim()
+              : null,
+      district:
+          _addressController.text.isNotEmpty
+              ? _extractDistrict(_addressController.text.trim())
+              : null,
       updatedAt: DateTime.now(),
     );
 
@@ -620,5 +649,4 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
     }
     return null;
   }
-
 }

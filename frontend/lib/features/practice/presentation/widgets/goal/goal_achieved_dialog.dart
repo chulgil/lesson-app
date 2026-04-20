@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -34,13 +35,14 @@ class GoalAchievedDialog extends StatelessWidget {
     return showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => GoalAchievedDialog(
-        isDaily: isDaily,
-        isWeekly: isWeekly,
-        status: status,
-        streakDays: streakDays,
-        newBadge: newBadge,
-      ),
+      builder:
+          (context) => GoalAchievedDialog(
+            isDaily: isDaily,
+            isWeekly: isWeekly,
+            status: status,
+            streakDays: streakDays,
+            newBadge: newBadge,
+          ),
     );
   }
 
@@ -56,10 +58,7 @@ class GoalAchievedDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Celebration emoji
-            Text(
-              isWeekly ? '🏆' : '🎉',
-              style: const TextStyle(fontSize: 48),
-            ),
+            Text(isWeekly ? '🏆' : '🎉', style: const TextStyle(fontSize: 48)),
             const SizedBox(height: AppSpacing.space3),
 
             // Title
@@ -72,12 +71,8 @@ class GoalAchievedDialog extends StatelessWidget {
             const SizedBox(height: AppSpacing.space4),
 
             // Achievement details
-            if (isDaily) ...[
-              _buildDailyAchievements(),
-            ],
-            if (isWeekly) ...[
-              _buildWeeklyAchievements(),
-            ],
+            if (isDaily) ...[_buildDailyAchievements()],
+            if (isWeekly) ...[_buildWeeklyAchievements()],
 
             // Streak info
             if (streakDays > 0 && isDaily) ...[
@@ -121,7 +116,9 @@ class GoalAchievedDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.amberLight,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  border: Border.all(color: AppColors.amber.withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: AppColors.amber.withValues(alpha: 0.4),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -159,7 +156,7 @@ class GoalAchievedDialog extends StatelessWidget {
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
               ),
-              child: const Text('확인'),
+              child: const Text(AppStrings.confirm),
             ),
           ],
         ),
@@ -185,8 +182,7 @@ class GoalAchievedDialog extends StatelessWidget {
               value: status.todayProgress.practiceTimeText,
               target: goal.dailyTimeText,
             ),
-          if (goal.dailyTimeMinutes != null &&
-              goal.dailySectionCount != null)
+          if (goal.dailyTimeMinutes != null && goal.dailySectionCount != null)
             const Divider(height: AppSpacing.space4),
           if (goal.dailySectionCount != null)
             _buildAchievementRow(
@@ -218,8 +214,7 @@ class GoalAchievedDialog extends StatelessWidget {
               value: status.weeklyProgress.totalTimeText,
               target: goal.weeklyTimeText,
             ),
-          if (goal.weeklyTimeMinutes != null &&
-              goal.weeklyDayCount != null)
+          if (goal.weeklyTimeMinutes != null && goal.weeklyDayCount != null)
             const Divider(height: AppSpacing.space4),
           if (goal.weeklyDayCount != null)
             _buildAchievementRow(
@@ -252,9 +247,7 @@ class GoalAchievedDialog extends StatelessWidget {
         const Spacer(),
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         Text(
           ' (목표: $target)',
@@ -263,11 +256,7 @@ class GoalAchievedDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.space2),
-        Icon(
-          Icons.check_circle,
-          color: AppColors.success,
-          size: 18,
-        ),
+        Icon(Icons.check_circle, color: AppColors.success, size: 18),
       ],
     );
   }

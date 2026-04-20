@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -8,10 +9,7 @@ import '../../../../../features/practice/presentation/providers/smart_recording_
 
 /// Indicator widget showing smart recording status during recording.
 class SmartRecordingIndicator extends ConsumerWidget {
-  const SmartRecordingIndicator({
-    super.key,
-    required this.isRecording,
-  });
+  const SmartRecordingIndicator({super.key, required this.isRecording});
 
   final bool isRecording;
 
@@ -31,20 +29,20 @@ class SmartRecordingIndicator extends ConsumerWidget {
   Widget _buildIndicator(BuildContext context, SmartRecordingState state) {
     final (icon, label, color) = switch (state.phase) {
       RecordingPhase.waiting => (
-          Icons.hourglass_empty,
-          '대기 중... 연주를 시작하세요',
-          AppColors.warning,
-        ),
+        Icons.hourglass_empty,
+        '대기 중... 연주를 시작하세요',
+        AppColors.warning,
+      ),
       RecordingPhase.recording => (
-          Icons.fiber_manual_record,
-          '녹음 중',
-          AppColors.error,
-        ),
+        Icons.fiber_manual_record,
+        '녹음 중',
+        AppColors.error,
+      ),
       RecordingPhase.ending => (
-          Icons.pause_circle_outline,
-          '소리 감지 대기...',
-          AppColors.textSecondaryLight,
-        ),
+        Icons.pause_circle_outline,
+        '소리 감지 대기...',
+        AppColors.textSecondaryLight,
+      ),
     };
 
     return AnimatedContainer(
@@ -56,19 +54,12 @@ class SmartRecordingIndicator extends ConsumerWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 16,
-            color: color,
-          ),
+          Icon(icon, size: 16, color: color),
           const SizedBox(width: 6),
           Text(
             label,
@@ -116,8 +107,10 @@ class SmartRecordingResultDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final contentDuration = totalDuration - trimmedStart - trimmedEnd - middleSilenceDuration;
-    final hasTrimming = trimmedStart > Duration.zero || trimmedEnd > Duration.zero;
+    final contentDuration =
+        totalDuration - trimmedStart - trimmedEnd - middleSilenceDuration;
+    final hasTrimming =
+        trimmedStart > Duration.zero || trimmedEnd > Duration.zero;
     final hasMiddleSilence = middleSilenceCount > 0;
     final hasAnyTrimming = hasTrimming || hasMiddleSilence;
 
@@ -151,7 +144,11 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (trimmedStart > Duration.zero)
               Row(
                 children: [
-                  const Icon(Icons.content_cut, size: 16, color: AppColors.textTertiaryLight),
+                  const Icon(
+                    Icons.content_cut,
+                    size: 16,
+                    color: AppColors.textTertiaryLight,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
                   Text('앞 ${_formatDuration(trimmedStart)} 트림'),
                 ],
@@ -159,7 +156,11 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (trimmedEnd > Duration.zero)
               Row(
                 children: [
-                  const Icon(Icons.content_cut, size: 16, color: AppColors.textTertiaryLight),
+                  const Icon(
+                    Icons.content_cut,
+                    size: 16,
+                    color: AppColors.textTertiaryLight,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
                   Text('뒤 ${_formatDuration(trimmedEnd)} 트림'),
                 ],
@@ -167,9 +168,15 @@ class SmartRecordingResultDialog extends StatelessWidget {
             if (hasMiddleSilence)
               Row(
                 children: [
-                  const Icon(Icons.skip_next, size: 16, color: AppColors.textTertiaryLight),
+                  const Icon(
+                    Icons.skip_next,
+                    size: 16,
+                    color: AppColors.textTertiaryLight,
+                  ),
                   const SizedBox(width: AppSpacing.space2),
-                  Text('중간 무음 $middleSilenceCount구간 스킵 (${_formatDuration(middleSilenceDuration)})'),
+                  Text(
+                    '중간 무음 $middleSilenceCount구간 스킵 (${_formatDuration(middleSilenceDuration)})',
+                  ),
                 ],
               ),
           ],
@@ -189,7 +196,7 @@ class SmartRecordingResultDialog extends StatelessWidget {
             Navigator.of(context).pop();
             onConfirm?.call();
           },
-          child: const Text('확인'),
+          child: const Text(AppStrings.confirm),
         ),
       ],
     );
@@ -209,14 +216,15 @@ Future<void> showSmartRecordingResult(
 }) {
   return showDialog(
     context: context,
-    builder: (context) => SmartRecordingResultDialog(
-      trimmedStart: trimmedStart,
-      trimmedEnd: trimmedEnd,
-      totalDuration: totalDuration,
-      middleSilenceCount: middleSilenceCount,
-      middleSilenceDuration: middleSilenceDuration,
-      onRestore: onRestore,
-      onConfirm: onConfirm,
-    ),
+    builder:
+        (context) => SmartRecordingResultDialog(
+          trimmedStart: trimmedStart,
+          trimmedEnd: trimmedEnd,
+          totalDuration: totalDuration,
+          middleSilenceCount: middleSilenceCount,
+          middleSilenceDuration: middleSilenceDuration,
+          onRestore: onRestore,
+          onConfirm: onConfirm,
+        ),
   );
 }

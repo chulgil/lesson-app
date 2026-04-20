@@ -23,13 +23,17 @@ class ProfilePreviewScreen extends ConsumerWidget {
         title: const Text('프로필 미리보기'),
         actions: [
           profileAsync.whenOrNull(
-                data: (profile) => profile != null
-                    ? IconButton(
-                        icon: const Icon(Icons.copy_outlined),
-                        tooltip: '프로필 복사',
-                        onPressed: () => _copyProfileToClipboard(context, profile),
-                      )
-                    : null,
+                data:
+                    (profile) =>
+                        profile != null
+                            ? IconButton(
+                              icon: const Icon(Icons.copy_outlined),
+                              tooltip: '프로필 복사',
+                              onPressed:
+                                  () =>
+                                      _copyProfileToClipboard(context, profile),
+                            )
+                            : null,
               ) ??
               const SizedBox.shrink(),
         ],
@@ -92,24 +96,27 @@ class ProfilePreviewScreen extends ConsumerWidget {
               child: Wrap(
                 spacing: AppSpacing.space2,
                 runSpacing: AppSpacing.space2,
-                children: profile.specialties!.map((specialty) {
-                  return Chip(
-                    label: Text(specialty),
-                    labelStyle: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    backgroundColor:
-                        AppColors.primary.withValues(alpha: 0.08),
-                    side: BorderSide(
-                      color: AppColors.primary.withValues(alpha: 0.2),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusRound),
-                    ),
-                  );
-                }).toList(),
+                children:
+                    profile.specialties!.map((specialty) {
+                      return Chip(
+                        label: Text(specialty),
+                        labelStyle: AppTypography.bodySmall.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        backgroundColor: AppColors.primary.withValues(
+                          alpha: 0.08,
+                        ),
+                        side: BorderSide(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusRound,
+                          ),
+                        ),
+                      );
+                    }).toList(),
               ),
             ),
 
@@ -118,14 +125,15 @@ class ProfilePreviewScreen extends ConsumerWidget {
             _buildSection(
               title: '학력',
               child: Column(
-                children: profile.education!.map((edu) {
-                  return _buildListItem(
-                    icon: Icons.school_outlined,
-                    title: '${edu.school} ${edu.major}',
-                    subtitle:
-                        '${edu.degree}${edu.graduationYear != null ? ' · ${edu.graduationYear}' : ''}',
-                  );
-                }).toList(),
+                children:
+                    profile.education!.map((edu) {
+                      return _buildListItem(
+                        icon: Icons.school_outlined,
+                        title: '${edu.school} ${edu.major}',
+                        subtitle:
+                            '${edu.degree}${edu.graduationYear != null ? ' · ${edu.graduationYear}' : ''}',
+                      );
+                    }).toList(),
               ),
             ),
 
@@ -134,16 +142,19 @@ class ProfilePreviewScreen extends ConsumerWidget {
             _buildSection(
               title: '경력',
               child: Column(
-                children: profile.career!.map((c) {
-                  final period = c.endYear != null
-                      ? '${c.startYear} - ${c.endYear}'
-                      : '${c.startYear} - 현재';
-                  return _buildListItem(
-                    icon: Icons.business_outlined,
-                    title: '${c.organization}${c.position != null ? ' · ${c.position}' : ''}',
-                    subtitle: period,
-                  );
-                }).toList(),
+                children:
+                    profile.career!.map((c) {
+                      final period =
+                          c.endYear != null
+                              ? '${c.startYear} - ${c.endYear}'
+                              : '${c.startYear} - 현재';
+                      return _buildListItem(
+                        icon: Icons.business_outlined,
+                        title:
+                            '${c.organization}${c.position.isNotEmpty ? ' · ${c.position}' : ''}',
+                        subtitle: period,
+                      );
+                    }).toList(),
               ),
             ),
 
@@ -152,15 +163,17 @@ class ProfilePreviewScreen extends ConsumerWidget {
             _buildSection(
               title: '자격증',
               child: Column(
-                children: profile.verification.certificates
-                    .where((c) => c.isApproved)
-                    .map((cert) {
-                  return _buildListItem(
-                    icon: Icons.verified_outlined,
-                    title: cert.name,
-                    subtitle: cert.issuingBody,
-                  );
-                }).toList(),
+                children:
+                    profile.verification.certificates
+                        .where((c) => c.isApproved)
+                        .map((cert) {
+                          return _buildListItem(
+                            icon: Icons.verified_outlined,
+                            title: cert.name,
+                            subtitle: cert.issuingBody,
+                          );
+                        })
+                        .toList(),
               ),
             ),
 
@@ -180,15 +193,17 @@ class ProfilePreviewScreen extends ConsumerWidget {
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
               ),
             ),
           ),
 
-          SizedBox(height: AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32),
+          SizedBox(
+            height:
+                AppSpacing.space8 + MediaQuery.of(context).padding.bottom + 32,
+          ),
         ],
       ),
     );
@@ -218,24 +233,24 @@ class ProfilePreviewScreen extends ConsumerWidget {
               CircleAvatar(
                 radius: 48,
                 backgroundColor: Colors.white.withValues(alpha: 0.2),
-                backgroundImage: profile.profileImage != null
-                    ? NetworkImage(profile.profileImage!)
-                    : null,
-                child: profile.profileImage == null
-                    ? Text(
-                        initial,
-                        style: AppTypography.displayLarge.copyWith(
-                          color: Colors.white,
-                        ),
-                      )
-                    : null,
+                backgroundImage:
+                    profile.profileImage != null
+                        ? NetworkImage(profile.profileImage!)
+                        : null,
+                child:
+                    profile.profileImage == null
+                        ? Text(
+                          initial,
+                          style: AppTypography.displayLarge.copyWith(
+                            color: Colors.white,
+                          ),
+                        )
+                        : null,
               ),
               const SizedBox(height: AppSpacing.space4),
               Text(
                 profile.name,
-                style: AppTypography.headingLarge.copyWith(
-                  color: Colors.white,
-                ),
+                style: AppTypography.headingLarge.copyWith(color: Colors.white),
               ),
               if (profile.instruments.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.space2),
@@ -258,26 +273,24 @@ class ProfilePreviewScreen extends ConsumerWidget {
 
     if (profile.instruments.isNotEmpty) {
       for (final instrument in profile.instruments) {
-        chips.add(_InfoChipData(
-          icon: Icons.music_note_outlined,
-          label: instrument,
-        ));
+        chips.add(
+          _InfoChipData(icon: Icons.music_note_outlined, label: instrument),
+        );
       }
     }
 
     if (profile.experienceYears != null) {
-      chips.add(_InfoChipData(
-        icon: Icons.work_outline,
-        label: '경력 ${profile.experienceYears}년',
-      ));
+      chips.add(
+        _InfoChipData(
+          icon: Icons.work_outline,
+          label: '경력 ${profile.experienceYears}년',
+        ),
+      );
     }
 
     if (profile.lessonAreas != null && profile.lessonAreas!.isNotEmpty) {
       for (final area in profile.lessonAreas!.take(3)) {
-        chips.add(_InfoChipData(
-          icon: Icons.location_on_outlined,
-          label: area,
-        ));
+        chips.add(_InfoChipData(icon: Icons.location_on_outlined, label: area));
       }
     }
 
@@ -291,48 +304,44 @@ class ProfilePreviewScreen extends ConsumerWidget {
       child: Wrap(
         spacing: AppSpacing.space2,
         runSpacing: AppSpacing.space2,
-        children: chips.map((chip) {
-          return Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space3,
-              vertical: AppSpacing.space2,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  chip.icon,
-                  size: 16,
-                  color: AppColors.textSecondaryLight,
+        children:
+            chips.map((chip) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space2,
                 ),
-                const SizedBox(width: AppSpacing.space1),
-                Text(
-                  chip.label,
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                    fontWeight: FontWeight.w500,
-                  ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSecondaryLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
                 ),
-              ],
-            ),
-          );
-        }).toList(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      chip.icon,
+                      size: 16,
+                      color: AppColors.textSecondaryLight,
+                    ),
+                    const SizedBox(width: AppSpacing.space1),
+                    Text(
+                      chip.label,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
       ),
     );
   }
 
-  Widget _buildSection({
-    required String title,
-    required Widget child,
-  }) {
+  Widget _buildSection({required String title, required Widget child}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -360,11 +369,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: AppColors.primary,
-          ),
+          Icon(icon, size: 20, color: AppColors.primary),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -436,8 +441,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
     }
 
     // Teaching style
-    if (profile.teachingStyle != null &&
-        profile.teachingStyle!.isNotEmpty) {
+    if (profile.teachingStyle != null && profile.teachingStyle!.isNotEmpty) {
       buffer.writeln();
       buffer.writeln('[교수 스타일]');
       buffer.writeln(profile.teachingStyle);
@@ -457,8 +461,7 @@ class ProfilePreviewScreen extends ConsumerWidget {
       for (final edu in profile.education!) {
         final yearPart =
             edu.graduationYear != null ? ', ${edu.graduationYear}' : '';
-        buffer.writeln(
-            '- ${edu.school} ${edu.major} (${edu.degree}$yearPart)');
+        buffer.writeln('- ${edu.school} ${edu.major} (${edu.degree}$yearPart)');
       }
     }
 
@@ -467,19 +470,18 @@ class ProfilePreviewScreen extends ConsumerWidget {
       buffer.writeln();
       buffer.writeln('[경력]');
       for (final c in profile.career!) {
-        final period = c.endYear != null
-            ? '${c.startYear} - ${c.endYear}'
-            : '${c.startYear} - 현재';
-        final positionPart =
-            c.position.isNotEmpty ? ' ${c.position}' : '';
+        final period =
+            c.endYear != null
+                ? '${c.startYear} - ${c.endYear}'
+                : '${c.startYear} - 현재';
+        final positionPart = c.position.isNotEmpty ? ' ${c.position}' : '';
         buffer.writeln('- ${c.organization}$positionPart ($period)');
       }
     }
 
     // Certificates (approved only)
-    final approvedCerts = profile.verification.certificates
-        .where((c) => c.isApproved)
-        .toList();
+    final approvedCerts =
+        profile.verification.certificates.where((c) => c.isApproved).toList();
     if (approvedCerts.isNotEmpty) {
       buffer.writeln();
       buffer.writeln('[자격증]');

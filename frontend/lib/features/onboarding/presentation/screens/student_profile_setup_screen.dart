@@ -350,13 +350,11 @@ class _ProgressStep extends StatelessWidget {
   final int step;
   final String label;
   final bool isActive;
-  final bool isCompleted;
 
   const _ProgressStep({
     required this.step,
     required this.label,
     required this.isActive,
-    this.isCompleted = false,
   });
 
   @override
@@ -368,26 +366,17 @@ class _ProgressStep extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color:
-                  isActive || isCompleted
-                      ? AppColors.primary
-                      : AppColors.borderLight,
+              color: isActive ? AppColors.primary : AppColors.borderLight,
               shape: BoxShape.circle,
             ),
             child: Center(
-              child:
-                  isCompleted
-                      ? const Icon(Icons.check, size: 16, color: Colors.white)
-                      : Text(
-                        '$step',
-                        style: AppTypography.bodySmall.copyWith(
-                          color:
-                              isActive
-                                  ? Colors.white
-                                  : AppColors.textTertiaryLight,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+              child: Text(
+                '$step',
+                style: AppTypography.bodySmall.copyWith(
+                  color: isActive ? Colors.white : AppColors.textTertiaryLight,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -395,7 +384,7 @@ class _ProgressStep extends StatelessWidget {
             label,
             style: AppTypography.caption.copyWith(
               color:
-                  isActive || isCompleted
+                  isActive
                       ? AppColors.textPrimaryLight
                       : AppColors.textTertiaryLight,
             ),

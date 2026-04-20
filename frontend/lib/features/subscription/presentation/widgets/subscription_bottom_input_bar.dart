@@ -37,8 +37,6 @@ class SubscriptionBottomInputBar extends StatelessWidget {
     this.isBulkMode = false,
   });
 
-  bool get _isTeacher => viewerRole == 'teacher';
-
   @override
   Widget build(BuildContext context) {
     if (subscription.isExpired || subscription.isDepleted) {
@@ -55,9 +53,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          top: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,13 +77,11 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               border: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.borderLight),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 borderSide: BorderSide(color: AppColors.borderLight),
               ),
             ),
@@ -106,8 +100,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.borderLight),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
@@ -133,8 +128,9 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,

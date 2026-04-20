@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -133,10 +134,7 @@ class LessonConfirmationResult {
 class LessonConfirmationDialog extends StatefulWidget {
   final Lesson lesson;
 
-  const LessonConfirmationDialog({
-    super.key,
-    required this.lesson,
-  });
+  const LessonConfirmationDialog({super.key, required this.lesson});
 
   /// Show the dialog and return the result
   static Future<LessonConfirmationResult?> show(
@@ -174,9 +172,10 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
       ),
       child: AnimatedSize(
         duration: const Duration(milliseconds: 200),
-        child: _showReasonSelection
-            ? _buildReasonSelection()
-            : _buildInitialConfirmation(),
+        child:
+            _showReasonSelection
+                ? _buildReasonSelection()
+                : _buildInitialConfirmation(),
       ),
     );
   }
@@ -199,10 +198,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             children: [
               const Icon(Icons.fact_check, color: AppColors.primary),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '레슨 확인',
-                style: AppTypography.headingMedium,
-              ),
+              Text('레슨 확인', style: AppTypography.headingMedium),
             ],
           ),
 
@@ -251,9 +247,9 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
             description: '횟수 1회 차감',
             color: AppColors.success,
             onTap: () {
-              Navigator.of(context).pop(
-                const LessonConfirmationResult(completed: true),
-              );
+              Navigator.of(
+                context,
+              ).pop(const LessonConfirmationResult(completed: true));
             },
           ),
 
@@ -311,10 +307,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                 constraints: const BoxConstraints(),
               ),
               const SizedBox(width: AppSpacing.space2),
-              Text(
-                '레슨 미진행 사유',
-                style: AppTypography.headingMedium,
-              ),
+              Text('레슨 미진행 사유', style: AppTypography.headingMedium),
             ],
           ),
 
@@ -363,23 +356,25 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
 
           // Confirm button
           ElevatedButton(
-            onPressed: _selectedReason == null
-                ? null
-                : () {
-                    Navigator.of(context).pop(
-                      LessonConfirmationResult(
-                        completed: false,
-                        nonCompletionReason: _selectedReason,
-                        note: _noteController.text.isEmpty
-                            ? null
-                            : _noteController.text,
-                      ),
-                    );
-                  },
+            onPressed:
+                _selectedReason == null
+                    ? null
+                    : () {
+                      Navigator.of(context).pop(
+                        LessonConfirmationResult(
+                          completed: false,
+                          nonCompletionReason: _selectedReason,
+                          note:
+                              _noteController.text.isEmpty
+                                  ? null
+                                  : _noteController.text,
+                        ),
+                      );
+                    },
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
-            child: const Text('확인'),
+            child: const Text(AppStrings.confirm),
           ),
         ],
       ),
@@ -418,9 +413,7 @@ class _LessonConfirmationDialogState extends State<LessonConfirmationDialog> {
                   ),
                   Text(
                     description,
-                    style: AppTypography.caption.copyWith(
-                      color: color,
-                    ),
+                    style: AppTypography.caption.copyWith(color: color),
                   ),
                 ],
               ),

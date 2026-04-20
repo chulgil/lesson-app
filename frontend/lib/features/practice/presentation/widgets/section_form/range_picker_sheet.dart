@@ -3,6 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -66,9 +67,7 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
               vertical: AppSpacing.space3,
             ),
             decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: AppColors.borderLight),
-              ),
+              border: Border(bottom: BorderSide(color: AppColors.borderLight)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -77,16 +76,13 @@ class _RangePickerSheetState extends State<RangePickerSheet> {
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('취소'),
                 ),
-                Text(
-                  widget.title,
-                  style: AppTypography.headingSmall,
-                ),
+                Text(widget.title, style: AppTypography.headingSmall),
                 TextButton(
                   onPressed: () {
                     widget.onSelected(_selectedValue);
                     Navigator.of(context).pop();
                   },
-                  child: const Text('확인'),
+                  child: const Text(AppStrings.confirm),
                 ),
               ],
             ),
