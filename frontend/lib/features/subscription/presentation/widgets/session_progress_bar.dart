@@ -13,7 +13,7 @@ import '../../../../core/theme/app_typography.dart';
 /// - Completed: primary filled + checkmark
 /// - Active: primary filled + primaryLight ring
 /// - Future: hollow circle (borderLight)
-/// - Labels below each dot (fontSize: 10)
+/// - Labels below each dot (AppTypography.captionSmall)
 class SessionProgressBar extends StatelessWidget {
   final int totalSessions;
   final int completedSessions;
@@ -177,13 +177,12 @@ class _SessionDot extends StatelessWidget {
               showLabel && sessionNumber > 0
                   ? AppStrings.sessionNumberLabel(sessionNumber)
                   : '',
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.captionSmall.copyWith(
                 color: _textColor,
                 fontWeight:
                     state == _SessionState.scheduled || isSelected
                         ? FontWeight.w600
                         : FontWeight.normal,
-                fontSize: 10,
               ),
             ),
           ],

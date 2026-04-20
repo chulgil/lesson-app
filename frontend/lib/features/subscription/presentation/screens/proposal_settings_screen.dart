@@ -387,13 +387,14 @@ class _ProposalSettingsScreenState
                                     ),
                                     child: Text(
                                       isRecommended ? '추천' : '추천',
-                                      style: AppTypography.caption.copyWith(
-                                        color:
-                                            isRecommended
-                                                ? AppColors.warning
-                                                : AppColors.textTertiaryLight,
-                                        fontSize: 10,
-                                      ),
+                                      style: AppTypography.captionSmall
+                                          .copyWith(
+                                            color:
+                                                isRecommended
+                                                    ? AppColors.warning
+                                                    : AppColors
+                                                        .textTertiaryLight,
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -431,9 +432,8 @@ class _ProposalSettingsScreenState
               ),
               child: Text(
                 '전환율 UP',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: AppColors.warning,
-                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                 ),
               ),

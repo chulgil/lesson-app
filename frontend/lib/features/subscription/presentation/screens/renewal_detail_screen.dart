@@ -39,22 +39,20 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('수강권 갱신 제안'),
-        centerTitle: true,
-      ),
-      body: _isProcessing
-          ? const Center(child: CircularProgressIndicator())
-          : proposalAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-              data: (proposal) {
-                if (proposal == null) {
-                  return const Center(child: Text('제안을 찾을 수 없습니다'));
-                }
-                return _buildContent(proposal);
-              },
-            ),
+      appBar: AppBar(title: const Text('수강권 갱신 제안'), centerTitle: true),
+      body:
+          _isProcessing
+              ? const Center(child: CircularProgressIndicator())
+              : proposalAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                data: (proposal) {
+                  if (proposal == null) {
+                    return const Center(child: Text('제안을 찾을 수 없습니다'));
+                  }
+                  return _buildContent(proposal);
+                },
+              ),
       bottomNavigationBar: proposalAsync.whenOrNull(
         data: (proposal) {
           if (proposal == null || !proposal.canRespond || _isProcessing) {
@@ -70,10 +68,8 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     final teacherAsync = ref.watch(
       teacherFullProfileProvider(proposal.teacherId),
     );
-    final teacherName = teacherAsync.whenOrNull(
-          data: (profile) => profile?.name,
-        ) ??
-        '선생님';
+    final teacherName =
+        teacherAsync.whenOrNull(data: (profile) => profile?.name) ?? '선생님';
 
     _selectedTemplateId ??=
         proposal.selectedTemplateId ?? proposal.effectiveRecommendedTemplateId;
@@ -143,8 +139,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
           ],
 
           // Bottom spacing for action bar
-          if (proposal.canRespond)
-            const SizedBox(height: AppSpacing.space8),
+          if (proposal.canRespond) const SizedBox(height: AppSpacing.space8),
         ],
       ),
     );
@@ -159,9 +154,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -194,9 +187,10 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                   Text(
                     proposal.formattedExpiration,
                     style: AppTypography.bodySmall.copyWith(
-                      color: proposal.timeUntilExpiration.inDays < 2
-                          ? AppColors.warning
-                          : AppColors.textSecondaryLight,
+                      color:
+                          proposal.timeUntilExpiration.inDays < 2
+                              ? AppColors.warning
+                              : AppColors.textSecondaryLight,
                     ),
                   ),
               ],
@@ -209,32 +203,34 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
 
   Widget _buildTemplateOptions(SubscriptionProposal proposal) {
     return Column(
-      children: proposal.allTemplateIds.map((templateId) {
-        final templateAsync = ref.watch(
-          subscriptionTemplateProvider(templateId),
-        );
-        final isSelected = _selectedTemplateId == templateId;
-        final isRecommended = proposal.isRecommended(templateId);
-
-        return templateAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (template) {
-            if (template == null) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _buildTemplateOption(
-                template,
-                isSelected: isSelected,
-                isRecommended: isRecommended,
-                onTap: () => setState(() {
-                  _selectedTemplateId = templateId;
-                }),
-              ),
+      children:
+          proposal.allTemplateIds.map((templateId) {
+            final templateAsync = ref.watch(
+              subscriptionTemplateProvider(templateId),
             );
-          },
-        );
-      }).toList(),
+            final isSelected = _selectedTemplateId == templateId;
+            final isRecommended = proposal.isRecommended(templateId);
+
+            return templateAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (template) {
+                if (template == null) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildTemplateOption(
+                    template,
+                    isSelected: isSelected,
+                    isRecommended: isRecommended,
+                    onTap:
+                        () => setState(() {
+                          _selectedTemplateId = templateId;
+                        }),
+                  ),
+                );
+              },
+            );
+          }).toList(),
     );
   }
 
@@ -250,9 +246,10 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.05)
-              : AppColors.surfaceLight,
+          color:
+              isSelected
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.borderLight,
@@ -272,18 +269,19 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                   width: 2,
                 ),
               ),
-              child: isSelected
-                  ? Center(
-                      child: Container(
-                        width: 12,
-                        height: 12,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary,
+              child:
+                  isSelected
+                      ? Center(
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.primary,
+                          ),
                         ),
-                      ),
-                    )
-                  : null,
+                      )
+                      : null,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -311,9 +309,8 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           ),
                           child: Text(
                             '추천',
-                            style: AppTypography.caption.copyWith(
+                            style: AppTypography.captionSmall.copyWith(
                               color: AppColors.warning,
-                              fontSize: 10,
                             ),
                           ),
                         ),
@@ -408,16 +405,16 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     return teacherProfileAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (_, __) => const ProposalPaymentInfoCard(),
-      data: (profile) => ProposalPaymentInfoCard(
-        bankAccount: profile?.defaultBankAccount,
-        bankAccounts: profile?.bankAccounts ?? [],
-      ),
+      data:
+          (profile) => ProposalPaymentInfoCard(
+            bankAccount: profile?.defaultBankAccount,
+            bankAccounts: profile?.bankAccounts ?? [],
+          ),
     );
   }
 
   Widget _buildBottomActions(SubscriptionProposal proposal) {
-    final canProceed =
-        !proposal.isMultiChoice || _selectedTemplateId != null;
+    final canProceed = !proposal.isMultiChoice || _selectedTemplateId != null;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
@@ -440,31 +437,32 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: (_isProcessing || !canProceed)
-                    ? null
-                    : () => _notifyPayment(proposal),
+                onPressed:
+                    (_isProcessing || !canProceed)
+                        ? null
+                        : () => _notifyPayment(proposal),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: _isProcessing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.payment),
+                icon:
+                    _isProcessing
+                        ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                        : const Icon(Icons.payment),
                 label: const Text('수강권 선택하기'),
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             // Secondary: reject with snooze
             TextButton(
-              onPressed: _isProcessing
-                  ? null
-                  : () => _showRejectDialog(proposal),
+              onPressed:
+                  _isProcessing ? null : () => _showRejectDialog(proposal),
               child: Text(
                 '나중에 할게요',
                 style: AppTypography.bodyMedium.copyWith(
@@ -482,9 +480,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     setState(() => _isProcessing = true);
 
     try {
-      final notifier = ref.read(
-        subscriptionProposalNotifierProvider.notifier,
-      );
+      final notifier = ref.read(subscriptionProposalNotifierProvider.notifier);
 
       if (proposal.isMultiChoice && _selectedTemplateId != null) {
         await notifier.selectTemplate(proposal.id, _selectedTemplateId!);
@@ -533,15 +529,13 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
     setState(() => _isProcessing = true);
 
     try {
-      final notifier = ref.read(
-        subscriptionProposalNotifierProvider.notifier,
-      );
+      final notifier = ref.read(subscriptionProposalNotifierProvider.notifier);
       await notifier.reject(proposal.id, reason);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('다음에 다시 안내해 드릴게요')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('다음에 다시 안내해 드릴게요')));
         context.pop();
       }
     } catch (e) {

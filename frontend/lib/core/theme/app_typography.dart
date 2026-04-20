@@ -64,6 +64,12 @@ class AppTypography {
     fontWeight: FontWeight.w400,
   );
 
+  static const captionSmall = TextStyle(
+    fontSize: 10,
+    height: 1.2,
+    fontWeight: FontWeight.w400,
+  );
+
   // Button
   static const button = TextStyle(
     fontSize: 16,

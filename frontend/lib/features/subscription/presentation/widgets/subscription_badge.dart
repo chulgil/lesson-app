@@ -31,11 +31,7 @@ class SubscriptionBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (showIcon) ...[
-            Icon(
-              _getIcon(),
-              size: 12,
-              color: _getTextColor(),
-            ),
+            Icon(_getIcon(), size: 12, color: _getTextColor()),
             const SizedBox(width: 4),
           ],
           Text(
@@ -113,9 +109,8 @@ class SubscriptionProgressMini extends StatelessWidget {
     }
 
     final percentage = subscription.usagePercentage ?? 0;
-    final color = subscription.isExpiringSoon
-        ? AppColors.warning
-        : AppColors.primary;
+    final color =
+        subscription.isExpiringSoon ? AppColors.warning : AppColors.primary;
 
     return SizedBox(
       width: size,
@@ -131,9 +126,8 @@ class SubscriptionProgressMini extends StatelessWidget {
           ),
           Text(
             '${subscription.remainingLessons}',
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.captionSmall.copyWith(
               fontWeight: FontWeight.w700,
-              fontSize: 10,
               color: color,
             ),
           ),
@@ -157,15 +151,17 @@ class SubscriptionSummaryText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultStyle = AppTypography.bodySmall.copyWith(
-      color: subscription.isExpiringSoon
-          ? AppColors.warning
-          : AppColors.textSecondaryLight,
+      color:
+          subscription.isExpiringSoon
+              ? AppColors.warning
+              : AppColors.textSecondaryLight,
     );
 
     String text;
     if (subscription.type == SubscriptionType.package) {
       // Use totalLessonsForDisplay to include bonus lessons
-      text = '🎟️ ${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회 남음';
+      text =
+          '🎟️ ${subscription.remainingLessons}/${subscription.totalLessonsForDisplay}회 남음';
     } else if (subscription.type == SubscriptionType.monthly) {
       final days = subscription.daysUntilExpiration ?? 0;
       text = days > 0 ? '📅 D-$days 남음' : '📅 만료됨';
