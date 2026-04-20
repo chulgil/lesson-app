@@ -17,10 +17,7 @@ import '../../../profile/presentation/providers/invite_provider.dart';
 class TeacherDetailScreen extends ConsumerWidget {
   final String teacherId;
 
-  const TeacherDetailScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const TeacherDetailScreen({super.key, required this.teacherId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,36 +27,49 @@ class TeacherDetailScreen extends ConsumerWidget {
       backgroundColor: AppColors.backgroundLight,
       body: profileAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline,
-                  size: 48, color: AppColors.textSecondaryLight),
-              const SizedBox(height: AppSpacing.space4),
-              Text('프로필을 불러올 수 없습니다',
-                  style: AppTypography.bodyMedium
-                      .copyWith(color: AppColors.textSecondaryLight)),
-              const SizedBox(height: AppSpacing.space4),
-              TextButton(
-                onPressed: () => context.pop(),
-                child: const Text('돌아가기'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.textSecondaryLight,
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  Text(
+                    '프로필을 불러올 수 없습니다',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space4),
+                  TextButton(
+                    onPressed: () => context.pop(),
+                    child: const Text('돌아가기'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
         data: (profile) {
           if (profile == null) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.person_off_outlined,
-                      size: 48, color: AppColors.textSecondaryLight),
+                  Icon(
+                    Icons.person_off_outlined,
+                    size: 48,
+                    color: AppColors.textSecondaryLight,
+                  ),
                   const SizedBox(height: AppSpacing.space4),
-                  Text('선생님 정보를 찾을 수 없습니다',
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textSecondaryLight)),
+                  Text(
+                    '선생님 정보를 찾을 수 없습니다',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.textSecondaryLight,
+                    ),
+                  ),
                   const SizedBox(height: AppSpacing.space4),
                   TextButton(
                     onPressed: () => context.pop(),
@@ -84,13 +94,18 @@ class _TeacherDetailContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Check if this is a previous teacher (disconnected)
-    final disconnectedConnectionsAsync = ref.watch(myDisconnectedConnectionsProvider);
-    final isPreviousTeacher = disconnectedConnectionsAsync.valueOrNull
-            ?.any((c) => c.teacherId == profile.id) ??
+    final disconnectedConnectionsAsync = ref.watch(
+      myDisconnectedConnectionsProvider,
+    );
+    final isPreviousTeacher =
+        disconnectedConnectionsAsync.valueOrNull?.any(
+          (c) => c.teacherId == profile.id,
+        ) ??
         false;
-    final disconnectedConnection = disconnectedConnectionsAsync.valueOrNull
-        ?.where((c) => c.teacherId == profile.id)
-        .firstOrNull;
+    final disconnectedConnection =
+        disconnectedConnectionsAsync.valueOrNull
+            ?.where((c) => c.teacherId == profile.id)
+            .firstOrNull;
     return CustomScrollView(
       slivers: [
         // App bar with profile image
@@ -123,19 +138,25 @@ class _TeacherDetailContent extends ConsumerWidget {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: Colors.white.withValues(alpha: 0.2),
-                        backgroundImage: profile.profileImage != null
-                            ? NetworkImage(profile.profileImage!)
-                            : null,
-                        child: profile.profileImage == null
-                            ? const Icon(Icons.person,
-                                size: 50, color: Colors.white)
-                            : null,
+                        backgroundImage:
+                            profile.profileImage != null
+                                ? NetworkImage(profile.profileImage!)
+                                : null,
+                        child:
+                            profile.profileImage == null
+                                ? const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.white,
+                                )
+                                : null,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         profile.name ?? '익명 선생님',
-                        style: AppTypography.headingMedium
-                            .copyWith(color: Colors.white),
+                        style: AppTypography.headingMedium.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -165,15 +186,20 @@ class _TeacherDetailContent extends ConsumerWidget {
                   child: Wrap(
                     spacing: AppSpacing.space2,
                     runSpacing: AppSpacing.space1,
-                    children: profile.instruments
-                        .map((i) => Chip(
-                              label: Text(i),
-                              backgroundColor:
-                                  AppColors.primary.withValues(alpha: 0.1),
-                              labelStyle: AppTypography.bodySmall
-                                  .copyWith(color: AppColors.primary),
-                            ))
-                        .toList(),
+                    children:
+                        profile.instruments
+                            .map(
+                              (i) => Chip(
+                                label: Text(i),
+                                backgroundColor: AppColors.primary.withValues(
+                                  alpha: 0.1,
+                                ),
+                                labelStyle: AppTypography.bodySmall.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -185,7 +211,9 @@ class _TeacherDetailContent extends ConsumerWidget {
                   child: Text(
                     profile.introduction,
                     style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight, height: 1.5),
+                      color: AppColors.textSecondaryLight,
+                      height: 1.5,
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -197,8 +225,9 @@ class _TeacherDetailContent extends ConsumerWidget {
                     title: '경력',
                     child: Text(
                       '${profile.experienceYears}년 경력',
-                      style: AppTypography.bodyMedium
-                          .copyWith(color: AppColors.textSecondaryLight),
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textSecondaryLight,
+                      ),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -213,15 +242,19 @@ class _TeacherDetailContent extends ConsumerWidget {
                     child: Wrap(
                       spacing: AppSpacing.space2,
                       runSpacing: AppSpacing.space1,
-                      children: profile.lessonTypes!
-                          .map((t) => Chip(
-                                label: Text(_getLessonTypeLabel(t)),
-                                backgroundColor:
-                                    AppColors.secondary.withValues(alpha: 0.1),
-                                labelStyle: AppTypography.bodySmall
-                                    .copyWith(color: AppColors.secondary),
-                              ))
-                          .toList(),
+                      children:
+                          profile.lessonTypes!
+                              .map(
+                                (t) => Chip(
+                                  label: Text(_getLessonTypeLabel(t)),
+                                  backgroundColor: AppColors.secondary
+                                      .withValues(alpha: 0.1),
+                                  labelStyle: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -236,15 +269,19 @@ class _TeacherDetailContent extends ConsumerWidget {
                     child: Wrap(
                       spacing: AppSpacing.space2,
                       runSpacing: AppSpacing.space1,
-                      children: profile.lessonAreas!
-                          .map((a) => Chip(
-                                label: Text(a),
-                                backgroundColor: AppColors.textSecondaryLight
-                                    .withValues(alpha: 0.1),
-                                labelStyle: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight),
-                              ))
-                          .toList(),
+                      children:
+                          profile.lessonAreas!
+                              .map(
+                                (a) => Chip(
+                                  label: Text(a),
+                                  backgroundColor: AppColors.textSecondaryLight
+                                      .withValues(alpha: 0.1),
+                                  labelStyle: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -261,17 +298,20 @@ class _TeacherDetailContent extends ConsumerWidget {
                     title: '학력',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: profile.education!.map((edu) {
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: AppSpacing.space2),
-                          child: Text(
-                            '${edu.school} ${edu.major} (${edu.degree})',
-                            style: AppTypography.bodyMedium
-                                .copyWith(color: AppColors.textSecondaryLight),
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          profile.education!.map((edu) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.space2,
+                              ),
+                              child: Text(
+                                '${edu.school} ${edu.major} (${edu.degree})',
+                                style: AppTypography.bodyMedium.copyWith(
+                                  color: AppColors.textSecondaryLight,
+                                ),
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -284,34 +324,39 @@ class _TeacherDetailContent extends ConsumerWidget {
                     title: '경력 사항',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: profile.career!.map((career) {
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: AppSpacing.space2),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(
-                                    top: 6, right: AppSpacing.space2),
-                                width: 6,
-                                height: 6,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primary,
-                                  shape: BoxShape.circle,
-                                ),
+                      children:
+                          profile.career!.map((career) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.space2,
                               ),
-                              Expanded(
-                                child: Text(
-                                  '${career.organization} - ${career.position} (${career.period})',
-                                  style: AppTypography.bodyMedium.copyWith(
-                                      color: AppColors.textSecondaryLight),
-                                ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                      top: 6,
+                                      right: AppSpacing.space2,
+                                    ),
+                                    width: 6,
+                                    height: 6,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      '${career.organization} - ${career.position} (${career.period})',
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        color: AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -324,46 +369,60 @@ class _TeacherDetailContent extends ConsumerWidget {
                     title: '인증된 자격증',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: profile.verifiedCertificates.map((cert) {
-                        return Container(
-                          margin:
-                              const EdgeInsets.only(bottom: AppSpacing.space2),
-                          padding: const EdgeInsets.all(AppSpacing.space3),
-                          decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.success.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.verified,
-                                  color: AppColors.success, size: 20),
-                              const SizedBox(width: AppSpacing.space2),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      cert.name,
-                                      style: AppTypography.bodyMedium.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      cert.issuingBody,
-                                      style: AppTypography.bodySmall.copyWith(
-                                        color: AppColors.textSecondaryLight,
-                                      ),
-                                    ),
-                                  ],
+                      children:
+                          profile.verifiedCertificates.map((cert) {
+                            return Container(
+                              margin: const EdgeInsets.only(
+                                bottom: AppSpacing.space2,
+                              ),
+                              padding: const EdgeInsets.all(AppSpacing.space3),
+                              decoration: BoxDecoration(
+                                color: AppColors.success.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium,
+                                ),
+                                border: Border.all(
+                                  color: AppColors.success.withValues(
+                                    alpha: 0.3,
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.verified,
+                                    color: AppColors.success,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: AppSpacing.space2),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          cert.name,
+                                          style: AppTypography.bodyMedium
+                                              .copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        Text(
+                                          cert.issuingBody,
+                                          style: AppTypography.bodySmall
+                                              .copyWith(
+                                                color:
+                                                    AppColors
+                                                        .textSecondaryLight,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -396,9 +455,12 @@ class _TeacherDetailContent extends ConsumerWidget {
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.space3),
+                          vertical: AppSpacing.space3,
+                        ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusLarge,
+                          ),
                         ),
                       ),
                     ),
@@ -422,9 +484,10 @@ class _TeacherDetailContent extends ConsumerWidget {
     String? previousLessonPeriod;
     if (disconnectedConnection?.connectedAt != null) {
       final start = _formatDate(disconnectedConnection!.connectedAt);
-      final end = disconnectedConnection.deactivatedAt != null
-          ? _formatDate(disconnectedConnection.deactivatedAt!)
-          : '';
+      final end =
+          disconnectedConnection.deactivatedAt != null
+              ? _formatDate(disconnectedConnection.deactivatedAt!)
+              : '';
       previousLessonPeriod = '$start ~ $end';
     }
 
@@ -437,9 +500,7 @@ class _TeacherDetailContent extends ConsumerWidget {
           decoration: BoxDecoration(
             color: AppColors.info.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(
-              color: AppColors.info.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -482,9 +543,10 @@ class _TeacherDetailContent extends ConsumerWidget {
                   teacherName: profile.name ?? '',
                   teacherInstruments: profile.instruments,
                   isReturningStudent: true,
-                  previousInstrument: profile.instruments.isNotEmpty
-                      ? profile.instruments.first
-                      : null,
+                  previousInstrument:
+                      profile.instruments.isNotEmpty
+                          ? profile.instruments.first
+                          : null,
                 ),
               );
             },
@@ -495,7 +557,7 @@ class _TeacherDetailContent extends ConsumerWidget {
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
               ),
             ),
           ),
@@ -521,39 +583,40 @@ class _TeacherDetailContent extends ConsumerWidget {
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: profile.badges.map((badge) {
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space3,
-            vertical: AppSpacing.space1,
-          ),
-          decoration: BoxDecoration(
-            color: _getBadgeColor(badge).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: _getBadgeColor(badge).withValues(alpha: 0.3),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                _getBadgeIcon(badge),
-                size: 16,
-                color: _getBadgeColor(badge),
+      children:
+          profile.badges.map((badge) {
+            return Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+                vertical: AppSpacing.space1,
               ),
-              const SizedBox(width: 4),
-              Text(
-                _getBadgeLabel(badge),
-                style: AppTypography.bodySmall.copyWith(
-                  color: _getBadgeColor(badge),
-                  fontWeight: FontWeight.w600,
+              decoration: BoxDecoration(
+                color: _getBadgeColor(badge).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+                border: Border.all(
+                  color: _getBadgeColor(badge).withValues(alpha: 0.3),
                 ),
               ),
-            ],
-          ),
-        );
-      }).toList(),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    _getBadgeIcon(badge),
+                    size: 16,
+                    color: _getBadgeColor(badge),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _getBadgeLabel(badge),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: _getBadgeColor(badge),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -569,17 +632,11 @@ class _TeacherDetailContent extends ConsumerWidget {
           children: [
             Icon(icon, size: 20, color: AppColors.primary),
             const SizedBox(width: AppSpacing.space2),
-            Text(
-              title,
-              style: AppTypography.headingSmall,
-            ),
+            Text(title, style: AppTypography.headingSmall),
           ],
         ),
         const SizedBox(height: AppSpacing.space2),
-        Padding(
-          padding: const EdgeInsets.only(left: 28),
-          child: child,
-        ),
+        Padding(padding: const EdgeInsets.only(left: 28), child: child),
       ],
     );
   }
