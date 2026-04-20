@@ -32,8 +32,11 @@ class ParentDashboardTab extends ConsumerWidget {
       childrenAsync.whenData((profiles) {
         if (profiles.isNotEmpty) {
           Future.microtask(() {
-            ref.read(selectedChildProfileProvider.notifier).select(profiles.first);
-            ref.read(selectedChildIdProvider.notifier).state = profiles.first.id;
+            ref
+                .read(selectedChildProfileProvider.notifier)
+                .select(profiles.first);
+            ref.read(selectedChildIdProvider.notifier).state =
+                profiles.first.id;
           });
         }
       });
@@ -147,10 +150,7 @@ class ParentDashboardTab extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
             const SizedBox(height: AppSpacing.space4),
-            Text(
-              '등록된 자녀가 없습니다',
-              style: AppTypography.headingSmall,
-            ),
+            Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '자녀를 추가하여 레슨 일정과\n연습 현황을 관리해보세요',
@@ -181,7 +181,11 @@ class ParentDashboardTab extends ConsumerWidget {
     );
   }
 
-  void _showChildSelector(BuildContext context, WidgetRef ref, String parentId) {
+  void _showChildSelector(
+    BuildContext context,
+    WidgetRef ref,
+    String parentId,
+  ) {
     final selectedChildId = ref.read(selectedChildIdProvider);
 
     showModalBottomSheet(
@@ -189,111 +193,124 @@ class ParentDashboardTab extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (sheetContext) => Consumer(
-        builder: (context, sheetRef, _) {
-          final profilesAsync = sheetRef.watch(childProfilesProvider(parentId));
+      builder:
+          (sheetContext) => Consumer(
+            builder: (context, sheetRef, _) {
+              final profilesAsync = sheetRef.watch(
+                childProfilesProvider(parentId),
+              );
 
-          return Container(
-            padding: const EdgeInsets.all(AppSpacing.space4),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle indicator
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Text(
-                  '자녀 선택',
-                  style: AppTypography.headingMedium,
-                ),
-                const SizedBox(height: AppSpacing.space4),
-                // Child list from provider
-                profilesAsync.when(
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(AppSpacing.space4),
-                    child: CircularProgressIndicator(),
-                  ),
-                  error: (_, __) => const Padding(
-                    padding: EdgeInsets.all(AppSpacing.space4),
-                    child: Text('오류가 발생했습니다.'),
-                  ),
-                  data: (profiles) {
-                    if (profiles.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.all(AppSpacing.space4),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.child_care_outlined,
-                              size: 48,
-                              color: AppColors.textTertiaryLight,
-                            ),
-                            const SizedBox(height: AppSpacing.space2),
-                            Text(
-                              '등록된 자녀가 없습니다',
-                              style: AppTypography.bodyMedium.copyWith(
-                                color: AppColors.textSecondaryLight,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: profiles.map((profile) {
-                        final isSelected = selectedChildId == profile.id;
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: profile.profileColor,
-                            child: Text(
-                              profile.initial,
-                              style: const TextStyle(color: Colors.white),
-                            ),
+              return Container(
+                padding: const EdgeInsets.all(AppSpacing.space4),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Handle indicator
+                    Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.space4),
+                      decoration: BoxDecoration(
+                        color: AppColors.borderLight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    Text('자녀 선택', style: AppTypography.headingMedium),
+                    const SizedBox(height: AppSpacing.space4),
+                    // Child list from provider
+                    profilesAsync.when(
+                      loading:
+                          () => const Padding(
+                            padding: EdgeInsets.all(AppSpacing.space4),
+                            child: CircularProgressIndicator(),
                           ),
-                          title: Text(profile.name),
-                          subtitle: Text(profile.instrumentLabel),
-                          trailing: isSelected
-                              ? Icon(Icons.check, color: AppColors.primary)
-                              : null,
-                          onTap: () {
-                            ref.read(selectedChildIdProvider.notifier).state =
-                                profile.id;
-                            ref
-                                .read(selectedChildProfileProvider.notifier)
-                                .select(profile);
-                            Navigator.pop(sheetContext);
-                          },
+                      error:
+                          (_, __) => const Padding(
+                            padding: EdgeInsets.all(AppSpacing.space4),
+                            child: Text('오류가 발생했습니다.'),
+                          ),
+                      data: (profiles) {
+                        if (profiles.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.all(AppSpacing.space4),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.child_care_outlined,
+                                  size: 48,
+                                  color: AppColors.textTertiaryLight,
+                                ),
+                                const SizedBox(height: AppSpacing.space2),
+                                Text(
+                                  '등록된 자녀가 없습니다',
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children:
+                              profiles.map((profile) {
+                                final isSelected =
+                                    selectedChildId == profile.id;
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: profile.profileColor,
+                                    child: Text(
+                                      profile.initial,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  title: Text(profile.name),
+                                  subtitle: Text(profile.instrumentLabel),
+                                  trailing:
+                                      isSelected
+                                          ? Icon(
+                                            Icons.check,
+                                            color: AppColors.primary,
+                                          )
+                                          : null,
+                                  onTap: () {
+                                    ref
+                                        .read(selectedChildIdProvider.notifier)
+                                        .state = profile.id;
+                                    ref
+                                        .read(
+                                          selectedChildProfileProvider.notifier,
+                                        )
+                                        .select(profile);
+                                    Navigator.pop(sheetContext);
+                                  },
+                                );
+                              }).toList(),
                         );
-                      }).toList(),
-                    );
-                  },
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                    // Add child button
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(sheetContext);
+                        context.push(
+                          '${AppRoutes.addChildProfile}?parentId=$parentId',
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('자녀 추가'),
+                    ),
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.space4),
-                // Add child button
-                OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(sheetContext);
-                    context.push(
-                      '${AppRoutes.addChildProfile}?parentId=$parentId',
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('자녀 추가'),
-                ),
-                const SizedBox(height: AppSpacing.space4),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
@@ -303,7 +320,10 @@ class ParentDashboardTab extends ConsumerWidget {
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [profile.profileColor, profile.profileColor.withValues(alpha: 0.8)],
+          colors: [
+            profile.profileColor,
+            profile.profileColor.withValues(alpha: 0.8),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -317,9 +337,7 @@ class ParentDashboardTab extends ConsumerWidget {
               backgroundColor: Colors.white.withValues(alpha: 0.2),
               child: Text(
                 profile.initial,
-                style: AppTypography.headingLarge.copyWith(
-                  color: Colors.white,
-                ),
+                style: AppTypography.headingLarge.copyWith(color: Colors.white),
               ),
             ),
             const SizedBox(width: AppSpacing.space4),
@@ -343,7 +361,9 @@ class ParentDashboardTab extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                         child: Text(
                           '만 ${profile.age}세',
@@ -363,7 +383,9 @@ class ParentDashboardTab extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -455,7 +477,7 @@ class ParentDashboardTab extends ConsumerWidget {
           height: 48,
           decoration: BoxDecoration(
             color: AppColors.primaryLight.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -468,9 +490,7 @@ class ParentDashboardTab extends ConsumerWidget {
               ),
               Text(
                 '토',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
-                ),
+                style: AppTypography.caption.copyWith(color: AppColors.primary),
               ),
             ],
           ),
@@ -486,7 +506,7 @@ class ParentDashboardTab extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
             color: AppColors.successLight,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Text(
             'D-1',
@@ -538,29 +558,37 @@ class ParentDashboardTab extends ConsumerWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: practiced
-                      ? AppColors.success
-                      : isToday
+                  color:
+                      practiced
+                          ? AppColors.success
+                          : isToday
                           ? AppColors.primaryLight
                           : isPast
-                              ? AppColors.errorLight
-                              : AppColors.surfaceSecondaryLight,
+                          ? AppColors.errorLight
+                          : AppColors.surfaceSecondaryLight,
                   shape: BoxShape.circle,
-                  border: isToday
-                      ? Border.all(color: AppColors.primary, width: 2)
-                      : null,
+                  border:
+                      isToday
+                          ? Border.all(color: AppColors.primary, width: 2)
+                          : null,
                 ),
                 child: Center(
-                  child: practiced
-                      ? const Icon(Icons.check, size: 18, color: Colors.white)
-                      : Text(
-                          '${day.day}',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: isToday
-                                ? AppColors.primary
-                                : AppColors.textSecondaryLight,
+                  child:
+                      practiced
+                          ? const Icon(
+                            Icons.check,
+                            size: 18,
+                            color: Colors.white,
+                          )
+                          : Text(
+                            '${day.day}',
+                            style: AppTypography.bodySmall.copyWith(
+                              color:
+                                  isToday
+                                      ? AppColors.primary
+                                      : AppColors.textSecondaryLight,
+                            ),
                           ),
-                        ),
                 ),
               ),
             ],
@@ -574,10 +602,7 @@ class ParentDashboardTab extends ConsumerWidget {
     return SectionCard(
       title: '과제 현황',
       icon: Icons.assignment,
-      trailing: TextButton(
-        onPressed: () {},
-        child: const Text('전체보기'),
-      ),
+      trailing: TextButton(onPressed: () {}, child: const Text('전체보기')),
       child: Column(
         children: const [
           AssignmentItem(
@@ -617,10 +642,7 @@ class ParentDashboardTab extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '1월 수강료',
-                    style: AppTypography.bodyMedium,
-                  ),
+                  Text('1월 수강료', style: AppTypography.bodyMedium),
                   Text(
                     '결제 기한: 12/28',
                     style: AppTypography.caption.copyWith(
@@ -645,7 +667,9 @@ class ParentDashboardTab extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.warningLight,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Text(
                       '미결제',
@@ -662,10 +686,7 @@ class ParentDashboardTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           SizedBox(
             width: double.infinity,
-            child: FilledButton(
-              onPressed: () {},
-              child: const Text('결제하기'),
-            ),
+            child: FilledButton(onPressed: () {}, child: const Text('결제하기')),
           ),
         ],
       ),
