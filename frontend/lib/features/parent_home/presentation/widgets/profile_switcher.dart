@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/child_profile.dart';
 import '../../../../features/parent_home/domain/entities/user_profile.dart';
 import '../../../../features/parent_home/presentation/providers/user_profile_provider.dart';
@@ -122,31 +123,36 @@ class _ProfileDropdown extends ConsumerWidget {
 
     // Parent profile option
     if (availableProfiles.contains(ProfileType.parent)) {
-      items.add(_buildProfileItem(
-        option: _ProfileOption(
-          type: ProfileType.parent,
-          label: '학부모',
-          icon: ProfileType.parent.icon,
-          color: ProfileType.parent.color,
+      items.add(
+        _buildProfileItem(
+          option: _ProfileOption(
+            type: ProfileType.parent,
+            label: '학부모',
+            icon: ProfileType.parent.icon,
+            color: ProfileType.parent.color,
+          ),
+          isSelected: userProfile.activeProfile == ProfileType.parent,
         ),
-        isSelected: userProfile.activeProfile == ProfileType.parent,
-      ));
+      );
     }
 
     // Student profile option
     if (availableProfiles.contains(ProfileType.student)) {
-      items.add(_buildProfileItem(
-        option: _ProfileOption(
-          type: ProfileType.student,
-          label: '${userProfile.userName} (학생)',
-          icon: ProfileType.student.icon,
-          color: ProfileType.student.color,
-          subtitle: userProfile.studentTeacherName != null
-              ? '${userProfile.studentTeacherName} 선생님'
-              : null,
+      items.add(
+        _buildProfileItem(
+          option: _ProfileOption(
+            type: ProfileType.student,
+            label: '${userProfile.userName} (학생)',
+            icon: ProfileType.student.icon,
+            color: ProfileType.student.color,
+            subtitle:
+                userProfile.studentTeacherName != null
+                    ? '${userProfile.studentTeacherName} 선생님'
+                    : null,
+          ),
+          isSelected: userProfile.activeProfile == ProfileType.student,
         ),
-        isSelected: userProfile.activeProfile == ProfileType.student,
-      ));
+      );
     }
 
     // Child profile options
@@ -159,8 +165,7 @@ class _ProfileDropdown extends ConsumerWidget {
           height: 30,
           child: Text(
             '자녀 프로필',
-            style: TextStyle(
-              fontSize: 12,
+            style: AppTypography.bodySmall.copyWith(
               color: AppColors.textSecondaryLight,
               fontWeight: FontWeight.w500,
             ),
@@ -169,20 +174,23 @@ class _ProfileDropdown extends ConsumerWidget {
       );
 
       for (final child in userProfile.children) {
-        items.add(_buildProfileItem(
-          option: _ProfileOption(
-            type: ProfileType.child,
-            childId: child.id,
-            label: child.name,
-            icon: ProfileType.child.icon,
-            color: child.profileColor,
-            subtitle: _getChildSubtitle(child),
-            badge: child.isUnconnected ? '미연결' : null,
-            badgeColor: child.connectionStatus.color,
+        items.add(
+          _buildProfileItem(
+            option: _ProfileOption(
+              type: ProfileType.child,
+              childId: child.id,
+              label: child.name,
+              icon: ProfileType.child.icon,
+              color: child.profileColor,
+              subtitle: _getChildSubtitle(child),
+              badge: child.isUnconnected ? '미연결' : null,
+              badgeColor: child.connectionStatus.color,
+            ),
+            isSelected:
+                userProfile.activeProfile == ProfileType.child &&
+                userProfile.activeChildId == child.id,
           ),
-          isSelected: userProfile.activeProfile == ProfileType.child &&
-              userProfile.activeChildId == child.id,
-        ));
+        );
       }
     }
 
@@ -217,11 +225,7 @@ class _ProfileDropdown extends ConsumerWidget {
               color: option.color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
-            child: Icon(
-              option.icon,
-              size: 18,
-              color: option.color,
-            ),
+            child: Icon(option.icon, size: 18, color: option.color),
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
@@ -247,15 +251,17 @@ class _ProfileDropdown extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: option.badgeColor?.withValues(alpha: 0.1) ??
+                          color:
+                              option.badgeColor?.withValues(alpha: 0.1) ??
                               AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           option.badge!,
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: option.badgeColor ?? AppColors.textSecondaryLight,
+                          style: AppTypography.captionSmall.copyWith(
+                            color:
+                                option.badgeColor ??
+                                AppColors.textSecondaryLight,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -266,8 +272,7 @@ class _ProfileDropdown extends ConsumerWidget {
                 if (option.subtitle != null)
                   Text(
                     option.subtitle!,
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
                   ),
@@ -275,11 +280,7 @@ class _ProfileDropdown extends ConsumerWidget {
             ),
           ),
           if (isSelected)
-            const Icon(
-              Icons.check,
-              size: 18,
-              color: AppColors.primary,
-            ),
+            const Icon(Icons.check, size: 18, color: AppColors.primary),
         ],
       ),
     );
@@ -337,9 +338,7 @@ class ProfileSwitcherCompact extends ConsumerWidget {
     final canSwitch = ref.watch(canSwitchProfilesProvider);
 
     return GestureDetector(
-      onTap: canSwitch
-          ? () => _showProfileBottomSheet(context, ref)
-          : null,
+      onTap: canSwitch ? () => _showProfileBottomSheet(context, ref) : null,
       child: Container(
         width: 40,
         height: 40,
@@ -363,7 +362,9 @@ class ProfileSwitcherCompact extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusLarge),
+        ),
       ),
       builder: (context) => const ProfileSwitcherBottomSheet(),
     );
@@ -386,10 +387,9 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '프로필 전환',
-              style: TextStyle(
-                fontSize: 18,
+              style: AppTypography.headingSmall.copyWith(
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimaryLight,
               ),
@@ -405,7 +405,9 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
                 color: ProfileType.parent.color,
                 isSelected: userProfile.activeProfile == ProfileType.parent,
                 onTap: () {
-                  ref.read(currentUserProfileProvider.notifier).switchToParent();
+                  ref
+                      .read(currentUserProfileProvider.notifier)
+                      .switchToParent();
                   Navigator.pop(context);
                 },
               ),
@@ -414,14 +416,17 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             if (availableProfiles.contains(ProfileType.student))
               _ProfileTile(
                 label: '${userProfile.userName} (학생)',
-                subtitle: userProfile.studentTeacherName != null
-                    ? '${userProfile.studentTeacherName} 선생님'
-                    : '본인 연습',
+                subtitle:
+                    userProfile.studentTeacherName != null
+                        ? '${userProfile.studentTeacherName} 선생님'
+                        : '본인 연습',
                 icon: ProfileType.student.icon,
                 color: ProfileType.student.color,
                 isSelected: userProfile.activeProfile == ProfileType.student,
                 onTap: () {
-                  ref.read(currentUserProfileProvider.notifier).switchToStudent();
+                  ref
+                      .read(currentUserProfileProvider.notifier)
+                      .switchToStudent();
                   Navigator.pop(context);
                 },
               ),
@@ -429,33 +434,36 @@ class ProfileSwitcherBottomSheet extends ConsumerWidget {
             // Children
             if (userProfile.children.isNotEmpty) ...[
               const Divider(height: AppSpacing.space6),
-              const Text(
+              Text(
                 '자녀 프로필',
-                style: TextStyle(
-                  fontSize: 14,
+                style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondaryLight,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
-              ...userProfile.children.map((child) => _ProfileTile(
-                    label: child.name,
-                    subtitle: child.isUnconnected
-                        ? '연습/메트로놈만 가능'
-                        : child.teacherName ?? child.instrumentLabel,
-                    icon: ProfileType.child.icon,
-                    color: child.profileColor,
-                    isSelected: userProfile.activeProfile == ProfileType.child &&
-                        userProfile.activeChildId == child.id,
-                    badge: child.isUnconnected ? '미연결' : null,
-                    badgeColor: child.connectionStatus.color,
-                    onTap: () {
-                      ref
-                          .read(currentUserProfileProvider.notifier)
-                          .switchToChild(child.id);
-                      Navigator.pop(context);
-                    },
-                  )),
+              ...userProfile.children.map(
+                (child) => _ProfileTile(
+                  label: child.name,
+                  subtitle:
+                      child.isUnconnected
+                          ? '연습/메트로놈만 가능'
+                          : child.teacherName ?? child.instrumentLabel,
+                  icon: ProfileType.child.icon,
+                  color: child.profileColor,
+                  isSelected:
+                      userProfile.activeProfile == ProfileType.child &&
+                      userProfile.activeChildId == child.id,
+                  badge: child.isUnconnected ? '미연결' : null,
+                  badgeColor: child.connectionStatus.color,
+                  onTap: () {
+                    ref
+                        .read(currentUserProfileProvider.notifier)
+                        .switchToChild(child.id);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
             ],
 
             const SizedBox(height: AppSpacing.space3),
@@ -495,13 +503,12 @@ class _ProfileTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: isSelected
-              ? color.withValues(alpha: 0.1)
-              : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: isSelected
-              ? Border.all(color: color.withValues(alpha: 0.3))
-              : null,
+          border:
+              isSelected
+                  ? Border.all(color: color.withValues(alpha: 0.3))
+                  : null,
         ),
         child: Row(
           children: [
@@ -523,8 +530,7 @@ class _ProfileTile extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: TextStyle(
-                          fontSize: 16,
+                        style: AppTypography.bodyLarge.copyWith(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w500,
                           color: AppColors.textPrimaryLight,
@@ -538,14 +544,14 @@ class _ProfileTile extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: badgeColor?.withValues(alpha: 0.1) ??
+                            color:
+                                badgeColor?.withValues(alpha: 0.1) ??
                                 AppColors.surfaceLight,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             badge!,
-                            style: TextStyle(
-                              fontSize: 10,
+                            style: AppTypography.captionSmall.copyWith(
                               color: badgeColor ?? AppColors.textSecondaryLight,
                               fontWeight: FontWeight.w500,
                             ),
@@ -564,8 +570,7 @@ class _ProfileTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: color, size: 24),
+            if (isSelected) Icon(Icons.check_circle, color: color, size: 24),
           ],
         ),
       ),
