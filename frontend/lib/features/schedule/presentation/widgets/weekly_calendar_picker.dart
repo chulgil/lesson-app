@@ -231,7 +231,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
 
   Widget _buildWeekNavigation() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

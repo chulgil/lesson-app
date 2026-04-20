@@ -111,7 +111,7 @@ class LessonActionButtons extends StatelessWidget {
             icon: Icon(Icons.event_busy, color: AppColors.warning),
             label: Text('레슨 취소', style: TextStyle(color: AppColors.warning)),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(color: AppColors.warning.withValues(alpha: 0.5)),
             ),
           ),
@@ -123,7 +123,7 @@ class LessonActionButtons extends StatelessWidget {
             icon: Icon(Icons.delete_outline, color: AppColors.error),
             label: Text('레슨 삭제', style: TextStyle(color: AppColors.error)),
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
             ),
           ),

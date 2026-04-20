@@ -244,7 +244,9 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     side: const BorderSide(color: AppColors.primary),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.space3,
+                    ),
                   ),
                 ),
               ),
@@ -257,7 +259,9 @@ class UnconnectedChildDashboard extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.space3,
+                    ),
                   ),
                 ),
               ),

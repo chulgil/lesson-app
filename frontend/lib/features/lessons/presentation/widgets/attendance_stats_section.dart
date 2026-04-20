@@ -287,7 +287,7 @@ class AttendanceStatsSection extends ConsumerWidget {
     return Expanded(
       flex: flex,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.space1),
         child: Text(
           text,
           style:

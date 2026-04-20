@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Result returned when a badge is awarded.
 typedef BadgeAwardResult = ({String badgeId, String? message});
@@ -104,14 +105,10 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Drag handle
-                  Center(
-                    child: Container(
+                  const Center(
+                    child: BottomSheetHandle(
                       width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.borderLight,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                      margin: EdgeInsets.zero,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -148,8 +145,9 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                         color: AppColors.textTertiaryLight,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMedium),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.all(AppSpacing.space3),
                     ),
@@ -160,14 +158,14 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                   SizedBox(
                     height: AppSpacing.buttonHeight,
                     child: ElevatedButton(
-                      onPressed:
-                          _selectedBadgeId == null ? null : _onConfirm,
+                      onPressed: _selectedBadgeId == null ? null : _onConfirm,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         disabledBackgroundColor: AppColors.scheduleMutedAccent,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMedium,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -202,9 +200,8 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            color: isSelected
-                ? AppColors.primary.withValues(alpha: 0.05)
-                : null,
+            color:
+                isSelected ? AppColors.primary.withValues(alpha: 0.05) : null,
           ),
           child: Row(
             children: [
@@ -213,16 +210,18 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 width: AppSpacing.iconXL,
                 height: AppSpacing.iconXL,
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.primary.withValues(alpha: 0.15)
-                      : AppColors.surfaceSecondaryLight,
+                  color:
+                      isSelected
+                          ? AppColors.primary.withValues(alpha: 0.15)
+                          : AppColors.surfaceSecondaryLight,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   badge.icon,
-                  color: isSelected
-                      ? AppColors.primary
-                      : AppColors.textSecondaryLight,
+                  color:
+                      isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondaryLight,
                   size: AppSpacing.iconMD,
                 ),
               ),
@@ -254,9 +253,10 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
                 isSelected
                     ? Icons.radio_button_checked
                     : Icons.radio_button_off,
-                color: isSelected
-                    ? AppColors.primary
-                    : AppColors.textTertiaryLight,
+                color:
+                    isSelected
+                        ? AppColors.primary
+                        : AppColors.textTertiaryLight,
                 size: AppSpacing.iconSM,
               ),
             ],
@@ -268,11 +268,9 @@ class _BadgeAwardSheetState extends State<BadgeAwardSheet> {
 
   void _onConfirm() {
     final message = _messageController.text.trim();
-    Navigator.of(context).pop<BadgeAwardResult>(
-      (
-        badgeId: _selectedBadgeId!,
-        message: message.isEmpty ? null : message,
-      ),
-    );
+    Navigator.of(context).pop<BadgeAwardResult>((
+      badgeId: _selectedBadgeId!,
+      message: message.isEmpty ? null : message,
+    ));
   }
 }

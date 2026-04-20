@@ -7,8 +7,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/booking/entities/time_slot.dart';
-import '../../../../core/utils/date_format_utils.dart';
+import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../../core/widgets/chapter_summary.dart';
 import '../../../../core/widgets/lesson_progress_bar.dart';
 import '../../../students/domain/entities/student.dart';
@@ -65,7 +64,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     super.dispose();
   }
 
-  void _showEventMessage(String message, {
+  void _showEventMessage(
+    String message, {
     Color color = AppColors.success,
     IconData icon = Icons.check_circle,
   }) {
@@ -80,14 +80,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     });
   }
 
-  void _showSuccess(String message) =>
-      _showEventMessage(message, color: AppColors.success, icon: Icons.check_circle);
+  void _showSuccess(String message) => _showEventMessage(
+    message,
+    color: AppColors.success,
+    icon: Icons.check_circle,
+  );
 
-  void _showError([String message = '오류가 발생했습니다']) =>
-      _showEventMessage(message, color: AppColors.error, icon: Icons.error_outline);
+  void _showError([String message = '오류가 발생했습니다']) => _showEventMessage(
+    message,
+    color: AppColors.error,
+    icon: Icons.error_outline,
+  );
 
-  void _showInfo(String message) =>
-      _showEventMessage(message, color: AppColors.textSecondaryLight, icon: Icons.info_outline);
+  void _showInfo(String message) => _showEventMessage(
+    message,
+    color: AppColors.textSecondaryLight,
+    icon: Icons.info_outline,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -99,21 +108,23 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final academyNames = ref.watch(academyNameMapProvider);
 
     return requestAsync.when(
-      loading: () => Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
-      error: (error, _) => Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: Text(
-            AppStrings.requestLoadError,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+      loading:
+          () => Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          ),
+      error:
+          (error, _) => Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: Text(
+                AppStrings.requestLoadError,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
       data: (request) {
         if (request == null) {
           return Scaffold(
@@ -138,23 +149,21 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         final studentAsync = ref.watch(studentProvider(request.studentId));
 
         // Watch teacher templates for Phase 2 proposal display
-        final proposalTemplates = ref
-            .watch(activeTeacherTemplatesProvider(request.teacherId))
-            .valueOrNull ?? [];
+        final proposalTemplates =
+            ref
+                .watch(activeTeacherTemplatesProvider(request.teacherId))
+                .valueOrNull ??
+            [];
 
         final teacherName =
             teacherNames[request.teacherId] ?? AppStrings.teacher;
-        final opponentName = viewerRole == 'teacher'
-            ? studentName
-            : AppStrings.teacherDisplayName(teacherName);
+        final opponentName =
+            viewerRole == 'teacher'
+                ? studentName
+                : AppStrings.teacherDisplayName(teacherName);
 
         return Scaffold(
-          appBar: _buildChatAppBar(
-            context,
-            request,
-            opponentName,
-            academyName,
-          ),
+          appBar: _buildChatAppBar(context, request, opponentName, academyName),
           body: Column(
             children: [
               // Progress bar (fixed, below AppBar)
@@ -172,18 +181,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       events: _eventsForCurrentPhase(request, events),
                       request: request,
                       shrinkWrap: true,
-                      viewerId: viewerRole == 'teacher'
-                          ? request.teacherId
-                          : request.studentId,
+                      viewerId:
+                          viewerRole == 'teacher'
+                              ? request.teacherId
+                              : request.studentId,
                       viewerRole: viewerRole,
                       studentName: studentName,
                       proposalTemplates: proposalTemplates,
-                      onOpponentAvatarTap: () => _showProfileBottomSheet(
-                        context,
-                        request,
-                        opponentName,
-                        academyName,
-                      ),
+                      onOpponentAvatarTap:
+                          () => _showProfileBottomSheet(
+                            context,
+                            request,
+                            opponentName,
+                            academyName,
+                          ),
                     ),
                   ],
                 ),
@@ -200,48 +211,55 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                 initialSelectedSlot: _preselectedSlot,
                 opponentName: opponentName,
                 // Phase 1
-                onAccept: (slotIndex, message) =>
-                    _handleAccept(context, ref, request, slotIndex, message),
-                onCounterPropose: () =>
-                    _handleCounterPropose(context, ref, request),
+                onAccept:
+                    (slotIndex, message) => _handleAccept(
+                      context,
+                      ref,
+                      request,
+                      slotIndex,
+                      message,
+                    ),
+                onCounterPropose:
+                    () => _handleCounterPropose(context, ref, request),
                 onModify: () => _handleModify(context, request),
                 onCancel: () => _handleCancel(context, ref, request),
-                onWithdraw: () =>
-                    _handleWithdraw(context, ref, request),
+                onWithdraw: () => _handleWithdraw(context, ref, request),
                 // Phase 2
-                onSendPaymentGuide: () =>
-                    _handleSendPaymentGuide(context, ref, request),
-                onIssuePostpaid: () =>
-                    _handleIssuePostpaid(context, ref, request),
-                onIssueFree: () =>
-                    _handleIssueFree(context, ref, request),
-                onConfirmPayment: () =>
-                    _handleConfirmPayment(context, ref, request),
-                onVerifyPayment: () =>
-                    _handleVerifyPayment(context, ref, request),
-                onAcceptProposal: (templateId) =>
-                    _handleAcceptProposal(context, ref, request, templateId),
-                onRejectProposal: (reason) =>
-                    _handleRejectProposal(context, ref, request, reason),
+                onSendPaymentGuide:
+                    () => _handleSendPaymentGuide(context, ref, request),
+                onIssuePostpaid:
+                    () => _handleIssuePostpaid(context, ref, request),
+                onIssueFree: () => _handleIssueFree(context, ref, request),
+                onConfirmPayment:
+                    () => _handleConfirmPayment(context, ref, request),
+                onVerifyPayment:
+                    () => _handleVerifyPayment(context, ref, request),
+                onAcceptProposal:
+                    (templateId) => _handleAcceptProposal(
+                      context,
+                      ref,
+                      request,
+                      templateId,
+                    ),
+                onRejectProposal:
+                    (reason) =>
+                        _handleRejectProposal(context, ref, request, reason),
                 proposalTemplates: proposalTemplates,
                 // Phase 3
-                onLessonComplete: () =>
-                    _handleLessonComplete(context, ref, request),
-                onLessonCancel: () =>
-                    _handleLessonCancel(context, ref, request),
-                onScheduleChange: () =>
-                    _handleScheduleChange(context, ref, request),
-                onScheduleChangeResponse: () =>
-                    _handleScheduleChangeResponse(context, ref, request),
-                onAddNote: () =>
-                    _handleAddNote(context, ref, request),
+                onLessonComplete:
+                    () => _handleLessonComplete(context, ref, request),
+                onLessonCancel:
+                    () => _handleLessonCancel(context, ref, request),
+                onScheduleChange:
+                    () => _handleScheduleChange(context, ref, request),
+                onScheduleChangeResponse:
+                    () => _handleScheduleChangeResponse(context, ref, request),
+                onAddNote: () => _handleAddNote(context, ref, request),
                 // Phase 3/4
-                onViewSubscription: () =>
-                    _handleViewSubscription(context, request),
-                onProposeRenewal: () =>
-                    _handleRenewal(context, ref, request),
-                onRequestRenewal: () =>
-                    _handleRenewal(context, ref, request),
+                onViewSubscription:
+                    () => _handleViewSubscription(context, request),
+                onProposeRenewal: () => _handleRenewal(context, ref, request),
+                onRequestRenewal: () => _handleRenewal(context, ref, request),
               ),
             ],
           ),
@@ -255,36 +273,37 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   Widget _buildEventStrip() {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
-      child: _eventMessage != null
-          ? Container(
-              key: ValueKey(_eventMessage),
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-                vertical: AppSpacing.space2,
-              ),
-              color: _eventColor.withValues(alpha: 0.12),
-              child: Row(
-                children: [
-                  Icon(_eventIcon, size: 16, color: _eventColor),
-                  const SizedBox(width: AppSpacing.space2),
-                  Expanded(
-                    child: Text(
-                      _eventMessage!,
-                      style: AppTypography.caption.copyWith(
-                        color: _eventColor,
-                        fontWeight: FontWeight.w600,
+      child:
+          _eventMessage != null
+              ? Container(
+                key: ValueKey(_eventMessage),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenPadding,
+                  vertical: AppSpacing.space2,
+                ),
+                color: _eventColor.withValues(alpha: 0.12),
+                child: Row(
+                  children: [
+                    Icon(_eventIcon, size: 16, color: _eventColor),
+                    const SizedBox(width: AppSpacing.space2),
+                    Expanded(
+                      child: Text(
+                        _eventMessage!,
+                        style: AppTypography.caption.copyWith(
+                          color: _eventColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () => setState(() => _eventMessage = null),
-                    child: Icon(Icons.close, size: 14, color: _eventColor),
-                  ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
+                    GestureDetector(
+                      onTap: () => setState(() => _eventMessage = null),
+                      child: Icon(Icons.close, size: 14, color: _eventColor),
+                    ),
+                  ],
+                ),
+              )
+              : const SizedBox.shrink(),
     );
   }
 
@@ -297,12 +316,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     return AppBar(
       titleSpacing: 0,
       title: GestureDetector(
-        onTap: () => _showProfileBottomSheet(
-          context,
-          request,
-          opponentName,
-          academyName,
-        ),
+        onTap:
+            () => _showProfileBottomSheet(
+              context,
+              request,
+              opponentName,
+              academyName,
+            ),
         child: Text(
           request.isAcademy && academyName != null
               ? '$academyName $opponentName (${request.typeDisplayLabel})'
@@ -346,23 +366,15 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Drag handle
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+              const Center(
+                child: BottomSheetHandle(width: 36, margin: EdgeInsets.zero),
               ),
 
               // Typed profile card
               _buildProfileCard(request, opponentName, academyName, student),
 
               // Student message (quote block for trial, small text for regular)
-              if (request.message != null &&
-                  request.message!.isNotEmpty) ...[
+              if (request.message != null && request.message!.isNotEmpty) ...[
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.screenPadding,
@@ -371,19 +383,22 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
-                      color: request.type == LessonRequestType.trial
-                          ? AppColors.primary.withValues(alpha: 0.04)
-                          : AppColors.surfaceSecondaryLight,
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusMedium),
-                      border: request.type == LessonRequestType.trial
-                          ? Border(
-                              left: BorderSide(
-                                color: AppColors.primary,
-                                width: 3,
-                              ),
-                            )
-                          : null,
+                      color:
+                          request.type == LessonRequestType.trial
+                              ? AppColors.primary.withValues(alpha: 0.04)
+                              : AppColors.surfaceSecondaryLight,
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusMedium,
+                      ),
+                      border:
+                          request.type == LessonRequestType.trial
+                              ? Border(
+                                left: BorderSide(
+                                  color: AppColors.primary,
+                                  width: 3,
+                                ),
+                              )
+                              : null,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,13 +418,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                           ),
                         Text(
                           request.message!,
-                          style: request.type == LessonRequestType.trial
-                              ? AppTypography.bodyMedium.copyWith(
-                                  color: AppColors.textPrimaryLight,
-                                )
-                              : AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textSecondaryLight,
-                                ),
+                          style:
+                              request.type == LessonRequestType.trial
+                                  ? AppTypography.bodyMedium.copyWith(
+                                    color: AppColors.textPrimaryLight,
+                                  )
+                                  : AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondaryLight,
+                                  ),
                         ),
                       ],
                     ),
@@ -484,13 +500,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
-        builder: (_) => SuggestAlternativeScreen(
-          message: AppStrings.proposeDefaultMessage,
-          durationMinutes: request.preferredDuration,
-          teacherId: request.teacherId,
-          preferredSlots: request.preferredSlots,
-          isStudentView: viewerRole == 'student',
-        ),
+        builder:
+            (_) => SuggestAlternativeScreen(
+              message: AppStrings.proposeDefaultMessage,
+              durationMinutes: request.preferredDuration,
+              teacherId: request.teacherId,
+              preferredSlots: request.preferredSlots,
+              isStudentView: viewerRole == 'student',
+            ),
       ),
     );
     if (result == null || !context.mounted) return;
@@ -525,17 +542,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots: result.slots
-              .map((s) => TimeSlotOption(
-                    id: s.id,
-                    dayOfWeek: s.dayOfWeek - 1,
-                    startTime:
-                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                    endTime:
-                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                    date: s.specificDate,
-                  ))
-              .toList(),
+          slots:
+              result.slots
+                  .map(
+                    (s) => TimeSlotOption(
+                      id: s.id,
+                      dayOfWeek: s.dayOfWeek - 1,
+                      startTime:
+                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                      endTime:
+                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      date: s.specificDate,
+                    ),
+                  )
+                  .toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -564,9 +584,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     UnifiedLessonRequest request,
   ) async {
     // Find previously approved slot index from events
-    final events = await ref.read(
-      requestEventsProvider(request.id).future,
-    );
+    final events = await ref.read(requestEventsProvider(request.id).future);
     int? prevSlotIndex;
     for (int i = events.length - 1; i >= 0; i--) {
       if ((events[i].eventType == RequestEventType.approve ||
@@ -582,22 +600,22 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     final result = await Navigator.push<SuggestAlternativeResult>(
       context,
       MaterialPageRoute(
-        builder: (_) => SuggestAlternativeScreen(
-          message: '',
-          durationMinutes: request.preferredDuration,
-          teacherId: request.teacherId,
-          preferredSlots: request.preferredSlots,
-          isStudentView: viewerRole == 'student',
-        ),
+        builder:
+            (_) => SuggestAlternativeScreen(
+              message: '',
+              durationMinutes: request.preferredDuration,
+              teacherId: request.teacherId,
+              preferredSlots: request.preferredSlots,
+              isStudentView: viewerRole == 'student',
+            ),
       ),
     );
     if (result == null || !context.mounted) return;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
-      final actorRole = viewerRole == 'teacher'
-          ? ProposerRole.teacher
-          : ProposerRole.student;
+      final actorRole =
+          viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
 
       if (result.acceptedSlotIndex != null) {
         // Re-approve: check if slot changed
@@ -657,17 +675,20 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           request.id,
           request.teacherId,
           request.studentId,
-          slots: result.slots
-              .map((s) => TimeSlotOption(
-                    id: s.id,
-                    dayOfWeek: s.dayOfWeek - 1,
-                    startTime:
-                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                    endTime:
-                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                    date: s.specificDate,
-                  ))
-              .toList(),
+          slots:
+              result.slots
+                  .map(
+                    (s) => TimeSlotOption(
+                      id: s.id,
+                      dayOfWeek: s.dayOfWeek - 1,
+                      startTime:
+                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                      endTime:
+                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      date: s.specificDate,
+                    ),
+                  )
+                  .toList(),
           message: result.message,
         );
         if (context.mounted) {
@@ -705,13 +726,16 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
           final templates = await ref.read(
             activeTeacherTemplatesProvider(request.teacherId).future,
           );
-          final selectedTemplates = templates
-              .where((t) => result.templateIds.contains(t.id))
-              .toList();
+          final selectedTemplates =
+              templates
+                  .where((t) => result.templateIds.contains(t.id))
+                  .toList();
 
           final templateSummary = selectedTemplates
-              .map((t) =>
-                  '${t.name} ${t.totalLessons}${AppStrings.lessonsUnit} · ${t.formattedPrice}')
+              .map(
+                (t) =>
+                    '${t.name} ${t.totalLessons}${AppStrings.lessonsUnit} · ${t.formattedPrice}',
+              )
               .join('\n');
 
           final message = [
@@ -891,12 +915,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
@@ -920,12 +942,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     // Step 1: Choose change type
     final changeType = await showScheduleChangeTypeBottomSheet(context);
@@ -934,17 +954,19 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     // Both single and bulk use the same ScheduleChangeSlotScreen
     final result = await Navigator.of(context).push<ScheduleChangeSlotResult>(
       MaterialPageRoute(
-        builder: (_) => ScheduleChangeSlotScreen(
-          params: ScheduleChangeSlotParams(
-            teacherId: request.teacherId,
-            studentId: request.studentId,
-            durationMinutes: 60, // TODO: get from subscription
-            currentScheduleLabel: request.preferredSlots.isNotEmpty
-                ? request.preferredSlots.first.displayLabel
-                : '-',
-            isBulkChange: changeType == ScheduleChangeType.bulkChange,
-          ),
-        ),
+        builder:
+            (_) => ScheduleChangeSlotScreen(
+              params: ScheduleChangeSlotParams(
+                teacherId: request.teacherId,
+                studentId: request.studentId,
+                durationMinutes: 60, // TODO: get from subscription
+                currentScheduleLabel:
+                    request.preferredSlots.isNotEmpty
+                        ? request.preferredSlots.first.displayLabel
+                        : '-',
+                isBulkChange: changeType == ScheduleChangeType.bulkChange,
+              ),
+            ),
       ),
     );
     if (result == null || !context.mounted) return;
@@ -959,16 +981,19 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
         request.teacherId,
         request.studentId,
         changeType: changeType,
-        suggestedSlots: result.slots
-            .map((s) => TimeSlotOption(
-                  id: s.id,
-                  dayOfWeek: s.dayOfWeek,
-                  startTime:
-                      '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                  endTime:
-                      '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                ))
-            .toList(),
+        suggestedSlots:
+            result.slots
+                .map(
+                  (s) => TimeSlotOption(
+                    id: s.id,
+                    dayOfWeek: s.dayOfWeek,
+                    startTime:
+                        '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                    endTime:
+                        '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                  ),
+                )
+                .toList(),
         message: result.message.isEmpty ? null : result.message,
       );
       if (context.mounted) {
@@ -984,15 +1009,14 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     // Find the pending proposal's slots and change type
-    final events = ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
+    final events =
+        ref.read(requestEventsProvider(request.id)).valueOrNull ?? [];
     List<TimeSlotOption> proposedSlots = [];
     ScheduleChangeType changeType = ScheduleChangeType.singleLesson;
     for (int i = events.length - 1; i >= 0; i--) {
@@ -1000,7 +1024,8 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       if (event.eventType == RequestEventType.scheduleChangeProposed ||
           event.eventType == RequestEventType.scheduleChangeCountered) {
         proposedSlots = event.suggestedSlots;
-        changeType = event.scheduleChangeType ?? ScheduleChangeType.singleLesson;
+        changeType =
+            event.scheduleChangeType ?? ScheduleChangeType.singleLesson;
         break;
       }
     }
@@ -1053,16 +1078,19 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
             request.teacherId,
             request.studentId,
             changeType: changeType,
-            suggestedSlots: result.counterSlots
-                .map((s) => TimeSlotOption(
-                      id: s.id,
-                      dayOfWeek: s.dayOfWeek,
-                      startTime:
-                          '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
-                      endTime:
-                          '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
-                    ))
-                .toList(),
+            suggestedSlots:
+                result.counterSlots
+                    .map(
+                      (s) => TimeSlotOption(
+                        id: s.id,
+                        dayOfWeek: s.dayOfWeek,
+                        startTime:
+                            '${s.startTime.hour.toString().padLeft(2, '0')}:${s.startTime.minute.toString().padLeft(2, '0')}',
+                        endTime:
+                            '${s.endTime.hour.toString().padLeft(2, '0')}:${s.endTime.minute.toString().padLeft(2, '0')}',
+                      ),
+                    )
+                    .toList(),
             message: result.message.isEmpty ? null : result.message,
           );
           if (context.mounted) {
@@ -1109,12 +1137,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     WidgetRef ref,
     UnifiedLessonRequest request,
   ) async {
-    final actorRole = viewerRole == 'teacher'
-        ? ProposerRole.teacher
-        : ProposerRole.student;
-    final actorId = viewerRole == 'teacher'
-        ? request.teacherId
-        : request.studentId;
+    final actorRole =
+        viewerRole == 'teacher' ? ProposerRole.teacher : ProposerRole.student;
+    final actorId =
+        viewerRole == 'teacher' ? request.teacherId : request.studentId;
 
     try {
       final actions = UnifiedLessonRequestActions(ref);
@@ -1150,68 +1176,82 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
     // Phase 1: 레슨 신청 — show as collapsed if past Phase 1
     if (phase != RequestPhase.request && phase != RequestPhase.terminal) {
       final isExpanded = _expandedChapters.contains(RequestPhase.request);
-      chapters.add(ChapterSummary(
-        icon: Icons.send,
-        title: AppStrings.chapterRequest,
-        completedDate: _phaseCompletedDate(request, RequestPhase.request),
-        summary: _phaseSummary(request, events, RequestPhase.request),
-        isExpanded: isExpanded,
-        onTap: () => setState(() {
-          if (isExpanded) {
-            _expandedChapters.remove(RequestPhase.request);
-          } else {
-            _expandedChapters.add(RequestPhase.request);
-          }
-        }),
-        child: isExpanded
-            ? RequestHistoryChat(
-                events: _eventsForPhase(events, RequestPhase.request),
-                request: request,
-                shrinkWrap: true,
-                showGuide: false,
-                viewerId: viewerRole == 'teacher'
-                    ? request.teacherId
-                    : request.studentId,
-                studentName: '',
-              )
-            : null,
-      ));
+      chapters.add(
+        ChapterSummary(
+          icon: Icons.send,
+          title: AppStrings.chapterRequest,
+          completedDate: _phaseCompletedDate(request, RequestPhase.request),
+          summary: _phaseSummary(request, events, RequestPhase.request),
+          isExpanded: isExpanded,
+          onTap:
+              () => setState(() {
+                if (isExpanded) {
+                  _expandedChapters.remove(RequestPhase.request);
+                } else {
+                  _expandedChapters.add(RequestPhase.request);
+                }
+              }),
+          child:
+              isExpanded
+                  ? RequestHistoryChat(
+                    events: _eventsForPhase(events, RequestPhase.request),
+                    request: request,
+                    shrinkWrap: true,
+                    showGuide: false,
+                    viewerId:
+                        viewerRole == 'teacher'
+                            ? request.teacherId
+                            : request.studentId,
+                    studentName: '',
+                  )
+                  : null,
+        ),
+      );
     }
 
     // Phase 2: 수강권 & 결제 — show if past Phase 2
     if (_isPhaseCompleted(phase, RequestPhase.subscription)) {
-      final isExpanded =
-          _expandedChapters.contains(RequestPhase.subscription);
-      chapters.add(ChapterSummary(
-        icon: Icons.credit_card,
-        title: AppStrings.chapterSubscription,
-        completedDate:
-            _phaseCompletedDate(request, RequestPhase.subscription),
-        summary:
-            _phaseSummary(request, events, RequestPhase.subscription),
-        isExpanded: isExpanded,
-        onTap: () => setState(() {
-          if (isExpanded) {
-            _expandedChapters.remove(RequestPhase.subscription);
-          } else {
-            _expandedChapters.add(RequestPhase.subscription);
-          }
-        }),
-      ));
+      final isExpanded = _expandedChapters.contains(RequestPhase.subscription);
+      chapters.add(
+        ChapterSummary(
+          icon: Icons.credit_card,
+          title: AppStrings.chapterSubscription,
+          completedDate: _phaseCompletedDate(
+            request,
+            RequestPhase.subscription,
+          ),
+          summary: _phaseSummary(request, events, RequestPhase.subscription),
+          isExpanded: isExpanded,
+          onTap:
+              () => setState(() {
+                if (isExpanded) {
+                  _expandedChapters.remove(RequestPhase.subscription);
+                } else {
+                  _expandedChapters.add(RequestPhase.subscription);
+                }
+              }),
+        ),
+      );
     }
 
     // Phase 3: 레슨 진행 — show as active header if current
     if (phase == RequestPhase.lessons || phase == RequestPhase.completed) {
       final isActive = phase == RequestPhase.lessons;
-      chapters.add(ChapterSummary(
-        icon: Icons.music_note,
-        title: AppStrings.chapterLessons,
-        isActive: isActive,
-        summary: isActive ? null : _phaseSummary(request, events, RequestPhase.lessons),
-        completedDate: isActive
-            ? null
-            : _phaseCompletedDate(request, RequestPhase.lessons),
-      ));
+      chapters.add(
+        ChapterSummary(
+          icon: Icons.music_note,
+          title: AppStrings.chapterLessons,
+          isActive: isActive,
+          summary:
+              isActive
+                  ? null
+                  : _phaseSummary(request, events, RequestPhase.lessons),
+          completedDate:
+              isActive
+                  ? null
+                  : _phaseCompletedDate(request, RequestPhase.lessons),
+        ),
+      );
     }
 
     return chapters;
@@ -1242,35 +1282,35 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   bool _eventBelongsToPhase(RequestEvent event, RequestPhase phase) {
     return switch (phase) {
       RequestPhase.request => const {
-          RequestEventType.initialRequest,
-          RequestEventType.approve,
-          RequestEventType.reject,
-          RequestEventType.proposeAlternative,
-          RequestEventType.counterPropose,
-          RequestEventType.acceptAlternative,
-          RequestEventType.withdrawApproval,
-          RequestEventType.cancel,
-          RequestEventType.expire,
-          RequestEventType.proposalSent,
-          RequestEventType.proposalAccepted,
-          RequestEventType.paymentNotified,
-        }.contains(event.eventType),
+        RequestEventType.initialRequest,
+        RequestEventType.approve,
+        RequestEventType.reject,
+        RequestEventType.proposeAlternative,
+        RequestEventType.counterPropose,
+        RequestEventType.acceptAlternative,
+        RequestEventType.withdrawApproval,
+        RequestEventType.cancel,
+        RequestEventType.expire,
+        RequestEventType.proposalSent,
+        RequestEventType.proposalAccepted,
+        RequestEventType.paymentNotified,
+      }.contains(event.eventType),
       RequestPhase.subscription => const {
-          RequestEventType.paymentRequested,
-          RequestEventType.paymentConfirmed,
-          RequestEventType.subscriptionIssued,
-        }.contains(event.eventType),
+        RequestEventType.paymentRequested,
+        RequestEventType.paymentConfirmed,
+        RequestEventType.subscriptionIssued,
+      }.contains(event.eventType),
       RequestPhase.lessons => const {
-          RequestEventType.lessonCompleted,
-          RequestEventType.lessonCancelled,
-          RequestEventType.scheduleChanged,
-          RequestEventType.lessonNoteAdded,
-        }.contains(event.eventType),
+        RequestEventType.lessonCompleted,
+        RequestEventType.lessonCancelled,
+        RequestEventType.scheduleChanged,
+        RequestEventType.lessonNoteAdded,
+      }.contains(event.eventType),
       RequestPhase.completed => const {
-          RequestEventType.subscriptionRenewed,
-          RequestEventType.subscriptionCompleted,
-          RequestEventType.completed,
-        }.contains(event.eventType),
+        RequestEventType.subscriptionRenewed,
+        RequestEventType.subscriptionCompleted,
+        RequestEventType.completed,
+      }.contains(event.eventType),
       RequestPhase.terminal => true,
     };
   }
@@ -1313,9 +1353,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
       case RequestPhase.subscription:
         return AppStrings.subscription;
       case RequestPhase.lessons:
-        final completedCount = events
-            .where((e) => e.eventType == RequestEventType.lessonCompleted)
-            .length;
+        final completedCount =
+            events
+                .where((e) => e.eventType == RequestEventType.lessonCompleted)
+                .length;
         if (completedCount > 0) return '$completedCount회 완료';
         return null;
       case RequestPhase.completed:
@@ -1336,35 +1377,36 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   ) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text(AppStrings.cancelRequestTitle),
-        content: const Text(AppStrings.cancelRequestMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(AppStrings.no),
+      builder:
+          (ctx) => AlertDialog(
+            title: const Text(AppStrings.cancelRequestTitle),
+            content: const Text(AppStrings.cancelRequestMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text(AppStrings.no),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  final actions = UnifiedLessonRequestActions(ref);
+                  actions.cancelRequest(
+                    request.id,
+                    viewerRole == 'teacher'
+                        ? request.teacherId
+                        : request.studentId,
+                    viewerRole == 'teacher'
+                        ? ProposerRole.teacher
+                        : ProposerRole.student,
+                    request.teacherId,
+                    request.studentId,
+                  );
+                },
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text(AppStrings.cancelRequestAction),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              final actions = UnifiedLessonRequestActions(ref);
-              actions.cancelRequest(
-                request.id,
-                viewerRole == 'teacher'
-                    ? request.teacherId
-                    : request.studentId,
-                viewerRole == 'teacher'
-                    ? ProposerRole.teacher
-                    : ProposerRole.student,
-                request.teacherId,
-                request.studentId,
-              );
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text(AppStrings.cancelRequestAction),
-          ),
-        ],
-      ),
     );
   }
 }

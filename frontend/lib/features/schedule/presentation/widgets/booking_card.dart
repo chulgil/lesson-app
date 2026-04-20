@@ -150,8 +150,9 @@ class BookingCard extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.05),
-                    borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusMedium,
+                    ),
                     border: Border.all(
                       color: AppColors.primary.withValues(alpha: 0.2),
                     ),
@@ -216,7 +217,10 @@ class BookingCard extends StatelessWidget {
 
   Widget _buildTypeBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
+      ),
       decoration: BoxDecoration(
         color: booking.lessonType.color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -233,7 +237,10 @@ class BookingCard extends StatelessWidget {
 
   Widget _buildStatusBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: AppSpacing.space1,
+      ),
       decoration: BoxDecoration(
         color: booking.status.color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
@@ -241,11 +248,7 @@ class BookingCard extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            booking.status.icon,
-            size: 12,
-            color: booking.status.color,
-          ),
+          Icon(booking.status.icon, size: 12, color: booking.status.color),
           const SizedBox(width: 4),
           Text(
             booking.status.label,
@@ -272,11 +275,7 @@ class BookingCardCompact extends StatelessWidget {
   final LessonBooking booking;
   final VoidCallback? onTap;
 
-  const BookingCardCompact({
-    super.key,
-    required this.booking,
-    this.onTap,
-  });
+  const BookingCardCompact({super.key, required this.booking, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -292,9 +291,7 @@ class BookingCardCompact extends StatelessWidget {
       ),
       title: Text(
         booking.studentName,
-        style: AppTypography.bodyMedium.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
         '${booking.formattedDate} ${booking.timeRange}',
@@ -303,7 +300,10 @@ class BookingCardCompact extends StatelessWidget {
         ),
       ),
       trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.space2,
+          vertical: AppSpacing.space1,
+        ),
         decoration: BoxDecoration(
           color: booking.status.color.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),

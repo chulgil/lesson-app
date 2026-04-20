@@ -186,7 +186,10 @@ class _GroupClassAttendanceScreenState
 
   Widget _buildHelpText() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space4,
+        vertical: AppSpacing.space3,
+      ),
       color: AppColors.info.withValues(alpha: 0.05),
       child: Row(
         children: [
@@ -228,7 +231,7 @@ class _GroupClassAttendanceScreenState
 
   Widget _buildStudentList(List<GroupClassBooking> bookings) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
       itemCount: bookings.length,
       itemBuilder: (context, index) {
         final booking = bookings[index];
@@ -254,7 +257,10 @@ class _GroupClassAttendanceScreenState
         return InkWell(
           onTap: () => _toggleAttendance(booking.id),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space3,
+            ),
             decoration: BoxDecoration(
               color:
                   isAttended
@@ -332,10 +338,10 @@ class _GroupClassAttendanceScreenState
   Widget _buildBottomAction() {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        16,
-        16,
-        16,
-        16 + MediaQuery.of(context).padding.bottom,
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space4,
+        AppSpacing.space4 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
@@ -353,7 +359,7 @@ class _GroupClassAttendanceScreenState
         child: ElevatedButton(
           onPressed: _isSaving ? null : _finishClass,
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
           ),
           child:
               _isSaving
