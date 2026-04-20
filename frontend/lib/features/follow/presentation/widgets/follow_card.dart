@@ -44,9 +44,10 @@ class FollowCard extends StatelessWidget {
           // Avatar
           CircleAvatar(
             radius: 24,
-            backgroundColor: isTeacher
-                ? AppColors.primary.withValues(alpha: 0.1)
-                : AppColors.secondary.withValues(alpha: 0.1),
+            backgroundColor:
+                isTeacher
+                    ? AppColors.primary.withValues(alpha: 0.1)
+                    : AppColors.secondary.withValues(alpha: 0.1),
             child: Icon(
               isTeacher ? Icons.person : Icons.business,
               color: isTeacher ? AppColors.primary : AppColors.secondary,
@@ -78,17 +79,21 @@ class FollowCard extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: isTeacher
-                            ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.secondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
+                        color:
+                            isTeacher
+                                ? AppColors.primary.withValues(alpha: 0.1)
+                                : AppColors.secondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMedium,
+                        ),
                       ),
                       child: Text(
                         follow.targetType.displayName,
                         style: AppTypography.caption.copyWith(
-                          color: isTeacher
-                              ? AppColors.primary
-                              : AppColors.secondary,
+                          color:
+                              isTeacher
+                                  ? AppColors.primary
+                                  : AppColors.secondary,
                           fontSize: 11,
                         ),
                       ),
@@ -113,9 +118,10 @@ class FollowCard extends StatelessWidget {
               follow.notificationEnabled
                   ? Icons.notifications_active
                   : Icons.notifications_off_outlined,
-              color: follow.notificationEnabled
-                  ? AppColors.primary
-                  : AppColors.textTertiaryLight,
+              color:
+                  follow.notificationEnabled
+                      ? AppColors.primary
+                      : AppColors.textTertiaryLight,
               size: 20,
             ),
             tooltip: follow.notificationEnabled ? '알림 끄기' : '알림 켜기',

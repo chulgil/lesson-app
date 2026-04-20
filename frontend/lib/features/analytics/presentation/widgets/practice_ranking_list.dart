@@ -26,37 +26,39 @@ class PracticeRankingList extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(color: AppColors.borderLight),
           ),
-          child: rankings.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(AppSpacing.space6),
-                  child: Center(
-                    child: Text(
-                      '연습 데이터가 없습니다',
-                      style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textTertiaryLight,
+          child:
+              rankings.isEmpty
+                  ? Padding(
+                    padding: const EdgeInsets.all(AppSpacing.space6),
+                    child: Center(
+                      child: Text(
+                        '연습 데이터가 없습니다',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textTertiaryLight,
+                        ),
                       ),
                     ),
+                  )
+                  : Column(
+                    children:
+                        rankings.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final rank = entry.value;
+                          final isLast = index == rankings.length - 1;
+                          return Column(
+                            children: [
+                              _buildRankingTile(index + 1, rank),
+                              if (!isLast)
+                                Divider(
+                                  height: 1,
+                                  indent: AppSpacing.space4,
+                                  endIndent: AppSpacing.space4,
+                                  color: AppColors.borderLight,
+                                ),
+                            ],
+                          );
+                        }).toList(),
                   ),
-                )
-              : Column(
-                  children: rankings.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final rank = entry.value;
-                    final isLast = index == rankings.length - 1;
-                    return Column(
-                      children: [
-                        _buildRankingTile(index + 1, rank),
-                        if (!isLast)
-                          Divider(
-                            height: 1,
-                            indent: AppSpacing.space4,
-                            endIndent: AppSpacing.space4,
-                            color: AppColors.borderLight,
-                          ),
-                      ],
-                    );
-                  }).toList(),
-                ),
         ),
       ],
     );
@@ -128,7 +130,7 @@ class PracticeRankingList extends StatelessWidget {
           Expanded(
             flex: 3,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               child: LinearProgressIndicator(
                 value: student.practiceRate,
                 minHeight: 8,
@@ -137,8 +139,8 @@ class PracticeRankingList extends StatelessWidget {
                   student.practiceRate >= 0.8
                       ? AppColors.practiceGood
                       : student.practiceRate >= 0.5
-                          ? AppColors.practiceNormal
-                          : AppColors.practicePoor,
+                      ? AppColors.practiceNormal
+                      : AppColors.practicePoor,
                 ),
               ),
             ),

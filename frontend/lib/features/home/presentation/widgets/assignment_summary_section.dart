@@ -28,9 +28,10 @@ class AssignmentSummarySection extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, WeeklyAssignmentSummary summary) {
     final rate = summary.completionRate;
-    final color = rate >= 0.8
-        ? AppColors.success
-        : rate >= 0.5
+    final color =
+        rate >= 0.8
+            ? AppColors.success
+            : rate >= 0.5
             ? AppColors.warning
             : AppColors.error;
 
@@ -45,8 +46,7 @@ class AssignmentSummarySection extends ConsumerWidget {
             Text('이번 주 과제', style: AppTypography.headingSmall),
             const Spacer(),
             TextButton(
-              onPressed: () =>
-                  context.push(AppRoutes.assignmentDashboard),
+              onPressed: () => context.push(AppRoutes.assignmentDashboard),
               child: const Text('전체보기'),
             ),
           ],
@@ -86,7 +86,7 @@ class AssignmentSummarySection extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.space2),
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 child: LinearProgressIndicator(
                   value: rate,
                   backgroundColor: color.withValues(alpha: 0.15),
@@ -106,9 +106,9 @@ class AssignmentSummarySection extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
-                ...summary.incompleteStudents.take(3).map(
-                  (s) => _buildStudentRow(context, s),
-                ),
+                ...summary.incompleteStudents
+                    .take(3)
+                    .map((s) => _buildStudentRow(context, s)),
               ],
             ],
           ),
@@ -117,11 +117,17 @@ class AssignmentSummarySection extends ConsumerWidget {
     );
   }
 
-  Widget _buildStudentRow(BuildContext context, StudentAssignmentStatus status) {
+  Widget _buildStudentRow(
+    BuildContext context,
+    StudentAssignmentStatus status,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.space2),
       child: InkWell(
-        onTap: () => context.push(AppRoutes.studentDetail.replaceFirst(':id', status.studentId)),
+        onTap:
+            () => context.push(
+              AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
+            ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.symmetric(

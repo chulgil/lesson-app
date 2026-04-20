@@ -14,16 +14,11 @@ class GamificationHeader extends ConsumerWidget {
   final String studentId;
   final VoidCallback? onTap;
 
-  const GamificationHeader({
-    super.key,
-    required this.studentId,
-    this.onTap,
-  });
+  const GamificationHeader({super.key, required this.studentId, this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gamificationAsync =
-        ref.watch(studentGamificationProvider(studentId));
+    final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
 
     return gamificationAsync.when(
       data: (gamification) => _buildHeader(context, gamification),
@@ -101,8 +96,9 @@ class GamificationHeader extends ConsumerWidget {
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSmall),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusSmall,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -132,7 +128,7 @@ class GamificationHeader extends ConsumerWidget {
             Column(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   child: LinearProgressIndicator(
                     value: data.levelProgress,
                     minHeight: 6,
