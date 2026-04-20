@@ -19,8 +19,7 @@ class StudentTutorialScreen extends ConsumerStatefulWidget {
       _StudentTutorialScreenState();
 }
 
-class _StudentTutorialScreenState
-    extends ConsumerState<StudentTutorialScreen> {
+class _StudentTutorialScreenState extends ConsumerState<StudentTutorialScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -161,11 +160,11 @@ class _StudentTutorialScreenState
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.borderLight),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusLarge),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusLarge,
+                            ),
                           ),
-                          minimumSize:
-                              const Size(0, AppSpacing.buttonHeight),
+                          minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
                         child: Text(
                           '이전',
@@ -188,11 +187,11 @@ class _StudentTutorialScreenState
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusLarge,
+                          ),
                         ),
-                        minimumSize:
-                            const Size(0, AppSpacing.buttonHeight),
+                        minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
                       child: Text(
                         isLastPage ? '시작하기' : '다음',
@@ -242,11 +241,7 @@ class _StudentTutorialPage extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              data.icon,
-              size: 80,
-              color: AppColors.primary,
-            ),
+            child: Icon(data.icon, size: 80, color: AppColors.primary),
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -290,7 +285,7 @@ class _PageIndicator extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.primary : AppColors.borderLight,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
     );
   }

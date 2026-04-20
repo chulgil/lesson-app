@@ -60,7 +60,9 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
 
   void _completeTutorial() {
     for (final step in TutorialStep.values) {
-      ref.read(teacherOnboardingNotifierProvider.notifier).completeTutorialStep(step);
+      ref
+          .read(teacherOnboardingNotifierProvider.notifier)
+          .completeTutorialStep(step);
     }
     _navigateToHome();
   }
@@ -146,7 +148,9 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(color: AppColors.borderLight),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusLarge,
+                            ),
                           ),
                           minimumSize: const Size(0, AppSpacing.buttonHeight),
                         ),
@@ -171,7 +175,9 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusLarge,
+                          ),
                         ),
                         minimumSize: const Size(0, AppSpacing.buttonHeight),
                       ),
@@ -194,9 +200,19 @@ class _TutorialScreenState extends ConsumerState<TutorialScreen> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _ProgressStep(step: 1, label: '휴대폰', isActive: false, isCompleted: true),
+        _ProgressStep(
+          step: 1,
+          label: '휴대폰',
+          isActive: false,
+          isCompleted: true,
+        ),
         const SizedBox(width: AppSpacing.space1),
-        _ProgressStep(step: 2, label: '프로필', isActive: false, isCompleted: true),
+        _ProgressStep(
+          step: 2,
+          label: '프로필',
+          isActive: false,
+          isCompleted: true,
+        ),
         const SizedBox(width: AppSpacing.space1),
         _ProgressStep(step: 3, label: '튜토리얼', isActive: true),
       ],
@@ -287,7 +303,7 @@ class _PageIndicator extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.space1),
       decoration: BoxDecoration(
         color: isActive ? AppColors.primary : AppColors.borderLight,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
     );
   }
@@ -315,23 +331,26 @@ class _ProgressStep extends StatelessWidget {
           width: 20,
           height: 20,
           decoration: BoxDecoration(
-            color: isActive || isCompleted
-                ? AppColors.primary
-                : AppColors.borderLight,
+            color:
+                isActive || isCompleted
+                    ? AppColors.primary
+                    : AppColors.borderLight,
             shape: BoxShape.circle,
           ),
           child: Center(
-            child: isCompleted
-                ? const Icon(Icons.check, size: 12, color: Colors.white)
-                : Text(
-                    '$step',
-                    style: AppTypography.caption.copyWith(
-                      color: isActive
-                          ? Colors.white
-                          : AppColors.textTertiaryLight,
-                      fontWeight: FontWeight.w600,
+            child:
+                isCompleted
+                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                    : Text(
+                      '$step',
+                      style: AppTypography.caption.copyWith(
+                        color:
+                            isActive
+                                ? Colors.white
+                                : AppColors.textTertiaryLight,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
           ),
         ),
       ],

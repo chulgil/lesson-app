@@ -186,7 +186,9 @@ class NextLessonCard extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           typeText,

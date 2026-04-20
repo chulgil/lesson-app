@@ -12,10 +12,7 @@ import 'child_profile_form_screen.dart';
 class ChildProfilesScreen extends ConsumerWidget {
   final String parentId;
 
-  const ChildProfilesScreen({
-    super.key,
-    required this.parentId,
-  });
+  const ChildProfilesScreen({super.key, required this.parentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,22 +32,23 @@ class ChildProfilesScreen extends ConsumerWidget {
       ),
       body: profilesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space3),
-              Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
-              const SizedBox(height: AppSpacing.space2),
-              TextButton(
-                onPressed: () =>
-                    ref.invalidate(childProfilesProvider(parentId)),
-                child: const Text('다시 시도'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text('오류가 발생했습니다', style: AppTypography.bodyLarge),
+                  const SizedBox(height: AppSpacing.space2),
+                  TextButton(
+                    onPressed:
+                        () => ref.invalidate(childProfilesProvider(parentId)),
+                    child: const Text('다시 시도'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
         data: (profiles) {
           if (profiles.isEmpty) {
             return _buildEmptyState(context);
@@ -74,10 +72,7 @@ class ChildProfilesScreen extends ConsumerWidget {
               color: AppColors.textTertiaryLight,
             ),
             const SizedBox(height: AppSpacing.space4),
-            Text(
-              '등록된 자녀가 없습니다',
-              style: AppTypography.headingSmall,
-            ),
+            Text('등록된 자녀가 없습니다', style: AppTypography.headingSmall),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '만 14세 미만 자녀를 추가하여\n레슨 일정과 연습 현황을 관리해보세요',
@@ -121,7 +116,8 @@ class ChildProfilesScreen extends ConsumerWidget {
         return _ChildProfileCard(
           profile: profiles[index],
           onTap: () => _navigateToEditChild(context, profiles[index]),
-          onSwitchToChild: () => _switchToChildView(context, ref, profiles[index]),
+          onSwitchToChild:
+              () => _switchToChildView(context, ref, profiles[index]),
         );
       },
     );
@@ -156,10 +152,11 @@ class ChildProfilesScreen extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChildProfileFormScreen(
-          parentId: parentId,
-          existingProfile: profile,
-        ),
+        builder:
+            (context) => ChildProfileFormScreen(
+              parentId: parentId,
+              existingProfile: profile,
+            ),
       ),
     );
   }
@@ -177,10 +174,7 @@ class ChildProfilesScreen extends ConsumerWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text("${profile.name}의 화면으로 전환합니다"),
-        action: SnackBarAction(
-          label: '확인',
-          onPressed: () {},
-        ),
+        action: SnackBarAction(label: '확인', onPressed: () {}),
       ),
     );
 
@@ -249,8 +243,12 @@ class _ChildProfileCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryLight.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.primaryLight.withValues(
+                              alpha: 0.2,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusSmall,
+                            ),
                           ),
                           child: Text(
                             '만 ${profile.age}세',
@@ -307,10 +305,7 @@ class _ChildProfileCard extends StatelessWidget {
                   // Switch to child view button
                   IconButton(
                     onPressed: onSwitchToChild,
-                    icon: Icon(
-                      Icons.switch_account,
-                      color: AppColors.primary,
-                    ),
+                    icon: Icon(Icons.switch_account, color: AppColors.primary),
                     tooltip: '학생 화면으로 전환',
                   ),
                   // Edit button

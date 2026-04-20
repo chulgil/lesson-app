@@ -220,7 +220,7 @@ class StudentProfileTab extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

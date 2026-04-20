@@ -18,8 +18,7 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gamificationAsync =
-        ref.watch(studentGamificationProvider(studentId));
+    final gamificationAsync = ref.watch(studentGamificationProvider(studentId));
 
     return Scaffold(
       appBar: AppBar(
@@ -113,13 +112,14 @@ class BadgeCollectionScreen extends ConsumerWidget {
 
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: data.levelProgress,
               minHeight: 8,
               backgroundColor: AppColors.surfaceSecondaryLight,
-              valueColor:
-                  const AlwaysStoppedAnimation<Color>(AppColors.primary),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primary,
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -168,12 +168,16 @@ class BadgeCollectionScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: badge.isEarned
-            ? AppColors.surfaceLight
-            : AppColors.surfaceSecondaryLight,
+        color:
+            badge.isEarned
+                ? AppColors.surfaceLight
+                : AppColors.surfaceSecondaryLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: badge.isEarned ? rarityColor.withValues(alpha: 0.3) : AppColors.borderLight,
+          color:
+              badge.isEarned
+                  ? rarityColor.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
       ),
       child: Row(
@@ -183,9 +187,10 @@ class BadgeCollectionScreen extends ConsumerWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: badge.isEarned
-                  ? rarityColor.withValues(alpha: 0.15)
-                  : AppColors.surfaceSecondaryLight,
+              color:
+                  badge.isEarned
+                      ? rarityColor.withValues(alpha: 0.15)
+                      : AppColors.surfaceSecondaryLight,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
@@ -206,9 +211,10 @@ class BadgeCollectionScreen extends ConsumerWidget {
                   badge.name,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: badge.isEarned
-                        ? AppColors.textPrimaryLight
-                        : AppColors.textTertiaryLight,
+                    color:
+                        badge.isEarned
+                            ? AppColors.textPrimaryLight
+                            : AppColors.textTertiaryLight,
                   ),
                 ),
                 Text(
@@ -228,13 +234,16 @@ class BadgeCollectionScreen extends ConsumerWidget {
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: rarityColor.withValues(alpha: badge.isEarned ? 0.15 : 0.05),
-              borderRadius: BorderRadius.circular(4),
+              color: rarityColor.withValues(
+                alpha: badge.isEarned ? 0.15 : 0.05,
+              ),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               _getRarityLabel(badge.rarity),
               style: AppTypography.caption.copyWith(
-                color: badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
+                color:
+                    badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
                 fontWeight: FontWeight.w600,
                 fontSize: 10,
               ),
@@ -271,63 +280,64 @@ class BadgeCollectionScreen extends ConsumerWidget {
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
-        children: history.asMap().entries.map((entry) {
-          final item = entry.value;
-          final isLast = entry.key == history.length - 1;
-          final d = item.earnedAt;
+        children:
+            history.asMap().entries.map((entry) {
+              final item = entry.value;
+              final isLast = entry.key == history.length - 1;
+              final d = item.earnedAt;
 
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.space4,
-                  vertical: AppSpacing.space3,
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      _getPointTypeIcon(item.type),
-                      size: 18,
-                      color: AppColors.textSecondaryLight,
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.space4,
+                      vertical: AppSpacing.space3,
                     ),
-                    const SizedBox(width: AppSpacing.space3),
-                    Expanded(
-                      child: Text(
-                        item.description,
-                        style: AppTypography.bodyMedium,
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    child: Row(
                       children: [
-                        Text(
-                          '+${item.points}P',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                        Icon(
+                          _getPointTypeIcon(item.type),
+                          size: 18,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                        const SizedBox(width: AppSpacing.space3),
+                        Expanded(
+                          child: Text(
+                            item.description,
+                            style: AppTypography.bodyMedium,
                           ),
                         ),
-                        Text(
-                          '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
-                          style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '+${item.points}P',
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              '${d.month}/${d.day} ${d.hour.toString().padLeft(2, "0")}:${d.minute.toString().padLeft(2, "0")}',
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.textTertiaryLight,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              if (!isLast)
-                Divider(
-                  height: 1,
-                  indent: AppSpacing.space4,
-                  endIndent: AppSpacing.space4,
-                  color: AppColors.borderLight,
-                ),
-            ],
-          );
-        }).toList(),
+                  ),
+                  if (!isLast)
+                    Divider(
+                      height: 1,
+                      indent: AppSpacing.space4,
+                      endIndent: AppSpacing.space4,
+                      color: AppColors.borderLight,
+                    ),
+                ],
+              );
+            }).toList(),
       ),
     );
   }

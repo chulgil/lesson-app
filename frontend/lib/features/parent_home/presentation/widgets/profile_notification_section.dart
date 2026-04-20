@@ -37,8 +37,9 @@ class ProfileNotificationSection extends ConsumerWidget {
                 ),
               ),
               TextButton(
-                onPressed: () =>
-                    _showNotificationSettingsSheet(context, ref, parentId),
+                onPressed:
+                    () =>
+                        _showNotificationSettingsSheet(context, ref, parentId),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
@@ -62,17 +63,20 @@ class ProfileNotificationSection extends ConsumerWidget {
               ],
             ),
             child: settingsAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.all(AppSpacing.space4),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (_, __) => const Padding(
-                padding: EdgeInsets.all(AppSpacing.space4),
-                child: Text('오류가 발생했습니다.'),
-              ),
+              loading:
+                  () => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+              error:
+                  (_, __) => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.space4),
+                    child: Text('오류가 발생했습니다.'),
+                  ),
               data: (settings) {
                 // Use default settings if none exist
-                final s = settings ??
+                final s =
+                    settings ??
                     ParentNotificationSettings.defaultSettings(
                       id: 'default',
                       parentId: parentId,
@@ -85,12 +89,13 @@ class ProfileNotificationSection extends ConsumerWidget {
                       label: '과제 알림',
                       subtitle: '새 과제 등록, 미완료 알림',
                       value: s.newAssignment || s.assignmentIncomplete,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        assignmentEnabled: value,
-                      ),
+                      onChanged:
+                          (value) => _toggleNotificationGroup(
+                            ref,
+                            s,
+                            parentId,
+                            assignmentEnabled: value,
+                          ),
                     ),
                     _buildDivider(),
                     _buildNotificationItem(
@@ -98,12 +103,13 @@ class ProfileNotificationSection extends ConsumerWidget {
                       label: '레슨 알림',
                       subtitle: '일정 변경, 취소 알림',
                       value: s.lessonChange || s.lessonCancel,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        lessonEnabled: value,
-                      ),
+                      onChanged:
+                          (value) => _toggleNotificationGroup(
+                            ref,
+                            s,
+                            parentId,
+                            lessonEnabled: value,
+                          ),
                     ),
                     _buildDivider(),
                     _buildNotificationItem(
@@ -111,12 +117,13 @@ class ProfileNotificationSection extends ConsumerWidget {
                       label: '연습 알림',
                       subtitle: '연습 완료, 스트릭 달성',
                       value: s.practiceComplete || s.streakAchievement,
-                      onChanged: (value) => _toggleNotificationGroup(
-                        ref,
-                        s,
-                        parentId,
-                        practiceEnabled: value,
-                      ),
+                      onChanged:
+                          (value) => _toggleNotificationGroup(
+                            ref,
+                            s,
+                            parentId,
+                            practiceEnabled: value,
+                          ),
                     ),
                     _buildDivider(),
                     _buildNotificationItem(
@@ -152,11 +159,7 @@ class ProfileNotificationSection extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 24,
-            color: AppColors.textSecondaryLight,
-          ),
+          Icon(icon, size: 24, color: AppColors.textSecondaryLight),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -174,7 +177,9 @@ class ProfileNotificationSection extends ConsumerWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusSmall,
+                          ),
                         ),
                         child: Text(
                           '필수',
@@ -250,46 +255,55 @@ class ProfileNotificationSection extends ConsumerWidget {
   }
 
   void _showNotificationSettingsSheet(
-      BuildContext context, WidgetRef ref, String parentId) {
+    BuildContext context,
+    WidgetRef ref,
+    String parentId,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) {
-          final settingsAsync =
-              ref.watch(notificationSettingsNotifierProvider(parentId));
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.85,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            expand: false,
+            builder: (context, scrollController) {
+              final settingsAsync = ref.watch(
+                notificationSettingsNotifierProvider(parentId),
+              );
 
-          return settingsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
-            data: (settings) {
-              final s = settings ??
-                  ParentNotificationSettings.defaultSettings(
-                    id: 'default',
-                    parentId: parentId,
+              return settingsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, __) => const Center(child: Text('오류가 발생했습니다.')),
+                data: (settings) {
+                  final s =
+                      settings ??
+                      ParentNotificationSettings.defaultSettings(
+                        id: 'default',
+                        parentId: parentId,
+                      );
+
+                  return NotificationSettingsSheet(
+                    settings: s,
+                    scrollController: scrollController,
+                    onSettingsChanged: (newSettings) {
+                      ref
+                          .read(
+                            notificationSettingsNotifierProvider(
+                              parentId,
+                            ).notifier,
+                          )
+                          .saveSettings(newSettings);
+                    },
                   );
-
-              return NotificationSettingsSheet(
-                settings: s,
-                scrollController: scrollController,
-                onSettingsChanged: (newSettings) {
-                  ref
-                      .read(
-                          notificationSettingsNotifierProvider(parentId).notifier)
-                      .saveSettings(newSettings);
                 },
               );
             },
-          );
-        },
-      ),
+          ),
     );
   }
 }

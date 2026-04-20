@@ -29,15 +29,18 @@ class AssignmentItem extends StatelessWidget {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: isCompleted ? AppColors.success : AppColors.surfaceSecondaryLight,
+              color:
+                  isCompleted
+                      ? AppColors.success
+                      : AppColors.surfaceSecondaryLight,
               shape: BoxShape.circle,
-              border: isCompleted
-                  ? null
-                  : Border.all(color: AppColors.borderLight),
+              border:
+                  isCompleted ? null : Border.all(color: AppColors.borderLight),
             ),
-            child: isCompleted
-                ? const Icon(Icons.check, size: 16, color: Colors.white)
-                : null,
+            child:
+                isCompleted
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : null,
           ),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
@@ -48,17 +51,19 @@ class AssignmentItem extends StatelessWidget {
                   title,
                   style: AppTypography.bodyMedium.copyWith(
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color: isCompleted
-                        ? AppColors.textTertiaryLight
-                        : AppColors.textPrimaryLight,
+                    color:
+                        isCompleted
+                            ? AppColors.textTertiaryLight
+                            : AppColors.textPrimaryLight,
                   ),
                 ),
                 Text(
                   dueDate,
                   style: AppTypography.caption.copyWith(
-                    color: isCompleted
-                        ? AppColors.success
-                        : dueDate.contains('내일')
+                    color:
+                        isCompleted
+                            ? AppColors.success
+                            : dueDate.contains('내일')
                             ? AppColors.warning
                             : AppColors.textSecondaryLight,
                   ),
@@ -71,7 +76,7 @@ class AssignmentItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: AppColors.errorLight,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '필수',
