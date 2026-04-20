@@ -39,12 +39,14 @@ class UnifiedRequestCard extends StatelessWidget {
         horizontal: AppSpacing.screenPadding,
         vertical: AppSpacing.space2,
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+      ),
       elevation: 0,
       color: AppColors.surfaceLight,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.space4),
           child: Column(
@@ -85,19 +87,24 @@ class UnifiedRequestCard extends StatelessWidget {
       children: [
         // Type badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.space2,
+            vertical: AppSpacing.space1,
+          ),
           decoration: BoxDecoration(
-            color: request.type == LessonRequestType.trial
-                ? AppColors.infoLight
-                : AppColors.primaryLight.withValues(alpha: 0.2),
+            color:
+                request.type == LessonRequestType.trial
+                    ? AppColors.infoLight
+                    : AppColors.primaryLight.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             request.type.label,
             style: AppTypography.caption.copyWith(
-              color: request.type == LessonRequestType.trial
-                  ? AppColors.info
-                  : AppColors.primary,
+              color:
+                  request.type == LessonRequestType.trial
+                      ? AppColors.info
+                      : AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -105,7 +112,10 @@ class UnifiedRequestCard extends StatelessWidget {
         if (request.isReturningStudent) ...[
           const SizedBox(width: 6),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space2,
+              vertical: AppSpacing.space1,
+            ),
             decoration: BoxDecoration(
               color: AppColors.warningLight,
               borderRadius: BorderRadius.circular(6),
@@ -139,11 +149,11 @@ class UnifiedRequestCard extends StatelessWidget {
           '${studentName ?? '학생'} · ${request.instrument}',
           style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.space1),
         // Goal + Experience + Preferred time
         Wrap(
-          spacing: 8,
-          runSpacing: 4,
+          spacing: AppSpacing.space2,
+          runSpacing: AppSpacing.space1,
           children: [
             _InfoChip(icon: Icons.flag_outlined, label: request.goal.label),
             _InfoChip(
@@ -162,32 +172,37 @@ class UnifiedRequestCard extends StatelessWidget {
         // v2.0: Show 3 preferred time slots
         if (request.preferredSlots.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.space2),
-          ...request.preferredSlots.map((slot) => Padding(
-                padding: const EdgeInsets.only(bottom: 2),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.schedule_outlined,
-                      size: 14,
-                      color: slot.priority == 1
-                          ? AppColors.primary
-                          : AppColors.textTertiaryLight,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${slot.priority}순위: ${slot.displayLabel}',
-                      style: AppTypography.caption.copyWith(
-                        color: slot.priority == 1
+          ...request.preferredSlots.map(
+            (slot) => Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.schedule_outlined,
+                    size: 14,
+                    color:
+                        slot.priority == 1
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
-                        fontWeight: slot.priority == 1
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
+                            : AppColors.textTertiaryLight,
+                  ),
+                  const SizedBox(width: AppSpacing.space1),
+                  Text(
+                    '${slot.priority}순위: ${slot.displayLabel}',
+                    style: AppTypography.caption.copyWith(
+                      color:
+                          slot.priority == 1
+                              ? AppColors.primary
+                              : AppColors.textSecondaryLight,
+                      fontWeight:
+                          slot.priority == 1
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ],
     );
@@ -199,7 +214,7 @@ class UnifiedRequestCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: AppColors.backgroundLight,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         request.message!,
@@ -255,7 +270,7 @@ class UnifiedRequestCard extends StatelessWidget {
         Row(
           children: [
             Icon(Icons.swap_horiz, size: 16, color: AppColors.info),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.space1),
             Text(
               '시간 협상 중 (${request.currentRound}/3 라운드)',
               style: AppTypography.caption.copyWith(
@@ -275,12 +290,13 @@ class UnifiedRequestCard extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
               color: AppColors.infoLight,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Text(
               latestProposal.message!,
-              style: AppTypography.bodySmall
-                  .copyWith(color: AppColors.textSecondaryLight),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -289,19 +305,19 @@ class UnifiedRequestCard extends StatelessWidget {
         // Alternative slot cards
         Text(
           '대안 시간',
-          style: AppTypography.caption
-              .copyWith(fontWeight: FontWeight.w600),
+          style: AppTypography.caption.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.space1),
         ...latestProposal.slots.asMap().entries.map(
-              (entry) => _AlternativeSlotCard(
-                slot: entry.value,
-                index: entry.key,
-                onAccept: onAcceptAlternative != null
+          (entry) => _AlternativeSlotCard(
+            slot: entry.value,
+            index: entry.key,
+            onAccept:
+                onAcceptAlternative != null
                     ? () => onAcceptAlternative!(entry.key)
                     : null,
-              ),
-            ),
+          ),
+        ),
 
         // Counter-propose button
         if (onCounterPropose != null) ...[
@@ -346,12 +362,12 @@ class UnifiedRequestCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             color: AppColors.successLight,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
               Icon(Icons.check_circle, size: 18, color: AppColors.success),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,8 +399,12 @@ class UnifiedRequestCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              Icon(Icons.sell_outlined, size: 14, color: AppColors.textTertiaryLight),
-              const SizedBox(width: 4),
+              Icon(
+                Icons.sell_outlined,
+                size: 14,
+                color: AppColors.textTertiaryLight,
+              ),
+              const SizedBox(width: AppSpacing.space1),
               Text(
                 '참고 가격: ${_formatPrice(request.suggestedPrice!)}원',
                 style: AppTypography.caption.copyWith(
@@ -430,13 +450,15 @@ class UnifiedRequestCard extends StatelessWidget {
 
   Widget _buildStatusBadge() {
     final (color, bgColor) = switch (request.status) {
-      UnifiedRequestStatus.approved ||
-      UnifiedRequestStatus.timeConfirmed =>
-        (AppColors.success, AppColors.successLight),
+      UnifiedRequestStatus.approved || UnifiedRequestStatus.timeConfirmed => (
+        AppColors.success,
+        AppColors.successLight,
+      ),
       UnifiedRequestStatus.rejected => (AppColors.error, AppColors.errorLight),
-      UnifiedRequestStatus.cancelled ||
-      UnifiedRequestStatus.expired =>
-        (AppColors.textTertiaryLight, AppColors.backgroundLight),
+      UnifiedRequestStatus.cancelled || UnifiedRequestStatus.expired => (
+        AppColors.textTertiaryLight,
+        AppColors.backgroundLight,
+      ),
       UnifiedRequestStatus.negotiating => (AppColors.info, AppColors.infoLight),
       _ => (AppColors.primary, AppColors.primaryLight),
     };
@@ -487,7 +509,7 @@ class _AlternativeSlotCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.space1),
       child: InkWell(
         onTap: onAccept,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.space3,
@@ -495,16 +517,12 @@ class _AlternativeSlotCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.borderLight),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.access_time,
-                size: 16,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 8),
+              Icon(Icons.access_time, size: 16, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.space2),
               Text(
                 '${slot.dayLabel}요일 ${slot.startTime} - ${slot.endTime}',
                 style: AppTypography.bodySmall.copyWith(
