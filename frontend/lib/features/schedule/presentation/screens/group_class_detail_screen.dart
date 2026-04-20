@@ -42,16 +42,15 @@ class _GroupClassDetailScreenState
     final bookingAsync = ref.watch(
       studentScheduleBookingProvider(widget.scheduleId, widget.studentId),
     );
-    final confirmedCountAsync =
-        ref.watch(scheduleConfirmedCountProvider(widget.scheduleId));
-    final waitlistCountAsync =
-        ref.watch(scheduleWaitlistCountProvider(widget.scheduleId));
+    final confirmedCountAsync = ref.watch(
+      scheduleConfirmedCountProvider(widget.scheduleId),
+    );
+    final waitlistCountAsync = ref.watch(
+      scheduleWaitlistCountProvider(widget.scheduleId),
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('그룹 레슨'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('그룹 레슨'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -73,8 +72,8 @@ class _GroupClassDetailScreenState
               error: (_, __) => const Text('오류가 발생했습니다.'),
               data: (confirmedCount) {
                 return waitlistCountAsync.when(
-                  loading: () =>
-                      const Center(child: CircularProgressIndicator()),
+                  loading:
+                      () => const Center(child: CircularProgressIndicator()),
                   error: (_, __) => const Text('오류가 발생했습니다.'),
                   data: (waitlistCount) {
                     return _buildCapacityStatus(confirmedCount, waitlistCount);
@@ -121,7 +120,7 @@ class _GroupClassDetailScreenState
 
   Widget _buildClassHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(16),
@@ -159,21 +158,26 @@ class _GroupClassDetailScreenState
 
           // Type badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space3,
+              vertical: AppSpacing.space1,
+            ),
             decoration: BoxDecoration(
-              color: widget.groupClass.type == GroupClassType.regular
-                  ? AppColors.info.withValues(alpha: 0.1)
-                  : AppColors.secondary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color:
+                  widget.groupClass.type == GroupClassType.regular
+                      ? AppColors.info.withValues(alpha: 0.1)
+                      : AppColors.secondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Text(
               widget.groupClass.type == GroupClassType.regular
                   ? '정규 클래스'
                   : '드롭인 클래스',
               style: AppTypography.caption.copyWith(
-                color: widget.groupClass.type == GroupClassType.regular
-                    ? AppColors.info
-                    : AppColors.secondary,
+                color:
+                    widget.groupClass.type == GroupClassType.regular
+                        ? AppColors.info
+                        : AppColors.secondary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -185,10 +189,10 @@ class _GroupClassDetailScreenState
 
   Widget _buildScheduleInfo() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -241,9 +245,7 @@ class _GroupClassDetailScreenState
         const Spacer(),
         Text(
           value,
-          style: AppTypography.bodyMedium.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -255,18 +257,20 @@ class _GroupClassDetailScreenState
         confirmedCount >= widget.schedule.maxCapacity - 2 && !isFull;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isFull
-            ? AppColors.error.withValues(alpha: 0.05)
-            : isAlmostFull
+        color:
+            isFull
+                ? AppColors.error.withValues(alpha: 0.05)
+                : isAlmostFull
                 ? AppColors.warning.withValues(alpha: 0.05)
                 : AppColors.success.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isFull
-              ? AppColors.error.withValues(alpha: 0.3)
-              : isAlmostFull
+          color:
+              isFull
+                  ? AppColors.error.withValues(alpha: 0.3)
+                  : isAlmostFull
                   ? AppColors.warning.withValues(alpha: 0.3)
                   : AppColors.success.withValues(alpha: 0.3),
         ),
@@ -281,9 +285,10 @@ class _GroupClassDetailScreenState
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: isFull
-                      ? AppColors.error
-                      : isAlmostFull
+                  color:
+                      isFull
+                          ? AppColors.error
+                          : isAlmostFull
                           ? AppColors.warning
                           : AppColors.success,
                   shape: BoxShape.circle,
@@ -294,13 +299,14 @@ class _GroupClassDetailScreenState
                 isFull
                     ? '만석'
                     : isAlmostFull
-                        ? '마감임박'
-                        : '예약가능',
+                    ? '마감임박'
+                    : '예약가능',
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isFull
-                      ? AppColors.error
-                      : isAlmostFull
+                  color:
+                      isFull
+                          ? AppColors.error
+                          : isAlmostFull
                           ? AppColors.warning
                           : AppColors.success,
                 ),
@@ -337,16 +343,18 @@ class _GroupClassDetailScreenState
     final isWaitlist = booking.status == GroupBookingStatus.waitlist;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: isWaitlist
-            ? AppColors.warning.withValues(alpha: 0.05)
-            : AppColors.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        color:
+            isWaitlist
+                ? AppColors.warning.withValues(alpha: 0.05)
+                : AppColors.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isWaitlist
-              ? AppColors.warning.withValues(alpha: 0.3)
-              : AppColors.primary.withValues(alpha: 0.3),
+          color:
+              isWaitlist
+                  ? AppColors.warning.withValues(alpha: 0.3)
+                  : AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -355,10 +363,7 @@ class _GroupClassDetailScreenState
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                booking.statusIcon,
-                style: const TextStyle(fontSize: 24),
-              ),
+              Text(booking.statusIcon, style: const TextStyle(fontSize: 24)),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 booking.statusText,
@@ -391,13 +396,14 @@ class _GroupClassDetailScreenState
                 foregroundColor: AppColors.error,
                 side: const BorderSide(color: AppColors.error),
               ),
-              child: _isProcessing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(isWaitlist ? '대기 취소' : '예약 취소'),
+              child:
+                  _isProcessing
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : Text(isWaitlist ? '대기 취소' : '예약 취소'),
             ),
           ),
         ],
@@ -411,14 +417,18 @@ class _GroupClassDetailScreenState
 
     if (isFull && !canWaitlist) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Column(
           children: [
-            const Icon(Icons.block, size: 48, color: AppColors.textTertiaryLight),
+            const Icon(
+              Icons.block,
+              size: 48,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '예약이 마감되었습니다',
@@ -439,19 +449,20 @@ class _GroupClassDetailScreenState
           child: ElevatedButton(
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
               backgroundColor: isFull ? AppColors.warning : AppColors.primary,
             ),
-            child: _isProcessing
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(isFull ? '대기자로 등록하기' : '예약하기'),
+            child:
+                _isProcessing
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : Text(isFull ? '대기자로 등록하기' : '예약하기'),
           ),
         ),
 
@@ -470,10 +481,10 @@ class _GroupClassDetailScreenState
 
   Widget _buildDescription() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
@@ -499,10 +510,10 @@ class _GroupClassDetailScreenState
 
   Widget _buildPolicyInfo() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
         color: AppColors.info.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -601,25 +612,24 @@ class _GroupClassDetailScreenState
   Future<void> _cancelBooking(GroupClassBooking booking) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(booking.isOnWaitlist ? '대기 취소' : '예약 취소'),
-        content: Text(
-          booking.isOnWaitlist
-              ? '대기를 취소하시겠습니까?'
-              : '예약을 취소하시겠습니까?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('아니오'),
+      builder:
+          (context) => AlertDialog(
+            title: Text(booking.isOnWaitlist ? '대기 취소' : '예약 취소'),
+            content: Text(
+              booking.isOnWaitlist ? '대기를 취소하시겠습니까?' : '예약을 취소하시겠습니까?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('아니오'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('취소하기'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-            child: const Text('취소하기'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -635,9 +645,7 @@ class _GroupClassDetailScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              booking.isOnWaitlist ? '대기가 취소되었습니다' : '예약이 취소되었습니다',
-            ),
+            content: Text(booking.isOnWaitlist ? '대기가 취소되었습니다' : '예약이 취소되었습니다'),
           ),
         );
       }
