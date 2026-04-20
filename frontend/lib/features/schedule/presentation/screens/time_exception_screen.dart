@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -334,7 +335,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('취소'),
+                child: const Text(AppStrings.cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
@@ -477,7 +478,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: const Text('취소'),
+                        child: const Text(AppStrings.cancel),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),

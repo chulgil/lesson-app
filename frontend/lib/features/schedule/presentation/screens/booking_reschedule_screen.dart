@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -104,14 +105,15 @@ class _BookingRescheduleScreenState
               child: slotsAsync.when(
                 data: (slots) => _buildSlotSelection(slots),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(
-                  child: Text(
-                    '데이터를 불러올 수 없습니다',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                error:
+                    (error, _) => Center(
+                      child: Text(
+                        '데이터를 불러올 수 없습니다',
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ),
             ),
 
@@ -144,11 +146,7 @@ class _BookingRescheduleScreenState
           const SizedBox(height: AppSpacing.space2),
           Row(
             children: [
-              const Icon(
-                Icons.event,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              const Icon(Icons.event, size: 20, color: AppColors.primary),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 _formatCurrentBooking(),
@@ -210,9 +208,10 @@ class _BookingRescheduleScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: isLastChance
-            ? AppColors.warning.withValues(alpha: 0.1)
-            : AppColors.info.withValues(alpha: 0.1),
+        color:
+            isLastChance
+                ? AppColors.warning.withValues(alpha: 0.1)
+                : AppColors.info.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -239,9 +238,10 @@ class _BookingRescheduleScreenState
 
   Widget _buildSlotSelection(List<AvailabilitySlot> slots) {
     // Filter out unavailable slots
-    final availableSlots = slots
-        .where((s) => s.status == AvailabilitySlotStatus.available)
-        .toList();
+    final availableSlots =
+        slots
+            .where((s) => s.status == AvailabilitySlotStatus.available)
+            .toList();
 
     if (availableSlots.isEmpty) {
       return _buildEmptyState();
@@ -269,54 +269,57 @@ class _BookingRescheduleScreenState
     return Wrap(
       spacing: AppSpacing.space2,
       runSpacing: AppSpacing.space2,
-      children: slots.map((slot) {
-        final isSelected = _selectedSlot?.id == slot.id;
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedSlot = slot;
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            constraints: const BoxConstraints(
-              minWidth: 72,
-              minHeight: 44,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space4,
-              vertical: AppSpacing.space3,
-            ),
-            decoration: BoxDecoration(
-              color: isSelected ? AppColors.primary : AppColors.backgroundLight,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
-                width: isSelected ? 2 : 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (slot.isRecommended && !isSelected) ...[
-                  const Text(
-                    '⭐',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(width: AppSpacing.space1),
-                ],
-                Text(
-                  slot.formattedStartTime,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: isSelected ? Colors.white : AppColors.textPrimaryLight,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      children:
+          slots.map((slot) {
+            final isSelected = _selectedSlot?.id == slot.id;
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedSlot = slot;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                constraints: const BoxConstraints(minWidth: 72, minHeight: 44),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space4,
+                  vertical: AppSpacing.space3,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected
+                          ? AppColors.primary
+                          : AppColors.backgroundLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  border: Border.all(
+                    color:
+                        isSelected ? AppColors.primary : AppColors.borderLight,
+                    width: isSelected ? 2 : 1,
                   ),
                 ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (slot.isRecommended && !isSelected) ...[
+                      const Text('⭐', style: TextStyle(fontSize: 12)),
+                      const SizedBox(width: AppSpacing.space1),
+                    ],
+                    Text(
+                      slot.formattedStartTime,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color:
+                            isSelected
+                                ? Colors.white
+                                : AppColors.textPrimaryLight,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -354,10 +357,15 @@ class _BookingRescheduleScreenState
         }
 
         // Convert dates to DateSuggestion format
-        final suggestions = dates.map((date) => DateSuggestion(
-              date: date,
-              availableSlots: const [], // Will be loaded when selected
-            )).toList();
+        final suggestions =
+            dates
+                .map(
+                  (date) => DateSuggestion(
+                    date: date,
+                    availableSlots: const [], // Will be loaded when selected
+                  ),
+                )
+                .toList();
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -430,9 +438,10 @@ class _BookingRescheduleScreenState
           SizedBox(
             width: double.infinity,
             child: FilledButton(
-              onPressed: canReschedule && !_isLoading
-                  ? () => _handleReschedule(isLastChance)
-                  : null,
+              onPressed:
+                  canReschedule && !_isLoading
+                      ? () => _handleReschedule(isLastChance)
+                      : null,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(
@@ -442,22 +451,25 @@ class _BookingRescheduleScreenState
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
               ),
-              child: _isLoading
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              child:
+                  _isLoading
+                      ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                      : Text(
+                        '예약 변경하기',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    )
-                  : Text(
-                      '예약 변경하기',
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
             ),
           ),
         ],
@@ -470,38 +482,39 @@ class _BookingRescheduleScreenState
       // Show confirmation dialog for last chance
       final confirmed = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('마지막 변경 기회입니다'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
-                style: AppTypography.bodyMedium,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('마지막 변경 기회입니다'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '현재: ${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용',
+                    style: AppTypography.bodyMedium,
+                  ),
+                  Text(
+                    '변경 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  const Text('이후 더 이상 변경/취소가 불가합니다.'),
+                ],
               ),
-              Text(
-                '변경 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.warning,
-                  fontWeight: FontWeight.w600,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text(AppStrings.cancel),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.space3),
-              const Text('이후 더 이상 변경/취소가 불가합니다.'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('취소'),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('변경하기'),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('변경하기'),
-            ),
-          ],
-        ),
       );
 
       if (confirmed != true) return;
@@ -522,7 +535,9 @@ class _BookingRescheduleScreenState
           .cancelBooking(widget.currentBookingId);
 
       // 2. Create new booking
-      await ref.read(slotBookingNotifierProvider.notifier).bookSlotSimple(
+      await ref
+          .read(slotBookingNotifierProvider.notifier)
+          .bookSlotSimple(
             _selectedSlot!.id,
             widget.studentId,
             widget.studentName,

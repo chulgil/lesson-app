@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -115,7 +116,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
         builder: (context, constraints) {
           final blockWidth =
               (constraints.maxWidth - (columns - 1) * AppSpacing.space2 - 50) /
-                  columns;
+              columns;
           final blockHeight = 50.0;
 
           // Store for hit testing
@@ -179,15 +180,14 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
                       // Time blocks
                       ...hourSlots.map((time) {
                         final slot = _findSlot(time);
-                        final status = slot?.status ??
-                            AvailabilitySlotStatus.cancelled;
+                        final status =
+                            slot?.status ?? AvailabilitySlotStatus.cancelled;
                         final isSelected = _selectedTimes.contains(time);
 
                         return Padding(
                           padding: EdgeInsets.only(
-                            right: time != hourSlots.last
-                                ? AppSpacing.space2
-                                : 0,
+                            right:
+                                time != hourSlots.last ? AppSpacing.space2 : 0,
                           ),
                           child: SizedBox(
                             width: blockWidth,
@@ -359,7 +359,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
           onPressed: () {
             setState(() => _selectedTimes.clear());
           },
-          child: const Text('취소'),
+          child: const Text(AppStrings.cancel),
         ),
         const SizedBox(width: AppSpacing.space2),
         FilledButton(

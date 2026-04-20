@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -180,7 +181,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: const Text('취소'),
+                        child: const Text(AppStrings.cancel),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
