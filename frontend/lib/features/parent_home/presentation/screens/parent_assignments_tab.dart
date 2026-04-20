@@ -17,10 +17,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
         centerTitle: true,
         actions: [
           // Filter button
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.filter_list),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.filter_list)),
         ],
       ),
       body: ListView(
@@ -32,11 +29,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Incomplete assignments
-          _SectionHeader(
-            title: '미완료 과제',
-            count: 2,
-            color: AppColors.warning,
-          ),
+          _SectionHeader(title: '미완료 과제', count: 2, color: AppColors.warning),
           const SizedBox(height: AppSpacing.space3),
 
           _AssignmentCard(
@@ -60,11 +53,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space6),
 
           // Completed assignments
-          _SectionHeader(
-            title: '완료된 과제',
-            count: 5,
-            color: AppColors.success,
-          ),
+          _SectionHeader(title: '완료된 과제', count: 5, color: AppColors.success),
           const SizedBox(height: AppSpacing.space3),
 
           _AssignmentCard(
@@ -117,18 +106,16 @@ class ParentAssignmentsTab extends ConsumerWidget {
             children: [
               Text(
                 '이번 주 과제',
-                style: AppTypography.headingSmall.copyWith(
-                  color: Colors.white,
-                ),
+                style: AppTypography.headingSmall.copyWith(color: Colors.white),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
+                  horizontal: AppSpacing.space3,
+                  vertical: AppSpacing.space1,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
                 ),
                 child: Text(
                   '71% 완료',
@@ -143,7 +130,7 @@ class ParentAssignmentsTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             child: LinearProgressIndicator(
               value: 0.71,
               backgroundColor: Colors.white.withValues(alpha: 0.2),
@@ -156,8 +143,16 @@ class ParentAssignmentsTab extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _ProgressStat(label: '전체', value: '7', color: Colors.white),
-              _ProgressStat(label: '완료', value: '5', color: AppColors.successLight),
-              _ProgressStat(label: '진행중', value: '2', color: AppColors.warningLight),
+              _ProgressStat(
+                label: '완료',
+                value: '5',
+                color: AppColors.successLight,
+              ),
+              _ProgressStat(
+                label: '진행중',
+                value: '2',
+                color: AppColors.warningLight,
+              ),
             ],
           ),
         ],
@@ -187,7 +182,7 @@ class _SectionHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Text(
             '$count개',
@@ -217,10 +212,7 @@ class _ProgressStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          value,
-          style: AppTypography.headingMedium.copyWith(color: color),
-        ),
+        Text(value, style: AppTypography.headingMedium.copyWith(color: color)),
         Text(
           label,
           style: AppTypography.caption.copyWith(
@@ -257,7 +249,10 @@ class _AssignmentCard extends StatelessWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isCompleted ? AppColors.borderLight : _getPriorityColor().withValues(alpha: 0.3),
+          color:
+              isCompleted
+                  ? AppColors.borderLight
+                  : _getPriorityColor().withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -270,15 +265,20 @@ class _AssignmentCard extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: isCompleted ? AppColors.success : AppColors.surfaceSecondaryLight,
+                  color:
+                      isCompleted
+                          ? AppColors.success
+                          : AppColors.surfaceSecondaryLight,
                   shape: BoxShape.circle,
-                  border: isCompleted
-                      ? null
-                      : Border.all(color: AppColors.borderLight),
+                  border:
+                      isCompleted
+                          ? null
+                          : Border.all(color: AppColors.borderLight),
                 ),
-                child: isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
-                    : null,
+                child:
+                    isCompleted
+                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        : null,
               ),
               const SizedBox(width: AppSpacing.space3),
               // Title
@@ -288,9 +288,10 @@ class _AssignmentCard extends StatelessWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     decoration: isCompleted ? TextDecoration.lineThrough : null,
-                    color: isCompleted
-                        ? AppColors.textTertiaryLight
-                        : AppColors.textPrimaryLight,
+                    color:
+                        isCompleted
+                            ? AppColors.textTertiaryLight
+                            : AppColors.textPrimaryLight,
                   ),
                 ),
               ),
@@ -316,15 +317,19 @@ class _AssignmentCard extends StatelessWidget {
                     Icon(
                       isCompleted ? Icons.check_circle : Icons.schedule,
                       size: 14,
-                      color: isCompleted ? AppColors.success : AppColors.textTertiaryLight,
+                      color:
+                          isCompleted
+                              ? AppColors.success
+                              : AppColors.textTertiaryLight,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       dueDate,
                       style: AppTypography.caption.copyWith(
-                        color: isCompleted
-                            ? AppColors.success
-                            : dueDate.contains('내일')
+                        color:
+                            isCompleted
+                                ? AppColors.success
+                                : dueDate.contains('내일')
                                 ? AppColors.warning
                                 : AppColors.textTertiaryLight,
                         fontWeight: FontWeight.w500,
@@ -367,7 +372,7 @@ class _AssignmentCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: _getPriorityColor().withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Text(
         _getPriorityLabel(),
