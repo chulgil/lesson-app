@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
 
 /// Dialog to confirm lesson booking with reschedule policy notice
@@ -41,16 +42,17 @@ class BookingConfirmDialog extends StatelessWidget {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => BookingConfirmDialog(
-        teacherName: teacherName,
-        lessonDate: lessonDate,
-        startTime: startTime,
-        endTime: endTime,
-        remainingReschedules: remainingReschedules,
-        totalReschedules: totalReschedules,
-        isReschedule: isReschedule,
-        isTrialLesson: isTrialLesson,
-      ),
+      builder:
+          (context) => BookingConfirmDialog(
+            teacherName: teacherName,
+            lessonDate: lessonDate,
+            startTime: startTime,
+            endTime: endTime,
+            remainingReschedules: remainingReschedules,
+            totalReschedules: totalReschedules,
+            isReschedule: isReschedule,
+            isTrialLesson: isTrialLesson,
+          ),
     );
     return result ?? false;
   }
@@ -59,13 +61,11 @@ class BookingConfirmDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
       ),
       title: Text(
         isReschedule ? '레슨 시간을 변경하시겠습니까?' : '예약을 확정하시겠습니까?',
-        style: AppTypography.headingSmall.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTypography.headingSmall.copyWith(fontWeight: FontWeight.w600),
         textAlign: TextAlign.center,
       ),
       content: Column(
@@ -74,21 +74,17 @@ class BookingConfirmDialog extends StatelessWidget {
         children: [
           // Lesson info card
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.person,
-                      size: 16,
-                      color: AppColors.primary,
-                    ),
+                    Icon(Icons.person, size: 16, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
                       teacherName,
@@ -116,11 +112,7 @@ class BookingConfirmDialog extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 16,
-                      color: AppColors.primary,
-                    ),
+                    Icon(Icons.access_time, size: 16, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Text(
                       '$startTime - $endTime',
@@ -138,9 +130,10 @@ class BookingConfirmDialog extends StatelessWidget {
           if (!isTrialLesson) ...[
             _buildPolicyNotice(
               icon: Icons.info_outline,
-              text: isReschedule
-                  ? '확정 시 변경권 1회가 차감됩니다.'
-                  : '예약 확정 후 변경 시 변경권이 차감됩니다.',
+              text:
+                  isReschedule
+                      ? '확정 시 변경권 1회가 차감됩니다.'
+                      : '예약 확정 후 변경 시 변경권이 차감됩니다.',
               color: AppColors.warning,
             ),
             const SizedBox(height: 8),
@@ -160,7 +153,7 @@ class BookingConfirmDialog extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: _getRescheduleCountColor().withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -208,13 +201,18 @@ class BookingConfirmDialog extends StatelessWidget {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
           ),
           child: Text(isReschedule ? '변경 확정' : '예약 확정'),
         ),
       ],
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        AppSpacing.space4,
+        0,
+        AppSpacing.space4,
+        AppSpacing.space4,
+      ),
     );
   }
 
@@ -226,19 +224,12 @@ class BookingConfirmDialog extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          icon,
-          size: 18,
-          color: color,
-        ),
+        Icon(icon, size: 18, color: color),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
-            style: AppTypography.caption.copyWith(
-              color: color,
-              height: 1.4,
-            ),
+            style: AppTypography.caption.copyWith(color: color, height: 1.4),
           ),
         ),
       ],
