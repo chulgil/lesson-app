@@ -107,7 +107,6 @@ class CompactWeekStrip extends StatelessWidget {
                                     ? AppColors.primary
                                     : AppColors.textTertiaryLight,
                             fontWeight: FontWeight.w500,
-                            fontSize: 11,
                           ),
                         ),
                         const SizedBox(height: 4),
