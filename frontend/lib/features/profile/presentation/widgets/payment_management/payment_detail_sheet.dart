@@ -159,7 +159,7 @@ class PaymentDetailSheet extends ConsumerWidget {
                   // TODO: Edit payment
                 },
                 icon: const Icon(Icons.edit),
-                label: const Text('수정'),
+                label: const Text(AppStrings.modify),
               ),
             ),
             const SizedBox(width: AppSpacing.space3),

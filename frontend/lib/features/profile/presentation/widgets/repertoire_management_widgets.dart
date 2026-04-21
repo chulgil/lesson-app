@@ -301,7 +301,7 @@ class PieceCard extends StatelessWidget {
                           children: [
                             Icon(Icons.edit),
                             SizedBox(width: AppSpacing.space2),
-                            Text('수정'),
+                            Text(AppStrings.modify),
                           ],
                         ),
                       ),
@@ -689,7 +689,7 @@ void showPieceDetails({
                               onEdit();
                             },
                             icon: const Icon(Icons.edit),
-                            label: const Text('수정'),
+                            label: const Text(AppStrings.modify),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.space3),

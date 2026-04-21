@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -87,7 +88,7 @@ class NoteListItem extends StatelessWidget {
                             children: [
                               Icon(Icons.edit, size: 18),
                               SizedBox(width: AppSpacing.space2),
-                              Text('수정'),
+                              Text(AppStrings.modify),
                             ],
                           ),
                         ),

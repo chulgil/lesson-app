@@ -182,7 +182,7 @@ class _RepertoireCard extends ConsumerWidget {
                             children: [
                               Icon(Icons.edit, size: 20),
                               SizedBox(width: AppSpacing.space2),
-                              Text('수정'),
+                              Text(AppStrings.modify),
                             ],
                           ),
                         ),

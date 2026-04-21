@@ -239,7 +239,7 @@ class TrialBookingCard extends ConsumerWidget {
                   OutlinedButton.icon(
                     onPressed: () => _onModify(context),
                     icon: const Icon(Icons.edit, size: 16),
-                    label: const Text('수정'),
+                    label: const Text(AppStrings.modify),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(color: AppColors.primary),

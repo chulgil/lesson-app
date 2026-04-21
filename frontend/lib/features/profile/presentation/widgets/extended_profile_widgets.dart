@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -256,7 +257,10 @@ class EducationCard extends ConsumerWidget {
             },
             itemBuilder:
                 (context) => [
-                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Text(AppStrings.modify),
+                  ),
                   const PopupMenuItem(value: 'delete', child: Text('삭제')),
                 ],
           ),
@@ -368,7 +372,10 @@ class CareerCard extends ConsumerWidget {
             },
             itemBuilder:
                 (context) => [
-                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Text(AppStrings.modify),
+                  ),
                   const PopupMenuItem(value: 'delete', child: Text('삭제')),
                 ],
           ),
@@ -491,7 +498,10 @@ class CertificateCard extends ConsumerWidget {
             },
             itemBuilder:
                 (context) => [
-                  const PopupMenuItem(value: 'edit', child: Text('수정')),
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Text(AppStrings.modify),
+                  ),
                   const PopupMenuItem(value: 'delete', child: Text('삭제')),
                 ],
           ),

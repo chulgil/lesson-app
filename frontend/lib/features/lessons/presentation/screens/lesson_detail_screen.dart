@@ -230,7 +230,10 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
           onSelected: (value) => _handleAppBarAction(value, lesson),
           itemBuilder:
               (context) => [
-                const PopupMenuItem(value: 'edit', child: Text('수정')),
+                const PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppStrings.modify),
+                ),
                 if (lesson.displayStatus == LessonStatus.scheduled)
                   const PopupMenuItem(value: 'complete', child: Text('완료 처리')),
                 if (lesson.displayStatus == LessonStatus.scheduled)

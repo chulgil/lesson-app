@@ -384,7 +384,7 @@ class _TemplateCard extends StatelessWidget {
                               children: [
                                 Icon(Icons.edit_outlined, size: 20),
                                 SizedBox(width: AppSpacing.space2),
-                                Text('수정'),
+                                Text(AppStrings.modify),
                               ],
                             ),
                           ),
