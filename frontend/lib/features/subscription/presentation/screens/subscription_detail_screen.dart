@@ -21,6 +21,7 @@ import '../widgets/schedule_guide_info_box.dart';
 import '../widgets/session_progress_bar.dart';
 import '../widgets/subscription_bottom_input_bar.dart';
 import '../widgets/subscription_detail_chat_list.dart';
+import '../widgets/subscription_policy_sheet.dart';
 
 /// Screen showing subscription detail with progress bar + chat layout.
 ///
@@ -261,6 +262,17 @@ class _SubscriptionDetailBodyState
           appBar: AppBar(
             titleSpacing: 0,
             title: Text(appBarTitle, style: AppTypography.headingSmall),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.rule_rounded),
+                tooltip: '적용 정책',
+                onPressed:
+                    () => SubscriptionPolicySheet.show(
+                      context,
+                      subscription: subscription,
+                    ),
+              ),
+            ],
           ),
           body: Column(
             children: [

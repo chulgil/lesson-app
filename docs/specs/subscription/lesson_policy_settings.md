@@ -326,6 +326,10 @@ class MembershipBenefit extends HiveObject {
 
 4. 학생/학부모에게 정책 안내
    └─ 수강권 상세에서 정책 확인 가능
+   └─ AppBar 우측 📋 아이콘 → "적용 정책" 바텀시트 (SubscriptionPolicySheet)
+      · 변경/취소: 기준시간 + 월 한도 + 남은 횟수 (수강권 스냅샷)
+      · 노쇼 / 이월: 선생님의 현행 정책 (정보 안내)
+      · 하단 안내: 발급 시점 정책 고정 (법적 안정성)
 ```
 
 ---
@@ -350,6 +354,8 @@ class MembershipBenefit extends HiveObject {
 | `membership_benefit.dart` | 혜택 엔티티 |
 | `lesson_policy_screen.dart` | 정책 설정 화면 |
 | `benefit_settings_screen.dart` | 혜택 설정 화면 |
+| `subscription_policy_sheet.dart` | 수강권 상세 "적용 정책" 바텀시트 |
+| `issue_form_summary_widgets.dart` | 발급 요약 카드 "적용 정책" 섹션 |
 
 ---
 
