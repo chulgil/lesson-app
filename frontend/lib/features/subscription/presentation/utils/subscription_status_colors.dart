@@ -5,11 +5,11 @@ import '../../domain/entities/subscription.dart';
 
 /// Common subscription status colors for consistent UI across all screens.
 ///
-/// 3+1 Color System (Simplified):
-/// - 녹색 (Success): 이용중
-/// - 주황 (Warning): 갱신 필요 (D-7 이하 OR 1회 남음)
-/// - 회색 (Neutral): 만료됨, 일시정지
-/// - 보라 (Brand): 사용 완료 (성취)
+/// Notebook × Score 팔레트 (3색 원칙):
+/// - paperOk (녹색 펜): 이용중 (건강한 활성)
+/// - paperAccent (Vermillion Red): 갱신 필요 (warning+error 병합)
+/// - inkTertiary (회색 연필): 만료됨, 일시정지
+/// - paperHighlight (노란 형광펜): 사용 완료 (성취 표시)
 class SubscriptionStatusColors {
   SubscriptionStatusColors._();
 
@@ -17,32 +17,32 @@ class SubscriptionStatusColors {
   /// Priority: Depleted > Expired > ExpiringSoon > Paused > Active
   static Color getColor(Subscription subscription) {
     if (subscription.isDepleted) {
-      return AppColors.primaryLight; // 사용 완료 (보라) - 성취
+      return AppColors.paperHighlight; // 사용 완료 (노란 형광펜) - 성취
     }
     if (subscription.isExpired) {
       return AppColors.inkTertiary; // 만료됨 (회색)
     }
     if (subscription.isExpiringSoon) {
-      return AppColors.warning; // 갱신 필요 (주황)
+      return AppColors.paperAccent; // 갱신 필요 (Vermillion)
     }
     if (subscription.status == SubscriptionStatus.paused) {
       return AppColors.inkTertiary; // 일시정지 (회색)
     }
-    return AppColors.primary; // 이용중 (보라)
+    return AppColors.paperOk; // 이용중 (녹색 펜)
   }
 
   /// Get the progress/accent color (for progress bars, indicators).
   static Color getProgressColor(Subscription subscription) {
     if (subscription.isDepleted) {
-      return AppColors.primaryLight;
+      return AppColors.paperHighlight;
     }
     if (subscription.isExpiringSoon) {
-      return AppColors.warning;
+      return AppColors.paperAccent;
     }
     if (subscription.isExpired) {
       return AppColors.inkTertiary;
     }
-    return AppColors.primary;
+    return AppColors.paperOk;
   }
 
   /// Get the badge background color (with alpha).
@@ -53,10 +53,10 @@ class SubscriptionStatusColors {
   /// Get the border color.
   static Color getBorderColor(Subscription subscription) {
     if (subscription.isDepleted) {
-      return AppColors.primaryLight.withValues(alpha: 0.3);
+      return AppColors.paperHighlight.withValues(alpha: 0.3);
     }
     if (subscription.isExpiringSoon) {
-      return AppColors.warning.withValues(alpha: 0.5);
+      return AppColors.paperAccent.withValues(alpha: 0.5);
     }
     if (subscription.isExpired) {
       return AppColors.inkTertiary.withValues(alpha: 0.3);
@@ -67,10 +67,10 @@ class SubscriptionStatusColors {
   /// Get the summary text color.
   static Color getSummaryTextColor(Subscription subscription) {
     if (subscription.isDepleted) {
-      return AppColors.primaryLight;
+      return AppColors.paperHighlight;
     }
     if (subscription.isExpiringSoon) {
-      return AppColors.warning;
+      return AppColors.paperAccent;
     }
     if (subscription.isExpired) {
       return AppColors.inkTertiary;
