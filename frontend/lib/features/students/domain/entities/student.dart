@@ -35,13 +35,13 @@ enum StudentStatus {
   Color get color {
     switch (this) {
       case StudentStatus.trial:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case StudentStatus.active:
-        return AppColors.success;
+        return AppColors.paperOk;
       case StudentStatus.paused:
         return AppColors.inkTertiary;
       case StudentStatus.inactive:
-        return AppColors.error;
+        return AppColors.paperAccent;
     }
   }
 
@@ -127,8 +127,8 @@ Color _profileColorFromName(String name) {
   const colors = [
     AppColors.primary,
     AppColors.secondary,
-    AppColors.success,
-    AppColors.info,
+    AppColors.paperOk,
+    AppColors.ink,
     AppColors.profileRed,
     AppColors.profileTeal,
     AppColors.profilePurple,

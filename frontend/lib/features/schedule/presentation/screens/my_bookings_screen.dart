@@ -90,7 +90,7 @@ class MyBookingsScreen extends ConsumerWidget {
                           const Icon(
                             Icons.error_outline,
                             size: 48,
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                           const SizedBox(height: AppSpacing.space3),
                           Text(
@@ -160,9 +160,9 @@ class MyBookingsScreen extends ConsumerWidget {
                       color:
                           canReschedule
                               ? (isLastChance
-                                  ? AppColors.warning
-                                  : AppColors.info)
-                              : AppColors.error,
+                                  ? AppColors.paperAccent
+                                  : AppColors.ink)
+                              : AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space1),
                     Text(
@@ -171,9 +171,9 @@ class MyBookingsScreen extends ConsumerWidget {
                         color:
                             canReschedule
                                 ? (isLastChance
-                                    ? AppColors.warning
+                                    ? AppColors.paperAccent
                                     : AppColors.inkSecondary)
-                                : AppColors.error,
+                                : AppColors.paperAccent,
                         fontWeight:
                             isLastChance ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -284,13 +284,13 @@ class MyBookingsScreen extends ConsumerWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
+                    color: AppColors.paperOk.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Text(
                     '완료',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.success,
+                      color: AppColors.paperOk,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -338,11 +338,11 @@ class MyBookingsScreen extends ConsumerWidget {
                     icon: const Icon(Icons.close, size: 18),
                     label: const Text(AppStrings.cancel),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
+                      foregroundColor: AppColors.paperAccent,
                       side: BorderSide(
                         color:
                             canReschedule
-                                ? AppColors.error
+                                ? AppColors.paperAccent
                                 : AppColors.inkQuaternary,
                       ),
                       padding: const EdgeInsets.symmetric(

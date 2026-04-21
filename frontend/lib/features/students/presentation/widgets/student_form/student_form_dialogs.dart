@@ -99,10 +99,10 @@ Future<ImagePickerAction?> showImagePickerBottomSheet(
               ),
               if (showDelete)
                 ListTile(
-                  leading: Icon(Icons.delete, color: AppColors.error),
+                  leading: Icon(Icons.delete, color: AppColors.paperAccent),
                   title: Text(
                     '사진 삭제',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                   onTap: () => Navigator.pop(context, ImagePickerAction.delete),
                 ),
@@ -155,10 +155,10 @@ void showImagePickerOptions(
               ),
               if (onDelete != null)
                 ListTile(
-                  leading: Icon(Icons.delete, color: AppColors.error),
+                  leading: Icon(Icons.delete, color: AppColors.paperAccent),
                   title: Text(
                     '사진 삭제',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                   onTap: () {
                     Navigator.pop(context);
@@ -199,7 +199,7 @@ void showExitConfirmation(
                 Navigator.pop(context);
                 onExit();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
               child: const Text('나가기'),
             ),
           ],
@@ -233,7 +233,7 @@ void showDeleteStudentConfirmation(
                 Navigator.pop(context);
                 onDelete();
               },
-              style: TextButton.styleFrom(foregroundColor: AppColors.error),
+              style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
               child: const Text(AppStrings.delete),
             ),
           ],

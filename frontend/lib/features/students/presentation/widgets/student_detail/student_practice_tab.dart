@@ -99,7 +99,7 @@ class _WeeklySummaryCard extends StatelessWidget {
                   icon: Icons.mic_outlined,
                   label: '공유 녹음',
                   value: '${overview.sharedRecordings.length}개',
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
               ),
             ],
@@ -314,7 +314,7 @@ class _SharedRecordingsSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.mic_outlined, size: 18, color: AppColors.info),
+              const Icon(Icons.mic_outlined, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space2),
               Text('공유된 녹음', style: AppTypography.headingSmall),
               const Spacer(),

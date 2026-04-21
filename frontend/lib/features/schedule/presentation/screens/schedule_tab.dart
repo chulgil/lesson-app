@@ -435,7 +435,7 @@ class _LessonTimeCard extends ConsumerWidget {
             title: '레슨 완료',
             message: '${lesson.studentName} 레슨을 완료 처리하시겠습니까?',
             confirmLabel: '완료',
-            confirmColor: AppColors.success,
+            confirmColor: AppColors.paperOk,
             onConfirm: () async {
               final updated = lesson.copyWith(status: LessonStatus.completed);
               await ref
@@ -451,7 +451,7 @@ class _LessonTimeCard extends ConsumerWidget {
             title: '레슨 취소',
             message: '${lesson.studentName} 레슨을 취소하시겠습니까?',
             confirmLabel: '취소',
-            confirmColor: AppColors.error,
+            confirmColor: AppColors.paperAccent,
             onConfirm: () async {
               await ref
                   .read(lessonsNotifierProvider.notifier)
@@ -464,7 +464,7 @@ class _LessonTimeCard extends ConsumerWidget {
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSpacing.space5),
         decoration: BoxDecoration(
-          color: AppColors.success,
+          color: AppColors.paperOk,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: const Row(
@@ -485,7 +485,7 @@ class _LessonTimeCard extends ConsumerWidget {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.space5),
         decoration: BoxDecoration(
-          color: AppColors.error,
+          color: AppColors.paperAccent,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: const Row(
@@ -711,7 +711,7 @@ class _LessonTimeCard extends ConsumerWidget {
       case LessonStatus.reschedulePending:
         return AppColors.primary;
       case LessonStatus.completed:
-        return AppColors.success;
+        return AppColors.paperOk;
       case LessonStatus.cancelled:
       case LessonStatus.cancelledByStudentAdvance:
       case LessonStatus.cancelledByTeacher:
@@ -720,7 +720,7 @@ class _LessonTimeCard extends ConsumerWidget {
       case LessonStatus.noShow:
       case LessonStatus.cancelledByStudentLate:
       case LessonStatus.studentAbsent:
-        return AppColors.error;
+        return AppColors.paperAccent;
     }
   }
 

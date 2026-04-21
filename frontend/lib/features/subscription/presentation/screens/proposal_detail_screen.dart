@@ -254,7 +254,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.info.withValues(alpha: 0.1),
+                          color: AppColors.ink.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -262,7 +262,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                         child: Text(
                           '자동 발송',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.info,
+                            color: AppColors.ink,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -279,7 +279,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     style: AppTypography.bodySmall.copyWith(
                       color:
                           proposal.timeUntilExpiration.inDays < 2
-                              ? AppColors.warning
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                     ),
                   )
@@ -398,7 +398,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.warning.withValues(
+                                          color: AppColors.paperAccent.withValues(
                                             alpha: 0.2,
                                           ),
                                           borderRadius: BorderRadius.circular(
@@ -417,7 +417,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                               '추천',
                                               style: AppTypography.caption
                                                   .copyWith(
-                                                    color: AppColors.warning,
+                                                    color: AppColors.paperAccent,
                                                   ),
                                             ),
                                           ],
@@ -571,7 +571,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       const SizedBox(height: AppSpacing.space4),
                       ListTile(
                         leading: const CircleAvatar(
-                          backgroundColor: AppColors.success,
+                          backgroundColor: AppColors.paperOk,
                           child: Icon(Icons.call, color: Colors.white),
                         ),
                         title: const Text('전화하기'),
@@ -583,7 +583,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       ),
                       ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: AppColors.info,
+                          backgroundColor: AppColors.ink,
                           child: const Icon(Icons.message, color: Colors.white),
                         ),
                         title: const Text('문자 보내기'),
@@ -665,7 +665,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Row(
@@ -674,13 +674,13 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                     Icon(
                       Icons.info_outline,
                       size: 16,
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
                       '수강권을 선택해주세요',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ],
@@ -755,7 +755,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('입금 알림을 보냈습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         // Refresh the page
@@ -766,7 +766,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -815,7 +815,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

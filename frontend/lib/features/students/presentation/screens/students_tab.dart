@@ -578,7 +578,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: AppColors.error),
+          Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '데이터를 불러오는데 실패했습니다',
@@ -834,7 +834,7 @@ class _StudentCard extends ConsumerWidget {
                           size: 14,
                           color:
                               swm.isAppConnected
-                                  ? AppColors.success
+                                  ? AppColors.paperOk
                                   : AppColors.inkTertiary,
                         ),
                       ],
@@ -896,16 +896,16 @@ class _StudentCard extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
-                    color: AppColors.error.withValues(alpha: 0.4),
+                    color: AppColors.paperAccent.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Text(
                   '미수금',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,
@@ -927,16 +927,16 @@ class _StudentCard extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
+                  color: AppColors.paperAccent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   border: Border.all(
-                    color: AppColors.warning.withValues(alpha: 0.4),
+                    color: AppColors.paperAccent.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Text(
                   '갱신',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.warning,
+                    color: AppColors.paperAccent,
                     fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,

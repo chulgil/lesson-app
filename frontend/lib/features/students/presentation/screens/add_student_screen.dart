@@ -267,7 +267,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
     final profileColors = [
       AppColors.primary,
       AppColors.secondary,
-      AppColors.success,
+      AppColors.paperOk,
       AppColors.profilePurple,
       AppColors.profileRed,
       AppColors.profileBlue,
@@ -369,7 +369,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
         SnackBar(
           content: const Text('학생 추가에 실패했습니다. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     }

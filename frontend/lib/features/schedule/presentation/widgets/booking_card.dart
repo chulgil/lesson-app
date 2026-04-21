@@ -192,8 +192,8 @@ class BookingCard extends StatelessWidget {
                         icon: const Icon(Icons.close, size: 18),
                         label: const Text('거절'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.error,
-                          side: const BorderSide(color: AppColors.error),
+                          foregroundColor: AppColors.paperAccent,
+                          side: const BorderSide(color: AppColors.paperAccent),
                         ),
                       ),
                     ),

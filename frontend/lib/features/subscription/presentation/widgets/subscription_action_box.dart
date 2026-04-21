@@ -82,8 +82,8 @@ class SubscriptionActionBox extends StatelessWidget {
             icon: const Icon(Icons.cancel_outlined, size: 18),
             label: Text(AppStrings.cancelRequest),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.error,
-              side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
+              foregroundColor: AppColors.paperAccent,
+              side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
             ),
           ),
         ),

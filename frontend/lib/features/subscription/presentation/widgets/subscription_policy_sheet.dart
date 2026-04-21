@@ -87,9 +87,9 @@ class SubscriptionPolicySheet extends ConsumerWidget {
     final changeLine = '$deadline시간 전까지 · 월 $total회 (남은 $remaining회)';
     final remainingColor =
         remaining <= 0
-            ? AppColors.error
+            ? AppColors.paperAccent
             : remaining == 1
-            ? AppColors.warning
+            ? AppColors.paperAccent
             : AppColors.primary;
 
     return Column(

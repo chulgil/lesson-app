@@ -133,11 +133,11 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
                     '학생 정보를 불러올 수 없습니다',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   FilledButton(
@@ -398,15 +398,15 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                                 ),
                         icon: Icon(
                           Icons.delete_outline,
-                          color: AppColors.error,
+                          color: AppColors.paperAccent,
                         ),
                         label: Text(
                           '학생 삭제',
-                          style: TextStyle(color: AppColors.error),
+                          style: TextStyle(color: AppColors.paperAccent),
                         ),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: AppColors.error.withValues(alpha: 0.5),
+                            color: AppColors.paperAccent.withValues(alpha: 0.5),
                           ),
                         ),
                       ),
@@ -528,7 +528,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         SnackBar(
           content: const Text('학생 삭제에 실패했습니다. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     }
@@ -630,7 +630,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         SnackBar(
           content: const Text('학생 정보 저장에 실패했습니다. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {

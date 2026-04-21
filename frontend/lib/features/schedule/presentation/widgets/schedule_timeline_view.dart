@@ -515,7 +515,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                 ListTile(
                   leading: const Icon(
                     Icons.check_circle,
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                   ),
                   title: const Text('완료 처리'),
                   onTap: () {
@@ -526,7 +526,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                 ListTile(
                   leading: const Icon(
                     Icons.edit_calendar,
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                   title: const Text('일정 변경'),
                   onTap: () {
@@ -537,7 +537,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.cancel, color: AppColors.error),
+                  leading: const Icon(Icons.cancel, color: AppColors.paperAccent),
                   title: const Text(AppStrings.cancel),
                   onTap: () {
                     Navigator.of(ctx).pop();

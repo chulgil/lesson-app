@@ -313,7 +313,7 @@ class _StudentProposalAcceptScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('수강권을 선택했습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop();
@@ -323,7 +323,7 @@ class _StudentProposalAcceptScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -349,7 +349,7 @@ class _StudentProposalAcceptScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('다음에 다시 제안 받을 수 있어요'),
-            backgroundColor: AppColors.info,
+            backgroundColor: AppColors.ink,
           ),
         );
         context.pop();
@@ -359,7 +359,7 @@ class _StudentProposalAcceptScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

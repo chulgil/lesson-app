@@ -132,7 +132,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
               '🔄 변경: $remainingReschedules/$totalReschedules회 남음',
               style: AppTypography.bodySmall.copyWith(
                 color: remainingReschedules == 1
-                    ? AppColors.warning
+                    ? AppColors.paperAccent
                     : AppColors.inkTertiary,
               ),
             ),

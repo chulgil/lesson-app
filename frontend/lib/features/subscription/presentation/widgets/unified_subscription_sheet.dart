@@ -637,7 +637,7 @@ class _UnifiedSubscriptionSheetState
                   ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
                   : '수강권 제안을 보냈습니다',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -646,7 +646,7 @@ class _UnifiedSubscriptionSheetState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('제안 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

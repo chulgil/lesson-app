@@ -338,7 +338,7 @@ class SubscriptionCard extends StatelessWidget {
             '• 잔여',
             '${subscription.remainingLessons ?? 0}회',
             valueColor: subscription.isExpiringSoon
-                ? AppColors.warning
+                ? AppColors.paperAccent
                 : AppColors.primary,
             isBold: true,
           ),
@@ -352,7 +352,7 @@ class SubscriptionCard extends StatelessWidget {
             valueColor: subscription.remainingReschedule <= 0
                 ? AppColors.inkTertiary
                 : subscription.remainingReschedule == 1
-                    ? AppColors.warning
+                    ? AppColors.paperAccent
                     : null,
           ),
           // 유효기간
@@ -385,7 +385,7 @@ class SubscriptionCard extends StatelessWidget {
             Text(
               '⚠️ 미사용분 소멸 (이월 불가)',
               style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
               ),
             ),
           ],
@@ -453,12 +453,12 @@ class SubscriptionCard extends StatelessWidget {
       if (remaining <= 1) {
         warnings.add((
           text: AppStrings.lastLessonWarning,
-          color: AppColors.error,
+          color: AppColors.paperAccent,
         ));
       } else {
         warnings.add((
           text: AppStrings.remainingLessonsWarning(remaining),
-          color: AppColors.warning,
+          color: AppColors.paperAccent,
         ));
       }
     }
@@ -469,12 +469,12 @@ class SubscriptionCard extends StatelessWidget {
       if (days <= 3) {
         warnings.add((
           text: AppStrings.expirationUrgent(days),
-          color: AppColors.error,
+          color: AppColors.paperAccent,
         ));
       } else {
         warnings.add((
           text: AppStrings.expirationDday(days),
-          color: AppColors.warning,
+          color: AppColors.paperAccent,
         ));
       }
     }
@@ -488,7 +488,7 @@ class SubscriptionCard extends StatelessWidget {
     } else if (subscription.remainingReschedule == 1) {
       warnings.add((
         text: AppStrings.rescheduleLastOne,
-        color: AppColors.warning,
+        color: AppColors.paperAccent,
       ));
     }
 

@@ -62,8 +62,8 @@ class PracticeSparkline extends StatelessWidget {
   /// Determine color based on practice days out of 7.
   Color get _trendColor {
     final days = _practiceDays;
-    if (days >= 5) return AppColors.success;
-    if (days >= 3) return AppColors.warning;
-    return AppColors.error;
+    if (days >= 5) return AppColors.paperOk;
+    if (days >= 3) return AppColors.paperAccent;
+    return AppColors.paperAccent;
   }
 }

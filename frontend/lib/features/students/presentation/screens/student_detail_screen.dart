@@ -96,7 +96,7 @@ class StudentDetailScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                  Icon(Icons.error_outline, size: 64, color: AppColors.paperAccent),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
                     '데이터를 불러오는데 실패했습니다',
@@ -491,7 +491,7 @@ class _StudentDetailContent extends ConsumerWidget {
                                 content: const Text(
                                   '상태 변경에 실패했습니다. 다시 시도해주세요.',
                                 ),
-                                backgroundColor: AppColors.error,
+                                backgroundColor: AppColors.paperAccent,
                               ),
                             );
                           }
@@ -528,7 +528,7 @@ class _StudentDetailContent extends ConsumerWidget {
                                 content: const Text(
                                   '상태 변경에 실패했습니다. 다시 시도해주세요.',
                                 ),
-                                backgroundColor: AppColors.error,
+                                backgroundColor: AppColors.paperAccent,
                               ),
                             );
                           }
@@ -571,7 +571,7 @@ class _StudentDetailContent extends ConsumerWidget {
                                 content: const Text(
                                   '상태 변경에 실패했습니다. 다시 시도해주세요.',
                                 ),
-                                backgroundColor: AppColors.error,
+                                backgroundColor: AppColors.paperAccent,
                               ),
                             );
                           }
@@ -595,10 +595,10 @@ class _StudentDetailContent extends ConsumerWidget {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: Icon(Icons.delete_outline, color: AppColors.error),
+                  leading: Icon(Icons.delete_outline, color: AppColors.paperAccent),
                   title: Text(
                     '학생 삭제',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: AppColors.paperAccent),
                   ),
                   onTap: () async {
                     Navigator.pop(context);
@@ -616,7 +616,7 @@ class _StudentDetailContent extends ConsumerWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: const Text('학생 삭제에 실패했습니다. 다시 시도해주세요.'),
-                              backgroundColor: AppColors.error,
+                              backgroundColor: AppColors.paperAccent,
                             ),
                           );
                         }
@@ -647,7 +647,7 @@ class _StudentDetailContent extends ConsumerWidget {
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -714,7 +714,7 @@ class _StudentDetailContent extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('초대 코드 생성에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

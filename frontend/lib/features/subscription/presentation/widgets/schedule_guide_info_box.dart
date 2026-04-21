@@ -11,7 +11,7 @@ import '../../domain/entities/subscription.dart';
 ///
 /// Matches [RequestHistoryChat._buildSystemGuide] style:
 /// - Icon: lightbulb_outline (18px)
-/// - Color: AppColors.info
+/// - Color: AppColors.ink
 /// - Background: info.withValues(alpha: 0.06)
 /// - Structure: [title chip] + [situation text]
 ///
@@ -97,7 +97,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     if (subscription.remainingReschedule <= 0 && viewerRole == 'student') {
       return const _GuideContent(
         title: AppStrings.scheduleChangeTitle,
-        color: AppColors.error,
+        color: AppColors.paperAccent,
         message: AppStrings.rescheduleCreditsExhausted,
       );
     }
@@ -116,7 +116,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
         _hasUnbookedSessions) {
       return const _GuideContent(
         title: AppStrings.scheduleChangeTitle,
-        color: AppColors.info,
+        color: AppColors.ink,
         message: AppStrings.packageGuideMessage,
       );
     }
@@ -124,7 +124,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
     // Priority 4: Default
     return const _GuideContent(
       title: AppStrings.scheduleChangeTitle,
-      color: AppColors.info,
+      color: AppColors.ink,
       message: AppStrings.guideDefaultMessage,
     );
   }

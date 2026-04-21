@@ -158,8 +158,8 @@ class TimelineLessonBlock extends StatelessWidget {
         size: 16,
         color:
             isCompleted
-                ? AppColors.success.withValues(alpha: 0.7)
-                : AppColors.warning.withValues(alpha: 0.7),
+                ? AppColors.paperOk.withValues(alpha: 0.7)
+                : AppColors.paperAccent.withValues(alpha: 0.7),
       ),
     );
   }

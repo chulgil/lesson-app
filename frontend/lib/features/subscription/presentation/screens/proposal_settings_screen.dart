@@ -108,13 +108,13 @@ class _ProposalSettingsScreenState
       decoration: BoxDecoration(
         color:
             _autoProposalEnabled
-                ? AppColors.success.withValues(alpha: 0.1)
+                ? AppColors.paperOk.withValues(alpha: 0.1)
                 : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               _autoProposalEnabled
-                  ? AppColors.success.withValues(alpha: 0.3)
+                  ? AppColors.paperOk.withValues(alpha: 0.3)
                   : AppColors.inkQuaternary,
         ),
       ),
@@ -150,7 +150,7 @@ class _ProposalSettingsScreenState
                     _autoProposalEnabled = value;
                   });
                 },
-                activeThumbColor: AppColors.success,
+                activeThumbColor: AppColors.paperOk,
               ),
             ],
           ),
@@ -159,7 +159,7 @@ class _ProposalSettingsScreenState
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.1),
+                color: AppColors.ink.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Row(
@@ -167,14 +167,14 @@ class _ProposalSettingsScreenState
                   const Icon(
                     Icons.info_outline,
                     size: 16,
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '체험 후 즉시 제안하여 전환율을 높이세요',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.info,
+                        color: AppColors.ink,
                       ),
                     ),
                   ),
@@ -378,7 +378,7 @@ class _ProposalSettingsScreenState
                                     decoration: BoxDecoration(
                                       color:
                                           isRecommended
-                                              ? AppColors.warning.withValues(
+                                              ? AppColors.paperAccent.withValues(
                                                 alpha: 0.2,
                                               )
                                               : AppColors.paperDark,
@@ -392,7 +392,7 @@ class _ProposalSettingsScreenState
                                           .copyWith(
                                             color:
                                                 isRecommended
-                                                    ? AppColors.warning
+                                                    ? AppColors.paperAccent
                                                     : AppColors
                                                         .textTertiaryLight,
                                           ),
@@ -428,13 +428,13 @@ class _ProposalSettingsScreenState
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.2),
+                color: AppColors.paperAccent.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '전환율 UP',
                 style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.warning,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -528,7 +528,7 @@ class _ProposalSettingsScreenState
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
+                    color: AppColors.paperAccent.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -538,14 +538,14 @@ class _ProposalSettingsScreenState
                       const Icon(
                         Icons.local_offer,
                         size: 16,
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           '체험 후 $_discountHours시간 이내 결제 시 $_discountPercent% 할인',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.warning,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ),
@@ -661,7 +661,7 @@ class _ProposalSettingsScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('설정이 저장되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         Navigator.of(context).pop();
@@ -671,7 +671,7 @@ class _ProposalSettingsScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('저장 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

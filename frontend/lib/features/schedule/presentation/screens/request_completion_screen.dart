@@ -98,7 +98,7 @@ class RequestCompletionScreen extends StatelessWidget {
           width: 72,
           height: 72,
           decoration: const BoxDecoration(
-            color: AppColors.success,
+            color: AppColors.paperOk,
             shape: BoxShape.circle,
           ),
           child: const Icon(

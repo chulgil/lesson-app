@@ -284,14 +284,14 @@ class ScheduleChangeEventBubble extends StatelessWidget {
               const Icon(
                 Icons.check_circle,
                 size: 16,
-                color: AppColors.success,
+                color: AppColors.paperOk,
               ),
               const SizedBox(width: AppSpacing.space1),
               Expanded(
                 child: Text(
                   AppStrings.sessionConfirmed(sessionNum, selectedSlotLabel),
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

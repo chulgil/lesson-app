@@ -125,19 +125,19 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
 
     // Unpaid takes highest priority
     if (subscription.isUnpaid) {
-      textColor = AppColors.error;
+      textColor = AppColors.paperAccent;
       label = '미수금';
       icon = Icons.warning_amber_rounded;
     } else if (subscription.status == SubscriptionStatus.expired) {
-      textColor = AppColors.error;
+      textColor = AppColors.paperAccent;
       label = '만료됨';
       icon = Icons.warning_amber_rounded;
     } else if (subscription.isExpiringSoon) {
-      textColor = AppColors.warning;
+      textColor = AppColors.paperAccent;
       label = _formatBadgeLabel(subscription);
       icon = Icons.access_time;
     } else {
-      textColor = AppColors.success;
+      textColor = AppColors.paperOk;
       label = _formatBadgeLabel(subscription);
     }
 

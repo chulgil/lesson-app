@@ -332,7 +332,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -340,14 +340,14 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
           Icon(
             Icons.info_outline,
             size: 18,
-            color: AppColors.warning,
+            color: AppColors.paperAccent,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               '모든 일정이 불가능하면 거절 후 메시지로 대안을 제안해주세요',
               style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
               ),
             ),
           ),

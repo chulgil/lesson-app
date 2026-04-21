@@ -58,7 +58,7 @@ class _TeacherAvailabilityScreenState
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space3),
                   Text(
@@ -160,18 +160,18 @@ class _TeacherAvailabilityScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.08),
+              color: AppColors.ink.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline, size: 16, color: AppColors.info),
+                const Icon(Icons.info_outline, size: 16, color: AppColors.ink),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     helpText,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.info,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -613,14 +613,14 @@ class _TeacherAvailabilityScreenState
             decoration: BoxDecoration(
               color:
                   isHoliday
-                      ? AppColors.error.withValues(alpha: 0.1)
+                      ? AppColors.paperAccent.withValues(alpha: 0.1)
                       : AppColors.paperOk.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               isHoliday ? Icons.event_busy : Icons.add_circle_outline,
               size: 18,
-              color: isHoliday ? AppColors.error : AppColors.paperOk,
+              color: isHoliday ? AppColors.paperAccent : AppColors.paperOk,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -727,7 +727,7 @@ class _TeacherAvailabilityScreenState
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

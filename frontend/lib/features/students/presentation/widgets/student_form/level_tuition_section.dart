@@ -103,7 +103,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                       Text(
                         '수강권으로 관리 중',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                       )
                     else
@@ -194,9 +194,9 @@ class LevelAndTuitionSection extends StatelessWidget {
                 icon: const Icon(Icons.confirmation_number_outlined, size: 18),
                 label: const Text('수강권 관리'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.info,
+                  foregroundColor: AppColors.ink,
                   side: BorderSide(
-                      color: AppColors.info.withValues(alpha: 0.4)),
+                      color: AppColors.ink.withValues(alpha: 0.4)),
                 ),
               ),
             ),
@@ -251,7 +251,7 @@ class LevelAndTuitionSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: (isLinked ? AppColors.info : AppColors.primary)
+              color: (isLinked ? AppColors.ink : AppColors.primary)
                   .withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
@@ -260,7 +260,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                 Icon(
                   Icons.info_outline,
                   size: 16,
-                  color: isLinked ? AppColors.info : AppColors.primary,
+                  color: isLinked ? AppColors.ink : AppColors.primary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
@@ -269,7 +269,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                         ? '수강권이 발급된 학생은 수강료가 수강권에서 관리됩니다'
                         : '수강료를 직접 수정하면 레벨 기본값과 다르게 설정됩니다',
                     style: AppTypography.caption.copyWith(
-                      color: isLinked ? AppColors.info : AppColors.primary,
+                      color: isLinked ? AppColors.ink : AppColors.primary,
                     ),
                   ),
                 ),

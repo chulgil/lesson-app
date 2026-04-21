@@ -165,7 +165,7 @@ class _GroupClassDetailScreenState
             decoration: BoxDecoration(
               color:
                   widget.groupClass.type == GroupClassType.regular
-                      ? AppColors.info.withValues(alpha: 0.1)
+                      ? AppColors.ink.withValues(alpha: 0.1)
                       : AppColors.secondary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             ),
@@ -176,7 +176,7 @@ class _GroupClassDetailScreenState
               style: AppTypography.caption.copyWith(
                 color:
                     widget.groupClass.type == GroupClassType.regular
-                        ? AppColors.info
+                        ? AppColors.ink
                         : AppColors.secondary,
                 fontWeight: FontWeight.w600,
               ),
@@ -261,18 +261,18 @@ class _GroupClassDetailScreenState
       decoration: BoxDecoration(
         color:
             isFull
-                ? AppColors.error.withValues(alpha: 0.05)
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : isAlmostFull
-                ? AppColors.warning.withValues(alpha: 0.05)
-                : AppColors.success.withValues(alpha: 0.05),
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
+                : AppColors.paperOk.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isFull
-                  ? AppColors.error.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent.withValues(alpha: 0.3)
                   : isAlmostFull
-                  ? AppColors.warning.withValues(alpha: 0.3)
-                  : AppColors.success.withValues(alpha: 0.3),
+                  ? AppColors.paperAccent.withValues(alpha: 0.3)
+                  : AppColors.paperOk.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -287,10 +287,10 @@ class _GroupClassDetailScreenState
                 decoration: BoxDecoration(
                   color:
                       isFull
-                          ? AppColors.error
+                          ? AppColors.paperAccent
                           : isAlmostFull
-                          ? AppColors.warning
-                          : AppColors.success,
+                          ? AppColors.paperAccent
+                          : AppColors.paperOk,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -305,10 +305,10 @@ class _GroupClassDetailScreenState
                   fontWeight: FontWeight.w700,
                   color:
                       isFull
-                          ? AppColors.error
+                          ? AppColors.paperAccent
                           : isAlmostFull
-                          ? AppColors.warning
-                          : AppColors.success,
+                          ? AppColors.paperAccent
+                          : AppColors.paperOk,
                 ),
               ),
             ],
@@ -347,13 +347,13 @@ class _GroupClassDetailScreenState
       decoration: BoxDecoration(
         color:
             isWaitlist
-                ? AppColors.warning.withValues(alpha: 0.05)
+                ? AppColors.paperAccent.withValues(alpha: 0.05)
                 : AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               isWaitlist
-                  ? AppColors.warning.withValues(alpha: 0.3)
+                  ? AppColors.paperAccent.withValues(alpha: 0.3)
                   : AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
@@ -369,7 +369,7 @@ class _GroupClassDetailScreenState
                 booking.statusText,
                 style: AppTypography.headingSmall.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: isWaitlist ? AppColors.warning : AppColors.primary,
+                  color: isWaitlist ? AppColors.paperAccent : AppColors.primary,
                 ),
               ),
             ],
@@ -393,8 +393,8 @@ class _GroupClassDetailScreenState
             child: OutlinedButton(
               onPressed: _isProcessing ? null : () => _cancelBooking(booking),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.error,
-                side: const BorderSide(color: AppColors.error),
+                foregroundColor: AppColors.paperAccent,
+                side: const BorderSide(color: AppColors.paperAccent),
               ),
               child:
                   _isProcessing
@@ -450,7 +450,7 @@ class _GroupClassDetailScreenState
             onPressed: _isProcessing ? null : _createBooking,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-              backgroundColor: isFull ? AppColors.warning : AppColors.primary,
+              backgroundColor: isFull ? AppColors.paperAccent : AppColors.primary,
             ),
             child:
                 _isProcessing
@@ -512,7 +512,7 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.05),
+        color: AppColors.ink.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
@@ -520,13 +520,13 @@ class _GroupClassDetailScreenState
         children: [
           Row(
             children: [
-              const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+              const Icon(Icons.info_outline, size: 18, color: AppColors.ink),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '예약 안내',
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
               ),
             ],
@@ -587,7 +587,7 @@ class _GroupClassDetailScreenState
                   ? '대기 ${booking.waitlistPosition}번으로 등록되었습니다'
                   : '예약이 완료되었습니다',
             ),
-            backgroundColor: isWaitlist ? AppColors.warning : AppColors.success,
+            backgroundColor: isWaitlist ? AppColors.paperAccent : AppColors.paperOk,
           ),
         );
       }
@@ -596,7 +596,7 @@ class _GroupClassDetailScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -625,7 +625,7 @@ class _GroupClassDetailScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text('취소하기'),
               ),
             ],
@@ -654,7 +654,7 @@ class _GroupClassDetailScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

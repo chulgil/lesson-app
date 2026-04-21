@@ -354,22 +354,22 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.warning.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.warning_amber, size: 18, color: AppColors.warning),
+                Icon(Icons.warning_amber, size: 18, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     AppStrings.rescheduleDeadlineWarning(deadlineHours),
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -379,7 +379,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
             const SizedBox(height: AppSpacing.space1),
             Text(
               AppStrings.rescheduleCreditsChange(remaining, remaining - 1),
-              style: AppTypography.caption.copyWith(color: AppColors.warning),
+              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
             ),
           ],
         ),
@@ -389,17 +389,17 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.1),
+        color: AppColors.paperOk.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.check_circle_outline, size: 18, color: AppColors.success),
+          Icon(Icons.check_circle_outline, size: 18, color: AppColors.paperOk),
           const SizedBox(width: AppSpacing.space2),
           Text(
             AppStrings.rescheduleDeadlineFree(deadlineHours),
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.success,
+              color: AppColors.paperOk,
               fontWeight: FontWeight.w500,
             ),
           ),

@@ -132,13 +132,13 @@ class _SubscriptionChapterLessonsState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.06),
+        color: AppColors.ink.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.lightbulb_outline, size: 18, color: AppColors.info),
+          Icon(Icons.lightbulb_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
@@ -630,7 +630,7 @@ class _SubscriptionChapterLessonsState
   Color _iconColorForStatus(_SessionStatus status) {
     switch (status) {
       case _SessionStatus.completed:
-        return AppColors.success;
+        return AppColors.paperOk;
       case _SessionStatus.scheduled:
       case _SessionStatus.bookingRequired:
         return AppColors.primary;

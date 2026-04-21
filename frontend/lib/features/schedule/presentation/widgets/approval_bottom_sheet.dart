@@ -272,17 +272,17 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 18, color: AppColors.warning),
+          Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               '모든 일정이 불가능하면 거절 후 메시지로 대안을 제안해주세요',
-              style: AppTypography.caption.copyWith(color: AppColors.warning),
+              style: AppTypography.caption.copyWith(color: AppColors.paperAccent),
             ),
           ),
         ],
@@ -390,7 +390,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('승인 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {
@@ -438,7 +438,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {

@@ -51,7 +51,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   int? _preselectedSlot;
   final Set<RequestPhase> _expandedChapters = {};
   String? _eventMessage;
-  Color _eventColor = AppColors.success;
+  Color _eventColor = AppColors.paperOk;
   IconData _eventIcon = Icons.check_circle;
   Timer? _eventTimer;
 
@@ -66,7 +66,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   void _showEventMessage(
     String message, {
-    Color color = AppColors.success,
+    Color color = AppColors.paperOk,
     IconData icon = Icons.check_circle,
   }) {
     _eventTimer?.cancel();
@@ -82,13 +82,13 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   void _showSuccess(String message) => _showEventMessage(
     message,
-    color: AppColors.success,
+    color: AppColors.paperOk,
     icon: Icons.check_circle,
   );
 
   void _showError([String message = '오류가 발생했습니다']) => _showEventMessage(
     message,
-    color: AppColors.error,
+    color: AppColors.paperAccent,
     icon: Icons.error_outline,
   );
 
@@ -1399,7 +1399,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     request.studentId,
                   );
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.cancelRequestAction),
               ),
             ],

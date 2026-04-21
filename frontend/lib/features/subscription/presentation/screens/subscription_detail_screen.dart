@@ -105,7 +105,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
               const SizedBox(height: AppSpacing.space3),
               Text(AppStrings.errorOccurred, style: AppTypography.headingSmall),
               const SizedBox(height: AppSpacing.space2),
@@ -146,7 +146,7 @@ class _SubscriptionDetailBodyState
 
   // Event strip state — matches RequestDetailScreen pattern exactly
   String? _eventMessage;
-  Color _eventColor = AppColors.success;
+  Color _eventColor = AppColors.paperOk;
   IconData _eventIcon = Icons.check_circle;
   Timer? _eventTimer;
 
@@ -171,7 +171,7 @@ class _SubscriptionDetailBodyState
 
   void _showEventMessage(
     String message, {
-    Color color = AppColors.success,
+    Color color = AppColors.paperOk,
     IconData icon = Icons.check_circle,
   }) {
     _eventTimer?.cancel();
@@ -187,7 +187,7 @@ class _SubscriptionDetailBodyState
 
   void _showSuccess(String message) => _showEventMessage(
     message,
-    color: AppColors.success,
+    color: AppColors.paperOk,
     icon: Icons.check_circle,
   );
 

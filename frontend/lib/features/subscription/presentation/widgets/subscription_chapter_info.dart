@@ -57,9 +57,9 @@ class SubscriptionChapterInfo extends StatelessWidget {
             ),
             valueColor:
                 subscription.remainingReschedule <= 0
-                    ? AppColors.error
+                    ? AppColors.paperAccent
                     : subscription.remainingReschedule == 1
-                    ? AppColors.warning
+                    ? AppColors.paperAccent
                     : null,
           ),
         ],

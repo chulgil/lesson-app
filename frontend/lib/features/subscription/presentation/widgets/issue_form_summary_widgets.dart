@@ -245,7 +245,7 @@ class SubscriptionSummaryCard extends StatelessWidget {
                 isPaymentConfirmed
                     ? '${selectedPaymentMethod.label} (확인됨)'
                     : '미결제 (후불)',
-            valueColor: isPaymentConfirmed ? null : AppColors.warning,
+            valueColor: isPaymentConfirmed ? null : AppColors.paperAccent,
           ),
 
           if (startDate != null)
@@ -304,13 +304,13 @@ class BatchInfoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.people, color: AppColors.info),
+          Icon(Icons.people, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -319,7 +319,7 @@ class BatchInfoBanner extends StatelessWidget {
                 Text(
                   '$studentCount명의 학생에게 동일한 수강권을 발급합니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -327,7 +327,7 @@ class BatchInfoBanner extends StatelessWidget {
                 Text(
                   '각 학생에게 개별 수강권이 생성됩니다',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.info.withValues(alpha: 0.8),
+                    color: AppColors.ink.withValues(alpha: 0.8),
                   ),
                 ),
               ],

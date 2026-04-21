@@ -28,7 +28,7 @@ InputDecoration studentInputDecoration({
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      borderSide: BorderSide(color: AppColors.error),
+      borderSide: BorderSide(color: AppColors.paperAccent),
     ),
     filled: true,
     fillColor: AppColors.paper,

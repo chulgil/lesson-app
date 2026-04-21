@@ -45,13 +45,13 @@ class NoSubscriptionView extends ConsumerWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
+                color: AppColors.paperAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.card_membership_outlined,
                 size: 48,
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
               ),
             ),
 
@@ -136,17 +136,17 @@ class NoSubscriptionView extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.1),
+            color: AppColors.ink.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: AppColors.info.withValues(alpha: 0.3),
+              color: AppColors.ink.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.info_outline,
-                color: AppColors.info,
+                color: AppColors.ink,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -154,7 +154,7 @@ class NoSubscriptionView extends ConsumerWidget {
                 child: Text(
                   '선생님에게 수강권 제안을 요청해 주세요.\n체험 레슨 후 선생님이 수강권을 제안합니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                 ),
               ),
@@ -180,17 +180,17 @@ class NoSubscriptionView extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.1),
+            color: AppColors.paperOk.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: AppColors.success.withValues(alpha: 0.3),
+              color: AppColors.paperOk.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
             children: [
               Icon(
                 Icons.mail_outline,
-                color: AppColors.success,
+                color: AppColors.paperOk,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -198,7 +198,7 @@ class NoSubscriptionView extends ConsumerWidget {
                 child: Text(
                   '$teacherName 선생님이 수강권을 제안했습니다!\n제안을 확인하고 결제해 주세요.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.success,
+                    color: AppColors.paperOk,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

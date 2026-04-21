@@ -45,7 +45,7 @@ class LessonRequestsScreen extends ConsumerWidget {
                   Text(
                     AppStrings.lessonRequestPending(pendingCount),
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -64,7 +64,7 @@ class LessonRequestsScreen extends ConsumerWidget {
                   const Icon(
                     Icons.error_outline,
                     size: AppSpacing.iconXL,
-                    color: AppColors.error,
+                    color: AppColors.paperAccent,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(

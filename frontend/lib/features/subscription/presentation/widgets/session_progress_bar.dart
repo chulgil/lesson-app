@@ -205,7 +205,7 @@ class _SessionDot extends StatelessWidget {
               height: AppSpacing.space2,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
               ),
             ),
           ),

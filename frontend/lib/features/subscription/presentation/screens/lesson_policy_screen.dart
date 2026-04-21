@@ -465,7 +465,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('저장 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

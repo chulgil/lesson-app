@@ -23,20 +23,20 @@ class ProposalStatusBanner extends StatelessWidget {
 
     switch (proposal.status) {
       case ProposalStatus.paymentNotified:
-        backgroundColor = AppColors.info.withValues(alpha: 0.1);
-        textColor = AppColors.info;
+        backgroundColor = AppColors.ink.withValues(alpha: 0.1);
+        textColor = AppColors.ink;
         icon = Icons.schedule;
         message = '입금 확인을 기다리고 있습니다';
         break;
       case ProposalStatus.confirmed:
-        backgroundColor = AppColors.success.withValues(alpha: 0.1);
-        textColor = AppColors.success;
+        backgroundColor = AppColors.paperOk.withValues(alpha: 0.1);
+        textColor = AppColors.paperOk;
         icon = Icons.check_circle;
         message = '수강권이 발급되었습니다!';
         break;
       case ProposalStatus.rejected:
-        backgroundColor = AppColors.error.withValues(alpha: 0.1);
-        textColor = AppColors.error;
+        backgroundColor = AppColors.paperAccent.withValues(alpha: 0.1);
+        textColor = AppColors.paperAccent;
         icon = Icons.cancel;
         message = '스킵한 제안입니다';
         break;
@@ -135,7 +135,7 @@ class ProposalHeaderCard extends StatelessWidget {
               style: AppTypography.caption.copyWith(
                 color:
                     proposal.timeUntilExpiration.inDays < 2
-                        ? AppColors.warning
+                        ? AppColors.paperAccent
                         : AppColors.inkTertiary,
               ),
             ),
@@ -256,21 +256,21 @@ class ProposalDiscountCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.local_offer, size: 18, color: AppColors.warning),
+              const Icon(Icons.local_offer, size: 18, color: AppColors.paperAccent),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 proposal.discountReason ?? '할인 적용',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.warning,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -308,7 +308,7 @@ class ProposalDiscountCard extends StatelessWidget {
               Text(
                 '-${_formatPrice(proposal.discountAmount ?? 0)}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -554,13 +554,13 @@ class ProposalWaitingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.05),
+        color: AppColors.ink.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.hourglass_empty, size: 48, color: AppColors.info),
+          const Icon(Icons.hourglass_empty, size: 48, color: AppColors.ink),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '입금 확인 대기중',

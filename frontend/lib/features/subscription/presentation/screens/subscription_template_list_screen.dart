@@ -128,7 +128,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+            const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '데이터를 불러올 수 없습니다',
@@ -222,7 +222,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
                       .read(subscriptionTemplateNotifierProvider.notifier)
                       .deleteTemplate(template);
                 },
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(foregroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -319,7 +319,7 @@ class _TemplateCard extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.success.withValues(
+                                  color: AppColors.paperOk.withValues(
                                     alpha: 0.1,
                                   ),
                                   borderRadius: BorderRadius.circular(
@@ -332,13 +332,13 @@ class _TemplateCard extends StatelessWidget {
                                     Icon(
                                       Icons.flash_on,
                                       size: 12,
-                                      color: AppColors.success,
+                                      color: AppColors.paperOk,
                                     ),
                                     const SizedBox(width: 2),
                                     Text(
                                       '자동',
                                       style: AppTypography.caption.copyWith(
-                                        color: AppColors.success,
+                                        color: AppColors.paperOk,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -410,12 +410,12 @@ class _TemplateCard extends StatelessWidget {
                                 Icon(
                                   Icons.delete_outline,
                                   size: 20,
-                                  color: AppColors.error,
+                                  color: AppColors.paperAccent,
                                 ),
                                 SizedBox(width: AppSpacing.space2),
                                 Text(
                                   '삭제',
-                                  style: TextStyle(color: AppColors.error),
+                                  style: TextStyle(color: AppColors.paperAccent),
                                 ),
                               ],
                             ),
@@ -773,13 +773,13 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
       decoration: BoxDecoration(
         color:
             _isAutoProposalEnabled
-                ? AppColors.success.withValues(alpha: 0.05)
+                ? AppColors.paperOk.withValues(alpha: 0.05)
                 : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               _isAutoProposalEnabled
-                  ? AppColors.success.withValues(alpha: 0.3)
+                  ? AppColors.paperOk.withValues(alpha: 0.3)
                   : AppColors.inkQuaternary,
         ),
       ),
@@ -799,7 +799,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                       _isAutoProposalEnabled = value ?? true;
                     });
                   },
-                  activeColor: AppColors.success,
+                  activeColor: AppColors.paperOk,
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
@@ -817,7 +817,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                         size: 18,
                         color:
                             _isAutoProposalEnabled
-                                ? AppColors.success
+                                ? AppColors.paperOk
                                 : AppColors.inkTertiary,
                       ),
                       const SizedBox(width: AppSpacing.space1),
@@ -900,7 +900,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

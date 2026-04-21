@@ -30,8 +30,8 @@ class SubscriptionChapterPayment extends StatelessWidget {
                 : AppStrings.paymentPending,
             valueColor:
                 subscription.paymentConfirmed
-                    ? AppColors.success
-                    : AppColors.warning,
+                    ? AppColors.paperOk
+                    : AppColors.paperAccent,
           ),
           if (subscription.paymentMethod != null)
             _buildRow(

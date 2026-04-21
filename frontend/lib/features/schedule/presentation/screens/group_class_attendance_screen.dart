@@ -191,15 +191,15 @@ class _GroupClassAttendanceScreenState
         horizontal: AppSpacing.space4,
         vertical: AppSpacing.space3,
       ),
-      color: AppColors.info.withValues(alpha: 0.05),
+      color: AppColors.ink.withValues(alpha: 0.05),
       child: Row(
         children: [
-          const Icon(Icons.lightbulb_outline, size: 18, color: AppColors.info),
+          const Icon(Icons.lightbulb_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '미참석자만 탭하세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.info,
+              color: AppColors.ink,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -266,7 +266,7 @@ class _GroupClassAttendanceScreenState
               color:
                   isAttended
                       ? Colors.transparent
-                      : AppColors.error.withValues(alpha: 0.05),
+                      : AppColors.paperAccent.withValues(alpha: 0.05),
               border: const Border(
                 bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
               ),
@@ -280,14 +280,14 @@ class _GroupClassAttendanceScreenState
                   decoration: BoxDecoration(
                     color:
                         isAttended
-                            ? AppColors.success.withValues(alpha: 0.1)
-                            : AppColors.error.withValues(alpha: 0.1),
+                            ? AppColors.paperOk.withValues(alpha: 0.1)
+                            : AppColors.paperAccent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Icon(
                       isAttended ? Icons.check : Icons.close,
-                      color: isAttended ? AppColors.success : AppColors.error,
+                      color: isAttended ? AppColors.paperOk : AppColors.paperAccent,
                       size: 24,
                     ),
                   ),
@@ -315,7 +315,7 @@ class _GroupClassAttendanceScreenState
                         Text(
                           '미참석',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                     ],
@@ -405,7 +405,7 @@ class _GroupClassAttendanceScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('출석이 저장되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -414,7 +414,7 @@ class _GroupClassAttendanceScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -492,7 +492,7 @@ class _GroupClassAttendanceScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('수업이 종료되었습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         Navigator.of(context).pop();
@@ -502,7 +502,7 @@ class _GroupClassAttendanceScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

@@ -184,7 +184,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('발급 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -481,8 +481,8 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
               content: Text('$successCount명 발급 완료, $failCount명 실패'),
               backgroundColor:
                   failCount == allStudentIds.length
-                      ? AppColors.error
-                      : AppColors.warning,
+                      ? AppColors.paperAccent
+                      : AppColors.paperAccent,
             ),
           );
         }
@@ -493,7 +493,7 @@ mixin IssueSubscriptionActions<T extends ConsumerStatefulWidget>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('발급 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

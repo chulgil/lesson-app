@@ -270,7 +270,7 @@ class _LocationTravelSelectorState
             : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isWarning ? AppColors.warning : AppColors.inkQuaternary,
+          color: isWarning ? AppColors.paperAccent : AppColors.inkQuaternary,
         ),
       ),
       child: Row(
@@ -279,7 +279,7 @@ class _LocationTravelSelectorState
             icon,
             size: AppSpacing.iconSM,
             color: isWarning
-                ? AppColors.warning
+                ? AppColors.paperAccent
                 : AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -288,7 +288,7 @@ class _LocationTravelSelectorState
               text,
               style: AppTypography.bodySmall.copyWith(
                 color: isWarning
-                    ? AppColors.warning
+                    ? AppColors.paperAccent
                     : AppColors.inkSecondary,
               ),
             ),

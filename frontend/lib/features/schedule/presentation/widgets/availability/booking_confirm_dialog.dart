@@ -134,7 +134,7 @@ class BookingConfirmDialog extends StatelessWidget {
                   isReschedule
                       ? '확정 시 변경권 1회가 차감됩니다.'
                       : '예약 확정 후 변경 시 변경권이 차감됩니다.',
-              color: AppColors.warning,
+              color: AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space2),
             _buildPolicyNotice(
@@ -238,9 +238,9 @@ class BookingConfirmDialog extends StatelessWidget {
 
   Color _getRescheduleCountColor() {
     if (remainingReschedules == null) return AppColors.inkSecondary;
-    if (remainingReschedules! <= 0) return AppColors.error;
-    if (remainingReschedules! == 1) return AppColors.warning;
-    return AppColors.success;
+    if (remainingReschedules! <= 0) return AppColors.paperAccent;
+    if (remainingReschedules! == 1) return AppColors.paperAccent;
+    return AppColors.paperOk;
   }
 
   String _formatDate(DateTime date) {

@@ -360,21 +360,21 @@ class RegularLessonTimeSelector extends StatelessWidget {
                 vertical: AppSpacing.space2,
               ),
               decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
+                color: AppColors.paperOk.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 border: Border.all(
-                  color: AppColors.success.withValues(alpha: 0.3),
+                  color: AppColors.paperOk.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle, size: 16, color: AppColors.success),
+                  Icon(Icons.check_circle, size: 16, color: AppColors.paperOk),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '${formatTimeOfDay(selectedTime!)} ~ ${formatTimeOfDay(addMinutes(selectedTime!, lessonDuration))} (${LessonDurations.format(lessonDuration)})',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.success,
+                      color: AppColors.paperOk,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -716,21 +716,21 @@ class FirstMonthFeeSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.warning.withValues(alpha: 0.1),
+            color: AppColors.paperAccent.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+            border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: AppColors.warning),
+                  Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '시작일 기준 첫 달은 일할 계산됩니다',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.warning,
+                        color: AppColors.paperAccent,
                       ),
                     ),
                   ),

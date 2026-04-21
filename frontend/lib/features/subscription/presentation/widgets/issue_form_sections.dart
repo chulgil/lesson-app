@@ -176,7 +176,7 @@ class PaymentStatusSection extends StatelessWidget {
                 icon: Icons.schedule,
                 isSelected: !isPaymentConfirmed,
                 onTap: () => onPaymentConfirmedChanged(false),
-                accentColor: AppColors.warning,
+                accentColor: AppColors.paperAccent,
               ),
             ),
           ],
@@ -223,18 +223,18 @@ class PaymentStatusSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.warning.withValues(alpha: 0.1),
+              color: AppColors.paperAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: AppColors.warning),
+                Icon(Icons.info_outline, size: 16, color: AppColors.paperAccent),
                 const SizedBox(width: AppSpacing.space2),
                 Expanded(
                   child: Text(
                     '후불 수강권은 미수금으로 표시됩니다. 입금 확인 후 결제완료 처리할 수 있습니다.',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),

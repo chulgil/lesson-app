@@ -300,14 +300,14 @@ class _UnifiedApprovalBottomSheetState
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+          const Icon(Icons.info_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               currentRound == 0
                   ? '희망 시간 중 하나를 선택하거나, 모두 불가하면 역제안하세요'
                   : '협상 $currentRound/$maxRounds 라운드',
-              style: AppTypography.caption.copyWith(color: AppColors.info),
+              style: AppTypography.caption.copyWith(color: AppColors.ink),
             ),
           ),
         ],
@@ -525,7 +525,7 @@ class _UnifiedApprovalBottomSheetState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(AppStrings.acceptError),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {
@@ -562,7 +562,7 @@ class _UnifiedApprovalBottomSheetState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(AppStrings.counterProposeError),
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {

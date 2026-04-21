@@ -189,7 +189,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                     style: AppTypography.bodySmall.copyWith(
                       color:
                           proposal.timeUntilExpiration.inDays < 2
-                              ? AppColors.warning
+                              ? AppColors.paperAccent
                               : AppColors.inkSecondary,
                     ),
                   ),
@@ -304,7 +304,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.warning.withValues(alpha: 0.2),
+                            color: AppColors.paperAccent.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSmall,
                             ),
@@ -312,7 +312,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                           child: Text(
                             '추천',
                             style: AppTypography.captionSmall.copyWith(
-                              color: AppColors.warning,
+                              color: AppColors.paperAccent,
                             ),
                           ),
                         ),
@@ -366,17 +366,17 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.08),
+        color: AppColors.ink.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
         children: [
-          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.info),
+          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '지난번과 동일한 수강권입니다',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.info,
+              color: AppColors.ink,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -496,7 +496,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('입금 알림을 보냈습니다'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         ref.invalidate(subscriptionProposalProvider(proposal.id));
@@ -506,7 +506,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -547,7 +547,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

@@ -202,13 +202,13 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.paperAccent.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber, color: AppColors.warning, size: 32),
+          Icon(Icons.warning_amber, color: AppColors.paperAccent, size: 32),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -218,7 +218,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
                   '수강권 미등록',
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.warning,
+                    color: AppColors.paperAccent,
                   ),
                 ),
                 Text(
@@ -237,7 +237,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
               );
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.warning,
+              backgroundColor: AppColors.paperAccent,
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space4,
                 vertical: AppSpacing.space2,

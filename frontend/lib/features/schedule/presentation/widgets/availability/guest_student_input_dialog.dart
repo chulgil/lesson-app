@@ -171,7 +171,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                   Container(
                     padding: const EdgeInsets.all(AppSpacing.space3),
                     decoration: BoxDecoration(
-                      color: AppColors.info.withValues(alpha: 0.08),
+                      color: AppColors.ink.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
                       ),
@@ -181,14 +181,14 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                         Icon(
                           Icons.info_outline,
                           size: 18,
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                         const SizedBox(width: AppSpacing.space2),
                         Expanded(
                           child: Text(
                             '연락처나 이메일을 입력하면 예약 확정 알림을 받을 수 있어요',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.info,
+                              color: AppColors.ink,
                             ),
                           ),
                         ),
@@ -245,7 +245,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
           Text(
             ' *',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -285,7 +285,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: const BorderSide(color: AppColors.error),
+        borderSide: const BorderSide(color: AppColors.paperAccent),
       ),
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,

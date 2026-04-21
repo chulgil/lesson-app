@@ -41,7 +41,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         side: BorderSide(
-          color: AppColors.success.withValues(alpha: 0.3),
+          color: AppColors.paperOk.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -52,8 +52,8 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.success.withValues(alpha: 0.05),
-              AppColors.success.withValues(alpha: 0.1),
+              AppColors.paperOk.withValues(alpha: 0.05),
+              AppColors.paperOk.withValues(alpha: 0.1),
             ],
           ),
         ),
@@ -89,12 +89,12 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space2),
           decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.2),
+            color: AppColors.paperOk.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: const Icon(
             Icons.celebration,
-            color: AppColors.success,
+            color: AppColors.paperOk,
             size: 24,
           ),
         ),
@@ -107,7 +107,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                 '수강권이 발급되었습니다!',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.success,
+                      color: AppColors.paperOk,
                     ),
               ),
               const SizedBox(height: 2),
@@ -298,17 +298,17 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.08),
+        color: AppColors.ink.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.info.withValues(alpha: 0.3),
+          color: AppColors.ink.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
         children: [
           Icon(
             Icons.calendar_today,
-            color: AppColors.info,
+            color: AppColors.ink,
             size: 32,
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -316,7 +316,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             '레슨 시간을 선택해주세요',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -354,7 +354,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           icon: const Icon(Icons.access_time, size: 18),
           label: const Text('시간 선택하기'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.info,
+            backgroundColor: AppColors.ink,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
             shape: RoundedRectangleBorder(
@@ -399,7 +399,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                 : const Icon(Icons.check, size: 18),
             label: const Text('이 시간으로 예약'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.success,
+              backgroundColor: AppColors.paperOk,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               shape: RoundedRectangleBorder(
@@ -450,7 +450,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${card.formattedSuggestedSchedule} 스케줄이 확정되었습니다!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
@@ -461,7 +461,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('스케줄 확정 중 오류가 발생했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

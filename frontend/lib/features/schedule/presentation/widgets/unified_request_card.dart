@@ -103,7 +103,7 @@ class UnifiedRequestCard extends StatelessWidget {
             style: AppTypography.caption.copyWith(
               color:
                   request.type == LessonRequestType.trial
-                      ? AppColors.info
+                      ? AppColors.ink
                       : AppColors.primary,
               fontWeight: FontWeight.w600,
             ),
@@ -123,7 +123,7 @@ class UnifiedRequestCard extends StatelessWidget {
             child: Text(
               '복귀',
               style: AppTypography.caption.copyWith(
-                color: AppColors.warning,
+                color: AppColors.paperAccent,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -269,12 +269,12 @@ class UnifiedRequestCard extends StatelessWidget {
         // Round indicator
         Row(
           children: [
-            Icon(Icons.swap_horiz, size: 16, color: AppColors.info),
+            Icon(Icons.swap_horiz, size: 16, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space1),
             Text(
               '시간 협상 중 (${request.currentRound}/3 라운드)',
               style: AppTypography.caption.copyWith(
-                color: AppColors.info,
+                color: AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -366,7 +366,7 @@ class UnifiedRequestCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(Icons.check_circle, size: 18, color: AppColors.success),
+              Icon(Icons.check_circle, size: 18, color: AppColors.paperOk),
               const SizedBox(width: AppSpacing.space2),
               Expanded(
                 child: Column(
@@ -375,7 +375,7 @@ class UnifiedRequestCard extends StatelessWidget {
                     Text(
                       '시간 확정',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.success,
+                        color: AppColors.paperOk,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -451,15 +451,15 @@ class UnifiedRequestCard extends StatelessWidget {
   Widget _buildStatusBadge() {
     final (color, bgColor) = switch (request.status) {
       UnifiedRequestStatus.approved || UnifiedRequestStatus.timeConfirmed => (
-        AppColors.success,
+        AppColors.paperOk,
         AppColors.successLight,
       ),
-      UnifiedRequestStatus.rejected => (AppColors.error, AppColors.errorLight),
+      UnifiedRequestStatus.rejected => (AppColors.paperAccent, AppColors.errorLight),
       UnifiedRequestStatus.cancelled || UnifiedRequestStatus.expired => (
         AppColors.inkTertiary,
         AppColors.paperDark,
       ),
-      UnifiedRequestStatus.negotiating => (AppColors.info, AppColors.infoLight),
+      UnifiedRequestStatus.negotiating => (AppColors.ink, AppColors.infoLight),
       _ => (AppColors.primary, AppColors.primaryLight),
     };
 

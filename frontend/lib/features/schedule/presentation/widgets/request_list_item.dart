@@ -90,7 +90,7 @@ class RequestListItem extends StatelessWidget {
             width: 10,
             height: 10,
             decoration: BoxDecoration(
-              color: AppColors.error,
+              color: AppColors.paperAccent,
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.paper, width: 1.5),
             ),
@@ -216,7 +216,7 @@ class RequestListItem extends StatelessWidget {
         Text(
           formatRelativeTime(request.createdAt),
           style: AppTypography.caption.copyWith(
-            color: urgent ? AppColors.error : AppColors.inkTertiary,
+            color: urgent ? AppColors.paperAccent : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),
         ),

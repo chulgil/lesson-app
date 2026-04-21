@@ -206,13 +206,13 @@ class _UnifiedLessonRequestScreenState
       ),
       child: Row(
         children: [
-          const Icon(Icons.history, size: 20, color: AppColors.info),
+          const Icon(Icons.history, size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               '재수강 신청 — 이전 레슨 정보가 자동 입력되었습니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.info,
+                color: AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -484,19 +484,19 @@ class _UnifiedLessonRequestScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.05),
+        color: AppColors.ink.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.15)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+          const Icon(Icons.info_outline, size: 18, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               AppStrings.cancellationPolicy,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.info,
+                color: AppColors.ink,
               ),
             ),
           ),
@@ -558,7 +558,7 @@ class _UnifiedLessonRequestScreenState
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 20, color: AppColors.info),
+          const Icon(Icons.info_outline, size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -635,7 +635,7 @@ class _UnifiedLessonRequestScreenState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.error,
+        backgroundColor: AppColors.paperAccent,
       ),
     );
   }
@@ -693,7 +693,7 @@ class _UnifiedLessonRequestScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('신청 전송에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }
@@ -759,7 +759,7 @@ class _SectionWrapper extends StatelessWidget {
               Text(
                 ' *',
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                 ),
               ),
             if (subtitle != null) ...[

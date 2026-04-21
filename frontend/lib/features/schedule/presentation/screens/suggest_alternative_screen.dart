@@ -216,14 +216,14 @@ class _SuggestAlternativeScreenState
               Icon(
                 Icons.person_outline,
                 size: AppSpacing.iconSM,
-                color: AppColors.info,
+                color: AppColors.ink,
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 AppStrings.studentPreferredSlots,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.info,
+                  color: AppColors.ink,
                 ),
               ),
             ],
@@ -264,7 +264,7 @@ class _SuggestAlternativeScreenState
                   decoration: BoxDecoration(
                     color:
                         isSelected
-                            ? AppColors.success.withValues(alpha: 0.08)
+                            ? AppColors.paperOk.withValues(alpha: 0.08)
                             : AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
@@ -272,7 +272,7 @@ class _SuggestAlternativeScreenState
                     border: Border.all(
                       color:
                           isSelected
-                              ? AppColors.success
+                              ? AppColors.paperOk
                               : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
@@ -285,8 +285,8 @@ class _SuggestAlternativeScreenState
                         decoration: BoxDecoration(
                           color:
                               isSelected
-                                  ? AppColors.success
-                                  : AppColors.info.withValues(alpha: 0.12),
+                                  ? AppColors.paperOk
+                                  : AppColors.ink.withValues(alpha: 0.12),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -301,7 +301,7 @@ class _SuggestAlternativeScreenState
                                     '${index + 1}',
                                     style: AppTypography.caption.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.info,
+                                      color: AppColors.ink,
                                     ),
                                   ),
                         ),
@@ -317,7 +317,7 @@ class _SuggestAlternativeScreenState
                                     : FontWeight.normal,
                             color:
                                 isSelected
-                                    ? AppColors.success
+                                    ? AppColors.paperOk
                                     : AppColors.ink,
                           ),
                         ),
@@ -328,13 +328,13 @@ class _SuggestAlternativeScreenState
                         Icon(
                           Icons.warning_amber_rounded,
                           size: 16,
-                          color: AppColors.error,
+                          color: AppColors.paperAccent,
                         ),
                         const SizedBox(width: 2),
                         Text(
                           AppStrings.slotConflict,
                           style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.error,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ] else if (conflict == 'preview') ...[
@@ -342,13 +342,13 @@ class _SuggestAlternativeScreenState
                         Icon(
                           Icons.warning_amber_rounded,
                           size: 16,
-                          color: AppColors.warning,
+                          color: AppColors.paperAccent,
                         ),
                         const SizedBox(width: 2),
                         Text(
                           AppStrings.previewConflict,
                           style: AppTypography.captionSmall.copyWith(
-                            color: AppColors.warning,
+                            color: AppColors.paperAccent,
                           ),
                         ),
                       ],
@@ -448,15 +448,15 @@ class _SuggestAlternativeScreenState
     final String label;
 
     if (hasHardConflict) {
-      bgColor = AppColors.error;
+      bgColor = AppColors.paperAccent;
       icon = Icons.block;
       label = AppStrings.slotConflict;
     } else if (hasPreviewConflict) {
-      bgColor = AppColors.warning;
+      bgColor = AppColors.paperAccent;
       icon = Icons.warning_amber_rounded;
       label = AppStrings.previewConflictConfirm;
     } else {
-      bgColor = AppColors.success;
+      bgColor = AppColors.paperOk;
       icon = Icons.check_circle;
       label = AppStrings.confirmThisSchedule;
     }
@@ -698,7 +698,7 @@ class _SuggestAlternativeScreenState
                             ];
                           }),
                       icon: const Icon(Icons.close, size: 18),
-                      color: AppColors.error,
+                      color: AppColors.paperAccent,
                       visualDensity: VisualDensity.compact,
                     ),
                   ],

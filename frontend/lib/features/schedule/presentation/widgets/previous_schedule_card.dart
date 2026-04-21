@@ -43,11 +43,11 @@ class PreviousScheduleCard extends ConsumerWidget {
             horizontal: AppSpacing.screenPadding,
             vertical: AppSpacing.space2,
           ),
-          color: AppColors.info.withValues(alpha: 0.1),
+          color: AppColors.ink.withValues(alpha: 0.1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             side: BorderSide(
-              color: AppColors.info.withValues(alpha: 0.3),
+              color: AppColors.ink.withValues(alpha: 0.3),
             ),
           ),
           child: Padding(
@@ -59,7 +59,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                   children: [
                     Icon(
                       Icons.history,
-                      color: AppColors.info,
+                      color: AppColors.ink,
                       size: 20,
                     ),
                     const SizedBox(width: AppSpacing.space2),
@@ -67,7 +67,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                       '이전 스케줄 복원',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppColors.info,
+                            color: AppColors.ink,
                           ),
                     ),
                     const Spacer(),
@@ -144,7 +144,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                     icon: const Icon(Icons.restore, size: 18),
                     label: const Text('이 스케줄로 복원'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.info,
+                      backgroundColor: AppColors.ink,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space3,

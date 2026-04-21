@@ -88,7 +88,7 @@ class RequestProfileCard extends StatelessWidget {
       children: [
         _buildTopInfoRow(urgent),
         const SizedBox(height: AppSpacing.space3),
-        _buildStudentInfoRow(AppStrings.teacher, AppColors.info),
+        _buildStudentInfoRow(AppStrings.teacher, AppColors.ink),
       ],
     );
   }
@@ -184,14 +184,14 @@ class RequestProfileCard extends StatelessWidget {
               vertical: 2,
             ),
             decoration: BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.12),
+              color: AppColors.paperOk.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Text(
               AppStrings.returning,
               style: AppTypography.captionSmall.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.success,
+                color: AppColors.paperOk,
               ),
             ),
           ),
@@ -200,7 +200,7 @@ class RequestProfileCard extends StatelessWidget {
         Text(
           formatRelativeTime(request.createdAt),
           style: AppTypography.caption.copyWith(
-            color: urgent ? AppColors.error : AppColors.inkTertiary,
+            color: urgent ? AppColors.paperAccent : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -211,7 +211,7 @@ class RequestProfileCard extends StatelessWidget {
   Widget _buildTypeBadge() {
     final typeColor =
         request.type == LessonRequestType.trial
-            ? AppColors.info
+            ? AppColors.ink
             : AppColors.primary;
 
     return Container(
@@ -256,11 +256,11 @@ class RequestProfileCard extends StatelessWidget {
 
   Color _statusColor(UnifiedRequestStatus status) {
     return switch (status) {
-      UnifiedRequestStatus.completed => AppColors.success,
-      UnifiedRequestStatus.paymentNotified => AppColors.error,
-      UnifiedRequestStatus.cancelled => AppColors.warning,
-      UnifiedRequestStatus.expired => AppColors.warning,
-      UnifiedRequestStatus.rejected => AppColors.warning,
+      UnifiedRequestStatus.completed => AppColors.paperOk,
+      UnifiedRequestStatus.paymentNotified => AppColors.paperAccent,
+      UnifiedRequestStatus.cancelled => AppColors.paperAccent,
+      UnifiedRequestStatus.expired => AppColors.paperAccent,
+      UnifiedRequestStatus.rejected => AppColors.paperAccent,
       _ => AppColors.ink,
     };
   }

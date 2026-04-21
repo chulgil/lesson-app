@@ -230,7 +230,7 @@ class _ScheduleChangeRequestListScreenState
   }
 
   Widget _buildStatusBadge(bool isPending) {
-    final color = isPending ? AppColors.info : AppColors.success;
+    final color = isPending ? AppColors.ink : AppColors.paperOk;
     final label = isPending ? AppStrings.tabPending : AppStrings.tabCompleted;
 
     return Container(

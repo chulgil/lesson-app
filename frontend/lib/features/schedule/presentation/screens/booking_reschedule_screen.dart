@@ -180,18 +180,18 @@ class _BookingRescheduleScreenState
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: AppColors.error.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
-            const Icon(Icons.block, color: AppColors.error, size: 20),
+            const Icon(Icons.block, color: AppColors.paperAccent, size: 20),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
                 '변경 불가 (${widget.totalReschedules - widget.remainingReschedules}/${widget.totalReschedules}회 사용완료)',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.error,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -210,15 +210,15 @@ class _BookingRescheduleScreenState
       decoration: BoxDecoration(
         color:
             isLastChance
-                ? AppColors.warning.withValues(alpha: 0.1)
-                : AppColors.info.withValues(alpha: 0.1),
+                ? AppColors.paperAccent.withValues(alpha: 0.1)
+                : AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
           Icon(
             isLastChance ? Icons.warning_amber : Icons.swap_horiz,
-            color: isLastChance ? AppColors.warning : AppColors.info,
+            color: isLastChance ? AppColors.paperAccent : AppColors.ink,
             size: 20,
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -227,7 +227,7 @@ class _BookingRescheduleScreenState
                 ? '마지막 변경 기회! (${widget.remainingReschedules}/${widget.totalReschedules}회 남음)'
                 : '변경 가능: ${widget.remainingReschedules}/${widget.totalReschedules}회',
             style: AppTypography.bodyMedium.copyWith(
-              color: isLastChance ? AppColors.warning : AppColors.info,
+              color: isLastChance ? AppColors.paperAccent : AppColors.ink,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -496,7 +496,7 @@ class _BookingRescheduleScreenState
                   Text(
                     '변경 후: ${widget.totalReschedules}/${widget.totalReschedules}회 (마지막)',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -562,7 +562,7 @@ class _BookingRescheduleScreenState
             content: Text(
               '예약이 ${_selectedSlot!.formattedDate} ${_selectedSlot!.formattedStartTime}로 변경되었습니다',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         Navigator.of(context).pop(true);
@@ -572,7 +572,7 @@ class _BookingRescheduleScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('예약 변경에 실패했습니다. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

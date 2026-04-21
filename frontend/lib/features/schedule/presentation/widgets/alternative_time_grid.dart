@@ -271,9 +271,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       final Color textColor;
 
       if (isOverlapWithHighlight) {
-        bgColor = AppColors.warning.withValues(alpha: 0.15);
-        accentColor = AppColors.warning;
-        textColor = AppColors.warning;
+        bgColor = AppColors.paperAccent.withValues(alpha: 0.15);
+        accentColor = AppColors.paperAccent;
+        textColor = AppColors.paperAccent;
       } else if (isPreview) {
         bgColor = AppColors.scheduleMutedBackground.withValues(alpha: 0.4);
         accentColor = AppColors.scheduleMutedAccent;
@@ -337,21 +337,21 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: AppColors.success.withValues(alpha: 0.15),
+          color: AppColors.paperOk.withValues(alpha: 0.15),
           border: Border(
             top:
                 isStart
                     ? BorderSide(
-                      color: AppColors.success.withValues(alpha: 0.6),
+                      color: AppColors.paperOk.withValues(alpha: 0.6),
                       width: 2,
                     )
                     : BorderSide.none,
             left: BorderSide(
-              color: AppColors.success.withValues(alpha: 0.3),
+              color: AppColors.paperOk.withValues(alpha: 0.3),
               width: 0.5,
             ),
             right: BorderSide(
-              color: AppColors.success.withValues(alpha: 0.3),
+              color: AppColors.paperOk.withValues(alpha: 0.3),
               width: 0.5,
             ),
           ),
@@ -364,7 +364,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                     AppStrings.preferredSlotLabel,
                     style: AppTypography.captionXSmall.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.success,
+                      color: AppColors.paperOk,
                     ),
                   ),
                 )

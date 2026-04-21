@@ -360,17 +360,17 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
       padding: const EdgeInsets.all(AppSpacing.space3),
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.1),
+        color: AppColors.ink.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: AppColors.info),
+          const Icon(Icons.info_outline, size: 16, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               text,
-              style: AppTypography.caption.copyWith(color: AppColors.info),
+              style: AppTypography.caption.copyWith(color: AppColors.ink),
             ),
           ),
         ],
@@ -536,7 +536,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   ? '${_selectedTemplateIds.length}개 수강권 제안을 보냈습니다'
                   : '수강권 제안을 보냈습니다',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop();
@@ -546,7 +546,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('제안 실패. 다시 시도해주세요.'),
-            backgroundColor: AppColors.error,
+            backgroundColor: AppColors.paperAccent,
           ),
         );
       }

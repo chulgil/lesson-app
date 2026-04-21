@@ -164,7 +164,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                 child: FilledButton(
                   onPressed: _selectedReason != null ? _submit : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.error,
+                    backgroundColor: AppColors.paperAccent,
                   ),
                   child: Text(AppStrings.cancelRequest),
                 ),
@@ -222,14 +222,14 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                       Text(
                         AppStrings.lessonDeductWarning,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.warning,
+                          color: AppColors.paperAccent,
                         ),
                       ),
                     if (!reason.deductsLesson)
                       Text(
                         AppStrings.makeupAvailable,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.success,
+                          color: AppColors.paperOk,
                         ),
                       ),
                   ],
@@ -248,18 +248,18 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.warning.withValues(alpha: 0.1),
+          color: AppColors.paperAccent.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           children: [
-            Icon(Icons.info_outline, size: 18, color: AppColors.warning),
+            Icon(Icons.info_outline, size: 18, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
                 AppStrings.studentCancelDeductNotice,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.warning,
+                  color: AppColors.paperAccent,
                 ),
               ),
             ),
@@ -274,17 +274,17 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
+        color: AppColors.paperAccent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber, size: 18, color: AppColors.error),
+          Icon(Icons.warning_amber, size: 18, color: AppColors.paperAccent),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
             child: Text(
               AppStrings.rescheduleDeadlineWarning(deadlineHours),
-              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+              style: AppTypography.bodySmall.copyWith(color: AppColors.paperAccent),
             ),
           ),
         ],

@@ -380,14 +380,14 @@ class RequestHistoryChat extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.info.withValues(alpha: 0.06),
+          color: AppColors.ink.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(Icons.lightbulb_outline,
-                size: 18, color: AppColors.info),
+                size: 18, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Column(
@@ -400,14 +400,14 @@ class RequestHistoryChat extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.info.withValues(alpha: 0.12),
+                      color: AppColors.ink.withValues(alpha: 0.12),
                       borderRadius:
                           BorderRadius.circular(AppSpacing.radiusSmall),
                     ),
                     child: Text(
                       guide.title,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.info,
+                        color: AppColors.ink,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

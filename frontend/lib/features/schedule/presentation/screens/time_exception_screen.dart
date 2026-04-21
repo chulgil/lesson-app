@@ -120,13 +120,13 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.info.withValues(alpha: 0.08),
+        color: AppColors.ink.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, size: 24, color: AppColors.info),
+          Icon(Icons.info_outline, size: 24, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Column(
@@ -136,14 +136,14 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
                   '휴무 설정 안내',
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '휴무일로 설정된 날짜는 학생들에게 예약 가능 시간으로 표시되지 않습니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.info,
+                    color: AppColors.ink,
                   ),
                 ),
               ],
@@ -254,7 +254,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
@@ -288,9 +288,9 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   Color _getExceptionColor(ExceptionType type) {
     switch (type) {
       case ExceptionType.holiday:
-        return AppColors.error;
+        return AppColors.paperAccent;
       case ExceptionType.vacation:
-        return AppColors.warning;
+        return AppColors.paperAccent;
       case ExceptionType.additionalSlot:
         return AppColors.paperOk;
     }
@@ -339,7 +339,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

@@ -113,7 +113,7 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expiring soon
         if (expiringSoonSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader(AppStrings.statusExpiringSoon, color: AppColors.warning),
+          _buildSectionHeader(AppStrings.statusExpiringSoon, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           ...expiringSoonSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
@@ -179,7 +179,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             child: _SummaryStatCard(
               label: AppStrings.statusExpiringSoon,
               count: expiringCount,
-              color: AppColors.warning,
+              color: AppColors.paperAccent,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -222,7 +222,7 @@ class SubscriptionListScreen extends ConsumerWidget {
                   child: ListTile(
                     leading: Icon(
                       Icons.schedule,
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                     ),
                     title: Text(
                       r.message ?? AppStrings.pendingRequests,
@@ -348,7 +348,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             Icon(
               Icons.error_outline,
               size: 48,
-              color: AppColors.error,
+              color: AppColors.paperAccent,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(

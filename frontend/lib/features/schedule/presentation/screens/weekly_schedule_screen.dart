@@ -394,7 +394,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          const Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '데이터를 불러올 수 없습니다',
@@ -471,7 +471,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
               ),
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+                style: FilledButton.styleFrom(backgroundColor: AppColors.paperAccent),
                 child: const Text(AppStrings.delete),
               ),
             ],

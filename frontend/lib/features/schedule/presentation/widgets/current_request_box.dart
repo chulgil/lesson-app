@@ -392,7 +392,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         // Waiting message row
         Row(
           children: [
-            Icon(Icons.hourglass_top, color: AppColors.info, size: 18),
+            Icon(Icons.hourglass_top, color: AppColors.ink, size: 18),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
@@ -459,7 +459,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.proposalSent) {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
-        iconColor: AppColors.info,
+        iconColor: AppColors.ink,
         message: AppStrings.actionBoxWaitingAccept,
       );
     }
@@ -468,7 +468,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.proposalAccepted) {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
-        iconColor: AppColors.info,
+        iconColor: AppColors.ink,
         message: AppStrings.actionBoxWaitingPayment,
       );
     }
@@ -477,7 +477,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.paymentNotified) {
       return _buildActionRow(
         icon: Icons.account_balance,
-        iconColor: AppColors.success,
+        iconColor: AppColors.paperOk,
         message: AppStrings.phase2PaymentReceivedTeacher,
         primaryLabel: AppStrings.actionVerifyPayment,
         primaryIcon: Icons.check_circle,
@@ -489,7 +489,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.subscriptionIssued) {
       return _buildMessageOnly(
         icon: Icons.card_membership,
-        iconColor: AppColors.success,
+        iconColor: AppColors.paperOk,
         message: AppStrings.actionBoxSubscriptionReady,
       );
     }
@@ -523,7 +523,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.proposalAccepted) {
       return _buildActionRow(
         icon: Icons.receipt_long,
-        iconColor: AppColors.info,
+        iconColor: AppColors.ink,
         message: AppStrings.phase2WaitingPaymentStudent,
         primaryLabel: AppStrings.actionConfirmPayment,
         primaryIcon: Icons.check_circle_outline,
@@ -535,7 +535,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     if (status == UnifiedRequestStatus.paymentNotified) {
       return _buildMessageOnly(
         icon: Icons.hourglass_top,
-        iconColor: AppColors.info,
+        iconColor: AppColors.ink,
         message: AppStrings.actionBoxWaitingVerify,
       );
     }
@@ -543,7 +543,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
     // 수강권 발행 완료
     return _buildMessageOnly(
       icon: Icons.card_membership,
-      iconColor: AppColors.success,
+      iconColor: AppColors.paperOk,
       message: AppStrings.chatSubscriptionIssued,
     );
   }

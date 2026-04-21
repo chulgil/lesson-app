@@ -50,7 +50,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
                   Text(
                     '${allStudents.length}명의 학생',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.paperAccent,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -231,7 +231,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
             child: Icon(
               Icons.check_circle_outline,
               size: 48,
-              color: AppColors.success,
+              color: AppColors.paperOk,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
