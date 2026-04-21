@@ -312,7 +312,11 @@ class _PracticeItemTile extends ConsumerWidget {
                 ),
                 child:
                     item.isCompleted
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
+                        ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.paper,
+                        )
                         : null,
               ),
             ),
@@ -416,7 +420,7 @@ class _PracticeItemTile extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color:
                             item.practiceCount > 0
-                                ? AppColors.primary.withValues(alpha: 0.1)
+                                ? AppColors.paperAccentSoft
                                 : AppColors.paperDark,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
@@ -427,7 +431,7 @@ class _PracticeItemTile extends ConsumerWidget {
                         style: AppTypography.caption.copyWith(
                           color:
                               item.practiceCount > 0
-                                  ? AppColors.primary
+                                  ? AppColors.paperAccent
                                   : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -437,7 +441,7 @@ class _PracticeItemTile extends ConsumerWidget {
                       onPressed: () => _incrementCount(ref),
                       icon: const Icon(Icons.add_circle_outline),
                       iconSize: 20,
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(
                         minWidth: 32,
@@ -457,11 +461,11 @@ class _PracticeItemTile extends ConsumerWidget {
   Color _getTypeColor(PracticeType type) {
     switch (type) {
       case PracticeType.repertoire:
-        return AppColors.primary;
+        return AppColors.paperAccent;
       case PracticeType.technique:
-        return AppColors.secondary;
+        return AppColors.ink;
       case PracticeType.theory:
-        return AppColors.info;
+        return AppColors.paperOk;
       case PracticeType.custom:
         return AppColors.inkSecondary;
     }

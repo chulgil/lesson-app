@@ -268,7 +268,7 @@ Text(
 | Phase 1 | 선생님 홈화면 — 토큰 + PaperScaffold + NotebookMasthead + Programme Title + 로마숫자 레슨 리스트 + Fine. 푸터 | **완료** (2026-04-21, f425ff11) |
 | Phase 2 | 공통 위젯 (StatCard/EmptyStateWidget/ThinRule/SectionHeader) + 홈 섹션 (SubscriptionBadge/TimeContextBanner/GettingStartedCard/LessonRequestSection) + 대시보드 서브위젯 (LessonCard/AssignmentSummarySection/ScheduleChangeRequestSection/UrgentAlertZone) | **완료** (2026-04-21, 3462459b + c361592d + 89f04f94) |
 | Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
-| Phase 4 | 학생/학부모 홈 적용 | 계획됨 |
+| Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **진행 중** (a4b8f54f + 4094f677: 쉘·대시보드·카드 완료 / 학생 설정·프로필은 Phase 5) |
 | Phase 5 | 전 화면 확산 (설정/프로필/수강권/스케줄) | 계획됨 |
 
 ### 7.1 Phase 1 실제 산출물
@@ -299,7 +299,18 @@ Text(
 | Vermillion Red | **렌더** | `paperAccent` 액센트 — UrgentAlertZone urgent 세로선 · TimeContextBanner 세로선 · SubscriptionBadge 만료임박 · AssignmentSummary 50% 미만 경고 |
 | Gaegu 손글씨 | **렌더** | `NotebookTypography.hand` — **TimeContextBanner 메시지** · EmptyStateWidget 서브타이틀 |
 
-> **평가**: Phase 2 종료 시점에 4대 시그니처 모두 실제 관찰 가능. §8의 "4대 시그니처 필수" 원칙(5번)은 **선생님 홈화면 내에서 충족**. Phase 4 (학생/학부모 홈) 부터 확산 대상.
+> **평가**: Phase 2 종료 시점에 4대 시그니처 모두 실제 관찰 가능. §8의 "4대 시그니처 필수" 원칙(5번)은 **선생님 홈화면 내에서 충족**. Phase 4 에서 학생 홈으로 확산 중.
+
+### 7.3 Phase 4 진행 산출물 (커밋 a4b8f54f + 4094f677)
+
+| 영역 | 경로 | 상태 |
+|------|------|------|
+| 쉘 | `student_home_screen.dart` | 하단 네비를 로마숫자 (I/II/III/IV) + paperAccent active 로 교체 |
+| 대시보드 탭 | `student_dashboard_tab.dart` · `student_lessons_tab.dart` · `student_practice_tab.dart` | legacy → Notebook 팔레트 |
+| 대시보드 위젯 | `dashboard/next_lesson_card.dart` · `dashboard/practice_summary_section.dart` · `dashboard/subscription_renewal_banner.dart` · `dashboard/teacher_feedback_section.dart` | legacy → Notebook 팔레트 |
+| 카드 | `student_lesson_card.dart` · `trial_booking_card.dart` · `compact_trial_booking_card.dart` · `weekly_practice_widget.dart` | legacy → Notebook 팔레트 · boxShadow 제거 |
+| 엔티티 | `domain/entities/manual_teacher.dart` | 프로필 색상 팔레트 ink/paperAccent/paperOk/paperHighlight 로 재정의 |
+| 보류 | `student_profile_*.dart` · `my_teachers_screen.dart` · `notification_settings_screen.dart` · `help_screen.dart` · `app_info_screen.dart` | Phase 5 (설정·프로필 확산) 대상 |
 
 ---
 

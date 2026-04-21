@@ -119,28 +119,26 @@ class StudentSubscriptionSummary extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
           Icon(
             Icons.confirmation_number_outlined,
             size: 48,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '등록된 수강권이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '선생님에게 수강권 발급을 요청하세요',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
         ],
       ),
@@ -167,9 +165,7 @@ class StudentSubscriptionSummary extends ConsumerWidget {
       ),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
-        style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textSecondaryLight,
-        ),
+        style: AppTypography.bodyMedium.copyWith(color: AppColors.inkSecondary),
       ),
     );
   }
@@ -204,8 +200,8 @@ class _SubscriptionMiniCard extends ConsumerWidget {
           border: Border.all(
             color:
                 subscription.isExpiringSoon
-                    ? AppColors.warning
-                    : AppColors.borderLight,
+                    ? AppColors.paperAccent
+                    : AppColors.inkQuaternary,
             width: subscription.isExpiringSoon ? 2 : 1,
           ),
         ),
@@ -237,8 +233,8 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                     style: AppTypography.caption.copyWith(
                       color:
                           _daysRemaining! <= 7
-                              ? AppColors.warning
-                              : AppColors.textTertiaryLight,
+                              ? AppColors.paperAccent
+                              : AppColors.inkTertiary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -259,7 +255,7 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: _progressValue,
                         minHeight: 6,
-                        backgroundColor: AppColors.borderLight,
+                        backgroundColor: AppColors.inkQuaternary,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           _progressColor,
                         ),
@@ -270,14 +266,14 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                   Text(
                     '${subscription.usedLessons}/$_totalSessions',
                     style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     AppStrings.sessionUnit,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -299,14 +295,14 @@ class _SubscriptionMiniCard extends ConsumerWidget {
                           Text(
                             AppStrings.viewDetail,
                             style: AppTypography.buttonSmall.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             ),
                           ),
                           const SizedBox(width: 2),
                           const Icon(
                             Icons.arrow_forward_ios,
                             size: 12,
-                            color: AppColors.primary,
+                            color: AppColors.paperAccent,
                           ),
                         ],
                       ),
@@ -327,9 +323,9 @@ class _SubscriptionMiniCard extends ConsumerWidget {
   }
 
   Color get _progressColor {
-    if (subscription.isExpiringSoon) return AppColors.warning;
-    if (_progressValue >= 0.9) return AppColors.warning;
-    return AppColors.primary;
+    if (subscription.isExpiringSoon) return AppColors.paperAccent;
+    if (_progressValue >= 0.9) return AppColors.paperAccent;
+    return AppColors.ink;
   }
 
   int? get _daysRemaining {
@@ -340,15 +336,15 @@ class _SubscriptionMiniCard extends ConsumerWidget {
 
   Widget _buildStatusBadge() {
     if (subscription.id.isEmpty) {
-      return _badge(AppStrings.unregistered, AppColors.textTertiaryLight);
+      return _badge(AppStrings.unregistered, AppColors.inkTertiary);
     }
     if (subscription.status == SubscriptionStatus.expired) {
-      return _badge(AppStrings.expired, AppColors.error);
+      return _badge(AppStrings.expired, AppColors.paperAccent);
     }
     if (subscription.isExpiringSoon) {
-      return _badge(AppStrings.expiringSoon, AppColors.warning);
+      return _badge(AppStrings.expiringSoon, AppColors.paperAccent);
     }
-    return _badge(AppStrings.active, AppColors.success);
+    return _badge(AppStrings.active, AppColors.paperOk);
   }
 
   Widget _badge(String label, Color color) {
