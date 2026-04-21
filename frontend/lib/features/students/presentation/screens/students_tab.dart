@@ -59,21 +59,26 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       children: [
         Column(
           children: [
-            // Header
-            _buildHeader(),
-
-            // Search bar
-            _buildSearchBar(),
-
-            // Filter chips
-            _buildFilterChips(),
-
-            const SizedBox(height: AppSpacing.space2),
-
-            // Student count and sort
-            _buildCountAndSort(groupedAsync),
-
-            const SizedBox(height: AppSpacing.space2),
+            // Fixed top area — clear visual separator between sticky filters
+            // and the scrolling list below (avoids shadow/section overlap).
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceLight,
+                border: Border(
+                  bottom: BorderSide(color: AppColors.borderLight),
+                ),
+              ),
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  _buildSearchBar(),
+                  _buildFilterChips(),
+                  const SizedBox(height: AppSpacing.space2),
+                  _buildCountAndSort(groupedAsync),
+                  const SizedBox(height: AppSpacing.space2),
+                ],
+              ),
+            ),
 
             // Grouped student list
             Expanded(
