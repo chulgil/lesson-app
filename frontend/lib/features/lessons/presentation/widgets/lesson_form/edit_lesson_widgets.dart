@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/utils/date_format_utils.dart';
 import 'lesson_form_helpers.dart';
 
 /// Simple student info model for edit screen (without currentPiece)
@@ -142,8 +141,6 @@ void showCancelLessonDialog({
   required TimeOfDay lessonTime,
   required VoidCallback onConfirm,
 }) {
-  final dateFormat = DateFormat('M월 d일 (E)', 'ko');
-
   showDialog(
     context: context,
     builder:
@@ -171,7 +168,7 @@ void showCancelLessonDialog({
                       ),
                     ),
                     Text(
-                      '${dateFormat.format(lessonDate)} ${formatLessonTime(lessonTime)}',
+                      '${formatDateMDWithDayParens(lessonDate)} ${formatLessonTime(lessonTime)}',
                       style: AppTypography.bodySmall.copyWith(
                         color: AppColors.textSecondaryLight,
                       ),

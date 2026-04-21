@@ -4,13 +4,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../practice/domain/entities/practice_repertoire.dart';
 import '../../../practice/presentation/screens/section_picker_screen.dart';
@@ -352,8 +352,6 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy.MM.dd HH:mm');
-
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
@@ -396,7 +394,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        dateFormat.format(widget.recording.createdAt),
+                        formatDateTimeDotPadded(widget.recording.createdAt),
                         style: AppTypography.bodySmall.copyWith(
                           fontWeight: FontWeight.w500,
                         ),

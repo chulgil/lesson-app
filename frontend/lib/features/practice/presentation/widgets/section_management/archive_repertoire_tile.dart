@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/utils/date_format_utils.dart';
 import '../../../domain/entities/entities.dart';
 import '../../providers/repertoire_archive_provider.dart';
 
@@ -17,8 +16,6 @@ class ArchiveRepertoireTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateFormat = DateFormat('yyyy-MM-dd');
-
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space4,
@@ -83,7 +80,7 @@ class ArchiveRepertoireTile extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '아카이브: ${repertoire.archivedAt != null ? dateFormat.format(repertoire.archivedAt!) : '-'}',
+              '아카이브: ${repertoire.archivedAt != null ? formatDateDashPadded(repertoire.archivedAt!) : '-'}',
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.textSecondaryLight,
               ),

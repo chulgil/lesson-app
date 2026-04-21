@@ -61,6 +61,17 @@ String formatDateMD(DateTime date) {
   return '${date.month}/${date.day}';
 }
 
+/// Format date as M월 d일 (e.g., 4월 5일)
+String formatDateMDKorean(DateTime date) {
+  return '${date.month}월 ${date.day}일';
+}
+
+/// Format date as M월 d일 (요일) (e.g., 4월 5일 (토))
+String formatDateMDWithDayParens(DateTime date) {
+  const dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+  return '${date.month}월 ${date.day}일 (${dayNames[date.weekday]})';
+}
+
 /// Format time as HH:mm (e.g., 14:00)
 String formatTimeHM(DateTime date) {
   return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
@@ -99,6 +110,23 @@ String formatDateTimeDash(DateTime date) {
   final m = date.month.toString().padLeft(2, '0');
   final d = date.day.toString().padLeft(2, '0');
   return '$y-$m-$d ${formatTimeHM(date)}';
+}
+
+/// Format date as yyyy-MM-dd (e.g., 2026-04-05)
+String formatDateDashPadded(DateTime date) {
+  final y = date.year.toString();
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y-$m-$d';
+}
+
+/// Format date as yyyy.MM.dd HH:mm (e.g., 2026.04.05 14:00)
+/// Padded variant used for recording list timestamps.
+String formatDateTimeDotPadded(DateTime date) {
+  final y = date.year.toString();
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y.$m.$d ${formatTimeHM(date)}';
 }
 
 /// Format time as 오전/오후 H:mm (e.g., 오후 2:30)

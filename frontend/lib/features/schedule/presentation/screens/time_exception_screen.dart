@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../domain/entities/teacher_availability.dart';
@@ -297,13 +297,13 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
   }
 
   String _formatDateRange(DateTime start, DateTime end) {
-    final startStr = DateFormat('M월 d일 (E)', 'ko').format(start);
+    final startStr = formatDateMDWithDayParens(start);
     if (start.year == end.year &&
         start.month == end.month &&
         start.day == end.day) {
       return startStr;
     }
-    final endStr = DateFormat('M월 d일 (E)', 'ko').format(end);
+    final endStr = formatDateMDWithDayParens(end);
     return '$startStr ~ $endStr';
   }
 
@@ -558,10 +558,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
               color: AppColors.textSecondaryLight,
             ),
             const SizedBox(width: AppSpacing.space2),
-            Text(
-              DateFormat('M월 d일').format(date),
-              style: AppTypography.bodyMedium,
-            ),
+            Text(formatDateMDKorean(date), style: AppTypography.bodyMedium),
           ],
         ),
       ),
