@@ -56,43 +56,46 @@ Flutter 구현: `lib/core/theme/app_colors.dart`의 Notebook 섹션.
 
 | 항목 | 값 |
 |------|-----|
-| 위치 | `Positioned(left: 0, top: 0, bottom: 0)` |
+| 위치 | `Positioned(left: 14, top: 0, bottom: 0)` (기본값) |
 | 너비 | **3px 고정** |
 | 색상 | `AppColors.paperMargin` (#A83E3A) |
 | 투명도 | 1.0 (불투명) |
 | 상호작용 | `IgnorePointer` — tap/scroll 전달 금지 |
+| 콘텐츠 좌측 padding | **≥ 17px** (선 우측 끝 = left 14 + width 3) |
 
 ### 3.2 설계 근거
 
-**왜 3px인가?**
-- 레퍼런스 디자인은 52px 들여쓰기 + 1.2px 세로선이지만, 모바일에서는 **가로 공간이 부족**.
-- 해당 영역은 **사용 빈도가 극히 낮은 장식 영역**이므로 52px 들여쓰기 비용이 크다.
-- **3px 플러시 마진**으로 축소 → 콘텐츠 가로폭 최대화 + 노트북 은유 유지.
+**왜 `left: 14` 인가?**
+- 레퍼런스 디자인(웹)은 52px 들여쓰기 + 1.2px 세로선이지만, 모바일에서는 **가로 공간이 부족**.
+- 과거에는 `left: 0 + width: 3` 플러시 마진을 사용했으나, **기기 베젤·라운드 코너·SafeArea** 에 가려 선 자체가 잘 안 보이는 문제가 발생 (2026-04-21 피드백).
+- 14px 들여쓰기로 선이 **명확히 보이면서도** 콘텐츠 가로폭 손실은 최소화 (전체 폭의 ~3.7%).
+- 너비는 3px 유지 — 모바일에서 1.2px 은 너무 가늘어 저대비 상황에서 실종된다.
 
 ### 3.3 구현 예시
 
 ```dart
-Stack(
-  children: [
-    Container(color: AppColors.paper),
-    // ── 3px 고정 붉은 여백선 (불가침) ──
-    const Positioned(
-      left: 0, top: 0, bottom: 0, width: 3,
-      child: IgnorePointer(
-        child: ColoredBox(color: AppColors.paperMargin),
-      ),
-    ),
-    child, // 콘텐츠
-  ],
+// 일반 사용 — 기본값(left: 14, width: 3)
+PaperScaffold(
+  child: SafeArea(child: child),
+)
+
+// 튜닝 — 매우 좁은 화면에서 더 붙이고 싶을 때
+PaperScaffold(
+  marginLineLeft: 8,
+  marginLineWidth: 2.5,
+  child: SafeArea(child: child),
 )
 ```
 
+`PaperScaffold` 내부는 `Stack` + `Positioned` 로 구성되며, 콘텐츠(`Positioned.fill`) 는 선 **위에** 올라간다. 콘텐츠의 좌측 padding 이 `marginLineLeft + marginLineWidth` 미만이면 텍스트가 선과 겹치므로, 기본 설정에서는 `horizontal: AppSpacing.screenPadding` (16px) 이상을 사용한다. 17px 미만으로 가야 한다면 `marginLineLeft` 를 줄여 맞춘다.
+
 ### 3.4 금지 사항
 
-- 3px 외 다른 너비
-- `left: 0` 이외의 위치 (들여쓰기 금지)
-- 투명도/그라데이션
+- 화면 중앙·우측 배치 (반드시 좌측, `left` ≤ 24)
+- 투명도/그라데이션 (불투명 단색만)
 - 상하단 부분 그리기 (반드시 `top: 0, bottom: 0`)
+- 너비 1.5px 미만 (모바일 가독성 부족)
+- 콘텐츠 padding < 여백선 우측 끝 → 텍스트가 선과 겹침
 
 ---
 
@@ -259,7 +262,7 @@ Text(
 
 | 유형 | 경로 |
 |------|------|
-| 토큰 | `frontend/lib/core/theme/app_colors.dart` (Notebook 섹션 13종) |
+| 토큰 | `frontend/lib/core/theme/app_colors.dart` (Notebook 섹션 12종) |
 | 타이포 | `frontend/lib/core/theme/notebook_typography.dart` (14 스타일 + `romanOf`) |
 | 스캐폴드 | `frontend/lib/core/widgets/notebook/paper_scaffold.dart` |
 | 매스트헤드 | `frontend/lib/core/widgets/notebook/notebook_masthead.dart` |
