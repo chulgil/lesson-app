@@ -283,6 +283,33 @@ class MembershipBenefit extends HiveObject {
 └─────────────────────────────────────┘
 ```
 
+### 3-1. 변경/취소 횟수 — 정책 기본값 + 수강권 단위 조정
+
+> **원칙**: 선생님 기본 정책이 수강권 생성 시 **기본 표기**로 적용되지만,
+> 실제 변경/취소권 컨트롤은 **수강권 단위**로 저장/차감된다.
+> 즉, 발급 시점의 정책 값이 개별 수강권의 `totalRescheduleAllowance`로 스냅샷된다.
+
+| 항목 | 필드 | 동작 |
+|------|------|------|
+| 정책 기본값 | `LessonPolicy.maxChangesPerMonth` | 선생님 "레슨 정책 설정"에서 관리 (default 2) |
+| 수강권 스냅샷 | `Subscription.totalRescheduleAllowance` | 발급 시 정책값으로 자동 채움, 개별 조정 가능 |
+| 사용량 카운터 | `Subscription.usedRescheduleCount` | 변경/취소할 때마다 +1 |
+| 남은 횟수 | `remainingReschedule` | `total - used` (getter) |
+
+**UI 동작 (`IssueSubscriptionScreen`)**:
+
+1. 레슨(membership) 선택 시 → `LessonClass.teacherId` 도출 → `effectivePolicyProvider`로 정책 조회
+2. 정책 로딩 성공 시 `_rescheduleAllowance` 기본값을 `maxChangesPerMonth`로 자동 시드
+3. 섹션 헤더 옆 뱃지 표시:
+   - 정책값과 동일: `[기본 정책]` (primary 색상)
+   - 사용자가 개별 조정: `[개별 조정됨]` (회색)
+4. 보조 문구로 "선생님 기본 정책: 월 N회 변경 가능 (이 수강권에서 개별 조정 가능)" 노출
+
+**왜 스냅샷 방식인가**:
+- 수강권 발급 이후 선생님이 정책을 변경해도 **기존 수강권의 취소권은 유지**되어야 법적 안정성 확보
+- 학생마다 특별 협의(프로모션, 케어 학생 등)로 횟수를 달리할 수 있는 유연성
+- 정책은 "다음 발급부터 적용", 기존 수강권은 "발급 당시 값 유지"
+
 ---
 
 ## 정책 적용 흐름

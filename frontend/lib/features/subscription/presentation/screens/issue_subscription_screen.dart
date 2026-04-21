@@ -6,9 +6,12 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../students/domain/entities/class_membership.dart';
+import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
+import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
+import '../providers/lesson_policy_providers.dart';
 import '../widgets/issue_form_discount_bonus.dart';
 import '../widgets/issue_form_membership_widgets.dart';
 import '../widgets/issue_form_sections.dart';
@@ -72,6 +75,12 @@ class _IssueSubscriptionScreenState
   String? _selectedLocationId;
   int _travelTimeMinutes = 0;
 
+  // 선생님 정책 기본값 연동.
+  // 수강권 생성 시 정책값을 기본으로 표기하되, 실제 컨트롤은 수강권 단위.
+  bool _policyApplied = false;
+  LessonPolicy? _effectivePolicy;
+  String? _appliedPolicyMembershipId;
+
   final _amountController = TextEditingController();
   final _lessonsController = TextEditingController();
   final _validityController = TextEditingController();
@@ -100,8 +109,7 @@ class _IssueSubscriptionScreenState
   @override
   bool get isPaymentConfirmed => _isPaymentConfirmed;
   @override
-  SubscriptionPaymentMethod get selectedPaymentMethod =>
-      _selectedPaymentMethod;
+  SubscriptionPaymentMethod get selectedPaymentMethod => _selectedPaymentMethod;
   @override
   int get totalLessons => _totalLessons;
   @override
@@ -175,9 +183,7 @@ class _IssueSubscriptionScreenState
     if (!_hasPrefilledAmount && !widget.isBatchMode) {
       final studentAsync = ref.watch(studentProvider(widget.primaryStudentId));
       studentAsync.whenData((student) {
-        if (student != null &&
-            student.monthlyFee > 0 &&
-            _originalAmount == 0) {
+        if (student != null && student.monthlyFee > 0 && _originalAmount == 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               setState(() {
@@ -217,6 +223,16 @@ class _IssueSubscriptionScreenState
                       setState(() {
                         _selectedMembershipId = memberships.first.id;
                       });
+                      _applyPolicyDefaults(memberships.first);
+                    });
+                  } else if (_selectedMembershipId != null &&
+                      _appliedPolicyMembershipId != _selectedMembershipId) {
+                    final selected = memberships.firstWhere(
+                      (m) => m.id == _selectedMembershipId,
+                      orElse: () => memberships.first,
+                    );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _applyPolicyDefaults(selected);
                     });
                   }
 
@@ -224,9 +240,8 @@ class _IssueSubscriptionScreenState
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error:
-                    (error, _) => SubscriptionErrorState(
-                      error: error.toString(),
-                    ),
+                    (error, _) =>
+                        SubscriptionErrorState(error: error.toString()),
               ),
       bottomNavigationBar: _buildBottomBar(),
     );
@@ -243,8 +258,20 @@ class _IssueSubscriptionScreenState
             MembershipSelectorWidget(
               memberships: memberships,
               selectedMembershipId: _selectedMembershipId,
-              onChanged:
-                  (value) => setState(() => _selectedMembershipId = value),
+              onChanged: (value) {
+                setState(() {
+                  _selectedMembershipId = value;
+                  _policyApplied = false;
+                  _appliedPolicyMembershipId = null;
+                });
+                if (value != null) {
+                  final m = memberships.firstWhere(
+                    (x) => x.id == value,
+                    orElse: () => memberships.first,
+                  );
+                  _applyPolicyDefaults(m);
+                }
+              },
             ),
             const SizedBox(height: AppSpacing.space6),
           ],
@@ -264,10 +291,11 @@ class _IssueSubscriptionScreenState
               studentId: widget.primaryStudentId,
               currentLocationId: _selectedLocationId,
               currentTravelTime: _travelTimeMinutes,
-              onLocationChanged: (locationId) =>
-                  setState(() => _selectedLocationId = locationId),
-              onTravelTimeChanged: (minutes) =>
-                  setState(() => _travelTimeMinutes = minutes),
+              onLocationChanged:
+                  (locationId) =>
+                      setState(() => _selectedLocationId = locationId),
+              onTravelTimeChanged:
+                  (minutes) => setState(() => _travelTimeMinutes = minutes),
             ),
           ],
 
@@ -294,8 +322,7 @@ class _IssueSubscriptionScreenState
             totalLessons: _totalLessons,
             finalAmount: finalAmount,
             discountPercent: _discountPercent,
-            onAmountChanged:
-                (value) => setState(() => _originalAmount = value),
+            onAmountChanged: (value) => setState(() => _originalAmount = value),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -410,8 +437,7 @@ class _IssueSubscriptionScreenState
             totalLessons: _totalLessons,
             finalAmount: finalAmount,
             discountPercent: _discountPercent,
-            onAmountChanged:
-                (value) => setState(() => _originalAmount = value),
+            onAmountChanged: (value) => setState(() => _originalAmount = value),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -493,10 +519,24 @@ class _IssueSubscriptionScreenState
   }
 
   Widget _buildRescheduleAllowanceSection() {
+    final policy = _effectivePolicy;
+    final policyAllowance = policy?.maxChangesPerMonth;
+    final matchesPolicy =
+        policyAllowance != null && _rescheduleAllowance == policyAllowance;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('변경/취소 가능 횟수', style: AppTypography.headingSmall),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('변경/취소 가능 횟수', style: AppTypography.headingSmall),
+            if (policy != null) ...[
+              const SizedBox(width: AppSpacing.space2),
+              _PolicyBadge(isDefault: matchesPolicy),
+            ],
+          ],
+        ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.',
@@ -504,6 +544,21 @@ class _IssueSubscriptionScreenState
             color: AppColors.textSecondaryLight,
           ),
         ),
+        if (policy != null) ...[
+          const SizedBox(height: AppSpacing.space1),
+          Text(
+            matchesPolicy
+                ? '선생님 기본 정책: ${policy.changePolicySummary} (이 수강권에서 개별 조정 가능)'
+                : '선생님 기본 정책 ${policy.changePolicySummary} → 이 수강권만 $_rescheduleAllowance회로 재설정',
+            style: AppTypography.bodySmall.copyWith(
+              color:
+                  matchesPolicy
+                      ? AppColors.primary
+                      : AppColors.textTertiaryLight,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
         const SizedBox(height: AppSpacing.space3),
         Row(
           children: [
@@ -513,22 +568,25 @@ class _IssueSubscriptionScreenState
                 child: ChoiceChip(
                   label: Text(count == 0 ? '불가' : '$count회'),
                   selected: _rescheduleAllowance == count,
-                  onSelected: (_) =>
-                      setState(() => _rescheduleAllowance = count),
+                  onSelected:
+                      (_) => setState(() => _rescheduleAllowance = count),
                   selectedColor: AppColors.primary,
                   backgroundColor: AppColors.surfaceLight,
                   labelStyle: AppTypography.bodySmall.copyWith(
-                    color: _rescheduleAllowance == count
-                        ? Colors.white
-                        : AppColors.textPrimaryLight,
-                    fontWeight: _rescheduleAllowance == count
-                        ? FontWeight.w600
-                        : FontWeight.normal,
+                    color:
+                        _rescheduleAllowance == count
+                            ? Colors.white
+                            : AppColors.textPrimaryLight,
+                    fontWeight:
+                        _rescheduleAllowance == count
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                   ),
                   side: BorderSide(
-                    color: _rescheduleAllowance == count
-                        ? AppColors.primary
-                        : AppColors.borderLight,
+                    color:
+                        _rescheduleAllowance == count
+                            ? AppColors.primary
+                            : AppColors.borderLight,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
@@ -541,7 +599,10 @@ class _IssueSubscriptionScreenState
         ),
         if (_rescheduleAllowance > 0) ...[
           const SizedBox(height: AppSpacing.space4),
-          Text(AppStrings.rescheduleDeadlineLabel, style: AppTypography.headingSmall),
+          Text(
+            AppStrings.rescheduleDeadlineLabel,
+            style: AppTypography.headingSmall,
+          ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             AppStrings.rescheduleDeadlineDescription,
@@ -558,22 +619,25 @@ class _IssueSubscriptionScreenState
                   child: ChoiceChip(
                     label: Text('$hours${AppStrings.hoursUnit}'),
                     selected: _rescheduleDeadlineHours == hours,
-                    onSelected: (_) =>
-                        setState(() => _rescheduleDeadlineHours = hours),
+                    onSelected:
+                        (_) => setState(() => _rescheduleDeadlineHours = hours),
                     selectedColor: AppColors.primary,
                     backgroundColor: AppColors.surfaceLight,
                     labelStyle: AppTypography.bodySmall.copyWith(
-                      color: _rescheduleDeadlineHours == hours
-                          ? Colors.white
-                          : AppColors.textPrimaryLight,
-                      fontWeight: _rescheduleDeadlineHours == hours
-                          ? FontWeight.w600
-                          : FontWeight.normal,
+                      color:
+                          _rescheduleDeadlineHours == hours
+                              ? Colors.white
+                              : AppColors.textPrimaryLight,
+                      fontWeight:
+                          _rescheduleDeadlineHours == hours
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                     ),
                     side: BorderSide(
-                      color: _rescheduleDeadlineHours == hours
-                          ? AppColors.primary
-                          : AppColors.borderLight,
+                      color:
+                          _rescheduleDeadlineHours == hours
+                              ? AppColors.primary
+                              : AppColors.borderLight,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -642,6 +706,69 @@ class _IssueSubscriptionScreenState
                 ? '${widget.studentIds.length}명에게 수강권 발급'
                 : '수강권 발급',
           ),
+        ),
+      ),
+    );
+  }
+
+  /// Load teacher's default policy for the selected membership's class,
+  /// and seed `_rescheduleAllowance` unless the user already edited.
+  Future<void> _applyPolicyDefaults(ClassMembership membership) async {
+    if (!mounted) return;
+    if (_appliedPolicyMembershipId == membership.id && _policyApplied) return;
+
+    try {
+      final lessonClass = await ref.read(
+        lessonClassProvider(membership.lessonClassId).future,
+      );
+      if (lessonClass == null || !mounted) return;
+
+      final policy = await ref.read(
+        effectivePolicyProvider(
+          teacherId: lessonClass.teacherId,
+          lessonClassId: membership.lessonClassId,
+        ).future,
+      );
+      if (policy == null || !mounted) return;
+
+      setState(() {
+        _effectivePolicy = policy;
+        _appliedPolicyMembershipId = membership.id;
+        if (!_policyApplied) {
+          _rescheduleAllowance = policy.maxChangesPerMonth;
+          _policyApplied = true;
+        }
+      });
+    } catch (_) {
+      // Policy is optional; fall back to hard-coded defaults silently.
+    }
+  }
+}
+
+/// Small badge shown next to reschedule section header when the teacher's
+/// policy value is active (or has been manually overridden).
+class _PolicyBadge extends StatelessWidget {
+  final bool isDefault;
+  const _PolicyBadge({required this.isDefault});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isDefault ? AppColors.primary : AppColors.textTertiaryLight;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.space2,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        isDefault ? '기본 정책' : '개별 조정됨',
+        style: AppTypography.caption.copyWith(
+          color: color,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
