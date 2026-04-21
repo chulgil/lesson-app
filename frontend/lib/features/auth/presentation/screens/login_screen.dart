@@ -9,12 +9,16 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/notebook_masthead.dart';
+import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';
 import '../widgets/social_login_button.dart';
 
-/// Login screen with social login options (mock mode) or dev-login accounts (remote mode).
+/// Login screen — Notebook × Score 디자인.
+/// 스펙: docs/specs/design/notebook/README.md
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -27,61 +31,258 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Remote mode uses scrollable layout (social login + dev accounts)
+    final now = DateTime.now();
+    final meta =
+        'VOL. ${_romanMonth(now.month)} · NO. ${_romanDay(now.day)} · ${_englishMonth(now.month)} MMXXVI';
+
     if (!EnvironmentConfig.useMockData) {
+      // Remote mode — scrollable (social + dev accounts)
       return Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.screenPadding),
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.space6),
-                _buildHeader(),
-                const SizedBox(height: AppSpacing.space6),
-                _buildSocialButtons(context),
-                const SizedBox(height: AppSpacing.space6),
-                DevLoginSection(
-                  isLoading: _isLoading,
-                  onDevLogin:
-                      ({
-                        required String email,
-                        required String role,
-                        String? name,
-                      }) =>
-                          _handleDevLogin(email: email, role: role, name: name),
-                ),
-                const SizedBox(height: AppSpacing.space6),
-                _buildTermsText(context),
-                const SizedBox(height: AppSpacing.space4),
-              ],
+        body: PaperScaffold(
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: AppSpacing.space4),
+                  NotebookMasthead(eyebrow: 'LESSONAZA', meta: meta),
+                  const SizedBox(height: AppSpacing.space8),
+                  _buildHeader(),
+                  const SizedBox(height: AppSpacing.space8),
+                  _buildSocialButtons(context),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildDevAccountsSection(),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildFooter(context),
+                  const SizedBox(height: AppSpacing.space4),
+                ],
+              ),
             ),
           ),
         ),
       );
     }
 
-    // Mock mode uses spacer-based layout
+    // Mock mode — spacer-based
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              _buildHeader(),
-              const Spacer(flex: 2),
-              _buildSocialButtons(context),
-              const SizedBox(height: AppSpacing.space8),
-              _buildTermsText(context),
-              const SizedBox(height: AppSpacing.space4),
-            ],
+      body: PaperScaffold(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenPadding,
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.space4),
+                NotebookMasthead(eyebrow: 'LESSONAZA', meta: meta),
+                const Spacer(flex: 2),
+                _buildHeader(),
+                const Spacer(flex: 2),
+                _buildSocialButtons(context),
+                const SizedBox(height: AppSpacing.space8),
+                _buildFooter(context),
+                const SizedBox(height: AppSpacing.space4),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ── Dev Login (Remote mode) ──────────────────────────────────────
+  // ── Notebook header ───────────────────────────────────────────────
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Text('Programme for Login', style: NotebookTypography.mastheadLabel),
+        const SizedBox(height: AppSpacing.space3),
+        Text('Lessonaza', style: NotebookTypography.masthead),
+        const SizedBox(height: AppSpacing.space3),
+        Text(
+          '— 음악 레슨의 새로운 경험 —',
+          style: NotebookTypography.hand.copyWith(
+            color: AppColors.paperPencil,
+            fontSize: 15,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDevAccountsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 1,
+                color: AppColors.ink.withValues(alpha: 0.2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space3,
+              ),
+              child: Text(
+                'DEV · ACCOUNTS',
+                style: NotebookTypography.sectionLabel,
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: 1,
+                color: AppColors.ink.withValues(alpha: 0.2),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.space4),
+        DevLoginSection(
+          isLoading: _isLoading,
+          onDevLogin:
+              ({required String email, required String role, String? name}) =>
+                  _handleDevLogin(email: email, role: role, name: name),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialButtons(BuildContext context) {
+    return Column(
+      children: [
+        SocialLoginButton(
+          icon: Icons.g_mobiledata_rounded,
+          label: 'Google로 계속하기',
+          backgroundColor: AppColors.googleBackground,
+          textColor: AppColors.textPrimaryLight,
+          borderColor: AppColors.borderLight,
+          onPressed: () => _handleGoogleLogin(context),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        SocialLoginButton(
+          icon: Icons.chat_bubble_rounded,
+          label: '카카오로 계속하기',
+          backgroundColor: AppColors.kakaoBackground,
+          textColor: AppColors.textPrimaryLight,
+          onPressed: () => _handleKakaoLogin(context),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        SocialLoginButton(
+          icon: Icons.apple_rounded,
+          label: 'Apple로 계속하기',
+          backgroundColor: AppColors.appleBackground,
+          textColor: Colors.white,
+          onPressed: () => _handleAppleLogin(context),
+        ),
+        const SizedBox(height: AppSpacing.space5),
+        GestureDetector(
+          onTap: () => showParentLoginSheet(context),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.space4,
+              vertical: AppSpacing.space2,
+            ),
+            child: Text(
+              '학부모이신가요?',
+              style: NotebookTypography.hand.copyWith(
+                color: AppColors.paperAccent,
+                fontSize: 16,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.paperAccent,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Column(
+      children: [
+        Text('Fine.', style: NotebookTypography.fine),
+        const SizedBox(height: AppSpacing.space3),
+        Text.rich(
+          TextSpan(
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
+            children: [
+              const TextSpan(text: '계속하면 '),
+              TextSpan(
+                text: '이용약관',
+                style: TextStyle(
+                  color: AppColors.paperAccent,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.paperAccent,
+                ),
+              ),
+              const TextSpan(text: ' 및 '),
+              TextSpan(
+                text: '개인정보처리방침',
+                style: TextStyle(
+                  color: AppColors.paperAccent,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.paperAccent,
+                ),
+              ),
+              const TextSpan(text: '에 동의하는 것으로 간주됩니다.'),
+            ],
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  // ── Roman/Month helpers (Notebook meta) ──────────────────────────
+
+  String _romanMonth(int m) =>
+      const [
+        'I',
+        'II',
+        'III',
+        'IV',
+        'V',
+        'VI',
+        'VII',
+        'VIII',
+        'IX',
+        'X',
+        'XI',
+        'XII',
+      ][(m - 1).clamp(0, 11)];
+
+  String _romanDay(int d) {
+    // 1..31 → 간단한 로마숫자 변환. 실패 시 아라비아 숫자.
+    if (d < 1 || d > 31) return '$d';
+    const ones = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
+    const tens = ['', 'X', 'XX', 'XXX'];
+    return '${tens[d ~/ 10]}${ones[d % 10]}';
+  }
+
+  String _englishMonth(int m) =>
+      const [
+        'JAN',
+        'FEB',
+        'MAR',
+        'APR',
+        'MAY',
+        'JUN',
+        'JUL',
+        'AUG',
+        'SEP',
+        'OCT',
+        'NOV',
+        'DEC',
+      ][(m - 1).clamp(0, 11)];
+
+  // ── Login handlers ────────────────────────────────────────────────
 
   Future<void> _handleDevLogin({
     required String email,
@@ -98,12 +299,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .devLogin(email: email, role: role, name: name);
 
       if (!mounted) return;
-      // Navigate to home based on authenticated role
       final authState = ref.read(authNotifierProvider);
       if (authState is AuthAuthenticated) {
         context.go(authState.role.homeRoute);
       } else if (authState is AuthNeedsOnboarding) {
-        // Dev login: skip onboarding, go directly to home
         await ref.read(authNotifierProvider.notifier).completeOnboarding();
         if (!mounted) return;
         final updatedState = ref.read(authNotifierProvider);
@@ -128,147 +327,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  // ── Common UI builders ────────────────────────────────────────────
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        // App Icon
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
-          ),
-          child: const Icon(
-            Icons.music_note_rounded,
-            size: 48,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space6),
-
-        // App Name
-        Text(
-          'Lessonaza',
-          style: AppTypography.displayMedium.copyWith(
-            color: AppColors.textPrimaryLight,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.space2),
-
-        // Slogan
-        Text(
-          '음악 레슨의 새로운 경험',
-          style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.textSecondaryLight,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialButtons(BuildContext context) {
-    return Column(
-      children: [
-        // Google Login
-        SocialLoginButton(
-          icon: Icons.g_mobiledata_rounded,
-          label: 'Google로 계속하기',
-          backgroundColor: AppColors.googleBackground,
-          textColor: AppColors.textPrimaryLight,
-          borderColor: AppColors.borderLight,
-          onPressed: () => _handleGoogleLogin(context),
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // Kakao Login
-        SocialLoginButton(
-          icon: Icons.chat_bubble_rounded,
-          label: '카카오로 계속하기',
-          backgroundColor: AppColors.kakaoBackground,
-          textColor: AppColors.textPrimaryLight,
-          onPressed: () => _handleKakaoLogin(context),
-        ),
-        const SizedBox(height: AppSpacing.space3),
-
-        // Apple Login (iOS only)
-        SocialLoginButton(
-          icon: Icons.apple_rounded,
-          label: 'Apple로 계속하기',
-          backgroundColor: AppColors.appleBackground,
-          textColor: Colors.white,
-          onPressed: () => _handleAppleLogin(context),
-        ),
-
-        const SizedBox(height: AppSpacing.space5),
-
-        // Parent login link
-        GestureDetector(
-          onTap: () => showParentLoginSheet(context),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.space4,
-              vertical: AppSpacing.space2,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('👨‍👩‍👧', style: const TextStyle(fontSize: 18)),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  '학부모이신가요?',
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.info,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.info,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTermsText(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
-        children: [
-          const TextSpan(text: '계속하면 '),
-          TextSpan(
-            text: '이용약관',
-            style: TextStyle(
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-          const TextSpan(text: ' 및 '),
-          TextSpan(
-            text: '개인정보처리방침',
-            style: TextStyle(
-              color: AppColors.primary,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-          const TextSpan(text: '에 동의하는 것으로 간주됩니다.'),
-        ],
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-
-  // ── Login handlers ────────────────────────────────────────────────
-
   Future<void> _handleGoogleLogin(BuildContext context) async {
-    // Mock mode: show role select dialog
     if (EnvironmentConfig.useMockData) {
       showRoleSelectSheet(
         context,
@@ -278,10 +337,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return;
     }
 
-    // Remote mode: actual Google Sign-In
     if (_isLoading) return;
 
-    // Guard: check if Google OAuth credentials are configured
     if (EnvironmentConfig.googleServerClientId.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -305,7 +362,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       final account = await googleSignIn.signIn();
       if (account == null) {
-        // User cancelled
         if (mounted) setState(() => _isLoading = false);
         return;
       }

@@ -138,3 +138,6 @@ frontend/logs/
 .claude/settings.local.json
 backend/test.db
 .serena/project.yml
+
+# Design reference materials (not for commit)
+design-plan/
