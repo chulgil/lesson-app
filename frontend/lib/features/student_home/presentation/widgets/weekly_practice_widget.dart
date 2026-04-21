@@ -37,7 +37,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
     return Container(
       height: 200,
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: const Center(child: CircularProgressIndicator()),
@@ -48,7 +48,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       child: Column(
@@ -103,7 +103,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
 
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
@@ -162,7 +162,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                           backgroundColor: AppColors.inkQuaternary,
                           valueColor: AlwaysStoppedAnimation(
                             completed == total
-                                ? AppColors.practiceGood
+                                ? AppColors.paperOk
                                 : AppColors.paperAccent,
                           ),
                           minHeight: 8,
@@ -198,7 +198,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(AppSpacing.space6),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),
           child: Center(
@@ -298,14 +298,12 @@ class _PracticeItemTile extends ConsumerWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   color:
-                      item.isCompleted
-                          ? AppColors.practiceGood
-                          : Colors.transparent,
+                      item.isCompleted ? AppColors.paperOk : Colors.transparent,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color:
                         item.isCompleted
-                            ? AppColors.practiceGood
+                            ? AppColors.paperOk
                             : AppColors.inkQuaternary,
                     width: 2,
                   ),
