@@ -177,27 +177,52 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 
 ### 6.1 PaperScaffold
 
+파일: `lib/core/widgets/notebook/paper_scaffold.dart`
+
 ```dart
-// core/widgets/notebook/paper_scaffold.dart
 class PaperScaffold extends StatelessWidget {
   final Widget child;
-  const PaperScaffold({required this.child});
+  /// 여백선 왼쪽 offset. 기본 14px (베젤·SafeArea 회피).
+  final double marginLineLeft;
+  /// 여백선 너비. 기본 3px 고정.
+  final double marginLineWidth;
+
+  const PaperScaffold({
+    super.key,
+    required this.child,
+    this.marginLineLeft = 14,
+    this.marginLineWidth = 3,
+  });
+
+  /// 여백선 우측 끝 — 콘텐츠 좌측 padding 의 최소값.
+  double get marginLineRight => marginLineLeft + marginLineWidth;
 
   @override
   Widget build(BuildContext context) => Stack(
     children: [
       const Positioned.fill(child: ColoredBox(color: AppColors.paper)),
-      const Positioned(
-        left: 0, top: 0, bottom: 0, width: 3,
-        child: IgnorePointer(
+      Positioned(
+        left: marginLineLeft,
+        top: 0,
+        bottom: 0,
+        width: marginLineWidth,
+        child: const IgnorePointer(
           child: ColoredBox(color: AppColors.paperMargin),
         ),
       ),
-      child,
+      Positioned.fill(child: child),
     ],
   );
 }
 ```
+
+**파라미터**
+
+| 이름 | 기본값 | 설명 |
+|------|--------|------|
+| `marginLineLeft` | 14 | 여백선 왼쪽 offset. 기기 베젤·라운드 코너·SafeArea 에 가리지 않도록 기본값은 0이 아니다. |
+| `marginLineWidth` | 3 | 여백선 너비. **3px 고정 원칙**을 유지하되 극단적인 좁은 화면에서만 조정 허용 (§3.4 참조). |
+| `marginLineRight` | `marginLineLeft + marginLineWidth` | getter. 콘텐츠 좌측 padding 은 이 값 이상이어야 텍스트가 선과 겹치지 않는다. |
 
 ### 6.2 NotebookMasthead
 
