@@ -4,12 +4,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../data/services/backup_service.dart';
 import '../../domain/entities/backup_state.dart';
 import '../providers/backup_provider.dart';
@@ -24,8 +24,6 @@ class StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
-
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
@@ -66,7 +64,7 @@ class StatusCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.space1),
                     Text(
                       state.lastBackupDate != null
-                          ? '마지막 백업: ${dateFormat.format(state.lastBackupDate!)}'
+                          ? '마지막 백업: ${formatDateTimeDash(state.lastBackupDate!)}'
                           : '백업 기록 없음',
                       style: const TextStyle(
                         fontSize: 13,
@@ -590,8 +588,6 @@ class BackupItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateFormat = DateFormat('yyyy-MM-dd HH:mm');
-
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
@@ -613,7 +609,7 @@ class BackupItem extends ConsumerWidget {
           child: const Icon(Icons.archive, color: AppColors.secondary),
         ),
         title: Text(
-          dateFormat.format(backup.createdAt),
+          formatDateTimeDash(backup.createdAt),
           style: const TextStyle(
             fontWeight: FontWeight.w500,
             color: AppColors.textPrimaryLight,

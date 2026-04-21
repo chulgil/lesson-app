@@ -81,6 +81,15 @@ String formatDateTimeYMDHM(DateTime date) {
   return '${formatDateYMDShort(date)} ${formatTimeHM(date)}';
 }
 
+/// Format date as yyyy-MM-dd HH:mm (e.g., 2026-04-05 14:00)
+/// Use for logs, backup timestamps, and ISO-style displays.
+String formatDateTimeDash(DateTime date) {
+  final y = date.year.toString();
+  final m = date.month.toString().padLeft(2, '0');
+  final d = date.day.toString().padLeft(2, '0');
+  return '$y-$m-$d ${formatTimeHM(date)}';
+}
+
 /// Format time as 오전/오후 H:mm (e.g., 오후 2:30)
 String formatTimeAMPM(DateTime date) {
   final hour = date.hour;
