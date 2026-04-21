@@ -134,7 +134,7 @@ class _CareerEditScreenState extends ConsumerState<CareerEditScreen> {
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

@@ -333,7 +333,7 @@ class _AddManualTeacherScreenState
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

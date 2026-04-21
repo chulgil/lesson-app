@@ -279,7 +279,7 @@ class _DeleteButton extends StatelessWidget {
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.error,
                     ),
-                    child: const Text('삭제'),
+                    child: const Text(AppStrings.delete),
                   ),
                 ],
               ),

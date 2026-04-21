@@ -331,7 +331,7 @@ class _RecordingCardState extends ConsumerState<_RecordingCard> {
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

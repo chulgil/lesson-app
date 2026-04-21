@@ -360,7 +360,7 @@ class _RepertoireCard extends ConsumerWidget {
                   ref.invalidate(studentRepertoiresProvider(studentId));
                 },
                 style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

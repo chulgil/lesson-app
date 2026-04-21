@@ -761,7 +761,7 @@ class BackupItem extends ConsumerWidget {
                   backgroundColor: AppColors.error,
                 ),
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

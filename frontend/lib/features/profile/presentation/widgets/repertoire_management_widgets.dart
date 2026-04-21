@@ -760,7 +760,7 @@ void showDeletePieceConfirmation({
                 onConfirm();
               },
               style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-              child: const Text('삭제'),
+              child: const Text(AppStrings.delete),
             ),
           ],
         ),

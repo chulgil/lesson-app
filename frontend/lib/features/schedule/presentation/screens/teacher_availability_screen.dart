@@ -728,7 +728,7 @@ class _TeacherAvailabilityScreenState
               FilledButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 style: FilledButton.styleFrom(backgroundColor: AppColors.error),
-                child: const Text('삭제'),
+                child: const Text(AppStrings.delete),
               ),
             ],
           ),

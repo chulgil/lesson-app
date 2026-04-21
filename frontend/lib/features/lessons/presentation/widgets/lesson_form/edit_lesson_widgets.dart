@@ -231,7 +231,7 @@ void showDeleteLessonDialog({
                 onConfirm();
               },
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
-              child: const Text('삭제'),
+              child: const Text(AppStrings.delete),
             ),
           ],
         ),

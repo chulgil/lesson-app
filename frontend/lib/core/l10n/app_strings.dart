@@ -96,6 +96,9 @@ class AppStrings {
   /// 수정 버튼
   static const modify = '수정';
 
+  /// 삭제 버튼
+  static const delete = '삭제';
+
   /// 취소 버튼
   static const cancel = '취소';
 
