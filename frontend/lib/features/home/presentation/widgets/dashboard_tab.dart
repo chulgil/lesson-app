@@ -7,8 +7,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
+import '../../../../core/widgets/notebook/thin_rule.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -194,7 +196,7 @@ class DashboardTab extends ConsumerWidget {
             style: NotebookTypography.mastheadDate,
           ),
           const SizedBox(height: AppSpacing.space3),
-          const _ThinRule(),
+          const ThinRule(),
         ],
       ),
     );
@@ -354,43 +356,13 @@ class DashboardTab extends ConsumerWidget {
 
   Widget _buildLessonsList(BuildContext context, List<Lesson> lessons) {
     if (lessons.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(AppSpacing.space4),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Icon(Icons.event_available, color: AppColors.textTertiaryLight),
-                const SizedBox(width: AppSpacing.space3),
-                Text(
-                  '오늘 예정된 레슨이 없습니다',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.space3),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => context.push(AppRoutes.addLesson),
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('레슨 추가'),
-                style: OutlinedButton.styleFrom(
-                  side: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.5),
-                  ),
-                  foregroundColor: AppColors.primary,
-                ),
-              ),
-            ),
-          ],
-        ),
+      return EmptyStateWidget(
+        icon: Icons.event_available,
+        title: '오늘 예정된 레슨이 없습니다',
+        subtitle: '비어 있는 프로그램 — 새 레슨을 추가해 보세요.',
+        actionLabel: '레슨 추가',
+        actionIcon: Icons.add,
+        onAction: () => context.push(AppRoutes.addLesson),
       );
     }
 
@@ -461,7 +433,7 @@ class DashboardTab extends ConsumerWidget {
   Widget _buildAnalyticsLink(BuildContext context) {
     return Column(
       children: [
-        const _ThinRule(),
+        const ThinRule(),
         const SizedBox(height: AppSpacing.space3),
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -507,15 +479,5 @@ class DashboardTab extends ConsumerWidget {
         ],
       ),
     );
-  }
-}
-
-/// Notebook × Score 얇은 잉크 라인 — 섹션 구분용.
-class _ThinRule extends StatelessWidget {
-  const _ThinRule();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(height: 1, color: AppColors.inkQuaternary);
   }
 }
