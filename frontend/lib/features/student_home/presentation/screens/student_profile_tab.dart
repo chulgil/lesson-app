@@ -127,9 +127,7 @@ class StudentProfileTab extends ConsumerWidget {
           // App version
           Text(
             '버전 1.0.0',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
-            ),
+            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
           ),
 
           const SizedBox(height: AppSpacing.space6),
@@ -148,13 +146,7 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+      decoration: const BoxDecoration(color: AppColors.ink),
       child: SafeArea(
         child: Column(
           children: [
@@ -163,11 +155,11 @@ class StudentProfileTab extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 48,
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                  backgroundColor: AppColors.paper.withValues(alpha: 0.15),
                   child: Text(
                     initial,
                     style: AppTypography.displayMedium.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -177,20 +169,14 @@ class StudentProfileTab extends ConsumerWidget {
                   bottom: 0,
                   child: Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+                    decoration: const BoxDecoration(
+                      color: AppColors.paper,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 4,
-                        ),
-                      ],
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.camera_alt,
                       size: 16,
-                      color: AppColors.primary,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -202,7 +188,9 @@ class StudentProfileTab extends ConsumerWidget {
             // Name
             Text(
               name,
-              style: AppTypography.headingLarge.copyWith(color: Colors.white),
+              style: AppTypography.headingLarge.copyWith(
+                color: AppColors.paper,
+              ),
             ),
 
             const SizedBox(height: AppSpacing.space1),
@@ -210,7 +198,9 @@ class StudentProfileTab extends ConsumerWidget {
             // Email
             Text(
               email,
-              style: AppTypography.bodyMedium.copyWith(color: Colors.white70),
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.paper.withValues(alpha: 0.7),
+              ),
             ),
 
             const SizedBox(height: AppSpacing.space2),
@@ -219,18 +209,22 @@ class StudentProfileTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: AppColors.paper.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.music_note, size: 16, color: Colors.white),
+                  const Icon(
+                    Icons.music_note,
+                    size: 16,
+                    color: AppColors.paper,
+                  ),
                   const SizedBox(width: AppSpacing.space1),
                   Text(
                     instrument,
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -279,15 +273,13 @@ class StudentProfileTab extends ConsumerWidget {
         children: [
           Text(
             value,
-            style: AppTypography.headingMedium.copyWith(
-              color: AppColors.primary,
-            ),
+            style: AppTypography.headingMedium.copyWith(color: AppColors.ink),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -297,7 +289,7 @@ class StudentProfileTab extends ConsumerWidget {
   }
 
   Widget _buildDivider() {
-    return Container(width: 1, height: 40, color: AppColors.borderLight);
+    return Container(width: 1, height: 40, color: AppColors.inkQuaternary);
   }
 
   Widget _buildMenuSection(BuildContext context, WidgetRef ref) {
@@ -377,7 +369,7 @@ class StudentProfileTab extends ConsumerWidget {
           _buildMenuDivider(),
           _buildMenuItem(
             icon: Icons.family_restroom,
-            iconColor: AppColors.secondary,
+            iconColor: AppColors.paperAccent,
             title: '학부모 초대',
             subtitle: '학부모님과 연결하기',
             onTap: () => _showInviteCodeDialog(context, ref),
@@ -430,7 +422,7 @@ class StudentProfileTab extends ConsumerWidget {
                   context,
                 ).showSnackBar(const SnackBar(content: Text('다크 모드는 준비 중입니다')));
               },
-              activeThumbColor: AppColors.primary,
+              activeThumbColor: AppColors.paperAccent,
             ),
             onTap: () {
               ScaffoldMessenger.of(
@@ -493,7 +485,7 @@ class StudentProfileTab extends ConsumerWidget {
               child: Icon(
                 icon,
                 size: 20,
-                color: iconColor ?? AppColors.textSecondaryLight,
+                color: iconColor ?? AppColors.inkSecondary,
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -511,7 +503,7 @@ class StudentProfileTab extends ConsumerWidget {
                     Text(
                       subtitle,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                 ],
@@ -520,7 +512,7 @@ class StudentProfileTab extends ConsumerWidget {
             if (trailing != null)
               trailing
             else
-              Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+              Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),
@@ -531,7 +523,7 @@ class StudentProfileTab extends ConsumerWidget {
     return Divider(
       height: 1,
       indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-      color: AppColors.borderLight,
+      color: AppColors.inkQuaternary,
     );
   }
 
@@ -540,11 +532,11 @@ class StudentProfileTab extends ConsumerWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () => _showLogoutDialog(context),
-        icon: Icon(Icons.logout, color: AppColors.error),
-        label: Text('로그아웃', style: TextStyle(color: AppColors.error)),
+        icon: Icon(Icons.logout, color: AppColors.paperAccent),
+        label: Text('로그아웃', style: TextStyle(color: AppColors.paperAccent)),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.space4),
-          side: BorderSide(color: AppColors.error.withValues(alpha: 0.5)),
+          side: BorderSide(color: AppColors.paperAccent.withValues(alpha: 0.5)),
         ),
       ),
     );
@@ -567,7 +559,10 @@ class StudentProfileTab extends ConsumerWidget {
                   Navigator.pop(context);
                   context.go(AppRoutes.login);
                 },
-                child: Text('로그아웃', style: TextStyle(color: AppColors.error)),
+                child: Text(
+                  '로그아웃',
+                  style: TextStyle(color: AppColors.paperAccent),
+                ),
               ),
             ],
           ),
@@ -613,11 +608,11 @@ class StudentProfileTab extends ConsumerWidget {
                     vertical: AppSpacing.space4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withValues(alpha: 0.2),
+                    color: AppColors.paperAccentSoft,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    border: Border.all(color: AppColors.primary),
+                    border: Border.all(color: AppColors.paperAccent),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -630,7 +625,7 @@ class StudentProfileTab extends ConsumerWidget {
                             child: Text(
                               digit,
                               style: AppTypography.headingLarge.copyWith(
-                                color: AppColors.primary,
+                                color: AppColors.paperAccent,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 2,
                               ),
@@ -643,7 +638,7 @@ class StudentProfileTab extends ConsumerWidget {
                 Text(
                   '이 코드를 학부모님께 전달해주세요.\n학부모님이 앱에서 코드를 입력하면\n연결됩니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -651,7 +646,7 @@ class StudentProfileTab extends ConsumerWidget {
                 Text(
                   '* 코드는 24시간 동안 유효합니다',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],

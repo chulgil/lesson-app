@@ -128,7 +128,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       Text(
                         _formatDate(_selectedDate),
                         style: AppTypography.headingSmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       if (_isToday()) ...[
@@ -139,7 +139,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
+                            color: AppColors.paperAccentSoft,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSmall,
                             ),
@@ -147,7 +147,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                           child: Text(
                             '오늘',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -158,7 +158,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                       Text(
                         '$sectionCount개 섹션',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space3),
@@ -173,7 +173,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                         Text(
                           _formatDate(_selectedDate),
                           style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                         const Spacer(),
@@ -186,7 +186,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                         Text(
                           _formatDate(_selectedDate),
                           style: AppTypography.headingSmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                         const Spacer(),
@@ -251,8 +251,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                             size: 18,
                             color:
                                 type == sortType
-                                    ? AppColors.primary
-                                    : AppColors.textSecondaryLight,
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
                           ),
                           const SizedBox(width: AppSpacing.space2),
                           Text(
@@ -260,8 +260,8 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
                             style: TextStyle(
                               color:
                                   type == sortType
-                                      ? AppColors.primary
-                                      : AppColors.textPrimaryLight,
+                                      ? AppColors.paperAccent
+                                      : AppColors.ink,
                               fontWeight:
                                   type == sortType
                                       ? FontWeight.w600
@@ -279,7 +279,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
           vertical: AppSpacing.space1,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
         ),
         child: Row(
@@ -288,20 +288,20 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
             Icon(
               _getSortIcon(sortType),
               size: 16,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
               sortType.displayName,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(width: 2),
             Icon(
               Icons.arrow_drop_down,
               size: 16,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ],
         ),
@@ -348,13 +348,13 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
             Icon(
               Icons.library_music_outlined,
               size: 64,
-              color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
+              color: AppColors.inkSecondary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               _isToday() ? '오늘 연습할 레퍼토리가 없습니다' : '이 날짜에 연습 기록이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -449,11 +449,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.menu_book,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
+                        Icon(Icons.menu_book, color: AppColors.ink, size: 24),
                         const SizedBox(width: AppSpacing.space2),
                         Expanded(
                           child: Column(
@@ -466,7 +462,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                               Text(
                                 widget.repertoire.dateRangeText,
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.textSecondaryLight,
+                                  color: AppColors.inkSecondary,
                                 ),
                               ),
                             ],
@@ -476,7 +472,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     ),
                   ),
                 ),
-                // Add section button - square with purple background
+                // Add section button — ink square (Notebook × Score)
                 GestureDetector(
                   onTap: () {
                     context.push(
@@ -487,10 +483,14 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     width: 28,
                     height: 28,
                     decoration: BoxDecoration(
-                      color: AppColors.primary,
+                      color: AppColors.ink,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.add, color: Colors.white, size: 18),
+                    child: const Icon(
+                      Icons.add,
+                      color: AppColors.paper,
+                      size: 18,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space1),
@@ -505,7 +505,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
                     _isExpanded
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
@@ -538,7 +538,7 @@ class _RepertoireCardState extends ConsumerState<_RepertoireCard> {
               child: Text(
                 '이 날짜에 표시할 섹션이 없습니다',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -570,7 +570,7 @@ class _SectionTile extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: InkWell(
         onTap: () {
@@ -614,8 +614,8 @@ class _SectionTile extends ConsumerWidget {
                       : Icons.radio_button_unchecked,
                   color:
                       isCompletedForDate
-                          ? AppColors.success
-                          : AppColors.textSecondaryLight,
+                          ? AppColors.paperOk
+                          : AppColors.inkSecondary,
                   size: 22,
                 ),
               const SizedBox(width: AppSpacing.space2),
@@ -633,15 +633,13 @@ class _SectionTile extends ConsumerWidget {
                                 ? TextDecoration.lineThrough
                                 : null,
                         color:
-                            isCompletedForDate
-                                ? AppColors.textSecondaryLight
-                                : null,
+                            isCompletedForDate ? AppColors.inkSecondary : null,
                       ),
                     ),
                     Text(
                       section.rangeText,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -660,10 +658,8 @@ class _SectionTile extends ConsumerWidget {
                     Icons.repeat,
                     color:
                         section.isRepeat
-                            ? AppColors.primary
-                            : AppColors.textSecondaryLight.withValues(
-                              alpha: 0.5,
-                            ),
+                            ? AppColors.paperAccent
+                            : AppColors.inkSecondary.withValues(alpha: 0.5),
                     size: 20,
                   ),
                   tooltip: section.isRepeat ? '매일 반복' : '반복 안함',
@@ -677,7 +673,7 @@ class _SectionTile extends ConsumerWidget {
               // Arrow
               const Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 size: 20,
               ),
             ],

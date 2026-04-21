@@ -67,9 +67,10 @@ class _StudentProfileEditScreenState
           _nameController.text = student.name;
           _emailController.text = student.email ?? '';
           _phoneController.text = student.phone ?? '';
-          _selectedInstrument = _instruments.contains(student.instrument)
-              ? student.instrument
-              : '바이올린';
+          _selectedInstrument =
+              _instruments.contains(student.instrument)
+                  ? student.instrument
+                  : '바이올린';
           _isLoading = false;
         });
       } else if (mounted) {
@@ -112,17 +113,17 @@ class _StudentProfileEditScreenState
       await ref.read(studentsNotifierProvider.notifier).updateStudent(updated);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('프로필이 저장되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('프로필이 저장되었습니다')));
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('저장에 실패했습니다. 다시 시도해주세요.')));
       }
     }
   }
@@ -142,21 +143,23 @@ class _StudentProfileEditScreenState
         actions: [
           TextButton(
             onPressed: _hasChanges && !_isSaving ? _onSave : null,
-            child: _isSaving
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Text(
-                    '저장',
-                    style: TextStyle(
-                      color: _hasChanges
-                          ? AppColors.primary
-                          : AppColors.textTertiaryLight,
-                      fontWeight: FontWeight.w600,
+            child:
+                _isSaving
+                    ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : Text(
+                      '저장',
+                      style: TextStyle(
+                        color:
+                            _hasChanges
+                                ? AppColors.paperAccent
+                                : AppColors.inkTertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
           ),
         ],
       ),
@@ -164,9 +167,7 @@ class _StudentProfileEditScreenState
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
           // Profile image section
-          Center(
-            child: _buildProfileImageSection(),
-          ),
+          Center(child: _buildProfileImageSection()),
 
           const SizedBox(height: AppSpacing.space8),
 
@@ -216,22 +217,20 @@ class _StudentProfileEditScreenState
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.08),
+              color: AppColors.ink.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(
-                color: AppColors.info.withValues(alpha: 0.2),
-              ),
+              border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.info_outline, size: 20, color: AppColors.info),
+                Icon(Icons.info_outline, size: 20, color: AppColors.ink),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Text(
                     '프로필 정보는 선생님에게 공유됩니다.\n정확한 정보를 입력해주세요.',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.info,
+                      color: AppColors.ink,
                       height: 1.5,
                     ),
                   ),
@@ -249,7 +248,7 @@ class _StudentProfileEditScreenState
       label,
       style: AppTypography.bodySmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
       ),
     );
   }
@@ -268,7 +267,7 @@ class _StudentProfileEditScreenState
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
         filled: true,
         fillColor: AppColors.surfaceLight,
@@ -278,15 +277,15 @@ class _StudentProfileEditScreenState
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: BorderSide(color: AppColors.borderLight),
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: BorderSide(color: AppColors.borderLight),
+          borderSide: BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: AppColors.ink, width: 1.5),
         ),
       ),
     );
@@ -298,23 +297,21 @@ class _StudentProfileEditScreenState
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedInstrument,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down,
-              color: AppColors.textSecondaryLight),
-          style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textPrimaryLight,
-          ),
-          items: _instruments.map((instrument) {
-            return DropdownMenuItem(
-              value: instrument,
-              child: Text(instrument),
-            );
-          }).toList(),
+          icon: Icon(Icons.keyboard_arrow_down, color: AppColors.inkSecondary),
+          style: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
+          items:
+              _instruments.map((instrument) {
+                return DropdownMenuItem(
+                  value: instrument,
+                  child: Text(instrument),
+                );
+              }).toList(),
           onChanged: (value) {
             if (value != null) {
               setState(() {
@@ -330,28 +327,32 @@ class _StudentProfileEditScreenState
 
   Widget _buildProfileImageSection() {
     final studentId = _currentStudent?.id;
-    final imagePath = studentId != null
-        ? ref.watch(studentProfileImageNotifierProvider(studentId)).valueOrNull
-        : null;
+    final imagePath =
+        studentId != null
+            ? ref
+                .watch(studentProfileImageNotifierProvider(studentId))
+                .valueOrNull
+            : null;
 
     return Stack(
       children: [
         CircleAvatar(
           radius: 48,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+          backgroundColor: AppColors.paperDark,
           backgroundImage:
               imagePath != null ? FileImage(File(imagePath)) : null,
-          child: imagePath == null
-              ? Text(
-                  _nameController.text.isNotEmpty
-                      ? _nameController.text[0]
-                      : '?',
-                  style: AppTypography.displayMedium.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              : null,
+          child:
+              imagePath == null
+                  ? Text(
+                    _nameController.text.isNotEmpty
+                        ? _nameController.text[0]
+                        : '?',
+                    style: AppTypography.displayMedium.copyWith(
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                  : null,
         ),
         Positioned(
           right: 0,
@@ -360,20 +361,14 @@ class _StudentProfileEditScreenState
             onTap: () => _onTapProfileImage(),
             child: Container(
               padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
+              decoration: const BoxDecoration(
+                color: AppColors.ink,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.camera_alt,
                 size: 16,
-                color: Colors.white,
+                color: AppColors.paper,
               ),
             ),
           ),
@@ -386,8 +381,9 @@ class _StudentProfileEditScreenState
     final studentId = _currentStudent?.id;
     if (studentId == null) return;
 
-    final notifier =
-        ref.read(studentProfileImageNotifierProvider(studentId).notifier);
+    final notifier = ref.read(
+      studentProfileImageNotifierProvider(studentId).notifier,
+    );
     final currentPath =
         ref.read(studentProfileImageNotifierProvider(studentId)).valueOrNull;
 
@@ -404,9 +400,10 @@ class _StudentProfileEditScreenState
       return;
     }
 
-    final source = action == ImagePickerAction.camera
-        ? ImageSource.camera
-        : ImageSource.gallery;
+    final source =
+        action == ImagePickerAction.camera
+            ? ImageSource.camera
+            : ImageSource.gallery;
 
     if (!mounted) return;
     await notifier.pickAndSaveImage(source, context);

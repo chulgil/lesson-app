@@ -229,7 +229,7 @@ class StudentLessonsTab extends ConsumerWidget {
           Text(
             formatDateMDWithDayLong(selectedDate),
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           if (isToday) ...[
@@ -237,13 +237,13 @@ class StudentLessonsTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
+                color: AppColors.paperAccentSoft,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 '오늘',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -253,7 +253,7 @@ class StudentLessonsTab extends ConsumerWidget {
           Text(
             '$totalCount개 레슨',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -280,7 +280,7 @@ class StudentLessonsTab extends ConsumerWidget {
                             Icon(
                               Icons.check,
                               size: 16,
-                              color: AppColors.primary,
+                              color: AppColors.paperAccent,
                             )
                           else
                             const SizedBox(width: AppSpacing.space4),
@@ -297,14 +297,14 @@ class StudentLessonsTab extends ConsumerWidget {
           Text(
             sortType.displayName,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(width: 2),
           Icon(
             Icons.keyboard_arrow_down,
             size: 16,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ],
       ),
@@ -370,21 +370,21 @@ class StudentLessonsTab extends ConsumerWidget {
               child: Icon(
                 Icons.event_available,
                 size: 48,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '예정된 레슨이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '새로운 레슨을 예약해보세요',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.space4),
