@@ -141,7 +141,7 @@ class PracticeSummarySection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
@@ -173,7 +173,7 @@ class PracticeSummarySection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),
@@ -202,9 +202,9 @@ class PracticeSummarySection extends ConsumerWidget {
                         isFuture
                             ? AppColors.inkQuaternary
                             : value >= 0.8
-                            ? AppColors.practiceGood
+                            ? AppColors.paperOk
                             : value >= 0.5
-                            ? AppColors.practiceNormal
+                            ? AppColors.inkTertiary
                             : value > 0
                             ? AppColors.practicePoor
                             : AppColors.inkQuaternary,

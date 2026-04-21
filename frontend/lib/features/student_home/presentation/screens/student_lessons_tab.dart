@@ -364,7 +364,7 @@ class StudentLessonsTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 shape: BoxShape.circle,
               ),
               child: Icon(
