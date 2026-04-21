@@ -268,8 +268,9 @@ Text(
 | Phase 1 | 선생님 홈화면 — 토큰 + PaperScaffold + NotebookMasthead + Programme Title + 로마숫자 레슨 리스트 + Fine. 푸터 | **완료** (2026-04-21, f425ff11) |
 | Phase 2 | 공통 위젯 (StatCard/EmptyStateWidget/ThinRule/SectionHeader) + 홈 섹션 (SubscriptionBadge/TimeContextBanner/GettingStartedCard/LessonRequestSection) + 대시보드 서브위젯 (LessonCard/AssignmentSummarySection/ScheduleChangeRequestSection/UrgentAlertZone) | **완료** (2026-04-21, 3462459b + c361592d + 89f04f94) |
 | Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
-| Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **진행 중** (a4b8f54f + 4094f677: 쉘·대시보드·카드 완료 / 학생 설정·프로필은 Phase 5) |
-| Phase 5 | 전 화면 확산 (설정/프로필/수강권/스케줄) | 계획됨 |
+| Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **완료** (a4b8f54f + 4094f677 + 199c491f + 6cc52ca0) |
+| Phase 5 | 학생 설정·프로필 화면 확산 (선생님 목록·도움말·알림 설정·앱 정보·약관·수동 선생님 추가) | **진행 중** (b365c8b5 + da93a738 + e2d97784 + 24c359dd) |
+| Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | 계획됨 |
 
 ### 7.1 Phase 1 실제 산출물
 
@@ -313,7 +314,17 @@ Text(
 | 체험/예약 | `trial_bookings_section.dart` | surfaceSecondaryLight → paperDark |
 | 설정 시트 | `language_select_sheet.dart` · `practice_reminder_sheet.dart` | primary → paperAccent, surfaceLight → paper |
 | 엔티티 | `domain/entities/manual_teacher.dart` | 프로필 색상 팔레트 ink/paperAccent/paperOk/paperHighlight 로 재정의 |
-| 보류 | `student_profile_*.dart` · `my_teachers_screen.dart` · `notification_settings_screen.dart` · `help_screen.dart` · `app_info_screen.dart` | Phase 5 (설정·프로필 확산) 대상 |
+| 보류 | `student_profile_*.dart` | Phase 5 후반부 (프로필 편집·탭) 대상 |
+
+### 7.4 Phase 5 진행 산출물 (커밋 b365c8b5 + da93a738 + e2d97784 + 24c359dd)
+
+| 영역 | 경로 | 상태 |
+|------|------|------|
+| 설정 스크린 | `my_teachers_screen.dart` · `notification_settings_screen.dart` · `app_info_screen.dart` | legacy → Notebook 팔레트 |
+| 도움말/선생님 추가 | `help_screen.dart` · `add_manual_teacher_screen.dart` | legacy → Notebook 팔레트 |
+| 약관/정책 | `legal_document_screen.dart` | info 박스 → paperDark + inkQuaternary 테두리 |
+| 주간 연습 | `weekly_practice_widget.dart` | surfaceLight → paper, practiceGood → paperOk |
+| 보류 | `student_profile_tab.dart` · `student_profile_edit_screen.dart` | Phase 5 후반부 대상 |
 
 ---
 
