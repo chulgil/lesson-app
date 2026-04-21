@@ -47,7 +47,7 @@ class SubscriptionCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
               color: SubscriptionStatusColors.getBorderColor(subscription),
@@ -77,7 +77,7 @@ class SubscriptionCard extends StatelessWidget {
                         Text(
                           instrument!,
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                     ],
@@ -102,7 +102,7 @@ class SubscriptionCard extends StatelessWidget {
                       Text(
                         subscription.typeLabel,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.space1),
@@ -238,7 +238,7 @@ class SubscriptionCard extends StatelessWidget {
           CircularProgressIndicator(
             value: percentage / 100,
             strokeWidth: 4,
-            backgroundColor: AppColors.borderLight,
+            backgroundColor: AppColors.inkQuaternary,
             valueColor: AlwaysStoppedAnimation<Color>(progressColor),
           ),
           Text(
@@ -266,7 +266,7 @@ class SubscriptionCard extends StatelessWidget {
           child: LinearProgressIndicator(
             value: percentage / 100,
             minHeight: 6,
-            backgroundColor: AppColors.borderLight,
+            backgroundColor: AppColors.inkQuaternary,
             valueColor: AlwaysStoppedAnimation<Color>(
               SubscriptionStatusColors.getProgressColor(subscription),
             ),
@@ -288,7 +288,7 @@ class SubscriptionCard extends StatelessWidget {
               Text(
                 '(기본 $base + 보너스 ${subscription.bonusCount})',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
           ],
@@ -301,7 +301,7 @@ class SubscriptionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight.withValues(alpha: 0.5),
+        color: AppColors.paperDark.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Column(
@@ -311,7 +311,7 @@ class SubscriptionCard extends StatelessWidget {
             '📋 상세',
             style: AppTypography.caption.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -350,7 +350,7 @@ class SubscriptionCard extends StatelessWidget {
               subscription.totalRescheduleAllowance,
             ),
             valueColor: subscription.remainingReschedule <= 0
-                ? AppColors.textTertiaryLight
+                ? AppColors.inkTertiary
                 : subscription.remainingReschedule == 1
                     ? AppColors.warning
                     : null,
@@ -425,13 +425,13 @@ class SubscriptionCard extends StatelessWidget {
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(
             value,
             style: AppTypography.caption.copyWith(
-              color: valueColor ?? AppColors.textPrimaryLight,
+              color: valueColor ?? AppColors.ink,
               fontWeight: isBold ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -483,7 +483,7 @@ class SubscriptionCard extends StatelessWidget {
     if (subscription.remainingReschedule <= 0) {
       warnings.add((
         text: AppStrings.rescheduleUnavailable,
-        color: AppColors.textTertiaryLight,
+        color: AppColors.inkTertiary,
       ));
     } else if (subscription.remainingReschedule == 1) {
       warnings.add((

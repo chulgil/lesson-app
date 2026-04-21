@@ -92,7 +92,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
       parts.join(' '),
       style: AppTypography.bodySmall.copyWith(
         fontWeight: FontWeight.w500,
-        color: AppColors.textPrimaryLight,
+        color: AppColors.ink,
       ),
     );
   }
@@ -101,7 +101,7 @@ class SubscriptionIssuedCard extends StatelessWidget {
     return Text(
       text,
       style: AppTypography.caption.copyWith(
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
       ),
     );
   }

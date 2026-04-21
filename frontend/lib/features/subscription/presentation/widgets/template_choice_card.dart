@@ -33,10 +33,10 @@ class TemplateChoiceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isRecommended ? AppColors.primary : AppColors.borderLight,
+          color: isRecommended ? AppColors.primary : AppColors.inkQuaternary,
           width: isRecommended ? 2 : 1,
         ),
       ),
@@ -82,7 +82,7 @@ class TemplateChoiceCard extends StatelessWidget {
           Text(
             '${formatWonWithComma(template.price)}  ·  유효 ${template.validityDays}일',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
 
@@ -92,7 +92,7 @@ class TemplateChoiceCard extends StatelessWidget {
           Text(
             '주 1회 기준 약 $monthsLabel개월',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
 
@@ -104,7 +104,7 @@ class TemplateChoiceCard extends StatelessWidget {
               style: AppTypography.bodySmall.copyWith(
                 color: isRecommended
                     ? AppColors.primary
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
                 fontWeight:
                     isRecommended ? FontWeight.w600 : FontWeight.w400,
               ),
@@ -123,9 +123,9 @@ class TemplateChoiceCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isRecommended
                       ? AppColors.primary
-                      : AppColors.surfaceSecondaryLight,
+                      : AppColors.paperDark,
                   foregroundColor:
-                      isRecommended ? Colors.white : AppColors.textPrimaryLight,
+                      isRecommended ? Colors.white : AppColors.ink,
                   shape: RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusMedium),

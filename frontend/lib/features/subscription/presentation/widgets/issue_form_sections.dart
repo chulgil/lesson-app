@@ -60,10 +60,10 @@ class SubscriptionTypeSelector extends StatelessWidget {
             color:
                 isSelected
                     ? AppColors.primary.withValues(alpha: 0.1)
-                    : AppColors.surfaceLight,
+                    : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -74,7 +74,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
                 color:
                     isSelected
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
@@ -83,7 +83,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
                   color:
                       isSelected
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
@@ -126,7 +126,7 @@ class SubscriptionTypeSelector extends StatelessWidget {
             child: Text(
               description,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 height: 1.4,
               ),
             ),
@@ -197,18 +197,18 @@ class PaymentStatusSection extends StatelessWidget {
                     onSelected: (_) => onPaymentMethodChanged(method),
                     selectedColor: AppColors.primary.withValues(alpha: 0.15),
                     checkmarkColor: AppColors.primary,
-                    backgroundColor: AppColors.surfaceLight,
+                    backgroundColor: AppColors.paper,
                     side: BorderSide(
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.borderLight,
+                              : AppColors.inkQuaternary,
                     ),
                     labelStyle: AppTypography.bodySmall.copyWith(
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
@@ -276,10 +276,10 @@ class _PaymentStatusChip extends StatelessWidget {
           color:
               isSelected
                   ? color.withValues(alpha: 0.1)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? color : AppColors.borderLight,
+            color: isSelected ? color : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -289,13 +289,13 @@ class _PaymentStatusChip extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? color : AppColors.textSecondaryLight,
+              color: isSelected ? color : AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: isSelected ? color : AppColors.textSecondaryLight,
+                color: isSelected ? color : AppColors.inkSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -360,7 +360,7 @@ class AmountInputSection extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.textPrimaryLight,
+                                : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -368,7 +368,7 @@ class AmountInputSection extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.borderLight,
+                                : AppColors.inkQuaternary,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
@@ -394,14 +394,14 @@ class AmountInputSection extends StatelessWidget {
             hintText: '직접 입력',
             suffixText: '원',
             filled: true,
-            fillColor: AppColors.surfaceLight,
+            fillColor: AppColors.paper,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
           onChanged: (value) {
@@ -420,7 +420,7 @@ class AmountInputSection extends StatelessWidget {
           Text(
             '회당 ${formatWonWithComma((originalAmount / totalLessons).round())}',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -462,20 +462,20 @@ class StartDatePickerField extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(
               children: [
-                Icon(Icons.calendar_today, color: AppColors.textSecondaryLight),
+                Icon(Icons.calendar_today, color: AppColors.inkSecondary),
                 const SizedBox(width: AppSpacing.space3),
                 Text(
                   startDate != null ? formatDateYMDKorean(startDate!) : '날짜 선택',
                   style: AppTypography.bodyMedium,
                 ),
                 const Spacer(),
-                Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+                Icon(Icons.chevron_right, color: AppColors.inkTertiary),
               ],
             ),
           ),

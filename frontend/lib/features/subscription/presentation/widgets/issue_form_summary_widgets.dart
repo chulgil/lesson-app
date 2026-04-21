@@ -35,7 +35,7 @@ class SummaryRow extends StatelessWidget {
           Text(
             label,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(
@@ -44,7 +44,7 @@ class SummaryRow extends StatelessWidget {
               fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
               color:
                   valueColor ??
-                  (strikethrough ? AppColors.textTertiaryLight : null),
+                  (strikethrough ? AppColors.inkTertiary : null),
               decoration: strikethrough ? TextDecoration.lineThrough : null,
             ),
           ),
@@ -127,7 +127,7 @@ class _PolicyLine extends StatelessWidget {
             child: Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -135,7 +135,7 @@ class _PolicyLine extends StatelessWidget {
             child: Text(
               value,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
                 fontWeight: FontWeight.w500,
               ),
             ),

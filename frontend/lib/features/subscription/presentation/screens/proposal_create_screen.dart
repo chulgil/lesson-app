@@ -96,20 +96,20 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           Icon(
             Icons.people_outline,
             size: 64,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '등록된 학생이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '학생을 먼저 추가해주세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -125,20 +125,20 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           Icon(
             Icons.inventory_2_outlined,
             size: 64,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '수강권 템플릿이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '먼저 수강권 템플릿을 생성해주세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           const SizedBox(height: AppSpacing.space6),
@@ -236,9 +236,9 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButtonFormField<String>(
         initialValue: effectiveSelection,
@@ -347,7 +347,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
             child: Text(
               '${_selectedTemplateIds.length}/$kMaxTemplateSelections개 선택',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -401,9 +401,9 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
   Widget _buildMessageInput() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
         controller: _messageController,
@@ -468,7 +468,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
                   vertical: AppSpacing.space4,
                 ),
                 side: BorderSide(
-                  color: canSubmit ? AppColors.primary : AppColors.borderLight,
+                  color: canSubmit ? AppColors.primary : AppColors.inkQuaternary,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -481,7 +481,7 @@ class _ProposalCreateScreenState extends ConsumerState<ProposalCreateScreen> {
           Text(
             '즉시 발급: 학생 확인 없이 바로 수강권을 발급합니다',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),

@@ -109,13 +109,13 @@ class _ProposalSettingsScreenState
         color:
             _autoProposalEnabled
                 ? AppColors.success.withValues(alpha: 0.1)
-                : AppColors.surfaceLight,
+                : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
           color:
               _autoProposalEnabled
                   ? AppColors.success.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -137,7 +137,7 @@ class _ProposalSettingsScreenState
                     Text(
                       '체험레슨 완료 시 수강권을 자동으로 제안합니다',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -203,7 +203,7 @@ class _ProposalSettingsScreenState
         Text(
           '선택하지 않으면 모든 활성 수강권이 제안됩니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -215,22 +215,22 @@ class _ProposalSettingsScreenState
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: AppColors.paper,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.info_outline,
                       size: 20,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
                       '수강권 템플릿이 없습니다',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -282,7 +282,7 @@ class _ProposalSettingsScreenState
                             color:
                                 isSelected
                                     ? AppColors.primary.withValues(alpha: 0.05)
-                                    : AppColors.surfaceLight,
+                                    : AppColors.paper,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusLarge,
                             ),
@@ -290,7 +290,7 @@ class _ProposalSettingsScreenState
                               color:
                                   isSelected
                                       ? AppColors.primary
-                                      : AppColors.borderLight,
+                                      : AppColors.inkQuaternary,
                               width: isSelected ? 2 : 1,
                             ),
                           ),
@@ -308,7 +308,7 @@ class _ProposalSettingsScreenState
                                     color:
                                         isSelected
                                             ? AppColors.primary
-                                            : AppColors.borderLight,
+                                            : AppColors.inkQuaternary,
                                     width: 2,
                                   ),
                                   color:
@@ -355,7 +355,7 @@ class _ProposalSettingsScreenState
                                     Text(
                                       '${template.totalLessons}회 · ${template.formattedPrice}',
                                       style: AppTypography.caption.copyWith(
-                                        color: AppColors.textSecondaryLight,
+                                        color: AppColors.inkSecondary,
                                       ),
                                     ),
                                   ],
@@ -381,7 +381,7 @@ class _ProposalSettingsScreenState
                                               ? AppColors.warning.withValues(
                                                 alpha: 0.2,
                                               )
-                                              : AppColors.surfaceSecondaryLight,
+                                              : AppColors.paperDark,
                                       borderRadius: BorderRadius.circular(
                                         AppSpacing.radiusSmall,
                                       ),
@@ -445,16 +445,16 @@ class _ProposalSettingsScreenState
         Text(
           '체험 완료 후 일정 시간 내 결제 시 할인을 적용합니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             children: [
@@ -572,16 +572,16 @@ class _ProposalSettingsScreenState
         Text(
           '제안 후 응답이 없으면 자동으로 알림을 보냅니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
         Container(
           padding: const EdgeInsets.all(AppSpacing.space4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Row(
             children: [
@@ -593,7 +593,7 @@ class _ProposalSettingsScreenState
                     Text(
                       '24시간, 48시간, 72시간 후 알림',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],

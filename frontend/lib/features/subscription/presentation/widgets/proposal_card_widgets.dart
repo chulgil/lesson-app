@@ -41,14 +41,14 @@ class ProposalStatusBanner extends StatelessWidget {
         message = '스킵한 제안입니다';
         break;
       case ProposalStatus.expired:
-        backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.1);
-        textColor = AppColors.textTertiaryLight;
+        backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
+        textColor = AppColors.inkTertiary;
         icon = Icons.timer_off;
         message = '제안이 만료되었습니다';
         break;
       case ProposalStatus.cancelled:
-        backgroundColor = AppColors.textTertiaryLight.withValues(alpha: 0.1);
-        textColor = AppColors.textTertiaryLight;
+        backgroundColor = AppColors.inkTertiary.withValues(alpha: 0.1);
+        textColor = AppColors.inkTertiary;
         icon = Icons.block;
         message = '선생님이 제안을 취소했습니다';
         break;
@@ -95,9 +95,9 @@ class ProposalHeaderCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -125,7 +125,7 @@ class ProposalHeaderCard extends StatelessWidget {
           Text(
             '선생님 제안',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           if (proposal.status == ProposalStatus.pending) ...[
@@ -136,7 +136,7 @@ class ProposalHeaderCard extends StatelessWidget {
                 color:
                     proposal.timeUntilExpiration.inDays < 2
                         ? AppColors.warning
-                        : AppColors.textTertiaryLight,
+                        : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -157,9 +157,9 @@ class ProposalDetailsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -182,7 +182,7 @@ class ProposalDetailsCard extends StatelessWidget {
         Text(
           label,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         Text(
@@ -283,14 +283,14 @@ class ProposalDiscountCard extends StatelessWidget {
               Text(
                 '정가',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               Text(
                 template.formattedPrice,
                 style: AppTypography.bodySmall.copyWith(
                   decoration: TextDecoration.lineThrough,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -302,7 +302,7 @@ class ProposalDiscountCard extends StatelessWidget {
               Text(
                 '할인',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               Text(
@@ -388,9 +388,9 @@ class _ProposalPaymentInfoCardState extends State<ProposalPaymentInfoCard> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,7 +493,7 @@ class _PaymentInfoRow extends StatelessWidget {
         Text(
           label,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         Row(
@@ -573,7 +573,7 @@ class ProposalWaitingCard extends StatelessWidget {
             '선생님이 입금을 확인하면 수강권이 발급됩니다.\n입금 확인까지 1~2일 정도 소요될 수 있습니다.',
             textAlign: TextAlign.center,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),

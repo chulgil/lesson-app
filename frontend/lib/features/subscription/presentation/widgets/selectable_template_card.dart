@@ -50,7 +50,7 @@ class SelectableTemplateCard extends StatelessWidget {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           boxShadow:
@@ -103,7 +103,7 @@ class SelectableTemplateCard extends StatelessWidget {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.textPrimaryLight,
+                                : AppColors.ink,
                       ),
                     ),
                   ),
@@ -117,7 +117,7 @@ class SelectableTemplateCard extends StatelessWidget {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.borderLight,
+                              : AppColors.inkQuaternary,
                     ),
                     child:
                         isSelected
@@ -136,7 +136,7 @@ class SelectableTemplateCard extends StatelessWidget {
               Text(
                 '${template.totalLessons}회 · ${template.lessonDurationMinutes}분 · ${template.formattedValidity}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
@@ -151,14 +151,14 @@ class SelectableTemplateCard extends StatelessWidget {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.textPrimaryLight,
+                              : AppColors.ink,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '(1회 ${template.formattedPricePerLesson})',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
@@ -171,7 +171,7 @@ class SelectableTemplateCard extends StatelessWidget {
                 Text(
                   template.description!,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

@@ -46,7 +46,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             vertical: AppSpacing.space2,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
@@ -140,7 +140,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             child: Container(
               width: 20,
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: AppColors.paperDark,
                 shape: BoxShape.circle,
               ),
             ),
@@ -153,7 +153,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             child: Container(
               width: 20,
               decoration: BoxDecoration(
-                color: AppColors.backgroundLight,
+                color: AppColors.paperDark,
                 shape: BoxShape.circle,
               ),
             ),
@@ -193,7 +193,7 @@ class SubscriptionTicketCard extends StatelessWidget {
               Text(
                 subscription.typeLabel,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               // Remaining count
@@ -217,7 +217,7 @@ class SubscriptionTicketCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: total > 0 ? (total - remaining) / total : 0,
               minHeight: 6,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor: AppColors.inkQuaternary,
               valueColor: AlwaysStoppedAnimation<Color>(
                 SubscriptionStatusColors.getProgressColor(subscription),
               ),
@@ -236,7 +236,7 @@ class SubscriptionTicketCard extends StatelessWidget {
                 Text(
                   _formatPeriod(subscription.startDate!, subscription.endDate!),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
 
@@ -250,7 +250,7 @@ class SubscriptionTicketCard extends StatelessWidget {
                   color:
                       subscription.canReschedule
                           ? accentColor.withValues(alpha: 0.1)
-                          : AppColors.borderLight.withValues(alpha: 0.5),
+                          : AppColors.inkQuaternary.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 child: Text(
@@ -259,7 +259,7 @@ class SubscriptionTicketCard extends StatelessWidget {
                     color:
                         subscription.canReschedule
                             ? accentColor
-                            : AppColors.textTertiaryLight,
+                            : AppColors.inkTertiary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

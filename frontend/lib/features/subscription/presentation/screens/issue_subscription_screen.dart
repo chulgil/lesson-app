@@ -547,7 +547,7 @@ class _IssueSubscriptionScreenState
         Text(
           '학생이 예약 변경 또는 취소할 수 있는 횟수입니다. 소진 시 변경/취소 불가.',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         if (policy != null) ...[
@@ -560,7 +560,7 @@ class _IssueSubscriptionScreenState
               color:
                   matchesPolicy
                       ? AppColors.primary
-                      : AppColors.textTertiaryLight,
+                      : AppColors.inkTertiary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -577,12 +577,12 @@ class _IssueSubscriptionScreenState
                   onSelected:
                       (_) => setState(() => _rescheduleAllowance = count),
                   selectedColor: AppColors.primary,
-                  backgroundColor: AppColors.surfaceLight,
+                  backgroundColor: AppColors.paper,
                   labelStyle: AppTypography.bodySmall.copyWith(
                     color:
                         _rescheduleAllowance == count
                             ? Colors.white
-                            : AppColors.textPrimaryLight,
+                            : AppColors.ink,
                     fontWeight:
                         _rescheduleAllowance == count
                             ? FontWeight.w600
@@ -592,7 +592,7 @@ class _IssueSubscriptionScreenState
                     color:
                         _rescheduleAllowance == count
                             ? AppColors.primary
-                            : AppColors.borderLight,
+                            : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
@@ -613,7 +613,7 @@ class _IssueSubscriptionScreenState
           Text(
             AppStrings.rescheduleDeadlineDescription,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -628,12 +628,12 @@ class _IssueSubscriptionScreenState
                     onSelected:
                         (_) => setState(() => _rescheduleDeadlineHours = hours),
                     selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.surfaceLight,
+                    backgroundColor: AppColors.paper,
                     labelStyle: AppTypography.bodySmall.copyWith(
                       color:
                           _rescheduleDeadlineHours == hours
                               ? Colors.white
-                              : AppColors.textPrimaryLight,
+                              : AppColors.ink,
                       fontWeight:
                           _rescheduleDeadlineHours == hours
                               ? FontWeight.w600
@@ -643,7 +643,7 @@ class _IssueSubscriptionScreenState
                       color:
                           _rescheduleDeadlineHours == hours
                               ? AppColors.primary
-                              : AppColors.borderLight,
+                              : AppColors.inkQuaternary,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
@@ -759,7 +759,7 @@ class _PolicyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDefault ? AppColors.primary : AppColors.textTertiaryLight;
+    final color = isDefault ? AppColors.primary : AppColors.inkTertiary;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.space2,

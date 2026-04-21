@@ -41,9 +41,9 @@ class SubscriptionActionBox extends StatelessWidget {
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         border: Border(
-          top: BorderSide(color: AppColors.borderLight),
+          top: BorderSide(color: AppColors.inkQuaternary),
         ),
       ),
       child: SafeArea(
@@ -70,7 +70,7 @@ class SubscriptionActionBox extends StatelessWidget {
               side: BorderSide(
                 color: subscription.canReschedule
                     ? AppColors.primary
-                    : AppColors.borderLight,
+                    : AppColors.inkQuaternary,
               ),
             ),
           ),

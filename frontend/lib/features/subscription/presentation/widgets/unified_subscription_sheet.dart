@@ -96,7 +96,7 @@ class _UnifiedSubscriptionSheetState
       builder: (context, scrollController) {
         return Container(
           decoration: const BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXLarge),
             ),
@@ -113,7 +113,7 @@ class _UnifiedSubscriptionSheetState
                         child: Text(
                           '오류가 발생했습니다.',
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -154,7 +154,7 @@ class _UnifiedSubscriptionSheetState
             ],
           ),
         ),
-        const Divider(height: 1, color: AppColors.borderLight),
+        const Divider(height: 1, color: AppColors.inkQuaternary),
       ],
     );
   }
@@ -189,7 +189,7 @@ class _UnifiedSubscriptionSheetState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -197,7 +197,7 @@ class _UnifiedSubscriptionSheetState
           Icon(
             Icons.person_outline,
             size: AppSpacing.iconSM,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space2),
           Text(
@@ -216,7 +216,7 @@ class _UnifiedSubscriptionSheetState
       label,
       style: AppTypography.bodyMedium.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
       ),
     );
   }
@@ -229,7 +229,7 @@ class _UnifiedSubscriptionSheetState
         child: Text(
           '등록된 템플릿이 없습니다',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       );
@@ -313,18 +313,18 @@ class _UnifiedSubscriptionSheetState
                   ? Icons.keyboard_arrow_up
                   : Icons.keyboard_arrow_down,
               size: AppSpacing.iconSM,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Text(
               '직접 입력',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
             const Spacer(),
-            Container(height: 1, width: 200, color: AppColors.borderLight),
+            Container(height: 1, width: 200, color: AppColors.inkQuaternary),
           ],
         ),
       ),
@@ -335,9 +335,9 @@ class _UnifiedSubscriptionSheetState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +358,7 @@ class _UnifiedSubscriptionSheetState
               child: Text(
                 '자동: $_autoValidityDays일',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ),
@@ -373,7 +373,7 @@ class _UnifiedSubscriptionSheetState
       label,
       style: AppTypography.bodySmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimaryLight,
+        color: AppColors.ink,
       ),
     );
   }
@@ -398,11 +398,11 @@ class _UnifiedSubscriptionSheetState
             selectedColor: AppColors.primary.withValues(alpha: 0.15),
             labelStyle: AppTypography.bodySmall.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                  isSelected ? AppColors.primary : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
             ),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             ),
           );
         }),
@@ -414,9 +414,9 @@ class _UnifiedSubscriptionSheetState
           onSelected: (_) => _showCustomLessonCountDialog(),
           selectedColor: AppColors.primary.withValues(alpha: 0.15),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
-          side: const BorderSide(color: AppColors.borderLight),
+          side: const BorderSide(color: AppColors.inkQuaternary),
         ),
       ],
     );
@@ -425,9 +425,9 @@ class _UnifiedSubscriptionSheetState
   Widget _buildAmountInput() {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: TextField(
         controller: _amountController,
@@ -440,11 +440,11 @@ class _UnifiedSubscriptionSheetState
           border: InputBorder.none,
           hintText: '금액을 입력하세요',
           hintStyle: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           suffixText: '원',
           suffixStyle: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         style: AppTypography.bodyMedium,
@@ -471,11 +471,11 @@ class _UnifiedSubscriptionSheetState
               selectedColor: AppColors.primary.withValues(alpha: 0.15),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                    isSelected ? AppColors.primary : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
+                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               ),
             );
           }).toList(),
@@ -504,8 +504,8 @@ class _UnifiedSubscriptionSheetState
         bottom: MediaQuery.of(context).padding.bottom + AppSpacing.space3,
       ),
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         children: [
@@ -519,7 +519,7 @@ class _UnifiedSubscriptionSheetState
                   ),
                   side: BorderSide(
                     color:
-                        canSubmit ? AppColors.primary : AppColors.borderLight,
+                        canSubmit ? AppColors.primary : AppColors.inkQuaternary,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -729,10 +729,10 @@ class _TemplateChip extends StatelessWidget {
         color:
             isSelected
                 ? AppColors.primary.withValues(alpha: 0.05)
-                : AppColors.surfaceLight,
+                : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.borderLight,
+          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -764,7 +764,7 @@ class _TemplateChip extends StatelessWidget {
             style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w600,
               color:
-                  isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                  isSelected ? AppColors.primary : AppColors.ink,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -775,14 +775,14 @@ class _TemplateChip extends StatelessWidget {
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w500,
               color:
-                  isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+                  isSelected ? AppColors.primary : AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             template.formattedValidity,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],

@@ -103,7 +103,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -130,7 +130,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
               Text(
                 formatDateTimeMDHM(widget.lessonDateTime),
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
 
@@ -187,7 +187,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -204,7 +204,7 @@ class _CancelLessonBottomSheetState extends State<_CancelLessonBottomSheet> {
                 color:
                     isSelected
                         ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+                        : AppColors.inkTertiary,
               ),
               const SizedBox(width: AppSpacing.space3),
               Expanded(

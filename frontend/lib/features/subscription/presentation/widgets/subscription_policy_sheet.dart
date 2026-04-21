@@ -121,7 +121,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         Text(
           '수강권 발급 시점의 정책이 적용됩니다. 선생님이 이후 정책을 변경해도 이 수강권에는 영향을 주지 않습니다.',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],
@@ -139,7 +139,7 @@ class _SheetFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusLarge),
         ),
@@ -154,7 +154,7 @@ class _SheetFrame extends StatelessWidget {
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.borderLight,
+                color: AppColors.inkQuaternary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -207,7 +207,7 @@ class _PolicyItem extends StatelessWidget {
             child: Text(
               label,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -216,7 +216,7 @@ class _PolicyItem extends StatelessWidget {
             child: Text(
               value,
               style: AppTypography.bodyMedium.copyWith(
-                color: valueColor ?? AppColors.textPrimaryLight,
+                color: valueColor ?? AppColors.ink,
                 fontWeight: FontWeight.w600,
               ),
             ),

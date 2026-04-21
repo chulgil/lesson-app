@@ -20,13 +20,13 @@ class SubscriptionStatusColors {
       return AppColors.primaryLight; // 사용 완료 (보라) - 성취
     }
     if (subscription.isExpired) {
-      return AppColors.textTertiaryLight; // 만료됨 (회색)
+      return AppColors.inkTertiary; // 만료됨 (회색)
     }
     if (subscription.isExpiringSoon) {
       return AppColors.warning; // 갱신 필요 (주황)
     }
     if (subscription.status == SubscriptionStatus.paused) {
-      return AppColors.textTertiaryLight; // 일시정지 (회색)
+      return AppColors.inkTertiary; // 일시정지 (회색)
     }
     return AppColors.primary; // 이용중 (보라)
   }
@@ -40,7 +40,7 @@ class SubscriptionStatusColors {
       return AppColors.warning;
     }
     if (subscription.isExpired) {
-      return AppColors.textTertiaryLight;
+      return AppColors.inkTertiary;
     }
     return AppColors.primary;
   }
@@ -59,9 +59,9 @@ class SubscriptionStatusColors {
       return AppColors.warning.withValues(alpha: 0.5);
     }
     if (subscription.isExpired) {
-      return AppColors.textTertiaryLight.withValues(alpha: 0.3);
+      return AppColors.inkTertiary.withValues(alpha: 0.3);
     }
-    return AppColors.borderLight;
+    return AppColors.inkQuaternary;
   }
 
   /// Get the summary text color.
@@ -73,9 +73,9 @@ class SubscriptionStatusColors {
       return AppColors.warning;
     }
     if (subscription.isExpired) {
-      return AppColors.textTertiaryLight;
+      return AppColors.inkTertiary;
     }
-    return AppColors.textPrimaryLight;
+    return AppColors.ink;
   }
 
   /// Get the status label text.

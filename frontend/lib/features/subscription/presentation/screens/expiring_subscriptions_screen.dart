@@ -25,9 +25,9 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
     final studentsAsync = ref.watch(studentsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
@@ -175,7 +175,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
                 ),
                 Icon(
                   Icons.chevron_right,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   size: 20,
                 ),
               ],
@@ -225,7 +225,7 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -238,14 +238,14 @@ class ExpiringSubscriptionsScreen extends ConsumerWidget {
           Text(
             '확인이 필요한 수강권이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '모든 학생의 수강권이 정상입니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),

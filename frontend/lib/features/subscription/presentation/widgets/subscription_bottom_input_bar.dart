@@ -52,8 +52,8 @@ class SubscriptionBottomInputBar extends StatelessWidget {
         MediaQuery.of(context).padding.bottom + AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +69,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
             decoration: InputDecoration(
               hintText: AppStrings.subscriptionMessageHint,
               hintStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               counterText: '',
               contentPadding: const EdgeInsets.symmetric(
@@ -78,11 +78,11 @@ class SubscriptionBottomInputBar extends StatelessWidget {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
           ),
@@ -98,7 +98,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: onScheduleChange,
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.borderLight),
+                      side: const BorderSide(color: AppColors.inkQuaternary),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
@@ -111,7 +111,7 @@ class SubscriptionBottomInputBar extends StatelessWidget {
                     child: Text(
                       AppStrings.scheduleChangeButton,
                       style: AppTypography.buttonSmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),

@@ -76,14 +76,14 @@ class SubscriptionChapterInfo extends StatelessWidget {
           Text(
             label,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(
             value,
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
-              color: valueColor ?? AppColors.textPrimaryLight,
+              color: valueColor ?? AppColors.ink,
             ),
           ),
         ],

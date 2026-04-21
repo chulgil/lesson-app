@@ -80,7 +80,7 @@ class ScheduleGuideInfoBox extends StatelessWidget {
                   Text(
                     guide.message,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

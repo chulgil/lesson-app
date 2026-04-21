@@ -78,13 +78,13 @@ class SubscriptionDetailScreen extends ConsumerWidget {
             Icon(
               Icons.search_off,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               AppStrings.subscriptionNotFound,
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -112,7 +112,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
               Text(
                 error,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -334,7 +334,7 @@ class _SubscriptionDetailBodyState
               child: Text(
                 AppStrings.lessonInfoNotFound,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),

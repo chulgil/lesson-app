@@ -148,7 +148,7 @@ class _LocationTravelSelectorState
         Text(
           '이 학생의 기본 레슨 장소를 선택하세요',
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space3),
@@ -181,19 +181,19 @@ class _LocationTravelSelectorState
           avatar: Icon(
             option.icon,
             size: 18,
-            color: isSelected ? Colors.white : AppColors.textSecondaryLight,
+            color: isSelected ? Colors.white : AppColors.inkSecondary,
           ),
           label: Text(option.label),
           selected: isSelected,
           onSelected: (_) => _onTypeSelected(option.type),
           selectedColor: AppColors.primary,
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+            color: isSelected ? Colors.white : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -267,10 +267,10 @@ class _LocationTravelSelectorState
       decoration: BoxDecoration(
         color: isWarning
             ? AppColors.warningLight
-            : AppColors.surfaceSecondaryLight,
+            : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: isWarning ? AppColors.warning : AppColors.borderLight,
+          color: isWarning ? AppColors.warning : AppColors.inkQuaternary,
         ),
       ),
       child: Row(
@@ -280,7 +280,7 @@ class _LocationTravelSelectorState
             size: AppSpacing.iconSM,
             color: isWarning
                 ? AppColors.warning
-                : AppColors.textSecondaryLight,
+                : AppColors.inkSecondary,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
@@ -289,7 +289,7 @@ class _LocationTravelSelectorState
               style: AppTypography.bodySmall.copyWith(
                 color: isWarning
                     ? AppColors.warning
-                    : AppColors.textSecondaryLight,
+                    : AppColors.inkSecondary,
               ),
             ),
           ),
@@ -310,7 +310,7 @@ class _LocationTravelSelectorState
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          borderSide: const BorderSide(color: AppColors.borderLight),
+          borderSide: const BorderSide(color: AppColors.inkQuaternary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -361,7 +361,7 @@ class _LocationTravelSelectorState
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -377,7 +377,7 @@ class _LocationTravelSelectorState
         Text(
           '스케줄에서 레슨 시작 전 이동 블록으로 표시됩니다',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],

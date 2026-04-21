@@ -94,14 +94,14 @@ class _StudentProposalAcceptScreenState
         Text(
           '$teacherName 선생님',
           style: AppTypography.headingMedium.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '수강권을 제안했어요',
           style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -172,7 +172,7 @@ class _StudentProposalAcceptScreenState
       child: Text(
         '다음에 할게요',
         style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
     );
@@ -202,7 +202,7 @@ class _StudentProposalAcceptScreenState
             Text(
               '선택 후 위 계좌로 입금해 주세요',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -215,17 +215,17 @@ class _StudentProposalAcceptScreenState
   Widget _buildSectionDivider(String label) {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.borderLight)),
+        const Expanded(child: Divider(color: AppColors.inkQuaternary)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
           child: Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.borderLight)),
+        const Expanded(child: Divider(color: AppColors.inkQuaternary)),
       ],
     );
   }
@@ -234,9 +234,9 @@ class _StudentProposalAcceptScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [

@@ -49,9 +49,9 @@ class _ScheduleChangeRequestListScreenState
     );
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         title: const Text(AppStrings.scheduleChangeRequestTitle),
       ),
@@ -61,7 +61,7 @@ class _ScheduleChangeRequestListScreenState
           child: Text(
             AppStrings.errorOccurred,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -86,7 +86,7 @@ class _ScheduleChangeRequestListScreenState
             horizontal: AppSpacing.screenPadding,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surfaceSecondaryLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: TabBar(
@@ -97,7 +97,7 @@ class _ScheduleChangeRequestListScreenState
             ),
             indicatorSize: TabBarIndicatorSize.tab,
             labelColor: Colors.white,
-            unselectedLabelColor: AppColors.textSecondaryLight,
+            unselectedLabelColor: AppColors.inkSecondary,
             labelStyle: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -136,13 +136,13 @@ class _ScheduleChangeRequestListScreenState
             Icon(
               Icons.swap_horiz_rounded,
               size: 48,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               AppStrings.noChangeRequests,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -181,9 +181,9 @@ class _ScheduleChangeRequestListScreenState
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +203,7 @@ class _ScheduleChangeRequestListScreenState
                 Text(
                   changeTypeLabel,
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -216,7 +216,7 @@ class _ScheduleChangeRequestListScreenState
                 Text(
                   formatRelativeTime(event.createdAt),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
                 const Spacer(),

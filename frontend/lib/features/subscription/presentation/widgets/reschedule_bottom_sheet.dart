@@ -88,7 +88,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
@@ -168,7 +168,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         Text(
           label,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         Text(
@@ -195,7 +195,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -209,8 +209,8 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               style: AppTypography.bodyMedium.copyWith(
                 color:
                     _selectedDate != null
-                        ? AppColors.textPrimaryLight
-                        : AppColors.textTertiaryLight,
+                        ? AppColors.ink
+                        : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -233,7 +233,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -247,8 +247,8 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               style: AppTypography.bodyMedium.copyWith(
                 color:
                     _selectedTime != null
-                        ? AppColors.textPrimaryLight
-                        : AppColors.textTertiaryLight,
+                        ? AppColors.ink
+                        : AppColors.inkTertiary,
               ),
             ),
           ],
@@ -296,14 +296,14 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           color:
               isSelected
                   ? AppColors.primary.withValues(alpha: 0.05)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
         ),
         child: Row(
           children: [
@@ -311,7 +311,7 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
               icon,
               size: 20,
               color:
-                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                  isSelected ? AppColors.primary : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -325,14 +325,14 @@ class _RescheduleBottomSheetState extends State<_RescheduleBottomSheet> {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.textPrimaryLight,
+                              : AppColors.ink,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     description,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

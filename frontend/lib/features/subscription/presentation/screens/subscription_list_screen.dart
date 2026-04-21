@@ -132,7 +132,7 @@ class SubscriptionListScreen extends ConsumerWidget {
 
         // Expired
         if (expiredSubscriptions.isNotEmpty) ...[
-          _buildSectionHeader(AppStrings.statusExpired, color: AppColors.textTertiaryLight),
+          _buildSectionHeader(AppStrings.statusExpired, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           ...expiredSubscriptions.map((subscription) {
             final membership = memberships.firstWhere(
@@ -187,7 +187,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             child: _SummaryStatCard(
               label: AppStrings.statusExpired,
               count: expiredCount,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -246,7 +246,7 @@ class SubscriptionListScreen extends ConsumerWidget {
       child: Text(
         title,
         style: AppTypography.headingSmall.copyWith(
-          color: color ?? AppColors.textPrimaryLight,
+          color: color ?? AppColors.ink,
         ),
       ),
     );
@@ -277,20 +277,20 @@ class SubscriptionListScreen extends ConsumerWidget {
           Icon(
             Icons.confirmation_number_outlined,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '등록된 수강권이 없습니다',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '${memberships.length}개의 레슨에 등록되어 있습니다.\n선생님에게 수강권 발급을 요청하세요.',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -309,20 +309,20 @@ class SubscriptionListScreen extends ConsumerWidget {
             Icon(
               Icons.school_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '등록된 레슨이 없습니다',
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '선생님에게 초대를 요청하거나\n체험 레슨을 신청하세요.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -359,7 +359,7 @@ class SubscriptionListScreen extends ConsumerWidget {
             Text(
               error,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),

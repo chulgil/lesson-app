@@ -77,7 +77,7 @@ class ChipInputField extends StatelessWidget {
               Text(
                 '(선택)',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],
@@ -103,12 +103,12 @@ class ChipInputField extends StatelessWidget {
                   },
                   selectedColor: chipColor.withValues(alpha: 0.15),
                   checkmarkColor: chipColor,
-                  backgroundColor: AppColors.surfaceLight,
+                  backgroundColor: AppColors.paper,
                   side: BorderSide(
-                    color: isSelected ? chipColor : AppColors.borderLight,
+                    color: isSelected ? chipColor : AppColors.inkQuaternary,
                   ),
                   labelStyle: AppTypography.bodyMedium.copyWith(
-                    color: isSelected ? chipColor : AppColors.textSecondaryLight,
+                    color: isSelected ? chipColor : AppColors.inkSecondary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                   visualDensity: VisualDensity.compact,
@@ -128,7 +128,7 @@ class ChipInputField extends StatelessWidget {
                   hintText: '0',
                   suffixText: suffix,
                   filled: true,
-                  fillColor: AppColors.surfaceLight,
+                  fillColor: AppColors.paper,
                   isDense: true,
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.space2,
@@ -136,11 +136,11 @@ class ChipInputField extends StatelessWidget {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                    borderSide: BorderSide(color: AppColors.borderLight),
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                    borderSide: BorderSide(color: AppColors.borderLight),
+                    borderSide: BorderSide(color: AppColors.inkQuaternary),
                   ),
                 ),
                 onChanged: (value) {

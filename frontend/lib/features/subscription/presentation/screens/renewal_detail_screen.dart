@@ -190,7 +190,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                       color:
                           proposal.timeUntilExpiration.inDays < 2
                               ? AppColors.warning
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                     ),
                   ),
               ],
@@ -249,10 +249,10 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
           color:
               isSelected
                   ? AppColors.primary.withValues(alpha: 0.05)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -265,7 +265,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                  color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
                   width: 2,
                 ),
               ),
@@ -323,7 +323,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
                   Text(
                     template.summaryText,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -470,7 +470,7 @@ class _RenewalDetailScreenState extends ConsumerState<RenewalDetailScreen> {
               child: Text(
                 '나중에 할게요',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),

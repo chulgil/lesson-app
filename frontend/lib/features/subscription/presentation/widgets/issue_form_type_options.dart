@@ -79,16 +79,16 @@ class MonthlyOptionsSection extends StatelessWidget {
                   onSelected: (_) => onChanged(months),
                   selectedColor: AppColors.primary.withValues(alpha: 0.15),
                   checkmarkColor: AppColors.primary,
-                  backgroundColor: AppColors.surfaceLight,
+                  backgroundColor: AppColors.paper,
                   side: BorderSide(
                     color:
-                        isSelected ? AppColors.primary : AppColors.borderLight,
+                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
                   ),
                   labelStyle: AppTypography.bodyMedium.copyWith(
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),

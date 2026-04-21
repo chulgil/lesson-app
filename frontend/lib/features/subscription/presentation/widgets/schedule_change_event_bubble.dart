@@ -60,7 +60,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                 actorName.isNotEmpty ? actorName[0] : '?',
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -84,7 +84,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                     child: Text(
                       actorName,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -96,7 +96,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isMyMessage
                         ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.surfaceSecondaryLight,
+                        : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
                       topRight: const Radius.circular(AppSpacing.radiusLarge),
@@ -165,7 +165,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           AppStrings.sessionChangeRequested(sessionNum),
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
 
@@ -179,7 +179,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
               rescheduleCreditsRemaining!,
             ),
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -190,7 +190,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           Text(
             '${AppStrings.reasonPrefix}${event.message}',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -228,7 +228,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           headerText,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
 
@@ -249,7 +249,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           Text(
             event.message!,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -272,7 +272,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
             AppStrings.slotAccepted(selectedSlotLabel),
             style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
 
@@ -312,7 +312,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           AppStrings.changeRejected,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
 
@@ -322,7 +322,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
           Text(
             '${AppStrings.reasonPrefix}${event.message}',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -336,7 +336,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
       event.chatDisplayMessage,
       style: AppTypography.bodySmall.copyWith(
         fontWeight: FontWeight.w600,
-        color: AppColors.textPrimaryLight,
+        color: AppColors.ink,
       ),
     );
   }
@@ -348,10 +348,10 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: AppColors.inkQuaternary,
           width: 0.5,
         ),
       ),
@@ -380,7 +380,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                     style: AppTypography.caption.copyWith(
                       color: i == 0
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -391,7 +391,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
                   child: Text(
                     displaySlots[i].displayLabel,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
@@ -412,17 +412,17 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: AppColors.inkQuaternary,
           width: 0.5,
         ),
       ),
       child: Text(
         AppStrings.fixedScheduleLabel('$dayLabel $time'),
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.ink,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -447,7 +447,7 @@ class ScheduleChangeEventBubble extends StatelessWidget {
     return Text(
       formatTimeAMPM(time),
       style: AppTypography.caption.copyWith(
-        color: AppColors.textTertiaryLight,
+        color: AppColors.inkTertiary,
       ),
     );
   }

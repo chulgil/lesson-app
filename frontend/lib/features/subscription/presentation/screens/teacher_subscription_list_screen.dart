@@ -69,7 +69,7 @@ class _TeacherSubscriptionListScreenState
             error: (_, __) => _tabs.map((tab) => Tab(text: tab.label)).toList(),
           ),
           labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondaryLight,
+          unselectedLabelColor: AppColors.inkSecondary,
           indicatorColor: AppColors.primary,
         ),
       ),
@@ -87,7 +87,7 @@ class _TeacherSubscriptionListScreenState
           child: Text(
             AppStrings.errorOccurred,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -165,13 +165,13 @@ class _TeacherSubscriptionListScreenState
           Icon(
             Icons.confirmation_number_outlined,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             AppStrings.noSubscriptionsForStatus(tabLabel),
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

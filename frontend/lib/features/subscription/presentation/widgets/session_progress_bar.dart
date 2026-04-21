@@ -113,9 +113,9 @@ class SessionProgressBar extends StatelessWidget {
     if (isCompleted) {
       color = AppColors.primary;
     } else if (isEmpty) {
-      color = AppColors.borderLight.withValues(alpha: 0.4);
+      color = AppColors.inkQuaternary.withValues(alpha: 0.4);
     } else {
-      color = AppColors.borderLight;
+      color = AppColors.inkQuaternary;
     }
 
     return Expanded(
@@ -258,7 +258,7 @@ class _SessionDot extends StatelessWidget {
           height: SessionProgressBar._dotSize,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.borderLight, width: 1.5),
+            border: Border.all(color: AppColors.inkQuaternary, width: 1.5),
           ),
         );
     }
@@ -270,7 +270,7 @@ class _SessionDot extends StatelessWidget {
       case _SessionState.scheduled:
         return AppColors.primary;
       case _SessionState.future:
-        return isSelected ? AppColors.primary : AppColors.textTertiaryLight;
+        return isSelected ? AppColors.primary : AppColors.inkTertiary;
     }
   }
 }

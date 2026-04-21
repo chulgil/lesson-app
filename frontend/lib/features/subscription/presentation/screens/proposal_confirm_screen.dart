@@ -70,20 +70,20 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
           Icon(
             Icons.check_circle_outline,
             size: 64,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '입금 확인 대기 중인 제안이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '학생이 입금 완료를 알리면 여기에 표시됩니다',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -101,9 +101,9 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                               Text(
                                 '입금 알림: ${_formatDateTime(proposal.paymentNotifiedAt)}',
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.textTertiaryLight,
+                                  color: AppColors.inkTertiary,
                                 ),
                               ),
                             ],
@@ -230,7 +230,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                 Text(
                   '${template.totalLessons}회 · ${template.lessonDurationMinutes}분 · ${template.formattedValidity}',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -244,7 +244,7 @@ class _ProposalConfirmScreenState extends ConsumerState<ProposalConfirmScreen> {
                   template.formattedPrice,
                   style: AppTypography.caption.copyWith(
                     decoration: TextDecoration.lineThrough,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],

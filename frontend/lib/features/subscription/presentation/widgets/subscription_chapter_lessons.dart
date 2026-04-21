@@ -91,7 +91,7 @@ class _SubscriptionChapterLessonsState
               Text(
                 AppStrings.usageProgress(used, total),
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               Text(
@@ -109,7 +109,7 @@ class _SubscriptionChapterLessonsState
             child: LinearProgressIndicator(
               value: total > 0 ? used / total : 0,
               minHeight: 8,
-              backgroundColor: AppColors.borderLight,
+              backgroundColor: AppColors.inkQuaternary,
               valueColor: AlwaysStoppedAnimation<Color>(statusColor),
             ),
           ),
@@ -144,7 +144,7 @@ class _SubscriptionChapterLessonsState
             child: Text(
               message,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -360,7 +360,7 @@ class _SubscriptionChapterLessonsState
                   Container(
                     width: 1,
                     height: 28,
-                    color: AppColors.borderLight,
+                    color: AppColors.inkQuaternary,
                   ),
               ],
             ),
@@ -403,7 +403,7 @@ class _SubscriptionChapterLessonsState
                           Text(
                             '${formatTimeHM(session.dateTime!)} · ${session.teacherName}',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                           ),
                       ],
@@ -414,7 +414,7 @@ class _SubscriptionChapterLessonsState
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     size: 18,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ],
               ),
@@ -476,13 +476,13 @@ class _SubscriptionChapterLessonsState
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         AppStrings.noChangeHistory,
         style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
       ),
     );
@@ -507,7 +507,7 @@ class _SubscriptionChapterLessonsState
               decoration: BoxDecoration(
                 color: isTeacher
                     ? AppColors.primary.withValues(alpha: 0.08)
-                    : AppColors.surfaceSecondaryLight,
+                    : AppColors.paperDark,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(AppSpacing.radiusLarge),
                   topRight: const Radius.circular(AppSpacing.radiusLarge),
@@ -520,7 +520,7 @@ class _SubscriptionChapterLessonsState
               child: Text(
                 event.message ?? event.chatDisplayMessage ?? '',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
             ),
@@ -548,7 +548,7 @@ class _SubscriptionChapterLessonsState
             const SizedBox(width: 24, child: Icon(
               Icons.more_horiz,
               size: 20,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             )),
             const SizedBox(width: AppSpacing.space3),
             Text(
@@ -577,13 +577,13 @@ class _SubscriptionChapterLessonsState
             Icon(
               Icons.music_note,
               size: 40,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               AppStrings.noLessonRecords,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -636,7 +636,7 @@ class _SubscriptionChapterLessonsState
         return AppColors.primary;
       case _SessionStatus.upcoming:
       case _SessionStatus.pending:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 
@@ -645,10 +645,10 @@ class _SubscriptionChapterLessonsState
       case _SessionStatus.completed:
       case _SessionStatus.scheduled:
       case _SessionStatus.bookingRequired:
-        return AppColors.textPrimaryLight;
+        return AppColors.ink;
       case _SessionStatus.upcoming:
       case _SessionStatus.pending:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
     }
   }
 }

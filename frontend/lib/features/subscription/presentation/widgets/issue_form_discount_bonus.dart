@@ -112,14 +112,14 @@ class BonusSection extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: '사유를 직접 입력해주세요',
                 filled: true,
-                fillColor: AppColors.surfaceLight,
+                fillColor: AppColors.paper,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.space4,
@@ -142,12 +142,12 @@ class BonusSection extends StatelessWidget {
       onSelected: (_) => onBonusReasonChanged(reason),
       selectedColor: AppColors.primary.withValues(alpha: 0.15),
       checkmarkColor: AppColors.primary,
-      backgroundColor: AppColors.surfaceLight,
+      backgroundColor: AppColors.paper,
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.borderLight,
+        color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
       ),
       labelStyle: AppTypography.bodySmall.copyWith(
-        color: isSelected ? AppColors.primary : AppColors.textSecondaryLight,
+        color: isSelected ? AppColors.primary : AppColors.inkSecondary,
         fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
       ),
     );

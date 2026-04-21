@@ -210,9 +210,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -280,14 +280,14 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                       color:
                           proposal.timeUntilExpiration.inDays < 2
                               ? AppColors.warning
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                     ),
                   )
                 else if (!proposal.isAutoProposal)
                   Text(
                     '선생님이 보낸 제안',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
               ],
@@ -333,7 +333,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                         color:
                             isSelected
                                 ? AppColors.primary.withValues(alpha: 0.05)
-                                : AppColors.surfaceLight,
+                                : AppColors.paper,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
                         ),
@@ -341,7 +341,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                           color:
                               isSelected
                                   ? AppColors.primary
-                                  : AppColors.borderLight,
+                                  : AppColors.inkQuaternary,
                           width: isSelected ? 2 : 1,
                         ),
                       ),
@@ -357,7 +357,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                 color:
                                     isSelected
                                         ? AppColors.primary
-                                        : AppColors.borderLight,
+                                        : AppColors.inkQuaternary,
                                 width: 2,
                               ),
                             ),
@@ -430,7 +430,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
                                 Text(
                                   template.summaryText,
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                 ),
                               ],
@@ -726,7 +726,7 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
               child: Text(
                 '이번엔 스킵할게요',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),

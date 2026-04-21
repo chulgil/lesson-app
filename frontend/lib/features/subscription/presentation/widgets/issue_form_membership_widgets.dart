@@ -46,7 +46,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                     color:
                         isSelected
                             ? AppColors.primary.withValues(alpha: 0.1)
-                            : AppColors.surfaceLight,
+                            : AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -54,7 +54,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.borderLight,
+                              : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -80,7 +80,7 @@ class MembershipSelectorWidget extends ConsumerWidget {
                             Text(
                               membership.instrument,
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.textSecondaryLight,
+                                color: AppColors.inkSecondary,
                               ),
                             ),
                           ],
@@ -122,7 +122,7 @@ class MembershipInfoCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -151,7 +151,7 @@ class MembershipInfoCard extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -162,7 +162,7 @@ class MembershipInfoCard extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -189,7 +189,7 @@ class MembershipInfoCard extends ConsumerWidget {
                 Text(
                   '${membership.instrument} · ${membership.level ?? '레벨 미설정'}',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -216,20 +216,20 @@ class NoMembershipState extends StatelessWidget {
             Icon(
               Icons.school_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '등록된 레슨이 없습니다',
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '학생을 레슨에 먼저 등록해주세요.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -261,7 +261,7 @@ class SubscriptionErrorState extends StatelessWidget {
             Text(
               error,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),

@@ -85,7 +85,7 @@ class _SubscriptionDetailChatListState
             child: Text(
               AppStrings.noLessonRecords,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
@@ -147,12 +147,12 @@ class _SubscriptionDetailChatListState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.music_note, size: 40, color: AppColors.textTertiaryLight),
+          Icon(Icons.music_note, size: 40, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space2),
           Text(
             AppStrings.noLessonRecords,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -210,7 +210,7 @@ class _SessionSection extends ConsumerWidget {
                 color:
                     isSelected
                         ? AppColors.primary.withValues(alpha: 0.3)
-                        : AppColors.borderLight,
+                        : AppColors.inkQuaternary,
               ),
             ),
             // Session label
@@ -224,7 +224,7 @@ class _SessionSection extends ConsumerWidget {
                   color:
                       isSelected
                           ? AppColors.primary
-                          : AppColors.textTertiaryLight,
+                          : AppColors.inkTertiary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
@@ -236,14 +236,14 @@ class _SessionSection extends ConsumerWidget {
                 color:
                     isSelected
                         ? AppColors.primary.withValues(alpha: 0.3)
-                        : AppColors.borderLight,
+                        : AppColors.inkQuaternary,
               ),
             ),
             // Expand/collapse icon
             Icon(
               isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
               size: 16,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ],
         ),
@@ -312,13 +312,13 @@ class _SessionSection extends ConsumerWidget {
         vertical: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         AppStrings.noChangeHistory,
         style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
       ),
     );
@@ -345,7 +345,7 @@ class _SessionSection extends ConsumerWidget {
                     color:
                         isTeacher
                             ? AppColors.primary.withValues(alpha: 0.08)
-                            : AppColors.surfaceSecondaryLight,
+                            : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
                       topRight: const Radius.circular(AppSpacing.radiusLarge),
@@ -375,7 +375,7 @@ class _SessionSection extends ConsumerWidget {
       return Text(
         event.message ?? event.chatDisplayMessage,
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.ink,
         ),
       );
     }
@@ -412,7 +412,7 @@ class _SessionSection extends ConsumerWidget {
                   child: Text(
                     '${AppStrings.slotPriority(entry.key + 1)} ${isBulk ? '${AppStrings.everyWeek} ' : ''}${entry.value.displayLabel}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ),
@@ -424,7 +424,7 @@ class _SessionSection extends ConsumerWidget {
           Text(
             event.message!,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
         ],

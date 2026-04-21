@@ -143,9 +143,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,9 +194,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,9 +231,9 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,7 +347,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
             child: Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -404,12 +404,12 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+            Icon(icon, size: 20, color: AppColors.inkSecondary),
             const SizedBox(width: AppSpacing.space3),
             Expanded(child: Text(label, style: AppTypography.bodyMedium)),
             Icon(
               Icons.chevron_right,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
               size: 20,
             ),
           ],

@@ -25,7 +25,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('수강권 관리'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         actions: [
           IconButton(
@@ -39,7 +39,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
           ),
         ],
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: templatesAsync.when(
         data: (templates) => _buildContent(context, ref, templates),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -91,20 +91,20 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
             Icon(
               Icons.card_membership_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '등록된 수강권이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '수강권을 만들어 학생들에게 제안해보세요',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -133,7 +133,7 @@ class SubscriptionTemplateListScreen extends ConsumerWidget {
             Text(
               '데이터를 불러올 수 없습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -255,11 +255,11 @@ class _TemplateCard extends StatelessWidget {
         side: BorderSide(
           color:
               template.isActive
-                  ? AppColors.borderLight
-                  : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+                  ? AppColors.inkQuaternary
+                  : AppColors.inkTertiary.withValues(alpha: 0.3),
         ),
       ),
-      color: template.isActive ? Colors.white : AppColors.surfaceSecondaryLight,
+      color: template.isActive ? Colors.white : AppColors.paperDark,
       child: InkWell(
         onTap: onEdit,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -282,8 +282,8 @@ class _TemplateCard extends StatelessWidget {
                               style: AppTypography.headingSmall.copyWith(
                                 color:
                                     template.isActive
-                                        ? AppColors.textPrimaryLight
-                                        : AppColors.textTertiaryLight,
+                                        ? AppColors.ink
+                                        : AppColors.inkTertiary,
                               ),
                             ),
                             if (!template.isActive) ...[
@@ -294,7 +294,7 @@ class _TemplateCard extends StatelessWidget {
                                   vertical: 2,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.textTertiaryLight.withValues(
+                                  color: AppColors.inkTertiary.withValues(
                                     alpha: 0.2,
                                   ),
                                   borderRadius: BorderRadius.circular(
@@ -304,7 +304,7 @@ class _TemplateCard extends StatelessWidget {
                                 child: Text(
                                   '비활성',
                                   style: AppTypography.caption.copyWith(
-                                    color: AppColors.textTertiaryLight,
+                                    color: AppColors.inkTertiary,
                                   ),
                                 ),
                               ),
@@ -354,8 +354,8 @@ class _TemplateCard extends StatelessWidget {
                           style: AppTypography.bodyMedium.copyWith(
                             color:
                                 template.isActive
-                                    ? AppColors.textSecondaryLight
-                                    : AppColors.textTertiaryLight,
+                                    ? AppColors.inkSecondary
+                                    : AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -457,7 +457,7 @@ class _TemplateCard extends StatelessWidget {
                 Text(
                   template.description!,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -492,7 +492,7 @@ class _DetailChip extends StatelessWidget {
         color:
             isActive
                 ? AppColors.primary.withValues(alpha: 0.1)
-                : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                : AppColors.inkTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
       ),
       child: Row(
@@ -501,13 +501,13 @@ class _DetailChip extends StatelessWidget {
           Icon(
             icon,
             size: 14,
-            color: isActive ? AppColors.primary : AppColors.textTertiaryLight,
+            color: isActive ? AppColors.primary : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space1),
           Text(
             label,
             style: AppTypography.caption.copyWith(
-              color: isActive ? AppColors.primary : AppColors.textTertiaryLight,
+              color: isActive ? AppColors.primary : AppColors.inkTertiary,
             ),
           ),
         ],
@@ -774,13 +774,13 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         color:
             _isAutoProposalEnabled
                 ? AppColors.success.withValues(alpha: 0.05)
-                : AppColors.surfaceLight,
+                : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color:
               _isAutoProposalEnabled
                   ? AppColors.success.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+                  : AppColors.inkQuaternary,
         ),
       ),
       child: Column(
@@ -818,7 +818,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                         color:
                             _isAutoProposalEnabled
                                 ? AppColors.success
-                                : AppColors.textTertiaryLight,
+                                : AppColors.inkTertiary,
                       ),
                       const SizedBox(width: AppSpacing.space1),
                       Text(
@@ -827,8 +827,8 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                           fontWeight: FontWeight.w600,
                           color:
                               _isAutoProposalEnabled
-                                  ? AppColors.textPrimaryLight
-                                  : AppColors.textSecondaryLight,
+                                  ? AppColors.ink
+                                  : AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -849,7 +849,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
                   : '이 수강권은 선생님이 직접 제안할 때만 사용됩니다.\n'
                       '자동 제안에 포함되지 않습니다.',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 height: 1.4,
               ),
             ),
@@ -891,7 +891,7 @@ class _TemplateFormSheetState extends ConsumerState<_TemplateFormSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isEditing ? '수강권이 수정되었습니다' : '수강권이 추가되었습니다'),
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
       }
