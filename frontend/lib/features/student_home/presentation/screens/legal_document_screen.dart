@@ -20,9 +20,7 @@ class LegalDocumentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: Column(
@@ -32,18 +30,19 @@ class LegalDocumentScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.info.withValues(alpha: 0.08),
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: AppColors.info),
+                  Icon(Icons.info_outline, size: 16, color: AppColors.ink),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '버전 1.0 | 시행일: 추후 공지',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.info,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -58,7 +57,7 @@ class LegalDocumentScreen extends StatelessWidget {
               content,
               style: AppTypography.bodyMedium.copyWith(
                 height: 1.8,
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
             ),
 
@@ -149,7 +148,8 @@ const termsOfServiceContent = '''제1장 총칙
 이 약관은 추후 공지되는 날부터 시행합니다.''';
 
 /// Privacy policy content.
-const privacyPolicyContent = '''주식회사 Lessonaza(이하 "회사")는 「개인정보보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
+const privacyPolicyContent =
+    '''주식회사 Lessonaza(이하 "회사")는 「개인정보보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립·공개합니다.
 
 
 제1조 (개인정보의 처리 목적)
