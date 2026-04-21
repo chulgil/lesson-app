@@ -57,41 +57,44 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
 
     return Stack(
       children: [
-        Column(
-          children: [
-            // Fixed top area — clear visual separator between sticky filters
-            // and the scrolling list below (avoids shadow/section overlap).
-            DecoratedBox(
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceLight,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.borderLight),
+        RefreshIndicator(
+          onRefresh: () async {
+            final teacherId = ref.read(currentUserIdProvider);
+            ref.invalidate(groupedStudentsProvider(teacherId));
+          },
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              SliverToBoxAdapter(child: _buildHeader()),
+              SliverToBoxAdapter(child: _buildSearchBar()),
+              SliverToBoxAdapter(child: _buildFilterChips()),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSpacing.space2),
+              ),
+              SliverToBoxAdapter(child: _buildCountAndSort(groupedAsync)),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppSpacing.space2),
+              ),
+              groupedAsync.when(
+                data: (groups) => _buildGroupedStudentSliver(groups),
+                loading:
+                    () => const SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                error:
+                    (error, stack) => SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: _buildErrorState(error),
+                    ),
+              ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: _selectedStudentIds.isNotEmpty ? 72 : 0,
                 ),
               ),
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  _buildSearchBar(),
-                  _buildFilterChips(),
-                  const SizedBox(height: AppSpacing.space2),
-                  _buildCountAndSort(groupedAsync),
-                  const SizedBox(height: AppSpacing.space2),
-                ],
-              ),
-            ),
-
-            // Grouped student list
-            Expanded(
-              child: groupedAsync.when(
-                data: (groups) => _buildGroupedStudentList(groups),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => _buildErrorState(error),
-              ),
-            ),
-
-            // Reserve space for bottom bar when selections exist
-            if (_selectedStudentIds.isNotEmpty) const SizedBox(height: 72),
-          ],
+            ],
+          ),
         ),
 
         // Bottom action bar
@@ -462,11 +465,14 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
     }).toList();
   }
 
-  Widget _buildGroupedStudentList(List<StudentGroup> groups) {
+  Widget _buildGroupedStudentSliver(List<StudentGroup> groups) {
     final filtered = _applySortToGroups(_applyPracticeFilter(groups));
 
     if (filtered.isEmpty) {
-      return _buildEmptyState();
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: _buildEmptyState(),
+      );
     }
 
     // Count subjects (memberships) per student across all groups.
@@ -478,15 +484,9 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       }
     }
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        final teacherId = ref.read(currentUserIdProvider);
-        ref.invalidate(groupedStudentsProvider(teacherId));
-      },
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.screenPadding,
-        ),
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      sliver: SliverList.builder(
         itemCount: filtered.length,
         itemBuilder: (context, index) {
           return _ClassGroupSection(
