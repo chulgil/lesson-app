@@ -483,9 +483,10 @@ class ProfileTab extends ConsumerWidget {
     // 가용시간/수강권템플릿/입금계좌는 별도 Provider 필요 — 단순 버전에서 생략
     // 확장 프로필 (경력 또는 학력 또는 자격증 중 하나 이상)
     if (extended != null) {
-      final hasCareer = (extended.careers as List?)?.isNotEmpty ?? false;
-      final hasEducation = (extended.educations as List?)?.isNotEmpty ?? false;
-      final hasCert = (extended.certifications as List?)?.isNotEmpty ?? false;
+      final hasCareer = (extended.career as List?)?.isNotEmpty ?? false;
+      final hasEducation = (extended.education as List?)?.isNotEmpty ?? false;
+      final hasCert =
+          (extended.verification.certificates as List?)?.isNotEmpty ?? false;
       if (hasCareer || hasEducation || hasCert) score += 10;
     }
     // 최대 65% (나머지 3개 항목은 추후)
@@ -504,9 +505,9 @@ class ProfileTab extends ConsumerWidget {
     }
     if (extended != null) {
       final hasAny =
-          ((extended.careers as List?)?.isNotEmpty ?? false) ||
-          ((extended.educations as List?)?.isNotEmpty ?? false) ||
-          ((extended.certifications as List?)?.isNotEmpty ?? false);
+          ((extended.career as List?)?.isNotEmpty ?? false) ||
+          ((extended.education as List?)?.isNotEmpty ?? false) ||
+          ((extended.verification.certificates as List?)?.isNotEmpty ?? false);
       if (!hasAny) return '경력·학력·자격증을 등록해보세요';
     }
     return null;
