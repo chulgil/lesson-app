@@ -17,9 +17,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
     final settings = ref.watch(notificationSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('알림 설정'),
-      ),
+      appBar: AppBar(title: const Text('알림 설정')),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
@@ -31,9 +29,10 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 title: '알림 받기',
                 subtitle: '모든 알림을 켜거나 끕니다',
                 value: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleAll(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleAll(value),
               ),
             ],
           ),
@@ -49,18 +48,20 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 subtitle: '레슨 30분 전 알림',
                 value: settings.lessonReminder,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleLessonReminder(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleLessonReminder(value),
               ),
               _SwitchTile(
                 title: '레슨 변경 알림',
                 subtitle: '레슨 시간/일정 변경 시',
                 value: settings.lessonChange,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleLessonChange(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleLessonChange(value),
               ),
             ],
           ),
@@ -76,18 +77,20 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 subtitle: '선생님이 수강권을 제안할 때',
                 value: settings.subscriptionProposal,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleSubscriptionProposal(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleSubscriptionProposal(value),
               ),
               _SwitchTile(
                 title: '수강권 만료 알림',
                 subtitle: '수강권 만료 7일 전 알림',
                 value: settings.subscriptionExpiry,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleSubscriptionExpiry(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleSubscriptionExpiry(value),
               ),
             ],
           ),
@@ -103,18 +106,20 @@ class NotificationSettingsScreen extends ConsumerWidget {
                 subtitle: '매일 설정한 시간에 알림',
                 value: settings.practiceReminder,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .togglePracticeReminder(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .togglePracticeReminder(value),
               ),
               _SwitchTile(
                 title: '선생님 피드백',
                 subtitle: '선생님이 피드백을 남길 때',
                 value: settings.teacherFeedback,
                 enabled: settings.allNotifications,
-                onChanged: (value) => ref
-                    .read(notificationSettingsProvider.notifier)
-                    .toggleTeacherFeedback(value),
+                onChanged:
+                    (value) => ref
+                        .read(notificationSettingsProvider.notifier)
+                        .toggleTeacherFeedback(value),
               ),
             ],
           ),
@@ -125,27 +130,21 @@ class NotificationSettingsScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.info.withValues(alpha: 0.08),
+              color: AppColors.ink.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(
-                color: AppColors.info.withValues(alpha: 0.2),
-              ),
+              border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 20,
-                  color: AppColors.info,
-                ),
+                Icon(Icons.info_outline, size: 20, color: AppColors.ink),
                 const SizedBox(width: AppSpacing.space3),
                 Expanded(
                   child: Text(
                     '푸시 알림은 준비 중입니다.\n'
                     '알림 설정은 저장되며, 기능이 활성화되면 자동 적용됩니다.',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.info,
+                      color: AppColors.ink,
                       height: 1.5,
                     ),
                   ),
@@ -169,21 +168,15 @@ class NotificationSettingsScreen extends ConsumerWidget {
           title,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            border: Border.all(color: AppColors.inkQuaternary),
           ),
           child: Column(
             children: [
@@ -193,7 +186,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
                     height: 1,
                     indent: AppSpacing.space4,
                     endIndent: AppSpacing.space4,
-                    color: AppColors.borderLight,
+                    color: AppColors.inkQuaternary,
                   ),
                 children[i],
               ],
@@ -237,18 +230,17 @@ class _SwitchTile extends StatelessWidget {
                   title,
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w500,
-                    color: enabled
-                        ? AppColors.textPrimaryLight
-                        : AppColors.textTertiaryLight,
+                    color: enabled ? AppColors.ink : AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: AppTypography.caption.copyWith(
-                    color: enabled
-                        ? AppColors.textSecondaryLight
-                        : AppColors.textTertiaryLight,
+                    color:
+                        enabled
+                            ? AppColors.inkSecondary
+                            : AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -257,7 +249,7 @@ class _SwitchTile extends StatelessWidget {
           Switch(
             value: value && enabled,
             onChanged: enabled ? onChanged : null,
-            activeThumbColor: AppColors.primary,
+            activeThumbColor: AppColors.paperAccent,
           ),
         ],
       ),

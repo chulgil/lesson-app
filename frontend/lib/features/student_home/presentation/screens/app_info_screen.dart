@@ -29,24 +29,13 @@ class AppInfoScreen extends StatelessWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryDark],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppColors.ink,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
                   child: const Icon(
                     Icons.music_note,
                     size: 40,
-                    color: Colors.white,
+                    color: AppColors.paper,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space4),
@@ -60,7 +49,7 @@ class AppInfoScreen extends StatelessWidget {
                 Text(
                   '버전 1.0.0 (1)',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -72,15 +61,9 @@ class AppInfoScreen extends StatelessWidget {
           // Menu items
           Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
               children: [
@@ -93,7 +76,7 @@ class AppInfoScreen extends StatelessWidget {
                 Divider(
                   height: 1,
                   indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-                  color: AppColors.borderLight,
+                  color: AppColors.inkQuaternary,
                 ),
                 _buildMenuItem(
                   context,
@@ -104,7 +87,7 @@ class AppInfoScreen extends StatelessWidget {
                 Divider(
                   height: 1,
                   indent: AppSpacing.space4 + 36 + AppSpacing.space3,
-                  color: AppColors.borderLight,
+                  color: AppColors.inkQuaternary,
                 ),
                 _buildMenuItem(
                   context,
@@ -121,19 +104,14 @@ class AppInfoScreen extends StatelessWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  AppColors.primaryDark,
-                                ],
-                              ),
+                              color: AppColors.ink,
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusLarge,
                               ),
                             ),
                             child: const Icon(
                               Icons.music_note,
-                              color: Colors.white,
+                              color: AppColors.paper,
                             ),
                           ),
                         ),
@@ -152,14 +130,14 @@ class AppInfoScreen extends StatelessWidget {
                 Text(
                   '\u00a9 2026 Lessonaza',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   'Made with \u2665',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -185,10 +163,10 @@ class AppInfoScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              child: Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+              child: Icon(icon, size: 20, color: AppColors.inkSecondary),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -199,7 +177,7 @@ class AppInfoScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: AppColors.textTertiaryLight),
+            Icon(Icons.chevron_right, color: AppColors.inkTertiary),
           ],
         ),
       ),

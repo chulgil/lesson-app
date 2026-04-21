@@ -54,22 +54,18 @@ class MyTeachersScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.verified, size: 18, color: AppColors.primary),
+            Icon(Icons.verified, size: 18, color: AppColors.paperAccent),
             const SizedBox(width: AppSpacing.space2),
             Text(
               '앱 선생님',
-              style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textPrimaryLight,
-              ),
+              style: AppTypography.headingSmall.copyWith(color: AppColors.ink),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.space1),
         Text(
           '앱을 통해 연결된 선생님',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
         const SizedBox(height: AppSpacing.space3),
         relationsAsync.when(
@@ -112,7 +108,7 @@ class MyTeachersScreen extends ConsumerWidget {
                 child: Text(
                   '데이터를 불러올 수 없습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ),
@@ -126,29 +122,25 @@ class MyTeachersScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.school_outlined,
-            size: 40,
-            color: AppColors.textTertiaryLight,
-          ),
+          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '연결된 앱 선생님이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '선생님을 검색하여 레슨을 시작해보세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -171,17 +163,13 @@ class MyTeachersScreen extends ConsumerWidget {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.person_add_outlined,
-              size: 18,
-              color: AppColors.secondary,
-            ),
+            Icon(Icons.person_add_outlined, size: 18, color: AppColors.ink),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
               child: Text(
                 '직접 등록한 선생님',
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
             ),
@@ -190,9 +178,7 @@ class MyTeachersScreen extends ConsumerWidget {
         const SizedBox(height: AppSpacing.space1),
         Text(
           '앱에 가입하지 않은 선생님을 직접 등록하세요',
-          style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
-          ),
+          style: AppTypography.bodySmall.copyWith(color: AppColors.inkTertiary),
         ),
         const SizedBox(height: AppSpacing.space3),
         manualTeachersAsync.when(
@@ -226,7 +212,7 @@ class MyTeachersScreen extends ConsumerWidget {
                 child: Text(
                   '데이터를 불러올 수 없습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ),
@@ -240,22 +226,22 @@ class MyTeachersScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space6),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
           Icon(
             Icons.person_add_outlined,
             size: 40,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '직접 등록한 선생님이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -273,8 +259,8 @@ class MyTeachersScreen extends ConsumerWidget {
         icon: const Icon(Icons.add, size: 18),
         label: const Text('선생님 직접 등록'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+          foregroundColor: AppColors.ink,
+          side: BorderSide(color: AppColors.inkQuaternary),
         ),
       ),
     );
@@ -315,21 +301,11 @@ class _AppTeacherCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color:
-              isActive
-                  ? AppColors.primary.withValues(alpha: 0.3)
-                  : AppColors.borderLight,
+          color: isActive ? AppColors.ink : AppColors.inkQuaternary,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -349,16 +325,12 @@ class _AppTeacherCard extends StatelessWidget {
                     CircleAvatar(
                       radius: 28,
                       backgroundColor:
-                          isActive
-                              ? AppColors.primary.withValues(alpha: 0.1)
-                              : AppColors.surfaceSecondaryLight,
+                          isActive ? AppColors.ink : AppColors.paperDark,
                       child: Icon(
                         Icons.person,
                         size: 28,
                         color:
-                            isActive
-                                ? AppColors.primary
-                                : AppColors.textTertiaryLight,
+                            isActive ? AppColors.paper : AppColors.inkTertiary,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.space3),
@@ -382,20 +354,17 @@ class _AppTeacherCard extends StatelessWidget {
                           Text(
                             _teacherInstrument(relation.teacherId),
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: AppColors.textTertiaryLight,
-                    ),
+                    Icon(Icons.chevron_right, color: AppColors.inkTertiary),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.space3),
-                Divider(height: 1, color: AppColors.borderLight),
+                Divider(height: 1, color: AppColors.inkQuaternary),
                 const SizedBox(height: AppSpacing.space3),
                 Row(
                   children: [
@@ -429,10 +398,10 @@ class _AppTeacherCard extends StatelessWidget {
 
   Widget _buildStatusBadge() {
     final (label, color) = switch (relation.status) {
-      RelationshipStatus.active => ('수강 중', AppColors.practiceGood),
-      RelationshipStatus.expired => ('만료', AppColors.practiceNormal),
-      RelationshipStatus.trialBooked => ('체험 예약', AppColors.info),
-      RelationshipStatus.past => ('종료', AppColors.textTertiaryLight),
+      RelationshipStatus.active => ('수강 중', AppColors.paperOk),
+      RelationshipStatus.expired => ('만료', AppColors.inkTertiary),
+      RelationshipStatus.trialBooked => ('체험 예약', AppColors.paperAccent),
+      RelationshipStatus.past => ('종료', AppColors.inkTertiary),
     };
 
     return Container(
@@ -458,12 +427,12 @@ class _AppTeacherCard extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: AppColors.textTertiaryLight),
+            Icon(icon, size: 14, color: AppColors.inkTertiary),
             const SizedBox(width: AppSpacing.space1),
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -511,16 +480,9 @@ class _ManualTeacherCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(
         color: Colors.transparent,
@@ -563,13 +525,13 @@ class _ManualTeacherCard extends ConsumerWidget {
                             Icon(
                               Icons.music_note,
                               size: 14,
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
                               teacher.instrument!,
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondaryLight,
+                                color: AppColors.inkSecondary,
                               ),
                             ),
                           ],
@@ -582,7 +544,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                               child: Text(
                                 '|',
                                 style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textTertiaryLight,
+                                  color: AppColors.inkTertiary,
                                 ),
                               ),
                             ),
@@ -590,13 +552,13 @@ class _ManualTeacherCard extends ConsumerWidget {
                             Icon(
                               Icons.phone_outlined,
                               size: 14,
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                             const SizedBox(width: AppSpacing.space1),
                             Text(
                               teacher.phone!,
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textSecondaryLight,
+                                color: AppColors.inkSecondary,
                               ),
                             ),
                           ],
@@ -605,7 +567,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                             Text(
                               '직접 등록',
                               style: AppTypography.bodySmall.copyWith(
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                             ),
                         ],
@@ -642,12 +604,12 @@ class _ManualTeacherCard extends ConsumerWidget {
                               Icon(
                                 Icons.delete_outline,
                                 size: 18,
-                                color: AppColors.error,
+                                color: AppColors.paperAccent,
                               ),
                               const SizedBox(width: AppSpacing.space2),
                               Text(
                                 '삭제',
-                                style: TextStyle(color: AppColors.error),
+                                style: TextStyle(color: AppColors.paperAccent),
                               ),
                             ],
                           ),
@@ -655,7 +617,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                       ],
                   icon: Icon(
                     Icons.more_vert,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                     size: 20,
                   ),
                   padding: EdgeInsets.zero,
@@ -692,7 +654,7 @@ class _ManualTeacherCard extends ConsumerWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('${teacher.name} 선생님이 삭제되었습니다'),
-                          backgroundColor: AppColors.success,
+                          backgroundColor: AppColors.paperOk,
                         ),
                       );
                     }
@@ -701,13 +663,16 @@ class _ManualTeacherCard extends ConsumerWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: const Text('삭제 실패. 다시 시도해주세요.'),
-                          backgroundColor: AppColors.error,
+                          backgroundColor: AppColors.paperAccent,
                         ),
                       );
                     }
                   }
                 },
-                child: Text('삭제', style: TextStyle(color: AppColors.error)),
+                child: Text(
+                  '삭제',
+                  style: TextStyle(color: AppColors.paperAccent),
+                ),
               ),
             ],
           ),
