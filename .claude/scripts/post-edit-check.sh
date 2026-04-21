@@ -40,20 +40,20 @@ WARNINGS=""  # exit 0 — 경고만 (기존 코드 위반 다수, 점진 정리 
 
 # ── ERRORS (exit 2) ──────────────────────────────────────────────
 
-# Check 1: Hardcoded colors — Color(0x...)
-COLOR_MATCHES=$(grep -n 'Color(0x' "$FILE_PATH" 2>/dev/null)
+# Check 1: Hardcoded colors — Color(0x...) (주석 제외)
+COLOR_MATCHES=$(grep -n 'Color(0x' "$FILE_PATH" 2>/dev/null | grep -vE '^\s*[0-9]+:\s*//')
 if [[ -n "$COLOR_MATCHES" ]]; then
   ERRORS="${ERRORS}\n⚠️  하드코딩 색상 → AppColors 상수 사용:\n${COLOR_MATCHES}\n"
 fi
 
-# Check 2: Hardcoded routes — context.push('/...')
-ROUTE_MATCHES=$(grep -nE "context\.(push|go)\s*\(\s*['\"]/" "$FILE_PATH" 2>/dev/null)
+# Check 2: Hardcoded routes — context.push('/...') (주석 제외)
+ROUTE_MATCHES=$(grep -nE "context\.(push|go)\s*\(\s*['\"]/" "$FILE_PATH" 2>/dev/null | grep -vE '^\s*[0-9]+:\s*//')
 if [[ -n "$ROUTE_MATCHES" ]]; then
   ERRORS="${ERRORS}\n⚠️  하드코딩 라우트 → AppRoutes 상수 사용:\n${ROUTE_MATCHES}\n"
 fi
 
-# Check 3: Inline DateFormat (import 라인 제외)
-DATE_MATCHES=$(grep -n 'DateFormat(' "$FILE_PATH" 2>/dev/null | grep -v 'import' | grep -v '//')
+# Check 3: Inline DateFormat (import/주석 제외)
+DATE_MATCHES=$(grep -n 'DateFormat(' "$FILE_PATH" 2>/dev/null | grep -v 'import' | grep -vE '^\s*[0-9]+:\s*//')
 if [[ -n "$DATE_MATCHES" ]]; then
   ERRORS="${ERRORS}\n⚠️  인라인 DateFormat → formatDateYMD() 공통 유틸 사용:\n${DATE_MATCHES}\n"
 fi
