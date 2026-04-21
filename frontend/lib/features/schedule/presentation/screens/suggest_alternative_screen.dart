@@ -731,8 +731,8 @@ class _SuggestAlternativeScreenState
       context: context,
       initialTime: slot.startTime,
       helpText: AppStrings.selectStartTime,
-      cancelText: '취소',
-      confirmText: '확인',
+      cancelText: AppStrings.cancel,
+      confirmText: AppStrings.confirm,
     );
     if (newStartTime == null || !mounted) return;
 
