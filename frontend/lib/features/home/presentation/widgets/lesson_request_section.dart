@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/domain/entities/unified_lesson_request.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../schedule/presentation/widgets/request_list_item.dart';
@@ -27,9 +28,10 @@ class LessonRequestSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final requestsAsync = viewerRole == 'teacher'
-        ? ref.watch(todayRequestsProvider(userId))
-        : ref.watch(studentTodayRequestsProvider(userId));
+    final requestsAsync =
+        viewerRole == 'teacher'
+            ? ref.watch(todayRequestsProvider(userId))
+            : ref.watch(studentTodayRequestsProvider(userId));
     final studentNames = ref.watch(studentNameMapProvider);
     final teacherNames = ref.watch(teacherNameMapProvider);
     final academyNames = ref.watch(academyNameMapProvider);
@@ -53,29 +55,39 @@ class LessonRequestSection extends ConsumerWidget {
             _buildPhaseStats(requests),
             const SizedBox(height: AppSpacing.space2),
 
-            // Request list items
+            // Notebook × Score: 종이 위의 목록. 1px 잉크 구분선만, 카드 배경 없음.
             Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                border: Border.all(color: AppColors.borderLight),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: AppColors.inkQuaternary),
+                  bottom: BorderSide(color: AppColors.inkQuaternary),
+                ),
               ),
               child: Column(
                 children: [
                   for (int i = 0; i < displayRequests.length; i++) ...[
                     if (i > 0)
-                      const Divider(height: 1, indent: AppSpacing.space4),
+                      const Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: AppColors.inkQuaternary,
+                      ),
                     RequestListItem(
                       request: displayRequests[i],
-                      studentName: studentNames[displayRequests[i].studentId] ?? AppStrings.student,
+                      studentName:
+                          studentNames[displayRequests[i].studentId] ??
+                          AppStrings.student,
                       teacherName: teacherNames[displayRequests[i].teacherId],
                       academyName: academyNames[displayRequests[i].academyId],
                       viewerRole: viewerRole,
-                      onTap: () => context.push(
-                        AppRoutes.requestDetail
-                            .replaceFirst(':id', displayRequests[i].id),
-                        extra: {'viewerRole': viewerRole},
-                      ),
+                      onTap:
+                          () => context.push(
+                            AppRoutes.requestDetail.replaceFirst(
+                              ':id',
+                              displayRequests[i].id,
+                            ),
+                            extra: {'viewerRole': viewerRole},
+                          ),
                     ),
                   ],
                 ],
@@ -87,15 +99,17 @@ class LessonRequestSection extends ConsumerWidget {
               const SizedBox(height: AppSpacing.space2),
               Center(
                 child: TextButton(
-                  onPressed: () => context.push(
-                    viewerRole == 'student'
-                        ? '${AppRoutes.myLessonRequests}?studentId=$userId'
-                        : '${AppRoutes.lessonRequests}?teacherId=$userId',
-                  ),
+                  onPressed:
+                      () => context.push(
+                        viewerRole == 'student'
+                            ? '${AppRoutes.myLessonRequests}?studentId=$userId'
+                            : '${AppRoutes.lessonRequests}?teacherId=$userId',
+                      ),
                   child: Text(
                     AppStrings.moreRequests(requests.length - 3),
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.ink,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -144,44 +158,42 @@ class LessonRequestSection extends ConsumerWidget {
       padding: const EdgeInsets.only(left: AppSpacing.space2),
       child: Text(
         entries.join(' · '),
-        style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context, int totalCount) {
-    return Row(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              const Icon(Icons.assignment,
-                  size: AppSpacing.iconSM, color: AppColors.textSecondaryLight),
-              const SizedBox(width: AppSpacing.space2),
-              Text(AppStrings.lessonRequest, style: AppTypography.headingMedium),
-              const SizedBox(width: AppSpacing.space2),
-              Text(
-                '($totalCount)',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+    return NotebookSectionHeader(
+      label: '${AppStrings.lessonRequest} · $totalCount',
+      trailing:
+          totalCount > 3
+              ? TextButton.icon(
+                onPressed:
+                    () => context.push(
+                      viewerRole == 'student'
+                          ? '${AppRoutes.myLessonRequests}?studentId=$userId'
+                          : '${AppRoutes.lessonRequests}?teacherId=$userId',
+                    ),
+                icon: const Icon(
+                  Icons.list,
+                  size: AppSpacing.iconXS,
+                  color: AppColors.ink,
                 ),
-              ),
-            ],
-          ),
-        ),
-        if (totalCount > 3)
-          TextButton.icon(
-            onPressed: () => context.push(
-              viewerRole == 'student'
-                  ? '${AppRoutes.myLessonRequests}?studentId=$userId'
-                  : '${AppRoutes.lessonRequests}?teacherId=$userId',
-            ),
-            icon: const Icon(Icons.list, size: AppSpacing.iconXS),
-            label: const Text('전체보기'),
-          ),
-      ],
+                label: Text(
+                  '전체보기',
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              )
+              : null,
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
 import '../../../lessons/domain/entities/lesson.dart';
 
 /// Viewer role for time-aware banner messages.
@@ -36,33 +36,35 @@ class TimeContextBanner extends StatelessWidget {
 
     if (message == null) return const SizedBox.shrink();
 
+    // Notebook × Score: 크림 종이 위의 "마지널리아" 메타포.
+    // - 배경: 투명 (paper 직접)
+    // - 좌측: 3px paperAccent(vermillion) 세로선 — 4대 시그니처
+    // - 메시지: Gaegu 손글씨 — 시간 인식 멘트
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.space4),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.space3,
+        AppSpacing.space3,
+        AppSpacing.space3,
+        AppSpacing.space3,
+      ),
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+      decoration: const BoxDecoration(
+        border: Border(
+          left: BorderSide(color: AppColors.paperAccent, width: 3),
+        ),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            ),
-            child: Icon(_iconForHour(hour), size: 20, color: AppColors.primary),
-          ),
+          Icon(_iconForHour(hour), size: 20, color: AppColors.ink),
           const SizedBox(width: AppSpacing.space3),
           Expanded(
             child: Text(
               message,
-              style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textPrimaryLight,
-                fontWeight: FontWeight.w600,
+              style: NotebookTypography.hand.copyWith(
+                fontSize: 15,
+                color: AppColors.ink,
               ),
             ),
           ),

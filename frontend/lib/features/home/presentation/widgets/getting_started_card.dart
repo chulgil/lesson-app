@@ -4,14 +4,21 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/notebook_typography.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
+import '../../../../features/lessons/domain/entities/lesson.dart';
 import '../../../lessons/presentation/providers/lesson_crud_provider.dart';
 import '../../../students/presentation/providers/student_crud_provider.dart';
 
-/// Getting Started checklist card for new teachers with 0 students.
-/// Shows actionable steps to help them get started.
+/// Getting Started checklist — **Notebook × Score 스타일**.
+///
+/// 종이 위의 "할 일 목록" 메타포:
+/// - 섹션 헤더: uppercase + 1px ink rule
+/// - 각 스텝: 로마숫자 인덱스 + Gaegu 손글씨 제목 + 완료 시 취소선
+/// - 완료: `paperOk` 녹색 펜 색 체크
+/// - 대기: `inkQuaternary` 테두리의 원형 플레이스홀더
 class GettingStartedCard extends ConsumerWidget {
   const GettingStartedCard({super.key});
 
@@ -25,58 +32,28 @@ class GettingStartedCard extends ConsumerWidget {
         // Only show when teacher has 0 students
         if (students.isNotEmpty) return const SizedBox.shrink();
 
-        final hasLessons =
-            lessonsAsync.valueOrNull?.isNotEmpty ?? false;
-        final hasCompletedLesson = lessonsAsync.valueOrNull?.any(
+        final hasLessons = lessonsAsync.valueOrNull?.isNotEmpty ?? false;
+        final hasCompletedLesson =
+            lessonsAsync.valueOrNull?.any(
               (l) => l.status == LessonStatus.completed,
             ) ??
             false;
 
-        return Container(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColors.primary.withValues(alpha: 0.08),
-                AppColors.secondary.withValues(alpha: 0.08),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.2),
-            ),
-          ),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.space4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.rocket_launch_rounded,
-                    color: AppColors.primary,
-                    size: 24,
-                  ),
-                  const SizedBox(width: AppSpacing.space2),
-                  Text(
-                    '시작 가이드',
-                    style: AppTypography.headingSmall.copyWith(
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
+              const NotebookSectionHeader(label: 'Getting Started'),
               const SizedBox(height: AppSpacing.space2),
               Text(
                 '아래 단계를 따라 레슨 관리를 시작하세요',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                style: NotebookTypography.hand.copyWith(
+                  fontSize: 14,
+                  color: AppColors.inkSecondary,
                 ),
               ),
-              const SizedBox(height: AppSpacing.space4),
-
-              // Step 1: Add student
+              const SizedBox(height: AppSpacing.space3),
               _StepItem(
                 step: 1,
                 title: '학생 등록하기',
@@ -84,34 +61,37 @@ class GettingStartedCard extends ConsumerWidget {
                 isCompleted: false,
                 onTap: () => context.push(AppRoutes.addStudentMethod),
               ),
-
               const SizedBox(height: AppSpacing.space2),
-
-              // Step 2: Create lesson
               _StepItem(
                 step: 2,
                 title: '레슨 일정 만들기',
                 subtitle: '학생 등록 후 레슨을 추가하세요',
                 isCompleted: hasLessons,
-                onTap: students.isEmpty
-                    ? null
-                    : () => context.push('${AppRoutes.addLesson}?studentId=${students.first.id}'),
+                onTap:
+                    students.isEmpty
+                        ? null
+                        : () => context.push(
+                          '${AppRoutes.addLesson}?studentId=${students.first.id}',
+                        ),
               ),
-
               const SizedBox(height: AppSpacing.space2),
-
-              // Step 3: Complete first lesson
               _StepItem(
                 step: 3,
                 title: '첫 레슨 완료하기',
                 subtitle: '레슨을 탭해 완료 처리하세요',
                 isCompleted: hasCompletedLesson,
-                onTap: hasLessons
-                    ? () {
-                        final firstLesson = lessonsAsync.valueOrNull!.first;
-                        context.push(AppRoutes.lessonDetail.replaceFirst(':id', firstLesson.id));
-                      }
-                    : null,
+                onTap:
+                    hasLessons
+                        ? () {
+                          final firstLesson = lessonsAsync.valueOrNull!.first;
+                          context.push(
+                            AppRoutes.lessonDetail.replaceFirst(
+                              ':id',
+                              firstLesson.id,
+                            ),
+                          );
+                        }
+                        : null,
               ),
             ],
           ),
@@ -141,51 +121,33 @@ class _StepItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = onTap != null;
+    final accentColor =
+        isCompleted
+            ? AppColors.paperOk
+            : isEnabled
+            ? AppColors.ink
+            : AppColors.inkTertiary;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.space3,
-          vertical: AppSpacing.space3,
-        ),
-        decoration: BoxDecoration(
-          color: isCompleted
-              ? AppColors.success.withValues(alpha: 0.08)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(
-            color: isCompleted
-                ? AppColors.success.withValues(alpha: 0.3)
-                : AppColors.borderLight,
-          ),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Step number or check
-            Container(
+            // 로마숫자 or 체크 — Notebook × Score 시그니처
+            SizedBox(
               width: 28,
-              height: 28,
-              decoration: BoxDecoration(
-                color: isCompleted
-                    ? AppColors.success
-                    : isEnabled
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
-                    : Text(
-                        '$step',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+              child:
+                  isCompleted
+                      ? Icon(Icons.check, size: 18, color: AppColors.paperOk)
+                      : Text(
+                        romanOf(step - 1),
+                        style: NotebookTypography.roman.copyWith(
+                          color: accentColor,
                         ),
+                        textAlign: TextAlign.center,
                       ),
-              ),
             ),
             const SizedBox(width: AppSpacing.space3),
             Expanded(
@@ -194,30 +156,26 @@ class _StepItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: NotebookTypography.pieceTitle.copyWith(
+                      fontSize: 15,
+                      color:
+                          isCompleted ? AppColors.inkTertiary : AppColors.ink,
                       decoration:
                           isCompleted ? TextDecoration.lineThrough : null,
-                      color: isCompleted
-                          ? AppColors.textTertiaryLight
-                          : null,
                     ),
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textTertiaryLight,
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
               ),
             ),
             if (isEnabled && !isCompleted)
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              const Icon(Icons.chevron_right, color: AppColors.ink, size: 18),
           ],
         ),
       ),
