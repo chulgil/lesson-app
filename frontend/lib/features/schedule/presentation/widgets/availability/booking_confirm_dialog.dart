@@ -140,7 +140,7 @@ class BookingConfirmDialog extends StatelessWidget {
             _buildPolicyNotice(
               icon: Icons.warning_amber_outlined,
               text: '변경권이 없는 경우 레슨 시간 변경이 불가합니다.',
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
 
             // Show remaining reschedules if available
@@ -191,7 +191,7 @@ class BookingConfirmDialog extends StatelessWidget {
           child: Text(
             '취소',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -237,7 +237,7 @@ class BookingConfirmDialog extends StatelessWidget {
   }
 
   Color _getRescheduleCountColor() {
-    if (remainingReschedules == null) return AppColors.textSecondaryLight;
+    if (remainingReschedules == null) return AppColors.inkSecondary;
     if (remainingReschedules! <= 0) return AppColors.error;
     if (remainingReschedules! == 1) return AppColors.warning;
     return AppColors.success;

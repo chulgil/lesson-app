@@ -264,7 +264,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           child: Text(
             '${hour.toString().padLeft(2, '0')}:00',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.right,
           ),
@@ -461,7 +461,7 @@ class _ScheduleTimelineViewState extends ConsumerState<ScheduleTimelineView> {
           Text(
             '${_isToday ? "오늘" : ""} ${widget.lessons.length}레슨 · $timeStr',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],

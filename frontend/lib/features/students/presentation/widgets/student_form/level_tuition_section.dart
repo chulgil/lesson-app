@@ -38,9 +38,9 @@ class LevelAndTuitionSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,15 +66,15 @@ class LevelAndTuitionSection extends StatelessWidget {
                     onLevelChanged(level);
                   }
                 },
-                backgroundColor: AppColors.surfaceLight,
+                backgroundColor: AppColors.paper,
                 selectedColor: AppColors.primary.withValues(alpha: 0.15),
                 checkmarkColor: AppColors.primary,
                 side: BorderSide(
-                  color: isSelected ? AppColors.primary : AppColors.borderLight,
+                  color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
                 ),
                 labelStyle: AppTypography.bodySmall.copyWith(
                   color:
-                      isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                      isSelected ? AppColors.primary : AppColors.ink,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               );
@@ -110,7 +110,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                       Text(
                         '기본: ${formatCurrencyInMan(selectedLevel.defaultMonthlyFee)}',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                   ],
@@ -128,7 +128,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                         suffixText: '원',
                         filled: isLinked,
                         fillColor: isLinked
-                            ? AppColors.surfaceSecondaryLight
+                            ? AppColors.paperDark
                             : null,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.space3,
@@ -142,13 +142,13 @@ class LevelAndTuitionSection extends StatelessWidget {
                           borderRadius:
                               BorderRadius.circular(AppSpacing.radiusMedium),
                           borderSide:
-                              const BorderSide(color: AppColors.borderLight),
+                              const BorderSide(color: AppColors.inkQuaternary),
                         ),
                         disabledBorder: OutlineInputBorder(
                           borderRadius:
                               BorderRadius.circular(AppSpacing.radiusMedium),
                           borderSide:
-                              const BorderSide(color: AppColors.borderLight),
+                              const BorderSide(color: AppColors.inkQuaternary),
                         ),
                       ),
                       keyboardType: TextInputType.number,
@@ -159,7 +159,7 @@ class LevelAndTuitionSection extends StatelessWidget {
                       style: AppTypography.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isLinked
-                            ? AppColors.textTertiaryLight
+                            ? AppColors.inkTertiary
                             : null,
                       ),
                       onChanged: (_) => onFeeChanged(),
@@ -217,7 +217,7 @@ class LevelAndTuitionSection extends StatelessWidget {
           Text(
             '주 1회는 월 4회, 주 2회는 월 8회 레슨입니다',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),

@@ -41,14 +41,14 @@ class InstrumentSelector extends StatelessWidget {
           onSelected: (selected) {
             onChanged(selected ? instrument : null);
           },
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
           selectedColor: AppColors.primary.withValues(alpha: 0.15),
           checkmarkColor: AppColors.primary,
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+            color: isSelected ? AppColors.primary : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         );

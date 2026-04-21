@@ -144,9 +144,9 @@ class _SuggestAlternativeScreenState
     );
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         title: Text(AppStrings.counterPropose),
       ),
@@ -205,8 +205,8 @@ class _SuggestAlternativeScreenState
         AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +265,7 @@ class _SuggestAlternativeScreenState
                     color:
                         isSelected
                             ? AppColors.success.withValues(alpha: 0.08)
-                            : AppColors.surfaceLight,
+                            : AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -273,7 +273,7 @@ class _SuggestAlternativeScreenState
                       color:
                           isSelected
                               ? AppColors.success
-                              : AppColors.borderLight,
+                              : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -318,7 +318,7 @@ class _SuggestAlternativeScreenState
                             color:
                                 isSelected
                                     ? AppColors.success
-                                    : AppColors.textPrimaryLight,
+                                    : AppColors.ink,
                           ),
                         ),
                       ),
@@ -373,8 +373,8 @@ class _SuggestAlternativeScreenState
         MediaQuery.of(context).padding.bottom + AppSpacing.space4,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -392,7 +392,7 @@ class _SuggestAlternativeScreenState
                       ? AppStrings.acceptMessageHint
                       : AppStrings.messageHint,
               hintStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               counterText: '',
               contentPadding: const EdgeInsets.symmetric(
@@ -401,11 +401,11 @@ class _SuggestAlternativeScreenState
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: BorderSide(color: AppColors.borderLight),
+                borderSide: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
           ),
@@ -491,7 +491,7 @@ class _SuggestAlternativeScreenState
             onPressed: _showRejectBottomSheet,
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(AppSpacing.buttonHeightSmall),
-              side: const BorderSide(color: AppColors.borderLight),
+              side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -499,7 +499,7 @@ class _SuggestAlternativeScreenState
             child: Text(
               AppStrings.rejectAction,
               style: AppTypography.buttonSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -686,7 +686,7 @@ class _SuggestAlternativeScreenState
                     IconButton(
                       onPressed: () => _editSlot(index),
                       icon: const Icon(Icons.edit_outlined, size: 18),
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                       visualDensity: VisualDensity.compact,
                     ),
                     IconButton(
@@ -830,7 +830,7 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusLarge),
         ),
@@ -864,7 +864,7 @@ class _RejectBottomSheetState extends State<_RejectBottomSheet> {
           Text(
             AppStrings.rejectBottomSheetGuide,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),

@@ -22,7 +22,7 @@ class TravelAnalyticsCard extends ConsumerWidget {
         return Card(
           margin: EdgeInsets.zero,
           elevation: 0,
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           ),

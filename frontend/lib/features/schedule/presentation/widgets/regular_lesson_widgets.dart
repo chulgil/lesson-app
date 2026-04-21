@@ -62,7 +62,7 @@ class RegularLessonStudentInfo extends StatelessWidget {
                 Text(
                   '정규레슨으로 등록합니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -119,13 +119,13 @@ class RegularLessonDurationSelector extends StatelessWidget {
               onDurationChanged(duration);
             }
           },
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
           selectedColor: AppColors.primary,
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+            color: isSelected ? Colors.white : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         );
@@ -222,14 +222,14 @@ class DayButton extends StatelessWidget {
           color: isSelected
               ? AppColors.primary
               : isAvailable
-                  ? AppColors.surfaceLight
-                  : AppColors.surfaceSecondaryLight,
+                  ? AppColors.paper
+                  : AppColors.paperDark,
           shape: BoxShape.circle,
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
                 : isAvailable
-                    ? AppColors.borderLight
+                    ? AppColors.inkQuaternary
                     : Colors.transparent,
           ),
         ),
@@ -240,8 +240,8 @@ class DayButton extends StatelessWidget {
               color: isSelected
                   ? Colors.white
                   : isAvailable
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -302,9 +302,9 @@ class RegularLessonTimeSelector extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,7 +450,7 @@ class OptionCard extends StatelessWidget {
     return Material(
       color: isSelected
           ? AppColors.primary.withValues(alpha: 0.1)
-          : AppColors.surfaceLight,
+          : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onTap,
@@ -460,7 +460,7 @@ class OptionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -471,13 +471,13 @@ class OptionCard extends StatelessWidget {
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color:
-                      isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                      isSelected ? AppColors.primary : AppColors.ink,
                 ),
               ),
               Text(
                 subtitle,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -515,13 +515,13 @@ class RegularLessonFeeSelector extends StatelessWidget {
           onSelected: (selected) {
             if (selected) onFeeChanged(fees[index]);
           },
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.paper,
           selectedColor: AppColors.primary.withValues(alpha: 0.15),
           side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           ),
           labelStyle: AppTypography.bodySmall.copyWith(
-            color: isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+            color: isSelected ? AppColors.primary : AppColors.ink,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         );
@@ -549,9 +549,9 @@ class RegularLessonStartDateSelector extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Row(
           children: [
@@ -565,7 +565,7 @@ class RegularLessonStartDateSelector extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.edit, size: 18, color: AppColors.textTertiaryLight),
+            Icon(Icons.edit, size: 18, color: AppColors.inkTertiary),
           ],
         ),
       ),
@@ -627,7 +627,7 @@ class RegularLessonSummary extends StatelessWidget {
                   child: _buildRow(
                     '${dayNames[day - 1]}요일',
                     timeStr,
-                    valueColor: time != null ? null : AppColors.textTertiaryLight,
+                    valueColor: time != null ? null : AppColors.inkTertiary,
                   ),
                 );
               }),
@@ -759,7 +759,7 @@ class FirstMonthFeeSection extends StatelessWidget {
                       Text(
                         '($weekInfo)',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],

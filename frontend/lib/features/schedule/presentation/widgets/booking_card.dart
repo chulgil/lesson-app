@@ -28,7 +28,7 @@ class BookingCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        side: BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
@@ -49,7 +49,7 @@ class BookingCard extends StatelessWidget {
                     Text(
                       _getDaysText(),
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                 ],
@@ -93,7 +93,7 @@ class BookingCard extends StatelessWidget {
                                 booking.experienceLevel!.label,
                             ].join(' · '),
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                       ],
@@ -108,7 +108,7 @@ class BookingCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
@@ -116,7 +116,7 @@ class BookingCard extends StatelessWidget {
                     Icon(
                       Icons.calendar_today,
                       size: 18,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
@@ -129,7 +129,7 @@ class BookingCard extends StatelessWidget {
                     Icon(
                       Icons.access_time,
                       size: 18,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Text(
@@ -170,7 +170,7 @@ class BookingCard extends StatelessWidget {
                         child: Text(
                           booking.studentMessage!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textPrimaryLight,
+                            color: AppColors.ink,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -296,7 +296,7 @@ class BookingCardCompact extends StatelessWidget {
       subtitle: Text(
         '${booking.formattedDate} ${booking.timeRange}',
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
       trailing: Container(

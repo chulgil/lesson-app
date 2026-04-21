@@ -269,7 +269,7 @@ class ScheduleTab extends ConsumerWidget {
           Text(
             formatDateMDWithDayLong(selectedDate),
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           if (isToday) ...[
@@ -293,7 +293,7 @@ class ScheduleTab extends ConsumerWidget {
           Text(
             '$lessonCount개 레슨',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -337,14 +337,14 @@ class ScheduleTab extends ConsumerWidget {
           Text(
             sortType.displayName,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(width: 2),
           Icon(
             Icons.keyboard_arrow_down,
             size: 16,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ],
       ),
@@ -617,7 +617,7 @@ class _LessonTimeCard extends ConsumerWidget {
                     color:
                         (isPastDay ||
                                 lesson.displayStatus == LessonStatus.completed)
-                            ? AppColors.textTertiaryLight
+                            ? AppColors.inkTertiary
                             : null,
                   ),
                 ),
@@ -638,7 +638,7 @@ class _LessonTimeCard extends ConsumerWidget {
                             (isPastDay ||
                                     lesson.displayStatus ==
                                         LessonStatus.completed)
-                                ? AppColors.textSecondaryLight
+                                ? AppColors.inkSecondary
                                 : null,
                       ),
                       maxLines: 1,
@@ -649,7 +649,7 @@ class _LessonTimeCard extends ConsumerWidget {
                       Text(
                         lesson.pieces.first.displayName,
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -676,7 +676,7 @@ class _LessonTimeCard extends ConsumerWidget {
               // Arrow
               const Icon(
                 Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
                 size: 20,
               ),
             ],
@@ -716,7 +716,7 @@ class _LessonTimeCard extends ConsumerWidget {
       case LessonStatus.cancelledByStudentAdvance:
       case LessonStatus.cancelledByTeacher:
       case LessonStatus.cancelledMutual:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case LessonStatus.noShow:
       case LessonStatus.cancelledByStudentLate:
       case LessonStatus.studentAbsent:
@@ -747,7 +747,7 @@ class _LessonTimeCard extends ConsumerWidget {
         contextBadge = Text(
           isAcademy ? '🏫 ${lessonClass.name}' : '👤 개인레슨',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -825,7 +825,7 @@ class _ViewModeToggle extends StatelessWidget {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textTertiaryLight,
+                            : AppColors.inkTertiary,
                   ),
                 ),
               );

@@ -62,7 +62,7 @@ class StudentProfileSection extends StatelessWidget {
             Text(
               '프로필 사진 변경',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],

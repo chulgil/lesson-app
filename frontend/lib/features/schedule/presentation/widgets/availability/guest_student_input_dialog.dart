@@ -102,7 +102,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
                   Text(
                     '레슨 예약을 위해 정보를 입력해주세요',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
 
@@ -253,7 +253,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
           Text(
             ' (선택)',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
       ],
@@ -269,15 +269,15 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
       prefixIcon: Icon(
         prefixIcon,
         size: 20,
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderSide: const BorderSide(color: AppColors.inkQuaternary),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        borderSide: const BorderSide(color: AppColors.borderLight),
+        borderSide: const BorderSide(color: AppColors.inkQuaternary),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -292,7 +292,7 @@ class _GuestStudentInputDialogState extends State<GuestStudentInputDialog> {
         vertical: AppSpacing.space3,
       ),
       filled: true,
-      fillColor: AppColors.surfaceLight,
+      fillColor: AppColors.paper,
     );
   }
 

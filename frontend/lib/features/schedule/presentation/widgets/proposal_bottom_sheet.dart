@@ -83,7 +83,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -158,14 +158,14 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                     decoration: InputDecoration(
                       hintText: AppStrings.paymentMessageHint,
                       hintStyle: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMedium,
                         ),
                         borderSide: const BorderSide(
-                          color: AppColors.borderLight,
+                          color: AppColors.inkQuaternary,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
@@ -173,7 +173,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                           AppSpacing.radiusMedium,
                         ),
                         borderSide: const BorderSide(
-                          color: AppColors.borderLight,
+                          color: AppColors.inkQuaternary,
                         ),
                       ),
                       contentPadding: const EdgeInsets.all(AppSpacing.space3),
@@ -226,7 +226,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     return Text(
       text,
       style: AppTypography.bodySmall.copyWith(
-        color: AppColors.textSecondaryLight,
+        color: AppColors.inkSecondary,
         fontWeight: FontWeight.w600,
       ),
     );
@@ -238,7 +238,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -277,7 +277,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
             label,
             textAlign: TextAlign.center,
             style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : AppColors.textSecondaryLight,
+              color: isSelected ? Colors.white : AppColors.inkSecondary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -303,7 +303,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           (_, __) => Text(
             AppStrings.requestLoadError,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
       data: (templates) {
@@ -311,15 +311,15 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
           return Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.backgroundLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Center(
               child: Text(
                 AppStrings.proposalNoTemplates,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ),
@@ -356,14 +356,14 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.backgroundLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Text(
           AppStrings.proposalNoBankAccount,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       );
@@ -396,14 +396,14 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: DropdownButton<String>(
         value: _selectedBankAccountId,
         isExpanded: true,
         underline: const SizedBox.shrink(),
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textPrimaryLight,
+          color: AppColors.ink,
         ),
         selectedItemBuilder: (context) {
           return allAccounts.map((account) {
@@ -413,7 +413,7 @@ class _ProposalSheetState extends ConsumerState<_ProposalSheet> {
                 '${account.bankName} ${account.accountNumber}'
                 '${account.isDefault ? ' (기본)' : ''}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
             );

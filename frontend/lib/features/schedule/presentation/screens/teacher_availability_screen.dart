@@ -43,10 +43,10 @@ class _TeacherAvailabilityScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('레슨 운영 시간 설정'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: availabilityAsync.when(
         data: (availability) => _buildBody(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -64,7 +64,7 @@ class _TeacherAvailabilityScreenState
                   Text(
                     '데이터를 불러올 수 없습니다',
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space3),
@@ -151,7 +151,7 @@ class _TeacherAvailabilityScreenState
           Text(
             subtitle,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -212,9 +212,9 @@ class _TeacherAvailabilityScreenState
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
         leading: Container(
@@ -226,7 +226,7 @@ class _TeacherAvailabilityScreenState
                     ? AppColors.primary.withValues(alpha: 0.1)
                     : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
-                    : AppColors.surfaceLight,
+                    : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
@@ -239,7 +239,7 @@ class _TeacherAvailabilityScreenState
                         ? AppColors.primary
                         : isWeekend
                         ? AppColors.secondary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
             ),
           ),
@@ -254,7 +254,7 @@ class _TeacherAvailabilityScreenState
                 : Text(
                   '쉬는날',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -286,14 +286,14 @@ class _TeacherAvailabilityScreenState
         decoration: BoxDecoration(
           color:
               schedule.isActive
-                  ? AppColors.practiceGood.withValues(alpha: 0.1)
-                  : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                  ? AppColors.paperOk.withValues(alpha: 0.1)
+                  : AppColors.inkTertiary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color:
                 schedule.isActive
-                    ? AppColors.practiceGood.withValues(alpha: 0.3)
-                    : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+                    ? AppColors.paperOk.withValues(alpha: 0.3)
+                    : AppColors.inkTertiary.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
@@ -301,8 +301,8 @@ class _TeacherAvailabilityScreenState
           style: AppTypography.caption.copyWith(
             color:
                 schedule.isActive
-                    ? AppColors.practiceGood
-                    : AppColors.textTertiaryLight,
+                    ? AppColors.paperOk
+                    : AppColors.inkTertiary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -319,9 +319,9 @@ class _TeacherAvailabilityScreenState
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           children: [
@@ -385,7 +385,7 @@ class _TeacherAvailabilityScreenState
               Text(
                 help,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],
@@ -415,9 +415,9 @@ class _TeacherAvailabilityScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -436,7 +436,7 @@ class _TeacherAvailabilityScreenState
                       color:
                           hasSchedule
                               ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                   ),
                 ),
@@ -457,7 +457,7 @@ class _TeacherAvailabilityScreenState
                           ? Container(
                             height: 40,
                             decoration: BoxDecoration(
-                              color: AppColors.textTertiaryLight.withValues(
+                              color: AppColors.inkTertiary.withValues(
                                 alpha: 0.15,
                               ),
                               borderRadius: BorderRadius.circular(
@@ -468,7 +468,7 @@ class _TeacherAvailabilityScreenState
                               child: Text(
                                 '—',
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.textTertiaryLight,
+                                  color: AppColors.inkTertiary,
                                 ),
                               ),
                             ),
@@ -542,22 +542,22 @@ class _TeacherAvailabilityScreenState
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space6),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Column(
               children: [
                 Icon(
                   Icons.event_available,
                   size: 32,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(height: AppSpacing.space2),
                 Text(
                   '설정된 특별 일정이 없습니다',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -601,9 +601,9 @@ class _TeacherAvailabilityScreenState
       margin: const EdgeInsets.only(bottom: AppSpacing.space2),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -614,13 +614,13 @@ class _TeacherAvailabilityScreenState
               color:
                   isHoliday
                       ? AppColors.error.withValues(alpha: 0.1)
-                      : AppColors.practiceGood.withValues(alpha: 0.1),
+                      : AppColors.paperOk.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Icon(
               isHoliday ? Icons.event_busy : Icons.add_circle_outline,
               size: 18,
-              color: isHoliday ? AppColors.error : AppColors.practiceGood,
+              color: isHoliday ? AppColors.error : AppColors.paperOk,
             ),
           ),
           const SizedBox(width: AppSpacing.space3),
@@ -640,7 +640,7 @@ class _TeacherAvailabilityScreenState
                           ? ' · ${exc.reason}'
                           : ''),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

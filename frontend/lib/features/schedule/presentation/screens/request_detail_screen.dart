@@ -94,7 +94,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
   void _showInfo(String message) => _showEventMessage(
     message,
-    color: AppColors.textSecondaryLight,
+    color: AppColors.inkSecondary,
     icon: Icons.info_outline,
   );
 
@@ -120,7 +120,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               child: Text(
                 AppStrings.requestLoadError,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -133,7 +133,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
               child: Text(
                 AppStrings.requestNotFound,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -348,7 +348,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
 
         return Container(
           decoration: const BoxDecoration(
-            color: AppColors.surfaceLight,
+            color: AppColors.paper,
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusLarge),
             ),
@@ -383,7 +383,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                       color:
                           request.type == LessonRequestType.trial
                               ? AppColors.primary.withValues(alpha: 0.04)
-                              : AppColors.surfaceSecondaryLight,
+                              : AppColors.paperDark,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
                       ),
@@ -418,10 +418,10 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                           style:
                               request.type == LessonRequestType.trial
                                   ? AppTypography.bodyMedium.copyWith(
-                                    color: AppColors.textPrimaryLight,
+                                    color: AppColors.ink,
                                   )
                                   : AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                         ),
                       ],

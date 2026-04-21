@@ -147,18 +147,18 @@ class _ScheduleChangeSlotScreenState
       ),
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
-          Icon(Icons.schedule, color: AppColors.textSecondaryLight, size: 20),
+          Icon(Icons.schedule, color: AppColors.inkSecondary, size: 20),
           const SizedBox(width: AppSpacing.space2),
           Text(
             '${AppStrings.scheduleChangeCurrentSchedule}: ',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           Text(params.currentScheduleLabel, style: AppTypography.button),
@@ -247,7 +247,7 @@ class _ScheduleChangeSlotScreenState
           Text(
             '${AppStrings.scheduleChangePropose} (${_suggestedSlots.length}/3)',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
@@ -301,9 +301,9 @@ class _ScheduleChangeSlotScreenState
         top: AppSpacing.space2,
       ),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         border: Border(
-          top: BorderSide(color: AppColors.borderLight, width: 0.5),
+          top: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
         ),
       ),
       child: SafeArea(
@@ -321,11 +321,11 @@ class _ScheduleChangeSlotScreenState
                         ? AppStrings.scheduleChangeBulkDesc
                         : AppStrings.scheduleChangeSingleDesc,
                 hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-                  borderSide: BorderSide(color: AppColors.borderLight),
+                  borderSide: BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
                 counterText: '',

@@ -66,10 +66,10 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('예약 취소'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.space4),
@@ -109,7 +109,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +117,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
           Text(
             '취소할 예약',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -148,7 +148,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                     Text(
                       '${widget.teacherName}${widget.instrument != null ? ' · ${widget.instrument}' : ''}',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -197,7 +197,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             Text(
               '취소가 필요하시면 선생님께 직접 문의해주세요.',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -245,7 +245,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
             Text(
               '이후 더 이상 변경/취소가 불가합니다.',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -277,7 +277,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 Text(
                   '취소 시 1회 차감됩니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -313,7 +313,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                 Text(
                   '학생의 변경 횟수는 차감되지 않습니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -341,17 +341,17 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
           decoration: InputDecoration(
             hintText: '취소 사유를 입력해주세요',
             hintStyle: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -411,12 +411,12 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
-              side: const BorderSide(color: AppColors.borderLight),
+              side: const BorderSide(color: AppColors.inkQuaternary),
             ),
             child: Text(
               '돌아가기',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -584,7 +584,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
               Text(
                 phone,
                 style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),
@@ -648,7 +648,7 @@ class _BookingCancelScreenState extends ConsumerState<BookingCancelScreen> {
                   icon: const Icon(Icons.copy, size: 16),
                   label: const Text('번호 복사'),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.textSecondaryLight,
+                    foregroundColor: AppColors.inkSecondary,
                   ),
                 ),
               ),

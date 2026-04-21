@@ -64,13 +64,13 @@ class RequestProfileCard extends StatelessWidget {
               Icon(
                 Icons.bar_chart,
                 size: AppSpacing.iconSM,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '${AppStrings.lessonCount(student!.totalLessons)} · ${AppStrings.practiceRate(student!.practiceRate)}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -98,9 +98,9 @@ class RequestProfileCard extends StatelessWidget {
       margin: const EdgeInsets.all(AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +138,7 @@ class RequestProfileCard extends StatelessWidget {
               Text(
                 '${request.instrument} · ${request.experience.label} · ${request.goal.label}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -159,7 +159,7 @@ class RequestProfileCard extends StatelessWidget {
             child: Text(
               academyName!,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
@@ -170,7 +170,7 @@ class RequestProfileCard extends StatelessWidget {
           Text(
             AppStrings.individualLesson,
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           const SizedBox(width: AppSpacing.space2),
@@ -200,7 +200,7 @@ class RequestProfileCard extends StatelessWidget {
         Text(
           formatRelativeTime(request.createdAt),
           style: AppTypography.caption.copyWith(
-            color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+            color: urgent ? AppColors.error : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -261,7 +261,7 @@ class RequestProfileCard extends StatelessWidget {
       UnifiedRequestStatus.cancelled => AppColors.warning,
       UnifiedRequestStatus.expired => AppColors.warning,
       UnifiedRequestStatus.rejected => AppColors.warning,
-      _ => AppColors.textPrimaryLight,
+      _ => AppColors.ink,
     };
   }
 }

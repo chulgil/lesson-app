@@ -120,7 +120,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                                 ? AppColors.primary
                                 : isWeekend
                                 ? AppColors.secondary
-                                : AppColors.textSecondaryLight,
+                                : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -159,7 +159,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
                   subtitle: Text(
                     _isActive ? '학생들이 이 시간에 예약할 수 있습니다' : '이 스케줄은 비활성화 상태입니다',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   value: _isActive,
@@ -219,7 +219,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -228,7 +228,7 @@ class _ScheduleEditBottomSheetState extends State<ScheduleEditBottomSheet> {
             Icon(
               Icons.access_time,
               size: 18,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(

@@ -30,10 +30,10 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('휴무 및 예외 설정'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -103,7 +103,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             Text(
               '지난 휴무',
               style: AppTypography.headingSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -158,7 +158,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
     final icon = _getExceptionIcon(exception.type);
     final color =
         isPast
-            ? AppColors.textTertiaryLight
+            ? AppColors.inkTertiary
             : _getExceptionColor(exception.type);
 
     return Container(
@@ -166,7 +166,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
         leading: Container(
@@ -182,7 +182,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           _formatDateRange(exception.startDate, exception.endDate),
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: isPast ? AppColors.textTertiaryLight : null,
+            color: isPast ? AppColors.inkTertiary : null,
           ),
         ),
         subtitle: Column(
@@ -191,14 +191,14 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
             Text(
               exception.type.displayName,
               style: AppTypography.bodySmall.copyWith(
-                color: isPast ? AppColors.textTertiaryLight : color,
+                color: isPast ? AppColors.inkTertiary : color,
               ),
             ),
             if (exception.reason != null && exception.reason!.isNotEmpty)
               Text(
                 exception.reason!,
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
           ],
@@ -208,7 +208,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
                 ? null
                 : IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   onPressed: () => _confirmDelete(exception),
                 ),
         contentPadding: const EdgeInsets.symmetric(
@@ -227,20 +227,20 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           Icon(
             Icons.event_available,
             size: 64,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '설정된 휴무가 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '아래 버튼을 눌러 휴무일을 추가하세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -259,7 +259,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
           Text(
             '데이터를 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),
@@ -292,7 +292,7 @@ class _TimeExceptionScreenState extends ConsumerState<TimeExceptionScreen> {
       case ExceptionType.vacation:
         return AppColors.warning;
       case ExceptionType.additionalSlot:
-        return AppColors.practiceGood;
+        return AppColors.paperOk;
     }
   }
 
@@ -527,7 +527,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
@@ -547,7 +547,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         ),
         child: Row(
@@ -555,7 +555,7 @@ class _AddExceptionBottomSheetState extends State<_AddExceptionBottomSheet> {
             Icon(
               Icons.calendar_today,
               size: 18,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(formatDateMDKorean(date), style: AppTypography.bodyMedium),

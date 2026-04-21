@@ -171,7 +171,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                               color:
                                   isToday
                                       ? AppColors.primary
-                                      : AppColors.textSecondaryLight,
+                                      : AppColors.inkSecondary,
                               fontWeight: isToday ? FontWeight.bold : null,
                             ),
                           ),
@@ -181,7 +181,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                               color:
                                   isToday
                                       ? AppColors.primary
-                                      : AppColors.textTertiaryLight,
+                                      : AppColors.inkTertiary,
                             ),
                           ),
                         ],
@@ -216,7 +216,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                                       '$hour:00',
                                       style: AppTypography.captionSmall
                                           .copyWith(
-                                            color: AppColors.textTertiaryLight,
+                                            color: AppColors.inkTertiary,
                                           ),
                                     )
                                     : const SizedBox.shrink(),
@@ -277,11 +277,11 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       } else if (isPreview) {
         bgColor = AppColors.scheduleMutedBackground.withValues(alpha: 0.4);
         accentColor = AppColors.scheduleMutedAccent;
-        textColor = AppColors.textTertiaryLight;
+        textColor = AppColors.inkTertiary;
       } else {
         bgColor = AppColors.scheduleMutedBackground;
         accentColor = AppColors.scheduleMutedAccent;
-        textColor = AppColors.textSecondaryLight;
+        textColor = AppColors.inkSecondary;
       }
 
       return CustomPaint(
@@ -420,9 +420,9 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isPast ? AppColors.borderLight.withValues(alpha: 0.15) : null,
+          color: isPast ? AppColors.inkQuaternary.withValues(alpha: 0.15) : null,
           border: Border.all(
-            color: AppColors.borderLight.withValues(alpha: 0.3),
+            color: AppColors.inkQuaternary.withValues(alpha: 0.3),
             width: 0.5,
           ),
         ),

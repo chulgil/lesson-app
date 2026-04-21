@@ -151,7 +151,7 @@ class _ScheduleWeeklyGridViewState
               child: Text(
                 '$hour',
                 style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 textAlign: TextAlign.right,
               ),
@@ -443,13 +443,13 @@ class _ScheduleWeeklyGridViewState
           Icon(
             Icons.event_available,
             size: 48,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '이번 주는 레슨이 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -478,7 +478,7 @@ class _ScheduleWeeklyGridViewState
       child: Text(
         '이번 주: ${lessons.length}레슨 · 총 $timeStr',
         style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
         textAlign: TextAlign.center,
       ),

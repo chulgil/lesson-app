@@ -70,7 +70,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
     return Container(
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -96,7 +96,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
             Text(
               '수강권 종류',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -145,7 +145,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
             Text(
               AppStrings.paymentMessageHint,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space1),
@@ -155,15 +155,15 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
               decoration: InputDecoration(
                 hintText: AppStrings.paymentMessageHint,
                 hintStyle: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: const BorderSide(color: AppColors.borderLight),
+                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  borderSide: const BorderSide(color: AppColors.borderLight),
+                  borderSide: const BorderSide(color: AppColors.inkQuaternary),
                 ),
                 contentPadding: const EdgeInsets.all(AppSpacing.space3),
               ),
@@ -210,17 +210,17 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surfaceLight,
+          color: selected ? AppColors.primary : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.borderLight,
+            color: selected ? AppColors.primary : AppColors.inkQuaternary,
           ),
         ),
         child: Center(
           child: Text(
             label,
             style: AppTypography.bodyMedium.copyWith(
-              color: selected ? Colors.white : AppColors.textSecondaryLight,
+              color: selected ? Colors.white : AppColors.inkSecondary,
               fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -243,7 +243,7 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
           child: Text(
             label,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -256,15 +256,15 @@ class _PaymentGuideSheetState extends State<_PaymentGuideSheet> {
             decoration: InputDecoration(
               suffixText: suffix,
               suffixStyle: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: const BorderSide(color: AppColors.borderLight),
+                borderSide: const BorderSide(color: AppColors.inkQuaternary),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                borderSide: const BorderSide(color: AppColors.borderLight),
+                borderSide: const BorderSide(color: AppColors.inkQuaternary),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.space3,

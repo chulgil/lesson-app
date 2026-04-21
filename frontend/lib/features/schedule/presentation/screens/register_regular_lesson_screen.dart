@@ -114,7 +114,7 @@ class _RegisterRegularLessonScreenState
             Text(
               '선생님 기본 설정: ${LessonDurations.format(settings.defaultLessonDuration)}',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -138,7 +138,7 @@ class _RegisterRegularLessonScreenState
             Text(
               '주 $_lessonsPerWeek회 레슨 - $_lessonsPerWeek개 요일을 선택하세요',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -207,7 +207,7 @@ class _RegisterRegularLessonScreenState
           Text(
             '* 5주차가 있는 달은 기본 휴강입니다. 추가 레슨이 필요하시면 1회 레슨을 신청해주세요.',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
 
@@ -328,7 +328,7 @@ class _RegisterRegularLessonScreenState
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('정규레슨이 등록되었습니다'),
-            backgroundColor: AppColors.practiceGood,
+            backgroundColor: AppColors.paperOk,
           ),
         );
         context.pop();

@@ -35,19 +35,19 @@ class ProposalChatCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
             ),
             child: Row(
               children: [
                 Icon(Icons.account_balance,
-                    size: 14, color: AppColors.textTertiaryLight),
+                    size: 14, color: AppColors.inkTertiary),
                 const SizedBox(width: AppSpacing.space1),
                 Expanded(
                   child: Text(
                     bankInfo!,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ),
@@ -72,10 +72,10 @@ class ProposalChatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isRecommended
               ? AppColors.primary.withValues(alpha: 0.06)
-              : AppColors.surfaceLight,
+              : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
-            color: isRecommended ? AppColors.primary : AppColors.borderLight,
+            color: isRecommended ? AppColors.primary : AppColors.inkQuaternary,
             width: isRecommended ? 1.5 : 1,
           ),
         ),
@@ -90,14 +90,14 @@ class ProposalChatCard extends StatelessWidget {
                 template.name,
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: isRecommended ? FontWeight.w600 : FontWeight.w500,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
             ),
             Text(
               template.summaryText,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],

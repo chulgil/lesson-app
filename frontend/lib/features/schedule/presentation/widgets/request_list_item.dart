@@ -92,7 +92,7 @@ class RequestListItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.error,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.surfaceLight, width: 1.5),
+              border: Border.all(color: AppColors.paper, width: 1.5),
             ),
           ),
         ),
@@ -133,7 +133,7 @@ class RequestListItem extends StatelessWidget {
     return Text(
       '$source · ${request.typeDisplayLabel}',
       style: AppTypography.caption.copyWith(
-        color: AppColors.textTertiaryLight,
+        color: AppColors.inkTertiary,
       ),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
@@ -147,7 +147,7 @@ class RequestListItem extends StatelessWidget {
       return Text(
         AppStrings.noTimeSpecified,
         style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
       );
     }
@@ -162,13 +162,13 @@ class RequestListItem extends StatelessWidget {
         Icon(
           Icons.calendar_today,
           size: AppSpacing.iconXS,
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
         ),
         const SizedBox(width: AppSpacing.space1),
         Text(
           firstSlot.displayLabel,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         if (remaining > 0) ...[
@@ -176,7 +176,7 @@ class RequestListItem extends StatelessWidget {
           Text(
             AppStrings.slotsRemaining(remaining),
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
         ],
@@ -216,7 +216,7 @@ class RequestListItem extends StatelessWidget {
         Text(
           formatRelativeTime(request.createdAt),
           style: AppTypography.caption.copyWith(
-            color: urgent ? AppColors.error : AppColors.textTertiaryLight,
+            color: urgent ? AppColors.error : AppColors.inkTertiary,
             fontWeight: urgent ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
@@ -230,7 +230,7 @@ class RequestListItem extends StatelessWidget {
         : request.teacherActionColorKey;
     return switch (colorKey) {
       'action' => AppColors.primary,
-      _ => AppColors.textTertiaryLight,
+      _ => AppColors.inkTertiary,
     };
   }
 }

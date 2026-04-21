@@ -29,7 +29,7 @@ class FormSectionSubtitle extends StatelessWidget {
       child: Text(
         subtitle,
         style: AppTypography.caption.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
     );

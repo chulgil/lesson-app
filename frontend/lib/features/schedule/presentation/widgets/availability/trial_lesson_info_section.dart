@@ -30,7 +30,7 @@ class TrialLessonInfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1, color: AppColors.borderLight),
+        const Divider(height: 1, color: AppColors.inkQuaternary),
         const SizedBox(height: AppSpacing.space4),
 
         // Lesson goal
@@ -38,7 +38,7 @@ class TrialLessonInfoSection extends StatelessWidget {
           '레슨 목표',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -51,13 +51,13 @@ class TrialLessonInfoSection extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => onGoalChanged(goal),
               selectedColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: AppColors.paper,
               labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                color: isSelected ? Colors.white : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
+                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -73,7 +73,7 @@ class TrialLessonInfoSection extends StatelessWidget {
           '악기 경험',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -86,13 +86,13 @@ class TrialLessonInfoSection extends StatelessWidget {
               selected: isSelected,
               onSelected: (_) => onExperienceChanged(level),
               selectedColor: AppColors.primary,
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: AppColors.paper,
               labelStyle: AppTypography.bodySmall.copyWith(
-                color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+                color: isSelected ? Colors.white : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
+                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -108,14 +108,14 @@ class TrialLessonInfoSection extends StatelessWidget {
           '선생님께 전달할 메시지',
           style: AppTypography.bodyMedium.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           '선택사항',
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -126,17 +126,17 @@ class TrialLessonInfoSection extends StatelessWidget {
           decoration: InputDecoration(
             hintText: '배우고 싶은 곡이나 궁금한 점을 적어주세요',
             hintStyle: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             filled: true,
-            fillColor: AppColors.surfaceLight,
+            fillColor: AppColors.paper,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: const BorderSide(color: AppColors.borderLight),
+              borderSide: const BorderSide(color: AppColors.inkQuaternary),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -144,11 +144,11 @@ class TrialLessonInfoSection extends StatelessWidget {
             ),
             contentPadding: const EdgeInsets.all(AppSpacing.space3),
             counterStyle: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
           ),
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
 

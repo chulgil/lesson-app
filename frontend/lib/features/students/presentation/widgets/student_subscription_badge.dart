@@ -40,13 +40,13 @@ class StudentClassBadge extends ConsumerWidget {
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Text(
                 isAcademy ? '학원' : '개인',
                 style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -114,7 +114,7 @@ class StudentSubscriptionMiniBadge extends ConsumerWidget {
   Widget _buildNoSubscriptionBadge() {
     return Text(
       '수강권 없음',
-      style: AppTypography.caption.copyWith(color: AppColors.textTertiaryLight),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
     );
   }
 

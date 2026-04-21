@@ -77,7 +77,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                         onPressed: onDismiss,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                   ],
                 ),
@@ -85,7 +85,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                 Text(
                   '이전에 진행하던 스케줄이 있습니다.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                 ),
                 const SizedBox(height: AppSpacing.space2),
@@ -95,7 +95,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                     border: Border.all(
-                      color: AppColors.borderLight,
+                      color: AppColors.inkQuaternary,
                     ),
                   ),
                   child: Row(
@@ -126,7 +126,7 @@ class PreviousScheduleCard extends ConsumerWidget {
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: AppColors.textSecondaryLight,
+                                      color: AppColors.inkSecondary,
                                     ),
                               ),
                           ],

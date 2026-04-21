@@ -54,13 +54,13 @@ class ScheduleOptionCard extends StatelessWidget {
     final borderColor = isSelected
         ? AppColors.primary
         : isDisabled
-            ? AppColors.borderLight
-            : AppColors.borderLight;
+            ? AppColors.inkQuaternary
+            : AppColors.inkQuaternary;
     final backgroundColor = isSelected
         ? AppColors.primary.withValues(alpha: 0.05)
         : isDisabled
-            ? AppColors.textSecondaryLight.withValues(alpha: 0.05)
-            : AppColors.backgroundLight;
+            ? AppColors.inkSecondary.withValues(alpha: 0.05)
+            : AppColors.paperDark;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -93,7 +93,7 @@ class ScheduleOptionCard extends StatelessWidget {
                       index: option.priority - 1,
                       child: Icon(
                         Icons.drag_handle,
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                         size: 24,
                       ),
                     ),
@@ -155,7 +155,7 @@ class ScheduleOptionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isPrimary
             ? AppColors.primary.withValues(alpha: 0.1)
-            : AppColors.textSecondaryLight.withValues(alpha: 0.1),
+            : AppColors.inkSecondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
       ),
       child: Row(
@@ -172,7 +172,7 @@ class ScheduleOptionCard extends StatelessWidget {
           Text(
             option.priorityLabel,
             style: AppTypography.caption.copyWith(
-              color: isPrimary ? AppColors.primary : AppColors.textSecondaryLight,
+              color: isPrimary ? AppColors.primary : AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -193,7 +193,7 @@ class ScheduleOptionCard extends StatelessWidget {
         child: Icon(
           icon,
           size: 20,
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
     );
@@ -207,7 +207,7 @@ class ScheduleOptionCard extends StatelessWidget {
         shape: BoxShape.circle,
         color: isSelected ? AppColors.primary : Colors.transparent,
         border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.borderLight,
+          color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
           width: 2,
         ),
       ),
@@ -231,7 +231,7 @@ class ScheduleOptionCard extends StatelessWidget {
             Icon(
               Icons.calendar_today_outlined,
               size: 18,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
@@ -239,8 +239,8 @@ class ScheduleOptionCard extends StatelessWidget {
               style: AppTypography.bodyLarge.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDisabled
-                    ? AppColors.textSecondaryLight
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.inkSecondary
+                    : AppColors.ink,
               ),
             ),
           ],
@@ -254,15 +254,15 @@ class ScheduleOptionCard extends StatelessWidget {
             Icon(
               Icons.access_time,
               size: 18,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
               option.timeRange,
               style: AppTypography.bodyMedium.copyWith(
                 color: isDisabled
-                    ? AppColors.textSecondaryLight
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.inkSecondary
+                    : AppColors.ink,
               ),
             ),
           ],
@@ -281,7 +281,7 @@ class ScheduleOptionCard extends StatelessWidget {
             Icon(
               Icons.repeat,
               size: 18,
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
@@ -292,8 +292,8 @@ class ScheduleOptionCard extends StatelessWidget {
                 style: AppTypography.bodyLarge.copyWith(
                   fontWeight: FontWeight.w600,
                   color: isDisabled
-                      ? AppColors.textSecondaryLight
-                      : AppColors.textPrimaryLight,
+                      ? AppColors.inkSecondary
+                      : AppColors.ink,
                 ),
               ),
             ),
@@ -309,8 +309,8 @@ class ScheduleOptionCard extends StatelessWidget {
               '+ ${option.secondShortDayName} ${option.secondTimeRange}',
               style: AppTypography.bodyMedium.copyWith(
                 color: isDisabled
-                    ? AppColors.textSecondaryLight
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.inkSecondary
+                    : AppColors.ink,
               ),
             ),
           ),
@@ -323,15 +323,15 @@ class ScheduleOptionCard extends StatelessWidget {
               Icon(
                 Icons.access_time,
                 size: 18,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 option.timeRange,
                 style: AppTypography.bodyMedium.copyWith(
                   color: isDisabled
-                      ? AppColors.textSecondaryLight
-                      : AppColors.textPrimaryLight,
+                      ? AppColors.inkSecondary
+                      : AppColors.ink,
                 ),
               ),
             ],
@@ -346,13 +346,13 @@ class ScheduleOptionCard extends StatelessWidget {
               Icon(
                 Icons.event,
                 size: 18,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '시작일: ${option.startDate!.month}월 ${option.startDate!.day}일',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -384,7 +384,7 @@ class AddScheduleOptionButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           border: Border.all(
-            color: AppColors.borderLight,
+            color: AppColors.inkQuaternary,
             style: BorderStyle.solid,
           ),
         ),

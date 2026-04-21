@@ -43,7 +43,7 @@ class UnifiedRequestCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       ),
       elevation: 0,
-      color: AppColors.surfaceLight,
+      color: AppColors.paper,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -133,7 +133,7 @@ class UnifiedRequestCard extends StatelessWidget {
         Text(
           _formatRelativeTime(request.createdAt),
           style: AppTypography.caption.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],
@@ -183,7 +183,7 @@ class UnifiedRequestCard extends StatelessWidget {
                     color:
                         slot.priority == 1
                             ? AppColors.primary
-                            : AppColors.textTertiaryLight,
+                            : AppColors.inkTertiary,
                   ),
                   const SizedBox(width: AppSpacing.space1),
                   Text(
@@ -192,7 +192,7 @@ class UnifiedRequestCard extends StatelessWidget {
                       color:
                           slot.priority == 1
                               ? AppColors.primary
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                       fontWeight:
                           slot.priority == 1
                               ? FontWeight.w600
@@ -213,13 +213,13 @@ class UnifiedRequestCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         request.message!,
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
@@ -234,8 +234,8 @@ class UnifiedRequestCard extends StatelessWidget {
           child: OutlinedButton(
             onPressed: onReject,
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.textSecondaryLight,
-              side: BorderSide(color: AppColors.borderLight),
+              foregroundColor: AppColors.inkSecondary,
+              side: BorderSide(color: AppColors.inkQuaternary),
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
             child: Text(AppStrings.unavailable),
@@ -295,7 +295,7 @@ class UnifiedRequestCard extends StatelessWidget {
             child: Text(
               latestProposal.message!,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -329,8 +329,8 @@ class UnifiedRequestCard extends StatelessWidget {
               icon: const Icon(Icons.schedule, size: 16),
               label: Text(AppStrings.counterPropose),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textSecondaryLight,
-                side: BorderSide(color: AppColors.borderLight),
+                foregroundColor: AppColors.inkSecondary,
+                side: BorderSide(color: AppColors.inkQuaternary),
               ),
             ),
           ),
@@ -402,13 +402,13 @@ class UnifiedRequestCard extends StatelessWidget {
               Icon(
                 Icons.sell_outlined,
                 size: 14,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               const SizedBox(width: AppSpacing.space1),
               Text(
                 '참고 가격: ${_formatPrice(request.suggestedPrice!)}원',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -456,8 +456,8 @@ class UnifiedRequestCard extends StatelessWidget {
       ),
       UnifiedRequestStatus.rejected => (AppColors.error, AppColors.errorLight),
       UnifiedRequestStatus.cancelled || UnifiedRequestStatus.expired => (
-        AppColors.textTertiaryLight,
-        AppColors.backgroundLight,
+        AppColors.inkTertiary,
+        AppColors.paperDark,
       ),
       UnifiedRequestStatus.negotiating => (AppColors.info, AppColors.infoLight),
       _ => (AppColors.primary, AppColors.primaryLight),
@@ -516,7 +516,7 @@ class _AlternativeSlotCard extends StatelessWidget {
             vertical: AppSpacing.space2,
           ),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.borderLight),
+            border: Border.all(color: AppColors.inkQuaternary),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
@@ -557,12 +557,12 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: AppColors.textTertiaryLight),
+        Icon(icon, size: 14, color: AppColors.inkTertiary),
         const SizedBox(width: 3),
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],

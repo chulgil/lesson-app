@@ -47,7 +47,7 @@ class PracticeSparkline extends StatelessWidget {
                 width: (width / 7) - 1,
                 height: barHeight,
                 decoration: BoxDecoration(
-                  color: normalized > 0 ? color : AppColors.borderLight,
+                  color: normalized > 0 ? color : AppColors.inkQuaternary,
                   borderRadius: BorderRadius.circular(1),
                 ),
               );

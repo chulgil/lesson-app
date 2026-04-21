@@ -226,7 +226,7 @@ class _TimeSlotButton extends StatelessWidget {
         return Colors.transparent;
       case TimeSlotStatus.unavailable:
       case TimeSlotStatus.booked:
-        return AppColors.surfaceSecondaryLight;
+        return AppColors.paperDark;
       case TimeSlotStatus.selected:
         return AppColors.primary;
     }
@@ -238,7 +238,7 @@ class _TimeSlotButton extends StatelessWidget {
     }
     switch (slot.status) {
       case TimeSlotStatus.available:
-        return AppColors.borderLight;
+        return AppColors.inkQuaternary;
       case TimeSlotStatus.unavailable:
       case TimeSlotStatus.booked:
         return Colors.transparent;
@@ -253,10 +253,10 @@ class _TimeSlotButton extends StatelessWidget {
     }
     switch (slot.status) {
       case TimeSlotStatus.available:
-        return AppColors.textPrimaryLight;
+        return AppColors.ink;
       case TimeSlotStatus.unavailable:
       case TimeSlotStatus.booked:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case TimeSlotStatus.selected:
         return Colors.white;
     }

@@ -16,11 +16,11 @@ InputDecoration studentInputDecoration({
     prefixIcon: Icon(prefixIcon),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      borderSide: const BorderSide(color: AppColors.borderLight),
+      borderSide: const BorderSide(color: AppColors.inkQuaternary),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-      borderSide: const BorderSide(color: AppColors.borderLight),
+      borderSide: const BorderSide(color: AppColors.inkQuaternary),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -31,7 +31,7 @@ InputDecoration studentInputDecoration({
       borderSide: BorderSide(color: AppColors.error),
     ),
     filled: true,
-    fillColor: AppColors.surfaceLight,
+    fillColor: AppColors.paper,
   );
 }
 

@@ -48,9 +48,9 @@ class StudentPracticeSection extends ConsumerWidget {
           data: (practiced) => Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: AppColors.inkQuaternary),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -61,7 +61,7 @@ class StudentPracticeSection extends ConsumerWidget {
                     Text(
                       days[index],
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.space2),
@@ -70,19 +70,19 @@ class StudentPracticeSection extends ConsumerWidget {
                       height: 36,
                       decoration: BoxDecoration(
                         color: isPracticed
-                            ? AppColors.practiceGood.withValues(alpha: 0.15)
-                            : AppColors.surfaceSecondaryLight,
+                            ? AppColors.paperOk.withValues(alpha: 0.15)
+                            : AppColors.paperDark,
                         shape: BoxShape.circle,
                         border: isPracticed
-                            ? Border.all(color: AppColors.practiceGood, width: 2)
+                            ? Border.all(color: AppColors.paperOk, width: 2)
                             : null,
                       ),
                       child: Icon(
                         isPracticed ? Icons.check : Icons.remove,
                         size: 18,
                         color: isPracticed
-                            ? AppColors.practiceGood
-                            : AppColors.textTertiaryLight,
+                            ? AppColors.paperOk
+                            : AppColors.inkTertiary,
                       ),
                     ),
                   ],
@@ -134,8 +134,8 @@ class StudentPracticeSection extends ConsumerWidget {
                 : Icons.radio_button_unchecked,
             size: 20,
             color: task.isCompleted
-                ? AppColors.practiceGood
-                : AppColors.textTertiaryLight,
+                ? AppColors.paperOk
+                : AppColors.inkTertiary,
           ),
           const SizedBox(width: AppSpacing.space2),
           Expanded(
@@ -144,15 +144,15 @@ class StudentPracticeSection extends ConsumerWidget {
               style: AppTypography.bodyMedium.copyWith(
                 decoration: task.isCompleted ? TextDecoration.lineThrough : null,
                 color: task.isCompleted
-                    ? AppColors.textTertiaryLight
-                    : AppColors.textPrimaryLight,
+                    ? AppColors.inkTertiary
+                    : AppColors.ink,
               ),
             ),
           ),
           Text(
             '${task.targetMinutes}분',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

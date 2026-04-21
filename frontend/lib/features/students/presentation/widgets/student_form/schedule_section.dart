@@ -42,9 +42,9 @@ class ScheduleSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +69,7 @@ class ScheduleSection extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary
-                        : AppColors.surfaceSecondaryLight,
+                        : AppColors.paperDark,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
@@ -78,7 +78,7 @@ class ScheduleSection extends StatelessWidget {
                       style: AppTypography.bodySmall.copyWith(
                         color: isSelected
                             ? Colors.white
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -105,7 +105,7 @@ class ScheduleSection extends StatelessWidget {
             Text(
               '각 요일의 시작 시간을 개별 설정할 수 있습니다',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space3),
@@ -140,7 +140,7 @@ class ScheduleSection extends StatelessWidget {
                       Text(
                         '기본 레슨 시작 시간',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],
@@ -189,7 +189,7 @@ class ScheduleSection extends StatelessWidget {
                     Text(
                       '1회 레슨 시간',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],

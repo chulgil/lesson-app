@@ -65,10 +65,10 @@ class RequestCompletionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: const Text('신청 완료'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
@@ -111,14 +111,14 @@ class RequestCompletionScreen extends StatelessWidget {
         Text(
           AppStrings.requestCompleteHeader,
           style: AppTypography.headingLarge.copyWith(
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
         Text(
           '${params.teacherName} 선생님에게 요청을 보냈습니다',
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -129,7 +129,7 @@ class RequestCompletionScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -145,7 +145,7 @@ class RequestCompletionScreen extends StatelessWidget {
           Text(
             '진행 단계 가이드',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -185,7 +185,7 @@ class RequestCompletionScreen extends StatelessWidget {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: isActive ? AppColors.primary : AppColors.surfaceLight,
+                  color: isActive ? AppColors.primary : AppColors.paper,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isActive
@@ -231,14 +231,14 @@ class RequestCompletionScreen extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     color: isActive
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   description,
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -253,7 +253,7 @@ class RequestCompletionScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -269,7 +269,7 @@ class RequestCompletionScreen extends StatelessWidget {
           Text(
             '신청 정보 요약',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -281,7 +281,7 @@ class RequestCompletionScreen extends StatelessWidget {
           Text(
             '희망시간',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -350,7 +350,7 @@ class RequestCompletionScreen extends StatelessWidget {
             child: Text(
               label,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),

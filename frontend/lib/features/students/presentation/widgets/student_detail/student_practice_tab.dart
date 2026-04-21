@@ -28,7 +28,7 @@ class StudentPracticeTab extends ConsumerWidget {
             child: Text(
               '연습 데이터를 불러올 수 없습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -66,9 +66,9 @@ class _WeeklySummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.space3),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,9 +110,9 @@ class _WeeklySummaryCard extends StatelessWidget {
   }
 
   Color _practiceRateColor(double rate) {
-    if (rate >= 0.7) return AppColors.practiceGood;
+    if (rate >= 0.7) return AppColors.paperOk;
     if (rate >= 0.4) return AppColors.practiceNormal;
-    return AppColors.practicePoor;
+    return AppColors.paperAccent;
   }
 }
 
@@ -141,7 +141,7 @@ class _SummaryItem extends StatelessWidget {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -165,9 +165,9 @@ class _WeeklyPracticeGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.space3),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +223,7 @@ class _DayColumn extends StatelessWidget {
 
     final barColor =
         entry.hasPracticed
-            ? AppColors.practiceGood
+            ? AppColors.paperOk
             : AppColors.scheduleMutedBackground;
 
     final dayLabel = LessonDateUtils.getWeekdayNameKorean(entry.date.weekday);
@@ -238,8 +238,8 @@ class _DayColumn extends StatelessWidget {
             style: AppTypography.caption.copyWith(
               color:
                   entry.hasPracticed
-                      ? AppColors.textPrimaryLight
-                      : AppColors.textTertiaryLight,
+                      ? AppColors.ink
+                      : AppColors.inkTertiary,
               fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -278,8 +278,8 @@ class _DayColumn extends StatelessWidget {
               style: AppTypography.caption.copyWith(
                 color:
                     isToday
-                        ? AppColors.surfaceLight
-                        : AppColors.textSecondaryLight,
+                        ? AppColors.paper
+                        : AppColors.inkSecondary,
                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -305,9 +305,9 @@ class _SharedRecordingsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.space3),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,7 +321,7 @@ class _SharedRecordingsSection extends StatelessWidget {
               Text(
                 '${recordings.length}개',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -387,7 +387,7 @@ class _RecordingTile extends ConsumerWidget {
                           child: Text(
                             recording.sectionName,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -414,14 +414,14 @@ class _RecordingTile extends ConsumerWidget {
                   Text(
                     recording.formattedDuration,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                     ),
                   ),
                   if (recording.bpm != null)
                     Text(
                       '${recording.bpm} BPM',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textTertiaryLight,
+                        color: AppColors.inkTertiary,
                       ),
                     ),
                 ],
@@ -466,7 +466,7 @@ class _TileLeading extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(color: AppColors.surfaceLight, width: 1.5),
+                border: Border.all(color: AppColors.paper, width: 1.5),
               ),
               child: Text(
                 '$feedbackCount',
@@ -505,7 +505,7 @@ class _DetailStatsButton extends StatelessWidget {
       label: const Text('상세 통계 보기'),
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
-        side: const BorderSide(color: AppColors.borderLight),
+        side: const BorderSide(color: AppColors.inkQuaternary),
         padding: const EdgeInsets.symmetric(
           vertical: AppSpacing.space3,
           horizontal: AppSpacing.space4,

@@ -84,17 +84,17 @@ class StudentNotesSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          Icon(Icons.notes, color: AppColors.textTertiaryLight),
+          Icon(Icons.notes, color: AppColors.inkTertiary),
           const SizedBox(width: AppSpacing.space3),
           Text(
             '레슨 노트가 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -125,9 +125,9 @@ class _NotePreviewCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space3),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-          border: Border.all(color: AppColors.borderLight),
+          border: Border.all(color: AppColors.inkQuaternary),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +136,7 @@ class _NotePreviewCard extends StatelessWidget {
             Text(
               dateStr,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
                 fontWeight: FontWeight.w600,
               ),
             ),

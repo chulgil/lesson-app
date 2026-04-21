@@ -48,7 +48,7 @@ class AvailabilityBlock extends StatelessWidget {
                   child: Text(
                     bookedByName!,
                     style: AppTypography.captionXSmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -79,7 +79,7 @@ class AvailabilityBlock extends StatelessWidget {
       case AvailabilitySlotStatus.cancelled:
         return AppColors.error.withValues(alpha: 0.08);
       case AvailabilitySlotStatus.past:
-        return AppColors.surfaceSecondaryLight;
+        return AppColors.paperDark;
     }
   }
 
@@ -93,7 +93,7 @@ class AvailabilityBlock extends StatelessWidget {
       case AvailabilitySlotStatus.cancelled:
         return AppColors.error.withValues(alpha: 0.3);
       case AvailabilitySlotStatus.past:
-        return AppColors.borderLight;
+        return AppColors.inkQuaternary;
     }
   }
 

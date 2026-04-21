@@ -155,7 +155,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               child: Text(
                 '취소',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -205,11 +205,11 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
         decoration: InputDecoration(
           hintText: '학생 이름 또는 악기로 검색',
           hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           prefixIcon: const Icon(
             Icons.search,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           suffixIcon:
               _searchController.text.isNotEmpty
@@ -222,7 +222,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   )
                   : null,
           filled: true,
-          fillColor: AppColors.surfaceSecondaryLight,
+          fillColor: AppColors.paperDark,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             borderSide: BorderSide.none,
@@ -289,7 +289,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                   color:
                       hasActiveFilter
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                 ),
                 if (hasActiveFilter)
                   Positioned(
@@ -322,7 +322,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
       builder:
           (context) => Container(
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: AppColors.paper,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(AppSpacing.radiusLarge),
               ),
@@ -347,7 +347,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                         color:
                             isSelected
                                 ? AppColors.primary
-                                : AppColors.textTertiaryLight,
+                                : AppColors.inkTertiary,
                       ),
                       title: Text(
                         filter.label,
@@ -388,7 +388,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           Text(
             '전체 $count명',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           TextButton.icon(
@@ -431,7 +431,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
                       color:
                           isSelected
                               ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                              : AppColors.inkTertiary,
                     ),
                     title: Text(option.label),
                     onTap: () {
@@ -552,7 +552,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
               Text(
                 '${_selectedStudentIds.length}명 선택됨',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const Spacer(),
@@ -583,7 +583,7 @@ class _StudentsTabState extends ConsumerState<StudentsTab> {
           Text(
             '데이터를 불러오는데 실패했습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space6),
@@ -660,13 +660,13 @@ class _ClassGroupSectionState extends State<_ClassGroupSection> {
                     '${widget.group.icon} ${widget.group.title} (${widget.group.count})',
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimaryLight,
+                      color: AppColors.ink,
                     ),
                   ),
                 ),
                 Icon(
                   _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                   size: 20,
                 ),
               ],
@@ -835,7 +835,7 @@ class _StudentCard extends ConsumerWidget {
                           color:
                               swm.isAppConnected
                                   ? AppColors.success
-                                  : AppColors.textTertiaryLight,
+                                  : AppColors.inkTertiary,
                         ),
                       ],
                     ),
@@ -843,7 +843,7 @@ class _StudentCard extends ConsumerWidget {
                     Text(
                       swm.lessonSchedule ?? '스케줄 미등록',
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -861,7 +861,7 @@ class _StudentCard extends ConsumerWidget {
                 // Arrow
                 const Icon(
                   Icons.chevron_right,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                   size: 20,
                 ),
               ],
@@ -994,7 +994,7 @@ class _PracticeDots extends ConsumerWidget {
               Text(
                 '$practiced/7일',
                 style: AppTypography.captionSmall.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],

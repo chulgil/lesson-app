@@ -54,13 +54,13 @@ class StudentDetailScreen extends ConsumerWidget {
                   Icon(
                     Icons.person_off,
                     size: 64,
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                   const SizedBox(height: AppSpacing.space4),
                   Text(
                     '학생을 찾을 수 없습니다',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -101,7 +101,7 @@ class StudentDetailScreen extends ConsumerWidget {
                   Text(
                     '데이터를 불러오는데 실패했습니다',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space6),
@@ -462,10 +462,10 @@ class _StudentDetailContent extends ConsumerWidget {
                 // Show status change options based on current status
                 if (student.status == StudentStatus.trial) ...[
                   ListTile(
-                    leading: Icon(Icons.upgrade, color: AppColors.practiceGood),
+                    leading: Icon(Icons.upgrade, color: AppColors.paperOk),
                     title: Text(
                       '정규 전환',
-                      style: TextStyle(color: AppColors.practiceGood),
+                      style: TextStyle(color: AppColors.paperOk),
                     ),
                     subtitle: const Text('체험 학생을 정규 학생으로 전환'),
                     onTap: () async {
@@ -541,11 +541,11 @@ class _StudentDetailContent extends ConsumerWidget {
                   ListTile(
                     leading: Icon(
                       Icons.play_circle_outline,
-                      color: AppColors.practiceGood,
+                      color: AppColors.paperOk,
                     ),
                     title: Text(
                       '레슨 재개',
-                      style: TextStyle(color: AppColors.practiceGood),
+                      style: TextStyle(color: AppColors.paperOk),
                     ),
                     subtitle: const Text('휴강 상태를 해제하고 레슨 재개'),
                     onTap: () async {
@@ -772,7 +772,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 Text(
                   '이 코드를 학부모님께 전달해주세요.\n학부모님이 앱에서 코드를 입력하면\n자녀와 연결됩니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -780,7 +780,7 @@ class _StudentDetailContent extends ConsumerWidget {
                 Text(
                   '* 코드는 24시간 동안 유효합니다',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],

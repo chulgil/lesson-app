@@ -70,7 +70,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
             child: Center(
               child: Text(
                 '스케줄을 불러올 수 없습니다',
-                style: TextStyle(color: AppColors.textSecondaryLight),
+                style: TextStyle(color: AppColors.inkSecondary),
               ),
             ),
           ),
@@ -114,7 +114,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
                   label,
                   style: AppTypography.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ),
@@ -146,7 +146,7 @@ class _ScheduleSlotPickerState extends ConsumerState<ScheduleSlotPicker> {
                 child: Text(
                   timeLabel,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ),

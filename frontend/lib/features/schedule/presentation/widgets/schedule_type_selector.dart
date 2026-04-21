@@ -64,7 +64,7 @@ class _ScheduleTypeCard extends StatelessWidget {
       color:
           isSelected
               ? AppColors.primary.withValues(alpha: 0.08)
-              : AppColors.surfaceLight,
+              : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         onTap: onTap,
@@ -74,7 +74,7 @@ class _ScheduleTypeCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               width: isSelected ? 2 : 1,
             ),
           ),
@@ -87,7 +87,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                   color:
                       isSelected
                           ? AppColors.primary.withValues(alpha: 0.15)
-                          : AppColors.surfaceSecondaryLight,
+                          : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Icon(
@@ -97,7 +97,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                   color:
                       isSelected
                           ? AppColors.primary
-                          : AppColors.textSecondaryLight,
+                          : AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(width: AppSpacing.space3),
@@ -114,7 +114,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                             color:
                                 isSelected
                                     ? AppColors.primary
-                                    : AppColors.textPrimaryLight,
+                                    : AppColors.ink,
                           ),
                         ),
                         if (isRecommended) ...[
@@ -125,7 +125,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.practiceGood.withValues(
+                              color: AppColors.paperOk.withValues(
                                 alpha: 0.15,
                               ),
                               borderRadius: BorderRadius.circular(
@@ -135,7 +135,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                             child: Text(
                               '권장',
                               style: AppTypography.caption.copyWith(
-                                color: AppColors.practiceGood,
+                                color: AppColors.paperOk,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -147,7 +147,7 @@ class _ScheduleTypeCard extends StatelessWidget {
                     Text(
                       type.description,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -187,15 +187,15 @@ class LessonGoalSelector extends StatelessWidget {
               onSelected: (selected) {
                 if (selected) onGoalSelected(goal);
               },
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: AppColors.paper,
               selectedColor: AppColors.primary.withValues(alpha: 0.15),
               checkmarkColor: AppColors.primary,
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.borderLight,
+                color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
-                    isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                    isSelected ? AppColors.primary : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );
@@ -229,17 +229,17 @@ class ExperienceLevelSelector extends StatelessWidget {
               onSelected: (selected) {
                 if (selected) onLevelSelected(level);
               },
-              backgroundColor: AppColors.surfaceLight,
+              backgroundColor: AppColors.paper,
               selectedColor: AppColors.secondary.withValues(alpha: 0.15),
               checkmarkColor: AppColors.secondary,
               side: BorderSide(
-                color: isSelected ? AppColors.secondary : AppColors.borderLight,
+                color: isSelected ? AppColors.secondary : AppColors.inkQuaternary,
               ),
               labelStyle: AppTypography.bodySmall.copyWith(
                 color:
                     isSelected
                         ? AppColors.secondary
-                        : AppColors.textPrimaryLight,
+                        : AppColors.ink,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             );

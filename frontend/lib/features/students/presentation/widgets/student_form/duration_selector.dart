@@ -21,7 +21,7 @@ class DurationSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -42,7 +42,7 @@ class DurationSelector extends StatelessWidget {
               child: Text(
                 '$duration',
                 style: AppTypography.bodySmall.copyWith(
-                  color: isSelected ? Colors.white : AppColors.textSecondaryLight,
+                  color: isSelected ? Colors.white : AppColors.inkSecondary,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),

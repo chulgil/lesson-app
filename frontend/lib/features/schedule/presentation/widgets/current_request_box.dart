@@ -173,8 +173,8 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         MediaQuery.of(context).padding.bottom + AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: _buildPhaseContent(),
     );
@@ -220,13 +220,13 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 Icon(
                   Icons.touch_app,
                   size: 14,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(width: AppSpacing.space1),
                 Text(
                   AppStrings.slotSelectionHint,
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -246,7 +246,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           decoration: InputDecoration(
             hintText: AppStrings.messageHint,
             hintStyle: AppTypography.bodySmall.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             counterText: '',
             contentPadding: const EdgeInsets.symmetric(
@@ -255,11 +255,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-              borderSide: BorderSide(color: AppColors.borderLight),
+              borderSide: BorderSide(color: AppColors.inkQuaternary),
             ),
           ),
         ),
@@ -275,7 +275,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                 child: OutlinedButton(
                   onPressed: widget.onCounterPropose,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.borderLight),
+                    side: const BorderSide(color: AppColors.inkQuaternary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
@@ -288,7 +288,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   child: Text(
                     AppStrings.counterPropose,
                     style: AppTypography.buttonSmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ),
@@ -359,11 +359,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                   color:
                       isSelected
                           ? AppColors.primary.withValues(alpha: 0.08)
-                          : AppColors.surfaceLight,
+                          : AppColors.paper,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.primary : AppColors.borderLight,
+                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -375,7 +375,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textPrimaryLight,
+                            : AppColors.ink,
                   ),
                 ),
               ),
@@ -398,7 +398,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: Text(
                 AppStrings.waitingForResponse(widget.opponentName),
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -415,11 +415,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             label: Text(
               AppStrings.withdrawApproval,
               style: AppTypography.buttonSmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.borderLight),
+              side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -566,7 +566,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: Text(
                 AppStrings.chatProposalSent,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -625,10 +625,10 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           color:
               isSelected
                   ? AppColors.primary.withValues(alpha: 0.06)
-                  : AppColors.surfaceLight,
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -638,7 +638,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
               size: 18,
               color:
-                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                  isSelected ? AppColors.primary : AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Expanded(
@@ -652,7 +652,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
             Text(
               template.summaryText,
               style: AppTypography.caption.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -687,7 +687,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           child: Text(
             AppStrings.subscriptionSummaryMessage,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -719,7 +719,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
       children: [
         Icon(
           Icons.check_circle_outline,
-          color: AppColors.textTertiaryLight,
+          color: AppColors.inkTertiary,
           size: 18,
         ),
         const SizedBox(width: AppSpacing.space2),
@@ -727,7 +727,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           AppStrings.requestClosed,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w500,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
         ),
       ],
@@ -756,7 +756,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
               child: Text(
                 message,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -799,7 +799,7 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
           child: Text(
             message,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),
@@ -847,11 +847,11 @@ class _CurrentRequestBoxState extends State<CurrentRequestBox> {
         label: Text(
           label,
           style: AppTypography.buttonSmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppColors.borderLight),
+          side: const BorderSide(color: AppColors.inkQuaternary),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),

@@ -53,7 +53,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        side: BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.space4),
@@ -71,7 +71,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             const SizedBox(height: AppSpacing.space4),
 
             // Divider
-            Divider(color: AppColors.borderLight, height: 1),
+            Divider(color: AppColors.inkQuaternary, height: 1),
 
             const SizedBox(height: AppSpacing.space4),
 
@@ -145,7 +145,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
         Text(
           _getTimeSinceRequest(),
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -186,7 +186,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                       booking.experienceLevel!.label,
                   ].join(' · '),
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               if (booking.studentMessage != null &&
@@ -195,7 +195,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space2),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: AppColors.paperDark,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusMedium),
                   ),
@@ -204,14 +204,14 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
                       Icon(
                         Icons.chat_bubble_outline,
                         size: 14,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           booking.studentMessage!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -248,7 +248,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 18,
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -265,7 +265,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               Icon(
                 Icons.access_time,
                 size: 18,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -290,7 +290,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             onPressed: widget.onReject,
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(color: AppColors.borderLight),
+              side: BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -298,7 +298,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
             child: Text(
               '거절하기',
               style: AppTypography.button.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -311,7 +311,7 @@ class _TeacherApprovalCardState extends State<TeacherApprovalCard> {
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.primary,
               disabledBackgroundColor:
-                  AppColors.textSecondaryLight.withValues(alpha: 0.3),
+                  AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
@@ -392,7 +392,7 @@ class TeacherApprovalListItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.space3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        side: BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: onTap,
@@ -456,14 +456,14 @@ class TeacherApprovalListItem extends StatelessWidget {
                       Text(
                         '${booking.scheduleOptionsCount}개 일정 제안',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       )
                     else
                       Text(
                         '${booking.formattedDate} ${booking.timeRange}',
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                   ],
@@ -473,7 +473,7 @@ class TeacherApprovalListItem extends StatelessWidget {
               // Arrow
               Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ],
           ),

@@ -94,7 +94,7 @@ class _MethodCard extends StatelessWidget {
                 : Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isPrimary ? AppColors.primary : AppColors.borderLight,
+          color: isPrimary ? AppColors.primary : AppColors.inkQuaternary,
           width: isPrimary ? 1.5 : 1,
         ),
       ),
@@ -112,7 +112,7 @@ class _MethodCard extends StatelessWidget {
                     color:
                         isPrimary
                             ? AppColors.primary.withValues(alpha: 0.15)
-                            : AppColors.surfaceSecondaryLight,
+                            : AppColors.paperDark,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -123,7 +123,7 @@ class _MethodCard extends StatelessWidget {
                     color:
                         isPrimary
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.space3),
@@ -134,7 +134,7 @@ class _MethodCard extends StatelessWidget {
                     color:
                         isPrimary
                             ? AppColors.primary
-                            : AppColors.textPrimaryLight,
+                            : AppColors.ink,
                   ),
                 ),
                 if (badge != null) ...[
@@ -168,7 +168,7 @@ class _MethodCard extends StatelessWidget {
             Text(
               description,
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 height: 1.5,
               ),
             ),

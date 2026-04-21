@@ -39,7 +39,7 @@ enum StudentStatus {
       case StudentStatus.active:
         return AppColors.success;
       case StudentStatus.paused:
-        return AppColors.textTertiaryLight;
+        return AppColors.inkTertiary;
       case StudentStatus.inactive:
         return AppColors.error;
     }
@@ -111,11 +111,11 @@ enum PracticeStatus {
   Color get color {
     switch (this) {
       case PracticeStatus.good:
-        return AppColors.practiceGood;
+        return AppColors.paperOk;
       case PracticeStatus.normal:
         return AppColors.practiceNormal;
       case PracticeStatus.poor:
-        return AppColors.practicePoor;
+        return AppColors.paperAccent;
       case PracticeStatus.paused:
         return AppColors.practicePaused;
     }

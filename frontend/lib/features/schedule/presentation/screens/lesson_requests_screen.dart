@@ -24,9 +24,9 @@ class LessonRequestsScreen extends ConsumerWidget {
     final requestsAsync = ref.watch(teacherUnifiedRequestsProvider(teacherId));
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         title: requestsAsync.when(
           loading: () => const Text(AppStrings.lessonRequestTitle),
@@ -70,7 +70,7 @@ class LessonRequestsScreen extends ConsumerWidget {
                   Text(
                     AppStrings.requestLoadError,
                     style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.space4),
@@ -87,7 +87,7 @@ class LessonRequestsScreen extends ConsumerWidget {
               child: Text(
                 AppStrings.noHistory,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             );
@@ -105,9 +105,9 @@ class LessonRequestsScreen extends ConsumerWidget {
               final request = requests[index];
               return Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: AppColors.paper,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: RequestListItem(
                   request: request,

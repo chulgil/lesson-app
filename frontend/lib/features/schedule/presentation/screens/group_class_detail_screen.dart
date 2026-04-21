@@ -122,9 +122,9 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -191,9 +191,9 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -234,12 +234,12 @@ class _GroupClassDetailScreenState
   }) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.textSecondaryLight),
+        Icon(icon, size: 20, color: AppColors.inkSecondary),
         const SizedBox(width: AppSpacing.space2),
         Text(
           label,
           style: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const Spacer(),
@@ -330,7 +330,7 @@ class _GroupClassDetailScreenState
             Text(
               '대기자 현황: $waitlistCount명',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -380,7 +380,7 @@ class _GroupClassDetailScreenState
             Text(
               '취소 발생 시 순서대로 예약됩니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -419,7 +419,7 @@ class _GroupClassDetailScreenState
       return Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSecondaryLight,
+          color: AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         ),
         child: Column(
@@ -427,13 +427,13 @@ class _GroupClassDetailScreenState
             const Icon(
               Icons.block,
               size: 48,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '예약이 마감되었습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ],
@@ -471,7 +471,7 @@ class _GroupClassDetailScreenState
           Text(
             'ℹ️ 취소 발생 시 순서대로 예약됩니다',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -483,9 +483,9 @@ class _GroupClassDetailScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +500,7 @@ class _GroupClassDetailScreenState
           Text(
             widget.groupClass.description!,
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -537,7 +537,7 @@ class _GroupClassDetailScreenState
             '• 취소 마감: 수업 ${widget.groupClass.cancelDeadlineMinutes ~/ 60}시간 전\n'
             '• 미참석 시: ${widget.groupClass.noShowPolicy == NoShowPolicy.deduct ? '수강권 차감' : '수강권 미차감'}',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],

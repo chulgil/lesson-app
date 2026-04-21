@@ -53,8 +53,8 @@ class AvailabilityDateNavigator extends StatelessWidget {
               onPressed: canGoPrevious ? _previousDay : null,
               icon: const Icon(Icons.chevron_left),
               color: canGoPrevious
-                  ? AppColors.textSecondaryLight
-                  : AppColors.textTertiaryLight,
+                  ? AppColors.inkSecondary
+                  : AppColors.inkTertiary,
             ),
 
             // Date display
@@ -66,9 +66,9 @@ class AvailabilityDateNavigator extends StatelessWidget {
                   vertical: AppSpacing.space2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: AppColors.paper,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color: AppColors.inkQuaternary),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -83,7 +83,7 @@ class AvailabilityDateNavigator extends StatelessWidget {
                     const Icon(
                       Icons.keyboard_arrow_down,
                       size: 20,
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ],
                 ),
@@ -94,7 +94,7 @@ class AvailabilityDateNavigator extends StatelessWidget {
             IconButton(
               onPressed: _nextDay,
               icon: const Icon(Icons.chevron_right),
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ],
         ),

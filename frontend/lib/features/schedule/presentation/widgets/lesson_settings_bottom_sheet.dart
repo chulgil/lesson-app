@@ -70,7 +70,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                 Text(
                   '학생들이 예약할 수 있는 시간 단위를 설정합니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
 
@@ -175,7 +175,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
         Text(
           description,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -195,7 +195,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                     color:
                         isSelected
                             ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                            : AppColors.inkSecondary,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
@@ -226,9 +226,9 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +262,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
-                      border: Border.all(color: AppColors.borderLight),
+                      border: Border.all(color: AppColors.inkQuaternary),
                     ),
                     child: Text(slot, style: AppTypography.bodySmall),
                   );

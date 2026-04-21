@@ -90,10 +90,10 @@ class _UnifiedLessonRequestScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
         title: Text(AppStrings.lessonRequestFormTitle),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
       body: Form(
@@ -144,7 +144,7 @@ class _UnifiedLessonRequestScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -178,7 +178,7 @@ class _UnifiedLessonRequestScreenState
                 Text(
                   widget.params.teacherInstruments.join(', '),
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -283,13 +283,13 @@ class _UnifiedLessonRequestScreenState
             if (states.contains(WidgetState.selected)) {
               return AppColors.primary;
             }
-            return AppColors.surfaceLight;
+            return AppColors.paper;
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
               return Colors.white;
             }
-            return AppColors.textPrimaryLight;
+            return AppColors.ink;
           }),
         ),
       ),
@@ -323,14 +323,14 @@ class _UnifiedLessonRequestScreenState
               });
             },
             selectedColor: AppColors.primary.withValues(alpha: 0.2),
-            backgroundColor: AppColors.surfaceLight,
+            backgroundColor: AppColors.paper,
             labelStyle: AppTypography.bodyMedium.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                  isSelected ? AppColors.primary : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             ),
           );
         }).toList(),
@@ -348,14 +348,14 @@ class _UnifiedLessonRequestScreenState
         initialValue: _selectedGoal,
         decoration: InputDecoration(
           filled: true,
-          fillColor: AppColors.surfaceLight,
+          fillColor: AppColors.paper,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -409,13 +409,13 @@ class _UnifiedLessonRequestScreenState
             if (states.contains(WidgetState.selected)) {
               return AppColors.primary;
             }
-            return AppColors.surfaceLight;
+            return AppColors.paper;
           }),
           foregroundColor: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
               return Colors.white;
             }
-            return AppColors.textPrimaryLight;
+            return AppColors.ink;
           }),
         ),
       ),
@@ -450,17 +450,17 @@ class _UnifiedLessonRequestScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
         children: [
-          const Icon(Icons.schedule, size: 18, color: AppColors.textSecondaryLight),
+          const Icon(Icons.schedule, size: 18, color: AppColors.inkSecondary),
           const SizedBox(width: AppSpacing.space3),
           Text(
             AppStrings.estimatedDuration,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const Spacer(),
@@ -519,17 +519,17 @@ class _UnifiedLessonRequestScreenState
         decoration: InputDecoration(
           hintText: '선생님께 전달할 메시지를 입력하세요',
           hintStyle: AppTypography.bodyMedium.copyWith(
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           filled: true,
-          fillColor: AppColors.surfaceLight,
+          fillColor: AppColors.paper,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-            borderSide: const BorderSide(color: AppColors.borderLight),
+            borderSide: const BorderSide(color: AppColors.inkQuaternary),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -553,7 +553,7 @@ class _UnifiedLessonRequestScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Row(
@@ -567,7 +567,7 @@ class _UnifiedLessonRequestScreenState
                 Text(
                   '참고 레슨비',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -575,7 +575,7 @@ class _UnifiedLessonRequestScreenState
                   '${_formatPrice(referencePrice)}원 / 회',
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimaryLight,
+                    color: AppColors.ink,
                   ),
                 ),
               ],
@@ -767,7 +767,7 @@ class _SectionWrapper extends StatelessWidget {
               Text(
                 subtitle!,
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],

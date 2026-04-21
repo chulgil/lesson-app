@@ -101,14 +101,14 @@ class AddressFields extends StatelessWidget {
             Icon(
               Icons.lock_outline,
               size: AppSpacing.iconXS,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(width: AppSpacing.space1),
             Flexible(
               child: Text(
                 '주소는 연결된 선생님에게만 공개됩니다',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ),

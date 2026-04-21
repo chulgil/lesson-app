@@ -77,19 +77,19 @@ class PendingBookingsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.inbox, size: 64, color: AppColors.textTertiaryLight),
+          Icon(Icons.inbox, size: 64, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '대기 중인 신청이 없습니다',
             style: AppTypography.headingSmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '새로운 레슨 신청이 들어오면\n여기에 표시됩니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),

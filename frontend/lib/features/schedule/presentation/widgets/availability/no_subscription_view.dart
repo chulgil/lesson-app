@@ -70,7 +70,7 @@ class NoSubscriptionView extends ConsumerWidget {
             Text(
               '정기 레슨을 예약하려면\n먼저 수강권을 등록해야 합니다.',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -104,7 +104,7 @@ class NoSubscriptionView extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space4),
               decoration: BoxDecoration(
-                color: AppColors.surfaceSecondaryLight,
+                color: AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Column(
@@ -249,7 +249,7 @@ class NoSubscriptionView extends ConsumerWidget {
             child: Text(
               text,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),

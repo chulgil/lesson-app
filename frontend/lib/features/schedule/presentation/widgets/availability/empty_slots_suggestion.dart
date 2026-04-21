@@ -37,7 +37,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
         Text(
           '이 날은 예약 가능한 시간이\n없습니다',
           style: AppTypography.bodyLarge.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -62,7 +62,7 @@ class EmptySlotsSuggestion extends StatelessWidget {
               Text(
                 '가장 가까운 예약 가능일',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -137,7 +137,7 @@ class _SuggestionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Material(
         color: Colors.transparent,
@@ -163,7 +163,7 @@ class _SuggestionCard extends StatelessWidget {
                       Text(
                         suggestion.timesPreview,
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ],

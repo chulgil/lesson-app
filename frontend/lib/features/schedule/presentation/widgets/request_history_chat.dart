@@ -139,7 +139,7 @@ class RequestHistoryChat extends StatelessWidget {
                       actorName.isNotEmpty ? actorName[0] : '?',
                       style: AppTypography.bodySmall.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     )
                   : null,
@@ -164,7 +164,7 @@ class RequestHistoryChat extends StatelessWidget {
                     child: Text(
                       actorName,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -175,7 +175,7 @@ class RequestHistoryChat extends StatelessWidget {
                     // Color by role (not viewer): teacher=primary, student=secondary
                     color: event.actorType == ProposerRole.teacher
                         ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.surfaceSecondaryLight,
+                        : AppColors.paperDark,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(AppSpacing.radiusLarge),
                       topRight: const Radius.circular(AppSpacing.radiusLarge),
@@ -229,7 +229,7 @@ class RequestHistoryChat extends StatelessWidget {
             child: Text(
               '${entry.key + 1}순위 ${entry.value}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           )),
@@ -312,7 +312,7 @@ class RequestHistoryChat extends StatelessWidget {
           displayLabel,
           style: AppTypography.bodySmall.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimaryLight,
+            color: AppColors.ink,
           ),
         ),
 
@@ -329,7 +329,7 @@ class RequestHistoryChat extends StatelessWidget {
           Text(
             confirmedSlotLabel,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               decoration: isWithdrawEvent
                   ? TextDecoration.lineThrough
                   : null,
@@ -349,7 +349,7 @@ class RequestHistoryChat extends StatelessWidget {
           Text(
             '${LessonScheduleChange.dayOfWeekLabel(event.proposedDayOfWeek!)} ${event.proposedTime}',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -361,7 +361,7 @@ class RequestHistoryChat extends StatelessWidget {
           Text(
             event.message!,
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -417,7 +417,7 @@ class RequestHistoryChat extends StatelessWidget {
                   Text(
                     guide.situation,
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],
@@ -438,18 +438,18 @@ class RequestHistoryChat extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
       child: Row(
         children: [
-          const Expanded(child: Divider(color: AppColors.borderLight)),
+          const Expanded(child: Divider(color: AppColors.inkQuaternary)),
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: AppSpacing.space3),
             child: Text(
               '${date.month}월 ${date.day}일 $dayLabel요일',
               style: AppTypography.caption.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),
-          const Expanded(child: Divider(color: AppColors.borderLight)),
+          const Expanded(child: Divider(color: AppColors.inkQuaternary)),
         ],
       ),
     );
@@ -466,7 +466,7 @@ class RequestHistoryChat extends StatelessWidget {
     return Text(
       '$period $displayHour:$minuteStr',
       style: AppTypography.caption.copyWith(
-        color: AppColors.textTertiaryLight,
+        color: AppColors.inkTertiary,
       ),
     );
   }
@@ -539,7 +539,7 @@ class RequestHistoryChat extends StatelessWidget {
             child: Text(
               AppStrings.noHistory,
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ),

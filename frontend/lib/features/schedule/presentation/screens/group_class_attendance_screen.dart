@@ -121,8 +121,8 @@ class _GroupClassAttendanceScreenState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: const BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: Border(bottom: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         children: [
@@ -154,7 +154,7 @@ class _GroupClassAttendanceScreenState
                 Text(
                   '${widget.schedule.dateText} ${widget.schedule.timeText}',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -175,7 +175,7 @@ class _GroupClassAttendanceScreenState
               Text(
                 '출석',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ],
@@ -216,13 +216,13 @@ class _GroupClassAttendanceScreenState
           Icon(
             Icons.people_outline,
             size: 64,
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '예약된 학생이 없습니다',
             style: AppTypography.bodyLarge.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -268,7 +268,7 @@ class _GroupClassAttendanceScreenState
                       ? Colors.transparent
                       : AppColors.error.withValues(alpha: 0.05),
               border: const Border(
-                bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
+                bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
               ),
             ),
             child: Row(
@@ -307,8 +307,8 @@ class _GroupClassAttendanceScreenState
                               isAttended ? null : TextDecoration.lineThrough,
                           color:
                               isAttended
-                                  ? AppColors.textPrimaryLight
-                                  : AppColors.textSecondaryLight,
+                                  ? AppColors.ink
+                                  : AppColors.inkSecondary,
                         ),
                       ),
                       if (!isAttended)
@@ -326,7 +326,7 @@ class _GroupClassAttendanceScreenState
                 Icon(
                   Icons.touch_app_outlined,
                   size: 20,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ],
             ),
@@ -345,8 +345,8 @@ class _GroupClassAttendanceScreenState
         AppSpacing.space4 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        border: const Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paper,
+        border: const Border(top: BorderSide(color: AppColors.inkQuaternary)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -447,7 +447,7 @@ class _GroupClassAttendanceScreenState
                 Text(
                   '수업을 종료하시겠습니까?\n출석한 학생의 수강권이 차감됩니다.',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

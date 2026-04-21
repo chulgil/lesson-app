@@ -54,10 +54,10 @@ class MyBookingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('내 레슨 예약'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: SafeArea(
         child: Column(
           children: [
@@ -96,7 +96,7 @@ class MyBookingsScreen extends ConsumerWidget {
                           Text(
                             '데이터를 불러올 수 없습니다',
                             style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                           ),
                         ],
@@ -120,7 +120,7 @@ class MyBookingsScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -172,7 +172,7 @@ class MyBookingsScreen extends ConsumerWidget {
                             canReschedule
                                 ? (isLastChance
                                     ? AppColors.warning
-                                    : AppColors.textSecondaryLight)
+                                    : AppColors.inkSecondary)
                                 : AppColors.error,
                         fontWeight:
                             isLastChance ? FontWeight.w600 : FontWeight.normal,
@@ -232,7 +232,7 @@ class MyBookingsScreen extends ConsumerWidget {
         border: Border.all(
           color:
               isPast
-                  ? AppColors.borderLight
+                  ? AppColors.inkQuaternary
                   : AppColors.primary.withValues(alpha: 0.3),
         ),
       ),
@@ -250,7 +250,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color:
                       isPast
-                          ? AppColors.surfaceLight
+                          ? AppColors.paper
                           : AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
@@ -259,7 +259,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   style: AppTypography.bodySmall.copyWith(
                     color:
                         isPast
-                            ? AppColors.textSecondaryLight
+                            ? AppColors.inkSecondary
                             : AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -272,8 +272,8 @@ class MyBookingsScreen extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                   color:
                       isPast
-                          ? AppColors.textSecondaryLight
-                          : AppColors.textPrimaryLight,
+                          ? AppColors.inkSecondary
+                          : AppColors.ink,
                 ),
               ),
               const Spacer(),
@@ -320,7 +320,7 @@ class MyBookingsScreen extends ConsumerWidget {
                         color:
                             canReschedule
                                 ? AppColors.primary
-                                : AppColors.borderLight,
+                                : AppColors.inkQuaternary,
                       ),
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space2,
@@ -343,7 +343,7 @@ class MyBookingsScreen extends ConsumerWidget {
                         color:
                             canReschedule
                                 ? AppColors.error
-                                : AppColors.borderLight,
+                                : AppColors.inkQuaternary,
                       ),
                       padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.space2,
@@ -359,7 +359,7 @@ class MyBookingsScreen extends ConsumerWidget {
               Text(
                 '변경/취소 횟수를 모두 사용했습니다',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
             ],

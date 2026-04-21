@@ -119,7 +119,7 @@ class AvailabilityChipSelector extends StatelessWidget {
           Text(
             '예약 가능한 시간',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textPrimaryLight,
+              color: AppColors.ink,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -151,7 +151,7 @@ class AvailabilityChipSelector extends StatelessWidget {
         Text(
           label,
           style: AppTypography.bodySmall.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
         const SizedBox(height: AppSpacing.space2),
@@ -241,7 +241,7 @@ class _TimeChip extends StatelessWidget {
     if (slot.isRecommended) {
       return AppColors.warningLight; // Light orange
     }
-    return AppColors.backgroundLight; // #FFFAF5
+    return AppColors.paperDark; // #FFFAF5
   }
 
   Color get _borderColor {
@@ -251,13 +251,13 @@ class _TimeChip extends StatelessWidget {
     if (slot.isRecommended) {
       return AppColors.secondary; // #F4A460
     }
-    return AppColors.borderLight;
+    return AppColors.inkQuaternary;
   }
 
   Color get _textColor {
     if (isSelected) {
       return Colors.white;
     }
-    return AppColors.textPrimaryLight;
+    return AppColors.ink;
   }
 }

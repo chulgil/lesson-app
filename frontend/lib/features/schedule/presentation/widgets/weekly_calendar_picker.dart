@@ -191,7 +191,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
             child: Center(
               child: Text(
                 '스케줄을 불러올 수 없습니다',
-                style: TextStyle(color: AppColors.textSecondaryLight),
+                style: TextStyle(color: AppColors.inkSecondary),
               ),
             ),
           ),
@@ -287,7 +287,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                       color:
                           isToday
                               ? AppColors.primary
-                              : AppColors.textSecondaryLight,
+                              : AppColors.inkSecondary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -310,7 +310,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                           color:
                               isToday
                                   ? Colors.white
-                                  : AppColors.textSecondaryLight,
+                                  : AppColors.inkSecondary,
                         ),
                       ),
                     ),
@@ -346,7 +346,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                   child: Text(
                     timeLabel,
                     style: AppTypography.captionSmall.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ),
@@ -481,7 +481,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                   child: const Icon(
                     Icons.close,
                     size: 16,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

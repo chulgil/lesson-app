@@ -83,7 +83,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
     return Text(
       dateStr,
       style: AppTypography.headingSmall.copyWith(
-        color: AppColors.textPrimaryLight,
+        color: AppColors.ink,
       ),
     );
   }
@@ -136,7 +136,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
                         child: Text(
                           ':00',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                         ),
                       ),
@@ -148,7 +148,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
                         child: Text(
                           ':30',
                           style: AppTypography.caption.copyWith(
-                            color: AppColors.textTertiaryLight,
+                            color: AppColors.inkTertiary,
                           ),
                         ),
                       ),
@@ -171,7 +171,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
                         child: Text(
                           hour.toString().padLeft(2, ' '),
                           style: AppTypography.bodyMedium.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -351,7 +351,7 @@ class _AvailabilityBlockGridState extends State<AvailabilityBlockGrid> {
           child: Text(
             '${_selectedTimes.length}개 시간대 선택됨',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ),

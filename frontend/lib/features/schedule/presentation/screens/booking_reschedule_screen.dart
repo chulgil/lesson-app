@@ -76,10 +76,10 @@ class _BookingRescheduleScreenState
     return Scaffold(
       appBar: AppBar(
         title: const Text('예약 변경'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: SafeArea(
         child: Column(
           children: [
@@ -110,7 +110,7 @@ class _BookingRescheduleScreenState
                       child: Text(
                         '데이터를 불러올 수 없습니다',
                         style: AppTypography.bodyMedium.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ),
@@ -130,9 +130,9 @@ class _BookingRescheduleScreenState
       margin: const EdgeInsets.all(AppSpacing.space4),
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,7 +140,7 @@ class _BookingRescheduleScreenState
           Text(
             '현재 예약',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -160,7 +160,7 @@ class _BookingRescheduleScreenState
           Text(
             '${widget.teacherName}${widget.instrument != null ? ' · ${widget.instrument}' : ''}',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -289,11 +289,11 @@ class _BookingRescheduleScreenState
                   color:
                       isSelected
                           ? AppColors.primary
-                          : AppColors.backgroundLight,
+                          : AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                   border: Border.all(
                     color:
-                        isSelected ? AppColors.primary : AppColors.borderLight,
+                        isSelected ? AppColors.primary : AppColors.inkQuaternary,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -310,7 +310,7 @@ class _BookingRescheduleScreenState
                         color:
                             isSelected
                                 ? Colors.white
-                                : AppColors.textPrimaryLight,
+                                : AppColors.ink,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
@@ -342,13 +342,13 @@ class _BookingRescheduleScreenState
                 const Icon(
                   Icons.event_busy,
                   size: 64,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(height: AppSpacing.space4),
                 Text(
                   '예약 가능한 시간이 없습니다',
                   style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],

@@ -33,10 +33,10 @@ class FrequencyOption extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)
-              : AppColors.surfaceSecondaryLight,
+              : AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -58,7 +58,7 @@ class FrequencyOption extends StatelessWidget {
                   style: AppTypography.bodyMedium.copyWith(
                     fontWeight: FontWeight.w600,
                     color:
-                        isSelected ? AppColors.primary : AppColors.textPrimaryLight,
+                        isSelected ? AppColors.primary : AppColors.ink,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -67,7 +67,7 @@ class FrequencyOption extends StatelessWidget {
                   style: AppTypography.caption.copyWith(
                     color: isSelected
                         ? AppColors.primary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
                   ),
                 ),
               ],

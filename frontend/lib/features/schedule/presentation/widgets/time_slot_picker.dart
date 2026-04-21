@@ -40,20 +40,20 @@ class TimeSlotPicker extends StatelessWidget {
             Icon(
               Icons.event_busy,
               size: 48,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space3),
             Text(
               '가능한 시간이 없습니다',
               style: AppTypography.bodyMedium.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '다른 날짜를 선택해주세요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -92,7 +92,7 @@ class _TimeSlotChip extends StatelessWidget {
     return Material(
       color: isSelected
           ? AppColors.primary
-          : AppColors.surfaceLight,
+          : AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       child: InkWell(
         onTap: onTap,
@@ -105,13 +105,13 @@ class _TimeSlotChip extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.borderLight,
+              color: isSelected ? AppColors.primary : AppColors.inkQuaternary,
             ),
           ),
           child: Text(
             slot.timeRange,
             style: AppTypography.bodySmall.copyWith(
-              color: isSelected ? Colors.white : AppColors.textPrimaryLight,
+              color: isSelected ? Colors.white : AppColors.ink,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -196,7 +196,7 @@ class WeekDaySelector extends StatelessWidget {
                   ? AppColors.primary
                   : isAvailable
                       ? Colors.transparent
-                      : AppColors.surfaceSecondaryLight,
+                      : AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Column(
@@ -207,8 +207,8 @@ class WeekDaySelector extends StatelessWidget {
                     color: isSelected
                         ? Colors.white
                         : isAvailable
-                            ? AppColors.textSecondaryLight
-                            : AppColors.textTertiaryLight,
+                            ? AppColors.inkSecondary
+                            : AppColors.inkTertiary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
@@ -218,8 +218,8 @@ class WeekDaySelector extends StatelessWidget {
                     color: isSelected
                         ? Colors.white
                         : isAvailable
-                            ? AppColors.textPrimaryLight
-                            : AppColors.textTertiaryLight,
+                            ? AppColors.ink
+                            : AppColors.inkTertiary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),

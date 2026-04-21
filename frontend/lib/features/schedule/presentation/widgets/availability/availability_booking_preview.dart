@@ -45,7 +45,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -69,7 +69,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
               Text(
                 '${selectedSlot.formattedTimeRange} (${selectedSlot.durationMinutes}분)',
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
               if (selectedSlot.isRecommended) ...[
@@ -101,7 +101,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
           Text(
             '$teacherName · $instrument',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
 
@@ -111,7 +111,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
             Text(
               '수강권: $remainingLessons/$totalLessons회 남음',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ] else if (lessonFee != null) ...[
@@ -120,7 +120,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
             Text(
               '레슨비: ${_formatFee(lessonFee!)}',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ),
           ],
@@ -133,7 +133,7 @@ class AvailabilityBookingPreview extends StatelessWidget {
               style: AppTypography.bodySmall.copyWith(
                 color: remainingReschedules == 1
                     ? AppColors.warning
-                    : AppColors.textTertiaryLight,
+                    : AppColors.inkTertiary,
               ),
             ),
           ],

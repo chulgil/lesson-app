@@ -46,7 +46,7 @@ class _UnifiedApprovalBottomSheetState
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -55,7 +55,7 @@ class _UnifiedApprovalBottomSheetState
         children: [
           const Center(child: BottomSheetHandle()),
           _buildHeader(),
-          const Divider(height: 1, color: AppColors.borderLight),
+          const Divider(height: 1, color: AppColors.inkQuaternary),
           Expanded(
             child: ListView(
               controller: widget.scrollController,
@@ -105,7 +105,7 @@ class _UnifiedApprovalBottomSheetState
           Text(
             _getTimeSinceRequest(),
             style: AppTypography.caption.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
         ],
@@ -140,7 +140,7 @@ class _UnifiedApprovalBottomSheetState
                   widget.request.experience.label,
                 ].join(' · '),
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               if (widget.request.message != null &&
@@ -149,7 +149,7 @@ class _UnifiedApprovalBottomSheetState
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusMedium),
                   ),
@@ -158,14 +158,14 @@ class _UnifiedApprovalBottomSheetState
                       const Icon(
                         Icons.chat_bubble_outline,
                         size: 16,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           widget.request.message!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -203,7 +203,7 @@ class _UnifiedApprovalBottomSheetState
             child: Text(
               '희망 시간이 없습니다',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           )
@@ -224,13 +224,13 @@ class _UnifiedApprovalBottomSheetState
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary.withValues(alpha: 0.08)
-                        : AppColors.surfaceLight,
+                        : AppColors.paper,
                     borderRadius:
                         BorderRadius.circular(AppSpacing.radiusMedium),
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.borderLight,
+                          : AppColors.inkQuaternary,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -252,7 +252,7 @@ class _UnifiedApprovalBottomSheetState
                               fontWeight: FontWeight.bold,
                               color: isSelected
                                   ? Colors.white
-                                  : AppColors.textSecondaryLight,
+                                  : AppColors.inkSecondary,
                             ),
                           ),
                         ),
@@ -267,7 +267,7 @@ class _UnifiedApprovalBottomSheetState
                                 : FontWeight.normal,
                             color: isSelected
                                 ? AppColors.primary
-                                : AppColors.textPrimaryLight,
+                                : AppColors.ink,
                           ),
                         ),
                       ),
@@ -350,7 +350,7 @@ class _UnifiedApprovalBottomSheetState
           icon: const Icon(Icons.arrow_back, size: 16),
           label: const Text('학생 희망 시간으로 돌아가기'),
           style: TextButton.styleFrom(
-            foregroundColor: AppColors.textSecondaryLight,
+            foregroundColor: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -366,8 +366,8 @@ class _UnifiedApprovalBottomSheetState
         top: AppSpacing.space3,
       ),
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paperDark,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: _showCounterPropose
           ? _buildCounterProposeButtons()
@@ -414,7 +414,7 @@ class _UnifiedApprovalBottomSheetState
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.primary,
               disabledBackgroundColor:
-                  AppColors.textSecondaryLight.withValues(alpha: 0.3),
+                  AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(AppSpacing.radiusMedium),
@@ -454,7 +454,7 @@ class _UnifiedApprovalBottomSheetState
             style: OutlinedButton.styleFrom(
               padding:
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: const BorderSide(color: AppColors.borderLight),
+              side: const BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(AppSpacing.radiusMedium),
@@ -463,7 +463,7 @@ class _UnifiedApprovalBottomSheetState
             child: Text(
               '취소',
               style: AppTypography.button.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
           ),
@@ -480,7 +480,7 @@ class _UnifiedApprovalBottomSheetState
                   const EdgeInsets.symmetric(vertical: AppSpacing.space3),
               backgroundColor: AppColors.primary,
               disabledBackgroundColor:
-                  AppColors.textSecondaryLight.withValues(alpha: 0.3),
+                  AppColors.inkSecondary.withValues(alpha: 0.3),
               shape: RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(AppSpacing.radiusMedium),

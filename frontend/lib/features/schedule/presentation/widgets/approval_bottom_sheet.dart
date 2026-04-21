@@ -50,7 +50,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusXLarge),
         ),
@@ -74,14 +74,14 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 Text(
                   _getTimeSinceRequest(booking),
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
             ),
           ),
 
-          Divider(color: AppColors.borderLight, height: 1),
+          Divider(color: AppColors.inkQuaternary, height: 1),
 
           // Content
           Expanded(
@@ -183,7 +183,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                       booking.experienceLevel!.label,
                   ].join(' · '),
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               if (booking.studentMessage != null &&
@@ -192,7 +192,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.space3),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: AppColors.paper,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
@@ -202,14 +202,14 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                       Icon(
                         Icons.chat_bubble_outline,
                         size: 16,
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       const SizedBox(width: AppSpacing.space2),
                       Expanded(
                         child: Text(
                           booking.studentMessage!,
                           style: AppTypography.bodySmall.copyWith(
-                            color: AppColors.textSecondaryLight,
+                            color: AppColors.inkSecondary,
                           ),
                         ),
                       ),
@@ -240,7 +240,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 18,
-                color: AppColors.textPrimaryLight,
+                color: AppColors.ink,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(
@@ -257,7 +257,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
               Icon(
                 Icons.access_time,
                 size: 18,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space2),
               Text(booking.timeRange, style: AppTypography.bodyMedium),
@@ -302,8 +302,8 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
         top: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.backgroundLight,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+        color: AppColors.paperDark,
+        border: Border(top: BorderSide(color: AppColors.inkQuaternary)),
       ),
       child: Row(
         children: [
@@ -314,7 +314,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                 padding: const EdgeInsets.symmetric(
                   vertical: AppSpacing.space3,
                 ),
-                side: BorderSide(color: AppColors.borderLight),
+                side: BorderSide(color: AppColors.inkQuaternary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
@@ -322,7 +322,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
               child: Text(
                 '거절하기',
                 style: AppTypography.button.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -336,7 +336,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
                   vertical: AppSpacing.space3,
                 ),
                 backgroundColor: AppColors.primary,
-                disabledBackgroundColor: AppColors.textSecondaryLight
+                disabledBackgroundColor: AppColors.inkSecondary
                     .withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
@@ -382,7 +382,7 @@ class _ApprovalBottomSheetState extends ConsumerState<ApprovalBottomSheet> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${widget.booking.studentName}님의 레슨이 승인되었습니다'),
-          backgroundColor: AppColors.practiceGood,
+          backgroundColor: AppColors.paperOk,
         ),
       );
     } catch (e) {

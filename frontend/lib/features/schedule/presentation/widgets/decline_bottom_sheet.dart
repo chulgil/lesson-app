@@ -57,7 +57,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: AppColors.backgroundLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
@@ -109,7 +109,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                         minimumSize: const Size.fromHeight(
                           AppSpacing.buttonHeightSmall,
                         ),
-                        side: const BorderSide(color: AppColors.borderLight),
+                        side: const BorderSide(color: AppColors.inkQuaternary),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusMedium,
@@ -119,7 +119,7 @@ class _DeclineBottomSheetState extends State<_DeclineBottomSheet> {
                       child: Text(
                         AppStrings.messageOnly,
                         style: AppTypography.buttonSmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                       ),
                     ),

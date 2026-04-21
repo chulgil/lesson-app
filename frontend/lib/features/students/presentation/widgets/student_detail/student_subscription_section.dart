@@ -164,29 +164,29 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
           Icon(
             Icons.school_outlined,
             size: 40,
-            color: AppColors.textTertiaryLight,
+            color: AppColors.inkTertiary,
           ),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '레슨 등록이 필요합니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space1),
           Text(
             '학생을 레슨에 등록한 후 수강권을 발급할 수 있습니다',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -224,7 +224,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
                 Text(
                   '학생에게 수강권을 발급해주세요',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
               ],
@@ -254,7 +254,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: const Center(child: CircularProgressIndicator()),
@@ -283,7 +283,7 @@ class StudentSubscriptionSection extends ConsumerWidget {
 
     return Text(
       parts.join(' · '),
-      style: AppTypography.caption.copyWith(color: AppColors.textTertiaryLight),
+      style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
     );
   }
 
@@ -291,13 +291,13 @@ class StudentSubscriptionSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
       ),
       child: Text(
         '수강권 정보를 불러올 수 없습니다',
         style: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textSecondaryLight,
+          color: AppColors.inkSecondary,
         ),
       ),
     );

@@ -55,9 +55,9 @@ class _AllLessonRequestsScreenState
     final academyNames = ref.watch(academyNameMapProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
         title: const Text(AppStrings.lessonRequestTitle),
       ),
@@ -68,7 +68,7 @@ class _AllLessonRequestsScreenState
               child: Text(
                 AppStrings.requestLoadError,
                 style: AppTypography.bodyMedium.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
             ),
@@ -119,7 +119,7 @@ class _AllLessonRequestsScreenState
                           child: Text(
                             AppStrings.noHistory,
                             style: AppTypography.bodyMedium.copyWith(
-                              color: AppColors.textTertiaryLight,
+                              color: AppColors.inkTertiary,
                             ),
                           ),
                         )
@@ -136,12 +136,12 @@ class _AllLessonRequestsScreenState
                             final request = filtered[index];
                             return Container(
                               decoration: BoxDecoration(
-                                color: AppColors.surfaceLight,
+                                color: AppColors.paper,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMedium,
                                 ),
                                 border: Border.all(
-                                  color: AppColors.borderLight,
+                                  color: AppColors.inkQuaternary,
                                 ),
                               ),
                               child: RequestListItem(
@@ -230,7 +230,7 @@ class _AllLessonRequestsScreenState
             // Connecting line before (skip first)
             if (i > 0)
               Expanded(
-                child: Container(height: 1.5, color: AppColors.borderLight),
+                child: Container(height: 1.5, color: AppColors.inkQuaternary),
               ),
             // Step node
             _buildStepNode(
@@ -251,7 +251,7 @@ class _AllLessonRequestsScreenState
     required int count,
     required bool isSelected,
   }) {
-    final color = isSelected ? AppColors.primary : AppColors.textTertiaryLight;
+    final color = isSelected ? AppColors.primary : AppColors.inkTertiary;
     final displayLabel = count > 0 ? '$label $count' : label;
 
     return GestureDetector(
@@ -280,7 +280,7 @@ class _AllLessonRequestsScreenState
             displayLabel,
             style: AppTypography.captionSmall.copyWith(
               color:
-                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
+                  isSelected ? AppColors.primary : AppColors.inkTertiary,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -369,7 +369,7 @@ class _AllLessonRequestsScreenState
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Container(width: 1, height: 24, color: AppColors.borderLight),
+      child: Container(width: 1, height: 24, color: AppColors.inkQuaternary),
     );
   }
 
@@ -487,10 +487,10 @@ class _AllLessonRequestsScreenState
           vertical: AppSpacing.space1,
         ),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surfaceLight,
+          color: selected ? AppColors.primary : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusRound),
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.borderLight,
+            color: selected ? AppColors.primary : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -500,14 +500,14 @@ class _AllLessonRequestsScreenState
               Icon(
                 icon,
                 size: 14,
-                color: selected ? Colors.white : AppColors.textSecondaryLight,
+                color: selected ? Colors.white : AppColors.inkSecondary,
               ),
               const SizedBox(width: AppSpacing.space1),
             ],
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: selected ? Colors.white : AppColors.textSecondaryLight,
+                color: selected ? Colors.white : AppColors.inkSecondary,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

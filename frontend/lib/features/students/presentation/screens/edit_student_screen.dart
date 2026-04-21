@@ -196,7 +196,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                               color:
                                   _hasChanges
                                       ? null
-                                      : AppColors.textTertiaryLight,
+                                      : AppColors.inkTertiary,
                             ),
                           ),
                 ),
@@ -618,7 +618,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
         SnackBar(
           content: Text('${_nameController.text} 학생 정보가 수정되었습니다'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.practiceGood,
+          backgroundColor: AppColors.paperOk,
         ),
       );
 

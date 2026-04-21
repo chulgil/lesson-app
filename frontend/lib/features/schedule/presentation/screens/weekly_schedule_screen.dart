@@ -29,10 +29,10 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('주간 스케줄 설정'),
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: AppColors.paperDark,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: AppColors.paperDark,
       body: availabilityAsync.when(
         data: (availability) => _buildContent(availability),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -178,14 +178,14 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                   Icon(
                     Icons.info_outline,
                     size: 16,
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                   const SizedBox(width: AppSpacing.space2),
                   Expanded(
                     child: Text(
                       '예약 가능 시간: 10:00, ${startInterval == 30 ? '10:30, ' : ''}11:00${startInterval == 30 ? ', 11:30' : ''}...',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ),
@@ -214,7 +214,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
         Text(
           label,
           style: AppTypography.caption.copyWith(
-            color: AppColors.textSecondaryLight,
+            color: AppColors.inkSecondary,
           ),
         ),
       ],
@@ -259,7 +259,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: ListTile(
         leading: Container(
@@ -271,7 +271,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                     ? AppColors.primary.withValues(alpha: 0.1)
                     : isWeekend
                     ? AppColors.secondary.withValues(alpha: 0.1)
-                    : AppColors.surfaceLight,
+                    : AppColors.paper,
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
           child: Center(
@@ -284,7 +284,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                         ? AppColors.primary
                         : isWeekend
                         ? AppColors.secondary
-                        : AppColors.textSecondaryLight,
+                        : AppColors.inkSecondary,
               ),
             ),
           ),
@@ -299,7 +299,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
                 : Text(
                   '탭하여 시간 추가',
                   style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -331,14 +331,14 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
         decoration: BoxDecoration(
           color:
               schedule.isActive
-                  ? AppColors.practiceGood.withValues(alpha: 0.1)
-                  : AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                  ? AppColors.paperOk.withValues(alpha: 0.1)
+                  : AppColors.inkTertiary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           border: Border.all(
             color:
                 schedule.isActive
-                    ? AppColors.practiceGood.withValues(alpha: 0.3)
-                    : AppColors.textTertiaryLight.withValues(alpha: 0.3),
+                    ? AppColors.paperOk.withValues(alpha: 0.3)
+                    : AppColors.inkTertiary.withValues(alpha: 0.3),
           ),
         ),
         child: Text(
@@ -346,8 +346,8 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           style: AppTypography.caption.copyWith(
             color:
                 schedule.isActive
-                    ? AppColors.practiceGood
-                    : AppColors.textTertiaryLight,
+                    ? AppColors.paperOk
+                    : AppColors.inkTertiary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -365,20 +365,20 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             Icon(
               Icons.calendar_month_outlined,
               size: 64,
-              color: AppColors.textTertiaryLight,
+              color: AppColors.inkTertiary,
             ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '설정된 스케줄이 없습니다',
               style: AppTypography.bodyLarge.copyWith(
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
               ),
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
               '아래 버튼을 눌러 레슨 가능 시간을 추가하세요',
               style: AppTypography.bodySmall.copyWith(
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -399,7 +399,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
           Text(
             '데이터를 불러올 수 없습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),

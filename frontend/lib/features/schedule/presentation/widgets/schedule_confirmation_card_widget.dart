@@ -114,7 +114,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
               Text(
                 '레슨 시간을 확정해주세요',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
               ),
             ],
@@ -135,7 +135,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -164,7 +164,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                 Text(
                   '$instrumentText$lessonsText',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                 ),
               ],
@@ -191,7 +191,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             Icon(
               Icons.schedule,
               size: 18,
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
             const SizedBox(width: AppSpacing.space2),
             Text(
@@ -199,7 +199,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
                   ? '원하시는 시간을 선택해주세요'
                   : card.cardType.suggestionText,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
             ),
           ],
@@ -233,12 +233,12 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isRecommended
             ? AppColors.primary.withValues(alpha: 0.08)
-            : AppColors.surfaceLight,
+            : AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
           color: isRecommended
               ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+              : AppColors.inkQuaternary,
         ),
       ),
       child: Row(
@@ -256,12 +256,12 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.textTertiaryLight.withValues(alpha: 0.15),
+                color: AppColors.inkTertiary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),
               child: Icon(
                 Icons.access_time,
-                color: AppColors.textSecondaryLight,
+                color: AppColors.inkSecondary,
                 size: 16,
               ),
             ),
@@ -324,7 +324,7 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
             '선생님의 가용 시간 중에서 원하는 시간을 선택할 수 있습니다',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
           ),
         ],
@@ -372,9 +372,9 @@ class ScheduleConfirmationCardWidget extends ConsumerWidget {
           child: OutlinedButton(
             onPressed: isLoading ? null : () => _onSelectDifferentTime(context, ref),
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.textSecondaryLight,
+              foregroundColor: AppColors.inkSecondary,
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.space3),
-              side: BorderSide(color: AppColors.borderLight),
+              side: BorderSide(color: AppColors.inkQuaternary),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
               ),

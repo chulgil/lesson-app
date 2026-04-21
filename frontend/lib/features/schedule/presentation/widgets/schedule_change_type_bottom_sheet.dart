@@ -15,7 +15,7 @@ Future<ScheduleChangeType?> showScheduleChangeTypeBottomSheet(
   return showModalBottomSheet<ScheduleChangeType>(
     context: context,
     isScrollControlled: true,
-    backgroundColor: AppColors.backgroundLight,
+    backgroundColor: AppColors.paperDark,
     barrierColor: Colors.black.withValues(alpha: 0.3),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -90,7 +90,7 @@ class _ChangeTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.surfaceLight,
+      color: AppColors.paper,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -123,7 +123,7 @@ class _ChangeTypeCard extends StatelessWidget {
                     Text(
                       description,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -131,7 +131,7 @@ class _ChangeTypeCard extends StatelessWidget {
               ),
               const Icon(
                 Icons.chevron_right,
-                color: AppColors.textTertiaryLight,
+                color: AppColors.inkTertiary,
               ),
             ],
           ),

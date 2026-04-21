@@ -52,17 +52,17 @@ class StudentUpcomingLessonsSection extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.event_busy, color: AppColors.textTertiaryLight),
+                    Icon(Icons.event_busy, color: AppColors.inkTertiary),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
                       '예정된 레슨이 없습니다',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
@@ -134,17 +134,17 @@ class StudentRecentLessonsSection extends ConsumerWidget {
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.history, color: AppColors.textTertiaryLight),
+                    Icon(Icons.history, color: AppColors.inkTertiary),
                     const SizedBox(width: AppSpacing.space3),
                     Text(
                       '완료된 레슨이 없습니다',
                       style: AppTypography.bodyMedium.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                     ),
                   ],
