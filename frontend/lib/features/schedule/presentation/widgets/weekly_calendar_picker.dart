@@ -345,8 +345,7 @@ class _WeeklyCalendarPickerState extends ConsumerState<WeeklyCalendarPicker> {
                   alignment: Alignment.topRight,
                   child: Text(
                     timeLabel,
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 10,
+                    style: AppTypography.captionSmall.copyWith(
                       color: AppColors.textTertiaryLight,
                     ),
                   ),

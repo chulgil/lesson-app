@@ -37,9 +37,8 @@ class ParentNotificationBadge extends StatelessWidget {
               child: Center(
                 child: Text(
                   count > 99 ? '99+' : count.toString(),
-                  style: AppTypography.caption.copyWith(
+                  style: AppTypography.captionSmall.copyWith(
                     color: Colors.white,
-                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

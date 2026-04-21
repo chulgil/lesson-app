@@ -80,10 +80,9 @@ class AssignmentItem extends StatelessWidget {
               ),
               child: Text(
                 '필수',
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color: AppColors.error,
                   fontWeight: FontWeight.bold,
-                  fontSize: 10,
                 ),
               ),
             ),

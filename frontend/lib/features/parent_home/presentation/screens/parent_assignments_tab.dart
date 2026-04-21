@@ -376,10 +376,9 @@ class _AssignmentCard extends StatelessWidget {
       ),
       child: Text(
         _getPriorityLabel(),
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: _getPriorityColor(),
           fontWeight: FontWeight.bold,
-          fontSize: 10,
         ),
       ),
     );

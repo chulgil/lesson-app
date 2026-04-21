@@ -45,14 +45,15 @@ class MonthlyTrendChart extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: trendData.map((t) {
-              return Text(
-                '${t.month.month}월',
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
-                ),
-              );
-            }).toList(),
+            children:
+                trendData.map((t) {
+                  return Text(
+                    '${t.month.month}월',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textTertiaryLight,
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -75,25 +76,29 @@ class _TrendChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty) return;
 
-    final maxValue = data.map((d) => d.lessonCount).reduce(
-        (a, b) => a > b ? a : b);
-    final minValue = data.map((d) => d.lessonCount).reduce(
-        (a, b) => a < b ? a : b);
+    final maxValue = data
+        .map((d) => d.lessonCount)
+        .reduce((a, b) => a > b ? a : b);
+    final minValue = data
+        .map((d) => d.lessonCount)
+        .reduce((a, b) => a < b ? a : b);
     final range = (maxValue - minValue).clamp(1, double.infinity);
 
     final points = <Offset>[];
     for (int i = 0; i < data.length; i++) {
       final x = (i / (data.length - 1)) * size.width;
-      final y = size.height -
+      final y =
+          size.height -
           ((data[i].lessonCount - minValue) / range) * size.height * 0.8 -
           size.height * 0.1;
       points.add(Offset(x, y));
     }
 
     // Fill area
-    final fillPath = Path()
-      ..moveTo(points.first.dx, size.height)
-      ..lineTo(points.first.dx, points.first.dy);
+    final fillPath =
+        Path()
+          ..moveTo(points.first.dx, size.height)
+          ..lineTo(points.first.dx, points.first.dy);
     for (int i = 1; i < points.length; i++) {
       final prev = points[i - 1];
       final curr = points[i];
@@ -125,16 +130,8 @@ class _TrendChartPainter extends CustomPainter {
 
     // Dots
     for (final point in points) {
-      canvas.drawCircle(
-        point,
-        4,
-        Paint()..color = lineColor,
-      );
-      canvas.drawCircle(
-        point,
-        2.5,
-        Paint()..color = Colors.white,
-      );
+      canvas.drawCircle(point, 4, Paint()..color = lineColor);
+      canvas.drawCircle(point, 2.5, Paint()..color = Colors.white);
     }
 
     // Value labels
@@ -142,9 +139,8 @@ class _TrendChartPainter extends CustomPainter {
       final textPainter = TextPainter(
         text: TextSpan(
           text: '${data[i].lessonCount}',
-          style: TextStyle(
+          style: AppTypography.captionSmall.copyWith(
             color: lineColor,
-            fontSize: 10,
             fontWeight: FontWeight.w600,
           ),
         ),

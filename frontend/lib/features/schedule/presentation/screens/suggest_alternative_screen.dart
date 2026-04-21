@@ -333,9 +333,8 @@ class _SuggestAlternativeScreenState
                         const SizedBox(width: 2),
                         Text(
                           AppStrings.slotConflict,
-                          style: AppTypography.caption.copyWith(
+                          style: AppTypography.captionSmall.copyWith(
                             color: AppColors.error,
-                            fontSize: 10,
                           ),
                         ),
                       ] else if (conflict == 'preview') ...[
@@ -348,9 +347,8 @@ class _SuggestAlternativeScreenState
                         const SizedBox(width: 2),
                         Text(
                           AppStrings.previewConflict,
-                          style: AppTypography.caption.copyWith(
+                          style: AppTypography.captionSmall.copyWith(
                             color: AppColors.warning,
-                            fontSize: 10,
                           ),
                         ),
                       ],

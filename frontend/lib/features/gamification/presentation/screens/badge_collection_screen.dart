@@ -241,11 +241,10 @@ class BadgeCollectionScreen extends ConsumerWidget {
             ),
             child: Text(
               _getRarityLabel(badge.rarity),
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.captionSmall.copyWith(
                 color:
                     badge.isEarned ? rarityColor : AppColors.textTertiaryLight,
                 fontWeight: FontWeight.w600,
-                fontSize: 10,
               ),
             ),
           ),

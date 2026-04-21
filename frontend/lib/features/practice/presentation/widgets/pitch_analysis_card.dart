@@ -101,7 +101,8 @@ class PitchAnalysisCard extends ConsumerWidget {
               _buildDetailChip(
                 icon: Icons.music_note,
                 label: '음역',
-                value: '${metrics.frequencyMin.round()}-${metrics.frequencyMax.round()} Hz',
+                value:
+                    '${metrics.frequencyMin.round()}-${metrics.frequencyMax.round()} Hz',
               ),
             ],
           ),
@@ -185,9 +186,8 @@ class PitchAnalysisCard extends ConsumerWidget {
                 children: [
                   Text(
                     label,
-                    style: AppTypography.caption.copyWith(
+                    style: AppTypography.captionSmall.copyWith(
                       color: AppColors.textTertiaryLight,
-                      fontSize: 10,
                     ),
                   ),
                   Text(
@@ -207,44 +207,46 @@ class PitchAnalysisCard extends ConsumerWidget {
   }
 
   Widget _buildNoteDistribution(PitchAnalysisMetrics metrics) {
-    final sorted = metrics.noteDistribution.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final sorted =
+        metrics.noteDistribution.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
     final maxCount = sorted.first.value;
 
     return Wrap(
       spacing: AppSpacing.space1,
       runSpacing: AppSpacing.space1,
-      children: sorted.take(7).map((entry) {
-        final ratio = entry.value / maxCount;
-        return Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.space2,
-            vertical: 2,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.05 + ratio * 0.2),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-            border: Border.all(
-              color: AppColors.primary.withValues(alpha: 0.1 + ratio * 0.3),
-            ),
-          ),
-          child: Text(
-            '${entry.key} (${entry.value})',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.primary,
-              fontWeight: ratio > 0.5 ? FontWeight.w600 : FontWeight.normal,
-            ),
-          ),
-        );
-      }).toList(),
+      children:
+          sorted.take(7).map((entry) {
+            final ratio = entry.value / maxCount;
+            return Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.space2,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.05 + ratio * 0.2),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                border: Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.1 + ratio * 0.3),
+                ),
+              ),
+              child: Text(
+                '${entry.key} (${entry.value})',
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: ratio > 0.5 ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 
   Color _gradeColor(String colorName) => switch (colorName) {
-        'success' => AppColors.success,
-        'primary' => AppColors.primary,
-        'info' => AppColors.info,
-        'warning' => AppColors.warning,
-        _ => AppColors.error,
-      };
+    'success' => AppColors.success,
+    'primary' => AppColors.primary,
+    'info' => AppColors.info,
+    'warning' => AppColors.warning,
+    _ => AppColors.error,
+  };
 }

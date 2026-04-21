@@ -203,14 +203,13 @@ class _NotificationSettingsSheetState extends State<NotificationSettingsSheet> {
               ),
               child: Text(
                 item.suffix,
-                style: AppTypography.caption.copyWith(
+                style: AppTypography.captionSmall.copyWith(
                   color:
                       item.isRequired
                           ? AppColors.textTertiaryLight
                           : item.isRecommended
                           ? AppColors.success
                           : AppColors.textSecondaryLight,
-                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                 ),
               ),

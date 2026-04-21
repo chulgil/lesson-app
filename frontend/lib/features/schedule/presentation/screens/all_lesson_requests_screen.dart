@@ -63,17 +63,27 @@ class _AllLessonRequestsScreenState
       ),
       body: requestsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Text(AppStrings.requestLoadError,
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondaryLight)),
-        ),
+        error:
+            (_, __) => Center(
+              child: Text(
+                AppStrings.requestLoadError,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.textSecondaryLight,
+                ),
+              ),
+            ),
         data: (allRequests) {
           final filtered = _filter.apply(allRequests);
-          final requestDates = allRequests
-              .map((r) => DateTime(
-                  r.createdAt.year, r.createdAt.month, r.createdAt.day))
-              .toSet();
+          final requestDates =
+              allRequests
+                  .map(
+                    (r) => DateTime(
+                      r.createdAt.year,
+                      r.createdAt.month,
+                      r.createdAt.day,
+                    ),
+                  )
+                  .toSet();
 
           return Column(
             children: [
@@ -103,47 +113,57 @@ class _AllLessonRequestsScreenState
 
               // 4. Request list
               Expanded(
-                child: filtered.isEmpty
-                    ? Center(
-                        child: Text(
-                          AppStrings.noHistory,
-                          style: AppTypography.bodyMedium
-                              .copyWith(color: AppColors.textTertiaryLight),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.screenPadding,
-                          vertical: AppSpacing.space3,
-                        ),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: AppSpacing.space2),
-                        itemBuilder: (context, index) {
-                          final request = filtered[index];
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.surfaceLight,
-                              borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusMedium),
-                              border: Border.all(
-                                  color: AppColors.borderLight),
+                child:
+                    filtered.isEmpty
+                        ? Center(
+                          child: Text(
+                            AppStrings.noHistory,
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: AppColors.textTertiaryLight,
                             ),
-                            child: RequestListItem(
-                              request: request,
-                              studentName: studentNames[request.studentId] ?? AppStrings.student,
-                              teacherName: teacherNames[request.teacherId],
-                              academyName: academyNames[request.academyId],
-                              viewerRole: widget.viewerRole,
-                              onTap: () => context.push(
-                                AppRoutes.requestDetail
-                                    .replaceFirst(':id', request.id),
-                                extra: {'viewerRole': widget.viewerRole},
+                          ),
+                        )
+                        : ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.screenPadding,
+                            vertical: AppSpacing.space3,
+                          ),
+                          itemCount: filtered.length,
+                          separatorBuilder:
+                              (_, __) =>
+                                  const SizedBox(height: AppSpacing.space2),
+                          itemBuilder: (context, index) {
+                            final request = filtered[index];
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceLight,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMedium,
+                                ),
+                                border: Border.all(
+                                  color: AppColors.borderLight,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                              child: RequestListItem(
+                                request: request,
+                                studentName:
+                                    studentNames[request.studentId] ??
+                                    AppStrings.student,
+                                teacherName: teacherNames[request.teacherId],
+                                academyName: academyNames[request.academyId],
+                                viewerRole: widget.viewerRole,
+                                onTap:
+                                    () => context.push(
+                                      AppRoutes.requestDetail.replaceFirst(
+                                        ':id',
+                                        request.id,
+                                      ),
+                                      extra: {'viewerRole': widget.viewerRole},
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
               ),
             ],
           );
@@ -162,10 +182,7 @@ class _AllLessonRequestsScreenState
       _selectedDate = date;
       _isFilterMode = false;
       _phaseFilter = null;
-      _filter = RequestFilter(
-        specificDate: dateOnly,
-        sortBy: _sortBy,
-      );
+      _filter = RequestFilter(specificDate: dateOnly, sortBy: _sortBy);
     });
   }
 
@@ -176,7 +193,7 @@ class _AllLessonRequestsScreenState
       // All phase tabs (including "전체") clear date restriction
       // and show all matching requests across all dates.
       _filter = RequestFilter(
-        phase: phase,   // null = all phases
+        phase: phase, // null = all phases
         source: _sourceFilter,
         sortBy: _sortBy,
       );
@@ -206,19 +223,14 @@ class _AllLessonRequestsScreenState
 
     return Container(
       margin: const EdgeInsets.only(top: AppSpacing.space2),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: Row(
         children: [
           for (int i = 0; i < steps.length; i++) ...[
             // Connecting line before (skip first)
             if (i > 0)
               Expanded(
-                child: Container(
-                  height: 1.5,
-                  color: AppColors.borderLight,
-                ),
+                child: Container(height: 1.5, color: AppColors.borderLight),
               ),
             // Step node
             _buildStepNode(
@@ -255,25 +267,21 @@ class _AllLessonRequestsScreenState
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isSelected ? AppColors.primary : Colors.transparent,
-              border: Border.all(
-                color: color,
-                width: isSelected ? 2 : 1.5,
-              ),
+              border: Border.all(color: color, width: isSelected ? 2 : 1.5),
             ),
-            child: isSelected
-                ? const Icon(Icons.check, size: 12, color: Colors.white)
-                : null,
+            child:
+                isSelected
+                    ? const Icon(Icons.check, size: 12, color: Colors.white)
+                    : null,
           ),
           const SizedBox(height: AppSpacing.space1),
           // Label
           Text(
             displayLabel,
-            style: AppTypography.caption.copyWith(
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textTertiaryLight,
+            style: AppTypography.captionSmall.copyWith(
+              color:
+                  isSelected ? AppColors.primary : AppColors.textTertiaryLight,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              fontSize: 10,
             ),
           ),
         ],
@@ -321,9 +329,7 @@ class _AllLessonRequestsScreenState
       ),
       child: Text(
         '$dateText · $count개 요청',
-        style: AppTypography.bodyMedium.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
+        style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -354,10 +360,7 @@ class _AllLessonRequestsScreenState
           // Sort toggle (time order)
           _buildSortChip(),
           // Source filters (academy/individual) — only if both exist
-          if (showSourceFilter) ...[
-            _buildDivider(),
-            ..._buildSourceChips(),
-          ],
+          if (showSourceFilter) ...[_buildDivider(), ..._buildSourceChips()],
         ],
       ),
     );
@@ -366,11 +369,7 @@ class _AllLessonRequestsScreenState
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Container(
-        width: 1,
-        height: 24,
-        color: AppColors.borderLight,
-      ),
+      child: Container(width: 1, height: 24, color: AppColors.borderLight),
     );
   }
 
@@ -402,16 +401,18 @@ class _AllLessonRequestsScreenState
 
   Widget _buildSortChip() {
     return _buildUnifiedChip(
-      label: _sortBy == RequestSortBy.createdAtDesc
-          ? AppStrings.sortByTime
-          : AppStrings.sortByName,
+      label:
+          _sortBy == RequestSortBy.createdAtDesc
+              ? AppStrings.sortByTime
+              : AppStrings.sortByName,
       selected: false,
       icon: Icons.swap_vert,
       onTap: () {
         setState(() {
-          _sortBy = _sortBy == RequestSortBy.createdAtDesc
-              ? RequestSortBy.studentNameAsc
-              : RequestSortBy.createdAtDesc;
+          _sortBy =
+              _sortBy == RequestSortBy.createdAtDesc
+                  ? RequestSortBy.studentNameAsc
+                  : RequestSortBy.createdAtDesc;
           _filter = _filter.copyWith(sortBy: _sortBy);
         });
       },
@@ -506,9 +507,7 @@ class _AllLessonRequestsScreenState
             Text(
               label,
               style: AppTypography.caption.copyWith(
-                color: selected
-                    ? Colors.white
-                    : AppColors.textSecondaryLight,
+                color: selected ? Colors.white : AppColors.textSecondaryLight,
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),

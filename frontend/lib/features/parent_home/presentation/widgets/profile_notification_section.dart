@@ -183,10 +183,9 @@ class ProfileNotificationSection extends ConsumerWidget {
                         ),
                         child: Text(
                           '필수',
-                          style: AppTypography.caption.copyWith(
+                          style: AppTypography.captionSmall.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
-                            fontSize: 10,
                           ),
                         ),
                       ),
