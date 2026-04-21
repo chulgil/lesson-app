@@ -7,6 +7,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
 import '../../../schedule/presentation/providers/unified_lesson_request_providers.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
@@ -94,41 +95,31 @@ class TeacherSubscriptionSection extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context, int count) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Icon(
-                  Icons.confirmation_number_outlined,
-                  size: AppSpacing.iconSM,
-                  color: AppColors.textSecondaryLight,
+    return NotebookSectionHeader(
+      label: '${AppStrings.subscription} · $count',
+      trailing:
+          count > 3
+              ? TextButton.icon(
+                onPressed: () => context.push(AppRoutes.teacherSubscriptions),
+                icon: const Icon(
+                  Icons.list,
+                  size: AppSpacing.iconXS,
+                  color: AppColors.ink,
                 ),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  AppStrings.subscription,
-                  style: AppTypography.headingMedium,
-                ),
-                const SizedBox(width: AppSpacing.space2),
-                Text(
-                  '($count)',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                label: Text(
+                  AppStrings.viewAll,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
-          ),
-          if (count > 3)
-            TextButton.icon(
-              onPressed: () => context.push(AppRoutes.teacherSubscriptions),
-              icon: const Icon(Icons.list, size: AppSpacing.iconXS),
-              label: Text(AppStrings.viewAll),
-            ),
-        ],
-      ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 28),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              )
+              : null,
     );
   }
 
@@ -158,14 +149,10 @@ class TeacherSubscriptionSection extends ConsumerWidget {
     if (parts.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.only(
-        left: AppSpacing.screenPadding + AppSpacing.space2,
-      ),
+      padding: const EdgeInsets.only(left: AppSpacing.space2),
       child: Text(
         parts.join(' · '),
-        style: AppTypography.caption.copyWith(
-          color: AppColors.textTertiaryLight,
-        ),
+        style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
       ),
     );
   }

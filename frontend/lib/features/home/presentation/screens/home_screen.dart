@@ -44,7 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        border: Border(top: BorderSide(color: AppColors.borderLight, width: 1)),
+        border: Border(
+          top: BorderSide(color: AppColors.inkQuaternary, width: 1),
+        ),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,

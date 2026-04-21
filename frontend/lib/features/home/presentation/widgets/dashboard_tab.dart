@@ -460,21 +460,33 @@ class DashboardTab extends ConsumerWidget {
   }
 
   Widget _buildErrorCard(String message) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.space4),
-      decoration: BoxDecoration(
-        color: AppColors.error.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(
+          left: BorderSide(color: AppColors.paperAccent, width: 3),
+        ),
       ),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, color: AppColors.error),
-          const SizedBox(width: AppSpacing.space3),
-          Text(
-            message,
-            style: AppTypography.bodyMedium.copyWith(color: AppColors.error),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.space3),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: AppColors.paperAccent,
+              size: 18,
+            ),
+            const SizedBox(width: AppSpacing.space3),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
