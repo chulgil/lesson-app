@@ -566,8 +566,7 @@ class _ProfileTile extends StatelessWidget {
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: AppTypography.bodySmall.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),
                   ),

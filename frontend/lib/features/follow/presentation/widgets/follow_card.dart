@@ -94,7 +94,6 @@ class FollowCard extends StatelessWidget {
                               isTeacher
                                   ? AppColors.primary
                                   : AppColors.secondary,
-                          fontSize: 11,
                         ),
                       ),
                     ),

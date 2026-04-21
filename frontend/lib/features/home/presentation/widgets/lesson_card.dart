@@ -173,7 +173,6 @@ class LessonCard extends ConsumerWidget {
           isAcademy ? '🏫 ${lessonClass.name}' : '👤 개인레슨',
           style: AppTypography.caption.copyWith(
             color: AppColors.textSecondaryLight,
-            fontSize: 11,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

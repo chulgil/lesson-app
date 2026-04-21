@@ -660,8 +660,7 @@ class _StatusBadge extends StatelessWidget {
       ),
       child: Text(
         isActive ? '연결됨' : '해제됨',
-        style: AppTypography.bodySmall.copyWith(
-          fontSize: 11,
+        style: AppTypography.caption.copyWith(
           color: isActive ? AppColors.success : AppColors.textTertiaryLight,
           fontWeight: FontWeight.w500,
         ),
