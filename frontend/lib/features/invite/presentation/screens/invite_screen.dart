@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart' show ShareParams, SharePlus;
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -99,7 +100,7 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
             const SizedBox(height: AppSpacing.space4),
             ElevatedButton(
               onPressed: _createNewInvite,
-              child: const Text('다시 시도'),
+              child: const Text(AppStrings.retry),
             ),
           ],
         ),

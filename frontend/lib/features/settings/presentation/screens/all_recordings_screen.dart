@@ -87,7 +87,7 @@ class AllRecordingsScreen extends ConsumerWidget {
                           () => ref.invalidate(
                             allRecordingsWithSectionInfoProvider,
                           ),
-                      child: const Text('다시 시도'),
+                      child: const Text(AppStrings.retry),
                     ),
                   ],
                 ),

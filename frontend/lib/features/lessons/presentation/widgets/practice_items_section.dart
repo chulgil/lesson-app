@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -57,7 +58,7 @@ class PracticeItemsSection extends ConsumerWidget {
                           practiceItemsNotifierProvider(lessonId),
                         ),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('다시 시도'),
+                    label: const Text(AppStrings.retry),
                   ),
                 ],
               ),

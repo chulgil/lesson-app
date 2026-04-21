@@ -147,7 +147,7 @@ class _TipTemplateManagementScreenState
                     }
                   },
                   icon: const Icon(Icons.refresh),
-                  label: const Text('다시 시도'),
+                  label: const Text(AppStrings.retry),
                 ),
               ],
             ),

@@ -49,7 +49,7 @@ class LessonTimeSettingsScreen extends ConsumerWidget {
                             ref
                                 .read(teacherSettingsNotifierProvider.notifier)
                                 .refresh(),
-                    child: const Text('다시 시도'),
+                    child: const Text(AppStrings.retry),
                   ),
                 ],
               ),

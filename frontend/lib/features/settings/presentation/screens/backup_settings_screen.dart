@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/backup_state.dart';
@@ -48,7 +49,7 @@ class BackupSettingsScreen extends ConsumerWidget {
                   const SizedBox(height: AppSpacing.space4),
                   ElevatedButton(
                     onPressed: () => ref.invalidate(backupStateProvider),
-                    child: const Text('다시 시도'),
+                    child: const Text(AppStrings.retry),
                   ),
                 ],
               ),

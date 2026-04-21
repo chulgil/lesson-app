@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/practice/domain/entities/piece.dart';
@@ -46,8 +47,9 @@ class _RepertoireManagementScreenState
         children: [
           // Search and filter section
           RepertoireSearchAndFilter(
-            onSearchChanged: (value) =>
-                ref.read(pieceSearchQueryProvider.notifier).state = value,
+            onSearchChanged:
+                (value) =>
+                    ref.read(pieceSearchQueryProvider.notifier).state = value,
             selectedDifficulty: _selectedDifficulty,
             selectedComposer: _selectedComposer,
             onDifficultyTap: _showDifficultyFilter,
@@ -65,26 +67,30 @@ class _RepertoireManagementScreenState
             child: piecesAsync.when(
               data: (pieces) => _buildPiecesList(pieces, searchQuery),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 48,
-                      color: AppColors.error,
+              error:
+                  (_, __) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(height: AppSpacing.space4),
+                        const Text('오류가 발생했습니다.'),
+                        const SizedBox(height: AppSpacing.space4),
+                        FilledButton(
+                          onPressed:
+                              () =>
+                                  ref
+                                      .read(piecesNotifierProvider.notifier)
+                                      .refresh(),
+                          child: const Text(AppStrings.retry),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.space4),
-                    const Text('오류가 발생했습니다.'),
-                    const SizedBox(height: AppSpacing.space4),
-                    FilledButton(
-                      onPressed: () =>
-                          ref.read(piecesNotifierProvider.notifier).refresh(),
-                      child: const Text('다시 시도'),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
             ),
           ),
         ],
@@ -99,33 +105,36 @@ class _RepertoireManagementScreenState
 
   Widget _buildPiecesList(List<Piece> allPieces, String searchQuery) {
     // Apply filters
-    var filteredPieces = allPieces.where((piece) {
-      if (searchQuery.isNotEmpty) {
-        final query = searchQuery.toLowerCase();
-        if (!piece.title.toLowerCase().contains(query) &&
-            !(piece.composer?.toLowerCase().contains(query) ?? false)) {
-          return false;
-        }
-      }
+    var filteredPieces =
+        allPieces.where((piece) {
+          if (searchQuery.isNotEmpty) {
+            final query = searchQuery.toLowerCase();
+            if (!piece.title.toLowerCase().contains(query) &&
+                !(piece.composer?.toLowerCase().contains(query) ?? false)) {
+              return false;
+            }
+          }
 
-      if (_selectedDifficulty != null &&
-          piece.difficulty != _selectedDifficulty) {
-        return false;
-      }
+          if (_selectedDifficulty != null &&
+              piece.difficulty != _selectedDifficulty) {
+            return false;
+          }
 
-      if (_selectedComposer != null && piece.composer != _selectedComposer) {
-        return false;
-      }
+          if (_selectedComposer != null &&
+              piece.composer != _selectedComposer) {
+            return false;
+          }
 
-      return true;
-    }).toList();
+          return true;
+        }).toList();
 
     // Sort by title
     filteredPieces.sort((a, b) => a.title.compareTo(b.title));
 
     if (filteredPieces.isEmpty) {
       return RepertoireEmptyState(
-        hasFilters: searchQuery.isNotEmpty ||
+        hasFilters:
+            searchQuery.isNotEmpty ||
             _selectedDifficulty != null ||
             _selectedComposer != null,
       );
@@ -159,13 +168,14 @@ class _RepertoireManagementScreenState
 
   void _showComposerFilter() {
     final pieces = ref.read(piecesNotifierProvider).value ?? [];
-    final composers = pieces
-        .map((p) => p.composer)
-        .where((c) => c != null)
-        .cast<String>()
-        .toSet()
-        .toList()
-      ..sort();
+    final composers =
+        pieces
+            .map((p) => p.composer)
+            .where((c) => c != null)
+            .cast<String>()
+            .toSet()
+            .toList()
+          ..sort();
 
     showComposerFilter(
       context: context,
@@ -189,33 +199,35 @@ class _RepertoireManagementScreenState
   void _showAddPieceDialog() {
     showDialog(
       context: context,
-      builder: (dialogContext) => PieceDialog(
-        onSave: (piece) async {
-          await ref.read(piecesNotifierProvider.notifier).addPiece(piece);
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')),
-          );
-        },
-      ),
+      builder:
+          (dialogContext) => PieceDialog(
+            onSave: (piece) async {
+              await ref.read(piecesNotifierProvider.notifier).addPiece(piece);
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${piece.title}이(가) 추가되었습니다')),
+              );
+            },
+          ),
     );
   }
 
   void _showEditPieceDialog(Piece piece) {
     showDialog(
       context: context,
-      builder: (dialogContext) => PieceDialog(
-        existingPiece: piece,
-        onSave: (updatedPiece) async {
-          await ref
-              .read(piecesNotifierProvider.notifier)
-              .updatePiece(updatedPiece);
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('곡 정보가 수정되었습니다')),
-          );
-        },
-      ),
+      builder:
+          (dialogContext) => PieceDialog(
+            existingPiece: piece,
+            onSave: (updatedPiece) async {
+              await ref
+                  .read(piecesNotifierProvider.notifier)
+                  .updatePiece(updatedPiece);
+              if (!mounted) return;
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('곡 정보가 수정되었습니다')));
+            },
+          ),
     );
   }
 
@@ -226,9 +238,9 @@ class _RepertoireManagementScreenState
       onConfirm: () async {
         await ref.read(piecesNotifierProvider.notifier).deletePiece(piece.id);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${piece.title}이(가) 삭제되었습니다')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${piece.title}이(가) 삭제되었습니다')));
         }
       },
     );
@@ -251,9 +263,7 @@ class _RepertoireManagementScreenState
           final student = students.firstWhere((s) => s.id == studentId);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                '${piece.title}이(가) ${student.name}에게 할당되었습니다',
-              ),
+              content: Text('${piece.title}이(가) ${student.name}에게 할당되었습니다'),
             ),
           );
         }

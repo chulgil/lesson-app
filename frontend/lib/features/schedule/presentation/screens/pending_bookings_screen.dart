@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -14,19 +15,14 @@ import '../widgets/teacher_approval_card.dart';
 class PendingBookingsScreen extends ConsumerWidget {
   final String teacherId;
 
-  const PendingBookingsScreen({
-    super.key,
-    required this.teacherId,
-  });
+  const PendingBookingsScreen({super.key, required this.teacherId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingBookings = ref.watch(pendingBookingsProvider(teacherId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('승인 대기'),
-      ),
+      appBar: AppBar(title: const Text('승인 대기')),
       body: pendingBookings.when(
         data: (bookings) {
           if (bookings.isEmpty) {
@@ -54,22 +50,24 @@ class PendingBookingsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.error),
-              const SizedBox(height: AppSpacing.space3),
-              Text('오류가 발생했습니다', style: AppTypography.bodyMedium),
-              const SizedBox(height: AppSpacing.space2),
-              TextButton(
-                onPressed: () =>
-                    ref.invalidate(pendingBookingsProvider(teacherId)),
-                child: const Text('다시 시도'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text('오류가 발생했습니다', style: AppTypography.bodyMedium),
+                  const SizedBox(height: AppSpacing.space2),
+                  TextButton(
+                    onPressed:
+                        () =>
+                            ref.invalidate(pendingBookingsProvider(teacherId)),
+                    child: const Text(AppStrings.retry),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -79,11 +77,7 @@ class PendingBookingsScreen extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.inbox,
-            size: 64,
-            color: AppColors.textTertiaryLight,
-          ),
+          Icon(Icons.inbox, size: 64, color: AppColors.textTertiaryLight),
           const SizedBox(height: AppSpacing.space4),
           Text(
             '대기 중인 신청이 없습니다',
@@ -113,20 +107,22 @@ class PendingBookingsScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) => ApprovalBottomSheet(
-          booking: booking,
-          teacherId: teacherId,
-          scrollController: scrollController,
-          onApproved: () {
-            ref.invalidate(pendingBookingsProvider(teacherId));
-          },
-        ),
-      ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.85,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            expand: false,
+            builder:
+                (context, scrollController) => ApprovalBottomSheet(
+                  booking: booking,
+                  teacherId: teacherId,
+                  scrollController: scrollController,
+                  onApproved: () {
+                    ref.invalidate(pendingBookingsProvider(teacherId));
+                  },
+                ),
+          ),
     );
   }
 }

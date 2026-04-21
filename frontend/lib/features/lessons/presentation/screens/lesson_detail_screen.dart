@@ -139,7 +139,7 @@ class _LessonDetailScreenState extends ConsumerState<LessonDetailScreen>
             OutlinedButton.icon(
               onPressed: () => ref.invalidate(lessonProvider(widget.lessonId)),
               icon: const Icon(Icons.refresh),
-              label: const Text('다시 시도'),
+              label: const Text(AppStrings.retry),
             ),
           ],
         ),

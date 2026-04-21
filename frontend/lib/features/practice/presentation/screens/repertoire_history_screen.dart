@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -109,7 +110,7 @@ class RepertoireHistoryScreen extends ConsumerWidget {
           TextButton(
             onPressed:
                 () => ref.invalidate(repertoireTimelineProvider(studentId)),
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),

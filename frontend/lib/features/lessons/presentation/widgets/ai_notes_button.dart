@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -196,7 +197,7 @@ class AiNotesButton extends ConsumerWidget {
             onPressed: () {
               ref.read(aiNoteGeneratorProvider(lesson.id).notifier).reset();
             },
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),

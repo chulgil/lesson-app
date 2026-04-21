@@ -102,6 +102,9 @@ class AppStrings {
   /// 저장 버튼
   static const save = '저장';
 
+  /// 다시 시도 버튼 (에러 재시도)
+  static const retry = '다시 시도';
+
   /// 취소 버튼
   static const cancel = '취소';
 

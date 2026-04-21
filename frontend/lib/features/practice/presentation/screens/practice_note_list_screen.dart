@@ -252,7 +252,7 @@ class PracticeNoteListScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space4),
           TextButton(
             onPressed: () => ref.invalidate(sectionNotesProvider(sectionId)),
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),

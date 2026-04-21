@@ -133,7 +133,7 @@ class _SectionDetailScreenState extends ConsumerState<SectionDetailScreen>
                   TextButton(
                     onPressed:
                         () => ref.invalidate(sectionProvider(widget.sectionId)),
-                    child: const Text('다시 시도'),
+                    child: const Text(AppStrings.retry),
                   ),
                 ],
               ),

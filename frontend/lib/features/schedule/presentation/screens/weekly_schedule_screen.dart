@@ -407,7 +407,7 @@ class _WeeklyScheduleScreenState extends ConsumerState<WeeklyScheduleScreen> {
             onPressed: () {
               ref.invalidate(teacherAvailabilityProvider(teacherId));
             },
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),

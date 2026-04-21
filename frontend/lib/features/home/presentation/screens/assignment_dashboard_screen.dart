@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,38 +29,43 @@ class AssignmentDashboardScreen extends ConsumerWidget {
       ),
       body: summaryAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48,
-                  color: AppColors.textTertiaryLight),
-              const SizedBox(height: AppSpacing.space3),
-              Text('데이터를 불러올 수 없습니다',
-                  style: AppTypography.bodyMedium),
-              const SizedBox(height: AppSpacing.space3),
-              OutlinedButton(
-                onPressed: () =>
-                    ref.invalidate(weeklyAssignmentSummaryProvider),
-                child: const Text('다시 시도'),
+        error:
+            (_, __) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 48,
+                    color: AppColors.textTertiaryLight,
+                  ),
+                  const SizedBox(height: AppSpacing.space3),
+                  Text('데이터를 불러올 수 없습니다', style: AppTypography.bodyMedium),
+                  const SizedBox(height: AppSpacing.space3),
+                  OutlinedButton(
+                    onPressed:
+                        () => ref.invalidate(weeklyAssignmentSummaryProvider),
+                    child: const Text(AppStrings.retry),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
         data: (summary) => _buildContent(context, summary),
       ),
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, WeeklyAssignmentSummary summary) {
+  Widget _buildContent(BuildContext context, WeeklyAssignmentSummary summary) {
     if (summary.totalItems == 0) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.assignment_outlined, size: 64,
-                color: AppColors.textTertiaryLight),
+            Icon(
+              Icons.assignment_outlined,
+              size: 64,
+              color: AppColors.textTertiaryLight,
+            ),
             const SizedBox(height: AppSpacing.space4),
             Text(
               '이번 주 과제가 없습니다',
@@ -73,12 +79,14 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     }
 
     final rate = summary.completionRate;
-    final completedStudents = summary.incompleteStudents
-        .where((s) => s.completedItems == s.totalItems)
-        .toList();
-    final incompleteStudents = summary.incompleteStudents
-        .where((s) => s.completedItems < s.totalItems)
-        .toList();
+    final completedStudents =
+        summary.incompleteStudents
+            .where((s) => s.completedItems == s.totalItems)
+            .toList();
+    final incompleteStudents =
+        summary.incompleteStudents
+            .where((s) => s.completedItems < s.totalItems)
+            .toList();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -105,8 +113,9 @@ class AssignmentDashboardScreen extends ConsumerWidget {
               AppColors.warning,
             ),
             const SizedBox(height: AppSpacing.space3),
-            ...incompleteStudents
-                .map((s) => _buildStudentCard(context, s, false)),
+            ...incompleteStudents.map(
+              (s) => _buildStudentCard(context, s, false),
+            ),
           ],
 
           // Completed students section
@@ -118,8 +127,9 @@ class AssignmentDashboardScreen extends ConsumerWidget {
               AppColors.success,
             ),
             const SizedBox(height: AppSpacing.space3),
-            ...completedStudents
-                .map((s) => _buildStudentCard(context, s, true)),
+            ...completedStudents.map(
+              (s) => _buildStudentCard(context, s, true),
+            ),
           ],
 
           const SizedBox(height: AppSpacing.space8),
@@ -129,10 +139,13 @@ class AssignmentDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildOverallProgressCard(
-      WeeklyAssignmentSummary summary, double rate) {
-    final color = rate >= 0.8
-        ? AppColors.success
-        : rate >= 0.5
+    WeeklyAssignmentSummary summary,
+    double rate,
+  ) {
+    final color =
+        rate >= 0.8
+            ? AppColors.success
+            : rate >= 0.5
             ? AppColors.warning
             : AppColors.error;
 
@@ -197,8 +210,7 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatCards(
-      WeeklyAssignmentSummary summary, int incompleteCount) {
+  Widget _buildStatCards(WeeklyAssignmentSummary summary, int incompleteCount) {
     final allStudentCount = summary.incompleteStudents.length;
     final completedCount = allStudentCount - incompleteCount;
 
@@ -235,7 +247,11 @@ class AssignmentDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildMiniStatCard(
-      String label, String value, IconData icon, Color color) {
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
@@ -293,12 +309,12 @@ class AssignmentDashboardScreen extends ConsumerWidget {
     StudentAssignmentStatus status,
     bool isCompleted,
   ) {
-    final rate = status.totalItems > 0
-        ? status.completedItems / status.totalItems
-        : 0.0;
-    final color = isCompleted
-        ? AppColors.success
-        : rate >= 0.5
+    final rate =
+        status.totalItems > 0 ? status.completedItems / status.totalItems : 0.0;
+    final color =
+        isCompleted
+            ? AppColors.success
+            : rate >= 0.5
             ? AppColors.warning
             : AppColors.error;
 
@@ -308,7 +324,10 @@ class AssignmentDashboardScreen extends ConsumerWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: InkWell(
-          onTap: () => context.push(AppRoutes.studentDetail.replaceFirst(':id', status.studentId)),
+          onTap:
+              () => context.push(
+                AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
+              ),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.space4),
@@ -386,8 +405,11 @@ class AssignmentDashboardScreen extends ConsumerWidget {
                 ),
 
                 const SizedBox(width: AppSpacing.space2),
-                Icon(Icons.chevron_right,
-                    size: 20, color: AppColors.textTertiaryLight),
+                Icon(
+                  Icons.chevron_right,
+                  size: 20,
+                  color: AppColors.textTertiaryLight,
+                ),
               ],
             ),
           ),

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -66,24 +67,32 @@ class _TeacherDashboardScreenState
           Expanded(
             child: statsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 48,
-                        color: AppColors.textTertiaryLight),
-                    const SizedBox(height: AppSpacing.space3),
-                    Text('데이터를 불러올 수 없습니다',
-                        style: AppTypography.bodyMedium),
-                    const SizedBox(height: AppSpacing.space3),
-                    OutlinedButton(
-                      onPressed: () => ref.invalidate(
-                          teacherMonthlyStatsProvider(_selectedMonth)),
-                      child: const Text('다시 시도'),
+              error:
+                  (e, _) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: AppColors.textTertiaryLight,
+                        ),
+                        const SizedBox(height: AppSpacing.space3),
+                        Text(
+                          '데이터를 불러올 수 없습니다',
+                          style: AppTypography.bodyMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.space3),
+                        OutlinedButton(
+                          onPressed:
+                              () => ref.invalidate(
+                                teacherMonthlyStatsProvider(_selectedMonth),
+                              ),
+                          child: const Text(AppStrings.retry),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
               data: (stats) => _buildDashboard(stats),
             ),
           ),
@@ -93,7 +102,8 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildMonthSelector(String label) {
-    final isCurrentMonth = _selectedMonth.year == DateTime.now().year &&
+    final isCurrentMonth =
+        _selectedMonth.year == DateTime.now().year &&
         _selectedMonth.month == DateTime.now().month;
 
     return Container(
@@ -169,7 +179,9 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildStatCardGrid(
-      TeacherMonthlyStats stats, NumberFormat numberFormat) {
+    TeacherMonthlyStats stats,
+    NumberFormat numberFormat,
+  ) {
     return Column(
       children: [
         Row(
@@ -224,7 +236,9 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildRevenueCard(
-      TeacherMonthlyStats stats, NumberFormat numberFormat) {
+    TeacherMonthlyStats stats,
+    NumberFormat numberFormat,
+  ) {
     final isPositive = stats.revenueChangePercent >= 0;
 
     return Column(
@@ -275,9 +289,7 @@ class _TeacherDashboardScreenState
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isPositive
-                          ? Icons.trending_up
-                          : Icons.trending_down,
+                      isPositive ? Icons.trending_up : Icons.trending_down,
                       size: 16,
                       color: isPositive ? AppColors.success : AppColors.error,
                     ),
@@ -285,8 +297,7 @@ class _TeacherDashboardScreenState
                     Text(
                       '${isPositive ? '+' : ''}${stats.revenueChangePercent.toStringAsFixed(1)}%',
                       style: AppTypography.bodyMedium.copyWith(
-                        color:
-                            isPositive ? AppColors.success : AppColors.error,
+                        color: isPositive ? AppColors.success : AppColors.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -329,9 +340,7 @@ class _TeacherDashboardScreenState
               _buildDivider(),
               _buildStudentStatItem(
                 '이탈',
-                stats.churnedStudents > 0
-                    ? '-${stats.churnedStudents}명'
-                    : '0명',
+                stats.churnedStudents > 0 ? '-${stats.churnedStudents}명' : '0명',
                 stats.churnedStudents > 0
                     ? AppColors.error
                     : AppColors.textTertiaryLight,
@@ -367,10 +376,6 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildDivider() {
-    return Container(
-      width: 1,
-      height: 40,
-      color: AppColors.borderLight,
-    );
+    return Container(width: 1, height: 40, color: AppColors.borderLight);
   }
 }

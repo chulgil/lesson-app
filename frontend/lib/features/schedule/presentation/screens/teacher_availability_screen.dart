@@ -73,7 +73,7 @@ class _TeacherAvailabilityScreenState
                         () => ref.invalidate(
                           teacherAvailabilityProvider(widget.teacherId),
                         ),
-                    child: const Text('다시 시도'),
+                    child: const Text(AppStrings.retry),
                   ),
                 ],
               ),

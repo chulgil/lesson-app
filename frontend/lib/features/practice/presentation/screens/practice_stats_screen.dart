@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -16,10 +17,7 @@ import '../widgets/stats/weekly_trend_chart.dart';
 class PracticeStatsScreen extends ConsumerStatefulWidget {
   final String studentId;
 
-  const PracticeStatsScreen({
-    super.key,
-    required this.studentId,
-  });
+  const PracticeStatsScreen({super.key, required this.studentId});
 
   @override
   ConsumerState<PracticeStatsScreen> createState() =>
@@ -49,10 +47,7 @@ class _PracticeStatsScreenState extends ConsumerState<PracticeStatsScreen>
         title: const Text('연습 통계'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: '주간'),
-            Tab(text: '월간'),
-          ],
+          tabs: const [Tab(text: '주간'), Tab(text: '월간')],
         ),
       ),
       body: TabBarView(
@@ -76,21 +71,26 @@ class _WeeklyReportTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dateState = ref.watch(reportDateProvider);
     final reportAsync = ref.watch(
-      weeklyReportProvider((studentId: studentId, weekStart: dateState.weekStart)),
+      weeklyReportProvider((
+        studentId: studentId,
+        weekStart: dateState.weekStart,
+      )),
     );
 
     return Column(
       children: [
         // Date navigation
         _DateNavigator(
-          title: dateState.weekStart.year == DateTime.now().year
-              ? '${dateState.weekStart.month}월 ${getWeekOfMonth(dateState.weekStart)}주차'
-              : '${dateState.weekStart.year}년 ${dateState.weekStart.month}월 ${getWeekOfMonth(dateState.weekStart)}주차',
-          onPrevious: () =>
-              ref.read(reportDateProvider.notifier).previousWeek(),
-          onNext: dateState.canNavigateNextWeek
-              ? () => ref.read(reportDateProvider.notifier).nextWeek()
-              : null,
+          title:
+              dateState.weekStart.year == DateTime.now().year
+                  ? '${dateState.weekStart.month}월 ${getWeekOfMonth(dateState.weekStart)}주차'
+                  : '${dateState.weekStart.year}년 ${dateState.weekStart.month}월 ${getWeekOfMonth(dateState.weekStart)}주차',
+          onPrevious:
+              () => ref.read(reportDateProvider.notifier).previousWeek(),
+          onNext:
+              dateState.canNavigateNextWeek
+                  ? () => ref.read(reportDateProvider.notifier).nextWeek()
+                  : null,
         ),
 
         // Report content
@@ -135,7 +135,7 @@ class _WeeklyReportTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           TextButton(
             onPressed: () => ref.invalidate(weeklyReportProvider),
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),
@@ -165,11 +165,12 @@ class _MonthlyReportTab extends ConsumerWidget {
         // Date navigation
         _DateNavigator(
           title: '${dateState.year}년 ${dateState.month}월',
-          onPrevious: () =>
-              ref.read(reportDateProvider.notifier).previousMonth(),
-          onNext: dateState.canNavigateNextMonth
-              ? () => ref.read(reportDateProvider.notifier).nextMonth()
-              : null,
+          onPrevious:
+              () => ref.read(reportDateProvider.notifier).previousMonth(),
+          onNext:
+              dateState.canNavigateNextMonth
+                  ? () => ref.read(reportDateProvider.notifier).nextMonth()
+                  : null,
         ),
 
         // Report content
@@ -216,7 +217,7 @@ class _MonthlyReportTab extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
           TextButton(
             onPressed: () => ref.invalidate(monthlyReportProvider),
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),
@@ -245,9 +246,7 @@ class _DateNavigator extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderLight),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -269,9 +268,10 @@ class _DateNavigator extends StatelessWidget {
             onPressed: onNext,
             icon: Icon(
               Icons.chevron_right,
-              color: onNext != null
-                  ? AppColors.textPrimaryLight
-                  : AppColors.textTertiaryLight,
+              color:
+                  onNext != null
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textTertiaryLight,
             ),
             tooltip: '다음',
           ),

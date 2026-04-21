@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -11,19 +12,14 @@ import '../widgets/section_management/archive_repertoire_tile.dart';
 class RepertoireArchiveScreen extends ConsumerWidget {
   final String studentId;
 
-  const RepertoireArchiveScreen({
-    super.key,
-    required this.studentId,
-  });
+  const RepertoireArchiveScreen({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final archivedAsync = ref.watch(archivedRepertoiresProvider(studentId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('아카이브'),
-      ),
+      appBar: AppBar(title: const Text('아카이브')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -62,7 +58,9 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                         Icon(
                           Icons.inventory_2_outlined,
                           size: 64,
-                          color: AppColors.textSecondaryLight.withValues(alpha: 0.5),
+                          color: AppColors.textSecondaryLight.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.space4),
                         Text(
@@ -85,30 +83,34 @@ class RepertoireArchiveScreen extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: AppColors.error,
+              error:
+                  (error, stack) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: AppColors.error,
+                        ),
+                        const SizedBox(height: AppSpacing.space4),
+                        Text(
+                          '오류가 발생했습니다',
+                          style: AppTypography.bodyLarge.copyWith(
+                            color: AppColors.error,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.space2),
+                        TextButton(
+                          onPressed:
+                              () => ref.invalidate(
+                                archivedRepertoiresProvider(studentId),
+                              ),
+                          child: const Text(AppStrings.retry),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.space4),
-                    Text(
-                      '오류가 발생했습니다',
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: AppColors.error,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.space2),
-                    TextButton(
-                      onPressed: () => ref.invalidate(archivedRepertoiresProvider(studentId)),
-                      child: const Text('다시 시도'),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
             ),
           ),
         ],

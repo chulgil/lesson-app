@@ -198,7 +198,7 @@ class _PaymentManagementScreenState
           const SizedBox(height: AppSpacing.space4),
           OutlinedButton(
             onPressed: () => ref.invalidate(paymentsNotifierProvider),
-            child: const Text('다시 시도'),
+            child: const Text(AppStrings.retry),
           ),
         ],
       ),
