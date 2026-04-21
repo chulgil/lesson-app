@@ -48,7 +48,12 @@
 → minCancelHours: 4, maxChangesPerMonth: 2
 ```
 
-### 4. 환불 정책 (RefundPolicy)
+### 4. 환불 정책 (RefundPolicy) — ⚠️ 보류 (2026-04-21)
+
+> **보류 사유**: 앱 내 결제 기능이 미구현이므로 환불 로직을 설계·연결하지 않는다.
+> 관련 원칙: `docs/schema/entities/subscription.md` — "앱 내 결제 없음 → 환불/재결제 개념 불필요".
+> 엔티티 필드(`fullRefundDays`, `partialRefundRatio`, `halfwayRefundRatio`, `noShowRefundRatio`)는 Hive typeId 호환을 위해 유지하되 UI/로직에 연결하지 않는다.
+> 결제 기능이 구현되는 시점에 본 섹션을 재검토한다.
 
 | 항목 | 설명 | 기본값 |
 |------|------|--------|
@@ -58,7 +63,7 @@
 | `noShowRefundRatio` | 노쇼 시 환불 비율 | 0.67 |
 
 ```
-예시:
+예시(참고용, 현재 미적용):
 - 수업 1일전까지 100% 환불
 - 첫 수업 경과후(노쇼 포함): 2/3에 해당하는 금액
 - 1/2 경과후(4주기준2회수업후): 환불하지 않음

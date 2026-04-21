@@ -59,21 +59,20 @@ class LessonPolicy extends HiveObject {
   @HiveField(11)
   final int carryoverPeriodMonths;
 
-  // ===== 환불 정책 (§4.7 subscription_master) =====
+  // ===== 환불 정책 — 보류 (2026-04-21) =====
+  // 앱 내 결제 기능 미구현으로 환불 UI를 연결하지 않는다.
+  // 스펙: docs/specs/subscription/lesson_policy_settings.md §4 "보류".
+  // Hive typeId 유지를 위해 필드 자체는 삭제하지 않는다 (기존 저장 데이터 호환).
 
-  /// 전액 환불 가능 일수 (첫 수업 전). 기본 1일.
   @HiveField(14)
   final int fullRefundDays;
 
-  /// 첫 수업 후 환불 비율 (0.0 ~ 1.0). 기본 0.67 (2/3).
   @HiveField(15)
   final double partialRefundRatio;
 
-  /// 1/2 경과 후 환불 비율. 기본 0.0.
   @HiveField(16)
   final double halfwayRefundRatio;
 
-  /// 노쇼 시 환불 비율. 기본 0.67.
   @HiveField(17)
   final double noShowRefundRatio;
 
