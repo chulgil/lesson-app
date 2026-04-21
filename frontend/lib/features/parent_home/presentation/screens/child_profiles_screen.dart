@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -172,12 +171,9 @@ class ChildProfilesScreen extends ConsumerWidget {
 
     // Navigate to student home with child profile context
     // For now, show a message - full implementation would switch UI mode
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("${profile.name}의 화면으로 전환합니다"),
-        action: SnackBarAction(label: AppStrings.confirm, onPressed: () {}),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("${profile.name}의 화면으로 전환합니다")));
 
     // TODO: Implement proper view switching
     // This would typically navigate to StudentHomeScreen with the child profile

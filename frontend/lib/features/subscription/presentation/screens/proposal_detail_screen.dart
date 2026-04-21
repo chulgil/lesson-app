@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -619,12 +618,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     // Copy to clipboard (url_launcher can be added later for actual call)
     await Clipboard.setData(ClipboardData(text: phoneNumber));
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('전화번호가 복사되었습니다: $phoneNumber'),
-          action: SnackBarAction(label: AppStrings.confirm, onPressed: () {}),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('전화번호가 복사되었습니다: $phoneNumber')));
     }
   }
 
@@ -632,12 +628,9 @@ class _ProposalDetailScreenState extends ConsumerState<ProposalDetailScreen> {
     // Copy to clipboard (url_launcher can be added later for actual SMS)
     await Clipboard.setData(ClipboardData(text: phoneNumber));
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('전화번호가 복사되었습니다: $phoneNumber'),
-          action: SnackBarAction(label: AppStrings.confirm, onPressed: () {}),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('전화번호가 복사되었습니다: $phoneNumber')));
     }
   }
 
