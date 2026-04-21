@@ -221,8 +221,7 @@ class _SubdivisionChip extends StatelessWidget {
             // Korean label
             Text(
               subdivision.label,
-              style: AppTypography.bodySmall.copyWith(
-                fontSize: 11,
+              style: AppTypography.caption.copyWith(
                 color: isSelected ? Colors.white : AppColors.textSecondaryLight,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
