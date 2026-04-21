@@ -40,7 +40,7 @@
 | `inkTertiary` | `rgba(20,22,28,0.55)` | 캡션, 메타정보 |
 | `inkQuaternary` | `rgba(20,22,28,0.25)` | 비활성 / 완료 |
 | `paperPencil` | `rgba(20,22,28,0.60)` | 손글씨 본문 |
-| `paperMargin` | `#A83E3A` | **왼쪽 여백선** (3px 고정) |
+| `paperMargin` | `#A83E3A` | ~~왼쪽 여백선~~ — **제거됨 (2026-04-21)**. 토큰 자체는 레거시 호환용으로 유지. 신규 사용 금지 |
 | `paperAccent` | `#9B1B12` | **Vermillion Red** — 핵심 액션 |
 | `paperAccentSoft` | `rgba(155,27,18,0.12)` | 액센트 배경 |
 | `paperOk` | `#3F5D2F` | 완료 (녹색 펜) |
@@ -50,52 +50,42 @@ Flutter 구현: `lib/core/theme/app_colors.dart`의 Notebook 섹션.
 
 ---
 
-## 3. 왼쪽 붉은 여백선 규칙 (CRITICAL)
+## 3. 왼쪽 붉은 여백선 — 제거됨 (2026-04-21)
 
-### 3.1 스펙
+### 3.1 현재 상태
 
-| 항목 | 값 |
-|------|-----|
-| 위치 | `Positioned(left: 14, top: 0, bottom: 0)` (기본값) |
-| 너비 | **3px 고정** |
-| 색상 | `AppColors.paperMargin` (#A83E3A) |
-| 투명도 | 1.0 (불투명) |
-| 상호작용 | `IgnorePointer` — tap/scroll 전달 금지 |
-| 콘텐츠 좌측 padding | **≥ 17px** (선 우측 끝 = left 14 + width 3) |
+**왼쪽 붉은 여백선은 더 이상 렌더되지 않는다.** `PaperScaffold` 는 크림색 종이 배경만 제공한다.
 
-### 3.2 설계 근거
+### 3.2 제거 사유
 
-**왜 `left: 14` 인가?**
-- 레퍼런스 디자인(웹)은 52px 들여쓰기 + 1.2px 세로선이지만, 모바일에서는 **가로 공간이 부족**.
-- 과거에는 `left: 0 + width: 3` 플러시 마진을 사용했으나, **기기 베젤·라운드 코너·SafeArea** 에 가려 선 자체가 잘 안 보이는 문제가 발생 (2026-04-21 피드백).
-- 14px 들여쓰기로 선이 **명확히 보이면서도** 콘텐츠 가로폭 손실은 최소화 (전체 폭의 ~3.7%).
-- 너비는 3px 유지 — 모바일에서 1.2px 은 너무 가늘어 저대비 상황에서 실종된다.
+| 시도 | 결과 |
+|------|------|
+| `left: 0, width: 3` (플러시 마진) | 기기 베젤·라운드 코너·SafeArea 에 가려 선이 거의 안 보임 |
+| `left: 14, width: 3` (14px 들여쓰기) | 선은 보이나 콘텐츠 padding(16px)과 간격이 1px 로 좁아 **지저분해 보임** |
 
-### 3.3 구현 예시
+- 두 방식 모두 모바일에서 만족스러운 결과를 내지 못했다.
+- 노트북 은유는 **크림색 종이 배경(`paper`)** + Playfair Display + 로마숫자 + Gaegu 손글씨 주석으로 충분히 전달 가능.
+- 4대 시그니처(§1.1) 에 여백선은 포함되지 않으므로 제거해도 컨셉 훼손 없음.
+
+### 3.3 현재 구현
 
 ```dart
-// 일반 사용 — 기본값(left: 14, width: 3)
 PaperScaffold(
   child: SafeArea(child: child),
 )
 
-// 튜닝 — 매우 좁은 화면에서 더 붙이고 싶을 때
-PaperScaffold(
-  marginLineLeft: 8,
-  marginLineWidth: 2.5,
-  child: SafeArea(child: child),
-)
+// 내부: ColoredBox(color: AppColors.paper) 만.
 ```
 
-`PaperScaffold` 내부는 `Stack` + `Positioned` 로 구성되며, 콘텐츠(`Positioned.fill`) 는 선 **위에** 올라간다. 콘텐츠의 좌측 padding 이 `marginLineLeft + marginLineWidth` 미만이면 텍스트가 선과 겹치므로, 기본 설정에서는 `horizontal: AppSpacing.screenPadding` (16px) 이상을 사용한다. 17px 미만으로 가야 한다면 `marginLineLeft` 를 줄여 맞춘다.
+### 3.4 레거시 토큰
 
-### 3.4 금지 사항
+- `AppColors.paperMargin` (#A83E3A) — 삭제하지 않고 **유지**. 향후 다른 용도(보더 액센트 등)로 재사용 가능.
+- 신규 코드에서 이 토큰을 **왼쪽 세로선 용도로 사용 금지**.
 
-- 화면 중앙·우측 배치 (반드시 좌측, `left` ≤ 24)
-- 투명도/그라데이션 (불투명 단색만)
-- 상하단 부분 그리기 (반드시 `top: 0, bottom: 0`)
-- 너비 1.5px 미만 (모바일 가독성 부족)
-- 콘텐츠 padding < 여백선 우측 끝 → 텍스트가 선과 겹침
+### 3.5 금지 사항
+
+- `PaperScaffold` 를 수정하거나 래핑하여 왼쪽 세로선을 다시 그리는 행위 (이유 기록 없이)
+- 다른 형태(점선·점묘·음영)로 노트 여백을 표현하려는 시도 — §1.1 4대 시그니처로 충분
 
 ---
 
@@ -146,7 +136,7 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 
 | 기존 요소 | Notebook 매핑 | 변경 범위 |
 |-----------|---------------|-----------|
-| `Scaffold` 배경 | `PaperScaffold` — paper + 3px 왼쪽 마진선 | 스캐폴드 래퍼 |
+| `Scaffold` 배경 | `PaperScaffold` — 크림색 종이 배경 (왼쪽 여백선 제거됨, §3 참조) | 스캐폴드 래퍼 |
 | `_buildHeader` "Lessonaza" | `NotebookMasthead` (상단 2px / 하단 1px 라인 + Playfair eyebrow + trailing 알림 아이콘) | 교체 |
 | 타이틀 영역 (신규) | `_buildProgrammeTitle` — "Programme for {Weekday}" + "오늘의 레슨" + "M月 D日 · N 편의 수업" + thin rule | 추가 |
 | `UrgentAlertZone` | 그대로 | 변경 없음 |
@@ -182,47 +172,16 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 ```dart
 class PaperScaffold extends StatelessWidget {
   final Widget child;
-  /// 여백선 왼쪽 offset. 기본 14px (베젤·SafeArea 회피).
-  final double marginLineLeft;
-  /// 여백선 너비. 기본 3px 고정.
-  final double marginLineWidth;
 
-  const PaperScaffold({
-    super.key,
-    required this.child,
-    this.marginLineLeft = 14,
-    this.marginLineWidth = 3,
-  });
-
-  /// 여백선 우측 끝 — 콘텐츠 좌측 padding 의 최소값.
-  double get marginLineRight => marginLineLeft + marginLineWidth;
+  const PaperScaffold({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) => Stack(
-    children: [
-      const Positioned.fill(child: ColoredBox(color: AppColors.paper)),
-      Positioned(
-        left: marginLineLeft,
-        top: 0,
-        bottom: 0,
-        width: marginLineWidth,
-        child: const IgnorePointer(
-          child: ColoredBox(color: AppColors.paperMargin),
-        ),
-      ),
-      Positioned.fill(child: child),
-    ],
-  );
+  Widget build(BuildContext context) =>
+      ColoredBox(color: AppColors.paper, child: child);
 }
 ```
 
-**파라미터**
-
-| 이름 | 기본값 | 설명 |
-|------|--------|------|
-| `marginLineLeft` | 14 | 여백선 왼쪽 offset. 기기 베젤·라운드 코너·SafeArea 에 가리지 않도록 기본값은 0이 아니다. |
-| `marginLineWidth` | 3 | 여백선 너비. **3px 고정 원칙**을 유지하되 극단적인 좁은 화면에서만 조정 허용 (§3.4 참조). |
-| `marginLineRight` | `marginLineLeft + marginLineWidth` | getter. 콘텐츠 좌측 padding 은 이 값 이상이어야 텍스트가 선과 겹치지 않는다. |
+크림색 종이 배경만 제공한다. 과거에는 왼쪽 3px 붉은 여백선을 그렸으나 §3 사유로 제거했다. 파라미터/getter 없음 — 단순 `child` 만 받는다.
 
 ### 6.2 NotebookMasthead
 
