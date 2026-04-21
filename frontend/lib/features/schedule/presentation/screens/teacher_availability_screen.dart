@@ -499,18 +499,18 @@ class _TeacherAvailabilityScreenState
                                       children: [
                                         Text(
                                           s.startTime,
-                                          style: AppTypography.caption.copyWith(
-                                            fontSize: 9,
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: AppTypography.captionXSmall
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                         Text(
                                           s.endTime,
-                                          style: AppTypography.caption.copyWith(
-                                            fontSize: 9,
-                                            color: AppColors.primary,
-                                          ),
+                                          style: AppTypography.captionXSmall
+                                              .copyWith(
+                                                color: AppColors.primary,
+                                              ),
                                         ),
                                       ],
                                     ),
