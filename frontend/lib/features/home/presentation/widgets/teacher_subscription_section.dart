@@ -81,7 +81,7 @@ class TeacherSubscriptionSection extends ConsumerWidget {
                   child: Text(
                     AppStrings.moreSubscriptions(active.length - 3),
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.primary,
+                      color: AppColors.paperAccent,
                     ),
                   ),
                 ),

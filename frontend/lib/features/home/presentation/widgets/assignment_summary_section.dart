@@ -6,9 +6,15 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/notebook/section_header.dart';
 import '../providers/assignment_summary_provider.dart';
 
-/// Assignment progress summary section for home dashboard.
+/// Assignment progress summary — **Notebook × Score 스타일**.
+///
+/// 종이 위의 "주간 과제표":
+/// - 섹션 헤더: uppercase + 1px 잉크 rule
+/// - 진행률: ink 단색 + paperDark 트랙 (3색 원칙 준수)
+/// - 학생 리스트: paperDark 아바타, ink 텍스트
 class AssignmentSummarySection extends ConsumerWidget {
   const AssignmentSummarySection({super.key});
 
@@ -28,91 +34,76 @@ class AssignmentSummarySection extends ConsumerWidget {
 
   Widget _buildContent(BuildContext context, WeeklyAssignmentSummary summary) {
     final rate = summary.completionRate;
-    final color =
-        rate >= 0.8
-            ? AppColors.success
-            : rate >= 0.5
-            ? AppColors.warning
-            : AppColors.error;
+    // 완료율 임계값만 paperAccent 로 경고 (50% 미만), 그 외 ink 단색
+    final accentColor = rate < 0.5 ? AppColors.paperAccent : AppColors.ink;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        NotebookSectionHeader(
+          label: '이번 주 과제',
+          trailing: TextButton(
+            onPressed: () => context.push(AppRoutes.assignmentDashboard),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              minimumSize: const Size(0, 28),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              '전체보기',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.ink,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+        // Progress bar with label
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.assignment_outlined, size: 20, color: color),
-            const SizedBox(width: AppSpacing.space2),
-            Text('이번 주 과제', style: AppTypography.headingSmall),
-            const Spacer(),
-            TextButton(
-              onPressed: () => context.push(AppRoutes.assignmentDashboard),
-              child: const Text('전체보기'),
+            Text(
+              '완료율',
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.inkSecondary,
+              ),
+            ),
+            Text(
+              '${(rate * 100).round()}% (${summary.completedItems}/${summary.totalItems})',
+              style: AppTypography.bodySmall.copyWith(
+                color: accentColor,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
-
-        const SizedBox(height: AppSpacing.space3),
-
-        // Progress card
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.space4),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceLight,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-            border: Border.all(color: AppColors.borderLight),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Progress bar with label
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '완료율',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                  Text(
-                    '${(rate * 100).round()}% (${summary.completedItems}/${summary.totalItems})',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.space2),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-                child: LinearProgressIndicator(
-                  value: rate,
-                  backgroundColor: color.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation(color),
-                  minHeight: 8,
-                ),
-              ),
-
-              // Incomplete students list (max 3)
-              if (summary.incompleteStudents.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.space4),
-                Text(
-                  '미완료 학생',
-                  style: AppTypography.bodySmall.copyWith(
-                    color: AppColors.textSecondaryLight,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.space2),
-                ...summary.incompleteStudents
-                    .take(3)
-                    .map((s) => _buildStudentRow(context, s)),
-              ],
-            ],
+        const SizedBox(height: AppSpacing.space2),
+        // Thin linear bar — rectangular (no radius), ink stroke
+        SizedBox(
+          height: 4,
+          child: LinearProgressIndicator(
+            value: rate,
+            backgroundColor: AppColors.inkQuaternary,
+            valueColor: AlwaysStoppedAnimation(accentColor),
+            minHeight: 4,
           ),
         ),
+        // Incomplete students list (max 3)
+        if (summary.incompleteStudents.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.space4),
+          Text(
+            '미완료 학생',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.inkSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          ...summary.incompleteStudents
+              .take(3)
+              .map((s) => _buildStudentRow(context, s)),
+        ],
       ],
     );
   }
@@ -128,7 +119,6 @@ class AssignmentSummarySection extends ConsumerWidget {
             () => context.push(
               AppRoutes.studentDetail.replaceFirst(':id', status.studentId),
             ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.space1,
@@ -136,23 +126,20 @@ class AssignmentSummarySection extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              // Avatar
               CircleAvatar(
                 radius: 14,
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                backgroundColor: AppColors.paperDark,
                 child: Text(
                   status.studentName.isNotEmpty
                       ? status.studentName.substring(0, 1)
                       : '?',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.primary,
+                    color: AppColors.ink,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
               const SizedBox(width: AppSpacing.space2),
-
-              // Name + task
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,13 +148,14 @@ class AssignmentSummarySection extends ConsumerWidget {
                       status.studentName,
                       style: AppTypography.bodySmall.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
                       ),
                     ),
                     if (status.mostUrgentItem != null)
                       Text(
                         status.mostUrgentItem!.title,
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.textTertiaryLight,
+                          color: AppColors.inkTertiary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -175,12 +163,10 @@ class AssignmentSummarySection extends ConsumerWidget {
                   ],
                 ),
               ),
-
-              // Completion status
               Text(
                 '${status.completedItems}/${status.totalItems}',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.warning,
+                  color: AppColors.paperAccent,
                   fontWeight: FontWeight.w600,
                 ),
               ),

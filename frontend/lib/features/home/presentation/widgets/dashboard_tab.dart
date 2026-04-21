@@ -241,7 +241,7 @@ class DashboardTab extends ConsumerWidget {
           (lessons) => StatCard(
             title: '오늘 레슨',
             value: '${lessons.length}회',
-            color: AppColors.primary,
+            color: AppColors.ink,
             icon: Icons.today,
             onTap: onViewAllLessons,
           ),
@@ -249,12 +249,11 @@ class DashboardTab extends ConsumerWidget {
           () => StatCard(
             title: '오늘 레슨',
             value: '-',
-            color: AppColors.primary,
+            color: AppColors.ink,
             icon: Icons.today,
           ),
       error:
-          (_, __) =>
-              StatCard(title: '오늘 레슨', value: '-', color: AppColors.primary),
+          (_, __) => StatCard(title: '오늘 레슨', value: '-', color: AppColors.ink),
     );
 
     final monthCard = lessonStatsAsync.when(
@@ -262,7 +261,7 @@ class DashboardTab extends ConsumerWidget {
           (stats) => StatCard(
             title: '이번 달',
             value: '${stats['completed'] ?? 0}회',
-            color: AppColors.primary,
+            color: AppColors.ink,
             icon: Icons.check_circle_outline,
             onTap: () => context.push(AppRoutes.analytics),
           ),
@@ -270,12 +269,11 @@ class DashboardTab extends ConsumerWidget {
           () => StatCard(
             title: '이번 달',
             value: '-',
-            color: AppColors.primary,
+            color: AppColors.ink,
             icon: Icons.check_circle_outline,
           ),
       error:
-          (_, __) =>
-              StatCard(title: '이번 달', value: '-', color: AppColors.primary),
+          (_, __) => StatCard(title: '이번 달', value: '-', color: AppColors.ink),
     );
 
     return StatCardRow(cards: [todayCard, monthCard]);
