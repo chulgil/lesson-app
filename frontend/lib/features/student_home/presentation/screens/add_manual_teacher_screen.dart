@@ -87,7 +87,7 @@ class _AddManualTeacherScreenState
                 '이름',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -110,14 +110,14 @@ class _AddManualTeacherScreenState
                 '악기',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
                 '선택 사항',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -135,14 +135,14 @@ class _AddManualTeacherScreenState
                 '전화번호',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
                 '선택 사항',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -160,14 +160,14 @@ class _AddManualTeacherScreenState
                 '메모',
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimaryLight,
+                  color: AppColors.ink,
                 ),
               ),
               const SizedBox(height: AppSpacing.space1),
               Text(
                 '선택 사항',
                 style: AppTypography.caption.copyWith(
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -198,8 +198,8 @@ class _AddManualTeacherScreenState
                   child: OutlinedButton(
                     onPressed: _isSaving ? null : _confirmDelete,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
+                      foregroundColor: AppColors.paperAccent,
+                      side: const BorderSide(color: AppColors.paperAccent),
                     ),
                     child: const Text('선생님 삭제'),
                   ),
@@ -310,7 +310,7 @@ class _AddManualTeacherScreenState
         SnackBar(
           content: const Text('저장 실패. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {
@@ -332,7 +332,9 @@ class _AddManualTeacherScreenState
               ),
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text(AppStrings.delete),
               ),
             ],
@@ -365,7 +367,7 @@ class _AddManualTeacherScreenState
         SnackBar(
           content: const Text('삭제 실패. 다시 시도해주세요.'),
           behavior: SnackBarBehavior.floating,
-          backgroundColor: AppColors.error,
+          backgroundColor: AppColors.paperAccent,
         ),
       );
     } finally {
