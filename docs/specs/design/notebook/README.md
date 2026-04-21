@@ -2,7 +2,7 @@
 
 > Last updated: 2026-04-21
 > 컨셉: **괘선 종이의 아날로그 손맛 + 클래식 악보의 엄격한 타이포그래피**
-> 상태: 선생님 홈화면부터 적용 (Phase 1)
+> 상태: 선생님 홈화면 Phase 1 + Phase 2 완료 (공통 위젯 + 홈 섹션 + 대시보드 서브위젯 리스타일)
 > 레퍼런스: `design-plan/hybrid/`
 
 ---
@@ -151,15 +151,44 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 
 **원칙**: Phase 1은 스캐폴드·헤더·타이틀·리스트 래퍼·푸터만 Notebook으로 교체. 각 위젯 **내부는 변경 없음**.
 
-### 5.2 Phase 2 이후 대상 (미구현)
+### 5.2 Phase 2 (구현 완료 — 커밋 3462459b · c361592d · 89f04f94)
+
+공통 위젯 + 홈 전용 섹션 + 대시보드 서브위젯을 Notebook × Score 토큰으로 일괄 리스타일. 기능·Provider·라우팅은 보존.
+
+#### 5.2.A 공통 위젯 (커밋 3462459b)
+
+| 위젯 | 변경 |
+|------|------|
+| `ThinRule` (신규) | 1px `inkQuaternary` 라인. 섹션 구분 공통 유틸 |
+| `NotebookSectionHeader` (신규) | uppercase 라벨 + 선택 trailing + 하단 `ThinRule`. 모든 섹션 헤더 공통화 |
+| `StatCard` | `paperDark` 배경 + 좌측 3px `ink` 세로선. `color` 파라미터는 보존(무시됨)하여 기존 호출부 파괴 없음 — 42 callsites 일괄 반영 |
+| `EmptyStateWidget` | 32px `ink` 아이콘 + Playfair `pieceTitle` + Gaegu `hand` 서브타이틀 + `ink` OutlinedButton — 12 callsites 일괄 반영 |
+
+#### 5.2.B 홈 공통 섹션 (커밋 c361592d)
+
+| 위젯 | Notebook 매핑 |
+|------|--------------|
+| `SubscriptionBadge` | 사각 1px 보더 스탬프 · IBM Plex Mono 카운트 ("3/10", "D-5", "TRIAL", "EXP") · ink/paperAccent/inkTertiary 단색 — 8 callsites 일괄 반영 |
+| `TimeContextBanner` | 좌측 3px `paperAccent` 세로선 + 투명 배경 + **Gaegu 손글씨** (`NotebookTypography.hand`) |
+| `GettingStartedCard` | `NotebookSectionHeader` + **로마숫자 스텝 인덱스** (I, II, III) + Playfair `pieceTitle` 제목 · 완료 항목은 `paperOk` 체크 + 취소선 |
+| `LessonRequestSection` | 투명 배경 + 상·하단 `inkQuaternary` 1px · 헤더를 `NotebookSectionHeader` 로 교체 |
+
+#### 5.2.C 대시보드 서브위젯 (커밋 89f04f94)
+
+| 위젯 | Notebook 매핑 |
+|------|--------------|
+| `LessonCard` | 투명 배경 + 좌측 3px 상태 세로선 (`ink`/`paperOk`/`inkTertiary`/`paperAccent`) + 하단 1px `inkQuaternary` · **IBM Plex Mono 13px 시간** (52px 컬럼) · Playfair `pieceTitle` 학생·악기 · sans uppercase 상태 라벨 (10px) |
+| `AssignmentSummarySection` | `NotebookSectionHeader` + 4px thin linear bar (`inkQuaternary` 트랙 · `ink`/`paperAccent` 스트로크) · 완료율 < 50% 만 `paperAccent` 경고 (3색 원칙) |
+| `ScheduleChangeRequestSection` | `NotebookSectionHeader` + 상·하단 `inkQuaternary` 1px · `paperDark` 아바타 · 사각 1px 보더 상태 스탬프 (fill 제거) · urgent 점은 `paperAccent` |
+| `UrgentAlertZone` | 좌측 3px 세로선 (`paperAccent` urgent · `ink` 일반) + 투명 배경 · semantic error/warning/info 3색 분리 제거 (3색 원칙) |
+
+### 5.3 Phase 3 이후 대상 (미구현)
 
 | 항목 | 계획 | Phase |
 |------|------|-------|
-| `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 2 |
-| `TimeContextBanner` 손글씨 래핑 | Gaegu 마지널리아 스타일 외곽 래퍼 | Phase 2 |
-| `GettingStartedCard` | Notebook 스타일 체크리스트 (`PencilBox`) | Phase 2 |
-| `LessonCard` 내부 | 로마숫자 시간·곡명·노트 — 완전 이식 | Phase 3 |
-| `StatCard` | "Fine." 푸터에 HBStat 방식 수치 이식 | Phase 3 |
+| `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 3 |
+| 학생/학부모 홈 | Notebook × Score 적용 | Phase 4 |
+| 전 화면 확산 | 설정/프로필/수강권/스케줄 | Phase 5 |
 
 ---
 
@@ -237,8 +266,8 @@ Text(
 | Phase | 범위 | 상태 |
 |-------|------|------|
 | Phase 1 | 선생님 홈화면 — 토큰 + PaperScaffold + NotebookMasthead + Programme Title + 로마숫자 레슨 리스트 + Fine. 푸터 | **완료** (2026-04-21, f425ff11) |
-| Phase 2 | StaffDivider + PencilUnderline/Box/Circle CustomPainter · TimeContextBanner·GettingStartedCard 래핑 | 계획됨 |
-| Phase 3 | 개별 카드(LessonCard, StatCard) Notebook 내부 이식 + HBStat 수치 표기 | 계획됨 |
+| Phase 2 | 공통 위젯 (StatCard/EmptyStateWidget/ThinRule/SectionHeader) + 홈 섹션 (SubscriptionBadge/TimeContextBanner/GettingStartedCard/LessonRequestSection) + 대시보드 서브위젯 (LessonCard/AssignmentSummarySection/ScheduleChangeRequestSection/UrgentAlertZone) | **완료** (2026-04-21, 3462459b + c361592d + 89f04f94) |
+| Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
 | Phase 4 | 학생/학부모 홈 적용 | 계획됨 |
 | Phase 5 | 전 화면 확산 (설정/프로필/수강권/스케줄) | 계획됨 |
 
@@ -261,16 +290,16 @@ Text(
 | `flutter test` | 392/392 passed |
 | 기능 보존 | 기존 10개 위젯 모두 유지 — 제거/대체 없음 |
 
-#### 4대 시그니처 렌더 상태
+#### 4대 시그니처 렌더 상태 (Phase 2 종료 시점)
 
-| 시그니처 | Phase 1 상태 | 렌더 위치 |
-|----------|-------------|-----------|
-| Playfair Display | **렌더** | Masthead eyebrow · Programme Title · mastheadDate · 로마숫자 · "Fine." · "Today's Programme" |
-| 로마숫자 | **렌더** | "오늘의 레슨" 헤더 카운트 · 레슨 카드 앞 인덱스(I., II., III.…) |
-| Vermillion Red | **렌더** | 왼쪽 3px 여백선(#A83E3A) · "일괄 피드백" 텍스트(#9B1B12) |
-| Gaegu 손글씨 | **스타일만 정의 · 미렌더** | Phase 2에서 TimeContextBanner·마지널리아·"지금" 라벨 등에 투입 예정 |
+| 시그니처 | 상태 | 렌더 위치 |
+|----------|------|-----------|
+| Playfair Display | **렌더** | Masthead eyebrow · Programme Title · mastheadDate · 로마숫자 · "Fine." · LessonCard 학생·악기 · GettingStartedCard 스텝 · EmptyStateWidget 타이틀 |
+| 로마숫자 | **렌더** | "오늘의 레슨" 헤더 카운트 · 레슨 카드 앞 인덱스 · **GettingStartedCard 스텝 인덱스 (I, II, III)** |
+| Vermillion Red | **렌더** | `paperAccent` 액센트 — UrgentAlertZone urgent 세로선 · TimeContextBanner 세로선 · SubscriptionBadge 만료임박 · AssignmentSummary 50% 미만 경고 |
+| Gaegu 손글씨 | **렌더** | `NotebookTypography.hand` — **TimeContextBanner 메시지** · EmptyStateWidget 서브타이틀 |
 
-> **정직한 평가**: Phase 1은 4대 시그니처 중 **3종이 실제 관찰 가능**하며 Gaegu는 토큰 준비 완료·실사용은 Phase 2. §8의 "4대 시그니처 필수" 원칙(5번)은 **Phase 2 종료 후부터** 화면 단위 감사 대상이다.
+> **평가**: Phase 2 종료 시점에 4대 시그니처 모두 실제 관찰 가능. §8의 "4대 시그니처 필수" 원칙(5번)은 **선생님 홈화면 내에서 충족**. Phase 4 (학생/학부모 홈) 부터 확산 대상.
 
 ---
 
