@@ -128,11 +128,8 @@ class TimelineLessonBlock extends StatelessWidget {
         // Line 1: given name · instrument · duration
         Text(
           '${NameUtils.givenName(lesson.studentName)}  ${lesson.instrument}  ${lesson.duration}분',
-          style: AppTypography.caption.copyWith(
-            color: colors.accent,
-            fontWeight: FontWeight.w600,
-            fontSize: compact ? 11 : 12,
-          ),
+          style: (compact ? AppTypography.caption : AppTypography.bodySmall)
+              .copyWith(color: colors.accent, fontWeight: FontWeight.w600),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
