@@ -239,7 +239,7 @@ class _TimeChip extends StatelessWidget {
       return AppColors.primary;
     }
     if (slot.isRecommended) {
-      return AppColors.warningLight; // Light orange
+      return AppColors.paperAccentSoft; // Light orange
     }
     return AppColors.paperDark; // #FFFAF5
   }

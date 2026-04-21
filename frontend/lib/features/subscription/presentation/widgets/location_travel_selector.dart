@@ -266,7 +266,7 @@ class _LocationTravelSelectorState
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
         color: isWarning
-            ? AppColors.warningLight
+            ? AppColors.paperAccentSoft
             : AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(

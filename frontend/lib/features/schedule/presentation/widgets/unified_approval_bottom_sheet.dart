@@ -294,9 +294,9 @@ class _UnifiedApprovalBottomSheetState
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space3),
       decoration: BoxDecoration(
-        color: AppColors.infoLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.infoBorder),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [

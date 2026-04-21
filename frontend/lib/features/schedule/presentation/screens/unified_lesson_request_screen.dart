@@ -198,10 +198,10 @@ class _UnifiedLessonRequestScreenState
         vertical: AppSpacing.space3,
       ),
       decoration: BoxDecoration(
-        color: AppColors.infoLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(
-          color: AppColors.infoBorder,
+          color: AppColors.inkQuaternary,
         ),
       ),
       child: Row(

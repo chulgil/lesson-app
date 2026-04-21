@@ -72,10 +72,10 @@ class AvailabilityBlock extends StatelessWidget {
     }
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return AppColors.successLight;
+        return AppColors.paperDark;
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return AppColors.infoLight;
+        return AppColors.paperDark;
       case AvailabilitySlotStatus.cancelled:
         return AppColors.paperAccent.withValues(alpha: 0.08);
       case AvailabilitySlotStatus.past:
@@ -86,10 +86,10 @@ class AvailabilityBlock extends StatelessWidget {
   Color get _borderColor {
     switch (status) {
       case AvailabilitySlotStatus.available:
-        return AppColors.successBorder;
+        return AppColors.paperOk;
       case AvailabilitySlotStatus.booked:
       case AvailabilitySlotStatus.myBooking:
-        return AppColors.infoBorder;
+        return AppColors.inkQuaternary;
       case AvailabilitySlotStatus.cancelled:
         return AppColors.paperAccent.withValues(alpha: 0.3);
       case AvailabilitySlotStatus.past:

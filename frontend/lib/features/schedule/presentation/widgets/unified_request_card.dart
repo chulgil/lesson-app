@@ -94,7 +94,7 @@ class UnifiedRequestCard extends StatelessWidget {
           decoration: BoxDecoration(
             color:
                 request.type == LessonRequestType.trial
-                    ? AppColors.infoLight
+                    ? AppColors.paperDark
                     : AppColors.primaryLight.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(6),
           ),
@@ -117,7 +117,7 @@ class UnifiedRequestCard extends StatelessWidget {
               vertical: AppSpacing.space1,
             ),
             decoration: BoxDecoration(
-              color: AppColors.warningLight,
+              color: AppColors.paperAccentSoft,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -289,7 +289,7 @@ class UnifiedRequestCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.space2),
             decoration: BoxDecoration(
-              color: AppColors.infoLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Text(
@@ -361,7 +361,7 @@ class UnifiedRequestCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.space3),
           decoration: BoxDecoration(
-            color: AppColors.successLight,
+            color: AppColors.paperDark,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           ),
           child: Row(
@@ -452,14 +452,14 @@ class UnifiedRequestCard extends StatelessWidget {
     final (color, bgColor) = switch (request.status) {
       UnifiedRequestStatus.approved || UnifiedRequestStatus.timeConfirmed => (
         AppColors.paperOk,
-        AppColors.successLight,
+        AppColors.paperDark,
       ),
-      UnifiedRequestStatus.rejected => (AppColors.paperAccent, AppColors.errorLight),
+      UnifiedRequestStatus.rejected => (AppColors.paperAccent, AppColors.paperAccentSoft),
       UnifiedRequestStatus.cancelled || UnifiedRequestStatus.expired => (
         AppColors.inkTertiary,
         AppColors.paperDark,
       ),
-      UnifiedRequestStatus.negotiating => (AppColors.ink, AppColors.infoLight),
+      UnifiedRequestStatus.negotiating => (AppColors.ink, AppColors.paperDark),
       _ => (AppColors.primary, AppColors.primaryLight),
     };
 
