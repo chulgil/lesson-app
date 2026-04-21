@@ -270,7 +270,7 @@ Text(
 | Phase 3 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
 | Phase 4 | 학생 홈 — 쉘(로마숫자 네비) + 대시보드 위젯 + 레슨/연습 탭 + 카드(학생/체험) 팔레트 이식 | **완료** (a4b8f54f + 4094f677 + 199c491f + 6cc52ca0) |
 | Phase 5 | 학생 설정·프로필 화면 확산 + 대시보드 잔재 정리 (student_home 전역 레거시 팔레트 0건 달성) | **완료** (b365c8b5 + da93a738 + e2d97784 + 24c359dd + a00dd961 + 310d3435 + cd867abc) |
-| Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | **진행 중** (6.A 기계적 토큰 이식 완료 / 6.B 시맨틱 토큰 per-file 검토 남음) |
+| Phase 6 | 수강권/스케줄/선생님 영역 전 화면 확산 | **완료** (6.A 기계적 토큰 + 6.B 시맨틱 토큰 이식. 328파일, 2,213줄) |
 
 ### 7.1 Phase 1 실제 산출물
 
@@ -361,6 +361,45 @@ Text(
 - `AppColors.primary/success/warning/error/info` 직접 사용 (시맨틱 검토 필요 — 예: primary가 purple accent로 쓰이는지 브랜드 컬러로 쓰이는지 per-file 판단)
 - `*Light` 의미 변형 토큰 (`primaryLight`/`successLight` 등 — 18개 refs)
 - `Color(0x...)` 하드코딩 — `ux-rules.md` HARD-GATE 위반 사례
+
+### 7.6 Phase 6.B 산출물 (수강권/스케줄/선생님 시맨틱 토큰 이식)
+
+**전략**: 공통 유틸 먼저 수정 → semantic 토큰은 3색 원칙으로 병합(warning+error) → sed 일괄 치환.
+
+| 단계 | 내용 | 파일 수 | 커밋 |
+|------|------|---------|------|
+| (1) 공통 유틸 | `SubscriptionStatusColors` 상태색 매핑 Notebook 이식 | 1 (위젯 40+에 cascading) | a2e410da |
+| (2) semantic 단독 | `success/warning/error/info` → `paperOk/paperAccent/paperAccent/ink` | 81 | 084faa24 |
+| (3) *Light/Border | `*Light` 틴트/`*Border` → `paperDark/paperAccentSoft/paperOk/inkQuaternary` | 6 | d2c8fb87 |
+| (4) primary 계열 | `primary/primaryLight/primaryDark` → `paperAccent/paperAccentSoft/paperAccent` | 113 | 754e49fa |
+| **합계** | — | **200** | **1,038줄 치환** |
+
+**시맨틱 매핑** (3색 원칙 + Notebook 팔레트):
+
+| 레거시 | Notebook | 근거 |
+|--------|---------|------|
+| `success` | `paperOk` | 녹색 펜 (완료/건강) |
+| `warning` | `paperAccent` | 3색 원칙: warning+error 병합 |
+| `error` | `paperAccent` | Vermillion Red = 주의/취소 |
+| `info` | `ink` | neutral 본문색 |
+| `primary` | `paperAccent` | CTA (버튼/아이콘/진행바) |
+| `primaryLight` | `paperAccentSoft` | 12% alpha vermillion 배경 |
+| `primaryDark` | `paperAccent` | Notebook에는 dark 변형 없음 |
+| `successLight` | `paperDark` | cream accent 배경 |
+| `infoLight` | `paperDark` | cream accent 배경 |
+| `warningLight` | `paperAccentSoft` | soft action 배경 |
+| `errorLight` | `paperAccentSoft` | soft action 배경 |
+| `successBorder` | `paperOk` | 녹색 펜 테두리 |
+| `infoBorder` | `inkQuaternary` | neutral 테두리 |
+
+**검증**: 14개 토큰 Phase 6 3개 도메인 grep → 0건. `flutter analyze` → 0 issues.
+
+**Phase 6 총계 (6.A + 6.B)**: 328개 파일 작업, 2,213줄 치환. 3개 도메인(subscription/schedule/students) semantic/mechanical 레거시 토큰 완전 소거.
+
+**보류 (Phase 7 대상)**:
+- subscription/schedule/students 외 모든 도메인 (analytics, search, notifications, gamification, parent_home, follow, practice, auth 등)
+- `app_colors.dart` 레거시 선언 자체는 아직 유지 (호환성)
+- `Color(0x...)` 하드코딩 잔존 검토
 
 ---
 
