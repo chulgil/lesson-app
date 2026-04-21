@@ -10,7 +10,7 @@ import '../theme/app_typography.dart';
 /// swipe gesture for week navigation, date picker on label tap,
 /// and "오늘" jump button.
 ///
-/// [markerDates] accepts any Set<DateTime> — lessons, practices,
+/// [markerDates] accepts any `Set<DateTime>` — lessons, practices,
 /// requests, etc. Dots are shown for dates with markers.
 class CompactWeekStrip extends StatelessWidget {
   final DateTime selectedDate;

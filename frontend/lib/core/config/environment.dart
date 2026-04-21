@@ -30,14 +30,14 @@ class EnvironmentConfig {
   static const bool isDebug = bool.fromEnvironment('DEBUG', defaultValue: true);
 
   /// Google OAuth Web Client ID (for serverAuthCode exchange).
-  /// Set via --dart-define=GOOGLE_SERVER_CLIENT_ID=<your-web-client-id>
+  /// Set via `--dart-define=GOOGLE_SERVER_CLIENT_ID=your-web-client-id`
   static const String googleServerClientId = String.fromEnvironment(
     'GOOGLE_SERVER_CLIENT_ID',
     defaultValue: '',
   );
 
   /// Google OAuth iOS Client ID.
-  /// Set via --dart-define=GOOGLE_IOS_CLIENT_ID=<your-ios-client-id>
+  /// Set via `--dart-define=GOOGLE_IOS_CLIENT_ID=your-ios-client-id`
   static const String googleIosClientId = String.fromEnvironment(
     'GOOGLE_IOS_CLIENT_ID',
     defaultValue: '',

@@ -193,7 +193,7 @@ class Student {
 
   Student({
     required this.id,
-    required String name,
+    required this.name,
     required this.instrument,
     this.level = StudentLevel.intermediate,
     this.status = StudentStatus.trial, // Default to trial for new students
@@ -227,8 +227,7 @@ class Student {
     this.address,
     this.addressDetail,
     this.district,
-  }) : name = name,
-       profileColor = profileColor ?? _profileColorFromName(name);
+  }) : profileColor = profileColor ?? _profileColorFromName(name);
 
   /// Create from JSON (profileColor is auto-generated from name).
   factory Student.fromJson(Map<String, dynamic> json) =>
@@ -316,7 +315,8 @@ class Student {
   /// Get first character of name for avatar
   String get initial => name.isNotEmpty ? name[0] : '?';
 
-  LessonSlot? get primarySlot => lessonSlots.isNotEmpty ? lessonSlots.first : null;
+  LessonSlot? get primarySlot =>
+      lessonSlots.isNotEmpty ? lessonSlots.first : null;
 
   String? get lessonSchedule {
     if (lessonSlots.isEmpty) return null;
