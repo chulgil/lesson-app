@@ -112,18 +112,26 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 
 ### 4.1 타이포 스케일 (Notebook 전용)
 
-| 스타일 | Font | Size | Weight | 용도 |
-|--------|------|------|--------|------|
-| `masthead` | Playfair Display | 38 | 700 | 메인 타이틀 ("오늘의 레슨") |
-| `mastheadLabel` | Playfair Display (italic) | 12 | 600 | 부제 ("Programme for Thursday") |
-| `eyebrow` | Playfair Display | 11 | 600 | 상단 로고 라벨, letterSpacing 5 |
-| `metaMono` | IBM Plex Mono | 9 | 400 | VOL·NO·DATE |
-| `roman` | Playfair Display (italic) | 13~15 | 600 | 로마숫자 번호 |
-| `pieceTitle` | Playfair Display | 16 | 600 | 곡명·레슨 제목 |
-| `sectionLabel` | Pretendard | 11 | 500 | 업퍼케이스 라벨, letterSpacing 1.5 |
-| `body` | Pretendard | 14 | 400 | 본문 |
-| `hand` | Gaegu | 16~17 | 400 | 손글씨 |
-| `handEmphasis` | Gaegu | 13 | 700 | "지금", "발표회!" |
+`NotebookTypography` 클래스에 정의된 모든 스타일. 본문은 기존 `AppTypography` 사용.
+
+| 스타일 | Font | Size | Weight | Extra | 용도 |
+|--------|------|------|--------|-------|------|
+| `masthead` | Playfair Display | 38 | 700 | letterSpacing -0.8, height 1.0 | 메인 타이틀 ("오늘의 레슨") |
+| `mastheadLabel` | Playfair Display italic | 12 | 600 | letterSpacing 2 | 부제 ("Programme for Thursday") |
+| `mastheadDate` | Playfair Display italic | 13 | 400 | — | 날짜·레슨수 ("4月 18日 · 다섯 편…") |
+| `eyebrow` | Playfair Display | 11 | 600 | letterSpacing 5 | 매스트헤드 로고 ("LESSONAZA") |
+| `metaMono` | IBM Plex Mono | 9 | 400 | letterSpacing 1 | VOL·NO·DATE |
+| `roman` | Playfair Display italic | 14 | 600 | — | 로마숫자 번호 (기본) |
+| `romanActive` | Playfair Display italic | 14 | 600 | color: paperAccent | 현재 진행 중 레슨 번호 |
+| `pieceTitle` | Playfair Display | 16 | 600 | letterSpacing -0.2, height 1.3 | 곡명·레슨 제목 |
+| `fine` | Playfair Display italic | 15 | 500 | — | 푸터 "Fine." |
+| `sectionLabel` | (app 기본 sans)* | 11 | 500 | letterSpacing 1.5 | 업퍼케이스 섹션 라벨 |
+| `hand` | Gaegu | 16 | 400 | height 1.5, color: paperPencil | 손글씨 본문 |
+| `handEmphasis` | Gaegu | 13 | 700 | color: paperAccent | "지금", "발표회!" |
+| `handOk` | Gaegu | 13 | 700 | color: paperOk | "✓ 보잉 좋음" 등 완료 메모 |
+| `tempoMono` | IBM Plex Mono | 9 | 500 | letterSpacing 1 | 템포 표기 "♩ = 92" |
+
+\* `sectionLabel`은 `fontFamily`를 명시하지 않고 앱 전역 기본 폰트(Pretendard)를 상속한다.
 
 ---
 
@@ -131,23 +139,34 @@ Flutter 구현: `lib/core/theme/notebook_typography.dart`.
 
 기존 기능을 **제거하지 않고** Notebook 토큰으로 리스타일.
 
+### 5.1 Phase 1 (구현 완료 — 커밋 f425ff11)
+
 | 기존 요소 | Notebook 매핑 | 변경 범위 |
 |-----------|---------------|-----------|
-| `Scaffold` 배경 | Paper + 3px 왼쪽 마진선 | 스캐폴드 래퍼 |
-| `_buildHeader` "Lessonaza" | **Masthead** (상단 2px / 하단 1px 라인 + Playfair eyebrow + IBM Plex Mono VOL·NO·DATE) | 스타일만 |
-| 타이틀 영역 (신규) | **Programme Title** — "Programme for Thursday" + "오늘의 레슨" + 한글 날짜 | 추가 |
-| 섹션 구분선 (신규) | **StaffDivider** — 오선 + 높은음자리표 | 추가 (선택) |
-| `TimeContextBanner` | 그대로 + 손글씨 스타일 마지널리아로 감쌈 | 래퍼 스타일 |
+| `Scaffold` 배경 | `PaperScaffold` — paper + 3px 왼쪽 마진선 | 스캐폴드 래퍼 |
+| `_buildHeader` "Lessonaza" | `NotebookMasthead` (상단 2px / 하단 1px 라인 + Playfair eyebrow + trailing 알림 아이콘) | 교체 |
+| 타이틀 영역 (신규) | `_buildProgrammeTitle` — "Programme for {Weekday}" + "오늘의 레슨" + "M月 D日 · N 편의 수업" + thin rule | 추가 |
 | `UrgentAlertZone` | 그대로 | 변경 없음 |
 | `StatCardRow` | 그대로 | 변경 없음 |
-| "오늘의 레슨" 헤더 | Playfair Display headline + 카운트를 로마숫자로 | 스타일 |
-| `LessonCard` 리스트 | **로마숫자 인덱스(I, II, III…)** 를 카드 앞에 prepend | 래퍼 스타일 |
+| 오늘의 레슨 헤더 | `roman` 카운트 + "Today's Programme" italic + 일괄 피드백(paperAccent) | 스타일 교체 |
+| `LessonCard` 리스트 | **로마숫자 인덱스(I., II., III.…)** 를 각 카드 앞에 prepend | 래퍼 추가 |
+| "더보기" 버튼 | `inkQuaternary` 보더 + `ink` 텍스트 | 스타일만 |
 | `LessonRequestSection` | 그대로 | 변경 없음 |
 | `ScheduleChangeRequestSection` | 그대로 | 변경 없음 |
 | `AssignmentSummarySection` | 그대로 | 변경 없음 |
-| `_buildAnalyticsLink` | Playfair Display italic "Fine." + 링크 | 스타일 |
+| `_buildAnalyticsLink` | **thin rule + "Fine." (fine 스타일) + 통계 더보기 링크** | 교체 |
 
-**원칙**: Phase 1은 스캐폴드 + 헤더 + 리스트 래퍼 + 푸터만 Notebook으로 교체. 각 위젯 내부는 그대로.
+**원칙**: Phase 1은 스캐폴드·헤더·타이틀·리스트 래퍼·푸터만 Notebook으로 교체. 각 위젯 **내부는 변경 없음**.
+
+### 5.2 Phase 2 이후 대상 (미구현)
+
+| 항목 | 계획 | Phase |
+|------|------|-------|
+| `StaffDivider` | 오선 + 높은음자리표 기반 섹션 구분선 (CustomPainter) | Phase 2 |
+| `TimeContextBanner` 손글씨 래핑 | Gaegu 마지널리아 스타일 외곽 래퍼 | Phase 2 |
+| `GettingStartedCard` | Notebook 스타일 체크리스트 (`PencilBox`) | Phase 2 |
+| `LessonCard` 내부 | 로마숫자 시간·곡명·노트 — 완전 이식 | Phase 3 |
+| `StatCard` | "Fine." 푸터에 HBStat 방식 수치 이식 | Phase 3 |
 
 ---
 
@@ -177,18 +196,41 @@ class PaperScaffold extends StatelessWidget {
 }
 ```
 
-### 6.2 Masthead
+### 6.2 NotebookMasthead
 
-상단 2px 라인 + 하단 1px 라인 사이에 Playfair Display eyebrow(좌) + IBM Plex Mono VOL·NO·DATE(우).
+파일: `lib/core/widgets/notebook/notebook_masthead.dart`
+
+상단 2px 라인 + 하단 1px 라인 사이에 Playfair Display eyebrow(좌) + IBM Plex Mono 메타(우).
+
+**파라미터**
+
+| 이름 | 타입 | 설명 |
+|------|------|------|
+| `eyebrow` | `String` | 좌측 로고 라벨 (letterSpacing 5, 대문자 권장) |
+| `meta` | `String` | 우측 메타 ("VOL. IV · NO. 18 · APR MMXXVI") |
+| `onMetaTap` | `VoidCallback?` | 메타 탭 시 콜백 |
+| `trailing` | `Widget?` | **`meta`를 대체**하여 우측에 표시할 커스텀 위젯 (예: 알림 아이콘). `trailing`이 제공되면 `meta`는 렌더되지 않는다. |
 
 ### 6.3 Roman Numeral
 
+파일: `lib/core/theme/notebook_typography.dart`
+
 ```dart
-const _roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-String romanOf(int i) => i < _roman.length ? _roman[i] : (i + 1).toString();
+String romanOf(int index) {
+  const table = ['I','II','III','IV','V','VI',
+                 'VII','VIII','IX','X','XI','XII'];
+  if (index < 0) return '';                    // 음수 가드
+  if (index < table.length) return table[index];
+  return (index + 1).toString();               // XII 초과 시 아라비아 폴백
+}
 ```
 
-Playfair Display · italic · `FontWeight.w600`.
+**규칙**
+- 0-based index (index 0 → 'I')
+- 0~11 → 로마자 테이블
+- 12+ → 아라비아 숫자 (XIII 이상 가독성 하락 방지)
+- 음수 → 빈 문자열
+- 렌더: Playfair Display · italic · `FontWeight.w600` (`NotebookTypography.roman`)
 
 ### 6.4 손글씨 마지널리아
 
@@ -207,11 +249,41 @@ Text(
 
 | Phase | 범위 | 상태 |
 |-------|------|------|
-| Phase 1 | 선생님 홈화면 — 토큰 + Paper 스캐폴드 + Masthead + 로마숫자 + 손글씨 | **진행 중** |
-| Phase 2 | StaffDivider + PencilUnderline/Box/Circle CustomPainter | 계획됨 |
-| Phase 3 | 개별 카드(LessonCard, StatCard) Notebook 리스타일 | 계획됨 |
+| Phase 1 | 선생님 홈화면 — 토큰 + PaperScaffold + NotebookMasthead + Programme Title + 로마숫자 레슨 리스트 + Fine. 푸터 | **완료** (2026-04-21, f425ff11) |
+| Phase 2 | StaffDivider + PencilUnderline/Box/Circle CustomPainter · TimeContextBanner·GettingStartedCard 래핑 | 계획됨 |
+| Phase 3 | 개별 카드(LessonCard, StatCard) Notebook 내부 이식 + HBStat 수치 표기 | 계획됨 |
 | Phase 4 | 학생/학부모 홈 적용 | 계획됨 |
-| Phase 5 | 전 화면 확산 | 계획됨 |
+| Phase 5 | 전 화면 확산 (설정/프로필/수강권/스케줄) | 계획됨 |
+
+### 7.1 Phase 1 실제 산출물
+
+| 유형 | 경로 |
+|------|------|
+| 토큰 | `frontend/lib/core/theme/app_colors.dart` (Notebook 섹션 13종) |
+| 타이포 | `frontend/lib/core/theme/notebook_typography.dart` (14 스타일 + `romanOf`) |
+| 스캐폴드 | `frontend/lib/core/widgets/notebook/paper_scaffold.dart` |
+| 매스트헤드 | `frontend/lib/core/widgets/notebook/notebook_masthead.dart` |
+| 적용 화면 | `frontend/lib/features/home/presentation/widgets/dashboard_tab.dart` |
+| 의존성 | `google_fonts: ^8.0.2` (pubspec.yaml) |
+
+### 7.2 검증 결과
+
+| 항목 | 결과 |
+|------|------|
+| `flutter analyze` | 0 issues |
+| `flutter test` | 392/392 passed |
+| 기능 보존 | 기존 10개 위젯 모두 유지 — 제거/대체 없음 |
+
+#### 4대 시그니처 렌더 상태
+
+| 시그니처 | Phase 1 상태 | 렌더 위치 |
+|----------|-------------|-----------|
+| Playfair Display | **렌더** | Masthead eyebrow · Programme Title · mastheadDate · 로마숫자 · "Fine." · "Today's Programme" |
+| 로마숫자 | **렌더** | "오늘의 레슨" 헤더 카운트 · 레슨 카드 앞 인덱스(I., II., III.…) |
+| Vermillion Red | **렌더** | 왼쪽 3px 여백선(#A83E3A) · "일괄 피드백" 텍스트(#9B1B12) |
+| Gaegu 손글씨 | **스타일만 정의 · 미렌더** | Phase 2에서 TimeContextBanner·마지널리아·"지금" 라벨 등에 투입 예정 |
+
+> **정직한 평가**: Phase 1은 4대 시그니처 중 **3종이 실제 관찰 가능**하며 Gaegu는 토큰 준비 완료·실사용은 Phase 2. §8의 "4대 시그니처 필수" 원칙(5번)은 **Phase 2 종료 후부터** 화면 단위 감사 대상이다.
 
 ---
 

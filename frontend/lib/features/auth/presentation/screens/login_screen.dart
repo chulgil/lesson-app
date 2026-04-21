@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../../core/auth/auth_state.dart';
@@ -8,17 +9,16 @@ import '../../../../core/config/environment.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/notebook_typography.dart';
 import '../../../../core/widgets/notebook/notebook_masthead.dart';
 import '../../../../core/widgets/notebook/paper_scaffold.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/dev_login_section.dart';
 import '../widgets/login_bottom_sheets.dart';
-import '../widgets/social_login_button.dart';
 
 /// Login screen — Notebook × Score 디자인.
 /// 스펙: docs/specs/design/notebook/README.md
+/// 레퍼런스: design-plan/hybrid/login.jsx
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -31,60 +31,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final meta =
-        'VOL. ${_romanMonth(now.month)} · NO. ${_romanDay(now.day)} · ${_englishMonth(now.month)} MMXXVI';
-
-    if (!EnvironmentConfig.useMockData) {
-      // Remote mode — scrollable (social + dev accounts)
-      return Scaffold(
-        body: PaperScaffold(
-          child: SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenPadding,
-              ),
-              child: Column(
-                children: [
-                  const SizedBox(height: AppSpacing.space4),
-                  NotebookMasthead(eyebrow: 'LESSONAZA', meta: meta),
-                  const SizedBox(height: AppSpacing.space8),
-                  _buildHeader(),
-                  const SizedBox(height: AppSpacing.space8),
-                  _buildSocialButtons(context),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildDevAccountsSection(),
-                  const SizedBox(height: AppSpacing.space6),
-                  _buildFooter(context),
-                  const SizedBox(height: AppSpacing.space4),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Mock mode — spacer-based
     return Scaffold(
       body: PaperScaffold(
         child: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenPadding,
             ),
-            child: Column(
-              children: [
-                const SizedBox(height: AppSpacing.space4),
-                NotebookMasthead(eyebrow: 'LESSONAZA', meta: meta),
-                const Spacer(flex: 2),
-                _buildHeader(),
-                const Spacer(flex: 2),
-                _buildSocialButtons(context),
-                const SizedBox(height: AppSpacing.space8),
-                _buildFooter(context),
-                const SizedBox(height: AppSpacing.space4),
-              ],
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight:
+                    MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.vertical,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppSpacing.space4),
+                    const NotebookMasthead(
+                      eyebrow: 'ESTD. MMXXVI',
+                      meta: 'SEOUL · KOREA',
+                    ),
+                    const SizedBox(height: AppSpacing.space8),
+                    _buildHeader(),
+                    const SizedBox(height: AppSpacing.space8),
+                    _buildSocialButtons(context),
+                    if (EnvironmentConfig.useMockData == false) ...[
+                      const SizedBox(height: AppSpacing.space6),
+                      _buildDevAccountsSection(),
+                    ],
+                    const Spacer(),
+                    const SizedBox(height: AppSpacing.space6),
+                    _buildFooter(context),
+                    const SizedBox(height: AppSpacing.space4),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -97,17 +79,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Text('Programme for Login', style: NotebookTypography.mastheadLabel),
-        const SizedBox(height: AppSpacing.space3),
-        Text('Lessonaza', style: NotebookTypography.masthead),
-        const SizedBox(height: AppSpacing.space3),
+        // Ornament ❦ ❦ ❦
         Text(
-          '— 음악 레슨의 새로운 경험 —',
-          style: NotebookTypography.hand.copyWith(
-            color: AppColors.paperPencil,
+          '\u2766 \u2766 \u2766',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 22,
+            color: AppColors.inkTertiary,
+            letterSpacing: 10,
+            height: 1,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space4),
+
+        // "A handbook for" eyebrow (italic, uppercase)
+        Text(
+          'A HANDBOOK FOR',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            fontStyle: FontStyle.italic,
+            color: AppColors.inkSecondary,
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // Main title "Lessonaza" — Playfair 56
+        Text(
+          'Lessonaza',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 56,
+            fontWeight: FontWeight.w700,
+            color: AppColors.ink,
+            letterSpacing: -1.5,
+            height: 1,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // Pencil underline
+        const _PencilUnderline(
+          width: 160,
+          color: AppColors.paperAccent,
+          strokeWidth: 2.2,
+        ),
+        const SizedBox(height: AppSpacing.space3),
+
+        // Italic serif slogan
+        Text(
+          '선생님을 위한 레슨 노트.',
+          style: GoogleFonts.playfairDisplay(
             fontSize: 15,
+            fontStyle: FontStyle.italic,
+            color: AppColors.inkSecondary,
+            height: 1.5,
           ),
           textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.space5),
+
+        // Handwritten sub-note
+        Text(
+          '— 시작하시겠어요?',
+          style: NotebookTypography.hand.copyWith(
+            color: AppColors.paperPencil,
+            fontSize: 16,
+          ),
         ),
       ],
     );
@@ -156,29 +193,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildSocialButtons(BuildContext context) {
     return Column(
       children: [
-        SocialLoginButton(
-          icon: Icons.g_mobiledata_rounded,
-          label: 'Google로 계속하기',
-          backgroundColor: AppColors.googleBackground,
-          textColor: AppColors.textPrimaryLight,
-          borderColor: AppColors.borderLight,
-          onPressed: () => _handleGoogleLogin(context),
+        _NotebookAuthBtn(
+          label: 'Google 계정으로 시작',
+          primary: true,
+          onTap: () => _handleGoogleLogin(context),
         ),
         const SizedBox(height: AppSpacing.space3),
-        SocialLoginButton(
-          icon: Icons.chat_bubble_rounded,
-          label: '카카오로 계속하기',
-          backgroundColor: AppColors.kakaoBackground,
-          textColor: AppColors.textPrimaryLight,
-          onPressed: () => _handleKakaoLogin(context),
+        _NotebookAuthBtn(
+          label: 'Kakao로 시작',
+          onTap: () => _handleKakaoLogin(context),
         ),
         const SizedBox(height: AppSpacing.space3),
-        SocialLoginButton(
-          icon: Icons.apple_rounded,
-          label: 'Apple로 계속하기',
-          backgroundColor: AppColors.appleBackground,
-          textColor: Colors.white,
-          onPressed: () => _handleAppleLogin(context),
+        _NotebookAuthBtn(
+          label: 'Apple 계정으로 시작',
+          onTap: () => _handleAppleLogin(context),
         ),
         const SizedBox(height: AppSpacing.space5),
         GestureDetector(
@@ -207,80 +235,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildFooter(BuildContext context) {
     return Column(
       children: [
-        Text('Fine.', style: NotebookTypography.fine),
-        const SizedBox(height: AppSpacing.space3),
-        Text.rich(
-          TextSpan(
-            style: AppTypography.caption.copyWith(color: AppColors.inkTertiary),
-            children: [
-              const TextSpan(text: '계속하면 '),
-              TextSpan(
-                text: '이용약관',
-                style: TextStyle(
-                  color: AppColors.paperAccent,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.paperAccent,
-                ),
-              ),
-              const TextSpan(text: ' 및 '),
-              TextSpan(
-                text: '개인정보처리방침',
-                style: TextStyle(
-                  color: AppColors.paperAccent,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.paperAccent,
-                ),
-              ),
-              const TextSpan(text: '에 동의하는 것으로 간주됩니다.'),
-            ],
+        Container(
+          height: 1,
+          color: AppColors.ink.withValues(alpha: 0.25),
+          margin: const EdgeInsets.only(bottom: AppSpacing.space3),
+        ),
+        Text(
+          'TERMS · PRIVACY · MMXXVI',
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 9,
+            fontWeight: FontWeight.w400,
+            color: AppColors.inkTertiary,
+            letterSpacing: 1.5,
           ),
           textAlign: TextAlign.center,
         ),
       ],
     );
   }
-
-  // ── Roman/Month helpers (Notebook meta) ──────────────────────────
-
-  String _romanMonth(int m) =>
-      const [
-        'I',
-        'II',
-        'III',
-        'IV',
-        'V',
-        'VI',
-        'VII',
-        'VIII',
-        'IX',
-        'X',
-        'XI',
-        'XII',
-      ][(m - 1).clamp(0, 11)];
-
-  String _romanDay(int d) {
-    // 1..31 → 간단한 로마숫자 변환. 실패 시 아라비아 숫자.
-    if (d < 1 || d > 31) return '$d';
-    const ones = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
-    const tens = ['', 'X', 'XX', 'XXX'];
-    return '${tens[d ~/ 10]}${ones[d % 10]}';
-  }
-
-  String _englishMonth(int m) =>
-      const [
-        'JAN',
-        'FEB',
-        'MAR',
-        'APR',
-        'MAY',
-        'JUN',
-        'JUL',
-        'AUG',
-        'SEP',
-        'OCT',
-        'NOV',
-        'DEC',
-      ][(m - 1).clamp(0, 11)];
 
   // ── Login handlers ────────────────────────────────────────────────
 
@@ -474,4 +446,107 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         context.go(AppRoutes.home);
     }
   }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Notebook × Score auth button — HBAuthBtn 레퍼런스 이식.
+// primary=true: ink background + paper text (Google).
+// primary=false: transparent + ink border (Kakao, Apple).
+// 아이콘 없음, 직각 모서리, Playfair Display 15/600/letterSpacing 1.
+// ─────────────────────────────────────────────────────────────────
+class _NotebookAuthBtn extends StatelessWidget {
+  final String label;
+  final bool primary;
+  final VoidCallback onTap;
+
+  const _NotebookAuthBtn({
+    required this.label,
+    required this.onTap,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = primary ? AppColors.ink : Colors.transparent;
+    final fg = primary ? AppColors.paper : AppColors.ink;
+    final borderWidth = primary ? 1.0 : 1.2;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        decoration: BoxDecoration(
+          color: bg,
+          border: Border.all(color: AppColors.ink, width: borderWidth),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: fg,
+            letterSpacing: 1,
+            height: 1.1,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// PencilUnderline — 손그림 느낌 단순 곡선 (CustomPainter).
+// 레퍼런스: design-plan/hybrid/primitives.jsx PencilUnderline.
+// ─────────────────────────────────────────────────────────────────
+class _PencilUnderline extends StatelessWidget {
+  final double width;
+  final Color color;
+  final double strokeWidth;
+
+  const _PencilUnderline({
+    required this.width,
+    required this.color,
+    this.strokeWidth = 2.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(width, 6),
+      painter: _PencilUnderlinePainter(color: color, strokeWidth: strokeWidth),
+    );
+  }
+}
+
+class _PencilUnderlinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+
+  _PencilUnderlinePainter({required this.color, required this.strokeWidth});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = strokeWidth
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round;
+
+    final w = size.width;
+    final path =
+        Path()
+          ..moveTo(1, 3.5)
+          ..quadraticBezierTo(w * 0.3, 1.5, w * 0.5, 3)
+          ..quadraticBezierTo(w * 0.7, 4.5, w - 1, 3.5);
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PencilUnderlinePainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.strokeWidth != strokeWidth;
 }
