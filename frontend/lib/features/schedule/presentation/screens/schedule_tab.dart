@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/utils/instrument_colors.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
@@ -257,7 +256,6 @@ class ScheduleTab extends ConsumerWidget {
     int lessonCount,
     LessonSortType sortType,
   ) {
-    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
     final now = DateTime.now();
     final isToday =
         selectedDate.year == now.year &&
@@ -269,7 +267,7 @@ class ScheduleTab extends ConsumerWidget {
       child: Row(
         children: [
           Text(
-            dateFormat.format(selectedDate),
+            formatDateMDWithDayLong(selectedDate),
             style: AppTypography.headingSmall.copyWith(
               color: AppColors.textSecondaryLight,
             ),

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../features/practice/domain/entities/practice_repertoire.dart';
 import '../../../../features/practice/presentation/providers/practice_repertoire_crud_provider.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
@@ -220,8 +219,7 @@ class _StudentPracticeTabState extends ConsumerState<StudentPracticeTab> {
   }
 
   String _formatDate(DateTime date) {
-    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
-    return dateFormat.format(date);
+    return formatDateMDWithDayLong(date);
   }
 
   bool _isToday() {

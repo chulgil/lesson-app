@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../../features/home/presentation/widgets/lesson_request_section.dart';
 import '../../../../features/home/presentation/widgets/time_context_banner.dart';
@@ -29,7 +28,6 @@ class StudentDashboardTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final dateFormat = DateFormat('M월 d일 EEEE', 'ko');
     final currentStudentId = ref.watch(currentUserIdProvider);
 
     return SingleChildScrollView(
@@ -45,7 +43,7 @@ class StudentDashboardTab extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    dateFormat.format(now),
+                    formatDateMDWithDayLong(now),
                     style: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textSecondaryLight,
                     ),

@@ -39,6 +39,12 @@ String formatDateMDWithDay(DateTime date) {
   return '${date.month}/${date.day}(${dayNames[date.weekday]})';
 }
 
+/// Format date as M월 d일 요일 (e.g., 4월 5일 토요일)
+String formatDateMDWithDayLong(DateTime date) {
+  const dayNames = ['', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+  return '${date.month}월 ${date.day}일 ${dayNames[date.weekday]}';
+}
+
 /// Format date as yyyy년 M월 (e.g., 2026년 4월)
 String formatYearMonth(DateTime date) {
   return '${date.year}년 ${date.month}월';
