@@ -14,6 +14,7 @@ import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../lessons/presentation/providers/lesson_stats_provider.dart';
 import '../../../students/presentation/providers/grouped_students_provider.dart';
 import '../../../subscription/presentation/providers/subscription_providers.dart';
+import '../../domain/entities/teacher_profile.dart';
 import '../providers/teacher_extended_profile_provider.dart';
 
 /// Profile tab with user info and settings — redesigned for 1-tap access.
@@ -402,16 +403,16 @@ class ProfileTab extends ConsumerWidget {
   Widget _buildCompletionGauge(
     BuildContext context,
     WidgetRef ref,
-    dynamic profile,
+    TeacherProfile? profile,
     String teacherId,
   ) {
-    final extendedState = ref.watch(teacherExtendedProfileProvider);
-    final extended = extendedState.valueOrNull;
+    // 동일 provider. profile 인자와 동일하지만, 본 메서드에서 직접 사용.
+    final extended = profile;
 
-    final percent = _calculateCompletion(profile, extended);
+    final percent = _calculateCompletion(extended);
     if (percent >= 100) return const SizedBox.shrink();
 
-    final nextStep = _nextCompletionStep(profile, extended);
+    final nextStep = _nextCompletionStep(extended);
 
     return Padding(
       padding: const EdgeInsets.only(
@@ -473,43 +474,34 @@ class ProfileTab extends ConsumerWidget {
   }
 
   /// 완성도 계산 (100%). profile_master.md §2.2 가중치 참조.
-  int _calculateCompletion(dynamic profile, dynamic extended) {
+  int _calculateCompletion(TeacherProfile? profile) {
+    if (profile == null) return 0;
     var score = 0;
-    if (profile?.profileImageUrl != null) score += 20;
-    final intro = profile?.introduction as String?;
-    if (intro != null && intro.length >= 20) score += 20;
-    final instruments = profile?.instruments as List?;
-    if (instruments != null && instruments.isNotEmpty) score += 15;
+    if (profile.profileImage != null) score += 20;
+    if (profile.introduction.length >= 20) score += 20;
+    if (profile.instruments.isNotEmpty) score += 15;
     // 가용시간/수강권템플릿/입금계좌는 별도 Provider 필요 — 단순 버전에서 생략
     // 확장 프로필 (경력 또는 학력 또는 자격증 중 하나 이상)
-    if (extended != null) {
-      final hasCareer = (extended.career as List?)?.isNotEmpty ?? false;
-      final hasEducation = (extended.education as List?)?.isNotEmpty ?? false;
-      final hasCert =
-          (extended.verification.certificates as List?)?.isNotEmpty ?? false;
-      if (hasCareer || hasEducation || hasCert) score += 10;
-    }
+    final hasCareer = profile.career?.isNotEmpty ?? false;
+    final hasEducation = profile.education?.isNotEmpty ?? false;
+    final hasCert = profile.verification.certificates.isNotEmpty;
+    if (hasCareer || hasEducation || hasCert) score += 10;
     // 최대 65% (나머지 3개 항목은 추후)
     // 사용자 체감상 0~65% 구간을 0~100% 스케일로 정규화
     return (score * 100 / 65).round().clamp(0, 100);
   }
 
   /// 다음 완성 단계 안내 메시지.
-  String? _nextCompletionStep(dynamic profile, dynamic extended) {
-    if (profile?.profileImageUrl == null) return '프로필 사진을 등록해보세요';
-    final intro = profile?.introduction as String?;
-    if (intro == null || intro.length < 20) return '자기소개를 20자 이상 작성해보세요';
-    final instruments = profile?.instruments as List?;
-    if (instruments == null || instruments.isEmpty) {
-      return '가르치는 악기를 추가해보세요';
-    }
-    if (extended != null) {
-      final hasAny =
-          ((extended.career as List?)?.isNotEmpty ?? false) ||
-          ((extended.education as List?)?.isNotEmpty ?? false) ||
-          ((extended.verification.certificates as List?)?.isNotEmpty ?? false);
-      if (!hasAny) return '경력·학력·자격증을 등록해보세요';
-    }
+  String? _nextCompletionStep(TeacherProfile? profile) {
+    if (profile == null) return null;
+    if (profile.profileImage == null) return '프로필 사진을 등록해보세요';
+    if (profile.introduction.length < 20) return '자기소개를 20자 이상 작성해보세요';
+    if (profile.instruments.isEmpty) return '가르치는 악기를 추가해보세요';
+    final hasAny =
+        (profile.career?.isNotEmpty ?? false) ||
+        (profile.education?.isNotEmpty ?? false) ||
+        profile.verification.certificates.isNotEmpty;
+    if (!hasAny) return '경력·학력·자격증을 등록해보세요';
     return null;
   }
 
