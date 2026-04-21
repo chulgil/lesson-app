@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -77,7 +78,7 @@ class _AddStudentScreenState extends ConsumerState<AddStudentScreen> {
               ),
           icon: const Icon(Icons.close),
         ),
-        actions: [TextButton(onPressed: _saveStudent, child: const Text('저장'))],
+        actions: [TextButton(onPressed: _saveStudent, child: const Text(AppStrings.save))],
       ),
       body: Form(
         key: _formKey,

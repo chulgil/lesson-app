@@ -177,7 +177,7 @@ class _EditPracticeItemSheetState extends ConsumerState<EditPracticeItemSheet> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                          : const Text('저장'),
+                          : const Text(AppStrings.save),
                 ),
               ),
               const SizedBox(height: AppSpacing.space4),

@@ -71,7 +71,7 @@ class _AddManualTeacherScreenState
         actions: [
           TextButton(
             onPressed: _isSaving ? null : _save,
-            child: const Text('저장'),
+            child: const Text(AppStrings.save),
           ),
         ],
       ),

@@ -246,7 +246,7 @@ class _PracticeGoalSettingScreenState
                   padding: const EdgeInsets.all(AppSpacing.screenPadding),
                   child: FilledButton(
                     onPressed: _hasAnyGoal ? _saveGoal : null,
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ),
               )

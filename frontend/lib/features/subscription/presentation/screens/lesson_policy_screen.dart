@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -106,23 +107,24 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         title: Text(widget.lessonClassId != null ? '클래스 정책 설정' : '레슨 정책 설정'),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(AppSpacing.screenPadding),
-              children: [
-                _buildCancelPolicy(),
-                const SizedBox(height: AppSpacing.space6),
-                _buildNoShowPolicy(),
-                const SizedBox(height: AppSpacing.space6),
-                _buildCarryoverPolicy(),
-                const SizedBox(height: AppSpacing.space6),
-                _buildPolicySummary(),
-                const SizedBox(height: AppSpacing.space6),
-                _buildRelatedSettings(),
-                const SizedBox(height: AppSpacing.space8),
-              ],
-            ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                padding: const EdgeInsets.all(AppSpacing.screenPadding),
+                children: [
+                  _buildCancelPolicy(),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildNoShowPolicy(),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildCarryoverPolicy(),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildPolicySummary(),
+                  const SizedBox(height: AppSpacing.space6),
+                  _buildRelatedSettings(),
+                  const SizedBox(height: AppSpacing.space8),
+                ],
+              ),
       bottomNavigationBar: _buildBottomBar(),
     );
   }
@@ -254,7 +256,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
               title: '최대 이월 횟수',
               options: const [1, 2, 3],
               currentValue: _maxCarryoverLessons,
-              onChanged: (value) => setState(() => _maxCarryoverLessons = value),
+              onChanged:
+                  (value) => setState(() => _maxCarryoverLessons = value),
               controller: _carryoverCountController,
               suffix: '회',
             ),
@@ -266,7 +269,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
               title: '이월 유효 기간',
               options: const [1, 2, 3],
               currentValue: _carryoverPeriodMonths,
-              onChanged: (value) => setState(() => _carryoverPeriodMonths = value),
+              onChanged:
+                  (value) => setState(() => _carryoverPeriodMonths = value),
               controller: _carryoverMonthsController,
               suffix: '개월',
             ),
@@ -276,7 +280,11 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
     );
   }
 
-  Widget _buildToggleRow(String label, bool value, ValueChanged<bool> onChanged) {
+  Widget _buildToggleRow(
+    String label,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -310,22 +318,14 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
           const SizedBox(height: AppSpacing.space3),
           _buildSummaryItem(
             '취소',
-            _allowSameDayCancel
-                ? '당일 취소 가능'
-                : '$_minCancelHours시간 전까지',
+            _allowSameDayCancel ? '당일 취소 가능' : '$_minCancelHours시간 전까지',
           ),
           _buildSummaryItem(
             '변경',
             _maxChangesPerMonth >= 99 ? '무제한' : '월 $_maxChangesPerMonth회',
           ),
-          _buildSummaryItem(
-            '노쇼',
-            _deductLessonOnNoShow ? '횟수 차감' : '횟수 유지',
-          ),
-          _buildSummaryItem(
-            '지각',
-            '$_gracePeriodMinutes분까지 허용',
-          ),
+          _buildSummaryItem('노쇼', _deductLessonOnNoShow ? '횟수 차감' : '횟수 유지'),
+          _buildSummaryItem('지각', '$_gracePeriodMinutes분까지 허용'),
           _buildSummaryItem(
             '이월',
             _allowCarryover
@@ -406,9 +406,7 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
           children: [
             Icon(icon, size: 20, color: AppColors.textSecondaryLight),
             const SizedBox(width: AppSpacing.space3),
-            Expanded(
-              child: Text(label, style: AppTypography.bodyMedium),
-            ),
+            Expanded(child: Text(label, style: AppTypography.bodyMedium)),
             Icon(
               Icons.chevron_right,
               color: AppColors.textTertiaryLight,
@@ -426,10 +424,8 @@ class _LessonPolicyScreenState extends ConsumerState<LessonPolicyScreen> {
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         child: FilledButton(
           onPressed: _savePolicy,
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-          child: const Text('저장'),
+          style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+          child: const Text(AppStrings.save),
         ),
       ),
     );

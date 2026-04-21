@@ -141,7 +141,7 @@ class _LessonSettingsBottomSheetState extends State<LessonSettingsBottomSheet> {
                             vertical: AppSpacing.space3,
                           ),
                         ),
-                        child: const Text('저장'),
+                        child: const Text(AppStrings.save),
                       ),
                     ),
                   ],

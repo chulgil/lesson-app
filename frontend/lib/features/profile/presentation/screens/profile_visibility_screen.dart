@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../features/profile/domain/entities/teacher_profile.dart';
 import '../../../../features/profile/presentation/providers/teacher_extended_profile_provider.dart';
@@ -50,9 +51,9 @@ class _ProfileVisibilityScreenState
           .updateVisibilitySettings(_settings);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('설정이 저장되었습니다')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('설정이 저장되었습니다')));
         context.pop();
       }
     } catch (e) {
@@ -79,13 +80,14 @@ class _ProfileVisibilityScreenState
           if (_hasChanges)
             TextButton(
               onPressed: _isLoading ? null : _save,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('저장'),
+              child:
+                  _isLoading
+                      ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Text(AppStrings.save),
             ),
         ],
       ),
@@ -128,8 +130,8 @@ class _ProfileVisibilityScreenState
           subtitle: '프로필에 표시되는 이름',
           icon: Icons.person,
           value: _settings.nameVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(nameVisibility: v)),
+          onChanged:
+              (v) => _updateSettings(_settings.copyWith(nameVisibility: v)),
         ),
 
         VisibilityTile(
@@ -137,8 +139,8 @@ class _ProfileVisibilityScreenState
           subtitle: '프로필 이미지',
           icon: Icons.photo_camera,
           value: _settings.photoVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(photoVisibility: v)),
+          onChanged:
+              (v) => _updateSettings(_settings.copyWith(photoVisibility: v)),
         ),
 
         VisibilityTile(
@@ -146,8 +148,8 @@ class _ProfileVisibilityScreenState
           subtitle: '전화번호, 이메일 등',
           icon: Icons.phone,
           value: _settings.contactVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(contactVisibility: v)),
+          onChanged:
+              (v) => _updateSettings(_settings.copyWith(contactVisibility: v)),
         ),
 
         VisibilityTile(
@@ -155,8 +157,8 @@ class _ProfileVisibilityScreenState
           subtitle: '레슨 가격 정보',
           icon: Icons.payments,
           value: _settings.feeVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(feeVisibility: v)),
+          onChanged:
+              (v) => _updateSettings(_settings.copyWith(feeVisibility: v)),
         ),
 
         VisibilityTile(
@@ -164,8 +166,8 @@ class _ProfileVisibilityScreenState
           subtitle: '학력 및 경력 정보',
           icon: Icons.work,
           value: _settings.careerVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(careerVisibility: v)),
+          onChanged:
+              (v) => _updateSettings(_settings.copyWith(careerVisibility: v)),
         ),
 
         VisibilityTile(
@@ -173,8 +175,9 @@ class _ProfileVisibilityScreenState
           subtitle: '인증된 자격증 정보',
           icon: Icons.verified,
           value: _settings.certificateVisibility,
-          onChanged: (v) =>
-              _updateSettings(_settings.copyWith(certificateVisibility: v)),
+          onChanged:
+              (v) =>
+                  _updateSettings(_settings.copyWith(certificateVisibility: v)),
         ),
 
         const SizedBox(height: AppSpacing.space4),
@@ -189,11 +192,12 @@ class _ProfileVisibilityScreenState
           width: double.infinity,
           height: AppSpacing.buttonHeight,
           child: OutlinedButton.icon(
-            onPressed: () => showProfilePreviewSheet(
-              context: context,
-              profile: profile,
-              settings: _settings,
-            ),
+            onPressed:
+                () => showProfilePreviewSheet(
+                  context: context,
+                  profile: profile,
+                  settings: _settings,
+                ),
             icon: const Icon(Icons.preview),
             label: const Text('공개 프로필 미리보기'),
           ),

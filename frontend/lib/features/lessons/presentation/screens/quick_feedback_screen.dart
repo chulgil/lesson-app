@@ -92,7 +92,7 @@ class _QuickFeedbackScreenState extends ConsumerState<QuickFeedbackScreen> {
               else
                 TextButton(
                   onPressed: _hasChanges ? () => _saveFeedback(lesson) : null,
-                  child: const Text('저장'),
+                  child: const Text(AppStrings.save),
                 ),
             ],
           ),

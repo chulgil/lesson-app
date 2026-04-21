@@ -99,6 +99,9 @@ class AppStrings {
   /// 삭제 버튼
   static const delete = '삭제';
 
+  /// 저장 버튼
+  static const save = '저장';
+
   /// 취소 버튼
   static const cancel = '취소';
 

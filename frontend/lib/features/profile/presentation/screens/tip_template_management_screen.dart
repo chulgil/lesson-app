@@ -532,7 +532,7 @@ class _TipTemplateManagementScreenState
                         );
                       }
                     },
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ],
               );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -82,7 +83,7 @@ class _AiNotesResultSheetState extends State<AiNotesResultSheet> {
                         widget.onSave?.call();
                         Navigator.pop(context);
                       },
-                      child: const Text('저장'),
+                      child: const Text(AppStrings.save),
                     ),
                   ],
                 ),

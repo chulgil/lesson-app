@@ -63,7 +63,7 @@ class _GroupClassAttendanceScreenState
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                      : const Text('저장'),
+                      : const Text(AppStrings.save),
             ),
         ],
       ),

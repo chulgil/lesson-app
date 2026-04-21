@@ -617,7 +617,7 @@ Future<String?> showEditPracticeTipDialog({
               ),
             FilledButton(
               onPressed: () => Navigator.pop(context, controller.text.trim()),
-              child: const Text('저장'),
+              child: const Text(AppStrings.save),
             ),
           ],
         ),

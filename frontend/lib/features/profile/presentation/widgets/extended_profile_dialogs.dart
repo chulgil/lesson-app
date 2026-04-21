@@ -84,7 +84,7 @@ void showExperienceDialog(
                           .updateExperienceYears(years);
                       Navigator.pop(context);
                     },
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ],
               ),
@@ -199,7 +199,7 @@ void showFeeDialog(
                           );
                       Navigator.pop(context);
                     },
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ],
               ),
@@ -254,7 +254,7 @@ void showLessonTypesDialog(
                           .updateLessonTypes(selected.toList());
                       Navigator.pop(context);
                     },
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ],
               ),
@@ -338,7 +338,7 @@ void showAreasDialog(
                           .updateLessonAreas(areas);
                       Navigator.pop(context);
                     },
-                    child: const Text('저장'),
+                    child: const Text(AppStrings.save),
                   ),
                 ],
               ),

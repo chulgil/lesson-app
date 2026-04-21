@@ -123,7 +123,7 @@ class _AddLessonScreenState extends ConsumerState<AddLessonScreen> {
               ),
           icon: const Icon(Icons.close),
         ),
-        actions: [TextButton(onPressed: _saveLesson, child: const Text('저장'))],
+        actions: [TextButton(onPressed: _saveLesson, child: const Text(AppStrings.save))],
       ),
       body: Form(
         key: _formKey,

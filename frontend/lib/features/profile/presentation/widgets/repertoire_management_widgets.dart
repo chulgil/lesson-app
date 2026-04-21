@@ -484,7 +484,7 @@ class _PieceDialogState extends State<PieceDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text(AppStrings.cancel),
         ),
-        FilledButton(onPressed: _save, child: const Text('저장')),
+        FilledButton(onPressed: _save, child: const Text(AppStrings.save)),
       ],
     );
   }
