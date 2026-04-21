@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/bottom_sheet_handle.dart';
 
 /// Parent lessons tab for viewing child's lesson schedule
@@ -356,10 +356,9 @@ class ParentLessonsTab extends ConsumerWidget {
             ),
             child: Text(
               priorityLabel,
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.captionSmall.copyWith(
                 color: priorityColor,
                 fontWeight: FontWeight.bold,
-                fontSize: 10,
               ),
             ),
           ),
@@ -390,7 +389,7 @@ class ParentLessonsTab extends ConsumerWidget {
 
   Widget _buildCalendarHeader() {
     final now = DateTime.now();
-    final monthName = DateFormat('yyyy년 M월', 'ko').format(now);
+    final monthName = formatYearMonth(now);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
@@ -528,7 +527,7 @@ class _LessonCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    DateFormat('E', 'ko').format(date),
+                    formatWeekdayShort(date),
                     style: AppTypography.caption.copyWith(
                       color:
                           isPast
@@ -615,10 +614,9 @@ class _LessonCard extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTypography.caption.copyWith(
+        style: AppTypography.captionSmall.copyWith(
           color: textColor,
           fontWeight: FontWeight.bold,
-          fontSize: 10,
         ),
       ),
     );

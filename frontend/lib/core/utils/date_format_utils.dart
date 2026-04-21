@@ -39,6 +39,17 @@ String formatDateMDWithDay(DateTime date) {
   return '${date.month}/${date.day}(${dayNames[date.weekday]})';
 }
 
+/// Format date as yyyy년 M월 (e.g., 2026년 4월)
+String formatYearMonth(DateTime date) {
+  return '${date.year}년 ${date.month}월';
+}
+
+/// Format weekday as single Korean char (e.g., '월', '화')
+String formatWeekdayShort(DateTime date) {
+  const dayNames = ['', '월', '화', '수', '목', '금', '토', '일'];
+  return dayNames[date.weekday];
+}
+
 /// Format date as M/d (e.g., 4/5)
 String formatDateMD(DateTime date) {
   return '${date.month}/${date.day}';
