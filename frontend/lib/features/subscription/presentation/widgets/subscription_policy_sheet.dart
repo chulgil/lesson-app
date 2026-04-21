@@ -116,6 +116,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         if (policy != null) ...[
           _PolicyItem(label: '노쇼', value: policy.noShowPolicySummary),
           _PolicyItem(label: '이월', value: policy.carryoverPolicySummary),
+          _PolicyItem(label: '환불', value: policy.refundPolicySummary),
         ],
         const SizedBox(height: AppSpacing.space3),
         Text(
