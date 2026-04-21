@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Chapter 1: Subscription info (type, amount, period, reschedule credits).
@@ -15,8 +16,6 @@ class SubscriptionChapterInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy.M.d');
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.screenPadding,
@@ -39,12 +38,12 @@ class SubscriptionChapterInfo extends StatelessWidget {
           if (subscription.startDate != null)
             _buildRow(
               AppStrings.startDate,
-              dateFormat.format(subscription.startDate!),
+              formatDateYMDShort(subscription.startDate!),
             ),
           if (subscription.endDate != null)
             _buildRow(
               AppStrings.endDate,
-              dateFormat.format(subscription.endDate!),
+              formatDateYMDShort(subscription.endDate!),
             ),
           _buildRow(
             AppStrings.rescheduleDeadlineLabel,

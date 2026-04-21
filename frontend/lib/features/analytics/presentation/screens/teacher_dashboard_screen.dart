@@ -10,6 +10,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
 import '../providers/analytics_providers.dart';
@@ -48,7 +49,7 @@ class _TeacherDashboardScreenState
   @override
   Widget build(BuildContext context) {
     final statsAsync = ref.watch(teacherMonthlyStatsProvider(_selectedMonth));
-    final monthLabel = DateFormat('yyyy년 M월', 'ko').format(_selectedMonth);
+    final monthLabel = formatYearMonth(_selectedMonth);
 
     return Scaffold(
       appBar: AppBar(

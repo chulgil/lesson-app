@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Subscription type selector with chips and description
@@ -350,7 +351,9 @@ class AmountInputSection extends StatelessWidget {
                       selected: isSelected,
                       onSelected: (selected) {
                         if (selected) {
-                          controller.text = NumberFormat('#,###').format(amount);
+                          controller.text = NumberFormat(
+                            '#,###',
+                          ).format(amount);
                           onAmountChanged(amount);
                         }
                       },
@@ -441,8 +444,6 @@ class StartDatePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy년 M월 d일');
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -472,7 +473,7 @@ class StartDatePickerField extends StatelessWidget {
                 Icon(Icons.calendar_today, color: AppColors.textSecondaryLight),
                 const SizedBox(width: AppSpacing.space3),
                 Text(
-                  startDate != null ? dateFormat.format(startDate!) : '날짜 선택',
+                  startDate != null ? formatDateYMDKorean(startDate!) : '날짜 선택',
                   style: AppTypography.bodyMedium,
                 ),
                 const Spacer(),

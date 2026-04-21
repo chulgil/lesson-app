@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
+import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
 
 /// Summary row displaying label-value pair
@@ -52,6 +54,98 @@ class SummaryRow extends StatelessWidget {
   }
 }
 
+/// Applied-policy summary block
+/// Displays change/cancel/no-show policy derived from [LessonPolicy].
+/// If [rescheduleAllowance] / [rescheduleDeadlineHours] override the policy
+/// default, the override value wins.
+class AppliedPolicySection extends StatelessWidget {
+  final LessonPolicy policy;
+  final int? rescheduleAllowance;
+  final int? rescheduleDeadlineHours;
+
+  const AppliedPolicySection({
+    super.key,
+    required this.policy,
+    this.rescheduleAllowance,
+    this.rescheduleDeadlineHours,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final allowance = rescheduleAllowance ?? policy.maxChangesPerMonth;
+    final deadline = rescheduleDeadlineHours ?? policy.minCancelHours;
+    final changeLine = '$deadline시간 전까지 · 월 $allowance회';
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.space3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 1,
+            color: AppColors.primary.withValues(alpha: 0.12),
+          ),
+          const SizedBox(height: AppSpacing.space3),
+          Row(
+            children: [
+              Icon(Icons.rule_rounded, size: 16, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.space2),
+              Text(
+                '적용 정책',
+                style: AppTypography.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.space2),
+          _PolicyLine(label: '변경/취소', value: changeLine),
+          _PolicyLine(label: '노쇼', value: policy.noShowPolicySummary),
+          _PolicyLine(label: '이월', value: policy.carryoverPolicySummary),
+        ],
+      ),
+    );
+  }
+}
+
+class _PolicyLine extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _PolicyLine({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.space1),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 56,
+            child: Text(
+              label,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textSecondaryLight,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTypography.caption.copyWith(
+                color: AppColors.textPrimaryLight,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Summary card for single student subscription issuance
 class SubscriptionSummaryCard extends StatelessWidget {
   final SubscriptionType selectedType;
@@ -66,6 +160,9 @@ class SubscriptionSummaryCard extends StatelessWidget {
   final bool isPaymentConfirmed;
   final SubscriptionPaymentMethod selectedPaymentMethod;
   final DateTime? startDate;
+  final LessonPolicy? effectivePolicy;
+  final int? rescheduleAllowance;
+  final int? rescheduleDeadlineHours;
 
   const SubscriptionSummaryCard({
     super.key,
@@ -81,11 +178,13 @@ class SubscriptionSummaryCard extends StatelessWidget {
     required this.isPaymentConfirmed,
     required this.selectedPaymentMethod,
     this.startDate,
+    this.effectivePolicy,
+    this.rescheduleAllowance,
+    this.rescheduleDeadlineHours,
   });
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy년 M월 d일');
     final endDate = _calculateEndDate();
     final lessonsDisplay = _buildLessonsDisplay();
 
@@ -153,9 +252,16 @@ class SubscriptionSummaryCard extends StatelessWidget {
           ),
 
           if (startDate != null)
-            SummaryRow(label: '시작일', value: dateFormat.format(startDate!)),
+            SummaryRow(label: '시작일', value: formatDateYMDKorean(startDate!)),
           if (endDate != null)
-            SummaryRow(label: '만료일', value: dateFormat.format(endDate)),
+            SummaryRow(label: '만료일', value: formatDateYMDKorean(endDate)),
+
+          if (effectivePolicy != null)
+            AppliedPolicySection(
+              policy: effectivePolicy!,
+              rescheduleAllowance: rescheduleAllowance,
+              rescheduleDeadlineHours: rescheduleDeadlineHours,
+            ),
         ],
       ),
     );
@@ -249,6 +355,9 @@ class BatchSummaryCard extends StatelessWidget {
   final int bonusLessons;
   final String? effectiveBonusReason;
   final DateTime? startDate;
+  final LessonPolicy? effectivePolicy;
+  final int? rescheduleAllowance;
+  final int? rescheduleDeadlineHours;
 
   const BatchSummaryCard({
     super.key,
@@ -263,11 +372,13 @@ class BatchSummaryCard extends StatelessWidget {
     required this.bonusLessons,
     this.effectiveBonusReason,
     this.startDate,
+    this.effectivePolicy,
+    this.rescheduleAllowance,
+    this.rescheduleDeadlineHours,
   });
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy년 M월 d일');
     final endDate = _calculateEndDate();
     final lessonsDisplay = _buildLessonsDisplay();
 
@@ -335,9 +446,16 @@ class BatchSummaryCard extends StatelessWidget {
             ),
 
           if (startDate != null)
-            SummaryRow(label: '시작일', value: dateFormat.format(startDate!)),
+            SummaryRow(label: '시작일', value: formatDateYMDKorean(startDate!)),
           if (endDate != null)
-            SummaryRow(label: '만료일', value: dateFormat.format(endDate)),
+            SummaryRow(label: '만료일', value: formatDateYMDKorean(endDate)),
+
+          if (effectivePolicy != null)
+            AppliedPolicySection(
+              policy: effectivePolicy!,
+              rescheduleAllowance: rescheduleAllowance,
+              rescheduleDeadlineHours: rescheduleDeadlineHours,
+            ),
         ],
       ),
     );

@@ -401,6 +401,9 @@ class _IssueSubscriptionScreenState
             isPaymentConfirmed: _isPaymentConfirmed,
             selectedPaymentMethod: _selectedPaymentMethod,
             startDate: _startDate,
+            effectivePolicy: _effectivePolicy,
+            rescheduleAllowance: _rescheduleAllowance,
+            rescheduleDeadlineHours: _rescheduleDeadlineHours,
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -510,6 +513,9 @@ class _IssueSubscriptionScreenState
             bonusLessons: _bonusLessons,
             effectiveBonusReason: effectiveBonusReason,
             startDate: _startDate,
+            effectivePolicy: _effectivePolicy,
+            rescheduleAllowance: _rescheduleAllowance,
+            rescheduleDeadlineHours: _rescheduleDeadlineHours,
           ),
 
           const SizedBox(height: AppSpacing.space8),

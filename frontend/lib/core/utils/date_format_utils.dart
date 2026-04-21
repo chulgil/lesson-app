@@ -71,6 +71,11 @@ String formatDateYMDLong(DateTime date) {
   return '${date.year}년 ${date.month}월 ${date.day}일 (${dayNames[date.weekday]})';
 }
 
+/// Format date as yyyy년 M월 d일 (no weekday, e.g., 2026년 4월 5일)
+String formatDateYMDKorean(DateTime date) {
+  return '${date.year}년 ${date.month}월 ${date.day}일';
+}
+
 /// Format date as yyyy.M.d (e.g., 2026.4.5)
 String formatDateYMDShort(DateTime date) {
   return '${date.year}.${date.month}.${date.day}';

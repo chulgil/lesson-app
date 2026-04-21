@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../../core/router/app_routes.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
+import '../../../../../core/utils/date_format_utils.dart';
 import '../../../../../features/lessons/domain/entities/lesson.dart';
 
 /// Lesson card for student detail screen
@@ -29,9 +29,10 @@ class StudentLessonCard extends StatelessWidget {
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: isUpcoming
-              ? AppColors.primary.withValues(alpha: 0.3)
-              : AppColors.borderLight,
+          color:
+              isUpcoming
+                  ? AppColors.primary.withValues(alpha: 0.3)
+                  : AppColors.borderLight,
         ),
       ),
       child: InkWell(
@@ -46,11 +47,14 @@ class StudentLessonCard extends StatelessWidget {
               // Date badge
               Container(
                 width: 48,
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.space2),
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppSpacing.space2,
+                ),
                 decoration: BoxDecoration(
-                  color: isUpcoming
-                      ? AppColors.primary.withValues(alpha: 0.1)
-                      : AppColors.surfaceSecondaryLight,
+                  color:
+                      isUpcoming
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : AppColors.surfaceSecondaryLight,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Column(
@@ -58,17 +62,19 @@ class StudentLessonCard extends StatelessWidget {
                     Text(
                       '${lesson.date.day}',
                       style: AppTypography.headingSmall.copyWith(
-                        color: isUpcoming
-                            ? AppColors.primary
-                            : AppColors.textPrimaryLight,
+                        color:
+                            isUpcoming
+                                ? AppColors.primary
+                                : AppColors.textPrimaryLight,
                       ),
                     ),
                     Text(
-                      DateFormat('E', 'ko').format(lesson.date),
+                      formatWeekdayShort(lesson.date),
                       style: AppTypography.caption.copyWith(
-                        color: isUpcoming
-                            ? AppColors.primary
-                            : AppColors.textSecondaryLight,
+                        color:
+                            isUpcoming
+                                ? AppColors.primary
+                                : AppColors.textSecondaryLight,
                       ),
                     ),
                   ],
@@ -127,17 +133,9 @@ class StudentLessonCard extends StatelessWidget {
               Column(
                 children: [
                   if (lesson.hasRecordings)
-                    Icon(
-                      Icons.mic,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
+                    Icon(Icons.mic, size: 18, color: AppColors.primary),
                   if (lesson.hasFeedback)
-                    Icon(
-                      Icons.note,
-                      size: 18,
-                      color: AppColors.secondary,
-                    ),
+                    Icon(Icons.note, size: 18, color: AppColors.secondary),
                 ],
               ),
 

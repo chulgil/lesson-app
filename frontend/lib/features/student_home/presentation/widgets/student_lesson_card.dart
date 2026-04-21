@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/date_format_utils.dart';
 import '../../../../features/lessons/domain/entities/lesson.dart';
 
 /// Lesson card widget for student view
@@ -16,7 +16,6 @@ class StudentLessonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final timeFormat = DateFormat('HH:mm');
     // Parse startTime (format: "HH:mm") to DateTime for display
     final timeParts = lesson.startTime.split(':');
     final lessonDateTime = DateTime(
@@ -71,7 +70,7 @@ class StudentLessonCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          timeFormat.format(lessonDateTime),
+                          formatTimeHM(lessonDateTime),
                           style: AppTypography.bodyLarge.copyWith(
                             color:
                                 isUpcoming
