@@ -206,7 +206,7 @@ class PracticeSummarySection extends ConsumerWidget {
                             : value >= 0.5
                             ? AppColors.inkTertiary
                             : value > 0
-                            ? AppColors.practicePoor
+                            ? AppColors.paperAccent
                             : AppColors.inkQuaternary,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
