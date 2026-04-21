@@ -133,10 +133,12 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       final minHour = lessons
           .map((l) => int.parse(l.startTime.split(':')[0]))
           .reduce((a, b) => a < b ? a : b);
-      final maxHour = lessons.map((l) {
-        final end = _lessonEndMinutes(l);
-        return end ~/ 60 + (end % 60 > 0 ? 1 : 0);
-      }).reduce((a, b) => a > b ? a : b);
+      final maxHour = lessons
+          .map((l) {
+            final end = _lessonEndMinutes(l);
+            return end ~/ 60 + (end % 60 > 0 ? 1 : 0);
+          })
+          .reduce((a, b) => a > b ? a : b);
       startHour = minHour < startHour ? minHour : startHour;
       endHour = maxHour > endHour ? maxHour : endHour;
     }
@@ -145,9 +147,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     const cellHeight = 28.0;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.screenPadding,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final cellWidth = (constraints.maxWidth - 36) / 7;
@@ -168,18 +168,20 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                           Text(
                             dayLabels[i],
                             style: AppTypography.caption.copyWith(
-                              color: isToday
-                                  ? AppColors.primary
-                                  : AppColors.textSecondaryLight,
+                              color:
+                                  isToday
+                                      ? AppColors.primary
+                                      : AppColors.textSecondaryLight,
                               fontWeight: isToday ? FontWeight.bold : null,
                             ),
                           ),
                           Text(
                             '${date.day}',
                             style: AppTypography.caption.copyWith(
-                              color: isToday
-                                  ? AppColors.primary
-                                  : AppColors.textTertiaryLight,
+                              color:
+                                  isToday
+                                      ? AppColors.primary
+                                      : AppColors.textTertiaryLight,
                             ),
                           ),
                         ],
@@ -195,46 +197,44 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
                 child: SingleChildScrollView(
                   controller: _scrollController,
                   child: Column(
-                    children: List.generate(
-                      (endHour - startHour) * 2,
-                      (slotIndex) {
-                        final slotMinutes =
-                            startHour * 60 + slotIndex * 30;
-                        final hour = slotMinutes ~/ 60;
-                        final minute = slotMinutes % 60;
-                        final isHourBoundary = minute == 0;
+                    children: List.generate((endHour - startHour) * 2, (
+                      slotIndex,
+                    ) {
+                      final slotMinutes = startHour * 60 + slotIndex * 30;
+                      final hour = slotMinutes ~/ 60;
+                      final minute = slotMinutes % 60;
+                      final isHourBoundary = minute == 0;
 
-                        return Row(
-                          children: [
-                            SizedBox(
-                              width: 36,
-                              height: cellHeight,
-                              child: isHourBoundary
-                                  ? Text(
+                      return Row(
+                        children: [
+                          SizedBox(
+                            width: 36,
+                            height: cellHeight,
+                            child:
+                                isHourBoundary
+                                    ? Text(
                                       '$hour:00',
-                                      style:
-                                          AppTypography.caption.copyWith(
-                                        fontSize: 10,
-                                        color:
-                                            AppColors.textTertiaryLight,
-                                      ),
+                                      style: AppTypography.captionSmall
+                                          .copyWith(
+                                            color: AppColors.textTertiaryLight,
+                                          ),
                                     )
-                                  : const SizedBox.shrink(),
-                            ),
-                            ...List.generate(7, (dayIndex) {
-                              final date = weekStart
-                                  .add(Duration(days: dayIndex));
-                              return _buildCell(
-                                date: date,
-                                slotMinutes: slotMinutes,
-                                width: cellWidth,
-                                height: cellHeight,
-                              );
-                            }),
-                          ],
-                        );
-                      },
-                    ),
+                                    : const SizedBox.shrink(),
+                          ),
+                          ...List.generate(7, (dayIndex) {
+                            final date = weekStart.add(
+                              Duration(days: dayIndex),
+                            );
+                            return _buildCell(
+                              date: date,
+                              slotMinutes: slotMinutes,
+                              width: cellWidth,
+                              height: cellHeight,
+                            );
+                          }),
+                        ],
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -285,41 +285,47 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
       }
 
       return CustomPaint(
-        painter: (isPreview || isOverlapWithHighlight) && isStart
-            ? _DashedTopBorderPainter(color: accentColor, width: 2)
-            : null,
+        painter:
+            (isPreview || isOverlapWithHighlight) && isStart
+                ? _DashedTopBorderPainter(color: accentColor, width: 2)
+                : null,
         child: Container(
           width: width,
           height: height,
           decoration: BoxDecoration(
             color: bgColor,
-            border: !isPreview && !isOverlapWithHighlight
-                ? Border(
-                    top: isStart
-                        ? BorderSide(color: accentColor, width: 2)
-                        : BorderSide.none,
-                  )
-                : null,
+            border:
+                !isPreview && !isOverlapWithHighlight
+                    ? Border(
+                      top:
+                          isStart
+                              ? BorderSide(color: accentColor, width: 2)
+                              : BorderSide.none,
+                    )
+                    : null,
           ),
-          child: isStart
-              ? Padding(
-                  padding: const EdgeInsets.only(left: 2, top: 1),
-                  child: Text(
-                    hideStudentNames ? AppStrings.lessonPrivateLabel : NameUtils.givenName(lesson.studentName),
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 9,
-                      fontWeight: isOverlapWithHighlight
-                          ? FontWeight.w600
-                          : isPreview
-                              ? FontWeight.w400
-                              : FontWeight.w500,
-                      color: textColor,
-                  ),
-                  overflow: TextOverflow.clip,
-                  maxLines: 1,
-                ),
-              )
-            : null,
+          child:
+              isStart
+                  ? Padding(
+                    padding: const EdgeInsets.only(left: 2, top: 1),
+                    child: Text(
+                      hideStudentNames
+                          ? AppStrings.lessonPrivateLabel
+                          : NameUtils.givenName(lesson.studentName),
+                      style: AppTypography.captionXSmall.copyWith(
+                        fontWeight:
+                            isOverlapWithHighlight
+                                ? FontWeight.w600
+                                : isPreview
+                                ? FontWeight.w400
+                                : FontWeight.w500,
+                        color: textColor,
+                      ),
+                      overflow: TextOverflow.clip,
+                      maxLines: 1,
+                    ),
+                  )
+                  : null,
         ),
       );
     }
@@ -333,12 +339,13 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         decoration: BoxDecoration(
           color: AppColors.success.withValues(alpha: 0.15),
           border: Border(
-            top: isStart
-                ? BorderSide(
-                    color: AppColors.success.withValues(alpha: 0.6),
-                    width: 2,
-                  )
-                : BorderSide.none,
+            top:
+                isStart
+                    ? BorderSide(
+                      color: AppColors.success.withValues(alpha: 0.6),
+                      width: 2,
+                    )
+                    : BorderSide.none,
             left: BorderSide(
               color: AppColors.success.withValues(alpha: 0.3),
               width: 0.5,
@@ -349,19 +356,19 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
             ),
           ),
         ),
-        child: isStart
-            ? Padding(
-                padding: const EdgeInsets.only(left: 2, top: 1),
-                child: Text(
-                  AppStrings.preferredSlotLabel,
-                  style: AppTypography.caption.copyWith(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.success,
+        child:
+            isStart
+                ? Padding(
+                  padding: const EdgeInsets.only(left: 2, top: 1),
+                  child: Text(
+                    AppStrings.preferredSlotLabel,
+                    style: AppTypography.captionXSmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.success,
+                    ),
                   ),
-                ),
-              )
-            : null,
+                )
+                : null,
       );
     }
 
@@ -381,8 +388,7 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
         child: Center(
           child: Text(
             ['❶', '❷', '❸'][suggestedIndex.clamp(0, 2)],
-            style: AppTypography.caption.copyWith(
-              fontSize: 10,
+            style: AppTypography.captionSmall.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.bold,
             ),
@@ -392,24 +398,29 @@ class _AlternativeTimeGridState extends State<AlternativeTimeGrid> {
     }
 
     // Empty cell — tappable (past cells disabled)
-    final cellDateTime = DateTime(date.year, date.month, date.day, hour, minute);
+    final cellDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      hour,
+      minute,
+    );
     final isPast = cellDateTime.isBefore(DateTime.now());
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: !isPast && suggestedSlots.length < maxSlots
-          ? () {
-              HapticFeedback.lightImpact();
-              onEmptyCellTap((date: date, hour: hour, minute: minute));
-            }
-          : null,
+      onTap:
+          !isPast && suggestedSlots.length < maxSlots
+              ? () {
+                HapticFeedback.lightImpact();
+                onEmptyCellTap((date: date, hour: hour, minute: minute));
+              }
+              : null,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: isPast
-              ? AppColors.borderLight.withValues(alpha: 0.15)
-              : null,
+          color: isPast ? AppColors.borderLight.withValues(alpha: 0.15) : null,
           border: Border.all(
             color: AppColors.borderLight.withValues(alpha: 0.3),
             width: 0.5,
@@ -503,10 +514,11 @@ class _DashedTopBorderPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = width
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = color
+          ..strokeWidth = width
+          ..style = PaintingStyle.stroke;
 
     const dashWidth = 4.0;
     const dashGap = 3.0;

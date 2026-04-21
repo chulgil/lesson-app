@@ -70,6 +70,14 @@ class AppTypography {
     fontWeight: FontWeight.w400,
   );
 
+  /// Ultra-small caption for dense grids (e.g., weekly schedule cells).
+  /// Use sparingly — legibility degrades below this size.
+  static const captionXSmall = TextStyle(
+    fontSize: 9,
+    height: 1.2,
+    fontWeight: FontWeight.w400,
+  );
+
   // Button
   static const button = TextStyle(
     fontSize: 16,
