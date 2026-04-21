@@ -270,7 +270,7 @@ class _StudentProfileEditScreenState
           color: AppColors.inkTertiary,
         ),
         filled: true,
-        fillColor: AppColors.surfaceLight,
+        fillColor: AppColors.paper,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.space4,
           vertical: AppSpacing.space3,
@@ -295,7 +295,7 @@ class _StudentProfileEditScreenState
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
         border: Border.all(color: AppColors.inkQuaternary),
       ),

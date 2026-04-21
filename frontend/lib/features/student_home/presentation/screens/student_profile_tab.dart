@@ -245,15 +245,9 @@ class StudentProfileTab extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -310,15 +304,9 @@ class StudentProfileTab extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -383,15 +371,9 @@ class StudentProfileTab extends ConsumerWidget {
     final reminderSettings = ref.watch(practiceReminderProvider);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -477,9 +459,7 @@ class StudentProfileTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space2),
               decoration: BoxDecoration(
-                color:
-                    iconColor?.withValues(alpha: 0.1) ??
-                    AppColors.surfaceSecondaryLight,
+                color: iconColor?.withValues(alpha: 0.1) ?? AppColors.paperDark,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
               ),
               child: Icon(
