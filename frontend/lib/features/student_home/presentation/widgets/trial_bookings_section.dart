@@ -23,11 +23,12 @@ class TrialBookingsSection extends ConsumerWidget {
     return bookingsAsync.when(
       data: (bookings) {
         // Filter for active trial bookings
-        final trialBookings = bookings
-            .where((b) => b.lessonType == LessonType.trial)
-            .where((b) => b.status.isActive || b.status.canRetry)
-            .toList()
-          ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
+        final trialBookings =
+            bookings
+                .where((b) => b.lessonType == LessonType.trial)
+                .where((b) => b.status.isActive || b.status.canRetry)
+                .toList()
+              ..sort((a, b) => a.lessonDate.compareTo(b.lessonDate));
 
         if (trialBookings.isEmpty) {
           return _buildEmptyState(context);
@@ -51,10 +52,14 @@ class TrialBookingsSection extends ConsumerWidget {
             const SizedBox(height: AppSpacing.space3),
 
             // Booking cards (show max 2)
-            ...trialBookings.take(2).map((booking) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.space3),
-                  child: CompactTrialBookingCard(booking: booking),
-                )),
+            ...trialBookings
+                .take(2)
+                .map(
+                  (booking) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.space3),
+                    child: CompactTrialBookingCard(booking: booking),
+                  ),
+                ),
 
             // View all button if more than 2
             if (trialBookings.length > 2)
@@ -74,10 +79,11 @@ class TrialBookingsSection extends ConsumerWidget {
           ],
         );
       },
-      loading: () => const SizedBox(
-        height: 80,
-        child: Center(child: CircularProgressIndicator()),
-      ),
+      loading:
+          () => const SizedBox(
+            height: 80,
+            child: Center(child: CircularProgressIndicator()),
+          ),
       error: (_, __) => const SizedBox.shrink(),
     );
   }
@@ -86,25 +92,21 @@ class TrialBookingsSection extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceSecondaryLight,
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
-          color: AppColors.borderLight,
+          color: AppColors.inkQuaternary,
           style: BorderStyle.solid,
         ),
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.school_outlined,
-            size: 40,
-            color: AppColors.textTertiaryLight,
-          ),
+          Icon(Icons.school_outlined, size: 40, color: AppColors.inkTertiary),
           const SizedBox(height: AppSpacing.space3),
           Text(
             '새로운 선생님과 레슨을 시작해보세요',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space3),

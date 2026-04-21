@@ -28,7 +28,7 @@ class PracticeReminderSheet extends ConsumerWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
@@ -56,7 +56,7 @@ class PracticeReminderSheet extends ConsumerWidget {
               Text(
                 '설정한 시간에 연습 알림을 받습니다',
                 style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
 
@@ -69,7 +69,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                   vertical: AppSpacing.space3,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.backgroundLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
@@ -78,8 +78,8 @@ class PracticeReminderSheet extends ConsumerWidget {
                       Icons.alarm,
                       color:
                           settings.isEnabled
-                              ? AppColors.primary
-                              : AppColors.textTertiaryLight,
+                              ? AppColors.paperAccent
+                              : AppColors.inkTertiary,
                     ),
                     const SizedBox(width: AppSpacing.space3),
                     Expanded(
@@ -96,7 +96,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                           (value) => ref
                               .read(practiceReminderProvider.notifier)
                               .toggleEnabled(value),
-                      activeThumbColor: AppColors.primary,
+                      activeThumbColor: AppColors.paperAccent,
                     ),
                   ],
                 ),
@@ -109,7 +109,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                 '알림 시간',
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -126,11 +126,11 @@ class PracticeReminderSheet extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.space4),
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundLight,
+                    color: AppColors.paperDark,
                     borderRadius: BorderRadius.circular(
                       AppSpacing.radiusMedium,
                     ),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.inkQuaternary),
                   ),
                   child: Row(
                     children: [
@@ -138,8 +138,8 @@ class PracticeReminderSheet extends ConsumerWidget {
                         Icons.access_time,
                         color:
                             settings.isEnabled
-                                ? AppColors.primary
-                                : AppColors.textTertiaryLight,
+                                ? AppColors.paperAccent
+                                : AppColors.inkTertiary,
                       ),
                       const SizedBox(width: AppSpacing.space3),
                       Text(
@@ -147,8 +147,8 @@ class PracticeReminderSheet extends ConsumerWidget {
                         style: AppTypography.headingMedium.copyWith(
                           color:
                               settings.isEnabled
-                                  ? AppColors.textPrimaryLight
-                                  : AppColors.textTertiaryLight,
+                                  ? AppColors.ink
+                                  : AppColors.inkTertiary,
                         ),
                       ),
                       const Spacer(),
@@ -157,8 +157,8 @@ class PracticeReminderSheet extends ConsumerWidget {
                         size: 20,
                         color:
                             settings.isEnabled
-                                ? AppColors.textSecondaryLight
-                                : AppColors.textTertiaryLight,
+                                ? AppColors.inkSecondary
+                                : AppColors.inkTertiary,
                       ),
                     ],
                   ),
@@ -172,7 +172,7 @@ class PracticeReminderSheet extends ConsumerWidget {
                 '알림 요일',
                 style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
               ),
               const SizedBox(height: AppSpacing.space2),
@@ -194,14 +194,14 @@ class PracticeReminderSheet extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color:
                             isSelected && settings.isEnabled
-                                ? AppColors.primary
-                                : AppColors.backgroundLight,
+                                ? AppColors.paperAccent
+                                : AppColors.paperDark,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color:
                               isSelected && settings.isEnabled
-                                  ? AppColors.primary
-                                  : AppColors.borderLight,
+                                  ? AppColors.paperAccent
+                                  : AppColors.inkQuaternary,
                         ),
                       ),
                       child: Center(
@@ -210,10 +210,10 @@ class PracticeReminderSheet extends ConsumerWidget {
                           style: AppTypography.bodySmall.copyWith(
                             color:
                                 isSelected && settings.isEnabled
-                                    ? Colors.white
+                                    ? AppColors.paper
                                     : settings.isEnabled
-                                    ? AppColors.textSecondaryLight
-                                    : AppColors.textTertiaryLight,
+                                    ? AppColors.inkSecondary
+                                    : AppColors.inkTertiary,
                             fontWeight:
                                 isSelected
                                     ? FontWeight.w600
@@ -232,18 +232,18 @@ class PracticeReminderSheet extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.08),
+                  color: AppColors.ink.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, size: 16, color: AppColors.info),
+                    Icon(Icons.info_outline, size: 16, color: AppColors.ink),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
                         '푸시 알림은 준비 중입니다. 설정은 저장되며 기능 활성화 시 자동 적용됩니다.',
                         style: AppTypography.caption.copyWith(
-                          color: AppColors.info,
+                          color: AppColors.ink,
                         ),
                       ),
                     ),
@@ -271,7 +271,7 @@ class PracticeReminderSheet extends ConsumerWidget {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(primary: AppColors.primary),
+            colorScheme: ColorScheme.light(primary: AppColors.paperAccent),
           ),
           child: child!,
         );

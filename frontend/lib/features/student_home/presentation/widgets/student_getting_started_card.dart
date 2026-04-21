@@ -14,10 +14,7 @@ import '../../../../features/profile/presentation/providers/invite_provider.dart
 class StudentGettingStartedCard extends ConsumerWidget {
   final String studentId;
 
-  const StudentGettingStartedCard({
-    super.key,
-    required this.studentId,
-  });
+  const StudentGettingStartedCard({super.key, required this.studentId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,8 +26,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final hasConnections =
-        connectionsAsync.valueOrNull?.isNotEmpty ?? false;
+    final hasConnections = connectionsAsync.valueOrNull?.isNotEmpty ?? false;
     final hasLessons = bookingsAsync.valueOrNull?.isNotEmpty ?? false;
     const hasProfile = true; // Already set during onboarding
 
@@ -42,34 +38,21 @@ class StudentGettingStartedCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.space4),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withValues(alpha: 0.08),
-            AppColors.secondary.withValues(alpha: 0.08),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppColors.paperDark,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(
-                Icons.rocket_launch_rounded,
-                color: AppColors.primary,
-                size: 24,
-              ),
+              Icon(Icons.rocket_launch_rounded, color: AppColors.ink, size: 24),
               const SizedBox(width: AppSpacing.space2),
               Text(
                 '시작 가이드',
                 style: AppTypography.headingSmall.copyWith(
-                  color: AppColors.primary,
+                  color: AppColors.ink,
                 ),
               ),
             ],
@@ -78,7 +61,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
           Text(
             '아래 단계를 따라 레슨을 시작하세요',
             style: AppTypography.bodySmall.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space4),
@@ -89,9 +72,10 @@ class StudentGettingStartedCard extends ConsumerWidget {
             title: '선생님 연결하기',
             subtitle: '선생님을 검색하거나 초대 코드를 입력하세요',
             isCompleted: hasConnections,
-            onTap: hasConnections
-                ? null
-                : () => context.push(AppRoutes.selectTeacher),
+            onTap:
+                hasConnections
+                    ? null
+                    : () => context.push(AppRoutes.selectTeacher),
           ),
 
           const SizedBox(height: AppSpacing.space2),
@@ -113,9 +97,7 @@ class StudentGettingStartedCard extends ConsumerWidget {
             title: '첫 레슨 확인하기',
             subtitle: '선생님과 첫 레슨을 예약하세요',
             isCompleted: hasLessons,
-            onTap: hasLessons
-                ? null
-                : () => context.push(AppRoutes.myBookings),
+            onTap: hasLessons ? null : () => context.push(AppRoutes.myBookings),
           ),
         ],
       ),
@@ -151,14 +133,16 @@ class _StepItem extends StatelessWidget {
           vertical: AppSpacing.space3,
         ),
         decoration: BoxDecoration(
-          color: isCompleted
-              ? AppColors.success.withValues(alpha: 0.08)
-              : Colors.white,
+          color:
+              isCompleted
+                  ? AppColors.paperOk.withValues(alpha: 0.08)
+                  : AppColors.paper,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isCompleted
-                ? AppColors.success.withValues(alpha: 0.3)
-                : AppColors.borderLight,
+            color:
+                isCompleted
+                    ? AppColors.paperOk.withValues(alpha: 0.3)
+                    : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -168,23 +152,29 @@ class _StepItem extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(
-                color: isCompleted
-                    ? AppColors.success
-                    : isEnabled
-                        ? AppColors.primary
-                        : AppColors.textTertiaryLight,
+                color:
+                    isCompleted
+                        ? AppColors.paperOk
+                        : isEnabled
+                        ? AppColors.ink
+                        : AppColors.inkTertiary,
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
-                    : Text(
-                        '$step',
-                        style: AppTypography.bodySmall.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                child:
+                    isCompleted
+                        ? const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppColors.paper,
+                        )
+                        : Text(
+                          '$step',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.paper,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
               ),
             ),
             const SizedBox(width: AppSpacing.space3),
@@ -198,25 +188,20 @@ class _StepItem extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       decoration:
                           isCompleted ? TextDecoration.lineThrough : null,
-                      color:
-                          isCompleted ? AppColors.textTertiaryLight : null,
+                      color: isCompleted ? AppColors.inkTertiary : null,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                   ),
                 ],
               ),
             ),
             if (isEnabled && !isCompleted)
-              Icon(
-                Icons.chevron_right,
-                color: AppColors.primary,
-                size: 20,
-              ),
+              Icon(Icons.chevron_right, color: AppColors.ink, size: 20),
           ],
         ),
       ),

@@ -23,7 +23,7 @@ class LanguageSelectSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.paper,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
@@ -111,13 +111,10 @@ class LanguageSelectSheet extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.primary.withValues(alpha: 0.08)
-                  : AppColors.backgroundLight,
+          color: isSelected ? AppColors.paperAccentSoft : AppColors.paperDark,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.borderLight,
+            color: isSelected ? AppColors.paperAccent : AppColors.inkQuaternary,
           ),
         ),
         child: Row(
@@ -129,26 +126,23 @@ class LanguageSelectSheet extends StatelessWidget {
                 name,
                 style: AppTypography.bodyMedium.copyWith(
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  color:
-                      isComingSoon
-                          ? AppColors.textTertiaryLight
-                          : AppColors.textPrimaryLight,
+                  color: isComingSoon ? AppColors.inkTertiary : AppColors.ink,
                 ),
               ),
             ),
             if (isSelected)
-              Icon(Icons.check_circle, color: AppColors.primary, size: 22),
+              Icon(Icons.check_circle, color: AppColors.paperAccent, size: 22),
             if (isComingSoon)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.textTertiaryLight.withValues(alpha: 0.1),
+                  color: AppColors.inkTertiary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '준비 중',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ),
