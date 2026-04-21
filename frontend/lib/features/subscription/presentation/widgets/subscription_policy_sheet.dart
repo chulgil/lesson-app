@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../students/presentation/providers/lesson_class_providers.dart';
 import '../../../students/presentation/providers/membership_providers.dart';
 import '../../domain/entities/lesson_policy.dart';
+import '../../domain/entities/refund_calculator.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/lesson_policy_providers.dart';
 
@@ -117,6 +119,7 @@ class SubscriptionPolicySheet extends ConsumerWidget {
           _PolicyItem(label: '노쇼', value: policy.noShowPolicySummary),
           _PolicyItem(label: '이월', value: policy.carryoverPolicySummary),
           _PolicyItem(label: '환불', value: policy.refundPolicySummary),
+          _buildRefundPreview(policy),
         ],
         const SizedBox(height: AppSpacing.space3),
         Text(
@@ -127,6 +130,38 @@ class SubscriptionPolicySheet extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Widget _buildRefundPreview(LessonPolicy policy) {
+    final totalSessions = subscription.totalLessonsForDisplay ?? 0;
+    if (totalSessions <= 0 || subscription.amount <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final daysUntilFirst =
+        subscription.startDate != null
+            ? subscription.startDate!.difference(DateTime.now()).inDays
+            : -1;
+
+    final refund = RefundCalculator.calculate(
+      totalPrice: subscription.amount,
+      totalSessions: totalSessions + subscription.usedLessons,
+      usedSessions: subscription.usedLessons,
+      policy: policy,
+      daysUntilFirstLesson: daysUntilFirst,
+    );
+
+    final label = switch (refund.rule) {
+      RefundRule.fullRefund => '전액 환불',
+      RefundRule.partialRefund => '일부 환불',
+      RefundRule.halfwayRefund => '1/2 경과 환불',
+      RefundRule.noRefund => '환불 불가',
+    };
+    final formatted = '${formatWonWithComma(refund.amount)} · $label';
+    final color =
+        refund.amount > 0 ? AppColors.primary : AppColors.textTertiaryLight;
+
+    return _PolicyItem(label: '지금 환불 시', value: formatted, valueColor: color);
   }
 }
 

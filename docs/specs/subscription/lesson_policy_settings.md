@@ -365,3 +365,4 @@ class MembershipBenefit extends HiveObject {
 |------|----------|
 | 2026-01-25 | 초안 작성 |
 | 2026-04-21 | §4 환불 정책 — `refundPolicySummary` getter 추가 + 발급 요약/정책 시트에 환불 라인 노출 |
+| 2026-04-21 | §4.7 환불 정책 — `SubscriptionPolicySheet`에 "지금 환불 시" 실시간 예상 금액 프리뷰 추가 (`RefundCalculator` 사용) |
