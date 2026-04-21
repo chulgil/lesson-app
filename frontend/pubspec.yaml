@@ -17,6 +17,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
+  google_fonts: ^8.0.2  # Notebook × Score 타이포 (Playfair Display, Gaegu, IBM Plex Mono, Noto Serif KR)
 
   # State Management
   flutter_riverpod: ^2.5.1
