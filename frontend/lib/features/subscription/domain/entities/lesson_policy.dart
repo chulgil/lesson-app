@@ -209,13 +209,6 @@ class LessonPolicy extends HiveObject {
     return '최대 $maxCarryoverLessons회 이월 ($carryoverPeriodMonths개월 내)';
   }
 
-  /// 환불 정책 요약 텍스트 (§4.7 subscription_master)
-  String get refundPolicySummary {
-    final partialPct = (partialRefundRatio * 100).round();
-    final halfwayPct = (halfwayRefundRatio * 100).round();
-    return '$fullRefundDays일 전 100% · 첫수업 후 $partialPct% · 1/2 경과 후 $halfwayPct%';
-  }
-
   factory LessonPolicy.fromJson(Map<String, dynamic> json) =>
       _$LessonPolicyFromJson(json);
 

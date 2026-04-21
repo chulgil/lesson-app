@@ -328,7 +328,7 @@ class MembershipBenefit extends HiveObject {
    └─ 수강권 상세에서 정책 확인 가능
    └─ AppBar 우측 📋 아이콘 → "적용 정책" 바텀시트 (SubscriptionPolicySheet)
       · 변경/취소: 기준시간 + 월 한도 + 남은 횟수 (수강권 스냅샷)
-      · 노쇼 / 이월 / 환불: 선생님의 현행 정책 (정보 안내)
+      · 노쇼 / 이월: 선생님의 현행 정책 (정보 안내)
       · 하단 안내: 발급 시점 정책 고정 (법적 안정성)
 ```
 
@@ -364,5 +364,3 @@ class MembershipBenefit extends HiveObject {
 | 날짜 | 변경 내용 |
 |------|----------|
 | 2026-01-25 | 초안 작성 |
-| 2026-04-21 | §4 환불 정책 — `refundPolicySummary` getter 추가 + 발급 요약/정책 시트에 환불 라인 노출 |
-| 2026-04-21 | §4.7 환불 정책 — `SubscriptionPolicySheet`에 "지금 환불 시" 실시간 예상 금액 프리뷰 추가 (`RefundCalculator` 사용) |

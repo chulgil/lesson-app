@@ -103,7 +103,6 @@ class AppliedPolicySection extends StatelessWidget {
           _PolicyLine(label: '변경/취소', value: changeLine),
           _PolicyLine(label: '노쇼', value: policy.noShowPolicySummary),
           _PolicyLine(label: '이월', value: policy.carryoverPolicySummary),
-          _PolicyLine(label: '환불', value: policy.refundPolicySummary),
         ],
       ),
     );
