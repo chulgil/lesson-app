@@ -60,8 +60,8 @@ class StudentLessonCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isUpcoming
-                              ? AppColors.primaryLight.withValues(alpha: 0.2)
-                              : AppColors.surfaceSecondaryLight,
+                              ? AppColors.paperAccentSoft
+                              : AppColors.paperDark,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusMedium,
                       ),
@@ -74,8 +74,8 @@ class StudentLessonCard extends StatelessWidget {
                           style: AppTypography.bodyLarge.copyWith(
                             color:
                                 isUpcoming
-                                    ? AppColors.primary
-                                    : AppColors.textSecondaryLight,
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -84,8 +84,8 @@ class StudentLessonCard extends StatelessWidget {
                           style: AppTypography.caption.copyWith(
                             color:
                                 isUpcoming
-                                    ? AppColors.primary
-                                    : AppColors.textTertiaryLight,
+                                    ? AppColors.paperAccent
+                                    : AppColors.inkTertiary,
                           ),
                         ),
                       ],
@@ -114,9 +114,7 @@ class StudentLessonCard extends StatelessWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.secondaryLight.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: AppColors.paperDark,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusSmall,
                                 ),
@@ -124,7 +122,7 @@ class StudentLessonCard extends StatelessWidget {
                               child: Text(
                                 lesson.instrument,
                                 style: AppTypography.caption.copyWith(
-                                  color: AppColors.secondary,
+                                  color: AppColors.ink,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -138,14 +136,14 @@ class StudentLessonCard extends StatelessWidget {
                               Icon(
                                 Icons.location_on_outlined,
                                 size: 14,
-                                color: AppColors.textTertiaryLight,
+                                color: AppColors.inkTertiary,
                               ),
                               const SizedBox(width: AppSpacing.space1),
                               Expanded(
                                 child: Text(
                                   lesson.location!.name,
                                   style: AppTypography.bodySmall.copyWith(
-                                    color: AppColors.textSecondaryLight,
+                                    color: AppColors.inkSecondary,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -159,7 +157,7 @@ class StudentLessonCard extends StatelessWidget {
                           Text(
                             lesson.pieces.first.displayName,
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.inkSecondary,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -179,8 +177,8 @@ class StudentLessonCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         color:
                             daysUntil <= 1
-                                ? AppColors.primary
-                                : AppColors.surfaceSecondaryLight,
+                                ? AppColors.ink
+                                : AppColors.paperDark,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusXLarge,
                         ),
@@ -194,24 +192,21 @@ class StudentLessonCard extends StatelessWidget {
                         style: AppTypography.caption.copyWith(
                           color:
                               daysUntil <= 1
-                                  ? Colors.white
-                                  : AppColors.textSecondaryLight,
+                                  ? AppColors.paper
+                                  : AppColors.inkSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     )
                   else
-                    Icon(
-                      Icons.chevron_right,
-                      color: AppColors.textTertiaryLight,
-                    ),
+                    Icon(Icons.chevron_right, color: AppColors.inkTertiary),
                 ],
               ),
             ),
 
             // Feedback preview (for past lessons)
             if (!isUpcoming && lesson.hasFeedback) ...[
-              Divider(height: 1, color: AppColors.borderLight),
+              Divider(height: 1, color: AppColors.inkQuaternary),
               Padding(
                 padding: const EdgeInsets.all(AppSpacing.space3),
                 child: Row(
@@ -219,14 +214,14 @@ class StudentLessonCard extends StatelessWidget {
                     Icon(
                       Icons.comment_outlined,
                       size: 16,
-                      color: AppColors.textTertiaryLight,
+                      color: AppColors.inkTertiary,
                     ),
                     const SizedBox(width: AppSpacing.space2),
                     Expanded(
                       child: Text(
                         lesson.feedback!,
                         style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondaryLight,
+                          color: AppColors.inkSecondary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

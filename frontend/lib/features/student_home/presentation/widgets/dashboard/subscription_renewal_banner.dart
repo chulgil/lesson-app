@@ -138,7 +138,7 @@ class SubscriptionRenewalBanner extends ConsumerWidget {
                     child: Text(
                       ctaText,
                       style: AppTypography.caption.copyWith(
-                        color: Colors.white,
+                        color: AppColors.paper,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

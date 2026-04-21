@@ -6,12 +6,12 @@ import '../../../../core/theme/app_colors.dart';
 
 part 'manual_teacher.g.dart';
 
-/// Profile color palette for manual teachers.
+/// Profile color palette for manual teachers (Notebook × Score — ink-led).
 const _profileColors = [
-  AppColors.primary,
-  AppColors.secondary,
-  AppColors.success,
-  AppColors.info,
+  AppColors.ink,
+  AppColors.paperAccent,
+  AppColors.paperOk,
+  AppColors.paperHighlight,
   AppColors.profileRed,
   AppColors.profileTeal,
   AppColors.profilePurple,
@@ -59,7 +59,7 @@ class ManualTeacher extends HiveObject {
     required this.createdAt,
     int? profileColorValue,
   }) : profileColorValue =
-            profileColorValue ?? _profileColorFromName(name).toARGB32();
+           profileColorValue ?? _profileColorFromName(name).toARGB32();
 
   /// Profile color derived from stored int value.
   @JsonKey(includeFromJson: false, includeToJson: false)

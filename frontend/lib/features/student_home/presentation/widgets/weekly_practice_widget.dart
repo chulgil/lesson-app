@@ -53,12 +53,12 @@ class WeeklyPracticeWidget extends ConsumerWidget {
       ),
       child: Column(
         children: [
-          Icon(Icons.error_outline, size: 48, color: AppColors.error),
+          Icon(Icons.error_outline, size: 48, color: AppColors.paperAccent),
           const SizedBox(height: AppSpacing.space2),
           Text(
             '데이터를 불러오는데 실패했습니다',
             style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.inkSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.space2),
@@ -107,7 +107,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: AppColors.ink.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -119,7 +119,7 @@ class WeeklyPracticeWidget extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.space4),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(AppSpacing.radiusLarge),
                     topRight: Radius.circular(AppSpacing.radiusLarge),
@@ -159,11 +159,11 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                         ),
                         child: LinearProgressIndicator(
                           value: total > 0 ? completed / total : 0,
-                          backgroundColor: AppColors.borderLight,
+                          backgroundColor: AppColors.inkQuaternary,
                           valueColor: AlwaysStoppedAnimation(
                             completed == total
                                 ? AppColors.practiceGood
-                                : AppColors.primary,
+                                : AppColors.paperAccent,
                           ),
                           minHeight: 8,
                         ),
@@ -207,20 +207,20 @@ class WeeklyPracticeWidget extends ConsumerWidget {
                 Icon(
                   Icons.assignment_outlined,
                   size: 48,
-                  color: AppColors.textTertiaryLight,
+                  color: AppColors.inkTertiary,
                 ),
                 const SizedBox(height: AppSpacing.space3),
                 Text(
                   '아직 연습 과제가 없습니다',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.inkSecondary,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.space1),
                 Text(
                   '선생님이 과제를 등록하면 여기에 표시됩니다',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textTertiaryLight,
+                    color: AppColors.inkTertiary,
                   ),
                 ),
               ],
@@ -274,7 +274,7 @@ class _PracticeItemTile extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.space4),
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: AppColors.borderLight, width: 0.5),
+            bottom: BorderSide(color: AppColors.inkQuaternary, width: 0.5),
           ),
         ),
         child: Row(
@@ -306,7 +306,7 @@ class _PracticeItemTile extends ConsumerWidget {
                     color:
                         item.isCompleted
                             ? AppColors.practiceGood
-                            : AppColors.borderLight,
+                            : AppColors.inkQuaternary,
                     width: 2,
                   ),
                 ),
@@ -363,15 +363,15 @@ class _PracticeItemTile extends ConsumerWidget {
                           item.isCompleted ? TextDecoration.lineThrough : null,
                       color:
                           item.isCompleted
-                              ? AppColors.textTertiaryLight
-                              : AppColors.textPrimaryLight,
+                              ? AppColors.inkTertiary
+                              : AppColors.ink,
                     ),
                   ),
                   if (item.description != null && item.description!.isNotEmpty)
                     Text(
                       item.description!,
                       style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textSecondaryLight,
+                        color: AppColors.inkSecondary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -400,8 +400,8 @@ class _PracticeItemTile extends ConsumerWidget {
                         iconSize: 20,
                         color:
                             item.practiceCount > 0
-                                ? AppColors.textSecondaryLight
-                                : AppColors.borderLight,
+                                ? AppColors.inkSecondary
+                                : AppColors.inkQuaternary,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(
                           minWidth: 32,
@@ -417,7 +417,7 @@ class _PracticeItemTile extends ConsumerWidget {
                         color:
                             item.practiceCount > 0
                                 ? AppColors.primary.withValues(alpha: 0.1)
-                                : AppColors.surfaceSecondaryLight,
+                                : AppColors.paperDark,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLarge,
                         ),
@@ -428,7 +428,7 @@ class _PracticeItemTile extends ConsumerWidget {
                           color:
                               item.practiceCount > 0
                                   ? AppColors.primary
-                                  : AppColors.textTertiaryLight,
+                                  : AppColors.inkTertiary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -463,7 +463,7 @@ class _PracticeItemTile extends ConsumerWidget {
       case PracticeType.theory:
         return AppColors.info;
       case PracticeType.custom:
-        return AppColors.textSecondaryLight;
+        return AppColors.inkSecondary;
     }
   }
 

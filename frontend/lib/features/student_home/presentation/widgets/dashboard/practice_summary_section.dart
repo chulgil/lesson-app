@@ -143,7 +143,7 @@ class PracticeSummarySection extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         children: [
@@ -175,7 +175,7 @@ class PracticeSummarySection extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -190,7 +190,7 @@ class PracticeSummarySection extends ConsumerWidget {
                 width: 24,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceSecondaryLight,
+                  color: AppColors.paperDark,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                 ),
                 alignment: Alignment.bottomCenter,
@@ -200,14 +200,14 @@ class PracticeSummarySection extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         isFuture
-                            ? AppColors.borderLight
+                            ? AppColors.inkQuaternary
                             : value >= 0.8
                             ? AppColors.practiceGood
                             : value >= 0.5
                             ? AppColors.practiceNormal
                             : value > 0
                             ? AppColors.practicePoor
-                            : AppColors.borderLight,
+                            : AppColors.inkQuaternary,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                 ),

@@ -20,7 +20,7 @@ class CompactTrialBookingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: InkWell(
         onTap: () {
@@ -43,11 +43,11 @@ class CompactTrialBookingCard extends StatelessWidget {
             // Teacher avatar
             CircleAvatar(
               radius: 20,
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.ink,
               child: Text(
                 booking.teacherName.isNotEmpty ? booking.teacherName[0] : 'T',
                 style: AppTypography.bodyMedium.copyWith(
-                  color: Colors.white,
+                  color: AppColors.paper,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -75,9 +75,7 @@ class CompactTrialBookingCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryLight.withValues(
-                              alpha: 0.3,
-                            ),
+                            color: AppColors.paperDark,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSmall,
                             ),
@@ -85,7 +83,7 @@ class CompactTrialBookingCard extends StatelessWidget {
                           child: Text(
                             booking.instrument!,
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.ink,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -97,7 +95,7 @@ class CompactTrialBookingCard extends StatelessWidget {
                   Text(
                     booking.timeRange,
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.inkSecondary,
                     ),
                   ),
                 ],

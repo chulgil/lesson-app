@@ -46,7 +46,7 @@ class NextLessonCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: const Center(
         child: SizedBox(
@@ -64,7 +64,7 @@ class NextLessonCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Row(
         children: [
@@ -144,14 +144,14 @@ class NextLessonCard extends ConsumerWidget {
                   Text(
                     dDayText,
                     style: AppTypography.headingSmall.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   Text(
                     weekdayText,
                     style: AppTypography.caption.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
+                      color: AppColors.paper.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -167,7 +167,7 @@ class NextLessonCard extends ConsumerWidget {
                       Text(
                         '다음 레슨',
                         style: AppTypography.caption.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: AppColors.paper.withValues(alpha: 0.8),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.space2),
@@ -177,7 +177,7 @@ class NextLessonCard extends ConsumerWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: AppColors.paper.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
@@ -185,7 +185,7 @@ class NextLessonCard extends ConsumerWidget {
                         child: Text(
                           typeText,
                           style: AppTypography.captionSmall.copyWith(
-                            color: Colors.white,
+                            color: AppColors.paper,
                           ),
                         ),
                       ),
@@ -195,7 +195,7 @@ class NextLessonCard extends ConsumerWidget {
                   Text(
                     '${booking.teacherName} · ${booking.instrument}',
                     style: AppTypography.bodyLarge.copyWith(
-                      color: Colors.white,
+                      color: AppColors.paper,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -204,7 +204,7 @@ class NextLessonCard extends ConsumerWidget {
                     '${booking.startTime.hour.toString().padLeft(2, '0')}:${booking.startTime.minute.toString().padLeft(2, '0')} · '
                     '${booking.durationMinutes}분',
                     style: AppTypography.bodySmall.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.paper.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -212,7 +212,7 @@ class NextLessonCard extends ConsumerWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: AppColors.paper.withValues(alpha: 0.7),
             ),
           ],
         ),

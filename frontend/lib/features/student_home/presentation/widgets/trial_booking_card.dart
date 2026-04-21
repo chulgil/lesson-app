@@ -23,14 +23,7 @@ class TrialBookingCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.inkQuaternary),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,11 +34,11 @@ class TrialBookingCard extends ConsumerWidget {
               // Teacher avatar
               CircleAvatar(
                 radius: 20,
-                backgroundColor: AppColors.primary,
+                backgroundColor: AppColors.ink,
                 child: Text(
                   booking.teacherName.isNotEmpty ? booking.teacherName[0] : 'T',
                   style: AppTypography.bodyMedium.copyWith(
-                    color: Colors.white,
+                    color: AppColors.paper,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -65,7 +58,7 @@ class TrialBookingCard extends ConsumerWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.info.withValues(alpha: 0.15),
+                            color: AppColors.paperAccentSoft,
                             borderRadius: BorderRadius.circular(
                               AppSpacing.radiusSmall,
                             ),
@@ -73,7 +66,7 @@ class TrialBookingCard extends ConsumerWidget {
                           child: Text(
                             '체험레슨',
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.info,
+                              color: AppColors.paperAccent,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -129,7 +122,7 @@ class TrialBookingCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.space3),
             decoration: BoxDecoration(
-              color: AppColors.surfaceSecondaryLight,
+              color: AppColors.paperDark,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
             ),
             child: Row(
@@ -137,7 +130,7 @@ class TrialBookingCard extends ConsumerWidget {
                 Icon(
                   Icons.access_time,
                   size: 16,
-                  color: AppColors.textSecondaryLight,
+                  color: AppColors.inkSecondary,
                 ),
                 const SizedBox(width: AppSpacing.space2),
                 Text(booking.timeRange, style: AppTypography.bodyMedium),
@@ -149,7 +142,7 @@ class TrialBookingCard extends ConsumerWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.secondaryLight.withValues(alpha: 0.3),
+                      color: AppColors.paper,
                       borderRadius: BorderRadius.circular(
                         AppSpacing.radiusSmall,
                       ),
@@ -157,7 +150,7 @@ class TrialBookingCard extends ConsumerWidget {
                     child: Text(
                       booking.instrument!,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.secondary,
+                        color: AppColors.ink,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -173,20 +166,18 @@ class TrialBookingCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.space3),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
+                color: AppColors.paperHighlight.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
-                border: Border.all(
-                  color: AppColors.warning.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: AppColors.inkQuaternary),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.swap_horiz, size: 16, color: AppColors.warning),
+                  Icon(Icons.swap_horiz, size: 16, color: AppColors.ink),
                   const SizedBox(width: AppSpacing.space2),
                   Text(
                     '변경 요청: ${booking.formattedRequestedDate} ${booking.requestedTimeRange}',
                     style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.warning,
+                      color: AppColors.ink,
                     ),
                   ),
                 ],
@@ -241,8 +232,8 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.edit, size: 16),
                     label: const Text(AppStrings.modify),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
+                      foregroundColor: AppColors.ink,
+                      side: const BorderSide(color: AppColors.ink),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
                       ),
@@ -254,8 +245,8 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.swap_horiz, size: 16),
                     label: const Text('일정 변경'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.info,
-                      side: const BorderSide(color: AppColors.info),
+                      foregroundColor: AppColors.paperAccent,
+                      side: const BorderSide(color: AppColors.paperAccent),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
                       ),
@@ -267,8 +258,8 @@ class TrialBookingCard extends ConsumerWidget {
                     icon: const Icon(Icons.close, size: 16),
                     label: const Text(AppStrings.cancel),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.error,
-                      side: const BorderSide(color: AppColors.error),
+                      foregroundColor: AppColors.paperAccent,
+                      side: const BorderSide(color: AppColors.paperAccent),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.space3,
                       ),
@@ -332,7 +323,9 @@ class TrialBookingCard extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.paperAccent,
+                ),
                 child: const Text('취소하기'),
               ),
             ],
@@ -348,7 +341,7 @@ class TrialBookingCard extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('체험레슨 신청이 취소되었습니다'),
-              backgroundColor: AppColors.practiceGood,
+              backgroundColor: AppColors.paperOk,
             ),
           );
         }
@@ -357,7 +350,7 @@ class TrialBookingCard extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('취소 처리 중 오류가 발생했습니다. 다시 시도해주세요.'),
-              backgroundColor: AppColors.error,
+              backgroundColor: AppColors.paperAccent,
             ),
           );
         }
