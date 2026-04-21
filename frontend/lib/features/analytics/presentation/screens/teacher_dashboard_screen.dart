@@ -3,13 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../../../core/widgets/stat_card.dart';
 import '../../domain/entities/teacher_stats.dart';
@@ -141,8 +140,6 @@ class _TeacherDashboardScreenState
   }
 
   Widget _buildDashboard(TeacherMonthlyStats stats) {
-    final numberFormat = NumberFormat('#,###');
-
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(teacherMonthlyStatsProvider(_selectedMonth));
@@ -151,12 +148,12 @@ class _TeacherDashboardScreenState
         padding: const EdgeInsets.all(AppSpacing.screenPadding),
         children: [
           // Stat cards grid (2x2)
-          _buildStatCardGrid(stats, numberFormat),
+          _buildStatCardGrid(stats),
 
           const SizedBox(height: AppSpacing.space5),
 
           // Revenue section
-          _buildRevenueCard(stats, numberFormat),
+          _buildRevenueCard(stats),
 
           const SizedBox(height: AppSpacing.space5),
 
@@ -179,10 +176,7 @@ class _TeacherDashboardScreenState
     );
   }
 
-  Widget _buildStatCardGrid(
-    TeacherMonthlyStats stats,
-    NumberFormat numberFormat,
-  ) {
+  Widget _buildStatCardGrid(TeacherMonthlyStats stats) {
     return Column(
       children: [
         Row(
@@ -225,7 +219,7 @@ class _TeacherDashboardScreenState
             Expanded(
               child: StatCard(
                 title: '월 수입',
-                value: '${numberFormat.format(stats.totalRevenue)}원',
+                value: formatWonWithComma(stats.totalRevenue),
                 color: AppColors.secondary,
                 icon: Icons.payments_outlined,
               ),
@@ -236,10 +230,7 @@ class _TeacherDashboardScreenState
     );
   }
 
-  Widget _buildRevenueCard(
-    TeacherMonthlyStats stats,
-    NumberFormat numberFormat,
-  ) {
+  Widget _buildRevenueCard(TeacherMonthlyStats stats) {
     final isPositive = stats.revenueChangePercent >= 0;
 
     return Column(
@@ -268,7 +259,7 @@ class _TeacherDashboardScreenState
                     ),
                     const SizedBox(height: AppSpacing.space1),
                     Text(
-                      '${numberFormat.format(stats.totalRevenue)}원',
+                      formatWonWithComma(stats.totalRevenue),
                       style: AppTypography.headingLarge.copyWith(
                         fontWeight: FontWeight.w700,
                       ),

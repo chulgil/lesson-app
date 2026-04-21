@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -26,13 +26,13 @@ class SubscriptionChapterInfo extends StatelessWidget {
           _buildRow(AppStrings.subscriptionType, subscription.typeLabel),
           _buildRow(
             AppStrings.amount,
-            '${NumberFormat('#,###').format(subscription.amount)}${AppStrings.wonUnit}',
+            '${formatNumberWithComma(subscription.amount)}${AppStrings.wonUnit}',
           ),
           if (subscription.discountAmount != null &&
               subscription.discountAmount! > 0)
             _buildRow(
               AppStrings.discount,
-              '-${NumberFormat('#,###').format(subscription.discountAmount)}${AppStrings.wonUnit} (${subscription.discountReason ?? ""})',
+              '-${formatNumberWithComma(subscription.discountAmount!)}${AppStrings.wonUnit} (${subscription.discountReason ?? ""})',
               valueColor: AppColors.primary,
             ),
           if (subscription.startDate != null)

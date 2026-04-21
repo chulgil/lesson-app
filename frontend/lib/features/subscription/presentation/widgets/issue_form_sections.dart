@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -351,9 +351,7 @@ class AmountInputSection extends StatelessWidget {
                       selected: isSelected,
                       onSelected: (selected) {
                         if (selected) {
-                          controller.text = NumberFormat(
-                            '#,###',
-                          ).format(amount);
+                          controller.text = formatNumberWithComma(amount);
                           onAmountChanged(amount);
                         }
                       },
@@ -420,7 +418,7 @@ class AmountInputSection extends StatelessWidget {
         if (selectedType == SubscriptionType.package && originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '회당 ${NumberFormat('#,###').format((originalAmount / totalLessons).round())}원',
+            '회당 ${formatWonWithComma((originalAmount / totalLessons).round())}',
             style: AppTypography.caption.copyWith(
               color: AppColors.textSecondaryLight,
             ),
@@ -505,7 +503,7 @@ class ThousandsSeparatorFormatter extends TextInputFormatter {
       return oldValue;
     }
 
-    final formatted = NumberFormat('#,###').format(number);
+    final formatted = formatNumberWithComma(number);
     return TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/lesson_policy.dart';
 import '../../domain/entities/subscription.dart';
@@ -212,25 +212,22 @@ class SubscriptionSummaryCard extends StatelessWidget {
           if (discountPercent > 0 && originalAmount > 0) ...[
             SummaryRow(
               label: '정가',
-              value: '${NumberFormat('#,###').format(originalAmount)}원',
+              value: formatWonWithComma(originalAmount),
               strikethrough: true,
             ),
             SummaryRow(
               label: '할인',
               value:
-                  '-${NumberFormat('#,###').format(originalAmount - finalAmount)}원 ($discountPercent%)',
+                  '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
               valueColor: AppColors.secondary,
             ),
             SummaryRow(
               label: '결제금액',
-              value: '${NumberFormat('#,###').format(finalAmount)}원',
+              value: formatWonWithComma(finalAmount),
               isBold: true,
             ),
           ] else ...[
-            SummaryRow(
-              label: '금액',
-              value: '${NumberFormat('#,###').format(originalAmount)}원',
-            ),
+            SummaryRow(label: '금액', value: formatWonWithComma(originalAmount)),
           ],
 
           // Bonus
@@ -407,32 +404,31 @@ class BatchSummaryCard extends StatelessWidget {
           if (discountPercent > 0 && originalAmount > 0) ...[
             SummaryRow(
               label: '정가',
-              value: '${NumberFormat('#,###').format(originalAmount)}원',
+              value: formatWonWithComma(originalAmount),
               strikethrough: true,
             ),
             SummaryRow(
               label: '할인',
               value:
-                  '-${NumberFormat('#,###').format(originalAmount - finalAmount)}원 ($discountPercent%)',
+                  '-${formatWonWithComma(originalAmount - finalAmount)} ($discountPercent%)',
               valueColor: AppColors.secondary,
             ),
             SummaryRow(
               label: '개인당 금액',
-              value: '${NumberFormat('#,###').format(finalAmount)}원',
+              value: formatWonWithComma(finalAmount),
               isBold: true,
             ),
           ] else ...[
             SummaryRow(
               label: '개인당 금액',
-              value: '${NumberFormat('#,###').format(originalAmount)}원',
+              value: formatWonWithComma(originalAmount),
             ),
           ],
 
           // Total amount
           SummaryRow(
             label: '총 예상 금액',
-            value:
-                '${NumberFormat('#,###').format(finalAmount * studentCount)}원',
+            value: formatWonWithComma(finalAmount * studentCount),
             isBold: true,
             valueColor: AppColors.primary,
           ),

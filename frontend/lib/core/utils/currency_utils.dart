@@ -21,15 +21,24 @@ String formatKoreanWon(int amount) {
   return '$amount원';
 }
 
+/// Formats a number with comma separators (no currency suffix).
+///
+/// Example: 1500000 → "1,500,000"
+///
+/// Useful for text field formatters and inline amount strings where the
+/// caller appends its own unit suffix (원, %, etc).
+String formatNumberWithComma(int number) {
+  return number.toString().replaceAllMapped(
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+    (Match m) => '${m[1]},',
+  );
+}
+
 /// Formats a price with comma separators.
 ///
 /// Example: 1500000 → "1,500,000원"
 String formatWonWithComma(int amount) {
-  final formatted = amount.toString().replaceAllMapped(
-    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-    (Match m) => '${m[1]},',
-  );
-  return '$formatted원';
+  return '${formatNumberWithComma(amount)}원';
 }
 
 /// Extension on int for convenient currency formatting.

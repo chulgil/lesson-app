@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../../core/utils/date_format_utils.dart';
 import '../../domain/entities/subscription.dart';
 
@@ -51,7 +51,7 @@ class SubscriptionChapterPayment extends StatelessWidget {
           if (subscription.originalAmount != null)
             _buildRow(
               AppStrings.originalAmount,
-              '${NumberFormat('#,###').format(subscription.originalAmount)}${AppStrings.wonUnit}',
+              '${formatNumberWithComma(subscription.originalAmount!)}${AppStrings.wonUnit}',
               valueColor: AppColors.textTertiaryLight,
             ),
         ],

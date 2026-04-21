@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import '../../../auth/presentation/providers/user_role_provider.dart';
 import '../../../notifications/domain/entities/notification.dart';
 import '../../../notifications/presentation/providers/notification_providers.dart';
@@ -69,14 +68,13 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
   ) {
     final totalAmount = unpaidList.fold(0, (sum, s) => sum + s.amount);
     final studentCount = unpaidList.map((s) => s.studentId).toSet().length;
-    final currencyFormat = NumberFormat('#,###', 'ko_KR');
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Summary header
-          _buildSummaryHeader(totalAmount, studentCount, currencyFormat),
+          _buildSummaryHeader(totalAmount, studentCount),
 
           const SizedBox(height: AppSpacing.space6),
 
@@ -90,10 +88,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.space3),
 
           ...unpaidList.map(
-            (subscription) => _UnpaidCard(
-              subscription: subscription,
-              currencyFormat: currencyFormat,
-            ),
+            (subscription) => _UnpaidCard(subscription: subscription),
           ),
 
           const SizedBox(height: AppSpacing.space8),
@@ -102,11 +97,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSummaryHeader(
-    int totalAmount,
-    int studentCount,
-    NumberFormat currencyFormat,
-  ) {
+  Widget _buildSummaryHeader(int totalAmount, int studentCount) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.screenPadding),
       child: Container(
@@ -129,7 +120,7 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.space2),
             Text(
-              '${currencyFormat.format(totalAmount)}원',
+              formatWonWithComma(totalAmount),
               style: AppTypography.displayMedium.copyWith(color: Colors.white),
             ),
             const SizedBox(height: AppSpacing.space2),
@@ -148,9 +139,8 @@ class OutstandingPaymentsScreen extends ConsumerWidget {
 
 class _UnpaidCard extends ConsumerWidget {
   final Subscription subscription;
-  final NumberFormat currencyFormat;
 
-  const _UnpaidCard({required this.subscription, required this.currencyFormat});
+  const _UnpaidCard({required this.subscription});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -226,7 +216,7 @@ class _UnpaidCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        '${currencyFormat.format(subscription.amount)}원',
+                        formatWonWithComma(subscription.amount),
                         style: AppTypography.headingSmall.copyWith(
                           color: AppColors.error,
                         ),
@@ -360,7 +350,7 @@ class _UnpaidCard extends ConsumerWidget {
           (dialogContext) => AlertDialog(
             title: const Text('입금 확인'),
             content: Text(
-              '${currencyFormat.format(subscription.amount)}원 입금을 확인하시겠습니까?',
+              '${formatWonWithComma(subscription.amount)} 입금을 확인하시겠습니까?',
             ),
             actions: [
               TextButton(

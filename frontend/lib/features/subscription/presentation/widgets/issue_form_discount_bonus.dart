@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/currency_utils.dart';
 import 'chip_input_field.dart';
 
 class DiscountSection extends StatelessWidget {
@@ -42,7 +42,7 @@ class DiscountSection extends StatelessWidget {
         if (discountPercent > 0 && originalAmount > 0) ...[
           const SizedBox(height: AppSpacing.space2),
           Text(
-            '${NumberFormat('#,###').format(originalAmount)}원 → ${NumberFormat('#,###').format(finalAmount)}원 (-${NumberFormat('#,###').format(originalAmount - finalAmount)}원)',
+            '${formatWonWithComma(originalAmount)} → ${formatWonWithComma(finalAmount)} (-${formatWonWithComma(originalAmount - finalAmount)})',
             style: AppTypography.bodySmall.copyWith(
               color: AppColors.secondary,
               fontWeight: FontWeight.w500,
